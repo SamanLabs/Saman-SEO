@@ -7,235 +7,423 @@
  * @package WPSEOPilot
  */
 
+$social_defaults = get_option( 'wpseopilot_social_defaults', [] );
+if ( ! is_array( $social_defaults ) ) {
+	$social_defaults = [];
+}
+
+$social_field_defaults = [
+	'og_title'            => '',
+	'og_description'      => '',
+	'twitter_title'       => '',
+	'twitter_description' => '',
+	'image_source'        => '',
+	'schema_itemtype'     => '',
+];
+
+$social_defaults = wp_parse_args( $social_defaults, $social_field_defaults );
+
+$post_type_social_defaults = get_option( 'wpseopilot_post_type_social_defaults', [] );
+if ( ! is_array( $post_type_social_defaults ) ) {
+	$post_type_social_defaults = [];
+}
+
+$post_types = get_post_types(
+	[
+		'public'  => true,
+		'show_ui' => true,
+	],
+	'objects'
+);
+
+if ( isset( $post_types['attachment'] ) ) {
+	unset( $post_types['attachment'] );
+}
 ?>
 <div class="wrap wpseopilot-settings">
-	<h1><?php esc_html_e( 'WP SEO Pilot — Site Defaults', 'wp-seo-pilot' ); ?></h1>
+	<h1><?php esc_html_e( 'WP SEO Pilot — SEO Defaults', 'wp-seo-pilot' ); ?></h1>
 
-	<form action="options.php" method="post" class="wpseopilot-settings__form">
-		<?php settings_fields( 'wpseopilot' ); ?>
+	<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">
+		<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'Site default sections', 'wp-seo-pilot' ); ?>">
+			<button
+				type="button"
+				class="nav-tab nav-tab-active"
+				id="wpseopilot-tab-link-robots"
+				role="tab"
+				aria-selected="true"
+				aria-controls="wpseopilot-tab-robots"
+				data-wpseopilot-tab="wpseopilot-tab-robots"
+			>
+				<?php esc_html_e( 'Robots & Canonicals', 'wp-seo-pilot' ); ?>
+			</button>
+			<button
+				type="button"
+				class="nav-tab"
+				id="wpseopilot-tab-link-modules"
+				role="tab"
+				aria-selected="false"
+				aria-controls="wpseopilot-tab-modules"
+				data-wpseopilot-tab="wpseopilot-tab-modules"
+			>
+				<?php esc_html_e( 'Modules', 'wp-seo-pilot' ); ?>
+			</button>
+			<button
+				type="button"
+				class="nav-tab"
+				id="wpseopilot-tab-link-social"
+				role="tab"
+				aria-selected="false"
+				aria-controls="wpseopilot-tab-social"
+				data-wpseopilot-tab="wpseopilot-tab-social"
+			>
+				<?php esc_html_e( 'Social', 'wp-seo-pilot' ); ?>
+			</button>
+			<button
+				type="button"
+				class="nav-tab"
+				id="wpseopilot-tab-link-knowledge"
+				role="tab"
+				aria-selected="false"
+				aria-controls="wpseopilot-tab-knowledge"
+				data-wpseopilot-tab="wpseopilot-tab-knowledge"
+			>
+				<?php esc_html_e( 'Knowledge Graph', 'wp-seo-pilot' ); ?>
+			</button>
+			<button
+				type="button"
+				class="nav-tab"
+				id="wpseopilot-tab-link-export"
+				role="tab"
+				aria-selected="false"
+				aria-controls="wpseopilot-tab-export"
+				data-wpseopilot-tab="wpseopilot-tab-export"
+			>
+				<?php esc_html_e( 'Export / Backup', 'wp-seo-pilot' ); ?>
+			</button>
+		</div>
 
-		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Templates & Content', 'wp-seo-pilot' ); ?></h2>
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_default_title_template"><?php esc_html_e( 'Title template', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<input type="text" class="regular-text" id="wpseopilot_default_title_template" name="wpseopilot_default_title_template" value="<?php echo esc_attr( get_option( 'wpseopilot_default_title_template' ) ); ?>" />
-						<p class="description"><?php esc_html_e( 'Available tags: %post_title%, %site_title%, %tagline%, %post_author%', 'wp-seo-pilot' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_default_meta_description"><?php esc_html_e( 'Default meta description', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<textarea class="large-text" rows="3" id="wpseopilot_default_meta_description" name="wpseopilot_default_meta_description"><?php echo esc_textarea( get_option( 'wpseopilot_default_meta_description' ) ); ?></textarea>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Default OG/Twitter image', 'wp-seo-pilot' ); ?></th>
-					<td>
-						<div class="wpseopilot-media-field">
-							<input type="url" class="regular-text" id="wpseopilot_default_og_image" name="wpseopilot_default_og_image" value="<?php echo esc_url( get_option( 'wpseopilot_default_og_image' ) ); ?>" />
-							<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'wp-seo-pilot' ); ?></button>
-						</div>
-						<p class="description"><?php esc_html_e( 'Used when a post is missing a featured image or explicit override.', 'wp-seo-pilot' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_default_social_width"><?php esc_html_e( 'Fallback social image size', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<input type="number" min="1" id="wpseopilot_default_social_width" name="wpseopilot_default_social_width" value="<?php echo esc_attr( get_option( 'wpseopilot_default_social_width' ) ); ?>" /> ×
-						<input type="number" min="1" id="wpseopilot_default_social_height" name="wpseopilot_default_social_height" value="<?php echo esc_attr( get_option( 'wpseopilot_default_social_height' ) ); ?>" />
-					</td>
-				</tr>
-			</table>
-		</section>
+		<form action="options.php" method="post" class="wpseopilot-settings__form">
+			<?php settings_fields( 'wpseopilot' ); ?>
 
-		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Robots & Canonicals', 'wp-seo-pilot' ); ?></h2>
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Index by default', 'wp-seo-pilot' ); ?></th>
-					<td>
-						<label>
-							<input type="checkbox" name="wpseopilot_default_noindex" value="1" <?php checked( get_option( 'wpseopilot_default_noindex' ), '1' ); ?> />
-							<?php esc_html_e( 'Treat new content as noindex', 'wp-seo-pilot' ); ?>
-						</label>
-						<br />
-						<label>
-							<input type="checkbox" name="wpseopilot_default_nofollow" value="1" <?php checked( get_option( 'wpseopilot_default_nofollow' ), '1' ); ?> />
-							<?php esc_html_e( 'Treat new content as nofollow', 'wp-seo-pilot' ); ?>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_global_robots"><?php esc_html_e( 'Global robots meta', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<input type="text" class="regular-text" id="wpseopilot_global_robots" name="wpseopilot_global_robots" value="<?php echo esc_attr( get_option( 'wpseopilot_global_robots' ) ); ?>" />
-						<p class="description"><?php esc_html_e( 'Comma separated instructions (index, follow, max-snippet, etc.)', 'wp-seo-pilot' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_hreflang_map"><?php esc_html_e( 'Hreflang map (JSON)', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<textarea class="large-text code" rows="3" id="wpseopilot_hreflang_map" name="wpseopilot_hreflang_map" placeholder='{"en-us":"https://example.com/","es-es":"https://example.com/es/"}'><?php echo esc_textarea( get_option( 'wpseopilot_hreflang_map' ) ); ?></textarea>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_robots_txt"><?php esc_html_e( 'Robots.txt override', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<textarea class="large-text code" rows="6" id="wpseopilot_robots_txt" name="wpseopilot_robots_txt"><?php echo esc_textarea( get_option( 'wpseopilot_robots_txt' ) ); ?></textarea>
-						<p class="description"><?php esc_html_e( 'Leave blank to respect WP core output.', 'wp-seo-pilot' ); ?></p>
-					</td>
-				</tr>
-			</table>
-		</section>
+			<div
+				id="wpseopilot-tab-robots"
+				class="wpseopilot-tab-panel is-active"
+				role="tabpanel"
+				aria-labelledby="wpseopilot-tab-link-robots"
+			>
+				<section class="wpseopilot-card">
+					<h2><?php esc_html_e( 'Robots & Canonicals', 'wp-seo-pilot' ); ?></h2>
+					<table class="form-table" role="presentation">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Index by default', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<label>
+									<input type="checkbox" name="wpseopilot_default_noindex" value="1" <?php checked( get_option( 'wpseopilot_default_noindex' ), '1' ); ?> />
+									<?php esc_html_e( 'Treat new content as noindex', 'wp-seo-pilot' ); ?>
+								</label>
+								<br />
+								<label>
+									<input type="checkbox" name="wpseopilot_default_nofollow" value="1" <?php checked( get_option( 'wpseopilot_default_nofollow' ), '1' ); ?> />
+									<?php esc_html_e( 'Treat new content as nofollow', 'wp-seo-pilot' ); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label for="wpseopilot_global_robots"><?php esc_html_e( 'Global robots meta', 'wp-seo-pilot' ); ?></label>
+							</th>
+							<td>
+								<input type="text" class="regular-text" id="wpseopilot_global_robots" name="wpseopilot_global_robots" value="<?php echo esc_attr( get_option( 'wpseopilot_global_robots' ) ); ?>" />
+								<p class="description"><?php esc_html_e( 'Comma separated instructions (index, follow, max-snippet, etc.)', 'wp-seo-pilot' ); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label for="wpseopilot_hreflang_map"><?php esc_html_e( 'Hreflang map (JSON)', 'wp-seo-pilot' ); ?></label>
+							</th>
+							<td>
+								<textarea class="large-text code" rows="3" id="wpseopilot_hreflang_map" name="wpseopilot_hreflang_map" placeholder='{"en-us":"https://example.com/","es-es":"https://example.com/es/"}'><?php echo esc_textarea( get_option( 'wpseopilot_hreflang_map' ) ); ?></textarea>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label for="wpseopilot_robots_txt"><?php esc_html_e( 'Robots.txt override', 'wp-seo-pilot' ); ?></label>
+							</th>
+							<td>
+								<textarea class="large-text code" rows="6" id="wpseopilot_robots_txt" name="wpseopilot_robots_txt"><?php echo esc_textarea( get_option( 'wpseopilot_robots_txt' ) ); ?></textarea>
+								<p class="description"><?php esc_html_e( 'Leave blank to respect WP core output.', 'wp-seo-pilot' ); ?></p>
+							</td>
+						</tr>
+					</table>
+				</section>
+			</div>
 
-		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Modules', 'wp-seo-pilot' ); ?></h2>
-			<table class="form-table">
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Sitemap enhancer', 'wp-seo-pilot' ); ?></th>
-					<td>
-						<label>
-							<input type="checkbox" name="wpseopilot_enable_sitemap_enhancer" value="1" <?php checked( get_option( 'wpseopilot_enable_sitemap_enhancer' ), '1' ); ?> />
-							<?php esc_html_e( 'Add image, video, and news data to WP core sitemaps.', 'wp-seo-pilot' ); ?>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Redirect manager', 'wp-seo-pilot' ); ?></th>
-					<td>
-						<label>
-							<input type="checkbox" name="wpseopilot_enable_redirect_manager" value="1" <?php checked( get_option( 'wpseopilot_enable_redirect_manager' ), '1' ); ?> />
-							<?php esc_html_e( 'Enable UI + WP-CLI commands for redirects.', 'wp-seo-pilot' ); ?>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><?php esc_html_e( '404 logging', 'wp-seo-pilot' ); ?></th>
-					<td>
-						<label>
-							<input type="checkbox" name="wpseopilot_enable_404_logging" value="1" <?php checked( get_option( 'wpseopilot_enable_404_logging' ), '1' ); ?> />
-							<?php esc_html_e( 'Monitor and anonymize 404 referrers.', 'wp-seo-pilot' ); ?>
-						</label>
-					</td>
-				</tr>
-			</table>
-		</section>
+		<div
+			id="wpseopilot-tab-modules"
+			class="wpseopilot-tab-panel"
+			role="tabpanel"
+			aria-labelledby="wpseopilot-tab-link-modules"
+		>
+			<section class="wpseopilot-card">
+				<h2><?php esc_html_e( 'Modules', 'wp-seo-pilot' ); ?></h2>
+				<table class="form-table">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Sitemap enhancer', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<label>
+									<input type="checkbox" name="wpseopilot_enable_sitemap_enhancer" value="1" <?php checked( get_option( 'wpseopilot_enable_sitemap_enhancer' ), '1' ); ?> />
+									<?php esc_html_e( 'Add image, video, and news data to WP core sitemaps.', 'wp-seo-pilot' ); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Redirect manager', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<label>
+									<input type="checkbox" name="wpseopilot_enable_redirect_manager" value="1" <?php checked( get_option( 'wpseopilot_enable_redirect_manager' ), '1' ); ?> />
+									<?php esc_html_e( 'Enable UI + WP-CLI commands for redirects.', 'wp-seo-pilot' ); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( '404 logging', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<label>
+									<input type="checkbox" name="wpseopilot_enable_404_logging" value="1" <?php checked( get_option( 'wpseopilot_enable_404_logging' ), '1' ); ?> />
+									<?php esc_html_e( 'Monitor and anonymize 404 referrers.', 'wp-seo-pilot' ); ?>
+								</label>
+							</td>
+						</tr>
+					</table>
+			</section>
+		</div>
 
-		<?php submit_button( __( 'Save SEO defaults', 'wp-seo-pilot' ) ); ?>
-	</form>
+		<div class="wpseopilot-tabs__actions">
+			<?php submit_button( __( 'Save SEO defaults', 'wp-seo-pilot' ) ); ?>
+		</div>
+		</form>
 
-	<section class="wpseopilot-card wpseopilot-card--split">
-		<div>
-			<h2><?php esc_html_e( 'Import settings & metadata', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'Migrate from Yoast SEO, Rank Math, or All in One SEO.', 'wp-seo-pilot' ); ?></p>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<?php wp_nonce_field( 'wpseopilot_import' ); ?>
-				<input type="hidden" name="action" value="wpseopilot_import" />
-				<select name="vendor">
-					<option value="yoast"><?php esc_html_e( 'Yoast SEO', 'wp-seo-pilot' ); ?></option>
-					<option value="rankmath"><?php esc_html_e( 'Rank Math', 'wp-seo-pilot' ); ?></option>
-					<option value="aioseo"><?php esc_html_e( 'All in One SEO', 'wp-seo-pilot' ); ?></option>
-				</select>
-				<label style="margin-left:12px;">
-					<input type="checkbox" name="dry_run" value="1" />
-					<?php esc_html_e( 'Dry run (preview counts only)', 'wp-seo-pilot' ); ?>
-				</label>
-				<?php submit_button( __( 'Run importer', 'wp-seo-pilot' ), 'secondary', 'submit', false ); ?>
+		<div
+			id="wpseopilot-tab-social"
+			class="wpseopilot-tab-panel"
+			role="tabpanel"
+			aria-labelledby="wpseopilot-tab-link-social"
+		>
+			<form action="options.php" method="post" class="wpseopilot-settings__form">
+				<?php settings_fields( 'wpseopilot_social' ); ?>
+				<section class="wpseopilot-card">
+					<h2><?php esc_html_e( 'Social fallbacks', 'wp-seo-pilot' ); ?></h2>
+					<p><?php esc_html_e( 'Provide default Open Graph, Twitter, and schema values that WP SEO Pilot will use whenever editors leave fields blank.', 'wp-seo-pilot' ); ?></p>
+					<table class="form-table" role="presentation">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Open Graph (Facebook)', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<div class="wpseopilot-social-fields">
+									<div class="wpseopilot-field">
+										<label for="wpseopilot_social_defaults_og_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
+										<input type="text" class="regular-text" id="wpseopilot_social_defaults_og_title" name="wpseopilot_social_defaults[og_title]" value="<?php echo esc_attr( $social_defaults['og_title'] ); ?>" />
+									</div>
+									<div class="wpseopilot-field">
+										<label for="wpseopilot_social_defaults_og_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
+										<textarea class="large-text" rows="3" id="wpseopilot_social_defaults_og_description" name="wpseopilot_social_defaults[og_description]"><?php echo esc_textarea( $social_defaults['og_description'] ); ?></textarea>
+									</div>
+								</div>
+								<?php if ( empty( $social_defaults['og_title'] ) && empty( $social_defaults['og_description'] ) ) : ?>
+									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for OPEN GRAPH (Facebook).', 'wp-seo-pilot' ); ?></p>
+								<?php else : ?>
+									<p class="wpseopilot-social-status"><?php esc_html_e( 'Used whenever a post is missing a custom social title or description.', 'wp-seo-pilot' ); ?></p>
+								<?php endif; ?>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Twitter', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<div class="wpseopilot-social-fields">
+									<div class="wpseopilot-field">
+										<label for="wpseopilot_social_defaults_twitter_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
+										<input type="text" class="regular-text" id="wpseopilot_social_defaults_twitter_title" name="wpseopilot_social_defaults[twitter_title]" value="<?php echo esc_attr( $social_defaults['twitter_title'] ); ?>" />
+									</div>
+									<div class="wpseopilot-field">
+										<label for="wpseopilot_social_defaults_twitter_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
+										<textarea class="large-text" rows="3" id="wpseopilot_social_defaults_twitter_description" name="wpseopilot_social_defaults[twitter_description]"><?php echo esc_textarea( $social_defaults['twitter_description'] ); ?></textarea>
+									</div>
+								</div>
+								<?php if ( empty( $social_defaults['twitter_title'] ) && empty( $social_defaults['twitter_description'] ) ) : ?>
+									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for TWITTER.', 'wp-seo-pilot' ); ?></p>
+								<?php else : ?>
+									<p class="wpseopilot-social-status"><?php esc_html_e( 'Overrides the Twitter Card when a post does not provide its own.', 'wp-seo-pilot' ); ?></p>
+								<?php endif; ?>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Image source', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<input type="url" class="regular-text" id="wpseopilot_social_defaults_image_source" name="wpseopilot_social_defaults[image_source]" value="<?php echo esc_url( $social_defaults['image_source'] ); ?>" />
+								<p class="description"><?php esc_html_e( 'Optional fallback image URL for Open Graph and Twitter cards.', 'wp-seo-pilot' ); ?></p>
+								<?php if ( empty( $social_defaults['image_source'] ) ) : ?>
+									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No IMAGE_SRC has been found.', 'wp-seo-pilot' ); ?></p>
+								<?php else : ?>
+									<p class="wpseopilot-social-status"><?php esc_html_e( 'Used whenever a post is missing a featured image or override.', 'wp-seo-pilot' ); ?></p>
+								<?php endif; ?>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Schema.org (itemtype only)', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<input type="text" class="regular-text" id="wpseopilot_social_defaults_schema_itemtype" name="wpseopilot_social_defaults[schema_itemtype]" value="<?php echo esc_attr( $social_defaults['schema_itemtype'] ); ?>" />
+								<p class="description"><?php esc_html_e( 'Example: Article, Product, ProfilePage. Leave blank to keep the default article type.', 'wp-seo-pilot' ); ?></p>
+								<?php if ( empty( $social_defaults['schema_itemtype'] ) ) : ?>
+									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for Schema.org (itemtype only).', 'wp-seo-pilot' ); ?></p>
+								<?php else : ?>
+									<p class="wpseopilot-social-status"><?php esc_html_e( 'Controls the og:type meta tag whenever content lacks a specific schema override.', 'wp-seo-pilot' ); ?></p>
+								<?php endif; ?>
+							</td>
+						</tr>
+					</table>
+				</section>
+
+				<?php if ( ! empty( $post_types ) ) : ?>
+				<section class="wpseopilot-card">
+					<h2><?php esc_html_e( 'Per post type overrides', 'wp-seo-pilot' ); ?></h2>
+					<p><?php esc_html_e( 'Add tailored defaults for specific post or page types. Blank fields inherit the global fallbacks above.', 'wp-seo-pilot' ); ?></p>
+					<?php foreach ( $post_types as $slug => $object ) : ?>
+						<?php
+						$label = $object->labels->name ?: $object->label ?: ucfirst( $slug );
+						$raw_values = isset( $post_type_social_defaults[ $slug ] ) ? (array) $post_type_social_defaults[ $slug ] : [];
+						$values = wp_parse_args( $raw_values, $social_field_defaults );
+						$has_overrides = ! empty( $raw_values );
+						?>
+						<details class="wpseopilot-accordion">
+							<summary>
+								<span><?php echo esc_html( $label ); ?></span>
+								<span class="wpseopilot-type-slug"><?php echo esc_html( $slug ); ?></span>
+							</summary>
+							<div class="wpseopilot-accordion__body">
+								<table class="form-table" role="presentation">
+									<tr>
+										<th scope="row"><?php esc_html_e( 'Open Graph (Facebook)', 'wp-seo-pilot' ); ?></th>
+										<td>
+											<div class="wpseopilot-social-fields">
+												<div class="wpseopilot-field">
+													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
+													<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_title" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_title]" value="<?php echo esc_attr( $values['og_title'] ); ?>" />
+												</div>
+												<div class="wpseopilot-field">
+													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
+													<textarea class="large-text" rows="3" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_description" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_description]"><?php echo esc_textarea( $values['og_description'] ); ?></textarea>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row"><?php esc_html_e( 'Twitter', 'wp-seo-pilot' ); ?></th>
+										<td>
+											<div class="wpseopilot-social-fields">
+												<div class="wpseopilot-field">
+													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
+													<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_title" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_title]" value="<?php echo esc_attr( $values['twitter_title'] ); ?>" />
+												</div>
+												<div class="wpseopilot-field">
+													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
+													<textarea class="large-text" rows="3" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_description" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_description]"><?php echo esc_textarea( $values['twitter_description'] ); ?></textarea>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row"><?php esc_html_e( 'Image source', 'wp-seo-pilot' ); ?></th>
+										<td>
+											<input type="url" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_image_source" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][image_source]" value="<?php echo esc_url( $values['image_source'] ); ?>" />
+										</td>
+									</tr>
+									<tr>
+										<th scope="row"><?php esc_html_e( 'Schema.org (itemtype only)', 'wp-seo-pilot' ); ?></th>
+										<td>
+											<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_schema_itemtype" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][schema_itemtype]" value="<?php echo esc_attr( $values['schema_itemtype'] ); ?>" />
+										</td>
+									</tr>
+								</table>
+								<?php if ( ! $has_overrides ) : ?>
+									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No custom social data has been defined for this type yet.', 'wp-seo-pilot' ); ?></p>
+								<?php else : ?>
+									<p class="wpseopilot-social-status"><?php esc_html_e( 'These overrides take precedence over the global fallbacks.', 'wp-seo-pilot' ); ?></p>
+								<?php endif; ?>
+							</div>
+						</details>
+					<?php endforeach; ?>
+				</section>
+				<?php endif; ?>
+
+				<?php submit_button( __( 'Save social defaults', 'wp-seo-pilot' ) ); ?>
 			</form>
 		</div>
-		<div>
-			<h2><?php esc_html_e( 'Export / Backup', 'wp-seo-pilot' ); ?></h2>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<?php wp_nonce_field( 'wpseopilot_export' ); ?>
-				<input type="hidden" name="action" value="wpseopilot_export" />
-				<?php submit_button( __( 'Download JSON', 'wp-seo-pilot' ), 'secondary', 'submit', false ); ?>
-			</form>
+
+		<div
+			id="wpseopilot-tab-knowledge"
+			class="wpseopilot-tab-panel"
+			role="tabpanel"
+			aria-labelledby="wpseopilot-tab-link-knowledge"
+		>
+			<section class="wpseopilot-card">
+				<h2><?php esc_html_e( 'Knowledge Graph & Schema.org', 'wp-seo-pilot' ); ?></h2>
+				<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google’s Knowledge Graph and other rich results.', 'wp-seo-pilot' ); ?></p>
+					<form action="options.php" method="post">
+						<?php settings_fields( 'wpseopilot_knowledge' ); ?>
+					<table class="form-table" role="presentation">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Site represents', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<label>
+									<input type="radio" name="wpseopilot_homepage_knowledge_type" value="organization" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'organization' ); ?> />
+									<?php esc_html_e( 'Organization', 'wp-seo-pilot' ); ?>
+								</label>
+								<br />
+								<label>
+									<input type="radio" name="wpseopilot_homepage_knowledge_type" value="person" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'person' ); ?> />
+									<?php esc_html_e( 'Person', 'wp-seo-pilot' ); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label for="wpseopilot_homepage_organization_name"><?php esc_html_e( 'Organization name', 'wp-seo-pilot' ); ?></label>
+							</th>
+							<td>
+								<input type="text" class="regular-text" id="wpseopilot_homepage_organization_name" name="wpseopilot_homepage_organization_name" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_organization_name' ) ); ?>" />
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label for="wpseopilot_homepage_organization_logo"><?php esc_html_e( 'Organization logo', 'wp-seo-pilot' ); ?></label>
+							</th>
+							<td>
+								<div class="wpseopilot-media-field">
+									<input type="url" class="regular-text" id="wpseopilot_homepage_organization_logo" name="wpseopilot_homepage_organization_logo" value="<?php echo esc_url( get_option( 'wpseopilot_homepage_organization_logo' ) ); ?>" />
+									<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'wp-seo-pilot' ); ?></button>
+								</div>
+								<p class="description"><?php esc_html_e( 'Recommended: square logo at least 112×112 px. Used in structured data and social previews.', 'wp-seo-pilot' ); ?></p>
+							</td>
+						</tr>
+					</table>
+					<?php submit_button( __( 'Save Knowledge Graph settings', 'wp-seo-pilot' ) ); ?>
+				</form>
+			</section>
 		</div>
-	</section>
 
-	<section class="wpseopilot-card">
-		<h2><?php esc_html_e( 'Homepage Defaults', 'wp-seo-pilot' ); ?></h2>
-		<p><?php esc_html_e( 'Set the title and description that appear when visitors find your homepage in search results.', 'wp-seo-pilot' ); ?></p>
-		<form action="options.php" method="post">
-			<?php settings_fields( 'wpseopilot_homepage' ); ?>
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_homepage_title"><?php esc_html_e( 'SEO title', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<input type="text" class="regular-text" id="wpseopilot_homepage_title" name="wpseopilot_homepage_title" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_title' ) ); ?>" />
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_homepage_description"><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<textarea class="large-text" rows="3" id="wpseopilot_homepage_description" name="wpseopilot_homepage_description"><?php echo esc_textarea( get_option( 'wpseopilot_homepage_description' ) ); ?></textarea>
-					</td>
-				</tr>
-			</table>
-			<?php submit_button( __( 'Save homepage defaults', 'wp-seo-pilot' ) ); ?>
-		</form>
-	</section>
-
-	<section class="wpseopilot-card">
-		<h2><?php esc_html_e( 'Knowledge Graph & Schema.org', 'wp-seo-pilot' ); ?></h2>
-		<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google’s Knowledge Graph and other rich results.', 'wp-seo-pilot' ); ?></p>
-		<form action="options.php" method="post">
-			<?php settings_fields( 'wpseopilot_homepage' ); ?>
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Site represents', 'wp-seo-pilot' ); ?></th>
-					<td>
-						<label>
-							<input type="radio" name="wpseopilot_homepage_knowledge_type" value="organization" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'organization' ); ?> />
-							<?php esc_html_e( 'Organization', 'wp-seo-pilot' ); ?>
-						</label>
-						<br />
-						<label>
-							<input type="radio" name="wpseopilot_homepage_knowledge_type" value="person" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'person' ); ?> />
-							<?php esc_html_e( 'Person', 'wp-seo-pilot' ); ?>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_homepage_organization_name"><?php esc_html_e( 'Organization name', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<input type="text" class="regular-text" id="wpseopilot_homepage_organization_name" name="wpseopilot_homepage_organization_name" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_organization_name' ) ); ?>" />
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="wpseopilot_homepage_organization_logo"><?php esc_html_e( 'Organization logo', 'wp-seo-pilot' ); ?></label>
-					</th>
-					<td>
-						<div class="wpseopilot-media-field">
-							<input type="url" class="regular-text" id="wpseopilot_homepage_organization_logo" name="wpseopilot_homepage_organization_logo" value="<?php echo esc_url( get_option( 'wpseopilot_homepage_organization_logo' ) ); ?>" />
-							<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'wp-seo-pilot' ); ?></button>
-						</div>
-						<p class="description"><?php esc_html_e( 'Recommended: square logo at least 112×112 px. Used in structured data and social previews.', 'wp-seo-pilot' ); ?></p>
-					</td>
-				</tr>
-			</table>
-			<?php submit_button( __( 'Save Knowledge Graph settings', 'wp-seo-pilot' ) ); ?>
-		</form>
-	</section>
+		<div
+			id="wpseopilot-tab-export"
+			class="wpseopilot-tab-panel"
+			role="tabpanel"
+			aria-labelledby="wpseopilot-tab-link-export"
+		>
+			<section class="wpseopilot-card">
+				<h2><?php esc_html_e( 'Export / Backup', 'wp-seo-pilot' ); ?></h2>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<?php wp_nonce_field( 'wpseopilot_export' ); ?>
+					<input type="hidden" name="action" value="wpseopilot_export" />
+					<?php submit_button( __( 'Download JSON', 'wp-seo-pilot' ), 'secondary', 'submit', false ); ?>
+				</form>
+			</section>
+		</div>
+	</div>
 </div>

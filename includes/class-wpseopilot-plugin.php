@@ -60,7 +60,6 @@ class Plugin {
 		$this->register( 'ai', new Service\AI_Assistant() );
 		$this->register( 'importer', new Service\Importers() );
 		$this->register( 'redirects', new Service\Redirect_Manager() );
-		$this->register( 'onboarding', new Service\Onboarding() );
 		$this->register( 'audit', new Service\Audit() );
 		$this->register( 'sitemap', new Service\Sitemap_Enhancer() );
 		$this->register( 'robots', new Service\Robots_Manager() );
@@ -121,7 +120,6 @@ class Plugin {
 		add_option( 'wpseopilot_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' );
 		add_option( 'wpseopilot_default_meta_description', '' );
 		add_option( 'wpseopilot_default_og_image', '' );
-		add_option( 'wpseopilot_show_onboarding', '1' );
 		add_option( 'wpseopilot_show_tour', '1' );
 
 		flush_rewrite_rules();

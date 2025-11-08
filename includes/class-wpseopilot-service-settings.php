@@ -33,6 +33,7 @@ class Settings {
 		'wpseopilot_ai_prompt_description' => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
 		'wpseopilot_homepage_title' => '',
 		'wpseopilot_homepage_description' => '',
+		'wpseopilot_homepage_keywords' => '',
 		'wpseopilot_homepage_description_prompt' => '',
 		'wpseopilot_homepage_knowledge_type' => 'organization',
 		'wpseopilot_homepage_organization_name' => '',
@@ -40,6 +41,15 @@ class Settings {
 		'wpseopilot_openai_api_key' => '',
 		'wpseopilot_default_meta_description' => '',
 		'wpseopilot_default_og_image' => '',
+		'wpseopilot_social_defaults' => [
+			'og_title'            => '',
+			'og_description'      => '',
+			'twitter_title'       => '',
+			'twitter_description' => '',
+			'image_source'        => '',
+			'schema_itemtype'     => '',
+		],
+		'wpseopilot_post_type_social_defaults' => [],
 		'wpseopilot_default_social_width' => 1200,
 		'wpseopilot_default_social_height' => 630,
 		'wpseopilot_default_noindex' => '0',
@@ -94,17 +104,20 @@ class Settings {
 		register_setting( 'wpseopilot_archives', 'wpseopilot_archive_settings', [ $this, 'sanitize_archive_settings' ] );
 		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_model', [ $this, 'sanitize_ai_model' ] );
 		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_system', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_title', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_description', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_ai_key', 'wpseopilot_openai_api_key', [ $this, 'sanitize_api_key' ] );
+			register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_title', 'sanitize_textarea_field' );
+			register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_description', 'sanitize_textarea_field' );
+			register_setting( 'wpseopilot_ai_key', 'wpseopilot_openai_api_key', [ $this, 'sanitize_api_key' ] );
 		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_title', 'sanitize_text_field' );
 		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_description', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_description_prompt', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
-		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_organization_name', 'sanitize_text_field' );
-		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_organization_logo', 'esc_url_raw' );
+		register_setting( 'wpseopilot_homepage', 'wpseopilot_homepage_keywords', 'sanitize_text_field' );
+		register_setting( 'wpseopilot', 'wpseopilot_homepage_description_prompt', 'sanitize_textarea_field' );
+		register_setting( 'wpseopilot_knowledge', 'wpseopilot_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
+		register_setting( 'wpseopilot_knowledge', 'wpseopilot_homepage_organization_name', 'sanitize_text_field' );
+		register_setting( 'wpseopilot_knowledge', 'wpseopilot_homepage_organization_logo', 'esc_url_raw' );
 		register_setting( 'wpseopilot', 'wpseopilot_default_meta_description', 'sanitize_textarea_field' );
 		register_setting( 'wpseopilot', 'wpseopilot_default_og_image', 'esc_url_raw' );
+		register_setting( 'wpseopilot_social', 'wpseopilot_social_defaults', [ $this, 'sanitize_social_defaults' ] );
+		register_setting( 'wpseopilot_social', 'wpseopilot_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
 		register_setting( 'wpseopilot', 'wpseopilot_default_social_width', 'absint' );
 		register_setting( 'wpseopilot', 'wpseopilot_default_social_height', 'absint' );
 		register_setting( 'wpseopilot', 'wpseopilot_default_noindex', [ $this, 'sanitize_bool' ] );
@@ -214,6 +227,86 @@ class Settings {
 	 */
 	public function sanitize_post_type_keywords( $value ) {
 		return $this->sanitize_post_type_text_map( $value, 'sanitize_text_field' );
+	}
+
+	/**
+	 * Sanitize global social defaults.
+	 *
+	 * @param array|string $value Values.
+	 *
+	 * @return array
+	 */
+	public function sanitize_social_defaults( $value ) {
+		if ( ! is_array( $value ) ) {
+			$value = [];
+		}
+
+		$value = wp_parse_args( $value, [] );
+
+		$schema = sanitize_text_field( $value['schema_itemtype'] ?? '' );
+
+		return [
+			'og_title'            => sanitize_text_field( $value['og_title'] ?? '' ),
+			'og_description'      => sanitize_textarea_field( $value['og_description'] ?? '' ),
+			'twitter_title'       => sanitize_text_field( $value['twitter_title'] ?? '' ),
+			'twitter_description' => sanitize_textarea_field( $value['twitter_description'] ?? '' ),
+			'image_source'        => esc_url_raw( $value['image_source'] ?? '' ),
+			'schema_itemtype'     => $schema,
+		];
+	}
+
+	/**
+	 * Sanitize per-post-type social defaults.
+	 *
+	 * @param array|string $value Values.
+	 *
+	 * @return array<string,array<string,string>>
+	 */
+	public function sanitize_post_type_social_defaults( $value ) {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$post_types = get_post_types(
+			[
+				'public'  => true,
+				'show_ui' => true,
+			],
+			'names'
+		);
+
+		if ( isset( $post_types['attachment'] ) ) {
+			unset( $post_types['attachment'] );
+		}
+
+		$sanitized = [];
+		foreach ( $post_types as $slug => $label ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+			$data = isset( $value[ $slug ] ) && is_array( $value[ $slug ] ) ? $value[ $slug ] : [];
+
+			$clean = [
+				'og_title'            => sanitize_text_field( $data['og_title'] ?? '' ),
+				'og_description'      => sanitize_textarea_field( $data['og_description'] ?? '' ),
+				'twitter_title'       => sanitize_text_field( $data['twitter_title'] ?? '' ),
+				'twitter_description' => sanitize_textarea_field( $data['twitter_description'] ?? '' ),
+				'image_source'        => esc_url_raw( $data['image_source'] ?? '' ),
+				'schema_itemtype'     => sanitize_text_field( $data['schema_itemtype'] ?? '' ),
+			];
+
+			$clean = array_filter(
+				$clean,
+				static function ( $field ) {
+					return '' !== $field && null !== $field;
+				}
+			);
+
+			if ( empty( $clean ) ) {
+				continue;
+			}
+
+			$sanitized[ $slug ] = $clean;
+		}
+
+		return $sanitized;
 	}
 
 	/**

@@ -9,10 +9,10 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - Per-post SEO fields stored in `_wpseopilot_meta` (title, description, canonical, robots, OG image) with Gutenberg sidebar + classic meta box.
 - Server-rendered `<title>`, meta description, canonical, robots, Open Graph, Twitter Card, and JSON-LD (WebSite, WebPage, Article, Breadcrumb).
 - Site-wide defaults for templates, descriptions, social images, robots, hreflang, and module toggles — plus dedicated per-post-type defaults for titles, descriptions, and keywords.
-- Snippet + social previews, internal link suggestions, guided onboarding, quick actions, and compatibility detection for other SEO plugins.
+- Snippet + social previews, internal link suggestions, quick actions, and compatibility detection for other SEO plugins.
 - AI assistant connects to OpenAI for one-click title & meta description suggestions, with configurable prompts, model selection, and inline editor buttons.
 - SEO Audit dashboard with severity graph, issue log, and auto-generated fallback titles/descriptions/tags for posts that are missing metadata.
-- Redirect manager (DB table `wpseopilot_redirects`), WP-CLI commands, 404 logging with hashed referrers, sitemap enhancer module, robots.txt editor, and import/export (including Yoast/Rank Math/AIOSEO with dry-run previews).
+- Redirect manager (DB table `wpseopilot_redirects`), WP-CLI commands, 404 logging with hashed referrers, sitemap enhancer module, robots.txt editor, and JSON export for quick backups.
 
 ### Template Tags & Shortcodes
 
@@ -26,7 +26,10 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - `wpseopilot_jsonld` filters the Structured Data graph before output.
 - `wpseopilot_feature_toggle` receives feature keys (`frontend_head`, `metabox`, `redirects`, `sitemaps`) for compatibility fallbacks.
 - `wpseopilot_link_suggestions` lets you augment/replace link suggestions in the meta box.
-- `wpseopilot_custom_sitemap_items` filters URLs exposed via `wpseopilot-sitemap.xml`.
+- `wpseopilot_sitemap_map` adjusts which post types, taxonomies, or custom groups appear in the Yoast-style sitemap structure.
+- `wpseopilot_sitemap_index_items` filters the compiled sitemap index entries before rendering.
+- `wpseopilot_sitemap_stylesheet` swaps the pretty XSL front-end for `/sitemap_index.xml` and individual sitemaps.
+- `wpseopilot_sitemap_redirect` overrides the destination when requests hit WordPress core's `/wp-sitemap*.xml`.
 
 ### WP-CLI
 
@@ -36,9 +39,9 @@ wp wpseopilot redirects export redirects.json
 wp wpseopilot redirects import redirects.json
 ```
 
-### Import / Export
+### Export
 
-Export site defaults + postmeta as JSON via **WP SEO Pilot → SEO Defaults**, or import from Yoast SEO, Rank Math, or All in One SEO with optional dry-run counts.
+Export site defaults + postmeta as JSON via **WP SEO Pilot → SEO Defaults** for easy backups or migrations.
 
 ### Privacy
 

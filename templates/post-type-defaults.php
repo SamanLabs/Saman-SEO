@@ -29,6 +29,44 @@ $archive_items  = [
 		<?php esc_html_e( 'Control how your post types, taxonomies, and archives appear in search. These values act as defaults whenever editors leave fields blank.', 'wp-seo-pilot' ); ?>
 	</p>
 
+	<form action="options.php" method="post" class="wpseopilot-search-defaults">
+		<?php settings_fields( 'wpseopilot_homepage' ); ?>
+
+		<section class="wpseopilot-card">
+			<h2><?php esc_html_e( 'Homepage Defaults', 'wp-seo-pilot' ); ?></h2>
+			<p><?php esc_html_e( 'Set the title and description that appear when visitors find your homepage in search results.', 'wp-seo-pilot' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_title"><?php esc_html_e( 'SEO title', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<input type="text" class="regular-text" id="wpseopilot_homepage_title" name="wpseopilot_homepage_title" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_title' ) ); ?>" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_description"><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<textarea class="large-text" rows="3" id="wpseopilot_homepage_description" name="wpseopilot_homepage_description"><?php echo esc_textarea( get_option( 'wpseopilot_homepage_description' ) ); ?></textarea>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_keywords"><?php esc_html_e( 'Keywords', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<input type="text" class="regular-text" id="wpseopilot_homepage_keywords" name="wpseopilot_homepage_keywords" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_keywords' ) ); ?>" />
+						<p class="description"><?php esc_html_e( 'Optional comma-separated keywords for the homepage meta tag.', 'wp-seo-pilot' ); ?></p>
+					</td>
+				</tr>
+			</table>
+		</section>
+
+		<?php submit_button( __( 'Save SEO defaults', 'wp-seo-pilot' ) ); ?>
+	</form>
+
 	<section class="wpseopilot-card">
 		<h2><?php esc_html_e( 'Content Types', 'wp-seo-pilot' ); ?></h2>
 		<p><?php esc_html_e( 'Decide whether each post type should appear in search, expose SEO controls to editors, and define fallback metadata.', 'wp-seo-pilot' ); ?></p>

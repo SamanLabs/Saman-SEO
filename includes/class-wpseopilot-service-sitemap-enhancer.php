@@ -15,6 +15,34 @@ defined( 'ABSPATH' ) || exit;
 class Sitemap_Enhancer {
 
 	/**
+	 * Internal flag allowing temporary access to WP core sitemaps.
+	 *
+	 * @var bool
+	 */
+	private $allow_core_sitemaps = false;
+
+	/**
+	 * Cached instance of the WP sitemaps server.
+	 *
+	 * @var \WP_Sitemaps|null
+	 */
+	private $sitemap_server = null;
+
+	/**
+	 * Cached map of sitemap groups (post types, taxonomies, authors).
+	 *
+	 * @var array<int,array<string,mixed>>
+	 */
+	private $sitemap_map = [];
+
+	/**
+	 * Cache for generated sitemap page URL lists.
+	 *
+	 * @var array<string,array<int,array<string,mixed>>>
+	 */
+	private $sitemap_page_cache = [];
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
@@ -30,8 +58,11 @@ class Sitemap_Enhancer {
 
 		add_filter( 'wp_sitemaps_posts_entry', [ $this, 'include_media_fields' ], 10, 3 );
 		add_filter( 'wp_sitemaps_additional_namespaces', [ $this, 'add_namespaces' ] );
+		add_filter( 'wp_sitemaps_enabled', [ $this, 'disable_core_sitemaps' ] );
+		add_filter( 'wp_sitemaps_stylesheet_url', [ $this, 'filter_stylesheet_url' ] );
+		add_filter( 'wp_sitemaps_stylesheet_index_url', [ $this, 'filter_stylesheet_url' ] );
 		add_action( 'init', [ $this, 'register_custom_sitemap' ] );
-		add_action( 'template_redirect', [ $this, 'render_custom_sitemap' ] );
+		add_action( 'template_redirect', [ $this, 'render_custom_sitemap' ], 0 );
 	}
 
 	/**
@@ -96,8 +127,24 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	public function register_custom_sitemap() {
-		add_rewrite_rule( '^wpseopilot-sitemap\.xml$', 'index.php?wpseopilot_sitemap=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap%', '1' );
+		add_rewrite_rule( '^sitemap_index\.xml$', 'index.php?wpseopilot_sitemap_index=1', 'top' );
+		add_rewrite_tag( '%wpseopilot_sitemap_index%', '1' );
+
+		add_rewrite_rule(
+			'^([a-z0-9_-]+)-sitemap([0-9]+)\.xml$',
+			'index.php?wpseopilot_sitemap_slug=$matches[1]&wpseopilot_sitemap_page=$matches[2]',
+			'top'
+		);
+		add_rewrite_rule(
+			'^([a-z0-9_-]+)-sitemap\.xml$',
+			'index.php?wpseopilot_sitemap_slug=$matches[1]',
+			'top'
+		);
+		add_rewrite_tag( '%wpseopilot_sitemap_slug%', '([a-z0-9_-]+)' );
+		add_rewrite_tag( '%wpseopilot_sitemap_page%', '([0-9]+)' );
+
+		add_rewrite_rule( '^sitemap-style\.xsl$', 'index.php?wpseopilot_sitemap_stylesheet=1', 'top' );
+		add_rewrite_tag( '%wpseopilot_sitemap_stylesheet%', '1' );
 	}
 
 	/**
@@ -106,53 +153,422 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	public function render_custom_sitemap() {
-		if ( ! get_query_var( 'wpseopilot_sitemap' ) ) {
+		if ( $this->is_wp_core_sitemap_request() ) {
+			$this->redirect_core_sitemap();
+			return;
+		}
+
+		if ( get_query_var( 'wpseopilot_sitemap_stylesheet' ) ) {
+			$this->render_sitemap_stylesheet();
+			return;
+		}
+
+		if ( get_query_var( 'wpseopilot_sitemap_index' ) ) {
+			$this->render_sitemap_index();
+			return;
+		}
+
+		$slug = get_query_var( 'wpseopilot_sitemap_slug' );
+		if ( $slug ) {
+			$page = absint( get_query_var( 'wpseopilot_sitemap_page' ) );
+			$page = max( 1, $page );
+
+			$this->render_single_sitemap( $slug, $page );
+			return;
+		}
+	}
+
+	/**
+	 * Render WP SEO Pilot sitemap index with entries pulled from core providers.
+	 *
+	 * @return void
+	 */
+	private function render_sitemap_index() {
+		$items = $this->get_sitemap_index_items();
+
+		if ( empty( $items ) ) {
+			$this->bail_404();
+			return;
+		}
+
+		$renderer = $this->get_renderer();
+
+		if ( ! $renderer ) {
+			$this->bail_404();
 			return;
 		}
 
 		nocache_headers();
-		header( 'Content-Type: application/xml; charset=UTF-8' );
 
-		$items = apply_filters( 'wpseopilot_custom_sitemap_items', $this->default_items() );
+		$renderer->render_index( $items );
 
-		echo '<?xml version="1.0" encoding="UTF-8"?>';
-		echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-		foreach ( $items as $item ) {
-			printf(
-				'<url><loc>%s</loc><lastmod>%s</lastmod><priority>%s</priority></url>',
-				esc_url( $item['loc'] ),
-				esc_html( $item['lastmod'] ),
-				esc_html( $item['priority'] )
-			);
-		}
-		echo '</urlset>';
 		exit;
 	}
 
 	/**
-	 * Provide default urls.
+	 * Compile sitemap index items (core + plugin).
 	 *
-	 * @return array
+	 * @return array<int,array<string,string>>
 	 */
-	private function default_items() {
-		$posts = get_posts(
-			[
-				'post_type'      => 'any',
-				'post_status'    => 'publish',
-				'posts_per_page' => 100,
-			]
-		);
+	private function get_sitemap_index_items() {
+		$groups = $this->get_sitemap_map();
 
-		$data = [];
-		foreach ( $posts as $post ) {
-			$data[] = [
-				'loc'      => get_permalink( $post ),
-				'lastmod'  => get_post_modified_time( DATE_W3C, true, $post ),
-				'priority' => '0.5',
+		if ( empty( $groups ) ) {
+			return [];
+		}
+
+		$items = [];
+
+		foreach ( $groups as $group ) {
+			$max_pages = $this->get_max_pages_for_group( $group );
+
+			if ( $max_pages < 1 ) {
+				continue;
+			}
+
+			for ( $page = 1; $page <= $max_pages; $page++ ) {
+				$items[] = [
+					'loc'     => $this->build_sitemap_url( $group['slug'], $page ),
+					'lastmod' => $this->get_sitemap_lastmod( $group, $page ),
+				];
+			}
+		}
+
+		return apply_filters( 'wpseopilot_sitemap_index_items', $items );
+	}
+
+	/**
+	 * Render a specific sitemap page (posts, pages, taxonomies, authors).
+	 *
+	 * @param string $slug Requested slug (post, page, category, etc).
+	 * @param int    $page Page number.
+	 * @return void
+	 */
+	private function render_single_sitemap( $slug, $page ) {
+		$group = $this->resolve_sitemap_group( $slug );
+
+		if ( ! $group ) {
+			$this->bail_404();
+			return;
+		}
+
+		$max_pages = $this->get_max_pages_for_group( $group );
+
+		if ( $max_pages < 1 || $page > $max_pages ) {
+			$this->bail_404();
+			return;
+		}
+
+		$url_list = $this->fetch_sitemap_urls( $group, $page );
+
+		if ( empty( $url_list ) ) {
+			$this->bail_404();
+			return;
+		}
+
+		$renderer = $this->get_renderer();
+
+		if ( ! $renderer ) {
+			$this->bail_404();
+			return;
+		}
+
+		nocache_headers();
+
+		$renderer->render_sitemap( $url_list );
+
+		exit;
+	}
+
+	/**
+	 * Resolve slug to sitemap group metadata.
+	 *
+	 * @param string $slug Slug.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	private function resolve_sitemap_group( $slug ) {
+		$slug   = $this->sanitize_slug( $slug );
+		$groups = $this->get_sitemap_map();
+
+		foreach ( $groups as $group ) {
+			if ( $group['slug'] === $slug ) {
+				return $group;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Build sitemap map from WP core providers using Yoast-like naming.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function get_sitemap_map() {
+		if ( ! empty( $this->sitemap_map ) ) {
+			return $this->sitemap_map;
+		}
+
+		$server = $this->get_sitemaps_server();
+
+		if ( ! $server ) {
+			return [];
+		}
+
+		$map       = [];
+		$providers = $server->registry->get_providers();
+
+		if ( isset( $providers['posts'] ) ) {
+			$post_provider = $providers['posts'];
+			$subtypes      = $post_provider->get_object_subtypes();
+
+			foreach ( $subtypes as $name => $object ) {
+				$map[] = [
+					'slug'     => $this->sanitize_slug( $name ),
+					'label'    => $object->label ?? $name,
+					'provider' => 'posts',
+					'subtype'  => $name,
+				];
+			}
+		}
+
+		if ( isset( $providers['taxonomies'] ) ) {
+			$tax_provider = $providers['taxonomies'];
+			$taxonomies   = $tax_provider->get_object_subtypes();
+
+			foreach ( $taxonomies as $name => $object ) {
+				$map[] = [
+					'slug'     => $this->sanitize_slug( $name ),
+					'label'    => $object->label ?? $name,
+					'provider' => 'taxonomies',
+					'subtype'  => $name,
+				];
+			}
+		}
+
+		if ( isset( $providers['users'] ) ) {
+			$map[] = [
+				'slug'     => 'author',
+				'label'    => __( 'Authors', 'wp-seo-pilot' ),
+				'provider' => 'users',
+				'subtype'  => '',
 			];
 		}
 
-		return $data;
+		/**
+		 * Filter the sitemap groups before output.
+		 *
+		 * @param array<int,array<string,mixed>> $map Sitemap map.
+		 */
+		$this->sitemap_map = apply_filters( 'wpseopilot_sitemap_map', $map );
+
+		return $this->sitemap_map;
+	}
+
+	/**
+	 * Retrieve the WordPress sitemap server while temporarily allowing it to run.
+	 *
+	 * @return \WP_Sitemaps|null
+	 */
+	private function get_sitemaps_server() {
+		if ( $this->sitemap_server instanceof \WP_Sitemaps ) {
+			return $this->sitemap_server;
+		}
+
+		if ( ! function_exists( 'wp_sitemaps_get_server' ) ) {
+			return null;
+		}
+
+		$this->allow_core_sitemaps = true;
+		$server                    = wp_sitemaps_get_server();
+
+		if ( $server && empty( $server->registry->get_providers() ) && method_exists( $server, 'register_sitemaps' ) ) {
+			$server->register_sitemaps();
+		}
+
+		$this->allow_core_sitemaps = false;
+
+		if ( ! $server ) {
+			return null;
+		}
+
+		$this->sitemap_server = $server;
+
+		return $this->sitemap_server;
+	}
+
+	/**
+	 * Retrieve the WordPress sitemap renderer.
+	 *
+	 * @return \WP_Sitemaps_Renderer|null
+	 */
+	private function get_renderer() {
+		$server = $this->get_sitemaps_server();
+
+		return $server ? $server->renderer : null;
+	}
+
+	/**
+	 * Retrieve a provider by name.
+	 *
+	 * @param string $name Provider name.
+	 *
+	 * @return \WP_Sitemaps_Provider|null
+	 */
+	private function get_provider( $name ) {
+		$server = $this->get_sitemaps_server();
+
+		if ( ! $server ) {
+			return null;
+		}
+
+		return $server->registry->get_provider( $name );
+	}
+
+	/**
+	 * Determine the maximum number of pages for a sitemap group.
+	 *
+	 * @param array<string,mixed> $group Group metadata.
+	 *
+	 * @return int
+	 */
+	private function get_max_pages_for_group( $group ) {
+		$provider = $this->get_provider( $group['provider'] );
+
+		if ( ! $provider ) {
+			return 0;
+		}
+
+		$this->allow_core_sitemaps = true;
+
+		if ( 'users' === $group['provider'] ) {
+			$max_pages = (int) $provider->get_max_num_pages();
+		} else {
+			$max_pages = (int) $provider->get_max_num_pages( $group['subtype'] );
+		}
+
+		$this->allow_core_sitemaps = false;
+
+		return $max_pages;
+	}
+
+	/**
+	 * Fetch URL list for a sitemap page.
+	 *
+	 * @param array<string,mixed> $group Group metadata.
+	 * @param int                 $page  Page number.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function fetch_sitemap_urls( $group, $page ) {
+		$page      = max( 1, (int) $page );
+		$cache_key = sprintf( '%s|%d', $group['slug'], $page );
+
+		if ( isset( $this->sitemap_page_cache[ $cache_key ] ) ) {
+			return $this->sitemap_page_cache[ $cache_key ];
+		}
+
+		$provider = $this->get_provider( $group['provider'] );
+
+		if ( ! $provider ) {
+			return [];
+		}
+
+		$this->allow_core_sitemaps = true;
+
+		if ( 'users' === $group['provider'] ) {
+			$list = $provider->get_url_list( $page );
+		} else {
+			$list = $provider->get_url_list( $page, $group['subtype'] );
+		}
+
+		$this->allow_core_sitemaps = false;
+
+		if ( ! is_array( $list ) ) {
+			$list = [];
+		}
+
+		$this->sitemap_page_cache[ $cache_key ] = $list;
+
+		return $list;
+	}
+
+	/**
+	 * Determine last modified timestamp for a sitemap page.
+	 *
+	 * @param array<string,mixed> $group Group metadata.
+	 * @param int                 $page  Page number.
+	 *
+	 * @return string
+	 */
+	private function get_sitemap_lastmod( $group, $page ) {
+		$list = $this->fetch_sitemap_urls( $group, $page );
+
+		if ( empty( $list ) ) {
+			return '';
+		}
+
+		foreach ( $list as $entry ) {
+			if ( ! empty( $entry['lastmod'] ) ) {
+				return $entry['lastmod'];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Build a Yoast-style sitemap URL.
+	 *
+	 * @param string $slug Slug.
+	 * @param int    $page Page number.
+	 *
+	 * @return string
+	 */
+	private function build_sitemap_url( $slug, $page ) {
+		$page_suffix = ( $page > 1 ) ? $page : '';
+
+		return home_url( sprintf( '/%s-sitemap%s.xml', $slug, $page_suffix ) );
+	}
+
+	/**
+	 * Sanitize sitemap slug.
+	 *
+	 * @param string $slug Raw slug.
+	 *
+	 * @return string
+	 */
+	private function sanitize_slug( $slug ) {
+		$slug = strtolower( (string) $slug );
+
+		return preg_replace( '#[^a-z0-9_-]#', '', $slug );
+	}
+
+	/**
+	 * Force stylesheet URL to the WP SEO Pilot version.
+	 *
+	 * @param string $url Original URL.
+	 *
+	 * @return string
+	 */
+	public function filter_stylesheet_url( $url ) {
+		return $this->get_stylesheet_url();
+	}
+
+	/**
+	 * Send a 404 header when a sitemap cannot be built.
+	 *
+	 * @return void
+	 */
+	private function bail_404() {
+		global $wp_query;
+
+		if ( $wp_query instanceof \WP_Query ) {
+			$wp_query->set_404();
+		}
+
+		status_header( 404 );
 	}
 
 	/**
@@ -167,5 +583,185 @@ class Sitemap_Enhancer {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Force-disable WordPress core sitemaps while this module is active.
+	 *
+	 * @param bool $enabled Whether core sitemaps are enabled.
+	 *
+	 * @return bool
+	 */
+	public function disable_core_sitemaps( $enabled ) {
+		if ( $this->allow_core_sitemaps ) {
+			return $enabled;
+		}
+
+		$should_disable = apply_filters( 'wpseopilot_disable_core_sitemaps', true );
+
+		return $should_disable ? false : $enabled;
+	}
+
+	/**
+	 * Whether the current request targets WP core sitemaps.
+	 *
+	 * @return bool
+	 */
+	private function is_wp_core_sitemap_request() {
+		return (bool) ( get_query_var( 'sitemap' ) || get_query_var( 'sitemap-stylesheet' ) );
+	}
+
+	/**
+	 * Redirect the core sitemap endpoint to the WP SEO Pilot equivalent.
+	 *
+	 * @return void
+	 */
+	private function redirect_core_sitemap() {
+		$target = apply_filters( 'wpseopilot_sitemap_redirect', home_url( '/sitemap_index.xml' ) );
+
+		if ( empty( $target ) || headers_sent() ) {
+			return;
+		}
+
+		nocache_headers();
+		wp_safe_redirect( esc_url_raw( $target ), 301 );
+		exit;
+	}
+
+	/**
+	 * Render human-friendly XSL stylesheet.
+	 *
+	 * @return void
+	 */
+	private function render_sitemap_stylesheet() {
+		nocache_headers();
+		header( 'Content-Type: application/xml; charset=UTF-8' );
+
+		echo '<?xml version="1.0" encoding="UTF-8"?>';
+		?>
+<xsl:stylesheet version="1.0"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<xsl:output method="html" indent="yes" />
+
+	<xsl:template match="/">
+		<html lang="en">
+			<head>
+				<meta charset="utf-8" />
+				<title>WP SEO Pilot Sitemap</title>
+				<style>
+					body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f5f6fa;margin:0;padding:2rem;color:#1f2933;}
+					h1{margin-top:0;font-size:1.8rem;}
+					p.description{color:#4b5563;margin-bottom:1.5rem;}
+					table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 15px 35px rgba(31,45,61,.08);}
+					th,td{padding:1rem;text-align:left;}
+					th{background:#0f172a;color:#f8fafc;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em;}
+					tbody tr:nth-child(even){background:#fff;}
+					tbody tr:nth-child(odd){background:#f8fafc;}
+					tbody tr:hover{background:#e0f2fe;}
+					.loc{word-break:break-all;color:#0f62fe;font-weight:500;text-decoration:none;}
+					.badge{display:inline-flex;align-items:center;background:#0f172a;color:#fff;border-radius:999px;padding:0 .65rem;font-size:.72rem;font-weight:600;margin-left:.5rem;}
+					.meta{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:#475569;margin-bottom:.5rem;}
+				</style>
+			</head>
+			<body>
+				<main>
+					<h1>XML Sitemap Overview</h1>
+					<p class="description">
+						This sitemap is generated by WP SEO Pilot and helps search engines discover your most important content quickly.
+					</p>
+					<xsl:choose>
+						<xsl:when test="count(/sitemap:sitemapindex/sitemap:sitemap) &gt; 0">
+							<div class="meta">
+								<strong>Sitemaps:</strong>
+								<span class="badge">
+									<xsl:value-of select="count(/sitemap:sitemapindex/sitemap:sitemap)" />
+								</span>
+							</div>
+							<table>
+								<thead>
+									<tr>
+										<th scope="col">Sitemap URL</th>
+										<th scope="col">Last Modified</th>
+									</tr>
+								</thead>
+								<tbody>
+									<xsl:for-each select="/sitemap:sitemapindex/sitemap:sitemap">
+										<tr>
+											<td>
+												<a class="loc">
+													<xsl:attribute name="href"><xsl:value-of select="sitemap:loc" /></xsl:attribute>
+													<xsl:value-of select="sitemap:loc" />
+												</a>
+											</td>
+											<td>
+												<xsl:choose>
+													<xsl:when test="sitemap:lastmod">
+														<xsl:value-of select="sitemap:lastmod" />
+													</xsl:when>
+													<xsl:otherwise>—</xsl:otherwise>
+												</xsl:choose>
+											</td>
+										</tr>
+									</xsl:for-each>
+								</tbody>
+							</table>
+						</xsl:when>
+						<xsl:when test="count(/sitemap:urlset/sitemap:url) &gt; 0">
+							<div class="meta">
+								<strong>URLs:</strong>
+								<span class="badge">
+									<xsl:value-of select="count(/sitemap:urlset/sitemap:url)" />
+								</span>
+							</div>
+							<table>
+								<thead>
+									<tr>
+										<th scope="col">Page URL</th>
+										<th scope="col">Last Modified</th>
+									</tr>
+								</thead>
+								<tbody>
+									<xsl:for-each select="/sitemap:urlset/sitemap:url">
+										<tr>
+											<td>
+												<a class="loc">
+													<xsl:attribute name="href"><xsl:value-of select="sitemap:loc" /></xsl:attribute>
+													<xsl:value-of select="sitemap:loc" />
+												</a>
+											</td>
+											<td>
+												<xsl:choose>
+													<xsl:when test="sitemap:lastmod">
+														<xsl:value-of select="sitemap:lastmod" />
+													</xsl:when>
+													<xsl:otherwise>—</xsl:otherwise>
+												</xsl:choose>
+											</td>
+										</tr>
+									</xsl:for-each>
+								</tbody>
+							</table>
+						</xsl:when>
+						<xsl:otherwise>
+							<p>No sitemap entries were found.</p>
+						</xsl:otherwise>
+					</xsl:choose>
+				</main>
+			</body>
+		</html>
+	</xsl:template>
+</xsl:stylesheet>
+		<?php
+		exit;
+	}
+
+	/**
+	 * Get stylesheet URL.
+	 *
+	 * @return string
+	 */
+	private function get_stylesheet_url() {
+		return apply_filters( 'wpseopilot_sitemap_stylesheet', home_url( '/sitemap-style.xsl' ) );
 	}
 }

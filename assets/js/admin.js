@@ -43,11 +43,6 @@
 		frame.open();
 	});
 
-	$(document).ready(function () {
-		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);
-		updatePreview();
-	});
-
 	const setAiStatus = (statusEl, message, variant) => {
 		if (!statusEl || !statusEl.length) {
 			return;
@@ -131,5 +126,65 @@
 	$(document).on('click', '.wpseopilot-ai-button', function (e) {
 		e.preventDefault();
 		requestAi($(this));
+	});
+
+	const initTabs = () => {
+		$('.wpseopilot-tabs').each(function () {
+			const $container = $(this);
+			const $tabs = $container.find('[data-wpseopilot-tab]');
+			const $panels = $container.find('.wpseopilot-tab-panel');
+			const standalonePanels = [
+				'wpseopilot-tab-export',
+				'wpseopilot-tab-knowledge',
+				'wpseopilot-tab-social',
+			];
+
+			if (!$tabs.length || !$panels.length) {
+				return;
+			}
+
+			const activate = (targetId) => {
+				if (!targetId) {
+					return;
+				}
+
+				const $targetTab = $tabs.filter(function () {
+					return $(this).data('wpseopilot-tab') === targetId;
+				});
+				const $targetPanel = $panels.filter('#' + targetId);
+
+				if (!$targetTab.length || !$targetPanel.length) {
+					return;
+				}
+
+				$tabs.removeClass('nav-tab-active').attr('aria-selected', 'false');
+				$targetTab.addClass('nav-tab-active').attr('aria-selected', 'true');
+
+				$panels.removeClass('is-active').attr('hidden', 'hidden');
+				$targetPanel.addClass('is-active').removeAttr('hidden');
+
+				const noActions = standalonePanels.includes(targetId);
+				$container.toggleClass('wpseopilot-tabs--no-actions', noActions);
+			};
+
+			$tabs.on('click', function (event) {
+				event.preventDefault();
+				activate($(this).data('wpseopilot-tab'));
+			});
+
+			$container.addClass('wpseopilot-tabs--ready');
+
+			const initial =
+				$tabs.filter('.nav-tab-active').data('wpseopilot-tab') ||
+				$tabs.first().data('wpseopilot-tab');
+
+			activate(initial);
+		});
+	};
+
+	$(document).ready(function () {
+		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);
+		updatePreview();
+		initTabs();
 	});
 })(jQuery, window.WPSEOPilotAdmin);
