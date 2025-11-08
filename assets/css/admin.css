@@ -1,0 +1,111 @@
+.wpseopilot-card {
+	background: #fff;
+	padding: 20px;
+	margin-bottom: 20px;
+	border: 1px solid #e2e4e7;
+	border-radius: 8px;
+}
+
+.wpseopilot-card--split {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 24px;
+}
+
+.wpseopilot-media-field {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.wpseopilot-fields input[type='text'],
+.wpseopilot-fields input[type='url'],
+.wpseopilot-fields textarea {
+	margin-top: 4px;
+}
+
+.wpseopilot-counter {
+	font-size: 12px;
+	color: #888;
+	float: right;
+}
+
+.wpseopilot-preview {
+	margin-top: 16px;
+	border-top: 1px solid #e2e4e7;
+	padding-top: 12px;
+}
+
+.wpseopilot-serp {
+	border: 1px solid #dcdfe5;
+	padding: 12px;
+	border-radius: 6px;
+	background: #fff;
+	margin-bottom: 12px;
+}
+
+.wpseopilot-serp__title {
+	color: #1a0dab;
+	font-size: 16px;
+	margin: 0 0 4px;
+}
+
+.wpseopilot-serp__url {
+	color: #0f9d58;
+	font-size: 12px;
+	margin: 0 0 4px;
+}
+
+.wpseopilot-serp__desc {
+	color: #4d5156;
+	font-size: 13px;
+	margin: 0;
+}
+
+.wpseopilot-social {
+	display: grid;
+	grid-template-columns: 120px 1fr;
+	gap: 12px;
+	align-items: center;
+}
+
+.wpseopilot-social__image {
+	width: 120px;
+	height: 120px;
+	border: 1px dashed #c3c6cf;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f5f6f9;
+	overflow: hidden;
+}
+
+.wpseopilot-social__image img {
+	width: 100%;
+	height: auto;
+}
+
+.wpseopilot-links ul {
+	margin: 8px 0 0;
+	padding-left: 18px;
+}
+
+.wpseopilot-links li {
+	font-size: 12px;
+}
+
+.wpseopilot-chip {
+	display: inline-block;
+	background: #eef3ff;
+	color: #3451b2;
+	padding: 2px 6px;
+	margin-right: 4px;
+	border-radius: 4px;
+	font-size: 11px;
+}
+
+.wpseopilot-flag {
+	font-size: 11px;
+	color: #b24141;
+	font-weight: 600;
+}
