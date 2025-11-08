@@ -57,6 +57,7 @@ class Plugin {
 		$this->register( 'frontend', new Service\Frontend() );
 		$this->register( 'jsonld', new Service\JsonLD() );
 		$this->register( 'admin', new Service\Admin_UI() );
+		$this->register( 'ai', new Service\AI_Assistant() );
 		$this->register( 'importer', new Service\Importers() );
 		$this->register( 'redirects', new Service\Redirect_Manager() );
 		$this->register( 'onboarding', new Service\Onboarding() );
@@ -113,6 +114,11 @@ class Plugin {
 		add_option( 'wpseopilot_post_type_title_templates', [] );
 		add_option( 'wpseopilot_post_type_meta_descriptions', [] );
 		add_option( 'wpseopilot_post_type_keywords', [] );
+		add_option( 'wpseopilot_openai_api_key', '' );
+		add_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
+		add_option( 'wpseopilot_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' );
+		add_option( 'wpseopilot_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' );
+		add_option( 'wpseopilot_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' );
 		add_option( 'wpseopilot_default_meta_description', '' );
 		add_option( 'wpseopilot_default_og_image', '' );
 		add_option( 'wpseopilot_show_onboarding', '1' );

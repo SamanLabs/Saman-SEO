@@ -166,4 +166,76 @@
 			</form>
 		</div>
 	</section>
+
+	<section class="wpseopilot-card">
+		<h2><?php esc_html_e( 'Homepage Defaults', 'wp-seo-pilot' ); ?></h2>
+		<p><?php esc_html_e( 'Set the title and description that appear when visitors find your homepage in search results.', 'wp-seo-pilot' ); ?></p>
+		<form action="options.php" method="post">
+			<?php settings_fields( 'wpseopilot_homepage' ); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_title"><?php esc_html_e( 'SEO title', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<input type="text" class="regular-text" id="wpseopilot_homepage_title" name="wpseopilot_homepage_title" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_title' ) ); ?>" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_description"><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<textarea class="large-text" rows="3" id="wpseopilot_homepage_description" name="wpseopilot_homepage_description"><?php echo esc_textarea( get_option( 'wpseopilot_homepage_description' ) ); ?></textarea>
+					</td>
+				</tr>
+			</table>
+			<?php submit_button( __( 'Save homepage defaults', 'wp-seo-pilot' ) ); ?>
+		</form>
+	</section>
+
+	<section class="wpseopilot-card">
+		<h2><?php esc_html_e( 'Knowledge Graph & Schema.org', 'wp-seo-pilot' ); ?></h2>
+		<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google’s Knowledge Graph and other rich results.', 'wp-seo-pilot' ); ?></p>
+		<form action="options.php" method="post">
+			<?php settings_fields( 'wpseopilot_homepage' ); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Site represents', 'wp-seo-pilot' ); ?></th>
+					<td>
+						<label>
+							<input type="radio" name="wpseopilot_homepage_knowledge_type" value="organization" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'organization' ); ?> />
+							<?php esc_html_e( 'Organization', 'wp-seo-pilot' ); ?>
+						</label>
+						<br />
+						<label>
+							<input type="radio" name="wpseopilot_homepage_knowledge_type" value="person" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'person' ); ?> />
+							<?php esc_html_e( 'Person', 'wp-seo-pilot' ); ?>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_organization_name"><?php esc_html_e( 'Organization name', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<input type="text" class="regular-text" id="wpseopilot_homepage_organization_name" name="wpseopilot_homepage_organization_name" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_organization_name' ) ); ?>" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="wpseopilot_homepage_organization_logo"><?php esc_html_e( 'Organization logo', 'wp-seo-pilot' ); ?></label>
+					</th>
+					<td>
+						<div class="wpseopilot-media-field">
+							<input type="url" class="regular-text" id="wpseopilot_homepage_organization_logo" name="wpseopilot_homepage_organization_logo" value="<?php echo esc_url( get_option( 'wpseopilot_homepage_organization_logo' ) ); ?>" />
+							<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'wp-seo-pilot' ); ?></button>
+						</div>
+						<p class="description"><?php esc_html_e( 'Recommended: square logo at least 112×112 px. Used in structured data and social previews.', 'wp-seo-pilot' ); ?></p>
+					</td>
+				</tr>
+			</table>
+			<?php submit_button( __( 'Save Knowledge Graph settings', 'wp-seo-pilot' ) ); ?>
+		</form>
+	</section>
 </div>

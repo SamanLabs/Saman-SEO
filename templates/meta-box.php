@@ -2,24 +2,42 @@
 /**
  * Classic meta box layout.
  *
- * @var array $meta
+ * @var array   $meta
  * @var WP_Post $post
+ * @var bool    $ai_enabled
  *
  * @package WPSEOPilot
  */
 
+$ai_enabled = ! empty( $ai_enabled );
 ?>
 <div class="wpseopilot-fields">
 	<p>
 		<label for="wpseopilot_title"><strong><?php esc_html_e( 'Meta title', 'wp-seo-pilot' ); ?></strong></label>
 		<input type="text" name="wpseopilot_title" id="wpseopilot_title" class="widefat" value="<?php echo esc_attr( $meta['title'] ); ?>" maxlength="160" />
 		<span class="wpseopilot-counter" data-target="wpseopilot_title"></span>
+		<?php if ( $ai_enabled ) : ?>
+			<span class="wpseopilot-ai-inline">
+				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="title" data-target="#wpseopilot_title" data-post="<?php echo esc_attr( $post->ID ); ?>">
+					<?php esc_html_e( 'Generate title with AI', 'wp-seo-pilot' ); ?>
+				</button>
+				<span class="wpseopilot-ai-status" data-ai-status="title"></span>
+			</span>
+		<?php endif; ?>
 	</p>
 
 	<p>
 		<label for="wpseopilot_description"><strong><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></strong></label>
 		<textarea name="wpseopilot_description" id="wpseopilot_description" class="widefat" rows="3" maxlength="320"><?php echo esc_textarea( $meta['description'] ); ?></textarea>
 		<span class="wpseopilot-counter" data-target="wpseopilot_description"></span>
+		<?php if ( $ai_enabled ) : ?>
+			<span class="wpseopilot-ai-inline">
+				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="description" data-target="#wpseopilot_description" data-post="<?php echo esc_attr( $post->ID ); ?>">
+					<?php esc_html_e( 'Generate description with AI', 'wp-seo-pilot' ); ?>
+				</button>
+				<span class="wpseopilot-ai-status" data-ai-status="description"></span>
+			</span>
+		<?php endif; ?>
 	</p>
 
 	<p>

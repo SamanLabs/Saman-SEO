@@ -8,6 +8,7 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - Server-rendered `<title>`, meta description, canonical, robots, Open Graph, Twitter Card, and JSON-LD (WebSite, WebPage, Article, Breadcrumb).
 - Site-wide defaults for templates, descriptions, social images, robots, hreflang, and module toggles — plus dedicated per-post-type defaults for titles, descriptions, and keywords.
 - Snippet + social previews, internal link suggestions, guided onboarding, quick actions, and compatibility detection for other SEO plugins.
+- AI assistant connects to OpenAI for one-click title & meta description suggestions, with configurable prompts, model selection, and inline editor buttons.
 - SEO Audit dashboard with severity graph, issue log, and auto-generated fallback titles/descriptions/tags for posts that are missing metadata.
 - Redirect manager (DB table `wpseopilot_redirects`), WP-CLI commands, 404 logging with hashed referrers, sitemap enhancer module, robots.txt editor, and import/export (including Yoast/Rank Math/AIOSEO with dry-run previews).
 

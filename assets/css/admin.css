@@ -125,6 +125,185 @@
 	margin-left: 8px;
 }
 
+.wpseopilot-ai {
+	max-width: 960px;
+}
+
+.wpseopilot-accordion {
+	border: 1px solid #dfe1e5;
+	border-radius: 8px;
+	margin-bottom: 12px;
+	background: #fff;
+}
+
+.wpseopilot-accordion summary {
+	cursor: pointer;
+	padding: 12px 16px;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.wpseopilot-accordion summary::-webkit-details-marker {
+	display: none;
+}
+
+.wpseopilot-accordion__body {
+	padding: 16px;
+	border-top: 1px solid #e2e4e7;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.wpseopilot-flex {
+	display: flex;
+	gap: 24px;
+	flex-wrap: wrap;
+}
+
+.wpseopilot-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-right: 12px;
+}
+
+.wpseopilot-ai__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 20px;
+}
+
+.wpseopilot-ai__hero {
+	background: linear-gradient(135deg, #f0f7ff, #ffffff);
+	padding: 16px;
+	border-radius: 8px;
+	margin-bottom: 20px;
+}
+
+.wpseopilot-list {
+	margin: 8px 0 0;
+	padding-left: 18px;
+}
+
+.wpseopilot-list li {
+	margin-bottom: 4px;
+}
+
+.wpseopilot-ai__form label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+.wpseopilot-ai__form input.regular-text {
+	max-width: 420px;
+}
+
+.wpseopilot-ai__form--grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 20px;
+}
+
+.wpseopilot-field textarea {
+	width: 100%;
+}
+
+.wpseopilot-field select {
+	min-width: 220px;
+}
+
+.wpseopilot-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.wpseopilot-ai__toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+	gap: 12px;
+}
+
+.wpseopilot-ai__toolbar form {
+	margin: 0;
+}
+
+.wpseopilot-ai__toolbar .button-link-delete {
+	color: #b91c1c;
+	padding: 0;
+	text-decoration: underline;
+}
+
+.wpseopilot-ai__actions {
+	display: flex;
+	gap: 12px;
+	margin: 12px 0;
+}
+
+.wpseopilot-ai-inline {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.wpseopilot-ai-status,
+.wpseopilot-ai__status,
+.wpseopilot-ai-panel__status {
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.wpseopilot-ai-status.is-loading,
+.wpseopilot-ai__status.is-loading,
+.wpseopilot-ai-panel__status.is-loading {
+	color: #d97706;
+}
+
+.wpseopilot-ai-status.is-error,
+.wpseopilot-ai__status.is-error,
+.wpseopilot-ai-panel__status.is-error {
+	color: #b91c1c;
+}
+
+.wpseopilot-ai-status.is-success,
+.wpseopilot-ai__status.is-success,
+.wpseopilot-ai-panel__status.is-success {
+	color: #0f9d58;
+}
+
+.wpseopilot-ai__status {
+	min-height: 18px;
+	margin-bottom: 12px;
+	font-weight: 600;
+}
+
+.wpseopilot-ai__status.is-loading {
+	color: #d97706;
+}
+
+.wpseopilot-ai__status.is-error {
+	color: #b91c1c;
+}
+
+.wpseopilot-ai__status.is-success {
+	color: #0f9d58;
+}
+
+.wpseopilot-ai-panel {
+	margin: 12px 0;
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
 .wpseopilot-audit__summary {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

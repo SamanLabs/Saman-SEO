@@ -77,6 +77,8 @@ class Admin_UI {
 
 		wp_nonce_field( 'wpseopilot_meta', 'wpseopilot_meta_nonce' );
 
+		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+
 		include WPSEOPILOT_PATH . 'templates/meta-box.php';
 	}
 
@@ -113,6 +115,27 @@ class Admin_UI {
 			add_action( 'admin_print_footer_scripts', [ $this, 'print_pointer' ] );
 			update_option( 'wpseopilot_show_tour', '0' );
 		}
+
+		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+		wp_localize_script(
+			'wpseopilot-admin',
+			'WPSEOPilotAdmin',
+			[
+				'mediaTitle'  => __( 'Select image', 'wp-seo-pilot' ),
+				'mediaButton' => __( 'Use image', 'wp-seo-pilot' ),
+				'ai'          => [
+					'enabled' => $ai_enabled,
+					'ajax'    => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'wpseopilot_ai_generate' ),
+					'strings' => [
+						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI Assistant to enable suggestions.', 'wp-seo-pilot' ),
+						'running'  => __( 'Asking AI for ideas…', 'wp-seo-pilot' ),
+						'success'  => __( 'AI suggestion inserted.', 'wp-seo-pilot' ),
+						'error'    => __( 'Unable to fetch suggestion.', 'wp-seo-pilot' ),
+					],
+				],
+			]
+		);
 	}
 
 	/**
@@ -147,6 +170,8 @@ class Admin_UI {
 			$post_type_descriptions = [];
 		}
 
+		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+
 		wp_localize_script(
 			'wpseopilot-editor',
 			'WPSEOPilotEditor',
@@ -156,6 +181,17 @@ class Admin_UI {
 				'defaultOg'          => get_option( 'wpseopilot_default_og_image', '' ),
 				'postTypeTemplates'  => $post_type_templates,
 				'postTypeDescriptions' => $post_type_descriptions,
+				'ai'                 => [
+					'enabled' => $ai_enabled,
+					'ajax'    => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'wpseopilot_ai_generate' ),
+					'strings' => [
+						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI Assistant to enable suggestions.', 'wp-seo-pilot' ),
+						'running'  => __( 'Asking AI for ideas…', 'wp-seo-pilot' ),
+						'success'  => __( 'AI suggestion inserted.', 'wp-seo-pilot' ),
+						'error'    => __( 'Unable to fetch suggestion.', 'wp-seo-pilot' ),
+					],
+				],
 			]
 		);
 	}

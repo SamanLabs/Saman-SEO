@@ -9,6 +9,7 @@ namespace WPSEOPilot\Service;
 
 use WP_Post;
 use function WPSEOPilot\Helpers\breadcrumbs;
+use function WPSEOPilot\Helpers\generate_content_snippet;
 use function WPSEOPilot\Helpers\generate_title_from_template;
 
 defined( 'ABSPATH' ) || exit;
@@ -49,6 +50,7 @@ class Frontend {
 		$meta = $this->get_meta( $post );
 		$post_type_descriptions = $this->get_post_type_option( 'wpseopilot_post_type_meta_descriptions' );
 		$post_type_keywords     = $this->get_post_type_option( 'wpseopilot_post_type_keywords' );
+		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 
 		$title = $meta['title'];
 		if ( empty( $title ) && $post instanceof WP_Post ) {
@@ -64,8 +66,14 @@ class Frontend {
 		if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
 			$description = $post_type_descriptions[ $post->post_type ];
 		}
+		if ( empty( $description ) && ! empty( $content_snippet ) ) {
+			$description = $content_snippet;
+		}
 		if ( empty( $description ) ) {
 			$description = get_option( 'wpseopilot_default_meta_description', get_bloginfo( 'description' ) );
+		}
+		if ( empty( $description ) ) {
+			$description = get_bloginfo( 'description' );
 		}
 		$description = apply_filters( 'wpseopilot_description', $description, $post );
 
@@ -76,6 +84,25 @@ class Frontend {
 		$keywords = '';
 		if ( $post instanceof WP_Post && ! empty( $post_type_keywords[ $post->post_type ] ) ) {
 			$keywords = $post_type_keywords[ $post->post_type ];
+		}
+		if ( empty( $keywords ) && $post instanceof WP_Post ) {
+			$term_names = [];
+
+			$tags = get_the_tags( $post->ID );
+			if ( $tags && ! is_wp_error( $tags ) ) {
+				$term_names = array_merge( $term_names, wp_list_pluck( $tags, 'name' ) );
+			}
+
+			$categories = get_the_category( $post->ID );
+			if ( $categories && ! is_wp_error( $categories ) ) {
+				$term_names = array_merge( $term_names, wp_list_pluck( $categories, 'name' ) );
+			}
+
+			$term_names = array_filter( array_unique( array_map( 'trim', $term_names ) ) );
+
+			if ( $term_names ) {
+				$keywords = implode( ', ', $term_names );
+			}
 		}
 		$keywords = apply_filters( 'wpseopilot_keywords', $keywords, $post );
 
@@ -112,11 +139,15 @@ class Frontend {
 		$meta = $this->get_meta( $post );
 		$url  = $this->get_canonical( $post, $meta );
 		$post_type_descriptions = $this->get_post_type_option( 'wpseopilot_post_type_meta_descriptions' );
+		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 
 		$title = apply_filters( 'wpseopilot_og_title', $meta['title'] ?: get_the_title( $post ), $post );
 		$description = $meta['description'] ?: '';
 		if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
 			$description = $post_type_descriptions[ $post->post_type ];
+		}
+		if ( empty( $description ) && ! empty( $content_snippet ) ) {
+			$description = $content_snippet;
 		}
 		if ( empty( $description ) ) {
 			$description = get_option( 'wpseopilot_default_meta_description', '' );
@@ -350,4 +381,5 @@ class Frontend {
 
 		return is_array( $value ) ? $value : [];
 	}
+
 }

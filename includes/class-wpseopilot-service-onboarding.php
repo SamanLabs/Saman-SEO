@@ -21,7 +21,6 @@ class Onboarding {
 	 */
 	public function boot() {
 		add_action( 'admin_menu', [ $this, 'register_page' ] );
-		add_action( 'admin_notices', [ $this, 'maybe_prompt_notice' ] );
 		add_action( 'admin_post_wpseopilot_onboarding', [ $this, 'handle_submission' ] );
 	}
 
@@ -38,32 +37,6 @@ class Onboarding {
 			'manage_options',
 			'wpseopilot-onboarding',
 			[ $this, 'render_page' ]
-		);
-	}
-
-	/**
-	 * Display onboarding CTA.
-	 *
-	 * @return void
-	 */
-	public function maybe_prompt_notice() {
-		if ( '1' !== get_option( 'wpseopilot_show_onboarding', '1' ) ) {
-			return;
-		}
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		printf(
-			'<div class="notice notice-info"><p>%s</p></div>',
-			wp_kses_post(
-				sprintf(
-					/* translators: %s: link */
-					__( 'WP SEO Pilot is ready. <a href="%s">Finish onboarding</a> to set defaults.', 'wp-seo-pilot' ),
-					esc_url( admin_url( 'admin.php?page=wpseopilot-onboarding' ) )
-				)
-			)
 		);
 	}
 

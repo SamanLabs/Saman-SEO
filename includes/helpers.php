@@ -103,6 +103,41 @@ namespace WPSEOPilot\Helpers {
 	}
 
 	/**
+	 * Generate a trimmed snippet from post content.
+	 *
+	 * @param WP_Post|int $post  Post object or ID.
+	 * @param int         $words Number of words.
+	 *
+	 * @return string
+	 */
+	function generate_content_snippet( $post, $words = 30 ) {
+		$post = \get_post( $post );
+
+		if ( ! $post instanceof WP_Post ) {
+			return '';
+		}
+
+		$content = $post->post_content;
+		if ( \has_blocks( $post ) ) {
+			$content = \strip_shortcodes( $content );
+		}
+
+		$content = preg_replace( '/<!--(.|\s)*?-->/', ' ', $content );
+		$content = \wp_strip_all_tags( $content );
+		$content = trim( preg_replace( '/\s+/', ' ', $content ) );
+
+		if ( empty( $content ) ) {
+			$content = \wp_strip_all_tags( $post->post_excerpt ?: \get_the_excerpt( $post ) );
+		}
+
+		if ( empty( $content ) ) {
+			return '';
+		}
+
+		return \wp_trim_words( $content, $words );
+	}
+
+	/**
 	 * Convenience wrapper for breadcrumbs markup.
 	 *
 	 * @param WP_Post|int|null $post Post.
