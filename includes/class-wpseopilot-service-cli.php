@@ -38,12 +38,10 @@ class CLI {
 				 *
 				 * @subcommand list
 				 */
-				public function list_( $args, $assoc_args ) {
-					global $wpdb;
-					$table = $wpdb->prefix . 'wpseopilot_redirects';
-					$data  = $wpdb->get_results( "SELECT id, source, target, status_code, hits, last_hit FROM {$table}" );
-					\WP_CLI\Utils\format_items( $assoc_args['format'] ?? 'table', array_map( 'get_object_vars', $data ), [ 'id', 'source', 'target', 'status_code', 'hits', 'last_hit' ] );
-				}
+					public function list_( $args, $assoc_args ) {
+						$data = array_map( [ $this, 'sanitize_redirect_row' ], $this->get_redirect_rows() );
+						\WP_CLI\Utils\format_items( $assoc_args['format'] ?? 'table', $data, [ 'id', 'source', 'target', 'status_code', 'hits', 'last_hit' ] );
+					}
 
 				/**
 				 * Export redirects as JSON.
@@ -55,9 +53,10 @@ class CLI {
 				 */
 				public function export( $args ) {
 					list( $file ) = $args;
-					global $wpdb;
-					$table     = $wpdb->prefix . 'wpseopilot_redirects';
-					$redirects = $wpdb->get_results( "SELECT source, target, status_code FROM {$table}", ARRAY_A );
+					$redirects = array_map(
+						[ $this, 'sanitize_redirect_row_for_export' ],
+						$this->get_redirect_rows()
+					);
 					file_put_contents( $file, wp_json_encode( $redirects, JSON_PRETTY_PRINT ) );
 					\WP_CLI::success( sprintf( 'Exported %d redirects.', count( $redirects ) ) );
 				}
@@ -85,6 +84,7 @@ class CLI {
 					$table = $wpdb->prefix . 'wpseopilot_redirects';
 
 					foreach ( $data as $row ) {
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Importing redirect rows requires direct writes to the custom table.
 						$wpdb->insert(
 							$table,
 							[
@@ -96,7 +96,65 @@ class CLI {
 						);
 					}
 
+					Redirect_Manager::flush_cache();
+
 					\WP_CLI::success( sprintf( 'Imported %d redirects.', count( $data ) ) );
+				}
+
+				/**
+				 * Get redirect rows with shared caching.
+				 *
+				 * @return array[]
+				 */
+				private function get_redirect_rows() {
+					$data = wp_cache_get( Redirect_Manager::CACHE_KEY_CLI, Redirect_Manager::CACHE_GROUP );
+
+					if ( false === $data ) {
+						global $wpdb;
+						$table = esc_sql( $wpdb->prefix . 'wpseopilot_redirects' );
+						$query = "SELECT id, source, target, status_code, hits, last_hit FROM `{$table}`";
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom redirect table access requires a direct query. Results are cached immediately after.
+						$raw_data = $wpdb->get_results( $query, ARRAY_A );
+
+						$data = array_map( [ $this, 'sanitize_redirect_row' ], $raw_data );
+
+						wp_cache_set( Redirect_Manager::CACHE_KEY_CLI, $data, Redirect_Manager::CACHE_GROUP, Redirect_Manager::CACHE_TTL );
+					}
+
+					return $data;
+				}
+
+				/**
+				 * Sanitize redirect database row.
+				 *
+				 * @param array $row Row data.
+				 *
+				 * @return array
+				 */
+				private function sanitize_redirect_row( array $row ) {
+					return [
+						'id'          => isset( $row['id'] ) ? (int) $row['id'] : 0,
+						'source'      => isset( $row['source'] ) ? sanitize_text_field( $row['source'] ) : '',
+						'target'      => isset( $row['target'] ) ? esc_url_raw( $row['target'] ) : '',
+						'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
+						'hits'        => isset( $row['hits'] ) ? (int) $row['hits'] : 0,
+						'last_hit'    => isset( $row['last_hit'] ) ? sanitize_text_field( $row['last_hit'] ) : '',
+					];
+				}
+
+				/**
+				 * Sanitize fields specifically for export payload.
+				 *
+				 * @param array $row Row data.
+				 *
+				 * @return array
+				 */
+				private function sanitize_redirect_row_for_export( array $row ) {
+					return [
+						'source'      => isset( $row['source'] ) ? sanitize_text_field( $row['source'] ) : '',
+						'target'      => isset( $row['target'] ) ? esc_url_raw( $row['target'] ) : '',
+						'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
+					];
 				}
 			}
 		);

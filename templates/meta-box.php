@@ -9,14 +9,14 @@
  * @package WPSEOPilot
  */
 
-$ai_enabled = ! empty( $ai_enabled );
+$wpseopilot_ai_enabled = ! empty( $ai_enabled );
 ?>
 <div class="wpseopilot-fields">
 	<p>
 		<label for="wpseopilot_title"><strong><?php esc_html_e( 'Meta title', 'wp-seo-pilot' ); ?></strong></label>
 		<input type="text" name="wpseopilot_title" id="wpseopilot_title" class="widefat" value="<?php echo esc_attr( $meta['title'] ); ?>" maxlength="160" />
 		<span class="wpseopilot-counter" data-target="wpseopilot_title"></span>
-		<?php if ( $ai_enabled ) : ?>
+		<?php if ( $wpseopilot_ai_enabled ) : ?>
 			<span class="wpseopilot-ai-inline">
 				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="title" data-target="#wpseopilot_title" data-post="<?php echo esc_attr( $post->ID ); ?>">
 					<?php esc_html_e( 'Generate title with AI', 'wp-seo-pilot' ); ?>
@@ -30,7 +30,7 @@ $ai_enabled = ! empty( $ai_enabled );
 		<label for="wpseopilot_description"><strong><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></strong></label>
 		<textarea name="wpseopilot_description" id="wpseopilot_description" class="widefat" rows="3" maxlength="320"><?php echo esc_textarea( $meta['description'] ); ?></textarea>
 		<span class="wpseopilot-counter" data-target="wpseopilot_description"></span>
-		<?php if ( $ai_enabled ) : ?>
+		<?php if ( $wpseopilot_ai_enabled ) : ?>
 			<span class="wpseopilot-ai-inline">
 				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="description" data-target="#wpseopilot_description" data-post="<?php echo esc_attr( $post->ID ); ?>">
 					<?php esc_html_e( 'Generate description with AI', 'wp-seo-pilot' ); ?>
@@ -88,13 +88,13 @@ $ai_enabled = ! empty( $ai_enabled );
 	</div>
 </div>
 
-<?php $suggestions = apply_filters( 'wpseopilot_link_suggestions', [], $post->ID ); ?>
-<?php if ( $suggestions ) : ?>
+<?php $wpseopilot_suggestions = apply_filters( 'wpseopilot_link_suggestions', [], $post->ID ); ?>
+<?php if ( $wpseopilot_suggestions ) : ?>
 	<div class="wpseopilot-links">
 		<h4><?php esc_html_e( 'Internal link suggestions', 'wp-seo-pilot' ); ?></h4>
 		<ul>
-			<?php foreach ( $suggestions as $suggestion ) : ?>
-				<li><a href="<?php echo esc_url( $suggestion['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $suggestion['title'] ); ?></a></li>
+			<?php foreach ( $wpseopilot_suggestions as $wpseopilot_suggestion ) : ?>
+				<li><a href="<?php echo esc_url( $wpseopilot_suggestion['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $wpseopilot_suggestion['title'] ); ?></a></li>
 			<?php endforeach; ?>
 		</ul>
 	</div>

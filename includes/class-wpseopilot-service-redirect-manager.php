@@ -15,6 +15,14 @@ defined( 'ABSPATH' ) || exit;
 class Redirect_Manager {
 
 	/**
+	 * Cache settings shared with CLI helpers.
+	 */
+	public const CACHE_GROUP     = 'wpseopilot_redirects';
+	public const CACHE_KEY_ADMIN = 'redirect_manager_admin_list';
+	public const CACHE_KEY_CLI   = 'redirect_manager_cli_list';
+	public const CACHE_TTL       = 30;
+
+	/**
 	 * Table name.
 	 *
 	 * @var string
@@ -27,6 +35,25 @@ class Redirect_Manager {
 	public function __construct() {
 		global $wpdb;
 		$this->table = $wpdb->prefix . 'wpseopilot_redirects';
+	}
+
+	/**
+	 * Flush redirect caches.
+	 *
+	 * @return void
+	 */
+	public static function flush_cache() {
+		wp_cache_delete( self::CACHE_KEY_ADMIN, self::CACHE_GROUP );
+		wp_cache_delete( self::CACHE_KEY_CLI, self::CACHE_GROUP );
+	}
+
+	/**
+	 * Redirect manager admin page URL.
+	 *
+	 * @return string
+	 */
+	private function get_admin_redirect_url() {
+		return admin_url( 'admin.php?page=wpseopilot-redirects' );
 	}
 
 	/**
@@ -100,7 +127,19 @@ class Redirect_Manager {
 		}
 
 		global $wpdb;
-		$redirects = $wpdb->get_results( "SELECT * FROM {$this->table} ORDER BY id DESC LIMIT 200" );
+		$redirects = wp_cache_get( self::CACHE_KEY_ADMIN, self::CACHE_GROUP );
+
+		if ( false === $redirects ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom redirect table listing requires a direct query. Results are cached just below.
+			$redirects = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$this->table} ORDER BY id DESC LIMIT %d",
+					200
+				)
+			);
+
+			wp_cache_set( self::CACHE_KEY_ADMIN, $redirects, self::CACHE_GROUP, self::CACHE_TTL );
+		}
 
 		include WPSEOPILOT_PATH . 'templates/redirects.php';
 	}
@@ -122,7 +161,9 @@ class Redirect_Manager {
 		$status = isset( $_POST['status_code'] ) ? absint( $_POST['status_code'] ) : 301;
 
 		if ( empty( $source ) || empty( $target ) ) {
-			wp_redirect( wp_get_referer() );
+			$redirect_url = wp_get_referer();
+			$redirect_url = $redirect_url ? $redirect_url : $this->get_admin_redirect_url();
+			wp_safe_redirect( $redirect_url );
 			exit;
 		}
 
@@ -130,6 +171,7 @@ class Redirect_Manager {
 		$normalized = '/' . ltrim( $source, '/' );
 		$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Writing to the custom redirects table requires a direct query.
 		$wpdb->insert(
 			$this->table,
 			[
@@ -140,7 +182,11 @@ class Redirect_Manager {
 			[ '%s', '%s', '%d' ]
 		);
 
-		wp_redirect( wp_get_referer() );
+		self::flush_cache();
+
+		$redirect_url = wp_get_referer();
+		$redirect_url = $redirect_url ? $redirect_url : $this->get_admin_redirect_url();
+		wp_safe_redirect( $redirect_url );
 		exit;
 	}
 
@@ -160,10 +206,15 @@ class Redirect_Manager {
 
 		if ( $id ) {
 			global $wpdb;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Deleting rows from the custom redirects table requires a direct query.
 			$wpdb->delete( $this->table, [ 'id' => $id ], [ '%d' ] );
 		}
 
-		wp_redirect( wp_get_referer() );
+		self::flush_cache();
+
+		$redirect_url = wp_get_referer();
+		$redirect_url = $redirect_url ? $redirect_url : $this->get_admin_redirect_url();
+		wp_safe_redirect( $redirect_url );
 		exit;
 	}
 
@@ -177,8 +228,11 @@ class Redirect_Manager {
 			return;
 		}
 
-		$request = wp_parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-		if ( ! $request ) {
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
+		$request     = wp_parse_url( $request_uri, PHP_URL_PATH );
+		if ( $request ) {
+			$request = sanitize_text_field( $request );
+		} else {
 			$request = '/';
 		}
 
@@ -190,9 +244,10 @@ class Redirect_Manager {
 		}
 
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Each request URI must be checked directly against the redirect table.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table} WHERE source = %s LIMIT 1",
+				'SELECT * FROM ' . $this->table . ' WHERE source = %s LIMIT 1',
 				$request
 			)
 		);
@@ -201,6 +256,7 @@ class Redirect_Manager {
 			return;
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Updating redirect hit metadata requires manipulating the custom table directly.
 		$wpdb->update(
 			$this->table,
 			[
@@ -210,7 +266,19 @@ class Redirect_Manager {
 			[ 'id' => $row->id ]
 		);
 
-		wp_redirect( esc_url_raw( $row->target ), (int) $row->status_code );
+		$target = esc_url_raw( $row->target );
+		add_filter(
+			'allowed_redirect_hosts',
+			static function ( $hosts ) use ( $target ) {
+				$host = wp_parse_url( $target, PHP_URL_HOST );
+				if ( $host && ! in_array( $host, $hosts, true ) ) {
+					$hosts[] = $host;
+				}
+				return $hosts;
+			}
+		);
+
+		wp_safe_redirect( $target, (int) $row->status_code );
 		exit;
 	}
 

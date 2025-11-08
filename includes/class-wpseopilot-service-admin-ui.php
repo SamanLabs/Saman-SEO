@@ -235,7 +235,9 @@ class Admin_UI {
 
 		printf(
 			'<span class="wpseopilot-chip">%s</span><span class="wpseopilot-chip">%s</span> %s',
+			/* translators: %d is the current SEO title length in characters. */
 			esc_html( sprintf( __( 'Title: %d', 'wp-seo-pilot' ), $title ) ),
+			/* translators: %d is the current meta description length in characters. */
 			esc_html( sprintf( __( 'Desc: %d', 'wp-seo-pilot' ), $description ) ),
 			$flags ? '<span class="wpseopilot-flag">' . esc_html( implode( ', ', $flags ) ) . '</span>' : ''
 		);
@@ -361,7 +363,9 @@ class Admin_UI {
 		$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 
 		if ( ! $post_id ) {
-			wp_redirect( wp_get_referer() );
+			$redirect_url = wp_get_referer();
+			$redirect_url = $redirect_url ? $redirect_url : admin_url();
+			wp_safe_redirect( $redirect_url );
 			exit;
 		}
 
@@ -369,7 +373,9 @@ class Admin_UI {
 		$meta['noindex'] = empty( $meta['noindex'] ) ? '1' : '';
 		update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
 
-		wp_redirect( wp_get_referer() );
+		$redirect_url = wp_get_referer();
+		$redirect_url = $redirect_url ? $redirect_url : admin_url();
+		wp_safe_redirect( $redirect_url );
 		exit;
 	}
 

@@ -8,7 +8,7 @@
  */
 
 ?>
-<?php $prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslash( $_GET['prefill'] ) ) : ''; ?>
+<?php $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslash( $_GET['prefill'] ) ) : ''; ?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Redirect Manager', 'wp-seo-pilot' ); ?></h1>
 
@@ -18,7 +18,7 @@
 		<table class="form-table">
 			<tr>
 				<th scope="row"><label for="source"><?php esc_html_e( 'Source path', 'wp-seo-pilot' ); ?></label></th>
-				<td><input type="text" name="source" id="source" class="regular-text" placeholder="/old-url" value="<?php echo esc_attr( $prefill ); ?>" required /></td>
+				<td><input type="text" name="source" id="source" class="regular-text" placeholder="/old-url" value="<?php echo esc_attr( $wpseopilot_prefill ); ?>" required /></td>
 			</tr>
 			<tr>
 				<th scope="row"><label for="target"><?php esc_html_e( 'Target URL', 'wp-seo-pilot' ); ?></label></th>
@@ -52,15 +52,15 @@
 		</thead>
 		<tbody>
 			<?php if ( $redirects ) : ?>
-				<?php foreach ( $redirects as $redirect ) : ?>
+				<?php foreach ( $redirects as $wpseopilot_redirect ) : ?>
 					<tr>
-						<td><?php echo esc_html( $redirect->source ); ?></td>
-						<td><a href="<?php echo esc_url( $redirect->target ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $redirect->target ); ?></a></td>
-						<td><?php echo esc_html( $redirect->status_code ); ?></td>
-						<td><?php echo esc_html( $redirect->hits ); ?></td>
-						<td><?php echo esc_html( $redirect->last_hit ?: '—' ); ?></td>
+						<td><?php echo esc_html( $wpseopilot_redirect->source ); ?></td>
+						<td><a href="<?php echo esc_url( $wpseopilot_redirect->target ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $wpseopilot_redirect->target ); ?></a></td>
+						<td><?php echo esc_html( $wpseopilot_redirect->status_code ); ?></td>
+						<td><?php echo esc_html( $wpseopilot_redirect->hits ); ?></td>
+						<td><?php echo esc_html( $wpseopilot_redirect->last_hit ?: '—' ); ?></td>
 						<td>
-							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_redirect', 'id' => $redirect->id ], admin_url( 'admin-post.php' ) ), 'wpseopilot_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'wp-seo-pilot' ); ?></a>
+							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_redirect', 'id' => $wpseopilot_redirect->id ], admin_url( 'admin-post.php' ) ), 'wpseopilot_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'wp-seo-pilot' ); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>

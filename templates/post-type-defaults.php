@@ -15,14 +15,16 @@
  * @package WPSEOPilot
  */
 
-$schema_pages   = $this->get_schema_page_options();
-$schema_articles = $this->get_schema_article_options();
-$archive_items  = [
-	'author' => __( 'Author archives', 'wp-seo-pilot' ),
-	'date'   => __( 'Date archives', 'wp-seo-pilot' ),
-	'search' => __( 'Search results', 'wp-seo-pilot' ),
-];
-?>
+call_user_func(
+	static function ( $post_types, $post_type_templates, $post_type_descriptions, $post_type_keywords, $post_type_settings, $taxonomy_settings, $archive_settings, $taxonomies, $settings_instance ) {
+		$schema_pages    = $settings_instance->get_schema_page_options();
+		$schema_articles = $settings_instance->get_schema_article_options();
+		$archive_items   = [
+			'author' => __( 'Author archives', 'wp-seo-pilot' ),
+			'date'   => __( 'Date archives', 'wp-seo-pilot' ),
+			'search' => __( 'Search results', 'wp-seo-pilot' ),
+		];
+		?>
 <div class="wrap wpseopilot-settings">
 	<h1><?php esc_html_e( 'WP SEO Pilot — Search Appearance', 'wp-seo-pilot' ); ?></h1>
 	<p class="description">
@@ -124,7 +126,12 @@ $archive_items  = [
 							<strong><?php esc_html_e( 'SEO title template', 'wp-seo-pilot' ); ?></strong>
 						</label>
 						<input type="text" class="regular-text" id="wpseopilot_template_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_title_templates[<?php echo esc_attr( $slug ); ?>]" value="<?php echo esc_attr( $template ); ?>" />
-						<p class="description"><?php esc_html_e( 'Available tags: %post_title%, %site_title%, %tagline%, %post_author%', 'wp-seo-pilot' ); ?></p>
+						<p class="description">
+							<?php
+							/* translators: %post_title%, %site_title%, %tagline%, %post_author% are template placeholders. */
+							esc_html_e( 'Available tags: %post_title%, %site_title%, %tagline%, %post_author%', 'wp-seo-pilot' );
+							?>
+						</p>
 
 						<label for="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>">
 							<strong><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></strong>
@@ -286,3 +293,15 @@ $archive_items  = [
 		</form>
 	</section>
 </div>
+<?php
+	},
+	$post_types,
+	$post_type_templates,
+	$post_type_descriptions,
+	$post_type_keywords,
+	$post_type_settings,
+	$taxonomy_settings,
+	$archive_settings,
+	$taxonomies,
+	$this
+);

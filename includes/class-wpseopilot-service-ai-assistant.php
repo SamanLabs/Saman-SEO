@@ -229,15 +229,15 @@ class AI_Assistant {
 			}
 		}
 
-		wp_redirect(
-			add_query_arg(
-				[
-					'page'               => 'wpseopilot-ai',
-					'wpseopilot_ai_reset' => '1',
-				],
-				admin_url( 'admin.php' )
-			)
+		$redirect_url = add_query_arg(
+			[
+				'page'                => 'wpseopilot-ai',
+				'wpseopilot_ai_reset' => '1',
+			],
+			admin_url( 'admin.php' )
 		);
+
+		wp_safe_redirect( $redirect_url );
 		exit;
 	}
 }
