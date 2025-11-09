@@ -198,6 +198,17 @@
 	margin-bottom: 6px;
 }
 
+.wpseopilot-schema-control {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	max-width: 320px;
+}
+
+.wpseopilot-schema-control.is-preset .wpseopilot-schema-control__input {
+	display: none;
+}
+
 .wpseopilot-tabs {
 	margin-top: 20px;
 }

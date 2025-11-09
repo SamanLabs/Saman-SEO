@@ -141,11 +141,13 @@ class Frontend {
 	 * @return void
 	 */
 	public function render_social_tags() {
-		if ( ! is_singular() ) {
+		$is_home_view = is_front_page() || is_home();
+
+		if ( ! is_singular() && ! $is_home_view ) {
 			return;
 		}
 
-		$post = get_post();
+		$post = $this->get_context_post();
 		$meta = $this->get_meta( $post );
 		$url  = $this->get_canonical( $post, $meta );
 		$post_type_descriptions = $this->get_post_type_option( 'wpseopilot_post_type_meta_descriptions' );
@@ -153,16 +155,22 @@ class Frontend {
 		$social_defaults        = $this->get_social_defaults( $post );
 
 		$raw_title = $meta['title'] ?? '';
+		if ( $is_home_view && empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
+			$raw_title = $social_defaults['og_title'];
+		}
+		if ( empty( $raw_title ) && $post instanceof WP_Post ) {
+			$raw_title = get_the_title( $post );
+		}
 		if ( empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
 			$raw_title = $social_defaults['og_title'];
 		}
 		if ( empty( $raw_title ) ) {
-			$raw_title = get_the_title( $post );
+			$raw_title = get_bloginfo( 'name' );
 		}
 		$title = apply_filters( 'wpseopilot_og_title', $raw_title, $post );
 
-		$description = $meta['description'] ?: '';
-		if ( empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
+		$description = $meta['description'] ?? '';
+		if ( $is_home_view && empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
 			$description = $social_defaults['og_description'];
 		}
 		if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
@@ -174,11 +182,39 @@ class Frontend {
 		if ( empty( $description ) ) {
 			$description = get_option( 'wpseopilot_default_meta_description', '' );
 		}
+		if ( empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
+			$description = $social_defaults['og_description'];
+		}
+		if ( empty( $description ) ) {
+			$description = get_bloginfo( 'description' );
+		}
 		$description = apply_filters( 'wpseopilot_og_description', $description, $post );
 		$image = $this->get_social_image( $post, $meta, $social_defaults );
-		$twitter_title = ! empty( $social_defaults['twitter_title'] ) ? $social_defaults['twitter_title'] : $title;
-		$twitter_description = ! empty( $social_defaults['twitter_description'] ) ? $social_defaults['twitter_description'] : $description;
-		$og_type = ! empty( $social_defaults['schema_itemtype'] ) ? $social_defaults['schema_itemtype'] : 'article';
+
+		$twitter_title = $title;
+		$twitter_description = $description;
+
+		if ( $is_home_view ) {
+			if ( ! empty( $social_defaults['twitter_title'] ) ) {
+				$twitter_title = $social_defaults['twitter_title'];
+			}
+			if ( ! empty( $social_defaults['twitter_description'] ) ) {
+				$twitter_description = $social_defaults['twitter_description'];
+			}
+		} else {
+			if ( empty( $twitter_title ) && ! empty( $social_defaults['twitter_title'] ) ) {
+				$twitter_title = $social_defaults['twitter_title'];
+			}
+
+			if ( empty( $twitter_description ) && ! empty( $social_defaults['twitter_description'] ) ) {
+				$twitter_description = $social_defaults['twitter_description'];
+			}
+		}
+
+		$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? '' );
+		if ( empty( $og_type ) ) {
+			$og_type = 'article';
+		}
 
 		$tags = [
 			'og:title'       => $title,
@@ -274,7 +310,6 @@ class Frontend {
 	 *
 	 * @param WP_Post|null $post Post.
 	 * @param array        $meta Meta.
-	 * @param array        $social_defaults Social defaults.
 	 *
 	 * @return string
 	 */
@@ -285,15 +320,31 @@ class Frontend {
 
 		if ( $post instanceof WP_Post ) {
 			$url = get_permalink( $post );
-		} else {
-			$url = home_url( add_query_arg( [] ) );
+
+			$page = (int) get_query_var( 'page' );
+			if ( $page > 1 ) {
+				$url = trailingslashit( $url ) . user_trailingslashit( $page, 'single_paged' );
+			}
+
+			return esc_url_raw( $url );
 		}
 
-		if ( is_paged() ) {
-			$url = trailingslashit( $url ) . trailingslashit( get_query_var( 'paged' ) );
+		$paged = (int) get_query_var( 'paged' );
+		if ( $paged < 1 ) {
+			$paged = (int) get_query_var( 'page' );
 		}
 
-		return $url;
+		if ( $paged < 1 ) {
+			$paged = 1;
+		}
+
+		$url = get_pagenum_link( $paged );
+
+		if ( empty( $url ) ) {
+			$url = home_url( '/' );
+		}
+
+		return esc_url_raw( $url );
 	}
 
 	/**
@@ -473,7 +524,13 @@ class Frontend {
 	 * @return WP_Post|null
 	 */
 	private function get_context_post() {
-		if ( is_home() && ! is_singular() ) {
+		if ( is_singular() ) {
+			$post = get_post();
+
+			return $post instanceof WP_Post ? $post : null;
+		}
+
+		if ( is_home() && ! is_front_page() ) {
 			$posts_page_id = (int) get_option( 'page_for_posts' );
 			if ( $posts_page_id ) {
 				$posts_page = get_post( $posts_page_id );
@@ -481,13 +538,9 @@ class Frontend {
 					return $posts_page;
 				}
 			}
-
-			return null;
 		}
 
-		$post = get_post();
-
-		return $post instanceof WP_Post ? $post : null;
+		return null;
 	}
 
 }

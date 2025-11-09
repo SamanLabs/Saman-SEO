@@ -182,9 +182,92 @@
 		});
 	};
 
+	const initSchemaControls = () => {
+		const controls = document.querySelectorAll('[data-schema-control]');
+		if (!controls.length) {
+			return;
+		}
+
+		const normalize = (value) =>
+			(typeof value === 'string' ? value : '').trim().toLowerCase();
+
+		controls.forEach((control) => {
+			const select = control.querySelector('[data-schema-select]');
+			const input = control.querySelector('[data-schema-input]');
+
+			if (!select || !input) {
+				return;
+			}
+
+			const findPreset = (value) => {
+				const normalized = normalize(value);
+				let match = null;
+
+				select.querySelectorAll('option').forEach((option) => {
+					const optionValue = option.value;
+					if (optionValue === '__custom') {
+						return;
+					}
+
+					if (normalize(optionValue) === normalized) {
+						match = optionValue;
+					}
+				});
+
+				return match;
+			};
+
+			const applyPreset = (value) => {
+				const preset = findPreset(value);
+
+				if (preset !== null) {
+					select.value = preset;
+					input.value = preset;
+					input.setAttribute('readonly', 'readonly');
+					control.classList.add('is-preset');
+					control.classList.remove('is-custom');
+					return;
+				}
+
+				select.value = '__custom';
+				input.removeAttribute('readonly');
+				control.classList.add('is-custom');
+				control.classList.remove('is-preset');
+			};
+
+			applyPreset(input.value);
+
+			select.addEventListener('change', () => {
+				if (select.value === '__custom') {
+					input.removeAttribute('readonly');
+					control.classList.add('is-custom');
+					control.classList.remove('is-preset');
+					input.focus();
+					return;
+				}
+
+				input.value = select.value;
+				applyPreset(select.value);
+			});
+
+			input.addEventListener('input', () => {
+				const preset = findPreset(input.value);
+				if (preset !== null) {
+					applyPreset(preset);
+				} else {
+					select.value = '__custom';
+					input.removeAttribute('readonly');
+					control.classList.add('is-custom');
+					control.classList.remove('is-preset');
+				}
+			});
+		});
+	};
+
 	$(document).ready(function () {
 		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);
 		updatePreview();
 		initTabs();
+		initSchemaControls();
 	});
 })(jQuery, window.WPSEOPilotAdmin);

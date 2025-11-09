@@ -39,6 +39,54 @@ $post_types = get_post_types(
 if ( isset( $post_types['attachment'] ) ) {
 	unset( $post_types['attachment'] );
 }
+
+$schema_itemtype_options = [
+	''              => __( 'Use default (Article)', 'wp-seo-pilot' ),
+	'article'       => __( 'Article', 'wp-seo-pilot' ),
+	'blogposting'   => __( 'Blog posting', 'wp-seo-pilot' ),
+	'newsarticle'   => __( 'News article', 'wp-seo-pilot' ),
+	'product'       => __( 'Product', 'wp-seo-pilot' ),
+	'profilepage'   => __( 'Profile page', 'wp-seo-pilot' ),
+	'profile'       => __( 'Profile', 'wp-seo-pilot' ),
+	'website'       => __( 'Website', 'wp-seo-pilot' ),
+	'organization'  => __( 'Organization', 'wp-seo-pilot' ),
+	'event'         => __( 'Event', 'wp-seo-pilot' ),
+	'recipe'        => __( 'Recipe', 'wp-seo-pilot' ),
+	'videoobject'   => __( 'Video object', 'wp-seo-pilot' ),
+	'book'          => __( 'Book', 'wp-seo-pilot' ),
+	'service'       => __( 'Service', 'wp-seo-pilot' ),
+	'localbusiness' => __( 'Local business', 'wp-seo-pilot' ),
+];
+
+$render_schema_control = static function ( $field_name, $current_value, $input_id ) use ( $schema_itemtype_options ) {
+	$current_value = (string) $current_value;
+	$normalized    = strtolower( trim( $current_value ) );
+	$has_preset    = array_key_exists( $normalized, $schema_itemtype_options );
+	$select_value  = $has_preset ? $normalized : '__custom';
+	$control_class = $has_preset ? 'wpseopilot-schema-control is-preset' : 'wpseopilot-schema-control is-custom';
+	?>
+	<div class="<?php echo esc_attr( $control_class ); ?>" data-schema-control>
+		<select class="wpseopilot-schema-control__select" data-schema-select aria-controls="<?php echo esc_attr( $input_id ); ?>">
+			<?php foreach ( $schema_itemtype_options as $value => $label ) : ?>
+				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $select_value, $value ); ?>>
+					<?php echo esc_html( $label ); ?>
+				</option>
+			<?php endforeach; ?>
+			<option value="__custom" <?php selected( $select_value, '__custom' ); ?>>
+				<?php esc_html_e( 'Custom value…', 'wp-seo-pilot' ); ?>
+			</option>
+		</select>
+		<input
+			type="text"
+			class="regular-text wpseopilot-schema-control__input"
+			id="<?php echo esc_attr( $input_id ); ?>"
+			name="<?php echo esc_attr( $field_name ); ?>"
+			value="<?php echo esc_attr( $current_value ); ?>"
+			data-schema-input
+		/>
+	</div>
+	<?php
+};
 ?>
 <div class="wrap wpseopilot-settings">
 	<h1><?php esc_html_e( 'WP SEO Pilot — SEO Defaults', 'wp-seo-pilot' ); ?></h1>
@@ -270,7 +318,13 @@ if ( isset( $post_types['attachment'] ) ) {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Schema.org (itemtype only)', 'wp-seo-pilot' ); ?></th>
 							<td>
-								<input type="text" class="regular-text" id="wpseopilot_social_defaults_schema_itemtype" name="wpseopilot_social_defaults[schema_itemtype]" value="<?php echo esc_attr( $social_defaults['schema_itemtype'] ); ?>" />
+								<?php
+								$render_schema_control(
+									'wpseopilot_social_defaults[schema_itemtype]',
+									$social_defaults['schema_itemtype'],
+									'wpseopilot_social_defaults_schema_itemtype'
+								);
+								?>
 								<p class="description"><?php esc_html_e( 'Example: Article, Product, ProfilePage. Leave blank to keep the default article type.', 'wp-seo-pilot' ); ?></p>
 								<?php if ( empty( $social_defaults['schema_itemtype'] ) ) : ?>
 									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for Schema.org (itemtype only).', 'wp-seo-pilot' ); ?></p>
@@ -339,7 +393,13 @@ if ( isset( $post_types['attachment'] ) ) {
 									<tr>
 										<th scope="row"><?php esc_html_e( 'Schema.org (itemtype only)', 'wp-seo-pilot' ); ?></th>
 										<td>
-											<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_schema_itemtype" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][schema_itemtype]" value="<?php echo esc_attr( $values['schema_itemtype'] ); ?>" />
+											<?php
+											$render_schema_control(
+												sprintf( 'wpseopilot_post_type_social_defaults[%s][schema_itemtype]', $slug ),
+												$values['schema_itemtype'],
+												sprintf( 'wpseopilot_social_%s_schema_itemtype', $slug )
+											);
+											?>
 										</td>
 									</tr>
 								</table>
