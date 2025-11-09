@@ -268,15 +268,18 @@ class Audit {
 		$query = new \WP_Query(
 			[
 				'post_type'      => $post->post_type,
-				'post__not_in'   => [ $post_id ],
-				'posts_per_page' => 5,
+				'posts_per_page' => 6, // Fetch a buffer so we can skip the current post without using post__not_in.
 				's'              => $post->post_title,
+				'no_found_rows'  => true,
 			]
 		);
 
 		$list = [];
-		while ( $query->have_posts() ) {
+		while ( $query->have_posts() && count( $list ) < 5 ) {
 			$query->the_post();
+			if ( get_the_ID() === $post_id ) {
+				continue;
+			}
 			$list[] = [
 				'title' => get_the_title(),
 				'url'   => get_permalink(),
