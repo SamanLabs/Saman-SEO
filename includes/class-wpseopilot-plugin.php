@@ -58,6 +58,7 @@ class Plugin {
 		$this->register( 'jsonld', new Service\JsonLD() );
 		$this->register( 'admin', new Service\Admin_UI() );
 		$this->register( 'ai', new Service\AI_Assistant() );
+		$this->register( 'internal_links', new Service\Internal_Linking() );
 		$this->register( 'importer', new Service\Importers() );
 		$this->register( 'redirects', new Service\Redirect_Manager() );
 		$this->register( 'audit', new Service\Audit() );
@@ -108,6 +109,7 @@ class Plugin {
 	public static function activate() {
 		( new Service\Redirect_Manager() )->create_tables();
 		( new Service\Request_Monitor() )->create_tables();
+		Service\Internal_Linking::activate();
 
 		add_option( 'wpseopilot_default_title_template', '%post_title% | %site_title%' );
 		add_option( 'wpseopilot_post_type_title_templates', [] );

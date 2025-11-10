@@ -9,6 +9,7 @@ namespace WPSEOPilot\Service;
 
 defined( 'ABSPATH' ) || exit;
 
+use function WPSEOPilot\Helpers\calculate_seo_score;
 use function WPSEOPilot\Helpers\generate_title_from_template;
 
 /**
@@ -30,12 +31,41 @@ class Admin_UI {
 		}
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
-		add_filter( 'manage_post_posts_columns', [ $this, 'add_posts_column' ] );
-		add_action( 'manage_post_posts_custom_column', [ $this, 'render_posts_column' ], 10, 2 );
+		add_action( 'init', [ $this, 'register_score_columns' ] );
 		add_filter( 'post_row_actions', [ $this, 'post_row_actions' ], 10, 2 );
 		add_filter( 'bulk_actions-edit-post', [ $this, 'bulk_actions' ] );
 		add_filter( 'handle_bulk_actions-edit-post', [ $this, 'handle_bulk_actions' ], 10, 3 );
 		add_action( 'admin_post_wpseopilot_toggle_noindex', [ $this, 'handle_toggle_noindex' ] );
+	}
+
+	/**
+	 * Register SEO score column hooks for post types.
+	 *
+	 * @return void
+	 */
+	public function register_score_columns() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$post_types = get_post_types(
+			[
+				'public'  => true,
+				'show_ui' => true,
+			],
+			'names'
+		);
+
+		if ( isset( $post_types['attachment'] ) ) {
+			unset( $post_types['attachment'] );
+		}
+
+		$post_types = apply_filters( 'wpseopilot_score_post_types', array_values( $post_types ) );
+
+		foreach ( $post_types as $post_type ) {
+			add_filter( "manage_{$post_type}_posts_columns", [ $this, 'add_posts_column' ] );
+			add_action( "manage_{$post_type}_posts_custom_column", [ $this, 'render_posts_column' ], 10, 2 );
+		}
 	}
 
 	/**
@@ -78,6 +108,7 @@ class Admin_UI {
 		wp_nonce_field( 'wpseopilot_meta', 'wpseopilot_meta_nonce' );
 
 		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+		$seo_score  = calculate_seo_score( $post );
 
 		include WPSEOPILOT_PATH . 'templates/meta-box.php';
 	}
@@ -90,7 +121,18 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function enqueue_admin_assets( $hook ) {
-		if ( false === strpos( $hook, 'post.php' ) && false === strpos( $hook, 'post-new.php' ) && 'toplevel_page_wpseopilot' !== $hook ) {
+		$should_enqueue = ( 'toplevel_page_wpseopilot' === $hook );
+
+		if ( ! $should_enqueue ) {
+			foreach ( [ 'post.php', 'post-new.php', 'edit.php' ] as $needle ) {
+				if ( false !== strpos( $hook, $needle ) ) {
+					$should_enqueue = true;
+					break;
+				}
+			}
+		}
+
+		if ( ! $should_enqueue ) {
 			return;
 		}
 
@@ -221,10 +263,8 @@ class Admin_UI {
 			return;
 		}
 
-		$meta = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
-		$title       = isset( $meta['title'] ) ? mb_strlen( $meta['title'] ) : 0;
-		$description = isset( $meta['description'] ) ? mb_strlen( $meta['description'] ) : 0;
-		$flags       = [];
+		$meta  = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
+		$flags = [];
 
 		if ( ! empty( $meta['noindex'] ) ) {
 			$flags[] = 'noindex';
@@ -233,14 +273,59 @@ class Admin_UI {
 			$flags[] = 'nofollow';
 		}
 
-		printf(
-			'<span class="wpseopilot-chip">%s</span><span class="wpseopilot-chip">%s</span> %s',
-			/* translators: %d is the current SEO title length in characters. */
-			esc_html( sprintf( __( 'Title: %d', 'wp-seo-pilot' ), $title ) ),
-			/* translators: %d is the current meta description length in characters. */
-			esc_html( sprintf( __( 'Desc: %d', 'wp-seo-pilot' ), $description ) ),
-			$flags ? '<span class="wpseopilot-flag">' . esc_html( implode( ', ', $flags ) ) . '</span>' : ''
+		$score       = calculate_seo_score( $post_id );
+		$badge_class = 'wpseopilot-score-badge--' . sanitize_html_class( $score['level'] );
+
+		$issues = array_values(
+			array_filter(
+				$score['metrics'],
+				static function ( $metric ) {
+					return empty( $metric['is_pass'] );
+				}
+			)
 		);
+
+		$issue_labels = array_map(
+			static function ( $metric ) {
+				return $metric['issue_label'];
+			},
+			$issues
+		);
+
+		$issue_summary = $issue_labels ? implode( ' • ', array_slice( $issue_labels, 0, 2 ) ) : __( 'All baseline checks look good.', 'wp-seo-pilot' );
+		if ( count( $issue_labels ) > 2 ) {
+			$issue_summary .= sprintf(
+				/* translators: %d is the number of remaining issues. */
+				__( ' +%d more', 'wp-seo-pilot' ),
+				count( $issue_labels ) - 2
+			);
+		}
+
+		$details = implode(
+			' | ',
+			array_map(
+				static function ( $metric ) {
+					return $metric['label'] . ': ' . $metric['status'];
+				},
+				$score['metrics']
+			)
+		);
+
+		?>
+		<div class="wpseopilot-score-cell">
+			<span class="wpseopilot-score-badge <?php echo esc_attr( $badge_class ); ?>" title="<?php echo esc_attr( $details ); ?>">
+				<strong><?php echo esc_html( $score['score'] ); ?></strong>
+				<span>/100</span>
+			</span>
+			<span class="wpseopilot-score-label"><?php echo esc_html( $score['label'] ); ?></span>
+		</div>
+		<p class="wpseopilot-score-issues">
+			<?php echo esc_html( $issue_summary ); ?>
+			<?php if ( $flags ) : ?>
+				<span class="wpseopilot-flag"><?php echo esc_html( implode( ', ', $flags ) ); ?></span>
+			<?php endif; ?>
+		</p>
+		<?php
 	}
 
 	/**

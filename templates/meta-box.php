@@ -5,12 +5,45 @@
  * @var array   $meta
  * @var WP_Post $post
  * @var bool    $ai_enabled
+ * @var array   $seo_score
  *
  * @package WPSEOPilot
  */
 
 $wpseopilot_ai_enabled = ! empty( $ai_enabled );
+$wpseopilot_score      = is_array( $seo_score ) ? $seo_score : [];
+$wpseopilot_score_level = isset( $wpseopilot_score['level'] ) ? sanitize_html_class( $wpseopilot_score['level'] ) : 'low';
+$wpseopilot_score_value = isset( $wpseopilot_score['score'] ) ? (int) $wpseopilot_score['score'] : 0;
+$wpseopilot_score_label = isset( $wpseopilot_score['label'] ) ? $wpseopilot_score['label'] : __( 'Needs attention', 'wp-seo-pilot' );
+$wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_score['summary'] : __( 'Add content to generate a score.', 'wp-seo-pilot' );
 ?>
+
+<?php if ( $wpseopilot_score ) : ?>
+	<div class="wpseopilot-score-card" id="wpseopilot-score">
+		<div class="wpseopilot-score-card__header">
+			<span class="wpseopilot-score-badge <?php echo esc_attr( 'wpseopilot-score-badge--' . $wpseopilot_score_level ); ?>">
+				<strong><?php echo esc_html( $wpseopilot_score_value ); ?></strong>
+				<span>/100</span>
+			</span>
+			<div>
+				<p class="wpseopilot-score-card__title"><?php esc_html_e( 'SEO score', 'wp-seo-pilot' ); ?></p>
+				<p class="wpseopilot-score-card__label"><?php echo esc_html( $wpseopilot_score_label ); ?></p>
+				<p class="wpseopilot-score-card__summary"><?php echo esc_html( $wpseopilot_score_summary ); ?></p>
+			</div>
+		</div>
+		<?php if ( ! empty( $wpseopilot_score['metrics'] ) ) : ?>
+			<ul class="wpseopilot-score-card__metrics">
+				<?php foreach ( $wpseopilot_score['metrics'] as $wpseopilot_metric ) : ?>
+					<li class="<?php echo esc_attr( ! empty( $wpseopilot_metric['is_pass'] ) ? 'is-pass' : 'is-issue' ); ?>">
+						<span class="wpseopilot-score-card__metric-label"><?php echo esc_html( $wpseopilot_metric['label'] ); ?></span>
+						<span class="wpseopilot-score-card__metric-status"><?php echo esc_html( $wpseopilot_metric['status'] ); ?></span>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
+	</div>
+<?php endif; ?>
+
 <div class="wpseopilot-fields">
 	<p>
 		<label for="wpseopilot_title"><strong><?php esc_html_e( 'Meta title', 'wp-seo-pilot' ); ?></strong></label>
