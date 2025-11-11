@@ -64,6 +64,22 @@ class Sitemap_Enhancer {
 	private $group_item_counts = [];
 
 	/**
+	 * Default excluded term slugs per taxonomy.
+	 *
+	 * @var array<string,array<int,string>>
+	 */
+	private $default_excluded_term_slugs = [
+		'category' => [ 'uncategorized' ],
+	];
+
+	/**
+	 * Cached excluded term IDs per taxonomy.
+	 *
+	 * @var array<string,array<int,int>>
+	 */
+	private $excluded_term_ids = [];
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
@@ -80,6 +96,7 @@ class Sitemap_Enhancer {
 		add_filter( 'wp_sitemaps_posts_entry', [ $this, 'include_media_fields' ], 10, 3 );
 		add_filter( 'wp_sitemaps_additional_namespaces', [ $this, 'add_namespaces' ] );
 		add_filter( 'wp_sitemaps_max_urls', [ $this, 'limit_sitemap_page_size' ] );
+		add_filter( 'wp_sitemaps_taxonomies_query_args', [ $this, 'filter_taxonomy_query_args' ], 10, 2 );
 		add_filter( 'wp_sitemaps_enabled', [ $this, 'disable_core_sitemaps' ] );
 		add_filter( 'wp_sitemaps_stylesheet_url', [ $this, 'filter_stylesheet_url' ] );
 		add_filter( 'wp_sitemaps_stylesheet_index_url', [ $this, 'filter_stylesheet_url' ] );
@@ -152,6 +169,32 @@ class Sitemap_Enhancer {
 	 */
 	public function limit_sitemap_page_size( $max_urls ) {
 		return $this->get_max_urls_per_page( $max_urls );
+	}
+
+	/**
+	 * Exclude unwanted taxonomy terms from sitemap queries.
+	 *
+	 * @param array  $args     WP_Term_Query arguments.
+	 * @param string $taxonomy Taxonomy slug.
+	 *
+	 * @return array
+	 */
+	public function filter_taxonomy_query_args( $args, $taxonomy ) {
+		$exclude_ids = $this->resolve_excluded_term_ids( $taxonomy );
+
+		if ( empty( $exclude_ids ) ) {
+			return $args;
+		}
+
+		if ( isset( $args['exclude'] ) ) {
+			$args['exclude'] = array_unique(
+				array_merge( (array) $args['exclude'], $exclude_ids )
+			);
+		} else {
+			$args['exclude'] = $exclude_ids;
+		}
+
+		return $args;
 	}
 
 	/**
@@ -616,6 +659,95 @@ class Sitemap_Enhancer {
 	}
 
 	/**
+	 * Build taxonomy query args that respect core filters.
+	 *
+	 * @param string $taxonomy Taxonomy slug.
+	 * @return array<string,mixed>
+	 */
+	private function get_taxonomy_query_args_for_counts( $taxonomy ) {
+		$args = [
+			'taxonomy'               => $taxonomy,
+			'orderby'                => 'term_order',
+			'number'                 => wp_sitemaps_get_max_urls( 'term' ),
+			'hide_empty'             => true,
+			'hierarchical'           => false,
+			'update_term_meta_cache' => false,
+		];
+
+		return apply_filters( 'wp_sitemaps_taxonomies_query_args', $args, $taxonomy );
+	}
+
+	/**
+	 * Resolve excluded term IDs for a taxonomy.
+	 *
+	 * @param string $taxonomy Taxonomy slug.
+	 * @return array<int,int>
+	 */
+	private function resolve_excluded_term_ids( $taxonomy ) {
+		if ( isset( $this->excluded_term_ids[ $taxonomy ] ) ) {
+			return $this->excluded_term_ids[ $taxonomy ];
+		}
+
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			$this->excluded_term_ids[ $taxonomy ] = [];
+
+			return [];
+		}
+
+		$slugs = $this->get_excluded_term_slugs( $taxonomy );
+
+		if ( empty( $slugs ) ) {
+			$this->excluded_term_ids[ $taxonomy ] = [];
+
+			return [];
+		}
+
+		$terms = get_terms(
+			[
+				'taxonomy'   => $taxonomy,
+				'slug'       => $slugs,
+				'hide_empty' => false,
+				'fields'     => 'ids',
+			]
+		);
+
+		if ( is_wp_error( $terms ) ) {
+			$terms = [];
+		}
+
+		$this->excluded_term_ids[ $taxonomy ] = array_map( 'intval', (array) $terms );
+
+		return $this->excluded_term_ids[ $taxonomy ];
+	}
+
+	/**
+	 * Excluded term slugs per taxonomy.
+	 *
+	 * @param string $taxonomy Taxonomy slug.
+	 * @return array<int,string>
+	 */
+	private function get_excluded_term_slugs( $taxonomy ) {
+		$defaults = $this->default_excluded_term_slugs[ $taxonomy ] ?? [];
+
+		$slugs = (array) apply_filters(
+			'wpseopilot_sitemap_excluded_terms',
+			$defaults,
+			$taxonomy
+		);
+
+		$slugs = array_filter(
+			array_map(
+				static function ( $slug ) {
+					return sanitize_title( (string) $slug );
+				},
+				$slugs
+			)
+		);
+
+		return array_values( $slugs );
+	}
+
+	/**
 	 * Return the total number of objects for a sitemap group via cheap counts.
 	 *
 	 * @param array<string,mixed> $group Group metadata.
@@ -702,12 +834,9 @@ class Sitemap_Enhancer {
 			return 0;
 		}
 
-		$count = wp_count_terms(
-			$taxonomy,
-			[
-				'hide_empty' => true,
-			]
-		);
+		$args = $this->get_taxonomy_query_args_for_counts( $taxonomy );
+
+		$count = wp_count_terms( $args );
 
 		if ( is_wp_error( $count ) ) {
 			return 0;

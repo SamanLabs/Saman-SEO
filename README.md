@@ -32,6 +32,7 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - `wpseopilot_sitemap_group_count` overrides the calculated object totals per sitemap group.
 - `wpseopilot_sitemap_count_statuses` customizes which post statuses count toward post-type totals.
 - `wpseopilot_sitemap_lastmod` supplies last modified timestamps without forcing full URL hydration.
+- `wpseopilot_sitemap_excluded_terms` removes specific taxonomy slugs (e.g. `uncategorized`) from sitemap queries.
 - `wpseopilot_sitemap_index_items` filters the compiled sitemap index entries before rendering.
 - `wpseopilot_sitemap_stylesheet` swaps the pretty XSL front-end for `/sitemap_index.xml` and individual sitemaps.
 - `wpseopilot_sitemap_redirect` overrides the destination when requests hit WordPress core's `/wp-sitemap*.xml`.
