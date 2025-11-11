@@ -43,11 +43,25 @@ class Sitemap_Enhancer {
 	private $sitemap_page_cache = [];
 
 	/**
+	 * Cached max URLs per sitemap page.
+	 *
+	 * @var int|null
+	 */
+	private $max_urls_per_page = null;
+
+	/**
 	 * Default number of URLs per sitemap page.
 	 *
 	 * @var int
 	 */
 	private $default_max_urls_per_page = 1000;
+
+	/**
+	 * Cached item counts per sitemap group.
+	 *
+	 * @var array<string,int>
+	 */
+	private $group_item_counts = [];
 
 	/**
 	 * Boot hooks.
@@ -137,19 +151,7 @@ class Sitemap_Enhancer {
 	 * @return int
 	 */
 	public function limit_sitemap_page_size( $max_urls ) {
-		$limit = $this->default_max_urls_per_page;
-
-		if ( defined( 'WPSEOPILOT_SITEMAP_MAX_URLS' ) ) {
-			$limit = (int) WPSEOPILOT_SITEMAP_MAX_URLS;
-		}
-
-		$limit = (int) apply_filters( 'wpseopilot_sitemap_max_urls', $limit, $max_urls );
-
-		if ( $limit < 1 ) {
-			$limit = 1;
-		}
-
-		return $limit;
+		return $this->get_max_urls_per_page( $max_urls );
 	}
 
 	/**
@@ -465,6 +467,17 @@ class Sitemap_Enhancer {
 	 * @return int
 	 */
 	private function get_max_pages_for_group( $group ) {
+		$count = $this->get_group_item_count( $group );
+		$limit = $this->get_max_urls_per_page();
+
+		if ( null !== $count ) {
+			if ( $count < 1 || $limit < 1 ) {
+				return 0;
+			}
+
+			return (int) ceil( $count / $limit );
+		}
+
 		$provider = $this->get_provider( $group['provider'] );
 
 		if ( ! $provider ) {
@@ -537,19 +550,7 @@ class Sitemap_Enhancer {
 	 * @return string
 	 */
 	private function get_sitemap_lastmod( $group, $page ) {
-		$list = $this->fetch_sitemap_urls( $group, $page, false );
-
-		if ( empty( $list ) ) {
-			return '';
-		}
-
-		foreach ( $list as $entry ) {
-			if ( ! empty( $entry['lastmod'] ) ) {
-				return $entry['lastmod'];
-			}
-		}
-
-		return '';
+		return apply_filters( 'wpseopilot_sitemap_lastmod', '', $group, $page );
 	}
 
 	/**
@@ -577,6 +578,160 @@ class Sitemap_Enhancer {
 		$slug = strtolower( (string) $slug );
 
 		return preg_replace( '#[^a-z0-9_-]#', '', $slug );
+	}
+
+	/**
+	 * Resolve the maximum URLs per sitemap page.
+	 *
+	 * @return int
+	 */
+	private function get_max_urls_per_page( $core_default = null ) {
+		if ( null !== $this->max_urls_per_page ) {
+			return $this->max_urls_per_page;
+		}
+
+		$limit = $this->default_max_urls_per_page;
+
+		if ( null !== $core_default ) {
+			$limit = min( (int) $core_default, $limit );
+		}
+
+		if ( defined( 'WPSEOPILOT_SITEMAP_MAX_URLS' ) ) {
+			$limit = (int) WPSEOPILOT_SITEMAP_MAX_URLS;
+		}
+
+		$limit = (int) apply_filters(
+			'wpseopilot_sitemap_max_urls',
+			$limit,
+			$core_default ?? $this->default_max_urls_per_page
+		);
+
+		if ( $limit < 1 ) {
+			$limit = 1;
+		}
+
+		$this->max_urls_per_page = $limit;
+
+		return $this->max_urls_per_page;
+	}
+
+	/**
+	 * Return the total number of objects for a sitemap group via cheap counts.
+	 *
+	 * @param array<string,mixed> $group Group metadata.
+	 *
+	 * @return int|null
+	 */
+	private function get_group_item_count( $group ) {
+		$cache_key = sprintf( '%s|%s', $group['provider'], $group['subtype'] );
+
+		if ( isset( $this->group_item_counts[ $cache_key ] ) ) {
+			return $this->group_item_counts[ $cache_key ];
+		}
+
+		$count = null;
+
+		switch ( $group['provider'] ) {
+			case 'posts':
+				$count = $this->count_posts_for_sitemap( $group['subtype'] );
+				break;
+			case 'taxonomies':
+				$count = $this->count_terms_for_sitemap( $group['subtype'] );
+				break;
+			case 'users':
+				$count = $this->count_users_for_sitemap();
+				break;
+		}
+
+		/**
+		 * Allow custom sitemap providers to supply their total counts.
+		 *
+		 * @param int|null                 $count Current count (null when unknown).
+		 * @param array<string,mixed>      $group Group metadata.
+		 */
+		$count = apply_filters( 'wpseopilot_sitemap_group_count', $count, $group );
+
+		if ( null !== $count ) {
+			$count = max( 0, (int) $count );
+			$this->group_item_counts[ $cache_key ] = $count;
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Count published posts for a given post type.
+	 *
+	 * @param string $post_type Post type.
+	 * @return int
+	 */
+	private function count_posts_for_sitemap( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			return 0;
+		}
+
+		$counts            = wp_count_posts( $post_type, 'readable' );
+		$allowed_statuses  = (array) apply_filters(
+			'wpseopilot_sitemap_count_statuses',
+			[ 'publish', 'inherit' ],
+			$post_type
+		);
+		$total             = 0;
+
+		if ( $counts instanceof \stdClass ) {
+			foreach ( $allowed_statuses as $status ) {
+				if ( isset( $counts->{$status} ) ) {
+					$total += (int) $counts->{$status};
+				}
+			}
+		} else {
+			$total = (int) $counts;
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Count public terms for a taxonomy.
+	 *
+	 * @param string $taxonomy Taxonomy slug.
+	 * @return int
+	 */
+	private function count_terms_for_sitemap( $taxonomy ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return 0;
+		}
+
+		$count = wp_count_terms(
+			$taxonomy,
+			[
+				'hide_empty' => true,
+			]
+		);
+
+		if ( is_wp_error( $count ) ) {
+			return 0;
+		}
+
+		return (int) $count;
+	}
+
+	/**
+	 * Count the number of authors with published posts.
+	 *
+	 * @return int
+	 */
+	private function count_users_for_sitemap() {
+		$query = new \WP_User_Query(
+			[
+				'has_published_posts' => true,
+				'fields'              => 'ID',
+				'number'              => 1,
+				'count_total'         => true,
+			]
+		);
+
+		return (int) $query->get_total();
 	}
 
 	/**
