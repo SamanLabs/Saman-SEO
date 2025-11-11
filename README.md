@@ -28,6 +28,7 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - `wpseopilot_feature_toggle` receives feature keys (`frontend_head`, `metabox`, `redirects`, `sitemaps`) for compatibility fallbacks.
 - `wpseopilot_link_suggestions` lets you augment/replace link suggestions in the meta box.
 - `wpseopilot_sitemap_map` adjusts which post types, taxonomies, or custom groups appear in the Yoast-style sitemap structure.
+- `wpseopilot_sitemap_max_urls` changes how many URLs are emitted per sitemap page (defaults to 1,000).
 - `wpseopilot_sitemap_index_items` filters the compiled sitemap index entries before rendering.
 - `wpseopilot_sitemap_stylesheet` swaps the pretty XSL front-end for `/sitemap_index.xml` and individual sitemaps.
 - `wpseopilot_sitemap_redirect` overrides the destination when requests hit WordPress core's `/wp-sitemap*.xml`.

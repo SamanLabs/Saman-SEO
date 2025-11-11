@@ -43,6 +43,13 @@ class Sitemap_Enhancer {
 	private $sitemap_page_cache = [];
 
 	/**
+	 * Default number of URLs per sitemap page.
+	 *
+	 * @var int
+	 */
+	private $default_max_urls_per_page = 1000;
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
@@ -58,6 +65,7 @@ class Sitemap_Enhancer {
 
 		add_filter( 'wp_sitemaps_posts_entry', [ $this, 'include_media_fields' ], 10, 3 );
 		add_filter( 'wp_sitemaps_additional_namespaces', [ $this, 'add_namespaces' ] );
+		add_filter( 'wp_sitemaps_max_urls', [ $this, 'limit_sitemap_page_size' ] );
 		add_filter( 'wp_sitemaps_enabled', [ $this, 'disable_core_sitemaps' ] );
 		add_filter( 'wp_sitemaps_stylesheet_url', [ $this, 'filter_stylesheet_url' ] );
 		add_filter( 'wp_sitemaps_stylesheet_index_url', [ $this, 'filter_stylesheet_url' ] );
@@ -119,6 +127,29 @@ class Sitemap_Enhancer {
 		}
 
 		return apply_filters( 'wpseopilot_sitemap_entry', $entry, $post_id, $post_type );
+	}
+
+	/**
+	 * Reduce sitemap page size to keep large indexes paginated.
+	 *
+	 * @param int $max_urls Core-provided limit.
+	 *
+	 * @return int
+	 */
+	public function limit_sitemap_page_size( $max_urls ) {
+		$limit = $this->default_max_urls_per_page;
+
+		if ( defined( 'WPSEOPILOT_SITEMAP_MAX_URLS' ) ) {
+			$limit = (int) WPSEOPILOT_SITEMAP_MAX_URLS;
+		}
+
+		$limit = (int) apply_filters( 'wpseopilot_sitemap_max_urls', $limit, $max_urls );
+
+		if ( $limit < 1 ) {
+			$limit = 1;
+		}
+
+		return $limit;
 	}
 
 	/**
@@ -458,14 +489,15 @@ class Sitemap_Enhancer {
 	 *
 	 * @param array<string,mixed> $group Group metadata.
 	 * @param int                 $page  Page number.
+	 * @param bool                $use_cache Whether to reuse cached results.
 	 *
 	 * @return array<int,array<string,mixed>>
 	 */
-	private function fetch_sitemap_urls( $group, $page ) {
+	private function fetch_sitemap_urls( $group, $page, $use_cache = true ) {
 		$page      = max( 1, (int) $page );
 		$cache_key = sprintf( '%s|%d', $group['slug'], $page );
 
-		if ( isset( $this->sitemap_page_cache[ $cache_key ] ) ) {
+		if ( $use_cache && isset( $this->sitemap_page_cache[ $cache_key ] ) ) {
 			return $this->sitemap_page_cache[ $cache_key ];
 		}
 
@@ -489,7 +521,9 @@ class Sitemap_Enhancer {
 			$list = [];
 		}
 
-		$this->sitemap_page_cache[ $cache_key ] = $list;
+		if ( $use_cache ) {
+			$this->sitemap_page_cache[ $cache_key ] = $list;
+		}
 
 		return $list;
 	}
@@ -503,7 +537,7 @@ class Sitemap_Enhancer {
 	 * @return string
 	 */
 	private function get_sitemap_lastmod( $group, $page ) {
-		$list = $this->fetch_sitemap_urls( $group, $page );
+		$list = $this->fetch_sitemap_urls( $group, $page, false );
 
 		if ( empty( $list ) ) {
 			return '';
