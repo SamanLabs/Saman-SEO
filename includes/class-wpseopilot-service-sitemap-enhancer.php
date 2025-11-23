@@ -205,6 +205,8 @@ class Sitemap_Enhancer {
 	public function register_custom_sitemap() {
 		add_rewrite_rule( '^sitemap_index\.xml$', 'index.php?wpseopilot_sitemap_index=1', 'top' );
 		add_rewrite_tag( '%wpseopilot_sitemap_index%', '1' );
+		add_rewrite_rule( '^sitemap\.xml$', 'index.php?wpseopilot_sitemap_root=1', 'top' );
+		add_rewrite_tag( '%wpseopilot_sitemap_root%', '1' );
 
 		add_rewrite_rule(
 			'^([a-z0-9_-]+)-sitemap([0-9]+)\.xml$',
@@ -236,6 +238,11 @@ class Sitemap_Enhancer {
 
 		if ( get_query_var( 'wpseopilot_sitemap_stylesheet' ) ) {
 			$this->render_sitemap_stylesheet();
+			return;
+		}
+
+		if ( get_query_var( 'wpseopilot_sitemap_root' ) ) {
+			$this->redirect_pretty_sitemap();
 			return;
 		}
 
@@ -303,10 +310,16 @@ class Sitemap_Enhancer {
 			}
 
 			for ( $page = 1; $page <= $max_pages; $page++ ) {
-				$items[] = [
-					'loc'     => $this->build_sitemap_url( $group['slug'], $page ),
-					'lastmod' => $this->get_sitemap_lastmod( $group, $page ),
+				$item = [
+					'loc' => $this->build_sitemap_url( $group['slug'], $page ),
 				];
+				$lastmod = $this->get_sitemap_lastmod( $group, $page );
+
+				if ( $lastmod ) {
+					$item['lastmod'] = $lastmod;
+				}
+
+				$items[] = $item;
 			}
 		}
 
@@ -593,7 +606,81 @@ class Sitemap_Enhancer {
 	 * @return string
 	 */
 	private function get_sitemap_lastmod( $group, $page ) {
-		return apply_filters( 'wpseopilot_sitemap_lastmod', '', $group, $page );
+		$filtered_lastmod = apply_filters( 'wpseopilot_sitemap_lastmod', '', $group, $page );
+		$timestamp        = $this->parse_lastmod_timestamp( $filtered_lastmod );
+
+		if ( ! $timestamp ) {
+			$url_list = $this->fetch_sitemap_urls( $group, $page );
+			$timestamp = $this->get_latest_lastmod_from_list( $url_list );
+		}
+
+		if ( ! $timestamp ) {
+			return '';
+		}
+
+		return $this->format_lastmod_timestamp( $timestamp );
+	}
+
+	/**
+	 * Retrieve the newest valid lastmod timestamp from a sitemap entry list.
+	 *
+	 * @param array<int,array<string,string>> $url_list Sitemap entry list.
+	 * @return int
+	 */
+	private function get_latest_lastmod_from_list( $url_list ) {
+		$latest = 0;
+
+		if ( empty( $url_list ) ) {
+			return $latest;
+		}
+
+		foreach ( $url_list as $entry ) {
+			if ( empty( $entry['lastmod'] ) ) {
+				continue;
+			}
+
+			$timestamp = $this->parse_lastmod_timestamp( $entry['lastmod'] );
+
+			if ( $timestamp > $latest ) {
+				$latest = $timestamp;
+			}
+		}
+
+		return $latest;
+	}
+
+	/**
+	 * Normalize a provided lastmod value to a Unix timestamp.
+	 *
+	 * @param mixed $value Raw lastmod value.
+	 * @return int
+	 */
+	private function parse_lastmod_timestamp( $value ) {
+		if ( empty( $value ) ) {
+			return 0;
+		}
+
+		if ( is_numeric( $value ) ) {
+			$timestamp = (int) $value;
+		} else {
+			$timestamp = strtotime( (string) $value );
+		}
+
+		return $timestamp ? $timestamp : 0;
+	}
+
+	/**
+	 * Convert a timestamp to the RFC3339 format expected by sitemap consumers.
+	 *
+	 * @param int $timestamp Unix timestamp.
+	 * @return string
+	 */
+	private function format_lastmod_timestamp( $timestamp ) {
+		if ( empty( $timestamp ) ) {
+			return '';
+		}
+
+		return gmdate( 'c', (int) $timestamp );
 	}
 
 	/**
@@ -936,7 +1023,30 @@ class Sitemap_Enhancer {
 	 */
 	private function redirect_core_sitemap() {
 		$target = apply_filters( 'wpseopilot_sitemap_redirect', home_url( '/sitemap_index.xml' ) );
+		$this->send_sitemap_redirect( $target );
+	}
 
+	/**
+	 * Redirect pretty /sitemap.xml requests to the sitemap index.
+	 *
+	 * @return void
+	 */
+	private function redirect_pretty_sitemap() {
+		$target = apply_filters(
+			'wpseopilot_pretty_sitemap_redirect',
+			apply_filters( 'wpseopilot_sitemap_redirect', home_url( '/sitemap_index.xml' ) )
+		);
+
+		$this->send_sitemap_redirect( $target );
+	}
+
+	/**
+	 * Send a 301 redirect to the provided sitemap destination.
+	 *
+	 * @param string $target Destination URL.
+	 * @return void
+	 */
+	private function send_sitemap_redirect( $target ) {
 		if ( empty( $target ) || headers_sent() ) {
 			return;
 		}
