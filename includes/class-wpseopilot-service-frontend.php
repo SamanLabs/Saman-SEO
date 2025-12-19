@@ -385,6 +385,11 @@ class Frontend {
 	 * @return string
 	 */
 	private function get_social_image( $post, $meta, $social_defaults = [] ) {
+		$override = apply_filters( 'wpseopilot_og_image', '', $post, $meta, $social_defaults );
+		if ( ! empty( $override ) ) {
+			return esc_url_raw( $override );
+		}
+
 		if ( ! empty( $meta['og_image'] ) ) {
 			return esc_url_raw( $meta['og_image'] );
 		}

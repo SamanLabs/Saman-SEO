@@ -131,11 +131,11 @@ class Sitemap_Enhancer {
 		$entry['priority']   = 0.7;
 		$entry['changefreq'] = 'weekly';
 
-		if ( has_post_thumbnail( $post_id ) ) {
-			$entry['image:image'] = [
-				'image:loc'     => wp_get_attachment_image_url( get_post_thumbnail_id( $post_id ), 'full' ),
-				'image:caption' => get_the_title( $post_id ),
-			];
+		$content = get_post_field( 'post_content', $post_id );
+		$images  = $this->collect_post_images( $post_id, $content );
+
+		if ( ! empty( $images ) ) {
+			$entry['image:image'] = $images;
 		}
 
 		if ( 'post' === $post_type ) {
@@ -158,6 +158,78 @@ class Sitemap_Enhancer {
 		}
 
 		return apply_filters( 'wpseopilot_sitemap_entry', $entry, $post_id, $post_type );
+	}
+
+	/**
+	 * Collect sitemap-ready image entries for a post.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $content Optional post content to parse.
+	 * @return array<int,array<string,string>>
+	 */
+	private function collect_post_images( $post_id, $content = '' ) {
+		$images    = [];
+		$seen_urls = [];
+
+		$add_image = static function ( $url, $caption = '' ) use ( &$images, &$seen_urls ) {
+			$url = esc_url_raw( $url );
+
+			if ( empty( $url ) ) {
+				return;
+			}
+
+			$key = md5( $url );
+
+			if ( isset( $seen_urls[ $key ] ) ) {
+				return;
+			}
+
+			$seen_urls[ $key ] = true;
+
+			$image_entry = [
+				'image:loc' => $url,
+			];
+
+			if ( $caption ) {
+				$image_entry['image:caption'] = wp_strip_all_tags( $caption );
+			}
+
+			$images[] = $image_entry;
+		};
+
+		if ( has_post_thumbnail( $post_id ) ) {
+			$add_image(
+				wp_get_attachment_image_url( get_post_thumbnail_id( $post_id ), 'full' ),
+				get_the_title( $post_id )
+			);
+		}
+
+		$attachments = get_attached_media( 'image', $post_id );
+
+		if ( ! empty( $attachments ) ) {
+			foreach ( $attachments as $attachment ) {
+				$caption = $attachment->post_excerpt ?: $attachment->post_title;
+				$add_image( wp_get_attachment_url( $attachment->ID ), $caption );
+			}
+		}
+
+		if ( '' === $content ) {
+			$content = get_post_field( 'post_content', $post_id );
+		}
+
+		if ( $content && preg_match_all( '#<img[^>]+src=["\']([^"\']+)["\'][^>]*>#i', $content, $matches ) ) {
+			foreach ( $matches[1] as $src ) {
+				$add_image( $src );
+			}
+		}
+
+		/**
+		 * Filter the images included for a post's sitemap entry.
+		 *
+		 * @param array<int,array<string,string>> $images  Image entries.
+		 * @param int                             $post_id Post ID.
+		 */
+		return apply_filters( 'wpseopilot_sitemap_images', $images, $post_id );
 	}
 
 	/**
