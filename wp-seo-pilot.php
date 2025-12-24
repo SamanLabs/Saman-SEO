@@ -3,7 +3,7 @@
  * Plugin Name: WP SEO Pilot
  * Plugin URI:  https://github.com/jhd3197/WP-SEO-Pilot
  * Description: Opinionated all-in-one SEO toolkit that keeps titles, metadata, structured data, redirects, and audits in sync with WordPress.
-* Version: 0.1.25
+* Version: 0.1.26
  * Author:      Juan Denis
  * Author URI:  https://github.com/jhd3197
  * Text Domain: wp-seo-pilot
@@ -15,7 +15,7 @@
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'WPSEOPILOT_VERSION' ) ) {
-	define( 'WPSEOPILOT_VERSION', '0.1.25' );
+	define( 'WPSEOPILOT_VERSION', '0.1.26' );
 }
 
 if ( ! defined( 'WPSEOPILOT_PATH' ) ) {
