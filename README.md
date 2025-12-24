@@ -23,7 +23,7 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 ### Filters
 
 - `wpseopilot_title`, `wpseopilot_description`, `wpseopilot_canonical` allow programmatic overrides.
-- `wpseopilot_og_title`, `wpseopilot_og_description`, `wpseopilot_og_image` let you override Open Graph output per post.
+- `wpseopilot_og_title`, `wpseopilot_og_description`, `wpseopilot_og_url`, `wpseopilot_og_type`, `wpseopilot_og_image` let you override Open Graph output per post.
 - `wpseopilot_social_tags` filters the full Open Graph + Twitter tag map (supports duplicate tags).
 - `wpseopilot_social_multi_tags` controls which social tags may appear multiple times (defaults include `og:image`, `og:video`, `twitter:image`).
 - `wpseopilot_keywords` filters the meta keywords tag derived from post-type defaults.
@@ -152,6 +152,8 @@ add_filter( 'wpseopilot_canonical', function( $url ) {
 ```php
 add_filter( 'wpseopilot_og_title', function( $title ) { return $title; } );
 add_filter( 'wpseopilot_og_description', function( $desc ) { return $desc; } );
+add_filter( 'wpseopilot_og_url', function( $url, $post ) { return $url; }, 10, 2 );
+add_filter( 'wpseopilot_og_type', function( $type, $post ) { return $type; }, 10, 2 );
 add_filter( 'wpseopilot_og_image', function( $img ) { return $img; } );
 ```
 

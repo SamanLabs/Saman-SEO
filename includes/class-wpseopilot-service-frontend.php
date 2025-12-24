@@ -35,6 +35,7 @@ class Frontend {
 		add_action( 'wp_head', [ $this, 'render_social_tags' ], 5 );
 		add_action( 'wp_head', [ $this, 'render_json_ld' ], 20 );
 		add_action( 'wp_head', [ $this, 'render_hreflang' ], 8 );
+		add_action( 'wp_head', [ $this, 'render_pagination_links' ], 9 );
 		add_shortcode( 'wpseopilot_breadcrumbs', [ $this, 'breadcrumbs_shortcode' ] );
 	}
 
@@ -44,7 +45,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function render_head_tags() {
-		if ( ! is_singular() && ! is_home() && ! is_archive() ) {
+		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
 			return;
 		}
 
@@ -58,12 +59,29 @@ class Frontend {
 		$homepage_description   = $is_home_view ? get_option( 'wpseopilot_homepage_description', '' ) : '';
 		$homepage_keywords      = $is_home_view ? trim( (string) get_option( 'wpseopilot_homepage_keywords', '' ) ) : '';
 
-		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
+		// Handle 404 pages
+		if ( is_404() ) {
+			$title = apply_filters( 'wpseopilot_title', 'Page Not Found', null );
+		} else {
+			$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
+		}
 
 		$description = $meta['description'] ?? '';
 		if ( empty( $description ) && $is_home_view && ! empty( $homepage_description ) ) {
 			$description = $homepage_description;
 		}
+
+		// Add taxonomy term description support
+		if ( empty( $description ) && ( is_category() || is_tag() || is_tax() ) ) {
+			$term = get_queried_object();
+			if ( $term instanceof \WP_Term ) {
+				$term_desc = term_description( $term->term_id, $term->taxonomy );
+				if ( ! empty( $term_desc ) ) {
+					$description = wp_strip_all_tags( $term_desc );
+				}
+			}
+		}
+
 		if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
 			$description = $post_type_descriptions[ $post->post_type ];
 		}
@@ -148,7 +166,11 @@ class Frontend {
 
 		$post = $this->get_context_post();
 		$meta = $this->get_meta( $post );
-		$url  = $this->get_canonical( $post, $meta );
+		$canonical_url = $this->get_canonical( $post, $meta );
+		$canonical_url = apply_filters( 'wpseopilot_canonical', $canonical_url, $post );
+
+		// OG URL should match canonical URL by default
+		$url = apply_filters( 'wpseopilot_og_url', $canonical_url, $post );
 		$post_type_descriptions = $this->get_post_type_option( 'wpseopilot_post_type_meta_descriptions' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 		$social_defaults        = $this->get_social_defaults( $post );
@@ -220,10 +242,21 @@ class Frontend {
 		// We use $image for both initially.
 		$twitter_image = apply_filters( 'wpseopilot_twitter_image', $image, $post );
 
-		$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? '' );
-		if ( empty( $og_type ) ) {
+		// Determine OG type based on context
+		// Homepage and pages should use 'website', only blog posts should use 'article'
+		if ( $is_home_view ) {
+			$og_type = 'website';
+		} elseif ( $post instanceof WP_Post && 'page' === $post->post_type ) {
+			$og_type = 'website';
+		} elseif ( $post instanceof WP_Post && 'post' === $post->post_type ) {
 			$og_type = 'article';
+		} else {
+			// For other post types, check schema_itemtype from defaults
+			$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? 'website' );
 		}
+
+		// Allow override via filter
+		$og_type = apply_filters( 'wpseopilot_og_type', $og_type, $post );
 
 		$tags = [
 			'og:title'       => $title,
@@ -267,7 +300,12 @@ class Frontend {
 	 * @return string
 	 */
 	public function filter_document_title( $title ) {
-		if ( ! is_singular() && ! is_home() && ! is_archive() ) {
+		// Handle 404 pages
+		if ( is_404() ) {
+			return apply_filters( 'wpseopilot_title', 'Page Not Found', null );
+		}
+
+		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() ) {
 			return $title;
 		}
 
@@ -320,6 +358,57 @@ class Frontend {
 				"<link rel=\"alternate\" hreflang=\"%s\" href=\"%s\" />\n",
 				esc_attr( $locale ),
 				esc_url( $url )
+			);
+		}
+	}
+
+	/**
+	 * Render pagination links for multi-page posts.
+	 *
+	 * @return void
+	 */
+	public function render_pagination_links() {
+		if ( ! is_singular() ) {
+			return;
+		}
+
+		global $post, $page, $numpages;
+
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		// Check if this post has multiple pages (using <!--nextpage-->)
+		if ( $numpages < 2 ) {
+			return;
+		}
+
+		$page = (int) get_query_var( 'page' );
+		if ( $page < 1 ) {
+			$page = 1;
+		}
+
+		// Output rel="prev" for page 2 and above
+		if ( $page > 1 ) {
+			$prev_page = $page - 1;
+			$prev_link = $prev_page > 1
+				? trailingslashit( get_permalink( $post ) ) . user_trailingslashit( $prev_page, 'single_paged' )
+				: get_permalink( $post );
+
+			printf(
+				"<link rel=\"prev\" href=\"%s\" />\n",
+				esc_url( $prev_link )
+			);
+		}
+
+		// Output rel="next" for all pages except the last
+		if ( $page < $numpages ) {
+			$next_page = $page + 1;
+			$next_link = trailingslashit( get_permalink( $post ) ) . user_trailingslashit( $next_page, 'single_paged' );
+
+			printf(
+				"<link rel=\"next\" href=\"%s\" />\n",
+				esc_url( $next_link )
 			);
 		}
 	}
@@ -393,6 +482,16 @@ class Frontend {
 	 */
 	private function get_robots( $meta ) {
 		$directives = [];
+
+		// Add noindex for search results pages
+		if ( is_search() ) {
+			$directives[] = 'noindex';
+		}
+
+		// Add noindex for password protected posts
+		if ( is_singular() && post_password_required() ) {
+			$directives[] = 'noindex';
+		}
 
 		if ( ! empty( $meta['noindex'] ) || '1' === get_option( 'wpseopilot_default_noindex' ) ) {
 			$directives[] = 'noindex';
