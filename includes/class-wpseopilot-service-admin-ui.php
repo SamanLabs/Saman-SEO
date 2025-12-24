@@ -388,20 +388,22 @@ class Admin_UI {
 			),
 			esc_html__( 'Toggle noindex', 'wp-seo-pilot' )
 		);
-
-		$actions['wpseopilot_og_preview'] = sprintf(
-			'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
-			esc_url(
-				add_query_arg(
-					[
-						'wpseopilot_social_card' => 1,
-						'title'                  => $post->post_title,
-					],
-					home_url( '/' )
-				)
-			),
-			esc_html__( 'OG preview', 'wp-seo-pilot' )
-		);
+		
+		if ( '1' === get_option( 'wpseopilot_enable_og_preview', '1' ) ) {
+			$actions['wpseopilot_og_preview'] = sprintf(
+				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+				esc_url(
+					add_query_arg(
+						[
+							'wpseopilot_social_card' => 1,
+							'title'                  => $post->post_title,
+						],
+						home_url( '/' )
+					)
+				),
+				esc_html__( 'OG preview', 'wp-seo-pilot' )
+			);
+		}
 
 		return $actions;
 	}

@@ -242,6 +242,15 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 								</label>
 							</td>
 						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'OG Preview Link', 'wp-seo-pilot' ); ?></th>
+							<td>
+								<label>
+									<input type="checkbox" name="wpseopilot_enable_og_preview" value="1" <?php checked( get_option( 'wpseopilot_enable_og_preview', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'Show "OG Preview" link in post list row actions.', 'wp-seo-pilot' ); ?>
+								</label>
+							</td>
+						</tr>
 					</table>
 			</section>
 		</div>
