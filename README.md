@@ -41,6 +41,192 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - `wpseopilot_sitemap_stylesheet` swaps the pretty XSL front-end for `/sitemap_index.xml` and individual sitemaps.
 - `wpseopilot_sitemap_redirect` overrides the destination when requests hit WordPress core's `/wp-sitemap*.xml`.
 
+### Developer Helper Functions
+
+You can use these global functions in your theme's `functions.php` or other plugins.
+
+**Create Redirects Programmatically**
+
+Use `wpseopilot_create_redirect()` to register 301 redirects dynamically (e.g., during a migration script or custom event). It handles normalization and cache clearing automatically.
+
+```php
+/**
+ * Create a redirect.
+ *
+ * @param string $source      The path to redirect FROM (e.g. '/old-page').
+ * @param string $target      The URL to redirect TO (e.g. 'https://example.com/new-page').
+ * @param int    $status_code HTTP status code (default 301).
+ *
+ * @return int|\WP_Error      Returns the new Redirect ID or a WP_Error on failure.
+ */
+$result = wpseopilot_create_redirect( '/old-url', '/new-url' );
+
+if ( is_wp_error( $result ) ) {
+    error_log( 'Redirect failed: ' . $result->get_error_message() );
+}
+```
+
+**Breadcrumbs**
+
+Render a breadcrumb trail anywhere in your theme.
+
+```php
+if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
+    wpseopilot_breadcrumbs();
+}
+```
+
+**Get Template Title**
+
+Retrieve the auto-generated SEO title for a post (resolving all variables like `{{post_title}}`).
+
+### SEO Filters Cheatsheet
+
+Below is a complete reference of filters you can use to customize WP SEO Pilot output.
+
+#### 🔧 Global SEO Output
+```php
+// Change the entire SEO title
+add_filter( 'wpseopilot_title', function( $title ) {
+    return $title;
+});
+
+// Change the meta description
+add_filter( 'wpseopilot_description', function( $desc ) {
+    return $desc;
+});
+
+// Change the canonical URL
+add_filter( 'wpseopilot_canonical', function( $canonical ) {
+    return $canonical;
+});
+
+// Change robots meta string
+add_filter( 'wpseopilot_robots', function( $robots ) {
+    return 'noindex, nofollow';
+});
+```
+
+#### 🧠 Contextual SEO Filters
+```php
+// Modify title by post ID or post type
+add_filter( 'wpseopilot_title', function( $title, $post ) {
+    if ( is_singular( 'post' ) || ( $post && $post->ID === 123 ) ) {
+        return 'Custom Title';
+    }
+    return $title;
+}, 10, 2 );
+
+// Modify description by post
+add_filter( 'wpseopilot_description', function( $desc, $post ) {
+    if ( $post && $post->ID === 42 ) {
+        return 'Custom description';
+    }
+    return $desc;
+}, 10, 2 );
+```
+
+#### 🧾 Robots and Indexing
+```php
+// Disable indexing for specific post types
+add_filter( 'wpseopilot_robots_array', function( $robots ) {
+    if ( is_post_type_archive( 'private' ) ) {
+        $robots[] = 'noindex';
+    }
+    return $robots;
+});
+```
+
+#### 🔗 Canonical & URL Control
+```php
+// Remove canonical
+add_filter( 'wpseopilot_canonical', '__return_false' );
+
+// Modify canonical dynamically
+add_filter( 'wpseopilot_canonical', function( $url ) {
+    return home_url( '/custom-url/' );
+});
+```
+
+#### 🖼️ OpenGraph Filters
+```php
+add_filter( 'wpseopilot_og_title', function( $title ) { return $title; } );
+add_filter( 'wpseopilot_og_description', function( $desc ) { return $desc; } );
+add_filter( 'wpseopilot_og_image', function( $img ) { return $img; } );
+```
+
+#### 🐦 Twitter Card Filters
+```php
+add_filter( 'wpseopilot_twitter_title', function( $title ) { return $title; } );
+add_filter( 'wpseopilot_twitter_description', function( $desc ) { return $desc; } );
+add_filter( 'wpseopilot_twitter_image', function( $img ) { return $img; } );
+```
+
+#### 🧠 Schema / Structured Data
+```php
+// Filter entire schema graph
+add_filter( 'wpseopilot_jsonld', function( $graph ) {
+    return $graph;
+});
+
+// Filter specific schema pieces
+add_filter( 'wpseopilot_schema_webpage', function( $data ) {
+    return $data;
+});
+
+add_filter( 'wpseopilot_schema_article', function( $data ) {
+    return $data;
+});
+```
+
+#### 🧩 Breadcrumbs
+```php
+// Filter breadcrumbs output (array of links)
+add_filter( 'wpseopilot_breadcrumb_links', function( $links ) {
+    // $links[] = ['title' => 'Custom', 'url' => '/custom'];
+    return $links;
+});
+```
+
+#### 🗂️ XML SITEMAPS
+```php
+// Exclude a post type entirely from the sitemap index
+add_filter( 'wpseopilot_sitemap_map', function( $map ) {
+    foreach ( $map as $key => $group ) {
+        if ( 'private_type' === $group['subtype'] ) {
+            unset( $map[ $key ] );
+        }
+    }
+    return $map;
+});
+
+// Exclude specific posts from the sitemap query
+add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+    if ( 'post' === $post_type ) {
+        $args['post__not_in'] = [ 123, 456 ]; // Exclude IDs
+    }
+    return $args;
+}, 10, 2 );
+
+// Modify individual sitemap entries (add images, change priority)
+add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+    return $entry;
+}, 10, 3 );
+```
+
+#### ⚙️ Features
+```php
+// Disable specific module features
+add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+    if ( 'frontend_head' === $feature ) {
+        return false; // Disable head output
+    }
+    return $enabled;
+}, 10, 2 );
+```
+
+### Advanced Config
+
 Add or duplicate social meta tags with `wpseopilot_social_tags`:
 
 ```php

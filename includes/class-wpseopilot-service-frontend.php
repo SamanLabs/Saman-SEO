@@ -211,10 +211,14 @@ class Frontend {
 				$twitter_title = $social_defaults['twitter_title'];
 			}
 
-			if ( empty( $twitter_description ) && ! empty( $social_defaults['twitter_description'] ) ) {
-				$twitter_description = $social_defaults['twitter_description'];
-			}
 		}
+
+		$twitter_title       = apply_filters( 'wpseopilot_twitter_title', $twitter_title, $post );
+		$twitter_description = apply_filters( 'wpseopilot_twitter_description', $twitter_description, $post );
+		
+		// Twitter image is same as OG by default unless overridden here, or if the user wants separate filter content.
+		// We use $image for both initially.
+		$twitter_image = apply_filters( 'wpseopilot_twitter_image', $image, $post );
 
 		$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? '' );
 		if ( empty( $og_type ) ) {
@@ -229,9 +233,9 @@ class Frontend {
 			'og:site_name'   => get_bloginfo( 'name' ),
 			'og:image'       => $image,
 			'twitter:card'   => 'summary_large_image',
-			'twitter:title'  => $twitter_title,
+			'twitter:title'       => $twitter_title,
 			'twitter:description' => $twitter_description,
-			'twitter:image'  => $image,
+			'twitter:image'       => $twitter_image,
 		];
 
 		$tags = apply_filters( 'wpseopilot_social_tags', $tags, $post, $meta, $social_defaults );
@@ -405,7 +409,17 @@ class Frontend {
 
 		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
 
-		return implode( ', ', $directives );
+		// Filter the array of directives (e.g. ['noindex', 'nofollow']).
+		$directives = apply_filters( 'wpseopilot_robots_array', $directives );
+
+		if ( ! is_array( $directives ) ) {
+			$directives = [];
+		}
+
+		$robots_string = implode( ', ', $directives );
+
+		// Filter the final string (e.g. 'noindex, nofollow').
+		return apply_filters( 'wpseopilot_robots', $robots_string );
 	}
 
 	/**

@@ -96,6 +96,7 @@ class Sitemap_Enhancer {
 		add_filter( 'wp_sitemaps_posts_entry', [ $this, 'include_media_fields' ], 10, 3 );
 		add_filter( 'wp_sitemaps_additional_namespaces', [ $this, 'add_namespaces' ] );
 		add_filter( 'wp_sitemaps_max_urls', [ $this, 'limit_sitemap_page_size' ] );
+		add_filter( 'wp_sitemaps_posts_query_args', [ $this, 'filter_posts_query_args' ], 10, 2 );
 		add_filter( 'wp_sitemaps_taxonomies_query_args', [ $this, 'filter_taxonomy_query_args' ], 10, 2 );
 		add_filter( 'wp_sitemaps_enabled', [ $this, 'disable_core_sitemaps' ] );
 		add_filter( 'wp_sitemaps_stylesheet_url', [ $this, 'filter_stylesheet_url' ] );
@@ -267,6 +268,24 @@ class Sitemap_Enhancer {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Filter posts query args used by WP sitemaps.
+	 *
+	 * @param array  $args      Query args.
+	 * @param string $post_type Post type.
+	 *
+	 * @return array
+	 */
+	public function filter_posts_query_args( $args, $post_type ) {
+		/**
+		 * Filter the WP_Query args for sitemap generation.
+		 *
+		 * @param array  $args      WP_Query args.
+		 * @param string $post_type Post type slug.
+		 */
+		return apply_filters( 'wpseopilot_sitemap_post_query_args', $args, $post_type );
 	}
 
 	/**

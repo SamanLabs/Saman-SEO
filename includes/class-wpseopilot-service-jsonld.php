@@ -57,7 +57,7 @@ class JsonLD {
 			$url    = get_permalink( $post );
 			$post_id = $url . '#webpage';
 
-			$graph[] = [
+			$webpage_schema = [
 				'@type'         => 'WebPage',
 				'@id'           => $post_id,
 				'url'           => $url,
@@ -72,8 +72,10 @@ class JsonLD {
 				],
 			];
 
+			$graph[] = apply_filters( 'wpseopilot_schema_webpage', $webpage_schema, $post );
+
 			if ( in_array( get_post_type( $post ), [ 'post', 'article' ], true ) ) {
-				$graph[] = [
+				$article_schema = [
 					'@type'        => 'Article',
 					'@id'          => $url . '#article',
 					'headline'     => get_the_title( $post ),
@@ -88,6 +90,8 @@ class JsonLD {
 					'dateModified'  => get_the_modified_date( DATE_W3C, $post ),
 					'isPartOf'      => [ '@id' => $post_id ],
 				];
+
+				$graph[] = apply_filters( 'wpseopilot_schema_article', $article_schema, $post );
 			}
 
 			$graph[] = $this->breadcrumb_ld( $post );

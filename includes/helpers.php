@@ -569,6 +569,12 @@ namespace WPSEOPilot\Helpers {
 			];
 		}
 
+		$crumbs = apply_filters( 'wpseopilot_breadcrumb_links', $crumbs );
+
+		if ( empty( $crumbs ) || ! is_array( $crumbs ) ) {
+			return null;
+		}
+
 		ob_start();
 		?>
 		<nav class="wpseopilot-breadcrumb" aria-label="Breadcrumb">
@@ -601,5 +607,25 @@ namespace {
 	 */
 	function wpseopilot_breadcrumbs( $post = null, $echo = true ) {
 		return \WPSEOPilot\Helpers\breadcrumbs( $post, $echo );
+	}
+
+	/**
+	 * Programmatically create a redirect.
+	 *
+	 * @param string $source      The request path to match (e.g. '/old-url').
+	 * @param string $target      The destination URL (can be relative or absolute).
+	 * @param int    $status_code HTTP Status Code (default 301).
+	 *
+	 * @return int|\WP_Error Redirect ID or WP_Error.
+	 */
+	function wpseopilot_create_redirect( $source, $target, $status_code = 301 ) {
+		$plugin = \WPSEOPilot\Plugin::instance();
+		$svc    = $plugin->get( 'redirects' );
+
+		if ( ! $svc ) {
+			return new \WP_Error( 'service_unavailable', 'Redirect service not loaded.' );
+		}
+
+		return $svc->create_redirect( $source, $target, $status_code );
 	}
 }

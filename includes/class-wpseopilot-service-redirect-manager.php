@@ -192,6 +192,54 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Create a new redirect programmatically.
+	 *
+	 * @param string $source      Source URL path.
+	 * @param string $target      Target URL.
+	 * @param int    $status_code HTTP status code (301, 302, 307, 410).
+	 *
+	 * @return int|\WP_Error Inserted redirect ID or WP_Error on failure.
+	 */
+	public function create_redirect( $source, $target, $status_code = 301 ) {
+		if ( empty( $source ) || empty( $target ) ) {
+			return new \WP_Error( 'invalid_data', __( 'Source and target are required.', 'wp-seo-pilot' ) );
+		}
+
+		global $wpdb;
+
+		$normalized = '/' . ltrim( $source, '/' );
+		$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s", $normalized ) );
+
+		if ( $exists ) {
+			return new \WP_Error( 'redirect_exists', __( 'Redirect already exists.', 'wp-seo-pilot' ) );
+		}
+
+		$status_code = in_array( $status_code, [ 301, 302, 307, 410 ], true ) ? $status_code : 301;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$inserted = $wpdb->insert(
+			$this->table,
+			[
+				'source'      => $normalized,
+				'target'      => $target,
+				'status_code' => $status_code,
+			],
+			[ '%s', '%s', '%d' ]
+		);
+
+		if ( ! $inserted ) {
+			return new \WP_Error( 'db_error', __( 'Could not insert redirect into database.', 'wp-seo-pilot' ) );
+		}
+
+		self::flush_cache();
+
+		return $wpdb->insert_id;
+	}
+
+	/**
 	 * AJAX handler to create the redirect.
 	 *
 	 * @return void
@@ -206,37 +254,11 @@ class Redirect_Manager {
 		$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : '';
 		$target = isset( $_POST['target'] ) ? esc_url_raw( wp_unslash( $_POST['target'] ) ) : '';
 
-		if ( empty( $source ) || empty( $target ) ) {
-			wp_send_json_error( __( 'Invalid parameters.', 'wp-seo-pilot' ) );
+		$result = $this->create_redirect( $source, $target );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result->get_error_message() );
 		}
-
-		global $wpdb;
-		
-		// Ideally we reuse handle_save logic but that expects $_POST structure for the form.
-		// Let's just do the insert.
-		$normalized = '/' . ltrim( $source, '/' );
-		$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
-
-		// Check if exists first to avoid dupes?
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s", $normalized ) );
-
-		if ( $exists ) {
-			wp_send_json_error( __( 'Redirect already exists.', 'wp-seo-pilot' ) );
-		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$wpdb->insert(
-			$this->table,
-			[
-				'source'      => $normalized,
-				'target'      => $target,
-				'status_code' => 301,
-			],
-			[ '%s', '%s', '%d' ]
-		);
-
-		self::flush_cache();
 
 		// Cleanup transient just in case it wasn't cleared by the render method (e.g. if we moved to dismissing manually).
 		delete_transient( 'wpseopilot_slug_changed_' . get_current_user_id() );
@@ -329,33 +351,18 @@ class Redirect_Manager {
 		$target = isset( $_POST['target'] ) ? esc_url_raw( wp_unslash( $_POST['target'] ) ) : '';
 		$status = isset( $_POST['status_code'] ) ? absint( $_POST['status_code'] ) : 301;
 
-		if ( empty( $source ) || empty( $target ) ) {
-			$redirect_url = wp_get_referer();
-			$redirect_url = $redirect_url ? $redirect_url : $this->get_admin_redirect_url();
-			wp_safe_redirect( $redirect_url );
-			exit;
-		}
-
-		global $wpdb;
-		$normalized = '/' . ltrim( $source, '/' );
-		$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Writing to the custom redirects table requires a direct query.
-		$wpdb->insert(
-			$this->table,
-			[
-				'source'      => $normalized ?: '/',
-				'target'      => $target,
-				'status_code' => in_array( $status, [ 301, 302, 307, 410 ], true ) ? $status : 301,
-			],
-			[ '%s', '%s', '%d' ]
-		);
-
-		self::flush_cache();
+		$result = $this->create_redirect( $source, $target, $status );
 
 		$redirect_url = wp_get_referer();
 		$redirect_url = $redirect_url ? $redirect_url : $this->get_admin_redirect_url();
-		wp_safe_redirect( $redirect_url );
+
+		if ( is_wp_error( $result ) ) {
+			// We could add an error query arg here to show admin notice.
+			wp_safe_redirect( add_query_arg( 'error', urlencode( $result->get_error_message() ), $redirect_url ) );
+			exit;
+		}
+
+		wp_safe_redirect( add_query_arg( 'updated', '1', $redirect_url ) );
 		exit;
 	}
 
