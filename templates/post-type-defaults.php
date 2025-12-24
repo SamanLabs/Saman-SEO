@@ -50,6 +50,9 @@ call_user_func(
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_homepage_title">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
 							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_homepage_title">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+							</button>
 						</div>
 						<div class="wpseopilot-preview"></div>
 					</td>
@@ -65,6 +68,9 @@ call_user_func(
 							<textarea class="large-text" rows="3" id="wpseopilot_homepage_description" name="wpseopilot_homepage_description" data-context="global"><?php echo esc_textarea( get_option( 'wpseopilot_homepage_description' ) ); ?></textarea>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_homepage_description">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_homepage_description">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
 							</button>
 						</div>
 						<div class="wpseopilot-preview"></div>
@@ -143,6 +149,9 @@ call_user_func(
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_template_<?php echo esc_attr( $slug ); ?>">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
 							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_template_<?php echo esc_attr( $slug ); ?>">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+							</button>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_template_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_title_templates[<?php echo esc_attr( $slug ); ?>]" value="<?php echo esc_attr( $template ); ?>" data-context="<?php echo esc_attr($context_key); ?>" />
 						<div class="wpseopilot-preview" style="margin-top: 5px; color: #646970; font-style: italic;"></div>
@@ -153,6 +162,9 @@ call_user_func(
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
 							</button>
 						</div>
 						<textarea class="large-text" rows="3" id="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_meta_descriptions[<?php echo esc_attr( $slug ); ?>]" data-context="<?php echo esc_attr($context_key); ?>"><?php echo esc_textarea( $description ); ?></textarea>
@@ -253,6 +265,9 @@ call_user_func(
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
 							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+							</button>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][title]" value="<?php echo esc_attr( $settings['title'] ); ?>" data-context="<?php echo esc_attr($context_key); ?>" />
 						<div class="wpseopilot-preview" style="margin-top: 5px; color: #646970; font-style: italic;"></div>
@@ -263,6 +278,9 @@ call_user_func(
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
 							</button>
 						</div>
 						<textarea class="large-text" rows="3" id="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][description]" data-context="<?php echo esc_attr($context_key); ?>"><?php echo esc_textarea( $settings['description'] ); ?></textarea>
@@ -313,6 +331,9 @@ call_user_func(
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
 							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+							</button>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>" name="wpseopilot_archive_settings[<?php echo esc_attr( $key ); ?>][title]" value="<?php echo esc_attr( $settings['title'] ); ?>" data-context="<?php echo esc_attr($context_key); ?>" />
 						<div class="wpseopilot-preview" style="margin-top: 5px; color: #646970; font-style: italic;"></div>
@@ -323,6 +344,9 @@ call_user_func(
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>">
 								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+							</button>
+							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>">
+								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
 							</button>
 						</div>
 						<textarea class="large-text" rows="3" id="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>" name="wpseopilot_archive_settings[<?php echo esc_attr( $key ); ?>][description]" data-context="<?php echo esc_attr($context_key); ?>"><?php echo esc_textarea( $settings['description'] ); ?></textarea>

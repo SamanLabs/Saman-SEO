@@ -358,6 +358,67 @@
                     const lastOpen = text.lastIndexOf('{{', caret);
                     if (lastOpen !== -1) {
                         const query = text.substring(lastOpen + 2, caret).trim();
+
+                        // Check if we just typed '}}' to close a tag manually
+                        // We check if the text *ends* with '}}' at the caret position
+                        // Or simply if text substring from lastOpen includes '}}' at the end
+                        const rawSegment = text.substring(lastOpen, caret);
+                        if (rawSegment.endsWith('}}')) {
+                            // Extract content between {{ and }}
+                            // content is rawSegment minus {{ and }}
+                            const content = rawSegment.substring(2, rawSegment.length - 2); // preserve whitespace inside if user typed spaces
+                            // We probably want to trim for the pill attribute value, but keep visual if complex?
+                            // Actually existing pill logic inserts `{{${variable}}}`. 
+                            // If user types `{{ post_title }}`, we probably want `{{post_title}}` or `{{ post_title }}`.
+                            // The regex used elsewhere is `\{\{\s*([^}]+)\s*\}\}`.
+                            // Let's use the content as-is or trimmed.
+                            const variable = content; // Keep spaces if user typed them, or trim? 
+                            // Let's trim for cleanliness, Twiglet handles spaces fine usually.
+
+                            console.log('WP SEO Pilot: Detected manual tag closure:', variable);
+
+                            // We need to replace the text node's content from lastOpen to caret with the pill
+                            const before = text.substring(0, lastOpen);
+                            const after = text.substring(caret);
+
+                            // Update text node to contain 'before' part
+                            node.textContent = before;
+
+                            // Insert Pill
+                            const $pill = $(`<span class="wpseopilot-tag" contenteditable="false">{{${variable}}}</span>`);
+                            // Insert Space? Usually good UX to add a space after.
+                            const spacer = document.createTextNode('\u00A0'); // nbsp
+
+                            // We need to insert these after 'node'
+                            // But 'node' is now just 'before'.
+                            // If 'after' exists, we need a text node for it.
+
+                            if (node.nextSibling) {
+                                node.parentNode.insertBefore($pill[0], node.nextSibling);
+                                node.parentNode.insertBefore(spacer, $pill[0].nextSibling);
+                                if (after) {
+                                    const afterNode = document.createTextNode(after);
+                                    node.parentNode.insertBefore(afterNode, spacer.nextSibling);
+                                }
+                            } else {
+                                $(node.parentNode).append($pill).append(spacer);
+                                if (after) {
+                                    $(node.parentNode).append(document.createTextNode(after));
+                                }
+                            }
+
+                            // Set cursor after spacer
+                            const newRange = document.createRange();
+                            newRange.setStart(spacer, 1);
+                            newRange.setEnd(spacer, 1);
+                            sel.removeAllRanges();
+                            sel.addRange(newRange);
+
+                            hideMenu();
+                            syncToInput();
+                            return;
+                        }
+
                         if (!query.includes('}}')) {
                             activeEditor = $editor[0];
                             const currentAllowed = $editor.data('allowed-vars') || {};
@@ -394,6 +455,7 @@
             });
 
             $editor.on('keydown', function (e) {
+                // Autocomplete Navigation
                 if ($menu.hasClass('is-visible')) {
                     const items = $menu.find('.wpseopilot-autocomplete-item');
                     if (e.key === 'ArrowDown') {
@@ -413,6 +475,55 @@
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
                         hideMenu();
+                    }
+                    return;
+                }
+
+                // Handle Backspace for "Unlocking" Tags
+                if (e.key === 'Backspace') {
+                    const sel = window.getSelection();
+                    if (!sel.rangeCount) return;
+                    const range = sel.getRangeAt(0);
+
+                    // Check if collapsed (caret)
+                    if (range.collapsed) {
+                        // Check if we are immediately after a tag
+                        // range.startContainer could be a text node, or the editor element itself
+                        let prevNode = null;
+
+                        if (range.startContainer.nodeType === 3 && range.startOffset === 0) {
+                            // At start of text node, look at previous sibling
+                            prevNode = range.startContainer.previousSibling;
+                        } else if (range.startContainer.nodeType === 1) {
+                            // In element, look at child at offset-1
+                            if (range.startOffset > 0) {
+                                prevNode = range.startContainer.childNodes[range.startOffset - 1];
+                            }
+                        }
+
+                        if (prevNode && prevNode.nodeType === 1 && prevNode.classList.contains('wpseopilot-tag')) {
+                            e.preventDefault();
+                            console.log('WP SEO Pilot: Unlocking tag on backspace');
+                            const tagText = prevNode.innerText; // e.g. "{{post_title}}"
+                            // Remove last char (the closing brace usually)
+                            const newText = tagText.slice(0, -1);
+
+                            // Create text node
+                            const textNode = document.createTextNode(newText);
+
+                            // Replace tag with text
+                            prevNode.parentNode.replaceChild(textNode, prevNode);
+
+                            // Set cursor to end of new text node
+                            const newRange = document.createRange();
+                            newRange.setStart(textNode, newText.length);
+                            newRange.setEnd(textNode, newText.length);
+                            sel.removeAllRanges();
+                            sel.addRange(newRange);
+
+                            // Trigger sync
+                            syncToInput();
+                        }
                     }
                 }
             });
@@ -459,6 +570,41 @@
                 renderMenu(allowedVars); // Show all allowed vars
             } else {
                 console.error('WP SEO Pilot: No editor found for input', targetId);
+            }
+        });
+
+        // Trigger Preview Button Logic
+        $(document).on('click', '.wpseopilot-trigger-preview', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = $(this).data('target');
+            console.log('WP SEO Pilot: Preview button clicked for', targetId);
+            const $input = $('#' + targetId);
+
+            const $previewContainer = $input.nextAll('.wpseopilot-preview').add($input.parent().nextAll('.wpseopilot-preview')).first();
+
+            if ($previewContainer.length) {
+                $previewContainer.text('Loading preview...');
+                // Force preview update immediately (bypass debounce)
+                const template = $input.val();
+                const context = $input.data('context');
+
+                $.post(settings.ai.ajax, {
+                    action: 'wpseopilot_render_preview',
+                    nonce: settings.ai.nonce,
+                    template: template,
+                    context: context
+                }).done(function (response) {
+                    if (response.success) {
+                        $previewContainer.text(response.data.preview || '(Empty)');
+                    } else {
+                        $previewContainer.text('Preview Error: ' + (response.data || 'Unknown'));
+                    }
+                }).fail(function () {
+                    $previewContainer.text('Preview Request Failed');
+                });
+            } else {
+                console.error('WP SEO Pilot: No preview container found for input', targetId);
             }
         });
     };
