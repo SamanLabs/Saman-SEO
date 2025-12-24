@@ -74,6 +74,174 @@ class Redirect_Manager {
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_post_wpseopilot_save_redirect', [ $this, 'handle_save' ] );
 		add_action( 'admin_post_wpseopilot_delete_redirect', [ $this, 'handle_delete' ] );
+
+		// Slug change detection.
+		add_action( 'post_updated', [ $this, 'detect_slug_change' ], 10, 3 );
+		add_action( 'admin_notices', [ $this, 'render_slug_change_notice' ] );
+		add_action( 'wp_ajax_wpseopilot_create_automatic_redirect', [ $this, 'ajax_create_redirect' ] );
+	}
+
+	/**
+	 * Detect if a post slug has changed and store a transient to prompt the user.
+	 *
+	 * @param int      $post_id     Post ID.
+	 * @param \WP_Post $post_after  Post object after update.
+	 * @param \WP_Post $post_before Post object before update.
+	 *
+	 * @return void
+	 */
+	public function detect_slug_change( $post_id, $post_after, $post_before ) {
+		// Only check for published posts.
+		if ( 'publish' !== $post_after->post_status || 'publish' !== $post_before->post_status ) {
+			return;
+		}
+
+		// Check if slug changed.
+		if ( $post_after->post_name === $post_before->post_name ) {
+			return;
+		}
+
+		// Don't trigger on post type changes, revisions, etc.
+		if ( $post_after->post_type !== $post_before->post_type ) {
+			return;
+		}
+
+		$start_slug = $post_before->post_name;
+		$end_slug   = $post_after->post_name;
+
+		// Calculate relative paths.
+		// We can't rely solely on get_permalink() here because it might already reflect the new slug,
+		// or complex permalink structures.
+		// However, for the purpose of the redirect, we need the *old* URL path.
+		// The most reliable way for the OLD path is to assume the same structure but with the old name.
+		// But get_permalink($post_id) will return the NEW permalink.
+		// Let's try to construct the old permalink by replacing the new slug with the old one in the new permalink.
+		// This handles most standard permalink structures.
+
+		$new_url = get_permalink( $post_id );
+		$old_url = str_replace( $end_slug, $start_slug, $new_url );
+
+		// Normalize to paths.
+		$source = wp_parse_url( $old_url, PHP_URL_PATH );
+		$target = wp_parse_url( $new_url, PHP_URL_PATH ); // Or full URL? The existing manager supports full URLs in 'target'.
+
+		if ( ! $source || ! $target ) {
+			return;
+		}
+
+		// Store in transient for the current user.
+		$user_id = get_current_user_id();
+		set_transient(
+			'wpseopilot_slug_changed_' . $user_id,
+			[
+				'post_id' => $post_id,
+				'old_url' => $source,
+				'new_url' => $new_url, // Use full URL for target as per existing redirect logic preference often.
+			],
+			60
+		);
+	}
+
+	/**
+	 * Render admin notice if a slug change was detected.
+	 *
+	 * @return void
+	 */
+	public function render_slug_change_notice() {
+		$screen = get_current_screen();
+		if ( $screen && $screen->is_block_editor() ) {
+			return;
+		}
+
+		$user_id = get_current_user_id();
+		$data    = get_transient( 'wpseopilot_slug_changed_' . $user_id );
+
+		if ( ! $data ) {
+			return;
+		}
+
+		// Clear it immediately effectively (or keep it until dismissed? Better to keep until page reload or action).
+		// We'll delete it in the AJAX handler or let it expire.
+		// Actually, if we don't delete different page loads might show it.
+		// Let's delete it NOW so it only shows once.
+		delete_transient( 'wpseopilot_slug_changed_' . $user_id );
+
+		?>
+		<div class="notice notice-info is-dismissible wpseopilot-slug-notice">
+			<p>
+				<?php
+				printf(
+					/* translators: 1: Old path, 2: New path */
+					esc_html__( 'We noticed the post slug changed from %1$s to %2$s. Would you like to create a redirect?', 'wp-seo-pilot' ),
+					'<strong>' . esc_html( $data['old_url'] ) . '</strong>',
+					'<strong>' . esc_html( wp_parse_url( $data['new_url'], PHP_URL_PATH ) ) . '</strong>'
+				);
+				?>
+			</p>
+			<p>
+				<button type="button" 
+					class="button button-primary wpseopilot-create-redirect-btn"
+					data-source="<?php echo esc_attr( $data['old_url'] ); ?>"
+					data-target="<?php echo esc_attr( $data['new_url'] ); ?>"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpseopilot_create_redirect' ) ); ?>">
+					<?php esc_html_e( 'Create Redirect', 'wp-seo-pilot' ); ?>
+				</button>
+			</p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * AJAX handler to create the redirect.
+	 *
+	 * @return void
+	 */
+	public function ajax_create_redirect() {
+		check_ajax_referer( 'wpseopilot_create_redirect', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'wp-seo-pilot' ) );
+		}
+
+		$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : '';
+		$target = isset( $_POST['target'] ) ? esc_url_raw( wp_unslash( $_POST['target'] ) ) : '';
+
+		if ( empty( $source ) || empty( $target ) ) {
+			wp_send_json_error( __( 'Invalid parameters.', 'wp-seo-pilot' ) );
+		}
+
+		global $wpdb;
+		
+		// Ideally we reuse handle_save logic but that expects $_POST structure for the form.
+		// Let's just do the insert.
+		$normalized = '/' . ltrim( $source, '/' );
+		$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+
+		// Check if exists first to avoid dupes?
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s", $normalized ) );
+
+		if ( $exists ) {
+			wp_send_json_error( __( 'Redirect already exists.', 'wp-seo-pilot' ) );
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->insert(
+			$this->table,
+			[
+				'source'      => $normalized,
+				'target'      => $target,
+				'status_code' => 301,
+			],
+			[ '%s', '%s', '%d' ]
+		);
+
+		self::flush_cache();
+
+		// Cleanup transient just in case it wasn't cleared by the render method (e.g. if we moved to dismissing manually).
+		delete_transient( 'wpseopilot_slug_changed_' . get_current_user_id() );
+
+		wp_send_json_success( __( 'Redirect created successfully.', 'wp-seo-pilot' ) );
 	}
 
 	/**

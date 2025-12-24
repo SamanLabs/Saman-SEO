@@ -7,6 +7,7 @@
 	const __ = (wp.i18n && wp.i18n.__) || ((str) => str);
 
 	config = config || {};
+	console.log('WPSEOPilotEditor Config:', config);
 
 	const defaults = {
 		title: '',
@@ -128,8 +129,8 @@
 					if (!response || !response.success) {
 						throw new Error(
 							response?.data ||
-								aiConfig.strings?.error ||
-								'Unable to generate suggestion.'
+							aiConfig.strings?.error ||
+							'Unable to generate suggestion.'
 						);
 					}
 
@@ -169,14 +170,13 @@
 				),
 				aiState.message
 					? el(
-							'p',
-							{
-								className: `wpseopilot-ai-panel__status ${
-									aiState.variant ? 'is-' + aiState.variant : ''
+						'p',
+						{
+							className: `wpseopilot-ai-panel__status ${aiState.variant ? 'is-' + aiState.variant : ''
 								}`,
-							},
-							aiState.message
-					  )
+						},
+						aiState.message
+					)
 					: null
 			);
 
@@ -226,19 +226,159 @@
 		);
 	};
 
+	const SlugMonitor = () => {
+		const { createNotice, removeNotice } = useDispatch('core/notices');
+		const { isSavingPost, isCurrentPostPublished, getCurrentPostAttribute, getPermalink } = useSelect(
+			(select) => select('core/editor'),
+			[]
+		);
+
+		// Debug logs
+		// console.log('SlugMonitor Render', { isSavingPost, isCurrentPostPublished });
+
+		// Initial slug state from when the editor loaded.
+		const [initialSlug, setInitialSlug] = useState(
+			getCurrentPostAttribute('slug')
+		);
+		const [wasSaving, setWasSaving] = useState(false);
+
+		// Check for transient data passed from PHP (e.g. page reload after slug change).
+		const [processedTransient, setProcessedTransient] = useState(false);
+
+		const handleCreateRedirect = (oldUrl, newUrl, nonce, noticeId) => {
+			console.log('SlugMonitor: Creating redirect for', oldUrl, 'to', newUrl);
+			const ajaxUrl = aiConfig.ajax || window.ajaxurl;
+
+			const formData = new window.FormData();
+			formData.append('action', 'wpseopilot_create_automatic_redirect');
+			formData.append('nonce', nonce);
+			formData.append('source', oldUrl);
+			formData.append('target', newUrl);
+
+			removeNotice(noticeId);
+			createNotice('info', __('Creating redirect…', 'wp-seo-pilot'), { id: 'wpseopilot-redirect-creating', isDismissible: false });
+
+			window.fetch(ajaxUrl, {
+				method: 'POST',
+				body: formData,
+			})
+				.then(res => res.json())
+				.then(response => {
+					removeNotice('wpseopilot-redirect-creating');
+					if (response.success) {
+						console.log('SlugMonitor: Redirect created success');
+						createNotice('success', response.data, {
+							id: 'wpseopilot-slug-success',
+							isDismissible: true,
+							type: 'snackbar'
+						});
+					} else {
+						console.warn('SlugMonitor: Redirect created error', response);
+						createNotice('error', response.data || 'Error', { isDismissible: true });
+					}
+				})
+				.catch((err) => {
+					console.error('SlugMonitor: Redirect created fail', err);
+					removeNotice('wpseopilot-redirect-creating');
+					createNotice('error', __('Request failed', 'wp-seo-pilot'), { isDismissible: true });
+				});
+		};
+
+		if (!processedTransient) {
+			console.log('SlugMonitor: check config.slugChange', config.slugChange);
+			if (config.slugChange) {
+				setProcessedTransient(true);
+				const { old_url, new_url, nonce } = config.slugChange;
+
+				console.log('SlugMonitor: Showing transient notice');
+				createNotice(
+					'info',
+					__('We noticed the post slug changed. Would you like to create a redirect?', 'wp-seo-pilot'),
+					{
+						id: 'wpseopilot-slug-notice',
+						isDismissible: true,
+						speak: true,
+						actions: [
+							{
+								label: __('Create Redirect', 'wp-seo-pilot'),
+								onClick: () => handleCreateRedirect(old_url, new_url, nonce, 'wpseopilot-slug-notice')
+							}
+						]
+					}
+				);
+			} else {
+				setProcessedTransient(true);
+			}
+		}
+
+		// Live monitoring logic.
+		if (wasSaving && !isSavingPost) {
+			// Save just finished.
+			setWasSaving(false);
+
+			if (isCurrentPostPublished) {
+				const currentSlug = getCurrentPostAttribute('slug');
+				// console.log('SlugMonitor: Save finished. Slug:', currentSlug, 'Initial:', initialSlug);
+
+				if (currentSlug && initialSlug && currentSlug !== initialSlug) {
+					const currentPermalink = getPermalink(); // This should be the NEW URL.
+					console.log('SlugMonitor: Slug changed detected. Permalink:', currentPermalink);
+
+					if (currentPermalink) {
+						const oldUrl = currentPermalink.replace(currentSlug, initialSlug);
+						const nonce = config.redirectNonce;
+
+						if (nonce) {
+							console.log('SlugMonitor: Triggering live notice');
+							createNotice(
+								'info',
+								__('We noticed the post slug changed. Would you like to create a redirect?', 'wp-seo-pilot'),
+								{
+									id: 'wpseopilot-slug-notice-live',
+									isDismissible: true,
+									speak: true,
+									actions: [
+										{
+											label: __('Create Redirect', 'wp-seo-pilot'),
+											onClick: () => handleCreateRedirect(oldUrl, currentPermalink, nonce, 'wpseopilot-slug-notice-live')
+										}
+									]
+								}
+							);
+						} else {
+							console.warn('SlugMonitor: No nonce for live redirect');
+						}
+					}
+					setInitialSlug(currentSlug);
+				}
+			}
+		}
+
+		if (!wasSaving && isSavingPost) {
+			setWasSaving(true);
+		}
+
+		return null;
+	};
+
 	registerPlugin('wpseopilot-sidebar', {
 		render: () =>
 			el(
-				PluginSidebar,
-				{
-					name: 'wpseopilot-sidebar',
-					title: 'WP SEO Pilot',
-				},
+				Fragment,
+				null,
 				el(
-					PanelBody,
-					{ className: 'wpseopilot-panel', initialOpen: true },
-					el(SeoFields)
-				)
+					PluginSidebar,
+					{
+						name: 'wpseopilot-sidebar',
+						title: 'WP SEO Pilot',
+					},
+					el(
+						PanelBody,
+						{ className: 'wpseopilot-panel', initialOpen: true },
+						el(SeoFields)
+					)
+				),
+				el(SlugMonitor)
 			),
 		icon: 'airplane',
 	});

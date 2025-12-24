@@ -226,6 +226,16 @@ class Admin_UI {
 
 		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
 
+		// Check for pending slug change redirect for this user.
+		$user_id     = get_current_user_id();
+		$slug_change = get_transient( 'wpseopilot_slug_changed_' . $user_id );
+		error_log( 'WPSEOPilot Admin_UI: slug_change transient (' . $user_id . '): ' . print_r( $slug_change, true ) );
+		if ( $slug_change ) {
+			// Clear it so it doesn't persist.
+			delete_transient( 'wpseopilot_slug_changed_' . $user_id );
+			$slug_change['nonce'] = wp_create_nonce( 'wpseopilot_create_redirect' );
+		}
+
 		wp_localize_script(
 			'wpseopilot-editor',
 			'WPSEOPilotEditor',
@@ -235,6 +245,9 @@ class Admin_UI {
 				'defaultOg'          => get_option( 'wpseopilot_default_og_image', '' ),
 				'postTypeTemplates'  => $post_type_templates,
 				'postTypeDescriptions' => $post_type_descriptions,
+				'postTypeDescriptions' => $post_type_descriptions,
+				'slugChange'         => $slug_change,
+				'redirectNonce'      => wp_create_nonce( 'wpseopilot_create_redirect' ),
 				'ai'                 => [
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),

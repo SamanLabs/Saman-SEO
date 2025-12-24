@@ -264,6 +264,48 @@
 		});
 	};
 
+	$(document).on('click', '.wpseopilot-create-redirect-btn', function (e) {
+		e.preventDefault();
+		const $btn = $(this);
+		const $notice = $btn.closest('.notice');
+		const source = $btn.data('source');
+		const target = $btn.data('target');
+		const nonce = $btn.data('nonce');
+
+		$btn.prop('disabled', true).text('Creating...');
+
+		$.post(
+			ajaxurl,
+			{
+				action: 'wpseopilot_create_automatic_redirect',
+				nonce: nonce,
+				source: source,
+				target: target,
+			},
+			function (response) {
+				if (response.success) {
+					$notice
+						.removeClass('notice-info')
+						.addClass('notice-success')
+						.html('<p>' + response.data + '</p>');
+					setTimeout(function () {
+						$notice.fadeOut();
+					}, 3000);
+				} else {
+					$notice
+						.removeClass('notice-info')
+						.addClass('notice-error')
+						.html('<p>' + (response.data || 'Error creating redirect') + '</p>');
+				}
+			}
+		).fail(function () {
+			$notice
+				.removeClass('notice-info')
+				.addClass('notice-error')
+				.html('<p>Request failed.</p>');
+		});
+	});
+
 	$(document).ready(function () {
 		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);
 		updatePreview();
