@@ -13,7 +13,8 @@ WP SEO Pilot is an all-in-one SEO workflow plugin focused on fast editorial UX a
 - Internal Linking: create rules that automatically convert chosen keywords into links across your content, complete with categories, limits, and preview tools.
 - AI assistant connects to OpenAI for one-click title & meta description suggestions, with configurable prompts, model selection, and inline editor buttons.
 - SEO Audit dashboard with severity graph, issue log, and auto-generated fallback titles/descriptions/tags for posts that are missing metadata.
-- Redirect manager (DB table `wpseopilot_redirects`), WP-CLI commands, 404 logging with hashed referrers, sitemap enhancer module, robots.txt editor, and JSON export for quick backups.
+- **Advanced Sitemap Manager**: Full control over XML sitemaps with dedicated admin UI - select post types/taxonomies, enable author/date archives, configure RSS & Google News sitemaps, add custom pages, schedule automatic updates, and customize image inclusion.
+- Redirect manager (DB table `wpseopilot_redirects`), WP-CLI commands, 404 logging with hashed referrers, robots.txt editor, and JSON export for quick backups.
 
 ### Template Tags & Shortcodes
 
@@ -273,9 +274,53 @@ The plugin styles now compile from Less sources located in `assets/less`.
 2. Run `npm run build` to regenerate the CSS in `assets/css`.
 3. Use `npm run watch` during development to recompile files on change.
 
-### Sitemap enhancer
+### Sitemap Settings & Customization
 
-WP SEO Pilot replaces WordPress core sitemaps with `/sitemap_index.xml` plus Yoast-style `*-sitemap.xml` endpoints and enriches every entry with changefreq, priority, news/video data, and now multiple images. The sitemap image list is built from the featured image, any images attached to the post, and `<img>` tags found in the post content. You can tweak the output with `wpseopilot_sitemap_images`, for example to append a custom CDN URL:
+**Admin UI:** Configure all sitemap options via **WP SEO Pilot → Sitemap**
+
+WP SEO Pilot replaces WordPress core sitemaps with `/sitemap_index.xml` plus Yoast-style `*-sitemap.xml` endpoints and enriches every entry with changefreq, priority, news/video data, and multiple images. The sitemap image list is built from the featured image, any images attached to the post, and `<img>` tags found in the post content.
+
+#### Sitemap Configuration Options
+
+Navigate to **WP SEO Pilot → Sitemap** to access these settings:
+
+**XML Sitemap Settings:**
+- **Schedule Updates**: Automatically regenerate sitemaps on a schedule (Hourly, Twice Daily, Daily, Weekly, or No Schedule)
+- **Enable Sitemap Indexes**: Use sitemap index for better organization of large sites
+- **Maximum Posts Per Sitemap Page**: Configure how many URLs appear per sitemap page (default: 1000, max: 50000)
+- **Post Types**: Select which post types to include in the sitemap (Posts, Pages, Custom Post Types)
+- **Taxonomies**: Select which taxonomies to include (Categories, Tags, Custom Taxonomies)
+- **Include Date Archive Pages**: Add date-based archive pages to sitemap
+- **Include Author Pages**: Add author archive pages to sitemap
+- **Exclude Images**: Toggle whether images should be included in sitemap entries
+- **Dynamically Generate Sitemap**: Generate sitemap on-demand (recommended) or cache and regenerate on schedule
+
+**Additional Sitemaps:**
+- **Create RSS Sitemap**: Enable RSS sitemap at `/sitemap-rss.xml` (latest 50 posts)
+- **Google News Sitemap**: Enable Google News sitemap at `/sitemap-news.xml`
+  - Configure publication name
+  - Select which post types to include
+  - Automatically filters posts from last 2 days (Google News requirement)
+
+**Additional Pages:**
+- Add custom URLs not managed by WordPress
+- Set priority (0.0 to 1.0) for each custom page
+- Perfect for external links or special landing pages
+
+#### Available Sitemap URLs
+
+Once configured, access your sitemaps at:
+- **Main Sitemap Index**: `yoursite.com/sitemap_index.xml`
+- **RSS Sitemap**: `yoursite.com/sitemap-rss.xml` (if enabled)
+- **Google News Sitemap**: `yoursite.com/sitemap-news.xml` (if enabled)
+- **Post Type Sitemaps**: `yoursite.com/post-sitemap.xml`, `yoursite.com/page-sitemap.xml`, etc.
+- **Taxonomy Sitemaps**: `yoursite.com/category-sitemap.xml`, `yoursite.com/post_tag-sitemap.xml`, etc.
+- **Author Sitemap**: `yoursite.com/author-sitemap.xml` (if enabled)
+- **Additional Pages**: `yoursite.com/additional-sitemap.xml` (if custom pages configured)
+
+#### Programmatic Customization
+
+You can tweak the sitemap output with `wpseopilot_sitemap_images`, for example to append a custom CDN URL:
 
 ```php
 add_filter( 'wpseopilot_sitemap_images', function ( $images, $post_id ) {

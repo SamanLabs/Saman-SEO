@@ -4,8 +4,15 @@ namespace Twiglet;
 
 class Twiglet {
 
-    protected array $filters = [];
-    protected array $filter_descriptions = [];
+    /**
+     * @var array
+     */
+    protected $filters = [];
+
+    /**
+     * @var array
+     */
+    protected $filter_descriptions = [];
 
     public function __construct() {
         $this->register_default_filters();
@@ -131,9 +138,10 @@ class Twiglet {
         return array_map(function ($arg) {
             $arg = trim($arg);
 
+            // Check for quoted strings (compatible with PHP 7.0+)
             if (
-                (str_starts_with($arg, '"') && str_ends_with($arg, '"')) ||
-                (str_starts_with($arg, "'") && str_ends_with($arg, "'"))
+                (substr($arg, 0, 1) === '"' && substr($arg, -1) === '"') ||
+                (substr($arg, 0, 1) === "'" && substr($arg, -1) === "'")
             ) {
                 return substr($arg, 1, -1);
             }
@@ -188,12 +196,16 @@ class Twiglet {
 
         $this->add_filter(
             'upper',
-            fn($v) => strtoupper((string) $v),
+            function ($v) {
+                return strtoupper((string) $v);
+            },
             'Uppercase a string.'
         );
         $this->add_filter(
             'lower',
-            fn($v) => strtolower((string) $v),
+            function ($v) {
+                return strtolower((string) $v);
+            },
             'Lowercase a string.'
         );
         $this->add_filter(
@@ -217,7 +229,9 @@ class Twiglet {
         );
         $this->add_filter(
             'trim',
-            fn($v) => trim((string) $v),
+            function ($v) {
+                return trim((string) $v);
+            },
             'Trim whitespace from the ends of a string.'
         );
         $this->add_filter(
