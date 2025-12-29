@@ -50,6 +50,7 @@ class Request_Monitor {
 
 		add_action( 'template_redirect', [ $this, 'maybe_log_404' ] );
 		add_action( 'admin_menu', [ $this, 'register_page' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 	}
 
 	/**
@@ -97,6 +98,25 @@ class Request_Monitor {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema corrections require direct queries.
 			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN device_label varchar(80) DEFAULT ''" );
 		}
+	}
+
+	/**
+	 * Enqueue admin assets.
+	 *
+	 * @param string $hook Hook suffix.
+	 * @return void
+	 */
+	public function enqueue_assets( $hook ) {
+		if ( 'wp-seo-pilot_page_wpseopilot-404' !== $hook ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'wpseopilot-plugin',
+			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			[],
+			WPSEOPILOT_VERSION
+		);
 	}
 
 	/**

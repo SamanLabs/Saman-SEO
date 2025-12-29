@@ -24,8 +24,11 @@ call_user_func(
 			'date'   => __( 'Date archives', 'wp-seo-pilot' ),
 			'search' => __( 'Search results', 'wp-seo-pilot' ),
 		];
+
+		// Render top bar
+		\WPSEOPilot\Admin_Topbar::render( 'types' );
 		?>
-<div class="wrap wpseopilot-settings">
+<div class="wrap wpseopilot-page wpseopilot-settings">
 	<h1><?php esc_html_e( 'Search Appearance', 'wp-seo-pilot' ); ?></h1>
 	<p class="description">
 		<?php esc_html_e( 'Control how your post types, taxonomies, and archives appear in search. These values act as defaults whenever editors leave fields blank.', 'wp-seo-pilot' ); ?>

@@ -1,0 +1,83 @@
+// Card Components
+
+.wpseopilot-card {
+	.card();
+
+	.wpseopilot-card-header {
+		margin-bottom: @spacing-lg;
+
+		h2, h3 {
+			.card-title();
+		}
+
+		p {
+			.card-description();
+		}
+	}
+
+	.wpseopilot-card-body {
+		// Content area
+	}
+
+	.wpseopilot-card-footer {
+		margin-top: @spacing-lg;
+		padding-top: @spacing-md;
+		border-top: 1px solid @color-border-light;
+	}
+
+	// Compact variant
+	&.compact {
+		padding: @spacing-md;
+	}
+
+	// No padding variant
+	&.no-padding {
+		padding: 0;
+
+		.wpseopilot-card-header {
+			padding: @spacing-lg @spacing-lg 0;
+		}
+
+		.wpseopilot-card-body {
+			padding: 0 @spacing-lg @spacing-lg;
+		}
+	}
+}
+
+// Card Grid
+.wpseopilot-card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: @spacing-lg;
+	margin-bottom: @spacing-lg;
+}
+
+// Info Card
+.wpseopilot-info-card {
+	background: @color-bg-hover;
+	border: 1px solid @color-border-subtle;
+	border-radius: @radius-md;
+	padding: @spacing-md;
+	margin: @spacing-md 0;
+
+	&.success {
+		background: lighten(@color-success, 50%);
+		border-color: lighten(@color-success, 30%);
+	}
+
+	&.warning {
+		background: lighten(@color-warning, 50%);
+		border-color: lighten(@color-warning, 30%);
+	}
+
+	&.error {
+		background: lighten(@color-error, 50%);
+		border-color: lighten(@color-error, 30%);
+	}
+
+	p {
+		margin: 0;
+		font-size: @font-size-base;
+		color: @color-text;
+	}
+}

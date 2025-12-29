@@ -87,8 +87,11 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 	</div>
 	<?php
 };
+
+// Render top bar
+\WPSEOPilot\Admin_Topbar::render( 'defaults' );
 ?>
-<div class="wrap wpseopilot-settings">
+<div class="wrap wpseopilot-page wpseopilot-settings">
 	<h1><?php esc_html_e( 'SEO Defaults', 'wp-seo-pilot' ); ?></h1>
 
 	<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">

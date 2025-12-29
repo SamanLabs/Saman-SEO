@@ -5,9 +5,9 @@
   "private": true,
   "scripts": {
     "clean": "rimraf --glob \"assets/css/*.css\"",
-    "build:less": "lessc assets/less/admin.less assets/css/admin.css && lessc assets/less/editor.less assets/css/editor.css && lessc assets/less/internal-linking.less assets/css/internal-linking.css",
+    "build:less": "lessc assets/less/admin.less assets/css/admin.css && lessc assets/less/editor.less assets/css/editor.css && lessc assets/less/internal-linking.less assets/css/internal-linking.css && lessc assets/less/plugin.less assets/css/plugin.css",
     "build": "npm run clean && npm run build:less",
-    "watch:less": "concurrently \"less-watch-compiler assets/less assets/css admin.less\" \"less-watch-compiler assets/less assets/css editor.less\" \"less-watch-compiler assets/less assets/css internal-linking.less\"",
+    "watch:less": "concurrently \"less-watch-compiler assets/less assets/css admin.less\" \"less-watch-compiler assets/less assets/css editor.less\" \"less-watch-compiler assets/less assets/css internal-linking.less\" \"less-watch-compiler assets/less assets/css plugin.less\"",
     "watch": "npm run build && npm run watch:less",
     "dev": "npm run watch"
   },

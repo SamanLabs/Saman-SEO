@@ -8,7 +8,11 @@
  */
 
 ?>
-<div class="wrap">
+<?php
+// Render top bar
+\WPSEOPilot\Admin_Topbar::render( '404-log' );
+?>
+<div class="wrap wpseopilot-page">
 	<h1><?php esc_html_e( '404 Error Log', 'wp-seo-pilot' ); ?></h1>
 	<p><?php esc_html_e( 'Monitor missing URLs and create redirects before search engines or visitors hit them again.', 'wp-seo-pilot' ); ?></p>
 	<p class="description">

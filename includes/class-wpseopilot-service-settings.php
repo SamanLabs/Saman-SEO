@@ -724,6 +724,13 @@ class Settings {
 			WPSEOPILOT_VERSION
 		);
 
+		wp_enqueue_style(
+			'wpseopilot-plugin',
+			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			[],
+			WPSEOPILOT_VERSION
+		);
+
 		include WPSEOPILOT_PATH . 'templates/settings-page.php';
 	}
 
@@ -740,6 +747,13 @@ class Settings {
 		wp_enqueue_style(
 			'wpseopilot-admin',
 			WPSEOPILOT_URL . 'assets/css/admin.css',
+			[],
+			WPSEOPILOT_VERSION
+		);
+
+		wp_enqueue_style(
+			'wpseopilot-plugin',
+			WPSEOPILOT_URL . 'assets/css/plugin.css',
 			[],
 			WPSEOPILOT_VERSION
 		);

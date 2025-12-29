@@ -354,6 +354,13 @@ class Redirect_Manager {
 			wp_cache_set( self::CACHE_KEY_ADMIN, $redirects, self::CACHE_GROUP, self::CACHE_TTL );
 		}
 
+		wp_enqueue_style(
+			'wpseopilot-plugin',
+			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			[],
+			WPSEOPILOT_VERSION
+		);
+
 		include WPSEOPILOT_PATH . 'templates/redirects.php';
 	}
 

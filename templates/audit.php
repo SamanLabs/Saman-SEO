@@ -26,8 +26,11 @@ $severity_labels = [
 	'medium' => __( 'Medium', 'wp-seo-pilot' ),
 	'low'    => __( 'Low', 'wp-seo-pilot' ),
 ];
+
+// Render top bar
+\WPSEOPilot\Admin_Topbar::render( 'audit' );
 ?>
-<div class="wrap wpseopilot-audit">
+<div class="wrap wpseopilot-page wpseopilot-audit">
 	<h1><?php esc_html_e( 'SEO Audit', 'wp-seo-pilot' ); ?></h1>
 	<p><?php esc_html_e( 'Automated checks for missing metadata, alt text, and length issues.', 'wp-seo-pilot' ); ?></p>
 

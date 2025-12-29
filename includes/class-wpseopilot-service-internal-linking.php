@@ -149,6 +149,13 @@ class Internal_Linking {
 		);
 
 		wp_enqueue_style(
+			'wpseopilot-plugin',
+			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			[],
+			WPSEOPILOT_VERSION
+		);
+
+		wp_enqueue_style(
 			'wpseopilot-internal-linking',
 			WPSEOPILOT_URL . 'assets/css/internal-linking.css',
 			[ 'wpseopilot-admin' ],

@@ -1,0 +1,91 @@
+// Sitemap Page Specific Styles
+
+.wpseopilot-sitemap-page {
+	.wpseopilot-settings-grid {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: @spacing-lg;
+		margin-bottom: @spacing-lg;
+
+		@media (max-width: 1200px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.wpseopilot-settings-main {
+		// Main settings column
+	}
+
+	.wpseopilot-settings-sidebar {
+		// Sidebar column
+	}
+
+	// Sitemap URL List
+	.wpseopilot-sitemap-urls {
+		display: flex;
+		flex-direction: column;
+		gap: @spacing-sm;
+
+		.sitemap-url-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: @spacing-sm @spacing-md;
+			background: @color-bg-light;
+			border-radius: @radius-sm;
+			transition: background @transition-fast;
+
+			&:hover {
+				background: darken(@color-bg-light, 3%);
+			}
+
+			strong {
+				font-weight: @font-weight-medium;
+				color: @color-text;
+				font-size: @font-size-small;
+				min-width: 140px;
+			}
+
+			a {
+				color: @color-primary;
+				text-decoration: none;
+				font-size: @font-size-small;
+				word-break: break-all;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+	}
+
+	// Additional Pages Manager
+	.wpseopilot-additional-pages {
+		.additional-page-row {
+			display: flex;
+			gap: @spacing-sm;
+			margin-bottom: @spacing-sm;
+			align-items: center;
+
+			input[type="url"] {
+				flex: 1;
+			}
+
+			input[type="text"] {
+				width: 80px;
+				flex-shrink: 0;
+			}
+
+			.button {
+				flex-shrink: 0;
+			}
+		}
+	}
+
+	// Post Type/Taxonomy Grid
+	.wpseopilot-type-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: @spacing-xs;
+	}
+}

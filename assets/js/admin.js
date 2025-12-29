@@ -174,11 +174,34 @@
 
 			$container.addClass('wpseopilot-tabs--ready');
 
-			const initial =
-				$tabs.filter('.nav-tab-active').data('wpseopilot-tab') ||
-				$tabs.first().data('wpseopilot-tab');
+			// Check for URL hash to determine initial tab
+			let initial = $tabs.first().data('wpseopilot-tab');
+
+			if (window.location.hash) {
+				const hash = window.location.hash.substring(1); // Remove the #
+				const tabId = 'wpseopilot-tab-' + hash;
+				if ($panels.filter('#' + tabId).length) {
+					initial = tabId;
+				}
+			}
+
+			if (!initial) {
+				initial = $tabs.filter('.nav-tab-active').data('wpseopilot-tab') ||
+					$tabs.first().data('wpseopilot-tab');
+			}
 
 			activate(initial);
+
+			// Handle hash changes for navigation
+			$(window).on('hashchange', function() {
+				if (window.location.hash) {
+					const hash = window.location.hash.substring(1);
+					const tabId = 'wpseopilot-tab-' + hash;
+					if ($panels.filter('#' + tabId).length) {
+						activate(tabId);
+					}
+				}
+			});
 		});
 	};
 

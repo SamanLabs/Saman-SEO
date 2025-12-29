@@ -61,6 +61,13 @@ class Audit {
 			WPSEOPILOT_VERSION
 		);
 
+		wp_enqueue_style(
+			'wpseopilot-plugin',
+			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			[],
+			WPSEOPILOT_VERSION
+		);
+
 		$results = $this->collect_issues();
 		$issues  = $results['issues'];
 		$stats   = $results['stats'];
