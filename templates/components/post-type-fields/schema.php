@@ -13,39 +13,64 @@ defined( 'ABSPATH' ) || exit;
 ?>
 
 <div class="wpseopilot-form-row">
-	<label for="schema_type_<?php echo esc_attr( $slug ); ?>">
-		<strong><?php esc_html_e( 'Schema Type', 'wp-seo-pilot' ); ?></strong>
-		<span class="wpseopilot-label-hint">
-			<?php esc_html_e( 'Select the schema.org type for this content', 'wp-seo-pilot' ); ?>
-		</span>
-	</label>
-	<select
-		id="schema_type_<?php echo esc_attr( $slug ); ?>"
-		name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][schema_type]"
-		class="regular-text"
-	>
-		<option value="">
-			<?php esc_html_e( 'None', 'wp-seo-pilot' ); ?>
-		</option>
-		<option value="Article" <?php selected( $settings['schema_type'] ?? '', 'Article' ); ?>>
-			<?php esc_html_e( 'Article', 'wp-seo-pilot' ); ?>
-		</option>
-		<option value="BlogPosting" <?php selected( $settings['schema_type'] ?? '', 'BlogPosting' ); ?>>
-			<?php esc_html_e( 'Blog Posting', 'wp-seo-pilot' ); ?>
-		</option>
-		<option value="NewsArticle" <?php selected( $settings['schema_type'] ?? '', 'NewsArticle' ); ?>>
-			<?php esc_html_e( 'News Article', 'wp-seo-pilot' ); ?>
-		</option>
-		<option value="WebPage" <?php selected( $settings['schema_type'] ?? '', 'WebPage' ); ?>>
-			<?php esc_html_e( 'Web Page', 'wp-seo-pilot' ); ?>
-		</option>
-		<option value="Product" <?php selected( $settings['schema_type'] ?? '', 'Product' ); ?>>
-			<?php esc_html_e( 'Product', 'wp-seo-pilot' ); ?>
-		</option>
-	</select>
-	<p class="description">
-		<?php esc_html_e( 'Schema markup helps search engines better understand your content type.', 'wp-seo-pilot' ); ?>
-	</p>
+	<?php
+	$current_schema = $settings['schema_type'] ?? 'Article';
+	$schema_options = [
+		'None' => [
+			'label' => __( 'None', 'wp-seo-pilot' ),
+			'desc'  => __( 'Do not output schema markup.', 'wp-seo-pilot' ),
+			'icon'  => 'dashicons-hidden',
+			'val'   => '',
+		],
+		'Article' => [
+			'label' => __( 'Article', 'wp-seo-pilot' ),
+			'desc'  => __( 'News or blog post content.', 'wp-seo-pilot' ),
+			'icon'  => 'dashicons-format-aside',
+			'val'   => 'Article',
+		],
+		'BlogPosting' => [
+			'label' => __( 'Blog Posting', 'wp-seo-pilot' ),
+			'desc'  => __( 'A post on a blog.', 'wp-seo-pilot' ),
+			'icon'  => 'dashicons-welcome-write-blog',
+			'val'   => 'BlogPosting',
+		],
+		'NewsArticle' => [
+			'label' => __( 'News Article', 'wp-seo-pilot' ),
+			'desc'  => __( 'News story or report.', 'wp-seo-pilot' ),
+			'icon'  => 'dashicons-media-document',
+			'val'   => 'NewsArticle',
+		],
+		'WebPage' => [
+			'label' => __( 'Web Page', 'wp-seo-pilot' ),
+			'desc'  => __( 'Generic web page.', 'wp-seo-pilot' ),
+			'icon'  => 'dashicons-admin-page',
+			'val'   => 'WebPage',
+		],
+		'Product' => [
+			'label' => __( 'Product', 'wp-seo-pilot' ),
+			'desc'  => __( 'Item for sale.', 'wp-seo-pilot' ),
+			'icon'  => 'dashicons-cart',
+			'val'   => 'Product',
+		],
+	];
+	?>
+	<div class="wpseopilot-radio-card-grid">
+		<?php foreach ( $schema_options as $key => $opt ) : ?>
+			<label class="wpseopilot-radio-card <?php echo ( $current_schema === $opt['val'] ) ? 'is-selected' : ''; ?>">
+				<input
+					type="radio"
+					name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][schema_type]"
+					value="<?php echo esc_attr( $opt['val'] ); ?>"
+					<?php checked( $current_schema, $opt['val'] ); ?>
+				/>
+				<span class="wpseopilot-radio-card__icon">
+					<span class="dashicons <?php echo esc_attr( $opt['icon'] ); ?>"></span>
+				</span>
+				<span class="wpseopilot-radio-card__title"><?php echo esc_html( $opt['label'] ); ?></span>
+				<span class="wpseopilot-radio-card__desc"><?php echo esc_html( $opt['desc'] ); ?></span>
+			</label>
+		<?php endforeach; ?>
+	</div>
 </div>
 
 <div class="wpseopilot-form-row">

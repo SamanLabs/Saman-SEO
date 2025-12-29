@@ -178,10 +178,18 @@
 			let initial = $tabs.first().data('wpseopilot-tab');
 
 			if (window.location.hash) {
-				const hash = window.location.hash.substring(1); // Remove the #
-				const tabId = 'wpseopilot-tab-' + hash;
-				if ($panels.filter('#' + tabId).length) {
-					initial = tabId;
+				// Only use the first part of the hash for the main tab
+				const hash = window.location.hash.substring(1).split('/')[0];
+				if (hash) {
+					const tabId = 'wpseopilot-tab-' + hash;
+					// Validate selector safety to handle edge cases
+					try {
+						if ($panels.filter('#' + tabId).length) {
+							initial = tabId;
+						}
+					} catch (e) {
+						// Invalid selector from hash, ignore
+					}
 				}
 			}
 
@@ -193,12 +201,18 @@
 			activate(initial);
 
 			// Handle hash changes for navigation
-			$(window).on('hashchange', function() {
+			$(window).on('hashchange', function () {
 				if (window.location.hash) {
-					const hash = window.location.hash.substring(1);
-					const tabId = 'wpseopilot-tab-' + hash;
-					if ($panels.filter('#' + tabId).length) {
-						activate(tabId);
+					const hash = window.location.hash.substring(1).split('/')[0];
+					if (hash) {
+						const tabId = 'wpseopilot-tab-' + hash;
+						try {
+							if ($panels.filter('#' + tabId).length) {
+								activate(tabId);
+							}
+						} catch (e) {
+							// Invalid selector from hash, ignore
+						}
 					}
 				}
 			});
@@ -296,10 +310,54 @@
 			const $titleCounter = $preview.find('.wpseopilot-char-count[data-type="title"]');
 			const $descCounter = $preview.find('.wpseopilot-char-count[data-type="description"]');
 
-			// Find associated input fields (within the same form or section)
-			const $form = $preview.closest('form');
-			const $titleField = $form.find('[data-preview-field="title"]');
-			const $descField = $form.find('[data-preview-field="description"]');
+			// Find associated input fields by looking in the closest container (accordion or card)
+			// This fixes the issue where inputs from other text types were being selected
+			let $container = $preview.closest('.wpseopilot-accordion__body');
+			if (!$container.length) {
+				$container = $preview.closest('.wpseopilot-card-body');
+			}
+			// Fallback to form if no container found (e.g. global settings)
+			if (!$container.length) {
+				$container = $preview.closest('form');
+			}
+
+			const $titleField = $container.find('[data-preview-field="title"]');
+			const $descField = $container.find('[data-preview-field="description"]');
+
+			// Preview Source Logic
+			const $sourceToggle = $preview.find('.wpseopilot-preview-source-toggle');
+			const $sourcePanel = $preview.find('.wpseopilot-preview-source-panel');
+			const $sourceInput = $preview.find('.wpseopilot-preview-object-id-input');
+			const $sourceApply = $preview.find('.wpseopilot-preview-apply-id');
+			const $sourceStatus = $preview.find('.wpseopilot-preview-source-status');
+
+			$sourceToggle.on('click', function (e) {
+				e.preventDefault();
+				$sourcePanel.slideToggle(200);
+			});
+
+			$sourceApply.on('click', function (e) {
+				e.preventDefault();
+				const id = $sourceInput.val();
+				if (!id) return;
+
+				$sourceStatus.text('Loading...');
+				// Trigger the fetch manually
+				// We need current title/desc values
+				const titleVal = $titleField.length ? $titleField.val() : $preview.find('[data-preview-title]').text();
+				const descVal = $descField.length ? $descField.val() : $preview.find('[data-preview-description]').text();
+				const context = $titleField.data('context') || 'global';
+
+				fetchRenderedPreview(titleVal, context, $titlePreview, $titleCounter, 60);
+				// We should also trigger description fetch but fetches are debounced/independent.
+				// Let's just trigger title fetch which usually covers it, or split logic.
+				// Better: call both if fields exist.
+				if ($descField.length) {
+					fetchRenderedPreview(descVal, context, $descPreview, $descCounter, 155);
+				}
+
+				setTimeout(() => $sourceStatus.text('Applied'), 1000);
+			});
 
 			// Fetch rendered preview from server
 			const fetchRenderedPreview = (template, context, previewEl, counterEl, maxChars) => {
@@ -311,12 +369,15 @@
 					return;
 				}
 
+				const objectId = $sourceInput.val();
+
 				// Use the AJAX endpoint to render the template with variables replaced
 				$.post(settings.ai.ajax, {
 					action: 'wpseopilot_render_preview',
 					nonce: settings.ai.nonce,
 					template: template,
-					context: context || 'global'
+					context: context || 'global',
+					object_id: objectId // Pass the explicit ID if set
 				}).done(function (response) {
 					if (response.success) {
 						const rendered = response.data.preview || template;
@@ -384,6 +445,14 @@
 		});
 	};
 
+	// Radio Card Interaction
+	$(document).on('change', '.wpseopilot-radio-card input[type="radio"]', function () {
+		const $input = $(this);
+		const $group = $input.closest('.wpseopilot-radio-card-grid');
+		$group.find('.wpseopilot-radio-card').removeClass('is-selected');
+		$input.closest('.wpseopilot-radio-card').addClass('is-selected');
+	});
+
 	$(document).on('click', '.wpseopilot-create-redirect-btn', function (e) {
 		e.preventDefault();
 		const $btn = $(this);
@@ -430,6 +499,9 @@
 	const initAccordionTabs = () => {
 		$('.wpseopilot-accordion-tabs').each(function () {
 			const $container = $(this);
+			// Only init if not already ready
+			if ($container.hasClass('wpseopilot-accordion-tabs--ready')) return;
+
 			const $tabs = $container.find('[data-accordion-tab]');
 			const $panels = $container.find('.wpseopilot-accordion-tab-panel');
 
@@ -441,70 +513,189 @@
 
 				$tabs.filter('[data-accordion-tab="' + targetId + '"]')
 					.addClass('is-active').attr('aria-selected', 'true');
-				$('#' + targetId).addClass('is-active').removeAttr('hidden');
+				// Ensure panel is visible
+				const $panel = $('#' + targetId);
+				$panel.addClass('is-active').removeAttr('hidden');
 			};
 
 			$tabs.on('click', function (e) {
 				e.preventDefault();
+				console.log('Accordion tab clicked', $(this).data('accordion-tab'));
 				activate($(this).data('accordion-tab'));
 			});
 
 			$container.addClass('wpseopilot-accordion-tabs--ready');
-			activate($tabs.first().data('accordion-tab'));
+
+			// Init first tab if none active
+			if (!$tabs.filter('.is-active').length) {
+				activate($tabs.first().data('accordion-tab'));
+			}
 		});
 	};
 
 	// Deep linking handler for nested tabs
 	const initDeepLinking = () => {
+		// helper to update hash
+		const updateHash = () => {
+			const activeMain = $('.nav-tab-active').attr('href').substring(1);
+			let hash = activeMain;
+
+			// If in content types, check for open accordion and active subtab
+			if (activeMain === 'content-types') {
+				const $openAccordion = $('.wpseopilot-accordion[open]');
+				if ($openAccordion.length) {
+					const slug = $openAccordion.data('accordion-slug');
+					hash += '/' + slug;
+
+					const $activeSubTab = $openAccordion.find('.wpseopilot-accordion-tab.is-active');
+					if ($activeSubTab.length) {
+						// Extract 'title-description' from 'wpseopilot-accordion-post-title-description'
+						const fullId = $activeSubTab.data('accordion-tab');
+						// format is wpseopilot-accordion-{slug}-{tab}
+						// simplified: we store the simple key in data attribute usually, but here ID is complex.
+						// Let's rely on index or simple mapping.
+						// Actually, let's just grab the last part.
+						// Convention: wpseopilot-accordion-{slug}-{tabKey}
+						const prefix = `wpseopilot-accordion-${slug}-`;
+						const tabKey = fullId.replace(prefix, '');
+						hash += '/' + tabKey;
+					}
+				}
+			}
+
+			// Don't scroll when updating hash
+			const scrollV = document.body.scrollTop;
+			const scrollH = document.body.scrollLeft;
+			window.location.hash = hash;
+			document.body.scrollTop = scrollV;
+			document.body.scrollLeft = scrollH;
+		};
+
 		const parseHash = () => {
 			if (!window.location.hash) return null;
 			const parts = window.location.hash.substring(1).split('/');
 			return {
-				mainTab: parts[0] || null,
+				mainTab: parts[0] || 'global',
 				accordionSlug: parts[1] || null,
 				subTab: parts[2] || null
 			};
 		};
 
-		const activateDeepLink = () => {
+		const restoreState = () => {
 			const parsed = parseHash();
-			if (!parsed?.mainTab) return;
+			if (!parsed) return;
 
 			// 1. Activate main tab
-			const mainTabId = 'wpseopilot-tab-' + parsed.mainTab;
-			$('[data-wpseopilot-tab="' + mainTabId + '"]').trigger('click');
+			const $mainTab = $(`a[href="#${parsed.mainTab}"]`);
+			if ($mainTab.length) {
+				$('.nav-tab').removeClass('nav-tab-active');
+				$('.wpseopilot-tab-panel').removeClass('is-active');
 
-			// 2. Expand accordion if slug provided
-			if (parsed.accordionSlug) {
-				const $accordion = $('[data-accordion-slug="' + parsed.accordionSlug + '"]');
-				$accordion.prop('open', true);
+				$mainTab.addClass('nav-tab-active');
+				$(`#wpseopilot-tab-${parsed.mainTab}`).addClass('is-active');
+			}
 
-				// 3. Activate sub-tab if provided
-				if (parsed.subTab) {
-					const subTabId = 'wpseopilot-accordion-' + parsed.accordionSlug + '-' + parsed.subTab;
-					setTimeout(() => {
-						$('[data-accordion-tab="' + subTabId + '"]').trigger('click');
-						if ($accordion[0]) {
-							$accordion[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+			// 2. Expand accordion if slug provided and we are on content-types
+			if (parsed.mainTab === 'content-types' && parsed.accordionSlug) {
+				const $accordion = $(`details[data-accordion-slug="${parsed.accordionSlug}"]`);
+				if ($accordion.length) {
+					$accordion.prop('open', true);
+
+					// Force init tabs inside
+					const initAccordionInside = () => {
+						const $container = $accordion.find('.wpseopilot-accordion-tabs');
+
+						// Manually trigger tab switch logic from initAccordionTabs
+						// We need to define activate function locally or reuse generic click trigger
+						const $tabs = $container.find('[data-accordion-tab]');
+						const $panels = $container.find('.wpseopilot-accordion-tab-panel');
+
+						if (parsed.subTab) {
+							const targetId = `wpseopilot-accordion-${parsed.accordionSlug}-${parsed.subTab}`;
+
+							$tabs.removeClass('is-active').attr('aria-selected', 'false');
+							$panels.removeClass('is-active').attr('hidden', '');
+
+							$tabs.filter(`[data-accordion-tab="${targetId}"]`)
+								.addClass('is-active').attr('aria-selected', 'true');
+							$panels.filter(`#${targetId}`).addClass('is-active').removeAttr('hidden');
+
+							// Scroll to accordion
+							setTimeout(() => {
+								$accordion[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+							}, 200);
 						}
-					}, 100);
+					};
+					// Wait for DOM paint/expand
+					setTimeout(initAccordionInside, 50);
 				}
 			}
 		};
 
-		activateDeepLink();
-		$(window).on('hashchange', activateDeepLink);
+		// Event Listeners for State Change
+		$('.nav-tab').on('click', function () {
+			// Small delay to let default handler run (if any) or just run update immediately
+			// We attach to click, but the actual tab switch might happen via hashed hrefs in some implementations.
+			// Here we assume our custom tab handler toggles classes.
+			// Ideally we hook into the tab activation logic.
+			setTimeout(updateHash, 50);
+		});
+
+		$(document).on('click', '.wpseopilot-accordion-tab', function () {
+			setTimeout(updateHash, 50);
+		});
+
+		$(document).on('toggle', '.wpseopilot-accordion', function () {
+			if (this.open) {
+				// Close other accordions? (Optional, user didn't ask but good for deep link clarity)
+				// For now let's just update hash based on this one.
+				updateHash();
+			} else {
+				// If closing, maybe revert to just main tab hash?
+				// Delay to check if another one opened?
+				// If all closed, revert to #content-types
+				setTimeout(() => {
+					if (!$('.wpseopilot-accordion[open]').length) {
+						updateHash();
+					}
+				}, 50);
+			}
+		});
+
+		// Run restore on load
+		restoreState();
+
+		// Handle browser back/forward
+		$(window).on('hashchange', restoreState);
 	};
 
 	// Lazy initialization on accordion open
 	const initAccordionOpenHandlers = () => {
-		$(document).on('toggle', '.wpseopilot-accordion[data-accordion-slug]', function () {
-			if ($(this).prop('open')) {
-				const $tabs = $(this).find('.wpseopilot-accordion-tabs');
-				if ($tabs.length && !$tabs.hasClass('wpseopilot-accordion-tabs--ready')) {
+		// Event delegation setup for 'toggle' which doesn't bubble, so we catch it at document level with capture=true
+		// However jQuery doesn't easily support capture phase in 'on'. 
+		// We can try to bind to all details elements present now, and maybe use a MutationObserver if they are dynamic.
+		// Since this is admin page, they are likely static.
+
+		const details = document.querySelectorAll('details.wpseopilot-accordion');
+		details.forEach((el) => {
+			el.addEventListener('toggle', (e) => {
+				if (el.open) {
+					// We need to use jQuery to match the initAccordionTabs logic expectations
+					// or just call it globally since it checks class guards
 					initAccordionTabs();
+
+					// Also refresh the google preview sizing if needed? 
+					// The preview might need a refresh of text if it was hidden
+					// but standard flow updates it on input.
 				}
-			}
+			});
+		});
+
+		// Fallback: Check on click of summary
+		$(document).on('click', 'summary', function () {
+			setTimeout(() => {
+				initAccordionTabs();
+			}, 50);
 		});
 	};
 
@@ -558,6 +749,29 @@
 			}
 		});
 	};
+
+	// Copy variable handler
+	$(document).on('click', '.wpseopilot-copy-var', function (e) {
+		e.preventDefault();
+		const $btn = $(this);
+		const variable = $btn.data('var');
+		const text = '{{' + variable + '}}'; // Include brackets for easy usage
+
+		navigator.clipboard.writeText(text).then(function () {
+			const $icon = $btn.find('.dashicons');
+			const original = $icon.attr('class');
+
+			$icon.removeClass('dashicons-docs').addClass('dashicons-yes');
+			$btn.addClass('button-primary');
+
+			setTimeout(function () {
+				$icon.attr('class', original);
+				$btn.removeClass('button-primary');
+			}, 1500);
+		}, function (err) {
+			console.error('Async: Could not copy text: ', err);
+		});
+	});
 
 	$(document).ready(function () {
 		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);

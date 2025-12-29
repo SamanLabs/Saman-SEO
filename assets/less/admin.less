@@ -385,28 +385,199 @@
 	display: none;
 }
 
-.wpseopilot-tabs {
-	margin-top: 20px;
+// Master-Detail Layout for Settings
+.wpseopilot-settings-layout {
+	display: flex;
+	gap: 32px;
+	margin-top: 24px;
+	align-items: flex-start;
+
+	@media (max-width: 782px) {
+		flex-direction: column;
+		gap: 20px;
+	}
 }
 
-.wpseopilot-tabs__nav {
-	margin-bottom: 0;
+.wpseopilot-sidebar-nav {
+	width: 240px;
+	flex-shrink: 0;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	overflow: hidden;
+
+	@media (max-width: 782px) {
+		width: 100%;
+	}
+
+	&__item {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: 14px 20px;
+		background: none;
+		border: none;
+		border-left: 3px solid transparent;
+		border-bottom: 1px solid #f0f0f1;
+		cursor: pointer;
+		font-size: 14px;
+		color: #1d2327;
+		font-weight: 500;
+		transition: all 0.2s ease;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+		&:hover {
+			background: #f6f7f7;
+			color: #2271b1;
+		}
+
+		&.is-active {
+			background: #f0f6fc;
+			color: #2271b1;
+			border-left-color: #2271b1;
+			font-weight: 600;
+		}
+	}
 }
 
-.wpseopilot-tabs__nav .nav-tab {
-	cursor: pointer;
+.wpseopilot-settings-content {
+	flex-grow: 1;
+	min-width: 0; // Prevent flex overflow
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 32px;
+
+	.wpseopilot-settings-panel {
+		display: none;
+		animation: fadeIn 0.2s ease;
+
+		&.is-active {
+			display: block;
+		}
+	}
+
+	// Inner tabs styling fix for new container
+	.wpseopilot-accordion-tabs__nav {
+		margin: -32px -32px 32px -32px; // Pull to edges
+		border-radius: 6px 6px 0 0;
+		border-bottom: 1px solid #c3c4c7;
+		padding: 0 16px;
+		background: #f8f9fa;
+	}
+
+	.wpseopilot-accordion-tab {
+		background: none;
+		border: none;
+		padding: 12px 16px;
+		margin-bottom: -1px;
+		cursor: pointer;
+		font-weight: 500;
+		color: #50575e;
+		border-bottom: 2px solid transparent;
+		transition: all 0.2s;
+		font-size: 13px;
+
+		&:hover {
+			color: #2271b1;
+		}
+
+		&.is-active {
+			color: #2271b1;
+			border-bottom-color: #2271b1;
+			font-weight: 600;
+		}
+	}
 }
 
-.wpseopilot-tab-panel {
-	margin-top: 20px;
-}
-
-.wpseopilot-tabs--ready .wpseopilot-tab-panel {
+.wpseopilot-accordion-tab-panel {
 	display: none;
+	animation: fadeIn 0.2s ease;
+
+	&.is-active {
+		display: block;
+	}
 }
 
-.wpseopilot-tabs--ready .wpseopilot-tab-panel.is-active {
+// Improved Form Layout
+.wpseopilot-form-row {
+	margin-bottom: 32px;
+
+	label {
+		display: block;
+		margin-bottom: 8px;
+		font-size: 14px;
+		color: #1d2327;
+		font-weight: 600;
+	}
+
+	input[type="text"],
+	input[type="url"],
+	textarea,
+	select {
+		margin-top: 0;
+		max-width: 100%;
+		border-color: #8c8f94;
+		border-radius: 4px;
+		padding: 6px 8px;
+		height: auto;
+		min-height: 36px;
+
+		&:focus {
+			border-color: #2271b1;
+			box-shadow: 0 0 0 1px #2271b1;
+		}
+	}
+
+	textarea {
+		min-height: 80px;
+	}
+
+	// Spacing helpers
+	&--separator {
+		border-top: 1px solid #f0f0f1;
+		padding-top: 32px;
+		margin-top: 32px;
+	}
+}
+
+.wpseopilot-flex-input {
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+
+	input,
+	textarea {
+		flex: 1;
+	}
+
+	.button {
+		margin-top: 2px;
+	}
+}
+
+.wpseopilot-label-hint {
 	display: block;
+	font-weight: 400;
+	color: #646970;
+	font-size: 13px;
+	margin-top: 4px;
+	line-height: 1.4;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(5px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .wpseopilot-tabs__actions {
@@ -655,6 +826,95 @@
 .wpseopilot-audit__bar-segment.is-low,
 .wpseopilot-dot.is-low {
 	background: #34a853;
+}
+
+// Visual Radio Cards (Schema Selection)
+.wpseopilot-radio-card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 16px;
+	margin-top: 8px;
+}
+
+.wpseopilot-radio-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 12px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	background: #fff;
+
+	&:hover {
+		border-color: #2271b1;
+		transform: translateY(-1px);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	}
+
+	&.is-selected {
+		border-color: #2271b1;
+		background: #f0f6fc;
+		box-shadow: 0 0 0 1px #2271b1;
+
+		.wpseopilot-radio-card__icon {
+			color: #2271b1;
+		}
+	}
+
+	input[type="radio"] {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+	}
+
+	&__icon {
+		font-size: 24px;
+		color: #646970;
+		margin-bottom: 8px;
+		display: inline-block;
+		width: 24px;
+		height: 24px;
+
+		.dashicons {
+			font-size: 24px;
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	&__title {
+		font-weight: 600;
+		font-size: 13px;
+		color: #1d2327;
+		margin-bottom: 4px;
+	}
+
+	&__desc {
+		font-size: 11px;
+		color: #50575e;
+		line-height: 1.4;
+	}
+}
+
+// Modern Form Styles
+.wpseopilot-form-row {
+	margin-bottom: 24px;
+
+	label {
+		display: block;
+		margin-bottom: 8px;
+		font-size: 14px;
+	}
+}
+
+.wpseopilot-label-hint {
+	display: block;
+	font-weight: 400;
+	color: #646970;
+	font-size: 12px;
+	margin-top: 2px;
 }
 
 // Visual Tags & Autocomplete

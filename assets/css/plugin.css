@@ -420,6 +420,13 @@
   font-size: 16px;
   color: #5f6368;
 }
+.wpseopilot-google-preview__favicon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
 .wpseopilot-google-preview__title {
   color: #1a0dab;
   font-size: 18px;
@@ -463,6 +470,20 @@
 }
 .wpseopilot-google-preview__chars.over-limit .wpseopilot-char-count {
   color: #b32d2e;
+}
+.wpseopilot-preview-source-toggle {
+  color: #2271b1 !important;
+  border-color: #2271b1 !important;
+  background: transparent !important;
+}
+.wpseopilot-preview-source-toggle:hover {
+  background: #f0f6fc !important;
+}
+.wpseopilot-preview-source-panel {
+  border-bottom: 1px solid #dfe3ec;
+}
+.wpseopilot-preview-source-panel input[type="number"] {
+  width: 100px;
 }
 .wpseopilot-sitemap-page .wpseopilot-settings-grid {
   display: grid;

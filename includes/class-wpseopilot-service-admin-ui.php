@@ -519,42 +519,47 @@ class Admin_UI {
 	 * AJAX handler for live template preview.
 	 */
 	public function ajax_render_preview() {
-		check_ajax_referer( 'wpseopilot_ai_generate', 'nonce' ); // Reusing existing nonce for simplicity or create new? Let's assume reuse for now or just generic admin check.
-		// Actually, let's look at enqueue_admin_assets, it sends 'wpseopilot_ai_generate' nonce. 
-		// But that's for AI. We should probably use a generic one or just check cap.
+		check_ajax_referer( 'wpseopilot_ai_generate', 'nonce' );
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( 'Permission denied' );
 		}
 
 		$template = isset( $_POST['template'] ) ? wp_unslash( $_POST['template'] ) : '';
 		$context  = isset( $_POST['context'] ) ? sanitize_text_field( $_POST['context'] ) : 'global';
+		$object_id = isset( $_POST['object_id'] ) ? absint( $_POST['object_id'] ) : 0;
 
-		// Determine mock context object
 		$mock_object = null;
 
-		if ( strpos( $context, 'post_type:' ) === 0 ) {
-			$pt = str_replace( 'post_type:', '', $context );
-			$posts = get_posts( [ 'post_type' => $pt, 'posts_per_page' => 1 ] );
-			if ( $posts ) {
-				$mock_object = $posts[0];
+		// If explicit object ID provided, try to fetch it
+		if ( $object_id > 0 ) {
+			// Try post first
+			$post = get_post( $object_id );
+			if ( $post ) {
+				$mock_object = $post;
+			} else {
+				// Try term
+				$term = get_term( $object_id );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$mock_object = $term;
+				}
 			}
-		} elseif ( strpos( $context, 'taxonomy:' ) === 0 ) {
-			$tax = str_replace( 'taxonomy:', '', $context );
-			$terms = get_terms( [ 'taxonomy' => $tax, 'number' => 1, 'hide_empty' => false ] );
-			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-				$mock_object = $terms[0];
+		}
+
+		// Fallback to auto-detection if no specific object found
+		if ( ! $mock_object ) {
+			if ( strpos( $context, 'post_type:' ) === 0 ) {
+				$pt = str_replace( 'post_type:', '', $context );
+				$posts = get_posts( [ 'post_type' => $pt, 'posts_per_page' => 1 ] );
+				if ( $posts ) {
+					$mock_object = $posts[0];
+				}
+			} elseif ( strpos( $context, 'taxonomy:' ) === 0 ) {
+				$tax = str_replace( 'taxonomy:', '', $context );
+				$terms = get_terms( [ 'taxonomy' => $tax, 'number' => 1, 'hide_empty' => false ] );
+				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+					$mock_object = $terms[0];
+				}
 			}
-		} elseif ( strpos( $context, 'archive:' ) === 0 || $context === 'archive' ) {
-			// Simulating archive context is harder without main query, so we'll just let helpers generic logic handle it?
-			// Helpers uses `is_post_type_archive()` which checks global query. 
-			// We might need to fake some data or just return empty for archives in AJAX context unless we mock query.
-			// For now, let's just pass null and let variable replacement fallback or handle basic globals.
-			// Actually helpers.php handles `is_date()` etc. 
-			// We can't easily mock `is_date()` calls. 
-			// Pass a special object or array if helpers allowed? Helpers expects WP_Post/WP_Term or null.
-			// Let's stick to Post/Term for now. Archives might define specific variables in array logic.
-			// helpers `replace_template_variables` checks `is_...` functions.
-			// This limitation means archive previews might be limited.
 		}
 
 		$rendered = replace_template_variables( $template, $mock_object );

@@ -20,18 +20,41 @@ defined( 'ABSPATH' ) || exit;
 </div>
 
 <div class="wpseopilot-form-row">
-	<div class="wpseopilot-placeholder-content">
-		<span class="dashicons dashicons-admin-generic" style="font-size: 48px; opacity: 0.3;"></span>
-		<p>
-			<?php esc_html_e( 'Custom field mapping and SEO analysis configuration will be available in a future update.', 'wp-seo-pilot' ); ?>
-		</p>
-		<p class="description">
-			<?php esc_html_e( 'This feature will allow you to:', 'wp-seo-pilot' ); ?>
-		</p>
-		<ul style="list-style: disc; margin-left: 20px;">
-			<li><?php esc_html_e( 'Map custom fields to template variables', 'wp-seo-pilot' ); ?></li>
-			<li><?php esc_html_e( 'Configure which fields to analyze for SEO', 'wp-seo-pilot' ); ?></li>
-			<li><?php esc_html_e( 'Set custom field priorities for content analysis', 'wp-seo-pilot' ); ?></li>
-		</ul>
+	<div class="wpseopilot-custom-fields-list">
+		<?php
+		// $this refers to Settings class instance
+		$all_vars = $this->get_context_variables();
+		$context_key = 'post_type:' . $slug;
+		$custom_fields = $all_vars[ $context_key ]['vars'] ?? [];
+
+		if ( ! empty( $custom_fields ) ) :
+			?>
+			<div class="wpseopilot-tag-cloud-container">
+				<p class="description" style="margin-bottom: 12px;">
+					<?php esc_html_e( 'Click to copy these custom field variables found in your latest post:', 'wp-seo-pilot' ); ?>
+				</p>
+				<div class="wpseopilot-tag-cloud">
+					<?php foreach ( $custom_fields as $field ) : ?>
+						<button type="button" class="wpseopilot-tag-chip wpseopilot-copy-var" data-var="<?php echo esc_attr( $field['tag'] ); ?>" title="<?php echo esc_attr( $field['desc'] ); ?> | Preview: <?php echo esc_attr( $field['preview'] ); ?>">
+							<code>{{<?php echo esc_html( $field['tag'] ); ?>}}</code>
+						</button>
+					<?php endforeach; ?>
+				</div>
+			</div>
+			<?php
+		else :
+			?>
+			<div class="wpseopilot-placeholder-content">
+				<span class="dashicons dashicons-list-view" style="font-size: 48px; opacity: 0.3;"></span>
+				<p>
+					<?php esc_html_e( 'No custom fields detected for this post type yet.', 'wp-seo-pilot' ); ?>
+				</p>
+				<p class="description">
+					<?php esc_html_e( 'Create a post with custom fields to see them listed here.', 'wp-seo-pilot' ); ?>
+				</p>
+			</div>
+			<?php
+		endif;
+		?>
 	</div>
 </div>

@@ -88,7 +88,7 @@ namespace WPSEOPilot\Helpers {
 		$vars = [
 			'site_title'    => \get_bloginfo( 'name' ),
 			'tagline'       => \get_bloginfo( 'description' ),
-			'separator'     => '-',
+			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),
