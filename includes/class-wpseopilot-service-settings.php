@@ -38,6 +38,7 @@ class Settings {
 		'wpseopilot_homepage_knowledge_type' => 'organization',
 		'wpseopilot_homepage_organization_name' => '',
 		'wpseopilot_homepage_organization_logo' => '',
+		'wpseopilot_title_separator' => '-',
 		'wpseopilot_openai_api_key' => '',
 		'wpseopilot_default_meta_description' => '',
 		'wpseopilot_default_og_image' => '',
@@ -109,6 +110,7 @@ class Settings {
 		register_setting( $group, 'wpseopilot_homepage_title', 'sanitize_text_field' );
 		register_setting( $group, 'wpseopilot_homepage_description', 'sanitize_textarea_field' );
 		register_setting( $group, 'wpseopilot_homepage_keywords', 'sanitize_text_field' );
+		register_setting( $group, 'wpseopilot_title_separator', [ $this, 'sanitize_separator' ] );
 
 		// New consolidated options for Search Appearance page redesign
 		register_setting( $group, 'wpseopilot_homepage_defaults', [ $this, 'sanitize_homepage_defaults' ] );
@@ -156,7 +158,7 @@ class Settings {
 				'vars'  => [
 					[ 'tag' => 'site_title', 'label' => __( 'Site Title', 'wp-seo-pilot' ), 'desc' => __( 'The main title of your site', 'wp-seo-pilot' ), 'preview' => get_bloginfo( 'name' ) ],
 					[ 'tag' => 'tagline', 'label' => __( 'Tagline', 'wp-seo-pilot' ), 'desc' => __( 'Site description / tagline', 'wp-seo-pilot' ), 'preview' => get_bloginfo( 'description' ) ],
-					[ 'tag' => 'separator', 'label' => __( 'Separator', 'wp-seo-pilot' ), 'desc' => __( 'Separator character (e.g. -)', 'wp-seo-pilot' ), 'preview' => '-' ],
+					[ 'tag' => 'separator', 'label' => __( 'Separator', 'wp-seo-pilot' ), 'desc' => __( 'Separator character (e.g. -)', 'wp-seo-pilot' ), 'preview' => $this->get( 'wpseopilot_title_separator' ) ],
 					[ 'tag' => 'current_year', 'label' => __( 'Current Year', 'wp-seo-pilot' ), 'desc' => __( 'The current year (4 digits)', 'wp-seo-pilot' ), 'preview' => date_i18n( 'Y' ) ],
 				],
 			],
@@ -735,6 +737,26 @@ class Settings {
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * Sanitize title separator character.
+	 *
+	 * @param string $value Separator value.
+	 *
+	 * @return string
+	 */
+	public function sanitize_separator( $value ) {
+		$value = sanitize_text_field( $value );
+		$value = trim( $value );
+
+		// Default to hyphen if empty
+		if ( empty( $value ) ) {
+			return '-';
+		}
+
+		// Limit to 3 characters max
+		return mb_substr( $value, 0, 3 );
 	}
 
 	/**

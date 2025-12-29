@@ -72,7 +72,7 @@ $taxonomies = get_taxonomies(
 								include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
 								?>
 
-								<div class="wpseopilot-form-row">
+								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label for="homepage_meta_title">
 										<strong><?php esc_html_e( 'Meta Title', 'wp-seo-pilot' ); ?></strong>
 										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The title tag for your homepage', 'wp-seo-pilot' ); ?></span>
@@ -129,6 +129,80 @@ $taxonomies = get_taxonomies(
 									/>
 								</div>
 
+								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
+									<label>
+										<strong><?php esc_html_e( 'Title Divider', 'wp-seo-pilot' ); ?></strong>
+										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Choose the character that separates title parts', 'wp-seo-pilot' ); ?></span>
+									</label>
+									<?php
+									$current_separator = get_option( 'wpseopilot_title_separator', '-' );
+									$separators = [
+										'-'  => [ 'label' => 'Hyphen', 'preview' => '-' ],
+										'–'  => [ 'label' => 'En Dash', 'preview' => '–' ],
+										'—'  => [ 'label' => 'Em Dash', 'preview' => '—' ],
+										'|'  => [ 'label' => 'Pipe', 'preview' => '|' ],
+										'/'  => [ 'label' => 'Slash', 'preview' => '/' ],
+										'»'  => [ 'label' => 'Guillemet', 'preview' => '»' ],
+										'›'  => [ 'label' => 'Angle', 'preview' => '›' ],
+										'·'  => [ 'label' => 'Dot', 'preview' => '·' ],
+										'•'  => [ 'label' => 'Bullet', 'preview' => '•' ],
+										'→'  => [ 'label' => 'Arrow', 'preview' => '→' ],
+									];
+									?>
+									<div class="wpseopilot-separator-selector" data-component="separator-selector">
+										<div class="wpseopilot-separator-grid">
+											<?php foreach ( $separators as $value => $config ) : ?>
+												<button
+													type="button"
+													class="wpseopilot-separator-option<?php echo ( $current_separator === $value ) ? ' is-active' : ''; ?>"
+													data-separator="<?php echo esc_attr( $value ); ?>"
+													title="<?php echo esc_attr( $config['label'] ); ?>"
+												>
+													<span class="wpseopilot-separator-preview"><?php echo esc_html( $config['preview'] ); ?></span>
+													<span class="wpseopilot-separator-label"><?php echo esc_html( $config['label'] ); ?></span>
+												</button>
+											<?php endforeach; ?>
+											<button
+												type="button"
+												class="wpseopilot-separator-option wpseopilot-separator-custom<?php echo ( ! isset( $separators[ $current_separator ] ) && ! empty( $current_separator ) ) ? ' is-active' : ''; ?>"
+												data-separator="custom"
+												title="<?php esc_attr_e( 'Custom', 'wp-seo-pilot' ); ?>"
+											>
+												<span class="wpseopilot-separator-preview">
+													<?php echo isset( $separators[ $current_separator ] ) ? '?' : esc_html( $current_separator ); ?>
+												</span>
+												<span class="wpseopilot-separator-label"><?php esc_html_e( 'Custom', 'wp-seo-pilot' ); ?></span>
+											</button>
+										</div>
+										<div class="wpseopilot-separator-custom-input" style="<?php echo isset( $separators[ $current_separator ] ) ? 'display: none;' : ''; ?>">
+											<input
+												type="text"
+												id="wpseopilot_custom_separator"
+												class="small-text"
+												maxlength="3"
+												placeholder="<?php esc_attr_e( 'Enter custom separator', 'wp-seo-pilot' ); ?>"
+												value="<?php echo isset( $separators[ $current_separator ] ) ? '' : esc_attr( $current_separator ); ?>"
+											/>
+										</div>
+										<input
+											type="hidden"
+											id="wpseopilot_title_separator"
+											name="wpseopilot_title_separator"
+											value="<?php echo esc_attr( $current_separator ); ?>"
+										/>
+										<p class="description">
+											<?php esc_html_e( 'This character appears in the {{separator}} variable used in title templates.', 'wp-seo-pilot' ); ?>
+											<?php
+											printf(
+												/* translators: %s: separator character */
+												esc_html__( 'Example: "My Page %s My Site"', 'wp-seo-pilot' ),
+												'<code>' . esc_html( $current_separator ) . '</code>'
+											);
+											?>
+										</p>
+									</div>
+								</div>
+
 							</div>
 						</div>
 
@@ -161,75 +235,96 @@ $taxonomies = get_taxonomies(
 						$label = $object->labels->name ?? $slug;
 						$settings = $post_type_defaults[ $slug ] ?? [];
 						?>
-						<details class="wpseopilot-accordion">
+						<details class="wpseopilot-accordion" data-accordion-slug="<?php echo esc_attr( $slug ); ?>">
 							<summary>
 								<span class="wpseopilot-accordion-title"><?php echo esc_html( $label ); ?></span>
 								<span class="wpseopilot-accordion-badge"><?php echo esc_html( $slug ); ?></span>
 							</summary>
 							<div class="wpseopilot-accordion__body">
 
-								<div class="wpseopilot-form-row">
-									<label>
-										<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
-									</label>
-									<label class="wpseopilot-toggle">
-										<input
-											type="checkbox"
-											name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][noindex]"
-											value="1"
-											<?php checked( $settings['noindex'] ?? false, 1 ); ?>
-										/>
-										<span class="wpseopilot-toggle-label">
-											<?php esc_html_e( 'Hide from search engines (noindex)', 'wp-seo-pilot' ); ?>
-										</span>
-									</label>
+								<!-- Google Preview (shared across all sub-tabs) -->
+								<div class="wpseopilot-accordion__preview">
+									<?php
+									$preview_title = $settings['title_template'] ?? '{{post_title}} {{separator}} {{site_title}}';
+									$preview_description = $settings['description_template'] ?? '{{post_excerpt}}';
+									$preview_url = home_url();
+									include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+									?>
 								</div>
 
-								<div class="wpseopilot-form-row">
-									<label>
-										<strong><?php esc_html_e( 'Title Template', 'wp-seo-pilot' ); ?></strong>
-										<span class="wpseopilot-label-hint">
-											<?php esc_html_e( 'Use {{title}} for post title, {{sitename}} for site name', 'wp-seo-pilot' ); ?>
-										</span>
-									</label>
-									<input
-										type="text"
-										name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][title_template]"
-										value="<?php echo esc_attr( $settings['title_template'] ?? '{{title}} - {{sitename}}' ); ?>"
-										class="regular-text"
-									/>
-								</div>
+								<!-- Nested Sub-Tabs -->
+								<div class="wpseopilot-accordion-tabs" data-component="wpseopilot-accordion-tabs">
+									<div class="wpseopilot-accordion-tabs__nav" role="tablist">
+										<button
+											type="button"
+											class="wpseopilot-accordion-tab is-active"
+											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-title-description"
+											aria-selected="true"
+											role="tab"
+										>
+											<?php esc_html_e( 'Title & Description', 'wp-seo-pilot' ); ?>
+										</button>
+										<button
+											type="button"
+											class="wpseopilot-accordion-tab"
+											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-schema"
+											aria-selected="false"
+											role="tab"
+										>
+											<?php esc_html_e( 'Schema Markup', 'wp-seo-pilot' ); ?>
+										</button>
+										<button
+											type="button"
+											class="wpseopilot-accordion-tab"
+											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-custom-fields"
+											aria-selected="false"
+											role="tab"
+										>
+											<?php esc_html_e( 'Custom Fields', 'wp-seo-pilot' ); ?>
+										</button>
+										<button
+											type="button"
+											class="wpseopilot-accordion-tab"
+											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-advanced"
+											aria-selected="false"
+											role="tab"
+										>
+											<?php esc_html_e( 'Advanced Settings', 'wp-seo-pilot' ); ?>
+										</button>
+									</div>
 
-								<div class="wpseopilot-form-row">
-									<label>
-										<strong><?php esc_html_e( 'Description Template', 'wp-seo-pilot' ); ?></strong>
-										<span class="wpseopilot-label-hint">
-											<?php esc_html_e( 'Use {{excerpt}} for post excerpt', 'wp-seo-pilot' ); ?>
-										</span>
-									</label>
-									<textarea
-										name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
-										rows="2"
-										class="large-text"
-									><?php echo esc_textarea( $settings['description_template'] ?? '{{excerpt}}' ); ?></textarea>
-								</div>
+									<!-- Sub-Tab Panels -->
+									<div
+										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-title-description"
+										class="wpseopilot-accordion-tab-panel is-active"
+										role="tabpanel"
+									>
+										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/title-description.php'; ?>
+									</div>
 
-								<div class="wpseopilot-form-row">
-									<label>
-										<strong><?php esc_html_e( 'Schema Type', 'wp-seo-pilot' ); ?></strong>
-									</label>
-									<select name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][schema_type]">
-										<option value=""><?php esc_html_e( 'None', 'wp-seo-pilot' ); ?></option>
-										<option value="Article" <?php selected( $settings['schema_type'] ?? '', 'Article' ); ?>>
-											<?php esc_html_e( 'Article', 'wp-seo-pilot' ); ?>
-										</option>
-										<option value="BlogPosting" <?php selected( $settings['schema_type'] ?? '', 'BlogPosting' ); ?>>
-											<?php esc_html_e( 'Blog Posting', 'wp-seo-pilot' ); ?>
-										</option>
-										<option value="WebPage" <?php selected( $settings['schema_type'] ?? '', 'WebPage' ); ?>>
-											<?php esc_html_e( 'Web Page', 'wp-seo-pilot' ); ?>
-										</option>
-									</select>
+									<div
+										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-schema"
+										class="wpseopilot-accordion-tab-panel"
+										role="tabpanel"
+									>
+										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/schema.php'; ?>
+									</div>
+
+									<div
+										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-custom-fields"
+										class="wpseopilot-accordion-tab-panel"
+										role="tabpanel"
+									>
+										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/custom-fields.php'; ?>
+									</div>
+
+									<div
+										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-advanced"
+										class="wpseopilot-accordion-tab-panel"
+										role="tabpanel"
+									>
+										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/advanced.php'; ?>
+									</div>
 								</div>
 
 							</div>

@@ -1,0 +1,90 @@
+// Nested Accordion Tabs Component
+// Provides sub-tab navigation within accordion items
+
+.wpseopilot-accordion-tabs {
+	margin-top: @spacing-lg;
+
+	&__nav {
+		display: flex;
+		gap: 0;
+		border-bottom: 1px solid @color-border-light;
+		margin-bottom: @spacing-lg;
+		padding: 0;
+		background: transparent;
+	}
+}
+
+.wpseopilot-accordion-tab {
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid transparent;
+	color: @color-text-light;
+	cursor: pointer;
+	font-size: @font-size-small;
+	font-weight: @font-weight-medium;
+	padding: @spacing-sm @spacing-md;
+	transition: all @transition-fast;
+	position: relative;
+	top: 1px;
+	font-family: @font-family;
+
+	&:hover {
+		background: transparent;
+		color: @color-text;
+		border-bottom-color: @color-border;
+	}
+
+	&.is-active {
+		background: transparent;
+		color: @color-active;
+		border-bottom-color: @color-active-underline;
+		font-weight: @font-weight-semibold;
+	}
+
+	&:focus {
+		outline: 2px solid @color-primary;
+		outline-offset: -2px;
+		box-shadow: none;
+	}
+}
+
+.wpseopilot-accordion-tab-panel {
+	display: none;
+	padding: @spacing-md 0;
+
+	&.is-active {
+		display: block;
+	}
+}
+
+// Fix FOUC for nested tabs
+.wpseopilot-accordion-tabs--ready {
+	.wpseopilot-accordion-tab-panel {
+		display: none;
+
+		&.is-active {
+			display: block;
+		}
+	}
+}
+
+// Google Preview positioning within accordion
+.wpseopilot-accordion__preview {
+	margin-bottom: @spacing-lg;
+	padding-bottom: @spacing-lg;
+	border-bottom: 1px solid @color-border-light;
+}
+
+// Responsive behavior for mobile
+@media (max-width: 782px) {
+	.wpseopilot-accordion-tabs__nav {
+		flex-wrap: wrap;
+	}
+
+	.wpseopilot-accordion-tab {
+		flex: 1 1 auto;
+		min-width: 120px;
+		padding: @spacing-sm;
+		font-size: 11px;
+	}
+}

@@ -144,3 +144,30 @@
 		margin: 0;
 	}
 }
+
+.wpseopilot-flex-input {
+	display: flex;
+	flex-wrap: wrap;
+	gap: @spacing-xs;
+	flex: 1;
+	min-width: 0;
+	align-items: flex-start;
+
+	> .button {
+		order: 0;
+	}
+
+	> .button:first-of-type {
+		margin-left: auto;
+	}
+
+	> input,
+	> textarea,
+	> select,
+	> .wpseopilot-rich-container {
+		order: 1;
+		flex: 1 1 100%;
+		width: 100%;
+		max-width: 100%;
+	}
+}

@@ -426,11 +426,147 @@
 		});
 	});
 
+	// Initialize nested accordion tabs
+	const initAccordionTabs = () => {
+		$('.wpseopilot-accordion-tabs').each(function () {
+			const $container = $(this);
+			const $tabs = $container.find('[data-accordion-tab]');
+			const $panels = $container.find('.wpseopilot-accordion-tab-panel');
+
+			if (!$tabs.length || !$panels.length) return;
+
+			const activate = (targetId) => {
+				$tabs.removeClass('is-active').attr('aria-selected', 'false');
+				$panels.removeClass('is-active').attr('hidden', '');
+
+				$tabs.filter('[data-accordion-tab="' + targetId + '"]')
+					.addClass('is-active').attr('aria-selected', 'true');
+				$('#' + targetId).addClass('is-active').removeAttr('hidden');
+			};
+
+			$tabs.on('click', function (e) {
+				e.preventDefault();
+				activate($(this).data('accordion-tab'));
+			});
+
+			$container.addClass('wpseopilot-accordion-tabs--ready');
+			activate($tabs.first().data('accordion-tab'));
+		});
+	};
+
+	// Deep linking handler for nested tabs
+	const initDeepLinking = () => {
+		const parseHash = () => {
+			if (!window.location.hash) return null;
+			const parts = window.location.hash.substring(1).split('/');
+			return {
+				mainTab: parts[0] || null,
+				accordionSlug: parts[1] || null,
+				subTab: parts[2] || null
+			};
+		};
+
+		const activateDeepLink = () => {
+			const parsed = parseHash();
+			if (!parsed?.mainTab) return;
+
+			// 1. Activate main tab
+			const mainTabId = 'wpseopilot-tab-' + parsed.mainTab;
+			$('[data-wpseopilot-tab="' + mainTabId + '"]').trigger('click');
+
+			// 2. Expand accordion if slug provided
+			if (parsed.accordionSlug) {
+				const $accordion = $('[data-accordion-slug="' + parsed.accordionSlug + '"]');
+				$accordion.prop('open', true);
+
+				// 3. Activate sub-tab if provided
+				if (parsed.subTab) {
+					const subTabId = 'wpseopilot-accordion-' + parsed.accordionSlug + '-' + parsed.subTab;
+					setTimeout(() => {
+						$('[data-accordion-tab="' + subTabId + '"]').trigger('click');
+						if ($accordion[0]) {
+							$accordion[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+						}
+					}, 100);
+				}
+			}
+		};
+
+		activateDeepLink();
+		$(window).on('hashchange', activateDeepLink);
+	};
+
+	// Lazy initialization on accordion open
+	const initAccordionOpenHandlers = () => {
+		$(document).on('toggle', '.wpseopilot-accordion[data-accordion-slug]', function () {
+			if ($(this).prop('open')) {
+				const $tabs = $(this).find('.wpseopilot-accordion-tabs');
+				if ($tabs.length && !$tabs.hasClass('wpseopilot-accordion-tabs--ready')) {
+					initAccordionTabs();
+				}
+			}
+		});
+	};
+
+	// Initialize separator selector
+	const initSeparatorSelector = () => {
+		const $selector = $('[data-component="separator-selector"]');
+		if (!$selector.length) return;
+
+		const $options = $selector.find('.wpseopilot-separator-option');
+		const $customInput = $selector.find('#wpseopilot_custom_separator');
+		const $hiddenField = $selector.find('#wpseopilot_title_separator');
+		const $customContainer = $selector.find('.wpseopilot-separator-custom-input');
+		const $customOption = $selector.find('.wpseopilot-separator-custom');
+
+		$options.on('click', function () {
+			const $this = $(this);
+			const separator = $this.data('separator');
+
+			// Remove active class from all options
+			$options.removeClass('is-active');
+			$this.addClass('is-active');
+
+			if (separator === 'custom') {
+				// Show custom input
+				$customContainer.slideDown(200);
+				$customInput.focus();
+
+				// Update hidden field with custom value or empty if not set
+				const customValue = $customInput.val().trim();
+				$hiddenField.val(customValue || '-');
+			} else {
+				// Hide custom input
+				$customContainer.slideUp(200);
+
+				// Update hidden field with selected separator
+				$hiddenField.val(separator);
+
+				// Update custom option preview back to question mark
+				$customOption.find('.wpseopilot-separator-preview').text('?');
+			}
+		});
+
+		// Handle custom input changes
+		$customInput.on('input', function () {
+			const value = $(this).val().trim();
+			$hiddenField.val(value || '-');
+
+			// Update the custom option preview
+			if (value) {
+				$customOption.find('.wpseopilot-separator-preview').text(value);
+			}
+		});
+	};
+
 	$(document).ready(function () {
 		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);
 		updatePreview();
 		initTabs();
+		initAccordionOpenHandlers();
+		initDeepLinking();
 		initSchemaControls();
 		initGooglePreview();
+		initSeparatorSelector();
 	});
 })(jQuery, window.WPSEOPilotAdmin);

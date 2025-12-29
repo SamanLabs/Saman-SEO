@@ -538,9 +538,14 @@
 
         // Initialize on existing inputs
         $('input[name^="wpseopilot_"], textarea[name^="wpseopilot_"]').each(function () {
-            if ($(this).attr('type') !== 'checkbox' && $(this).attr('type') !== 'radio') {
-                createRichInput(this);
+            const type = $(this).attr('type');
+            if (type === 'checkbox' || type === 'radio' || type === 'hidden') {
+                return;
             }
+            if ($(this).data('rich') === false || $(this).hasClass('wpseopilot-no-rich')) {
+                return;
+            }
+            createRichInput(this);
         });
 
         // Trigger Button Logic

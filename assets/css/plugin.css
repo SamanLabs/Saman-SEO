@@ -354,6 +354,29 @@
 .wpseopilot-field-group .button {
   margin: 0;
 }
+.wpseopilot-flex-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  align-items: flex-start;
+}
+.wpseopilot-flex-input > .button {
+  order: 0;
+}
+.wpseopilot-flex-input > .button:first-of-type {
+  margin-left: auto;
+}
+.wpseopilot-flex-input > input,
+.wpseopilot-flex-input > textarea,
+.wpseopilot-flex-input > select,
+.wpseopilot-flex-input > .wpseopilot-rich-container {
+  order: 1;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
+}
 .wpseopilot-google-preview {
   border: 1px solid #dfe3ec;
   border-radius: 8px;
@@ -589,6 +612,76 @@
   padding-top: 20px;
   border-top: 1px solid #f0f0f1;
 }
+.wpseopilot-accordion-tabs {
+  margin-top: 20px;
+}
+.wpseopilot-accordion-tabs__nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #f0f0f1;
+  margin-bottom: 20px;
+  padding: 0;
+  background: transparent;
+}
+.wpseopilot-accordion-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #50575e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 16px;
+  transition: all 150ms ease;
+  position: relative;
+  top: 1px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+.wpseopilot-accordion-tab:hover {
+  background: transparent;
+  color: #1d2327;
+  border-bottom-color: #dcdcde;
+}
+.wpseopilot-accordion-tab.is-active {
+  background: transparent;
+  color: #2271b1;
+  border-bottom-color: #135e96;
+  font-weight: 600;
+}
+.wpseopilot-accordion-tab:focus {
+  outline: 2px solid #2271b1;
+  outline-offset: -2px;
+  box-shadow: none;
+}
+.wpseopilot-accordion-tab-panel {
+  display: none;
+  padding: 16px 0;
+}
+.wpseopilot-accordion-tab-panel.is-active {
+  display: block;
+}
+.wpseopilot-accordion-tabs--ready .wpseopilot-accordion-tab-panel {
+  display: none;
+}
+.wpseopilot-accordion-tabs--ready .wpseopilot-accordion-tab-panel.is-active {
+  display: block;
+}
+.wpseopilot-accordion__preview {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f1;
+}
+@media (max-width: 782px) {
+  .wpseopilot-accordion-tabs__nav {
+    flex-wrap: wrap;
+  }
+  .wpseopilot-accordion-tab {
+    flex: 1 1 auto;
+    min-width: 120px;
+    padding: 12px;
+    font-size: 11px;
+  }
+}
 .wpseopilot-search-appearance-page .wpseopilot-settings-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -705,6 +798,117 @@
 .wpseopilot-search-appearance-page .wpseopilot-toggle-label {
   color: #1d2327;
   font-weight: 400;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-selector {
+  margin-top: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.wpseopilot-search-appearance-page .wpseopilot-form-row--separator {
+  flex-wrap: wrap;
+}
+.wpseopilot-search-appearance-page .wpseopilot-form-row--separator > label {
+  flex: 0 0 200px;
+  max-width: 200px;
+}
+.wpseopilot-search-appearance-page .wpseopilot-form-row--separator > .wpseopilot-separator-selector {
+  flex: 1 1 0;
+}
+.wpseopilot-search-appearance-page .wpseopilot-form-row--separator .wpseopilot-separator-selector .description {
+  margin: 8px 0 0;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(90px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  background: #ffffff;
+  border: 2px solid #dcdcde;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 70px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-option:hover {
+  border-color: #2271b1;
+  background: #f6f7f7;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-option.is-active {
+  border-color: #2271b1;
+  background: #f0f6fc;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-option.is-active .wpseopilot-separator-preview {
+  color: #2271b1;
+  font-weight: 600;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-option.is-active .wpseopilot-separator-label {
+  color: #2271b1;
+  font-weight: 600;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-option:focus {
+  outline: 2px solid #2271b1;
+  outline-offset: 2px;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-preview {
+  font-size: 24px;
+  font-weight: 500;
+  color: #1d2327;
+  margin-bottom: 4px;
+  line-height: 1;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-label {
+  font-size: 11px;
+  color: #646970;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-custom-input {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f6f7f7;
+  border-radius: 4px;
+  border: 1px solid #dcdcde;
+}
+.wpseopilot-search-appearance-page .wpseopilot-separator-custom-input input {
+  width: 100%;
+}
+@media (max-width: 782px) {
+  .wpseopilot-search-appearance-page .wpseopilot-separator-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .wpseopilot-search-appearance-page .wpseopilot-separator-option {
+    padding: 10px 6px;
+    min-height: 60px;
+  }
+  .wpseopilot-search-appearance-page .wpseopilot-separator-preview {
+    font-size: 20px;
+  }
+  .wpseopilot-search-appearance-page .wpseopilot-separator-label {
+    font-size: 10px;
+  }
+  .wpseopilot-search-appearance-page .wpseopilot-form-row--separator > label {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+  .wpseopilot-search-appearance-page .wpseopilot-form-row--separator .wpseopilot-separator-selector .description {
+    margin-left: 0;
+  }
 }
 .wp-plugin-sidebar__panel .wpseopilot-panel {
   padding: 16px;
