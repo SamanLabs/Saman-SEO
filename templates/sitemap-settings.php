@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Render top bar
-\WPSEOPilot\Admin_Topbar::render( 'sitemap', 'Configuration', [
+\WPSEOPilot\Admin_Topbar::render( 'sitemap', '', [
 	[
 		'type'   => 'button',
 		'label'  => __( 'View Sitemap', 'wp-seo-pilot' ),

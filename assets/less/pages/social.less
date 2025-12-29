@@ -1,0 +1,102 @@
+// Social Page Specific Styles
+
+.wpseopilot-social-page {
+	.wpseopilot-settings-grid {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: @spacing-lg;
+		margin-bottom: @spacing-lg;
+
+		@media (max-width: 1200px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.wpseopilot-form-section {
+		border-bottom: 1px solid @color-border-light;
+		padding-bottom: @spacing-lg;
+		margin-bottom: @spacing-lg;
+
+		&:last-child {
+			border-bottom: none;
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
+
+		h3 {
+			font-size: 16px;
+			font-weight: @font-weight-semibold;
+			color: @color-text;
+			margin: 0 0 @spacing-md 0;
+		}
+	}
+
+	.wpseopilot-accordion {
+		border-bottom: 1px solid @color-border-light;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+		summary {
+			padding: @spacing-md @spacing-lg;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			transition: background @transition-fast;
+
+			&:hover {
+				background: @color-bg-light;
+			}
+
+			.wpseopilot-accordion-title {
+				font-weight: @font-weight-medium;
+				color: @color-text;
+			}
+
+			.wpseopilot-accordion-badge {
+				font-size: @font-size-small;
+				color: @color-text-lighter;
+				background: @color-bg-light;
+				padding: 2px 8px;
+				border-radius: @radius-sm;
+				font-family: monospace;
+			}
+		}
+
+		&[open] summary {
+			background: @color-bg-light;
+		}
+
+		.wpseopilot-accordion__body {
+			padding: @spacing-lg;
+			background: @color-bg;
+		}
+	}
+
+	.wpseopilot-info-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+
+		li {
+			padding: @spacing-xs 0;
+			position: relative;
+			padding-left: @spacing-md;
+
+			&:before {
+				content: "•";
+				position: absolute;
+				left: 0;
+				color: @color-primary;
+			}
+		}
+	}
+
+	.wpseopilot-settings-footer {
+		margin-top: @spacing-xl;
+		padding-top: @spacing-lg;
+		border-top: 1px solid @color-border-light;
+	}
+}

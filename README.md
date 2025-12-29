@@ -260,7 +260,7 @@ wp wpseopilot redirects import redirects.json
 
 ### Export
 
-Export site defaults + postmeta as JSON via **WP SEO Pilot → SEO Defaults** for easy backups or migrations.
+Export site defaults + postmeta as JSON via **WP SEO Pilot → Defaults** for easy backups or migrations.
 
 ### Privacy
 

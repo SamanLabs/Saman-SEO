@@ -105,3 +105,69 @@
 	max-width: 1400px;
 	margin: 0 auto;
 }
+
+// Modern Tab Navigation (for pages with sub-sections like SEO Defaults)
+.wpseopilot-tabs__nav,
+.wpseopilot-links__tabs {
+	border-bottom: 1px solid @color-border-light;
+	margin: 0 0 @spacing-lg 0;
+	padding: 0;
+	background: transparent;
+
+	.nav-tab,
+	a.nav-tab {
+		background: transparent;
+		border: none;
+		border-bottom: 2px solid transparent;
+		color: @color-text-light;
+		cursor: pointer;
+		font-size: @font-size-base;
+		font-weight: @font-weight-medium;
+		margin: 0;
+		padding: @spacing-md @spacing-lg;
+		transition: all @transition-fast;
+		position: relative;
+		top: 1px;
+		text-decoration: none;
+
+		&:hover {
+			background: transparent;
+			color: @color-text;
+			border-bottom-color: @color-border;
+		}
+
+		&.nav-tab-active {
+			background: transparent;
+			color: @color-active;
+			border-bottom-color: @color-active-underline;
+			font-weight: @font-weight-semibold;
+		}
+
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+	}
+}
+
+// Fix FOUC - hide inactive tabs by default until JS initializes
+.wpseopilot-tabs {
+	.wpseopilot-tab-panel {
+		display: none;
+
+		&.is-active {
+			display: block;
+		}
+	}
+
+	// Once JS is ready, ensure proper display
+	&.wpseopilot-tabs--ready {
+		.wpseopilot-tab-panel {
+			display: none;
+
+			&.is-active {
+				display: block;
+			}
+		}
+	}
+}

@@ -13,11 +13,6 @@
 \WPSEOPilot\Admin_Topbar::render( '404-log' );
 ?>
 <div class="wrap wpseopilot-page">
-	<h1><?php esc_html_e( '404 Error Log', 'wp-seo-pilot' ); ?></h1>
-	<p><?php esc_html_e( 'Monitor missing URLs and create redirects before search engines or visitors hit them again.', 'wp-seo-pilot' ); ?></p>
-	<p class="description">
-		<?php esc_html_e( 'The 404 error log does not collect user IPs. It collects the timestamp of the event, the 404 URL that was opened, and the user-agent string.', 'wp-seo-pilot' ); ?>
-	</p>
 
 	<form method="get" class="wpseopilot-404-controls">
 		<input type="hidden" name="page" value="wpseopilot-404" />

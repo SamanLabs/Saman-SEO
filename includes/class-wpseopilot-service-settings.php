@@ -110,6 +110,12 @@ class Settings {
 		register_setting( $group, 'wpseopilot_homepage_description', 'sanitize_textarea_field' );
 		register_setting( $group, 'wpseopilot_homepage_keywords', 'sanitize_text_field' );
 
+		// New consolidated options for Search Appearance page redesign
+		register_setting( $group, 'wpseopilot_homepage_defaults', [ $this, 'sanitize_homepage_defaults' ] );
+		register_setting( $group, 'wpseopilot_post_type_defaults', [ $this, 'sanitize_post_type_defaults' ] );
+		register_setting( $group, 'wpseopilot_taxonomy_defaults', [ $this, 'sanitize_taxonomy_defaults' ] );
+		register_setting( $group, 'wpseopilot_archive_defaults', [ $this, 'sanitize_archive_defaults_new' ] );
+
 		// Other settings
 		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_model', [ $this, 'sanitize_ai_model' ] );
 		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_system', 'sanitize_textarea_field' );
@@ -254,8 +260,8 @@ class Settings {
 
 		add_submenu_page(
 			'wpseopilot',
-			__( 'SEO Defaults', 'wp-seo-pilot' ),
-			__( 'SEO Defaults', 'wp-seo-pilot' ),
+			__( 'Defaults', 'wp-seo-pilot' ),
+			__( 'Defaults', 'wp-seo-pilot' ),
 			'manage_options',
 			'wpseopilot',
 			[ $this, 'render_settings_page' ]
@@ -612,6 +618,126 @@ class Settings {
 	}
 
 	/**
+	 * Sanitize homepage defaults.
+	 *
+	 * @param array|string $value Value.
+	 *
+	 * @return array
+	 */
+	public function sanitize_homepage_defaults( $value ) {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		// Also update individual options for backward compatibility
+		update_option( 'wpseopilot_homepage_title', sanitize_text_field( $value['meta_title'] ?? '' ) );
+		update_option( 'wpseopilot_homepage_description', sanitize_textarea_field( $value['meta_description'] ?? '' ) );
+		update_option( 'wpseopilot_homepage_keywords', sanitize_text_field( $value['meta_keywords'] ?? '' ) );
+
+		return [
+			'meta_title'       => sanitize_text_field( $value['meta_title'] ?? '' ),
+			'meta_description' => sanitize_textarea_field( $value['meta_description'] ?? '' ),
+			'meta_keywords'    => sanitize_text_field( $value['meta_keywords'] ?? '' ),
+		];
+	}
+
+	/**
+	 * Sanitize post type defaults (new structure).
+	 *
+	 * @param array|string $value Value.
+	 *
+	 * @return array
+	 */
+	public function sanitize_post_type_defaults( $value ) {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$post_types = get_post_types(
+			[
+				'public'  => true,
+				'show_ui' => true,
+			],
+			'names'
+		);
+
+		$sanitized = [];
+		foreach ( $post_types as $slug ) {
+			$data = isset( $value[ $slug ] ) && is_array( $value[ $slug ] ) ? $value[ $slug ] : [];
+
+			$sanitized[ $slug ] = [
+				'noindex'              => ! empty( $data['noindex'] ) ? '1' : '0',
+				'title_template'       => isset( $data['title_template'] ) ? sanitize_text_field( $data['title_template'] ) : '',
+				'description_template' => isset( $data['description_template'] ) ? sanitize_textarea_field( $data['description_template'] ) : '',
+				'schema_type'          => isset( $data['schema_type'] ) ? sanitize_text_field( $data['schema_type'] ) : '',
+			];
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize taxonomy defaults (new structure).
+	 *
+	 * @param array|string $value Value.
+	 *
+	 * @return array
+	 */
+	public function sanitize_taxonomy_defaults( $value ) {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$taxonomies = get_taxonomies(
+			[
+				'public'  => true,
+				'show_ui' => true,
+			],
+			'names'
+		);
+
+		$sanitized = [];
+		foreach ( $taxonomies as $slug ) {
+			$data = isset( $value[ $slug ] ) && is_array( $value[ $slug ] ) ? $value[ $slug ] : [];
+
+			$sanitized[ $slug ] = [
+				'noindex'              => ! empty( $data['noindex'] ) ? '1' : '0',
+				'title_template'       => isset( $data['title_template'] ) ? sanitize_text_field( $data['title_template'] ) : '',
+				'description_template' => isset( $data['description_template'] ) ? sanitize_textarea_field( $data['description_template'] ) : '',
+			];
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize archive defaults (new structure).
+	 *
+	 * @param array|string $value Value.
+	 *
+	 * @return array
+	 */
+	public function sanitize_archive_defaults_new( $value ) {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$allowed = [ 'author', 'date', 'search' ];
+		$sanitized = [];
+
+		foreach ( $allowed as $key ) {
+			$data = isset( $value[ $key ] ) && is_array( $value[ $key ] ) ? $value[ $key ] : [];
+
+			$sanitized[ $key ] = [
+				'noindex'        => ! empty( $data['noindex'] ) ? '1' : '0',
+				'title_template' => isset( $data['title_template'] ) ? sanitize_text_field( $data['title_template'] ) : '',
+			];
+		}
+
+		return $sanitized;
+	}
+
+	/**
 	 * Sanitize stored OpenAI API key.
 	 *
 	 * @param string $value Value.
@@ -744,6 +870,14 @@ class Settings {
 			return;
 		}
 
+		wp_enqueue_script(
+			'wpseopilot-admin',
+			WPSEOPILOT_URL . 'assets/js/admin.js',
+			[ 'jquery' ],
+			WPSEOPILOT_VERSION,
+			true
+		);
+
 		wp_enqueue_style(
 			'wpseopilot-admin',
 			WPSEOPILOT_URL . 'assets/css/admin.css',
@@ -758,56 +892,31 @@ class Settings {
 			WPSEOPILOT_VERSION
 		);
 
-		$post_types = get_post_types(
-			[
-				'public'  => true,
-				'show_ui' => true,
-			],
-			'objects'
-		);
+		// Prepare homepage defaults
+		$homepage_defaults = [
+			'meta_title'       => get_option( 'wpseopilot_homepage_title', '' ),
+			'meta_description' => get_option( 'wpseopilot_homepage_description', '' ),
+			'meta_keywords'    => get_option( 'wpseopilot_homepage_keywords', '' ),
+		];
 
-		if ( isset( $post_types['attachment'] ) ) {
-			unset( $post_types['attachment'] );
+		// Prepare post type defaults
+		$post_type_defaults = get_option( 'wpseopilot_post_type_defaults', [] );
+		if ( ! is_array( $post_type_defaults ) ) {
+			$post_type_defaults = [];
 		}
 
-		$post_type_templates    = get_option( 'wpseopilot_post_type_title_templates', [] );
-		$post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
-		$post_type_keywords     = get_option( 'wpseopilot_post_type_keywords', [] );
-		$post_type_settings     = get_option( 'wpseopilot_post_type_settings', [] );
-		$taxonomy_settings      = get_option( 'wpseopilot_taxonomy_settings', [] );
-		$archive_settings       = get_option( 'wpseopilot_archive_settings', [] );
-		$taxonomies             = get_taxonomies(
-			[
-				'public'  => true,
-				'show_ui' => true,
-			],
-			'objects'
-		);
-
-		if ( ! is_array( $post_type_templates ) ) {
-			$post_type_templates = [];
+		// Prepare taxonomy defaults
+		$taxonomy_defaults = get_option( 'wpseopilot_taxonomy_defaults', [] );
+		if ( ! is_array( $taxonomy_defaults ) ) {
+			$taxonomy_defaults = [];
 		}
 
-		if ( ! is_array( $post_type_descriptions ) ) {
-			$post_type_descriptions = [];
+		// Prepare archive defaults
+		$archive_defaults = get_option( 'wpseopilot_archive_defaults', [] );
+		if ( ! is_array( $archive_defaults ) ) {
+			$archive_defaults = [];
 		}
 
-		if ( ! is_array( $post_type_keywords ) ) {
-			$post_type_keywords = [];
-		}
-
-		if ( ! is_array( $post_type_settings ) ) {
-			$post_type_settings = [];
-		}
-
-		if ( ! is_array( $taxonomy_settings ) ) {
-			$taxonomy_settings = [];
-		}
-
-		if ( ! is_array( $archive_settings ) ) {
-			$archive_settings = [];
-		}
-
-		include WPSEOPILOT_PATH . 'templates/post-type-defaults.php';
+		include WPSEOPILOT_PATH . 'templates/search-appearance.php';
 	}
 }

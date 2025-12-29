@@ -15,7 +15,6 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 \WPSEOPilot\Admin_Topbar::render( 'redirects' );
 ?>
 <div class="wrap wpseopilot-page">
-	<h1><?php esc_html_e( 'Redirect Manager', 'wp-seo-pilot' ); ?></h1>
 
 	<?php
 	$suggestions = get_option( 'wpseopilot_monitor_slugs', [] );

@@ -31,8 +31,6 @@ $severity_labels = [
 \WPSEOPilot\Admin_Topbar::render( 'audit' );
 ?>
 <div class="wrap wpseopilot-page wpseopilot-audit">
-	<h1><?php esc_html_e( 'SEO Audit', 'wp-seo-pilot' ); ?></h1>
-	<p><?php esc_html_e( 'Automated checks for missing metadata, alt text, and length issues.', 'wp-seo-pilot' ); ?></p>
 
 	<div class="wpseopilot-audit__summary">
 		<section class="wpseopilot-card">

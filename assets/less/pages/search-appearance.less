@@ -1,0 +1,144 @@
+// Search Appearance Page Styles
+.wpseopilot-search-appearance-page {
+	.wpseopilot-settings-grid {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 1.5rem;
+
+		@media (max-width: 960px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.wpseopilot-settings-main {
+		min-width: 0;
+	}
+
+	.wpseopilot-settings-sidebar {
+		min-width: 0;
+	}
+
+	// Accordion styles
+	.wpseopilot-accordion {
+		border-bottom: 1px solid #e2e8f0;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+		summary {
+			padding: 1rem 1.25rem;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			list-style: none;
+			transition: background-color 0.15s ease;
+			user-select: none;
+
+			&::-webkit-details-marker {
+				display: none;
+			}
+
+			&:hover {
+				background: #f6f7f7;
+			}
+
+			&::after {
+				content: '\f345';
+				font-family: 'dashicons';
+				font-size: 20px;
+				color: #555d66;
+				transition: transform 0.2s ease;
+			}
+		}
+
+		&[open] summary::after {
+			transform: rotate(180deg);
+		}
+
+		&-title {
+			font-weight: 600;
+			color: #1d2327;
+			font-size: 14px;
+		}
+
+		&-badge {
+			font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+			background: #f0f0f1;
+			color: #50575e;
+			padding: 2px 8px;
+			border-radius: 4px;
+			font-size: 11px;
+			font-weight: 500;
+			letter-spacing: 0.01em;
+		}
+
+		&__body {
+			padding: 1.25rem;
+			background: #fafbfc;
+			border-top: 1px solid #f0f0f1;
+		}
+	}
+
+	// Info card
+	.wpseopilot-info-card {
+		background: #fff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 1.25rem;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+		h3 {
+			margin-top: 0;
+			margin-bottom: 0.75rem;
+			font-size: 14px;
+			font-weight: 600;
+			color: #1d2327;
+		}
+
+		p {
+			margin: 0 0 0.75rem;
+			color: #555d66;
+			font-size: 13px;
+			line-height: 1.5;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	.wpseopilot-info-list {
+		margin: 0;
+		padding-left: 1.25rem;
+		color: #555d66;
+		font-size: 13px;
+
+		li {
+			margin-bottom: 0.5rem;
+			line-height: 1.5;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	// Toggle styles
+	.wpseopilot-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+
+		input[type="checkbox"] {
+			margin: 0;
+		}
+
+		&-label {
+			color: #1d2327;
+			font-weight: 400;
+		}
+	}
+}

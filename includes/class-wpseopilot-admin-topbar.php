@@ -76,12 +76,16 @@ class Admin_Topbar {
 	private static function get_nav_items() {
 		return [
 			'defaults'   => [
-				'label' => __( 'SEO Defaults', 'wp-seo-pilot' ),
+				'label' => __( 'Defaults', 'wp-seo-pilot' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot' ),
 			],
 			'types'      => [
 				'label' => __( 'Search Appearance', 'wp-seo-pilot' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-types' ),
+			],
+			'social'     => [
+				'label' => __( 'Social', 'wp-seo-pilot' ),
+				'url'   => admin_url( 'admin.php?page=wpseopilot-social' ),
 			],
 			'sitemap'    => [
 				'label' => __( 'Sitemap', 'wp-seo-pilot' ),

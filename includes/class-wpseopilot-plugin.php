@@ -64,6 +64,7 @@ class Plugin {
 		$this->register( 'audit', new Service\Audit() );
 		$this->register( 'sitemap', new Service\Sitemap_Enhancer() );
 		$this->register( 'sitemap_settings', new Service\Sitemap_Settings() );
+		$this->register( 'social_settings', new Service\Social_Settings() );
 		$this->register( 'robots', new Service\Robots_Manager() );
 		$this->register( 'monitor', new Service\Request_Monitor() );
 		$this->register( 'social_card', new Service\Social_Card_Generator() );

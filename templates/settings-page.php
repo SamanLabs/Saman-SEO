@@ -92,8 +92,6 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 \WPSEOPilot\Admin_Topbar::render( 'defaults' );
 ?>
 <div class="wrap wpseopilot-page wpseopilot-settings">
-	<h1><?php esc_html_e( 'SEO Defaults', 'wp-seo-pilot' ); ?></h1>
-
 	<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">
 		<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'Site default sections', 'wp-seo-pilot' ); ?>">
 			<button
@@ -117,17 +115,6 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 				data-wpseopilot-tab="wpseopilot-tab-modules"
 			>
 				<?php esc_html_e( 'Modules', 'wp-seo-pilot' ); ?>
-			</button>
-			<button
-				type="button"
-				class="nav-tab"
-				id="wpseopilot-tab-link-social"
-				role="tab"
-				aria-selected="false"
-				aria-controls="wpseopilot-tab-social"
-				data-wpseopilot-tab="wpseopilot-tab-social"
-			>
-				<?php esc_html_e( 'Social', 'wp-seo-pilot' ); ?>
 			</button>
 			<button
 				type="button"
@@ -259,176 +246,9 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 		</div>
 
 		<div class="wpseopilot-tabs__actions">
-			<?php submit_button( __( 'Save SEO defaults', 'wp-seo-pilot' ) ); ?>
+			<?php submit_button( __( 'Save defaults', 'wp-seo-pilot' ) ); ?>
 		</div>
 		</form>
-
-		<div
-			id="wpseopilot-tab-social"
-			class="wpseopilot-tab-panel"
-			role="tabpanel"
-			aria-labelledby="wpseopilot-tab-link-social"
-		>
-			<form action="options.php" method="post" class="wpseopilot-settings__form">
-				<?php settings_fields( 'wpseopilot_social' ); ?>
-				<section class="wpseopilot-card">
-					<h2><?php esc_html_e( 'Social fallbacks', 'wp-seo-pilot' ); ?></h2>
-					<p><?php esc_html_e( 'Provide default Open Graph, Twitter, and schema values that WP SEO Pilot will use whenever editors leave fields blank.', 'wp-seo-pilot' ); ?></p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Open Graph (Facebook)', 'wp-seo-pilot' ); ?></th>
-							<td>
-								<div class="wpseopilot-social-fields">
-									<div class="wpseopilot-field">
-										<label for="wpseopilot_social_defaults_og_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
-										<input type="text" class="regular-text" id="wpseopilot_social_defaults_og_title" name="wpseopilot_social_defaults[og_title]" value="<?php echo esc_attr( $social_defaults['og_title'] ); ?>" />
-									</div>
-									<div class="wpseopilot-field">
-										<label for="wpseopilot_social_defaults_og_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
-										<textarea class="large-text" rows="3" id="wpseopilot_social_defaults_og_description" name="wpseopilot_social_defaults[og_description]"><?php echo esc_textarea( $social_defaults['og_description'] ); ?></textarea>
-									</div>
-								</div>
-								<?php if ( empty( $social_defaults['og_title'] ) && empty( $social_defaults['og_description'] ) ) : ?>
-									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for OPEN GRAPH (Facebook).', 'wp-seo-pilot' ); ?></p>
-								<?php else : ?>
-									<p class="wpseopilot-social-status"><?php esc_html_e( 'Used whenever a post is missing a custom social title or description.', 'wp-seo-pilot' ); ?></p>
-								<?php endif; ?>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Twitter', 'wp-seo-pilot' ); ?></th>
-							<td>
-								<div class="wpseopilot-social-fields">
-									<div class="wpseopilot-field">
-										<label for="wpseopilot_social_defaults_twitter_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
-										<input type="text" class="regular-text" id="wpseopilot_social_defaults_twitter_title" name="wpseopilot_social_defaults[twitter_title]" value="<?php echo esc_attr( $social_defaults['twitter_title'] ); ?>" />
-									</div>
-									<div class="wpseopilot-field">
-										<label for="wpseopilot_social_defaults_twitter_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
-										<textarea class="large-text" rows="3" id="wpseopilot_social_defaults_twitter_description" name="wpseopilot_social_defaults[twitter_description]"><?php echo esc_textarea( $social_defaults['twitter_description'] ); ?></textarea>
-									</div>
-								</div>
-								<?php if ( empty( $social_defaults['twitter_title'] ) && empty( $social_defaults['twitter_description'] ) ) : ?>
-									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for TWITTER.', 'wp-seo-pilot' ); ?></p>
-								<?php else : ?>
-									<p class="wpseopilot-social-status"><?php esc_html_e( 'Overrides the Twitter Card when a post does not provide its own.', 'wp-seo-pilot' ); ?></p>
-								<?php endif; ?>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Image source', 'wp-seo-pilot' ); ?></th>
-							<td>
-								<input type="url" class="regular-text" id="wpseopilot_social_defaults_image_source" name="wpseopilot_social_defaults[image_source]" value="<?php echo esc_url( $social_defaults['image_source'] ); ?>" />
-								<p class="description"><?php esc_html_e( 'Optional fallback image URL for Open Graph and Twitter cards.', 'wp-seo-pilot' ); ?></p>
-								<?php if ( empty( $social_defaults['image_source'] ) ) : ?>
-									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No IMAGE_SRC has been found.', 'wp-seo-pilot' ); ?></p>
-								<?php else : ?>
-									<p class="wpseopilot-social-status"><?php esc_html_e( 'Used whenever a post is missing a featured image or override.', 'wp-seo-pilot' ); ?></p>
-								<?php endif; ?>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Schema.org (itemtype only)', 'wp-seo-pilot' ); ?></th>
-							<td>
-								<?php
-								$render_schema_control(
-									'wpseopilot_social_defaults[schema_itemtype]',
-									$social_defaults['schema_itemtype'],
-									'wpseopilot_social_defaults_schema_itemtype'
-								);
-								?>
-								<p class="description"><?php esc_html_e( 'Example: Article, Product, ProfilePage. Leave blank to keep the default article type.', 'wp-seo-pilot' ); ?></p>
-								<?php if ( empty( $social_defaults['schema_itemtype'] ) ) : ?>
-									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No DATA has been found for Schema.org (itemtype only).', 'wp-seo-pilot' ); ?></p>
-								<?php else : ?>
-									<p class="wpseopilot-social-status"><?php esc_html_e( 'Controls the og:type meta tag whenever content lacks a specific schema override.', 'wp-seo-pilot' ); ?></p>
-								<?php endif; ?>
-							</td>
-						</tr>
-					</table>
-				</section>
-
-				<?php if ( ! empty( $post_types ) ) : ?>
-				<section class="wpseopilot-card">
-					<h2><?php esc_html_e( 'Per post type overrides', 'wp-seo-pilot' ); ?></h2>
-					<p><?php esc_html_e( 'Add tailored defaults for specific post or page types. Blank fields inherit the global fallbacks above.', 'wp-seo-pilot' ); ?></p>
-					<?php foreach ( $post_types as $slug => $object ) : ?>
-						<?php
-						$label = $object->labels->name ?: $object->label ?: ucfirst( $slug );
-						$raw_values = isset( $post_type_social_defaults[ $slug ] ) ? (array) $post_type_social_defaults[ $slug ] : [];
-						$values = wp_parse_args( $raw_values, $social_field_defaults );
-						$has_overrides = ! empty( $raw_values );
-						?>
-						<details class="wpseopilot-accordion">
-							<summary>
-								<span><?php echo esc_html( $label ); ?></span>
-								<span class="wpseopilot-type-slug"><?php echo esc_html( $slug ); ?></span>
-							</summary>
-							<div class="wpseopilot-accordion__body">
-								<table class="form-table" role="presentation">
-									<tr>
-										<th scope="row"><?php esc_html_e( 'Open Graph (Facebook)', 'wp-seo-pilot' ); ?></th>
-										<td>
-											<div class="wpseopilot-social-fields">
-												<div class="wpseopilot-field">
-													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
-													<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_title" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_title]" value="<?php echo esc_attr( $values['og_title'] ); ?>" />
-												</div>
-												<div class="wpseopilot-field">
-													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
-													<textarea class="large-text" rows="3" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_description" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_description]"><?php echo esc_textarea( $values['og_description'] ); ?></textarea>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<th scope="row"><?php esc_html_e( 'Twitter', 'wp-seo-pilot' ); ?></th>
-										<td>
-											<div class="wpseopilot-social-fields">
-												<div class="wpseopilot-field">
-													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_title"><?php esc_html_e( 'Fallback title', 'wp-seo-pilot' ); ?></label>
-													<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_title" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_title]" value="<?php echo esc_attr( $values['twitter_title'] ); ?>" />
-												</div>
-												<div class="wpseopilot-field">
-													<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_description"><?php esc_html_e( 'Fallback description', 'wp-seo-pilot' ); ?></label>
-													<textarea class="large-text" rows="3" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_description" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_description]"><?php echo esc_textarea( $values['twitter_description'] ); ?></textarea>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<th scope="row"><?php esc_html_e( 'Image source', 'wp-seo-pilot' ); ?></th>
-										<td>
-											<input type="url" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_image_source" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][image_source]" value="<?php echo esc_url( $values['image_source'] ); ?>" />
-										</td>
-									</tr>
-									<tr>
-										<th scope="row"><?php esc_html_e( 'Schema.org (itemtype only)', 'wp-seo-pilot' ); ?></th>
-										<td>
-											<?php
-											$render_schema_control(
-												sprintf( 'wpseopilot_post_type_social_defaults[%s][schema_itemtype]', $slug ),
-												$values['schema_itemtype'],
-												sprintf( 'wpseopilot_social_%s_schema_itemtype', $slug )
-											);
-											?>
-										</td>
-									</tr>
-								</table>
-								<?php if ( ! $has_overrides ) : ?>
-									<p class="wpseopilot-social-status is-empty"><?php esc_html_e( 'No custom social data has been defined for this type yet.', 'wp-seo-pilot' ); ?></p>
-								<?php else : ?>
-									<p class="wpseopilot-social-status"><?php esc_html_e( 'These overrides take precedence over the global fallbacks.', 'wp-seo-pilot' ); ?></p>
-								<?php endif; ?>
-							</div>
-						</details>
-					<?php endforeach; ?>
-				</section>
-				<?php endif; ?>
-
-				<?php submit_button( __( 'Save social defaults', 'wp-seo-pilot' ) ); ?>
-			</form>
-		</div>
 
 		<div
 			id="wpseopilot-tab-knowledge"

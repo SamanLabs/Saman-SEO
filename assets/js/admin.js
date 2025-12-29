@@ -287,6 +287,103 @@
 		});
 	};
 
+	const initGooglePreview = () => {
+		// Find all Google preview components
+		$('.wpseopilot-google-preview').each(function () {
+			const $preview = $(this);
+			const $titlePreview = $preview.find('[data-preview-title]');
+			const $descPreview = $preview.find('[data-preview-description]');
+			const $titleCounter = $preview.find('.wpseopilot-char-count[data-type="title"]');
+			const $descCounter = $preview.find('.wpseopilot-char-count[data-type="description"]');
+
+			// Find associated input fields (within the same form or section)
+			const $form = $preview.closest('form');
+			const $titleField = $form.find('[data-preview-field="title"]');
+			const $descField = $form.find('[data-preview-field="description"]');
+
+			// Fetch rendered preview from server
+			const fetchRenderedPreview = (template, context, previewEl, counterEl, maxChars) => {
+				if (!template) {
+					previewEl.text(previewEl.data('default') || '');
+					if (counterEl.length) {
+						counterEl.text(0);
+					}
+					return;
+				}
+
+				// Use the AJAX endpoint to render the template with variables replaced
+				$.post(settings.ai.ajax, {
+					action: 'wpseopilot_render_preview',
+					nonce: settings.ai.nonce,
+					template: template,
+					context: context || 'global'
+				}).done(function (response) {
+					if (response.success) {
+						const rendered = response.data.preview || template;
+						previewEl.text(rendered);
+
+						if (counterEl.length) {
+							const charCount = rendered.length;
+							counterEl.text(charCount);
+
+							// Add warning class if over limit
+							const $charSpan = counterEl.closest('.wpseopilot-google-preview__chars');
+							if (charCount > maxChars) {
+								$charSpan.addClass('over-limit');
+							} else {
+								$charSpan.removeClass('over-limit');
+							}
+						}
+					} else {
+						// Fallback to showing the template as-is
+						previewEl.text(template);
+						if (counterEl.length) {
+							counterEl.text(template.length);
+						}
+					}
+				}).fail(function () {
+					// Fallback to showing the template as-is
+					previewEl.text(template);
+					if (counterEl.length) {
+						counterEl.text(template.length);
+					}
+				});
+			};
+
+			// Debounce function
+			const debounce = (func, wait) => {
+				let timeout;
+				return function (...args) {
+					clearTimeout(timeout);
+					timeout = setTimeout(() => func.apply(this, args), wait);
+				};
+			};
+
+			// Initialize with current values
+			if ($titleField.length) {
+				const context = $titleField.data('context') || 'global';
+				const debouncedFetch = debounce(() => {
+					fetchRenderedPreview($titleField.val(), context, $titlePreview, $titleCounter, 60);
+				}, 500);
+
+				fetchRenderedPreview($titleField.val(), context, $titlePreview, $titleCounter, 60);
+
+				$titleField.on('input change', debouncedFetch);
+			}
+
+			if ($descField.length) {
+				const context = $descField.data('context') || 'global';
+				const debouncedFetch = debounce(() => {
+					fetchRenderedPreview($descField.val(), context, $descPreview, $descCounter, 155);
+				}, 500);
+
+				fetchRenderedPreview($descField.val(), context, $descPreview, $descCounter, 155);
+
+				$descField.on('input change', debouncedFetch);
+			}
+		});
+	};
+
 	$(document).on('click', '.wpseopilot-create-redirect-btn', function (e) {
 		e.preventDefault();
 		const $btn = $(this);
@@ -334,5 +431,6 @@
 		updatePreview();
 		initTabs();
 		initSchemaControls();
+		initGooglePreview();
 	});
 })(jQuery, window.WPSEOPilotAdmin);
