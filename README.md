@@ -86,12 +86,21 @@ This is SEO without secrets—because better SEO comes from better collaboration
 
 ## Documentation
 
-- **[Getting Started](docs/GETTING_STARTED.md)** - Installation and basic configuration
+### Getting Started
+- **[Getting Started](docs/GETTING_STARTED.md)** - Installation, configuration, and basic usage
+
+### Developer Resources
 - **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Filters, hooks, and programmatic control
-- **[Sitemap Configuration](docs/SITEMAPS.md)** - Advanced sitemap customization
+- **[Filter Reference](docs/FILTERS.md)** - Complete filter documentation with examples
 - **[Template Tags & Shortcodes](docs/TEMPLATE_TAGS.md)** - Theme integration reference
 - **[WP-CLI Commands](docs/WP_CLI.md)** - Command-line interface documentation
-- **[Filter Reference](docs/FILTERS.md)** - Complete filter documentation with examples
+
+### Feature Guides
+- **[Sitemap Configuration](docs/SITEMAPS.md)** - Advanced sitemap customization
+- **[AI Assistant](docs/AI_ASSISTANT.md)** - AI-powered metadata generation
+- **[Internal Linking](docs/INTERNAL_LINKING.md)** - Automated internal link management
+- **[Redirect Manager](docs/REDIRECTS.md)** - 301 redirects and 404 monitoring
+- **[Local SEO](docs/LOCAL_SEO.md)** - Local business schema and settings
 
 ---
 
