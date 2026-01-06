@@ -269,22 +269,27 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					</div>
 				</div>
 
-				<!-- OG Preview Module -->
+				<!-- Dynamic Social Card Generator Module -->
 				<div class="wpseopilot-module-card">
 					<div class="wpseopilot-module-icon">
 						<span class="dashicons dashicons-share"></span>
 					</div>
 					<div class="wpseopilot-module-content">
 						<div class="wpseopilot-module-header">
-							<h3><?php esc_html_e( 'Social Preview', 'wp-seo-pilot' ); ?></h3>
+							<h3><?php esc_html_e( 'Dynamic Social Card Generator', 'wp-seo-pilot' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
 								<input type="checkbox" name="wpseopilot_enable_og_preview" value="1" <?php checked( get_option( 'wpseopilot_enable_og_preview', '1' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
 						<p class="wpseopilot-module-description">
-							<?php esc_html_e( 'Add quick preview links to see how your posts will appear when shared on social media.', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Generate dynamic PNG social card images on-the-fly for sharing. Note: This only controls dynamic image generation, not Open Graph meta tags.', 'wp-seo-pilot' ); ?>
 						</p>
+					<?php if ( '1' === get_option( 'wpseopilot_enable_og_preview', '1' ) ) : ?>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-types#social-cards' ) ); ?>" class="wpseopilot-module-link">
+							<?php esc_html_e( 'Customize Social Cards →', 'wp-seo-pilot' ); ?>
+						</a>
+					<?php endif; ?>
 					</div>
 				</div>
 
@@ -331,6 +336,25 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 								<?php esc_html_e( 'Configure Local SEO →', 'wp-seo-pilot' ); ?>
 							</a>
 						<?php endif; ?>
+					</div>
+				</div>
+
+				<!-- Analytics Module -->
+				<div class="wpseopilot-module-card">
+					<div class="wpseopilot-module-icon">
+						<span class="dashicons dashicons-chart-bar"></span>
+					</div>
+					<div class="wpseopilot-module-content">
+						<div class="wpseopilot-module-header">
+							<h3><?php esc_html_e( 'Usage Analytics', 'wp-seo-pilot' ); ?></h3>
+							<label class="wpseopilot-toggle-switch">
+								<input type="checkbox" name="wpseopilot_enable_analytics" value="1" <?php checked( get_option( 'wpseopilot_enable_analytics', '1' ), '1' ); ?> />
+								<span class="wpseopilot-toggle-slider"></span>
+							</label>
+						</div>
+						<p class="wpseopilot-module-description">
+							<?php esc_html_e( 'Help improve WP SEO Pilot by sending anonymous usage data. No personal information or user data is collected - only plugin activation and feature usage.', 'wp-seo-pilot' ); ?>
+						</p>
 					</div>
 				</div>
 			</div>

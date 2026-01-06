@@ -64,6 +64,17 @@ class Settings {
 		'wpseopilot_enable_og_preview' => '1',
 		'wpseopilot_enable_llm_txt' => '1',
 		'wpseopilot_enable_local_seo' => '0',
+		'wpseopilot_enable_analytics' => '1',
+		'wpseopilot_social_card_design' => [
+			'background_color' => '#1a1a36',
+			'accent_color'     => '#5a84ff',
+			'text_color'       => '#ffffff',
+			'title_font_size'  => 48,
+			'site_font_size'   => 24,
+			'logo_url'         => '',
+			'logo_position'    => 'bottom-left',
+			'layout'           => 'default',
+		],
 	];
 
 	/**
@@ -120,6 +131,11 @@ class Settings {
 		register_setting( $group, 'wpseopilot_taxonomy_defaults', [ $this, 'sanitize_taxonomy_defaults' ] );
 		register_setting( $group, 'wpseopilot_archive_defaults', [ $this, 'sanitize_archive_defaults_new' ] );
 
+		// Social settings (also registered under search_appearance group)
+		register_setting( $group, 'wpseopilot_social_defaults', [ $this, 'sanitize_social_defaults' ] );
+		register_setting( $group, 'wpseopilot_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
+		register_setting( $group, 'wpseopilot_social_card_design', [ $this, 'sanitize_social_card_design' ] );
+
 		// Other settings
 		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_model', [ $this, 'sanitize_ai_model' ] );
 		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_system', 'sanitize_textarea_field' );
@@ -148,6 +164,7 @@ class Settings {
 		register_setting( 'wpseopilot', 'wpseopilot_enable_og_preview', [ $this, 'sanitize_bool' ] );
 		register_setting( 'wpseopilot', 'wpseopilot_enable_llm_txt', [ $this, 'sanitize_bool' ] );
 		register_setting( 'wpseopilot', 'wpseopilot_enable_local_seo', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'wpseopilot_enable_analytics', [ $this, 'sanitize_bool' ] );
 	}
 
 	/**
@@ -774,6 +791,34 @@ class Settings {
 		$value = sanitize_text_field( $value );
 
 		return trim( $value );
+	}
+
+	/**
+	 * Sanitize social card design settings.
+	 *
+	 * @param array|string $value Value.
+	 *
+	 * @return array
+	 */
+	public function sanitize_social_card_design( $value ) {
+		if ( ! is_array( $value ) ) {
+			return $this->defaults['wpseopilot_social_card_design'];
+		}
+
+		return [
+			'background_color' => sanitize_hex_color( $value['background_color'] ?? '#1a1a36' ),
+			'accent_color'     => sanitize_hex_color( $value['accent_color'] ?? '#5a84ff' ),
+			'text_color'       => sanitize_hex_color( $value['text_color'] ?? '#ffffff' ),
+			'title_font_size'  => absint( $value['title_font_size'] ?? 48 ),
+			'site_font_size'   => absint( $value['site_font_size'] ?? 24 ),
+			'logo_url'         => esc_url_raw( $value['logo_url'] ?? '' ),
+			'logo_position'    => in_array( $value['logo_position'] ?? '', [ 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'center' ], true )
+			                      ? $value['logo_position']
+			                      : 'bottom-left',
+			'layout'           => in_array( $value['layout'] ?? '', [ 'default', 'centered', 'minimal', 'bold' ], true )
+			                      ? $value['layout']
+			                      : 'default',
+		];
 	}
 
 	/**

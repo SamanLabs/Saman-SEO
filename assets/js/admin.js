@@ -108,6 +108,12 @@
 					(aiConfig.strings && aiConfig.strings.success) || '',
 					'success'
 				);
+
+				// Track AI generation success
+				if (typeof _paq !== 'undefined') {
+					const fieldName = field.charAt(0).toUpperCase() + field.slice(1);
+					_paq.push(['trackEvent', 'AI Assistant', 'Generate', fieldName]);
+				}
 			}
 		)
 			.fail((xhr) => {
@@ -137,6 +143,7 @@
 				'wpseopilot-tab-export',
 				'wpseopilot-tab-knowledge',
 				'wpseopilot-tab-social',
+			'wpseopilot-tab-social-cards',
 			];
 
 			if (!$tabs.length || !$panels.length) {
@@ -175,7 +182,14 @@
 
 			$tabs.on('click', function (event) {
 				event.preventDefault();
-				activate($(this).data('wpseopilot-tab'));
+				const tabId = $(this).data('wpseopilot-tab');
+				activate(tabId);
+
+				// Track tab switch with Matomo
+				if (typeof _paq !== 'undefined') {
+					const tabName = tabId.replace('wpseopilot-tab-', '').replace(/-/g, ' ');
+					_paq.push(['trackEvent', 'Tabs', 'Switch', tabName]);
+				}
 			});
 
 			$container.addClass('wpseopilot-tabs--ready');
@@ -779,6 +793,93 @@
 		});
 	});
 
+	/**
+	 * Initialize social card preview functionality.
+	 */
+	const initSocialCardPreview = () => {
+		const $preview = $('#wpseopilot-social-card-preview-img');
+		const $titleInput = $('#wpseopilot-preview-title');
+		const $refreshBtn = $('#wpseopilot-refresh-preview');
+
+		if (!$preview.length) {
+			return;
+		}
+
+		// Debounce helper
+		const debounce = (func, wait) => {
+			let timeout;
+			return function (...args) {
+				clearTimeout(timeout);
+				timeout = setTimeout(() => func.apply(this, args), wait);
+			};
+		};
+
+		// Update preview image
+		const updatePreview = () => {
+			const title = $titleInput.val() || 'Sample Post Title';
+			const baseUrl = window.location.protocol + '//' + window.location.host;
+			const url = baseUrl + '/?wpseopilot_social_card=1&title=' + encodeURIComponent(title);
+
+			$preview.closest('.wpseopilot-social-card-preview__frame').addClass('is-loading');
+			$preview.attr('src', url + '&t=' + Date.now()).on('load', function() {
+				$(this).closest('.wpseopilot-social-card-preview__frame').removeClass('is-loading');
+			});
+		};
+
+		// Auto-update on design changes
+		$('.wpseopilot-color-picker, input[name^="wpseopilot_social_card_design"]').on('change',
+			debounce(updatePreview, 1000)
+		);
+
+		// Manual refresh
+		$refreshBtn.on('click', function(e) {
+			e.preventDefault();
+			updatePreview();
+		});
+
+		// Title input
+		$titleInput.on('keyup', debounce(updatePreview, 500));
+
+		// Color picker sync to text field
+		$('.wpseopilot-color-picker').on('input change', function() {
+			$(this).next('.wpseopilot-color-text').val($(this).val());
+		});
+
+		// Initial load
+		updatePreview();
+	};
+
+	/**
+	 * Initialize media upload for social card logo.
+	 */
+	const initSocialCardMedia = () => {
+		$('.wpseopilot-media-upload-btn').on('click', function(e) {
+			e.preventDefault();
+
+			const $btn = $(this);
+			const targetSelector = $btn.data('target');
+			const $target = $(targetSelector);
+
+			if (!$target.length) {
+				return;
+			}
+
+			const frame = wp.media({
+				title: 'Select Logo',
+				button: { text: 'Use this image' },
+				multiple: false
+			});
+
+			frame.on('select', function() {
+				const attachment = frame.state().get('selection').first().toJSON();
+				$target.val(attachment.url);
+				$target.trigger('change');
+			});
+
+			frame.open();
+		});
+	};
+
 	$(document).ready(function () {
 		['wpseopilot_title', 'wpseopilot_description'].forEach(counter);
 		updatePreview();
@@ -788,5 +889,7 @@
 		initSchemaControls();
 		initGooglePreview();
 		initSeparatorSelector();
+		initSocialCardPreview();
+		initSocialCardMedia();
 	});
 })(jQuery, window.WPSEOPilotAdmin);

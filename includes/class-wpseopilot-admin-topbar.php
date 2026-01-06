@@ -118,10 +118,6 @@ class Admin_Topbar {
 				'label' => __( 'Sitemap', 'wp-seo-pilot' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-sitemap' ),
 			],
-			'social'     => [
-				'label' => __( 'Social', 'wp-seo-pilot' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-social' ),
-			],
 		];
 
 		// Only show Local SEO if module is enabled.

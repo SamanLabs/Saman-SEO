@@ -50,6 +50,12 @@ $taxonomies = get_taxonomies(
 				<a href="#archives" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-archives">
 					<?php esc_html_e( 'Archives', 'wp-seo-pilot' ); ?>
 				</a>
+			<a href="#social" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-social">
+				<?php esc_html_e( 'Social Settings', 'wp-seo-pilot' ); ?>
+			</a>
+			<a href="#social-cards" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-social-cards">
+				<?php esc_html_e( 'Social Cards', 'wp-seo-pilot' ); ?>
+			</a>
 			</div>
 			<!-- Global Settings Tab -->
 			<div id="wpseopilot-tab-global" class="wpseopilot-tab-panel is-active">
@@ -484,6 +490,16 @@ $taxonomies = get_taxonomies(
 					<?php endforeach; ?>
 				</div>
 			</div>
+
+		<!-- Social Settings Tab -->
+		<div id="wpseopilot-tab-social" class="wpseopilot-tab-panel">
+			<?php include __DIR__ . '/components/social-settings-tab.php'; ?>
+		</div>
+
+	<!-- Social Cards Tab -->
+	<div id="wpseopilot-tab-social-cards" class="wpseopilot-tab-panel">
+		<?php include __DIR__ . '/components/social-cards-tab.php'; ?>
+	</div>
 
 			<div class="wpseopilot-tabs__actions">
 				<?php submit_button( __( 'Save Search Appearance Settings', 'wp-seo-pilot' ), 'primary', 'submit', false ); ?>

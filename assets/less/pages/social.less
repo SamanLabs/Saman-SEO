@@ -100,3 +100,213 @@
 		border-top: 1px solid @color-border-light;
 	}
 }
+
+// Social Card Preview Styles
+.wpseopilot-social-card-preview__controls {
+	display: flex;
+	align-items: flex-end;
+	gap: @spacing-md;
+	margin-bottom: @spacing-lg;
+
+	.wpseopilot-form-field {
+		flex: 1;
+		margin-bottom: 0;
+	}
+
+	.button {
+		white-space: nowrap;
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+}
+
+.wpseopilot-social-card-preview__frame {
+	position: relative;
+	background: @color-bg-light;
+	border: 1px solid @color-border;
+	border-radius: @radius-md;
+	overflow: hidden;
+	min-height: 330px;
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	&.is-loading {
+		img {
+			opacity: 0.3;
+		}
+
+		.wpseopilot-social-card-preview__loading {
+			display: flex;
+		}
+	}
+}
+
+.wpseopilot-social-card-preview__loading {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	align-items: center;
+	justify-content: center;
+
+	.spinner {
+		float: none;
+		margin: 0;
+	}
+}
+
+// Layout Selector
+.wpseopilot-layout-selector {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: @spacing-md;
+	margin-top: @spacing-sm;
+
+	@media (max-width: 768px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.wpseopilot-layout-option {
+	display: block;
+	position: relative;
+	cursor: pointer;
+
+	input[type="radio"] {
+		position: absolute;
+		opacity: 0;
+		width: 0;
+		height: 0;
+
+		&:checked + .wpseopilot-layout-option__content {
+			background: lighten(@color-primary, 45%);
+			border-color: @color-primary;
+
+			&:before {
+				content: "✓";
+				position: absolute;
+				top: 8px;
+				right: 8px;
+				background: @color-primary;
+				color: #fff;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 12px;
+				font-weight: bold;
+			}
+		}
+
+		&:focus + .wpseopilot-layout-option__content {
+			box-shadow: 0 0 0 2px @color-primary;
+		}
+	}
+}
+
+.wpseopilot-layout-option__content {
+	position: relative;
+	padding: @spacing-md;
+	border: 2px solid @color-border;
+	border-radius: @radius-md;
+	background: #fff;
+	transition: all @transition-fast;
+
+	&:hover {
+		border-color: @color-primary;
+	}
+
+	strong {
+		display: block;
+		font-weight: @font-weight-semibold;
+		color: @color-text;
+		margin-bottom: @spacing-xs;
+	}
+
+	span {
+		display: block;
+		font-size: @font-size-small;
+		color: @color-text-lighter;
+	}
+}
+
+// Color Picker Styles
+.wpseopilot-color-picker {
+	width: 60px;
+	height: 40px;
+	padding: 4px;
+	border: 1px solid @color-border;
+	border-radius: @radius-sm;
+	cursor: pointer;
+	vertical-align: middle;
+
+	&::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+
+	&::-webkit-color-swatch {
+		border: none;
+		border-radius: 2px;
+	}
+
+	&::-moz-color-swatch {
+		border: none;
+		border-radius: 2px;
+	}
+}
+
+.wpseopilot-color-text {
+	vertical-align: middle;
+	margin-left: @spacing-sm;
+	max-width: 120px;
+	font-family: monospace;
+}
+
+// Media Upload
+.wpseopilot-media-upload {
+	display: flex;
+	gap: @spacing-sm;
+	align-items: center;
+
+	input[type="url"] {
+		flex: 1;
+	}
+}
+
+// Status Badge
+.wpseopilot-status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 12px;
+	border-radius: @radius-sm;
+	font-weight: @font-weight-medium;
+	font-size: @font-size-small;
+	margin-bottom: @spacing-md;
+
+	.dashicons {
+		font-size: 18px;
+		width: 18px;
+		height: 18px;
+	}
+
+	&.wpseopilot-status-badge--success {
+		background: #d4edda;
+		color: #155724;
+		border: 1px solid #c3e6cb;
+	}
+
+	&.wpseopilot-status-badge--inactive {
+		background: #f8f9fa;
+		color: #6c757d;
+		border: 1px solid #dee2e6;
+	}
+}

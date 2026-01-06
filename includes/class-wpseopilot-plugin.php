@@ -70,6 +70,7 @@ class Plugin {
 		$this->register( 'social_card', new Service\Social_Card_Generator() );
 		$this->register( 'llm_txt', new Service\LLM_TXT_Generator() );
 		$this->register( 'local_seo', new Service\Local_SEO() );
+		$this->register( 'analytics', new Service\Analytics() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->register( 'cli', new Service\CLI() );
@@ -111,6 +112,8 @@ class Plugin {
 	 * @return void
 	 */
 	public static function activate() {
+		Service\Analytics::track_activation();
+
 		( new Service\Redirect_Manager() )->create_tables();
 		( new Service\Request_Monitor() )->create_tables();
 		Service\Internal_Linking::activate();
@@ -135,6 +138,7 @@ class Plugin {
 		add_option( 'wpseopilot_llm_txt_title', '' );
 		add_option( 'wpseopilot_llm_txt_description', '' );
 		add_option( 'wpseopilot_llm_txt_include_excerpt', '1' );
+		add_option( 'wpseopilot_enable_analytics', '1' );
 
 		// Sitemap settings defaults
 		add_option( 'wpseopilot_sitemap_enabled', '1' );

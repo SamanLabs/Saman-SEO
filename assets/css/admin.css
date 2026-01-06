@@ -858,3 +858,136 @@
 .wpseopilot-rich-input .wpseopilot-tag:hover {
   background: #dce7ff;
 }
+/* Module Cards */
+.wpseopilot-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+.wpseopilot-module-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+  transition: all 0.2s ease;
+  display: flex;
+  gap: 16px;
+}
+.wpseopilot-module-card:hover {
+  border-color: #2271b1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.wpseopilot-module-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wpseopilot-module-icon .dashicons {
+  color: #ffffff;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+.wpseopilot-module-content {
+  flex: 1;
+  min-width: 0;
+}
+.wpseopilot-module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.wpseopilot-module-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d2327;
+  margin: 0;
+  line-height: 1.3;
+}
+.wpseopilot-module-description {
+  font-size: 14px;
+  color: #646970;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+.wpseopilot-module-link {
+  font-size: 13px;
+  color: #2271b1;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+.wpseopilot-module-link:hover {
+  color: #135e96;
+  text-decoration: none;
+}
+/* Toggle Switch */
+.wpseopilot-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.wpseopilot-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.wpseopilot-toggle-switch input:checked + .wpseopilot-toggle-slider {
+  background-color: #2271b1;
+}
+.wpseopilot-toggle-switch input:checked + .wpseopilot-toggle-slider:before {
+  transform: translateX(20px);
+}
+.wpseopilot-toggle-switch input:focus + .wpseopilot-toggle-slider {
+  box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.2);
+}
+.wpseopilot-toggle-switch input:disabled + .wpseopilot-toggle-slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.wpseopilot-toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #dcdcde;
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
+.wpseopilot-toggle-slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+/* Responsive adjustments */
+@media (max-width: 782px) {
+  .wpseopilot-modules-grid {
+    grid-template-columns: 1fr;
+  }
+  .wpseopilot-module-card {
+    padding: 20px;
+  }
+}

@@ -30,14 +30,31 @@ class Social_Settings {
 	 * @return void
 	 */
 	public function register_menu() {
-		add_submenu_page(
-			'wpseopilot',
-			__( 'Social Settings', 'wp-seo-pilot' ),
-			__( 'Social', 'wp-seo-pilot' ),
-			'manage_options',
-			'wpseopilot-social',
-			[ $this, 'render_settings_page' ]
-		);
+		// Social settings moved to Search Appearance page
+		// Menu removed as of plugin reorganization
+		return;
+	}
+
+	/**
+	 * Render deprecation notice and redirect link.
+	 *
+	 * @return void
+	 */
+	public function render_redirect_notice() {
+		\WPSEOPilot\Admin_Topbar::render( 'social' );
+		?>
+		<div class="wrap">
+			<h1><?php esc_html_e( 'Social Settings Moved', 'wp-seo-pilot' ); ?></h1>
+			<div class="notice notice-info">
+				<p><?php esc_html_e( 'Social Settings have been moved to Search Appearance for better organization.', 'wp-seo-pilot' ); ?></p>
+				<p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-types#social' ) ); ?>" class="button button-primary">
+						<?php esc_html_e( 'Go to Social Settings →', 'wp-seo-pilot' ); ?>
+					</a>
+				</p>
+			</div>
+		</div>
+		<?php
 	}
 
 	/**
