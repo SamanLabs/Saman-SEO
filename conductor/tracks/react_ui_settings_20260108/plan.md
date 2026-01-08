@@ -20,7 +20,7 @@ This phase focuses on preparing the development environment for React developmen
 
 This phase focuses on creating the necessary backend infrastructure for the React components to communicate with WordPress.
 
-- [ ] Task: Create REST API endpoint for "Defaults" settings
+- [~] Task: Create REST API endpoint for "Defaults" settings
     - [ ] Sub-task: Write failing tests (e.g., PestPHP or PHPUnit) for the GET and POST/PUT endpoints for the "Defaults" settings.
     - [ ] Sub-task: Implement the PHP class and methods to register a custom REST API endpoint (e.g., `/wp-seo-pilot/v1/settings/defaults`).
     - [ ] Sub-task: Implement the `GET` callback to retrieve and return all "Defaults" settings as JSON, ensuring proper permissions checks.

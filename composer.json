@@ -11,8 +11,10 @@
     ],
     "autoload": {
         "psr-4": {
-            "WPSEOPilot\": "includes/"
+            "WPSEOPilot\\": "includes/"
         }
     },
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    }
 }
