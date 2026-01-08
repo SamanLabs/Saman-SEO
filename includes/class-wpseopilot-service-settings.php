@@ -745,15 +745,16 @@ class Settings {
 			return [];
 		}
 
-		$allowed = [ 'author', 'date', 'search' ];
+		$allowed = [ 'author', 'date', 'search', '404' ];
 		$sanitized = [];
 
 		foreach ( $allowed as $key ) {
 			$data = isset( $value[ $key ] ) && is_array( $value[ $key ] ) ? $value[ $key ] : [];
 
 			$sanitized[ $key ] = [
-				'noindex'        => ! empty( $data['noindex'] ) ? '1' : '0',
-				'title_template' => isset( $data['title_template'] ) ? sanitize_text_field( $data['title_template'] ) : '',
+				'noindex'              => ! empty( $data['noindex'] ) ? '1' : '0',
+				'title_template'       => isset( $data['title_template'] ) ? sanitize_text_field( $data['title_template'] ) : '',
+				'description_template' => isset( $data['description_template'] ) ? sanitize_textarea_field( $data['description_template'] ) : '',
 			];
 		}
 
@@ -982,10 +983,51 @@ class Settings {
 			$taxonomy_defaults = [];
 		}
 
-		// Prepare archive defaults
+		// Prepare archive defaults with fallback values
 		$archive_defaults = get_option( 'wpseopilot_archive_defaults', [] );
 		if ( ! is_array( $archive_defaults ) ) {
 			$archive_defaults = [];
+		}
+
+		// Define default templates for each archive type
+		$archive_default_templates = [
+			'author' => [
+				'noindex'              => '0',
+				'title_template'       => '{{author}} {{separator}} {{sitename}}',
+				'description_template' => 'Articles written by {{author}}. {{author_bio}}',
+			],
+			'date'   => [
+				'noindex'              => '0',
+				'title_template'       => '{{date}} Archives {{separator}} {{sitename}}',
+				'description_template' => 'Browse our articles from {{date}}.',
+			],
+			'search' => [
+				'noindex'              => '1',
+				'title_template'       => 'Search: {{search_term}} {{separator}} {{sitename}}',
+				'description_template' => 'Search results for "{{search_term}}" on {{sitename}}.',
+			],
+			'404'    => [
+				'noindex'              => '1',
+				'title_template'       => 'Page Not Found {{separator}} {{sitename}}',
+				'description_template' => 'The page you are looking for could not be found.',
+			],
+		];
+
+		// Merge saved values with defaults (use defaults for empty values)
+		foreach ( $archive_default_templates as $type => $defaults ) {
+			if ( ! isset( $archive_defaults[ $type ] ) || ! is_array( $archive_defaults[ $type ] ) ) {
+				$archive_defaults[ $type ] = $defaults;
+			} else {
+				// Merge with defaults, but also replace empty strings with defaults
+				$archive_defaults[ $type ] = wp_parse_args( $archive_defaults[ $type ], $defaults );
+
+				// Replace empty strings with default values
+				foreach ( $defaults as $key => $default_value ) {
+					if ( isset( $archive_defaults[ $type ][ $key ] ) && '' === $archive_defaults[ $type ][ $key ] ) {
+						$archive_defaults[ $type ][ $key ] = $default_value;
+					}
+				}
+			}
 		}
 
 		include WPSEOPILOT_PATH . 'templates/search-appearance.php';

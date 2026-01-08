@@ -52,6 +52,14 @@ class Social_Card_Generator {
 		$width = (int) get_option( 'wpseopilot_default_social_width', 1200 );
 		$height = (int) get_option( 'wpseopilot_default_social_height', 630 );
 
+		// Ensure width and height are valid
+		if ( $width <= 0 ) {
+			$width = 1200;
+		}
+		if ( $height <= 0 ) {
+			$height = 630;
+		}
+
 		// Load design settings
 		$design_settings = get_option( 'wpseopilot_social_card_design', [] );
 		if ( ! is_array( $design_settings ) ) {

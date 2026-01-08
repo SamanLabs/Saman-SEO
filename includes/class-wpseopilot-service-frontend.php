@@ -50,13 +50,13 @@ class Frontend {
 		// Remove WordPress default title tag generation.
 		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
 
-		// Remove theme support for title-tag to prevent conflicts.
+		// Remove theme support for title-tag to prevent conflicts
 		remove_theme_support( 'title-tag' );
 
-		// Add our own title tag rendering at the same priority.
-		add_action( 'wp_head', [ $this, 'render_plugin_title_tag' ], 1 );
+		// Add our own title tag rendering at the highest priority
+		add_action( 'wp_head', [ $this, 'render_plugin_title_tag' ], 0 );
 
-		// Prevent WordPress from generating document title via pre_get_document_title.
+		// Prevent WordPress from generating document title via pre_get_document_title
 		add_filter( 'pre_get_document_title', '__return_empty_string', 1 );
 	}
 
@@ -85,6 +85,26 @@ class Frontend {
 		$description = $meta['description'] ?? '';
 		if ( empty( $description ) && $is_home_view && ! empty( $homepage_description ) ) {
 			$description = $homepage_description;
+		}
+
+		// Add archive page description support
+		if ( empty( $description ) ) {
+			$archive_defaults = $this->get_archive_defaults();
+			$archive_type = null;
+
+			if ( is_404() ) {
+				$archive_type = '404';
+			} elseif ( is_search() ) {
+				$archive_type = 'search';
+			} elseif ( is_author() ) {
+				$archive_type = 'author';
+			} elseif ( is_date() ) {
+				$archive_type = 'date';
+			}
+
+			if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['description_template'] ) ) {
+				$description = $archive_defaults[ $archive_type ]['description_template'];
+			}
 		}
 
 		// Add taxonomy term description support
@@ -323,9 +343,40 @@ class Frontend {
 
 		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
 
-		// Handle 404 pages
+		// Handle archive pages (404, search, author, date)
+		$archive_defaults = $this->get_archive_defaults();
+		$archive_type = null;
+
 		if ( is_404() ) {
-			$title = apply_filters( 'wpseopilot_title', 'Page Not Found', null );
+			$archive_type = '404';
+		} elseif ( is_search() ) {
+			$archive_type = 'search';
+		} elseif ( is_author() ) {
+			$archive_type = 'author';
+		} elseif ( is_date() ) {
+			$archive_type = 'date';
+		}
+
+		if ( $archive_type ) {
+			$title_template = $archive_defaults[ $archive_type ]['title_template'] ?? '';
+
+			if ( ! empty( $title_template ) ) {
+				$title = replace_template_variables( $title_template, null );
+			} else {
+				// Fallback defaults if template is empty
+				$separator = get_option( 'wpseopilot_title_separator', '-' );
+				if ( '404' === $archive_type ) {
+					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
+				} elseif ( 'search' === $archive_type ) {
+					$title = 'Search: ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				} elseif ( 'author' === $archive_type ) {
+					$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				} elseif ( 'date' === $archive_type ) {
+					$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				}
+			}
+
+			$title = apply_filters( 'wpseopilot_title', $title, null );
 		}
 
 		if ( empty( $title ) ) {
@@ -501,8 +552,21 @@ class Frontend {
 	private function get_robots( $meta ) {
 		$directives = [];
 
-		// Add noindex for search results pages
-		if ( is_search() ) {
+		// Check archive defaults for noindex (404, search, author, date)
+		$archive_defaults = $this->get_archive_defaults();
+		$archive_type = null;
+
+		if ( is_404() ) {
+			$archive_type = '404';
+		} elseif ( is_search() ) {
+			$archive_type = 'search';
+		} elseif ( is_author() ) {
+			$archive_type = 'author';
+		} elseif ( is_date() ) {
+			$archive_type = 'date';
+		}
+
+		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['noindex'] ) ) {
 			$directives[] = 'noindex';
 		}
 
@@ -833,6 +897,63 @@ class Frontend {
 		];
 
 		return wp_parse_args( $meta, $defaults );
+	}
+
+	/**
+	 * Get archive defaults with fallback values.
+	 *
+	 * @return array
+	 */
+	private function get_archive_defaults() {
+		$archive_defaults = get_option( 'wpseopilot_archive_defaults', [] );
+		if ( ! is_array( $archive_defaults ) ) {
+			$archive_defaults = [];
+		}
+
+		// Define default templates for each archive type
+		$archive_default_templates = [
+			'author' => [
+				'noindex'              => '0',
+				'title_template'       => '{{author}} {{separator}} {{sitename}}',
+				'description_template' => 'Articles written by {{author}}. {{author_bio}}',
+			],
+			'date'   => [
+				'noindex'              => '0',
+				'title_template'       => '{{date}} Archives {{separator}} {{sitename}}',
+				'description_template' => 'Browse our articles from {{date}}.',
+			],
+			'search' => [
+				'noindex'              => '1',
+				'title_template'       => 'Search: {{search_term}} {{separator}} {{sitename}}',
+				'description_template' => 'Search results for "{{search_term}}" on {{sitename}}.',
+			],
+			'404'    => [
+				'noindex'              => '1',
+				'title_template'       => 'Page Not Found {{separator}} {{sitename}}',
+				'description_template' => 'The page you are looking for could not be found.',
+			],
+		];
+
+		// Merge saved values with defaults (use defaults for empty values)
+		foreach ( $archive_default_templates as $type => $defaults ) {
+			if ( ! isset( $archive_defaults[ $type ] ) || ! is_array( $archive_defaults[ $type ] ) ) {
+				$archive_defaults[ $type ] = $defaults;
+			} else {
+				// Merge with defaults, but also replace empty strings with defaults
+				$archive_defaults[ $type ] = wp_parse_args( $archive_defaults[ $type ], $defaults );
+
+				// Replace empty strings OR old values without variables with default values
+				foreach ( $defaults as $key => $default_value ) {
+					$current_value = $archive_defaults[ $type ][ $key ] ?? '';
+					// Replace if empty OR if it's a template field that doesn't have any {{variables}}
+					if ( '' === $current_value || ( in_array( $key, [ 'title_template', 'description_template' ] ) && strpos( $current_value, '{{' ) === false ) ) {
+						$archive_defaults[ $type ][ $key ] = $default_value;
+					}
+				}
+			}
+		}
+
+		return $archive_defaults;
 	}
 
 	/**

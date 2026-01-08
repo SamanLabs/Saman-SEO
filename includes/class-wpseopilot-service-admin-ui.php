@@ -556,14 +556,133 @@ class Admin_UI {
 			} elseif ( strpos( $context, 'taxonomy:' ) === 0 ) {
 				$tax = str_replace( 'taxonomy:', '', $context );
 				$terms = get_terms( [ 'taxonomy' => $tax, 'number' => 1, 'hide_empty' => false ] );
+				$mock_object = null;
 				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 					$mock_object = $terms[0];
 				}
+
+				// Always use custom taxonomy renderer for admin preview
+				// (replace_template_variables won't detect taxonomy context in admin)
+				$rendered = $this->render_taxonomy_preview( $template, $tax, $mock_object );
+				wp_send_json_success( [ 'preview' => $rendered ] );
+				return;
+			} elseif ( strpos( $context, 'archive:' ) === 0 ) {
+				// Handle archive contexts (404, search, author, date)
+				// For archives, we need to manually render the template with mock variables
+				$archive_type = str_replace( 'archive:', '', $context );
+				$rendered = $this->render_archive_preview( $template, $archive_type );
+				wp_send_json_success( [ 'preview' => $rendered ] );
+				return;
 			}
 		}
 
 		$rendered = replace_template_variables( $template, $mock_object );
-		
+
 		wp_send_json_success( [ 'preview' => $rendered ] );
+	}
+
+	/**
+	 * Render archive preview with mock variables.
+	 *
+	 * @param string $template Template string.
+	 * @param string $archive_type Archive type (404, search, author, date).
+	 *
+	 * @return string
+	 */
+	private function render_archive_preview( $template, $archive_type ) {
+		if ( ! class_exists( 'Twiglet\Twiglet' ) ) {
+			require_once plugin_dir_path( __FILE__ ) . 'src/Twiglet.php';
+		}
+
+		// Build mock variables based on archive type
+		$vars = [
+			'site_title'    => get_bloginfo( 'name' ),
+			'sitename'      => get_bloginfo( 'name' ),
+			'tagline'       => get_bloginfo( 'description' ),
+			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
+			'current_year'  => date_i18n( 'Y' ),
+			'current_month' => date_i18n( 'F' ),
+			'current_day'   => date_i18n( 'j' ),
+		];
+
+		// Add archive-type specific variables
+		switch ( $archive_type ) {
+			case '404':
+				$vars['request_url'] = home_url( '/example-page' );
+				break;
+			case 'search':
+				$vars['search_term'] = 'example search query';
+				break;
+			case 'author':
+				// Get a real author if possible
+				$users = get_users( [ 'number' => 1, 'capability' => 'edit_posts' ] );
+				if ( ! empty( $users ) ) {
+					$vars['author']      = $users[0]->display_name;
+					$vars['author_name'] = $users[0]->display_name;
+					$vars['author_bio']  = get_user_meta( $users[0]->ID, 'description', true );
+				} else {
+					$vars['author']      = 'Example Author';
+					$vars['author_name'] = 'Example Author';
+					$vars['author_bio']  = 'Author biography';
+				}
+				break;
+			case 'date':
+				$vars['date']          = date_i18n( 'F Y' );
+				$vars['archive_date']  = date_i18n( 'F Y' );
+				$vars['archive_title'] = date_i18n( 'F Y' );
+				break;
+		}
+
+		$twiglet = new \Twiglet\Twiglet();
+		return $twiglet->render_string( $template, $vars );
+	}
+
+	/**
+	 * Render taxonomy preview with mock variables.
+	 *
+	 * @param string        $template Template string.
+	 * @param string        $taxonomy Taxonomy name.
+	 * @param \WP_Term|null $term Existing term or null.
+	 *
+	 * @return string
+	 */
+	private function render_taxonomy_preview( $template, $taxonomy, $term = null ) {
+		if ( ! class_exists( 'Twiglet\Twiglet' ) ) {
+			require_once plugin_dir_path( __FILE__ ) . 'src/Twiglet.php';
+		}
+
+		// Build mock variables
+		$vars = [
+			'site_title'    => get_bloginfo( 'name' ),
+			'sitename'      => get_bloginfo( 'name' ),
+			'tagline'       => get_bloginfo( 'description' ),
+			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
+			'current_year'  => date_i18n( 'Y' ),
+			'current_month' => date_i18n( 'F' ),
+			'current_day'   => date_i18n( 'j' ),
+		];
+
+		// Use real term data if available, otherwise use mock data
+		if ( $term instanceof \WP_Term ) {
+			$vars['term']       = $term->name;
+			$vars['term_title'] = $term->name;
+			// Provide mock description if term has no description
+			$vars['term_description'] = ! empty( $term->description )
+				? wp_strip_all_tags( $term->description )
+				: 'Browse articles in the ' . $term->name . ' category.';
+		} else {
+			// No term exists, use generic mock data
+			$tax_object = get_taxonomy( $taxonomy );
+			$term_name = $tax_object && isset( $tax_object->labels->singular_name )
+				? $tax_object->labels->singular_name
+				: 'Example Term';
+
+			$vars['term']             = $term_name;
+			$vars['term_title']       = $term_name;
+			$vars['term_description'] = 'Browse articles in the ' . $term_name . ' category.';
+		}
+
+		$twiglet = new \Twiglet\Twiglet();
+		return $twiglet->render_string( $template, $vars );
 	}
 }

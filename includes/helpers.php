@@ -87,6 +87,7 @@ namespace WPSEOPilot\Helpers {
 		// Generic Global Replacements
 		$vars = [
 			'site_title'    => \get_bloginfo( 'name' ),
+			'sitename'      => \get_bloginfo( 'name' ), // Add sitename here too
 			'tagline'       => \get_bloginfo( 'description' ),
 			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
 			'current_year'  => date_i18n( 'Y' ),
@@ -133,6 +134,7 @@ namespace WPSEOPilot\Helpers {
 			$term = $context instanceof \WP_Term ? $context : get_queried_object();
 			if ( $term instanceof \WP_Term ) {
 				$vars['term_title']       = $term->name;
+				$vars['term']             = $term->name; // Alias for term_title
 				$vars['term_description'] = wp_strip_all_tags( term_description( $term->term_id ) );
 			}
 		} elseif ( is_post_type_archive() ) {
@@ -143,6 +145,12 @@ namespace WPSEOPilot\Helpers {
 		} elseif ( is_author() ) {
 			$vars['author_name'] = get_the_author();
 			$vars['author_bio']  = get_the_author_meta( 'description' );
+		} elseif ( is_404() ) {
+			// 404 page variables
+			$vars['request_url'] = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( home_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) : '';
+		} elseif ( is_search() ) {
+			// Search results variables
+			$vars['search_term'] = get_search_query();
 		}
 
 		$twiglet = new \Twiglet\Twiglet();

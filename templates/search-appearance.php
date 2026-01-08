@@ -359,7 +359,16 @@ $taxonomies = get_taxonomies(
 							</summary>
 							<div class="wpseopilot-accordion__body">
 
-								<div class="wpseopilot-form-row">
+								<!-- Google Preview -->
+								<?php
+								// Use settings values with defaults
+								$preview_title = ! empty( $settings['title_template'] ) ? $settings['title_template'] : '{{term}} Archives {{separator}} {{sitename}}';
+								$preview_description = ! empty( $settings['description_template'] ) ? $settings['description_template'] : '{{term_description}}';
+								$preview_url = home_url();
+								include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+								?>
+
+								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label>
 										<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
 									</label>
@@ -383,12 +392,21 @@ $taxonomies = get_taxonomies(
 											<?php esc_html_e( 'Use {{term}} for term name, {{sitename}} for site name', 'wp-seo-pilot' ); ?>
 										</span>
 									</label>
-									<input
-										type="text"
-										name="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]"
-										value="<?php echo esc_attr( $settings['title_template'] ?? '{{term}} Archives - {{sitename}}' ); ?>"
-										class="regular-text"
-									/>
+									<div class="wpseopilot-flex-input">
+										<input
+											type="text"
+											name="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]"
+											value="<?php echo esc_attr( $settings['title_template'] ?? '{{term}} Archives {{separator}} {{sitename}}' ); ?>"
+											class="regular-text"
+											data-preview-field="title"
+											data-context="taxonomy:<?php echo esc_attr( $slug ); ?>"
+											placeholder="<?php echo esc_attr__( '{{term}} Archives {{separator}} {{sitename}}', 'wp-seo-pilot' ); ?>"
+										/>
+										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]">
+											<span class="dashicons dashicons-editor-code"></span>
+											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+										</button>
+									</div>
 								</div>
 
 								<div class="wpseopilot-form-row">
@@ -398,11 +416,20 @@ $taxonomies = get_taxonomies(
 											<?php esc_html_e( 'Use {{term_description}} for term description', 'wp-seo-pilot' ); ?>
 										</span>
 									</label>
-									<textarea
-										name="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
-										rows="2"
-										class="large-text"
-									><?php echo esc_textarea( $settings['description_template'] ?? '{{term_description}}' ); ?></textarea>
+									<div class="wpseopilot-flex-input">
+										<textarea
+											name="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
+											rows="2"
+											class="large-text"
+											data-preview-field="description"
+											data-context="taxonomy:<?php echo esc_attr( $slug ); ?>"
+											placeholder="<?php echo esc_attr__( '{{term_description}}', 'wp-seo-pilot' ); ?>"
+										><?php echo esc_textarea( $settings['description_template'] ?? '{{term_description}}' ); ?></textarea>
+										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]">
+											<span class="dashicons dashicons-editor-code"></span>
+											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+										</button>
+									</div>
 								</div>
 
 							</div>
@@ -415,8 +442,8 @@ $taxonomies = get_taxonomies(
 			<div id="wpseopilot-tab-archives" class="wpseopilot-tab-panel">
 				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Archive Settings', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Configure SEO settings for author, date, and search archives.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Archive & Special Page Settings', 'wp-seo-pilot' ); ?></h2>
+						<p><?php esc_html_e( 'Configure SEO settings for author, date, search archives, and special pages like 404.', 'wp-seo-pilot' ); ?></p>
 					</div>
 
 					<?php
@@ -424,6 +451,7 @@ $taxonomies = get_taxonomies(
 						'author' => __( 'Author Archives', 'wp-seo-pilot' ),
 						'date'   => __( 'Date Archives', 'wp-seo-pilot' ),
 						'search' => __( 'Search Results', 'wp-seo-pilot' ),
+						'404'    => __( '404 Page', 'wp-seo-pilot' ),
 					];
 					?>
 
@@ -436,7 +464,16 @@ $taxonomies = get_taxonomies(
 							</summary>
 							<div class="wpseopilot-accordion__body">
 
-								<div class="wpseopilot-form-row">
+								<!-- Google Preview -->
+								<?php
+								// Use the settings values (which now include defaults)
+								$preview_title = $settings['title_template'] ?? '';
+								$preview_description = $settings['description_template'] ?? '';
+								$preview_url = home_url();
+								include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+								?>
+
+								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label>
 										<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
 									</label>
@@ -464,25 +501,80 @@ $taxonomies = get_taxonomies(
 												esc_html_e( 'Use {{date}} for date', 'wp-seo-pilot' );
 											} elseif ( 'search' === $type ) {
 												esc_html_e( 'Use {{search_term}} for search query', 'wp-seo-pilot' );
+											} elseif ( '404' === $type ) {
+												esc_html_e( 'Use {{request_url}} for requested URL, {{sitename}} for site name', 'wp-seo-pilot' );
 											}
 											?>
 										</span>
 									</label>
-									<input
-										type="text"
-										name="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]"
-										value="<?php echo esc_attr( $settings['title_template'] ?? '' ); ?>"
-										class="regular-text"
-										placeholder="<?php
-										if ( 'author' === $type ) {
-											echo esc_attr__( '{{author}} - {{sitename}}', 'wp-seo-pilot' );
-										} elseif ( 'date' === $type ) {
-											echo esc_attr__( '{{date}} Archives - {{sitename}}', 'wp-seo-pilot' );
-										} elseif ( 'search' === $type ) {
-											echo esc_attr__( 'Search: {{search_term}} - {{sitename}}', 'wp-seo-pilot' );
-										}
-										?>"
-									/>
+									<div class="wpseopilot-flex-input">
+										<input
+											type="text"
+											name="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]"
+											value="<?php echo esc_attr( $settings['title_template'] ?? '' ); ?>"
+											class="regular-text"
+											data-preview-field="title"
+											data-context="archive:<?php echo esc_attr( $type ); ?>"
+											placeholder="<?php
+											if ( 'author' === $type ) {
+												echo esc_attr__( '{{author}} {{separator}} {{sitename}}', 'wp-seo-pilot' );
+											} elseif ( 'date' === $type ) {
+												echo esc_attr__( '{{date}} Archives {{separator}} {{sitename}}', 'wp-seo-pilot' );
+											} elseif ( 'search' === $type ) {
+												echo esc_attr__( 'Search: {{search_term}} {{separator}} {{sitename}}', 'wp-seo-pilot' );
+											} elseif ( '404' === $type ) {
+												echo esc_attr__( 'Page Not Found {{separator}} {{sitename}}', 'wp-seo-pilot' );
+											}
+											?>"
+										/>
+										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]">
+											<span class="dashicons dashicons-editor-code"></span>
+											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+										</button>
+									</div>
+								</div>
+
+								<div class="wpseopilot-form-row">
+									<label>
+										<strong><?php esc_html_e( 'Meta Description', 'wp-seo-pilot' ); ?></strong>
+										<span class="wpseopilot-label-hint">
+											<?php
+											if ( 'author' === $type ) {
+												esc_html_e( 'Description for author archive pages', 'wp-seo-pilot' );
+											} elseif ( 'date' === $type ) {
+												esc_html_e( 'Description for date archive pages', 'wp-seo-pilot' );
+											} elseif ( 'search' === $type ) {
+												esc_html_e( 'Description for search results pages', 'wp-seo-pilot' );
+											} elseif ( '404' === $type ) {
+												esc_html_e( 'Description shown in search results for 404 pages', 'wp-seo-pilot' );
+											}
+											?>
+										</span>
+									</label>
+									<div class="wpseopilot-flex-input">
+										<textarea
+											name="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][description_template]"
+											rows="3"
+											class="large-text"
+											data-preview-field="description"
+											data-context="archive:<?php echo esc_attr( $type ); ?>"
+											placeholder="<?php
+											if ( 'author' === $type ) {
+												echo esc_attr__( 'Articles written by {{author}}. {{author_bio}}', 'wp-seo-pilot' );
+											} elseif ( 'date' === $type ) {
+												echo esc_attr__( 'Browse our articles from {{date}}.', 'wp-seo-pilot' );
+											} elseif ( 'search' === $type ) {
+												echo esc_attr__( 'Search results for "{{search_term}}" on {{sitename}}.', 'wp-seo-pilot' );
+											} elseif ( '404' === $type ) {
+												echo esc_attr__( 'The page you are looking for could not be found.', 'wp-seo-pilot' );
+											}
+											?>"
+										><?php echo esc_textarea( $settings['description_template'] ?? '' ); ?></textarea>
+										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][description_template]">
+											<span class="dashicons dashicons-editor-code"></span>
+											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+										</button>
+									</div>
 								</div>
 
 							</div>
