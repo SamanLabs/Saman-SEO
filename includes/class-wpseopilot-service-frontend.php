@@ -30,13 +30,32 @@ class Frontend {
 			return;
 		}
 
-		add_filter( 'pre_get_document_title', [ $this, 'filter_document_title' ], 10, 1 );
+		add_action( 'after_setup_theme', [ $this, 'init_title_handling' ], 999 );
 		add_action( 'wp_head', [ $this, 'render_head_tags' ], 1 );
 		add_action( 'wp_head', [ $this, 'render_social_tags' ], 5 );
 		add_action( 'wp_head', [ $this, 'render_json_ld' ], 20 );
 		add_action( 'wp_head', [ $this, 'render_hreflang' ], 8 );
 		add_action( 'wp_head', [ $this, 'render_pagination_links' ], 9 );
 		add_shortcode( 'wpseopilot_breadcrumbs', [ $this, 'breadcrumbs_shortcode' ] );
+	}
+
+	/**
+	 * Initialize title tag handling.
+	 *
+	 * @return void
+	 */
+	public function init_title_handling() {
+		// Remove WordPress default title tag generation.
+		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+
+		// Remove theme support for title-tag to prevent conflicts.
+		remove_theme_support( 'title-tag' );
+
+		// Add our own title tag rendering at the same priority.
+		add_action( 'wp_head', [ $this, 'render_plugin_title_tag' ], 1 );
+
+		// Prevent WordPress from generating document title via pre_get_document_title.
+		add_filter( 'pre_get_document_title', '__return_empty_string', 1 );
 	}
 
 	/**
@@ -59,12 +78,7 @@ class Frontend {
 		$homepage_description   = $is_home_view ? get_option( 'wpseopilot_homepage_description', '' ) : '';
 		$homepage_keywords      = $is_home_view ? trim( (string) get_option( 'wpseopilot_homepage_keywords', '' ) ) : '';
 
-		// Handle 404 pages
-		if ( is_404() ) {
-			$title = apply_filters( 'wpseopilot_title', 'Page Not Found', null );
-		} else {
-			$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
-		}
+
 
 		$description = $meta['description'] ?? '';
 		if ( empty( $description ) && $is_home_view && ! empty( $homepage_description ) ) {
@@ -131,9 +145,7 @@ class Frontend {
 		$keywords = replace_template_variables( $keywords, $post );
 		$keywords = apply_filters( 'wpseopilot_keywords', $keywords, $post );
 
-		if ( ! current_theme_supports( 'title-tag' ) ) {
-			echo '<title>' . esc_html( $title ) . "</title>\n";
-		}
+
 
 		if ( ! empty( $description ) ) {
 			printf( "<meta name=\"description\" content=\"%s\" />\n", esc_attr( $description ) );
@@ -293,20 +305,13 @@ class Frontend {
 	}
 
 	/**
-	 * Filter the document title when WordPress renders <title>.
+	 * Render the plugin's generated <title> tag.
 	 *
-	 * @param string $title Current title.
-	 *
-	 * @return string
+	 * @return void
 	 */
-	public function filter_document_title( $title ) {
-		// Handle 404 pages
-		if ( is_404() ) {
-			return apply_filters( 'wpseopilot_title', 'Page Not Found', null );
-		}
-
-		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() ) {
-			return $title;
+	public function render_plugin_title_tag() {
+		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
+			return;
 		}
 
 		$post = $this->get_context_post();
@@ -314,7 +319,18 @@ class Frontend {
 		$is_home_view   = is_front_page() || is_home();
 		$homepage_title = $is_home_view ? get_option( 'wpseopilot_homepage_title', '' ) : '';
 
-		return $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
+		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
+
+		// Handle 404 pages
+		if ( is_404() ) {
+			$title = apply_filters( 'wpseopilot_title', 'Page Not Found', null );
+		}
+
+		if ( empty( $title ) ) {
+			$title = get_bloginfo( 'name' );
+		}
+
+		echo '<title>' . esc_html( $title ) . "</title>\n";
 	}
 
 	/**

@@ -27,7 +27,7 @@ class Local_SEO {
 
 		add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_action( 'wp_head', [ $this, 'output_schema' ], 5 );
+		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
 	}
 
 	/**
@@ -232,23 +232,24 @@ class Local_SEO {
 	}
 
 	/**
-	 * Output Local Business schema.
+	 * Add Local Business schema to the JSON-LD graph.
 	 *
-	 * @return void
+	 * @param array $graph The existing JSON-LD graph.
+	 * @return array The modified JSON-LD graph.
 	 */
-	public function output_schema() {
+	public function add_local_business_to_graph( $graph ) {
 		// Only output on homepage or is_front_page by default.
 		if ( ! is_front_page() && ! is_home() ) {
-			return;
+			return $graph;
 		}
 
 		$schema = $this->build_schema();
 
-		if ( empty( $schema ) ) {
-			return;
+		if ( ! empty( $schema ) ) {
+			$graph[] = $schema;
 		}
 
-		echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . '</script>' . "\n";
+		return $graph;
 	}
 
 	/**
