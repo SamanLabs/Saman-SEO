@@ -30,7 +30,9 @@ class Frontend {
 			return;
 		}
 
-		add_action( 'after_setup_theme', [ $this, 'init_title_handling' ], 999 );
+		// Initialize title handling immediately since we're already past after_setup_theme
+		$this->init_title_handling();
+
 		add_action( 'wp_head', [ $this, 'render_head_tags' ], 1 );
 		add_action( 'wp_head', [ $this, 'render_social_tags' ], 5 );
 		add_action( 'wp_head', [ $this, 'render_json_ld' ], 20 );
