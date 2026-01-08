@@ -1,0 +1,18 @@
+{
+    "name": "wp-seo-pilot/wp-seo-pilot",
+    "description": "Opinionated all-in-one SEO toolkit that keeps titles, metadata, structured data, redirects, and audits in sync with WordPress.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Juan Denis",
+            "homepage": "https://github.com/jhd3197"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "WPSEOPilot\": "includes/"
+        }
+    },
+    "require": {}
+}
