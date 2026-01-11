@@ -92,6 +92,27 @@ const SearchAppearance = () => {
         }));
     }, [separator]);
 
+    // Apply modifier to a value (supports: upper, lower, capitalize, etc.)
+    const applyModifier = (value, modifier) => {
+        if (!value || !modifier) return value;
+        const mod = modifier.trim().toLowerCase();
+        switch (mod) {
+            case 'upper':
+            case 'uppercase':
+                return String(value).toUpperCase();
+            case 'lower':
+            case 'lowercase':
+                return String(value).toLowerCase();
+            case 'capitalize':
+            case 'title':
+                return String(value).replace(/\b\w/g, c => c.toUpperCase());
+            case 'trim':
+                return String(value).trim();
+            default:
+                return value;
+        }
+    };
+
     // Generate preview from template using variable values
     const renderTemplatePreview = useCallback((template, contextOverrides = {}) => {
         if (!template) return '';
@@ -99,10 +120,24 @@ const SearchAppearance = () => {
         let preview = template;
         const allValues = { ...variableValues, ...contextOverrides };
 
-        // Replace all {{variable}} patterns
-        preview = preview.replace(/\{\{([^}]+)\}\}/g, (match, tag) => {
-            const trimmedTag = tag.trim();
-            return allValues[trimmedTag] !== undefined ? allValues[trimmedTag] : match;
+        // Replace all {{variable}} or {{variable | modifier}} patterns
+        preview = preview.replace(/\{\{([^}]+)\}\}/g, (match, content) => {
+            const trimmedContent = content.trim();
+
+            // Check for modifier (e.g., "post_title | upper")
+            const pipeIndex = trimmedContent.indexOf('|');
+            if (pipeIndex > -1) {
+                const baseTag = trimmedContent.substring(0, pipeIndex).trim();
+                const modifier = trimmedContent.substring(pipeIndex + 1).trim();
+                const baseValue = allValues[baseTag];
+                if (baseValue !== undefined) {
+                    return applyModifier(baseValue, modifier);
+                }
+                return match; // Return original if no value found
+            }
+
+            // Simple variable without modifier
+            return allValues[trimmedContent] !== undefined ? allValues[trimmedContent] : match;
         });
 
         return preview;
@@ -242,8 +277,8 @@ const SearchAppearance = () => {
                     </div>
 
                     <SearchPreview
-                        title={homepage.meta_title || `${siteInfo.name} ${separator} ${siteInfo.description}`}
-                        description={homepage.meta_description || siteInfo.description || ''}
+                        title={renderTemplatePreview(homepage.meta_title || `{{site_title}} {{separator}} {{tagline}}`)}
+                        description={renderTemplatePreview(homepage.meta_description || siteInfo.description || '')}
                         domain={siteInfo.domain}
                         url={siteInfo.url}
                         favicon={siteInfo.favicon}
@@ -307,6 +342,16 @@ const SearchAppearance = () => {
                                             {value}
                                         </button>
                                     ))}
+                                    <div className="separator-custom">
+                                        <input
+                                            type="text"
+                                            className="separator-custom__input"
+                                            value={!Object.keys(separatorOptions).includes(separator) ? separator : ''}
+                                            onChange={(e) => saveSeparator(e.target.value)}
+                                            placeholder="Custom"
+                                            maxLength={5}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -2,20 +2,69 @@
  * Template Input Component
  *
  * An input/textarea with:
- * - Variable highlighting overlay showing rendered values
- * - Integrated variable picker
- * - Character counter
+ * - Syntax highlighting for variables (colored {{ }} brackets)
+ * - Hover preview showing rendered values
+ * - Floating action icons (Variables, AI)
  */
 
 import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 import VariablePicker from './VariablePicker';
+
+// Variable type color mapping
+const variableColors = {
+    // Global variables - blue
+    site_title: 'global',
+    tagline: 'global',
+    site_url: 'global',
+    separator: 'separator',
+    current_year: 'global',
+    current_month: 'global',
+    current_day: 'global',
+
+    // Post variables - violet
+    post_title: 'post',
+    post_excerpt: 'post',
+    post_date: 'post',
+    post_modified: 'post',
+    post_author: 'post',
+    post_id: 'post',
+    post_content: 'post',
+
+    // Taxonomy variables - green
+    term_title: 'taxonomy',
+    term_description: 'taxonomy',
+    term_count: 'taxonomy',
+
+    // Author variables - orange
+    author_name: 'author',
+    author_bio: 'author',
+
+    // Archive variables - teal
+    archive_title: 'archive',
+    search_query: 'archive',
+    page_number: 'archive',
+};
+
+// Extract base tag from variable (handles modifiers like "post_title | upper")
+const getBaseTag = (fullTag) => {
+    const pipeIndex = fullTag.indexOf('|');
+    if (pipeIndex > -1) {
+        return fullTag.substring(0, pipeIndex).trim();
+    }
+    return fullTag.trim();
+};
+
+const getVariableType = (tag) => {
+    const baseTag = getBaseTag(tag);
+    return variableColors[baseTag] || 'global';
+};
 
 const TemplateInput = ({
     value = '',
     onChange,
     placeholder = '',
     variables = {},
-    variableValues = {}, // Map of variable tag -> actual value
+    variableValues = {},
     context = 'global',
     multiline = false,
     maxLength = null,
@@ -23,10 +72,14 @@ const TemplateInput = ({
     helpText = '',
     id,
     disabled = false,
+    onAiClick = null,
+    showAiButton = true,
 }) => {
     const inputRef = useRef(null);
     const highlightRef = useRef(null);
     const [isFocused, setIsFocused] = useState(false);
+    const [showVariablePicker, setShowVariablePicker] = useState(false);
+    const [hoveredVariable, setHoveredVariable] = useState(null);
 
     // Sync scroll position between input and highlight overlay
     useEffect(() => {
@@ -43,11 +96,10 @@ const TemplateInput = ({
         return () => input.removeEventListener('scroll', syncScroll);
     }, []);
 
-    // Render the template with highlighted variables
+    // Parse template into parts with syntax highlighting
     const renderHighlighted = useMemo(() => {
-        if (!value) return '';
+        if (!value) return [];
 
-        // Replace {{variable}} with highlighted spans
         const parts = [];
         let lastIndex = 0;
         const regex = /\{\{([^}]+)\}\}/g;
@@ -62,14 +114,18 @@ const TemplateInput = ({
                 });
             }
 
-            const tag = match[1].trim();
-            const renderedValue = variableValues[tag] || variableValues[`{{${tag}}}`];
+            const fullTag = match[1].trim();
+            const baseTag = getBaseTag(fullTag);
+            const varType = getVariableType(baseTag);
+            const previewValue = variableValues[baseTag] || variableValues[`{{${baseTag}}}`];
 
             parts.push({
                 type: 'variable',
-                tag: tag,
+                fullTag: fullTag,
+                baseTag: baseTag,
                 raw: match[0],
-                rendered: renderedValue || match[0],
+                preview: previewValue || baseTag,
+                varType: varType,
             });
 
             lastIndex = regex.lastIndex;
@@ -86,13 +142,6 @@ const TemplateInput = ({
         return parts;
     }, [value, variableValues]);
 
-    // Get the full rendered preview (for display)
-    const renderedPreview = useMemo(() => {
-        return renderHighlighted
-            .map((part) => (part.type === 'variable' ? part.rendered : part.content))
-            .join('');
-    }, [renderHighlighted]);
-
     // Insert variable at cursor position
     const insertVariable = (variableTag) => {
         const input = inputRef.current;
@@ -106,8 +155,8 @@ const TemplateInput = ({
         const newValue = value.slice(0, start) + variableTag + value.slice(end);
 
         onChange(newValue);
+        setShowVariablePicker(false);
 
-        // Restore cursor position after the inserted variable
         requestAnimationFrame(() => {
             const newPos = start + variableTag.length;
             input.setSelectionRange(newPos, newPos);
@@ -121,69 +170,96 @@ const TemplateInput = ({
     const InputComponent = multiline ? 'textarea' : 'input';
 
     return (
-        <div className={`template-input ${isFocused ? 'is-focused' : ''} ${disabled ? 'is-disabled' : ''}`}>
+        <div className={`template-input-v2 ${isFocused ? 'is-focused' : ''} ${disabled ? 'is-disabled' : ''}`}>
             {label && (
-                <label className="template-input__label" htmlFor={id}>
+                <label className="template-input-v2__label" htmlFor={id}>
                     {label}
                 </label>
             )}
 
-            <div className="template-input__wrapper">
-                <div className="template-input__container">
-                    {/* Highlight overlay - shows rendered values */}
-                    <div
-                        ref={highlightRef}
-                        className={`template-input__highlight ${multiline ? 'multiline' : ''}`}
-                        aria-hidden="true"
-                    >
-                        {renderHighlighted.map((part, index) =>
-                            part.type === 'variable' ? (
-                                <span key={index} className="template-input__var" title={part.raw}>
-                                    {part.rendered}
-                                </span>
-                            ) : (
-                                <span key={index}>{part.content}</span>
-                            )
-                        )}
-                        {/* Invisible character to maintain height when empty */}
-                        {!value && <span className="template-input__placeholder">{placeholder}</span>}
-                    </div>
-
-                    {/* Actual input (transparent text, visible caret) */}
-                    <InputComponent
-                        ref={inputRef}
-                        id={id}
-                        type={multiline ? undefined : 'text'}
-                        className={`template-input__field ${multiline ? 'multiline' : ''}`}
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        placeholder=""
-                        disabled={disabled}
-                        rows={multiline ? 3 : undefined}
-                    />
+            <div className="template-input-v2__container">
+                {/* Highlight overlay - shows syntax highlighted variables */}
+                <div
+                    ref={highlightRef}
+                    className={`template-input-v2__highlight ${multiline ? 'multiline' : ''}`}
+                    aria-hidden="true"
+                >
+                    {renderHighlighted.map((part, index) =>
+                        part.type === 'variable' ? (
+                            <span
+                                key={index}
+                                className={`template-input-v2__var template-input-v2__var--${part.varType}`}
+                                onMouseEnter={() => setHoveredVariable({ ...part, index })}
+                                onMouseLeave={() => setHoveredVariable(null)}
+                            >
+                                <span className="template-input-v2__bracket">{'{'}</span>
+                                <span className="template-input-v2__bracket">{'{'}</span>
+                                <span className="template-input-v2__tag">{part.fullTag}</span>
+                                <span className="template-input-v2__bracket">{'}'}</span>
+                                <span className="template-input-v2__bracket">{'}'}</span>
+                                {hoveredVariable?.index === index && part.preview && (
+                                    <span className="template-input-v2__tooltip">
+                                        {part.preview}
+                                    </span>
+                                )}
+                            </span>
+                        ) : (
+                            <span key={index}>{part.content}</span>
+                        )
+                    )}
+                    {!value && <span className="template-input-v2__placeholder">{placeholder}</span>}
                 </div>
 
-                <div className="template-input__actions">
+                {/* Actual input - completely invisible, just for typing */}
+                <InputComponent
+                    ref={inputRef}
+                    id={id}
+                    type={multiline ? undefined : 'text'}
+                    className={`template-input-v2__field ${multiline ? 'multiline' : ''}`}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    placeholder=""
+                    disabled={disabled}
+                    rows={multiline ? 3 : undefined}
+                />
+
+                {/* Floating action buttons */}
+                <div className="template-input-v2__actions">
+                    {showAiButton && (
+                        <button
+                            type="button"
+                            className="template-input-v2__action-btn template-input-v2__action-btn--ai"
+                            onClick={onAiClick}
+                            disabled={disabled || !onAiClick}
+                            title="Generate with AI"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" />
+                                <circle cx="12" cy="12" r="4" />
+                            </svg>
+                        </button>
+                    )}
                     <VariablePicker
                         variables={variables}
                         context={context}
                         onSelect={insertVariable}
-                        buttonLabel="Variables"
                         disabled={disabled}
+                        isOpen={showVariablePicker}
+                        onToggle={() => setShowVariablePicker(!showVariablePicker)}
+                        onClose={() => setShowVariablePicker(false)}
+                        compact
                     />
                 </div>
             </div>
 
             {(helpText || maxLength) && (
-                <div className="template-input__footer">
-                    {helpText && (
-                        <span className="template-input__help">{helpText}</span>
-                    )}
+                <div className="template-input-v2__footer">
+                    {helpText && <span className="template-input-v2__help">{helpText}</span>}
                     {maxLength && (
-                        <span className={`template-input__counter ${isOverLimit ? 'over-limit' : ''}`}>
-                            {charCount} / {maxLength}
+                        <span className={`template-input-v2__counter ${isOverLimit ? 'over-limit' : ''}`}>
+                            {charCount}/{maxLength}
                         </span>
                     )}
                 </div>

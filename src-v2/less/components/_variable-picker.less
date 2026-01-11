@@ -4,6 +4,12 @@
 
 .variable-picker {
     position: relative;
+    z-index: @z-dropdown;
+}
+
+// Compact mode (inside template inputs)
+.variable-picker--compact {
+    position: static; // Let dropdown position relative to container
 }
 
 .variable-picker__trigger {
@@ -102,13 +108,55 @@
     gap: @spacing-sm;
 }
 
+// Tag colors matching template-input pills
+@tag-global: #2271b1;
+@tag-post: #7c3aed;
+@tag-taxonomy: #059669;
+@tag-author: #ea580c;
+@tag-archive: #0891b2;
+
 .variable-picker__tag {
     font-family: @font-family-mono;
-    font-size: @font-size-sm;
+    font-size: 11px;
     padding: 2px 6px;
-    background: @color-primary-light;
-    color: @color-primary;
+    background: fade(@tag-global, 12%);
+    color: @tag-global;
     border-radius: 4px;
+
+    // Color variants by group
+    &--global {
+        background: fade(@tag-global, 12%);
+        color: @tag-global;
+    }
+
+    &--post {
+        background: fade(@tag-post, 12%);
+        color: @tag-post;
+    }
+
+    &--taxonomy {
+        background: fade(@tag-taxonomy, 12%);
+        color: @tag-taxonomy;
+    }
+
+    &--author {
+        background: fade(@tag-author, 12%);
+        color: @tag-author;
+    }
+
+    &--archive {
+        background: fade(@tag-archive, 12%);
+        color: @tag-archive;
+    }
+}
+
+// Group label colors
+.variable-picker__group-label {
+    &--global { color: @tag-global; }
+    &--post { color: @tag-post; }
+    &--taxonomy { color: @tag-taxonomy; }
+    &--author { color: @tag-author; }
+    &--archive { color: @tag-archive; }
 }
 
 .variable-picker__label {
@@ -131,11 +179,67 @@
     font-size: @font-size-sm;
 }
 
+// Compact dropdown (used inside template inputs)
+.variable-picker__dropdown--compact {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: @z-modal; // Higher than other fields
+    width: 320px;
+    max-height: 400px;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    box-shadow: @shadow-xl;
+    overflow: hidden;
+    .flex-column();
+
+    // Search input inside compact dropdown
+    .variable-picker__search {
+        padding: @spacing-md;
+        border-bottom: 1px solid @color-border;
+        background: @color-surface;
+
+        input {
+            width: 100%;
+            padding: @spacing-sm @spacing-md;
+            border: 1px solid @color-border;
+            border-radius: @radius-md;
+            background: @color-surface-muted;
+            font-family: inherit;
+            font-size: @font-size-sm;
+            color: @color-text;
+
+            &::placeholder {
+                color: @color-muted;
+            }
+
+            &:focus {
+                outline: none;
+                border-color: @color-primary;
+                background: @color-surface;
+            }
+        }
+    }
+
+    .variable-picker__groups {
+        overflow-y: auto;
+        max-height: 320px;
+        background: @color-surface;
+    }
+
+    .variable-picker__item {
+        width: 100%;
+        font-family: inherit;
+    }
+}
+
 // Responsive
 @media (max-width: @breakpoint-sm) {
-    .variable-picker__dropdown {
+    .variable-picker__dropdown,
+    .variable-picker__dropdown--compact {
         width: 280px;
-        right: auto;
-        left: 0;
+        right: 0;
+        left: auto;
     }
 }
