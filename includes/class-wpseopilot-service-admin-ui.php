@@ -204,6 +204,44 @@ class Admin_UI {
 				],
 			]
 		);
+
+		// Enqueue React admin list badge for edit.php (posts list).
+		if ( 'edit.php' === $hook || false !== strpos( $hook, 'edit.php' ) ) {
+			$this->enqueue_admin_list_assets();
+		}
+	}
+
+	/**
+	 * Admin list React badge assets.
+	 *
+	 * @return void
+	 */
+	public function enqueue_admin_list_assets() {
+		$build_dir = WPSEOPILOT_PATH . 'build-admin-list/';
+		$build_url = WPSEOPILOT_URL . 'build-admin-list/';
+
+		$asset_file = $build_dir . 'index.asset.php';
+		$asset      = file_exists( $asset_file )
+			? require $asset_file
+			: [
+				'dependencies' => [ 'wp-element', 'react', 'react-dom' ],
+				'version'      => WPSEOPILOT_VERSION,
+			];
+
+		wp_enqueue_script(
+			'wpseopilot-admin-list',
+			$build_url . 'index.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		wp_enqueue_style(
+			'wpseopilot-admin-list',
+			$build_url . 'index.css',
+			[],
+			$asset['version']
+		);
 	}
 
 	/**
@@ -324,8 +362,7 @@ class Admin_UI {
 			$flags[] = 'nofollow';
 		}
 
-		$score       = calculate_seo_score( $post_id );
-		$badge_class = 'wpseopilot-score-badge--' . sanitize_html_class( $score['level'] );
+		$score = calculate_seo_score( $post_id );
 
 		$issues = array_values(
 			array_filter(
@@ -343,40 +380,16 @@ class Admin_UI {
 			$issues
 		);
 
-		$issue_summary = $issue_labels ? implode( ' • ', array_slice( $issue_labels, 0, 2 ) ) : __( 'All baseline checks look good.', 'wp-seo-pilot' );
-		if ( count( $issue_labels ) > 2 ) {
-			$issue_summary .= sprintf(
-				/* translators: %d is the number of remaining issues. */
-				__( ' +%d more', 'wp-seo-pilot' ),
-				count( $issue_labels ) - 2
-			);
-		}
-
-		$details = implode(
-			' | ',
-			array_map(
-				static function ( $metric ) {
-					return $metric['label'] . ': ' . $metric['status'];
-				},
-				$score['metrics']
-			)
+		// Output placeholder for React hydration.
+		printf(
+			'<div class="wpseopilot-badge-placeholder" data-post-id="%d" data-score="%d" data-level="%s" data-label="%s" data-issues="%s" data-flags="%s"></div>',
+			absint( $post_id ),
+			absint( $score['score'] ),
+			esc_attr( $score['level'] ),
+			esc_attr( $score['label'] ),
+			esc_attr( wp_json_encode( $issue_labels ) ),
+			esc_attr( wp_json_encode( $flags ) )
 		);
-
-		?>
-		<div class="wpseopilot-score-cell">
-			<span class="wpseopilot-score-badge <?php echo esc_attr( $badge_class ); ?>" title="<?php echo esc_attr( $details ); ?>">
-				<strong><?php echo esc_html( $score['score'] ); ?></strong>
-				<span>/100</span>
-			</span>
-			<span class="wpseopilot-score-label"><?php echo esc_html( $score['label'] ); ?></span>
-		</div>
-		<p class="wpseopilot-score-issues">
-			<?php echo esc_html( $issue_summary ); ?>
-			<?php if ( $flags ) : ?>
-				<span class="wpseopilot-flag"><?php echo esc_html( implode( ', ', $flags ) ); ?></span>
-			<?php endif; ?>
-		</p>
-		<?php
 	}
 
 	/**

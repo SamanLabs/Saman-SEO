@@ -1,0 +1,138 @@
+/**
+ * WP SEO Pilot - Admin List Badge Styles
+ */
+
+/* Badge container */
+.wpseopilot-list-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+/* Ring container */
+.wpseopilot-badge-ring {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.wpseopilot-badge-ring svg {
+    display: block;
+}
+
+/* Score number in center */
+.wpseopilot-badge-score {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e1e1e;
+    line-height: 1;
+}
+
+/* Info section */
+.wpseopilot-badge-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+/* Label (Good, Fair, Needs Work) */
+.wpseopilot-badge-label {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.wpseopilot-badge-label.wpseopilot-badge--good {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.wpseopilot-badge-label.wpseopilot-badge--fair {
+    background: #fef9c3;
+    color: #92400e;
+}
+
+.wpseopilot-badge-label.wpseopilot-badge--poor {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Issues summary */
+.wpseopilot-badge-issues {
+    font-size: 11px;
+    color: #6b7280;
+    line-height: 1.4;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Flags (noindex, nofollow) */
+.wpseopilot-badge-flags {
+    font-size: 10px;
+    font-weight: 500;
+    color: #dc2626;
+    background: #fef2f2;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+/* Placeholder loading state */
+.wpseopilot-badge-placeholder:not(.wpseopilot-badge-initialized) {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.wpseopilot-badge-placeholder:not(.wpseopilot-badge-initialized)::before {
+    content: '';
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #f0f0f1 25%, #e8e8e9 50%, #f0f0f1 75%);
+    background-size: 200% 100%;
+    animation: wpseopilot-shimmer 1.5s infinite;
+}
+
+@keyframes wpseopilot-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Column width adjustment */
+.column-wpseopilot {
+    width: 180px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .wpseopilot-list-badge {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .wpseopilot-badge-issues {
+        max-width: 100%;
+    }
+}
