@@ -1,0 +1,123 @@
+// ==========================================================================
+// Sitemap Page - Sitemap Configuration Styles
+// ==========================================================================
+
+// Additional Pages List
+.additional-pages-list {
+    .flex-column();
+    gap: @spacing-sm;
+    margin-bottom: @spacing-md;
+}
+
+.additional-page-row {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+}
+
+.page-url-input {
+    flex: 1;
+    .input-base();
+}
+
+.page-priority-input {
+    width: 80px;
+    .input-base();
+    text-align: center;
+}
+
+// Sitemap Links in Sidebar
+.sitemap-links {
+    .flex-column();
+    gap: @spacing-sm;
+}
+
+.sitemap-link-item {
+    .flex-column();
+    gap: 4px;
+    font-size: @font-size-sm;
+
+    strong {
+        color: @color-muted;
+        font-size: @font-size-sm;
+    }
+
+    a {
+        color: @color-primary;
+        word-break: break-all;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// URL Display
+.url-display {
+    display: block;
+    word-break: break-all;
+    padding: @spacing-sm @spacing-md;
+    background: rgba(34, 113, 177, 0.06);
+    border-radius: @radius-md;
+    font-size: @font-size-sm;
+    color: @color-primary;
+    margin-top: @spacing-sm;
+}
+
+// Post Types Preview for LLM.txt
+.post-types-preview {
+    .flex-column();
+    gap: @spacing-md;
+}
+
+.post-type-preview-item {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    padding: @spacing-md;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
+    border: 1px solid @color-border;
+}
+
+.post-type-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: @radius-md;
+    background: @color-primary-light;
+    .flex-center();
+    flex-shrink: 0;
+
+    .dashicon {
+        font-size: 20px;
+    }
+}
+
+.post-type-info {
+    .flex-column();
+    gap: 2px;
+
+    strong {
+        font-size: @font-size-base;
+    }
+
+    .muted {
+        font-size: @font-size-sm;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .additional-page-row {
+        flex-wrap: wrap;
+    }
+
+    .page-url-input {
+        flex: 1 1 100%;
+    }
+
+    .page-priority-input {
+        flex: 0 0 80px;
+    }
+}

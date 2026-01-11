@@ -1,0 +1,198 @@
+// ==========================================================================
+// Mixins - Reusable Style Patterns for WP SEO Pilot V2
+// ==========================================================================
+
+// Flexbox
+.flex-center() {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between() {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-start() {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.flex-column() {
+    display: flex;
+    flex-direction: column;
+}
+
+// Transitions
+.transition(@property: all) {
+    transition: @property @transition-normal;
+}
+
+.transition-fast(@property: all) {
+    transition: @property @transition-fast;
+}
+
+.transition-slow(@property: all) {
+    transition: @property @transition-slow;
+}
+
+// Shadows
+.shadow-soft() {
+    box-shadow: @shadow-md;
+}
+
+.shadow-card() {
+    box-shadow: 0 12px 24px rgba(20, 30, 45, 0.06);
+}
+
+.shadow-focus() {
+    box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.15);
+}
+
+// Border Radius
+.rounded-sm() {
+    border-radius: @radius-sm;
+}
+
+.rounded() {
+    border-radius: @radius-md;
+}
+
+.rounded-lg() {
+    border-radius: @radius-lg;
+}
+
+.rounded-full() {
+    border-radius: @radius-full;
+}
+
+// Text
+.text-truncate() {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-muted() {
+    color: @color-muted;
+    font-size: @font-size-sm;
+}
+
+// Button Base
+.button-base() {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: @radius-md;
+    font-weight: @font-weight-semibold;
+    cursor: pointer;
+    .transition();
+    font-family: inherit;
+}
+
+// Input Base
+.input-base() {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: @radius-md;
+    border: 1px solid @color-border;
+    background: @color-surface;
+    font-family: inherit;
+    font-size: @font-size-base;
+    .transition(border-color);
+
+    &:focus {
+        outline: none;
+        border-color: @color-primary;
+        .shadow-focus();
+    }
+}
+
+// Card Base
+.card-base() {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    .shadow-card();
+}
+
+// Panel Base
+.panel-base() {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: @spacing-xl;
+}
+
+// Status Colors
+.status-success() {
+    background: @color-success-bg;
+    color: @color-success;
+}
+
+.status-warning() {
+    background: @color-warning-bg;
+    color: @color-warning;
+}
+
+.status-danger() {
+    background: @color-danger-bg;
+    color: @color-danger;
+}
+
+// Responsive Helpers
+.responsive-stack(@breakpoint: @breakpoint-md) {
+    @media (max-width: @breakpoint) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+// Hover States
+.hover-lift() {
+    .transition();
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: @shadow-lg;
+    }
+}
+
+.hover-primary() {
+    .transition();
+    &:hover {
+        color: @color-primary;
+        border-color: rgba(34, 113, 177, 0.4);
+    }
+}
+
+// Code/Mono Text
+.code-text() {
+    font-family: @font-family-mono;
+    background: @color-primary-lighter;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: @font-size-sm;
+}
+
+// Overlay for modals/dropdowns
+.overlay-backdrop() {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: @z-modal-backdrop;
+}
+
+// Dropdown Base
+.dropdown-base() {
+    position: absolute;
+    z-index: @z-dropdown;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    box-shadow: @shadow-xl;
+    overflow: hidden;
+}

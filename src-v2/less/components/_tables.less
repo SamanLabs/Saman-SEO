@@ -1,0 +1,44 @@
+// ==========================================================================
+// Tables - Data Tables and Related Components
+// ==========================================================================
+
+.table-toolbar {
+    .flex-between();
+    gap: @spacing-lg;
+
+    h3 {
+        margin: 0 0 4px;
+    }
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: @font-size-base;
+
+    th,
+    td {
+        text-align: left;
+        padding: @spacing-md @spacing-sm;
+        border-bottom: 1px solid rgba(214, 217, 224, 0.6);
+    }
+
+    th {
+        color: @color-muted;
+        font-size: @font-size-sm;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    tr:hover {
+        background: rgba(34, 113, 177, 0.05);
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .table-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

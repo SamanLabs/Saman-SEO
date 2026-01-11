@@ -1,0 +1,231 @@
+// ==========================================================================
+// Cards - Card Components and Panels
+// ==========================================================================
+
+// Basic Card
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: @spacing-xl;
+}
+
+.card {
+    .card-base();
+    padding: @spacing-lg;
+    .flex-column();
+    gap: @spacing-md;
+}
+
+.card-header {
+    .flex-between();
+    gap: @spacing-md;
+
+    h3 {
+        margin: 0;
+        font-size: @font-size-lg;
+    }
+}
+
+.card-note {
+    margin: 0;
+    color: @color-muted;
+}
+
+// Pilot Card (Feature Cards)
+.pilot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: @spacing-lg;
+    align-items: stretch;
+}
+
+.pilot-card {
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: 22px;
+    min-height: 240px;
+    width: 100%;
+    background: @color-surface;
+    .flex-column();
+    gap: @spacing-md;
+    .shadow-card();
+    overflow: hidden;
+
+    &.active {
+        border-color: rgba(34, 113, 177, 0.45);
+        box-shadow: 0 18px 32px rgba(34, 113, 177, 0.12);
+    }
+}
+
+.pilot-card-head {
+    .flex-between();
+    flex-wrap: wrap;
+    gap: @spacing-md;
+
+    h3 {
+        margin: 0 0 4px;
+    }
+
+    .toggle {
+        flex-shrink: 0;
+    }
+}
+
+.pilot-card-identity {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    min-width: 0;
+    flex: 1;
+}
+
+.pilot-card-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: @radius-lg;
+    .flex-center();
+    color: #fff;
+    flex-shrink: 0;
+
+    &.security {
+        background: @color-success;
+    }
+
+    &.seo {
+        background: @color-primary;
+    }
+
+    svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+        display: block;
+    }
+}
+
+.pilot-card-title {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+}
+
+.pilot-card-tagline {
+    margin: 4px 0 0;
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+.pilot-card-desc {
+    margin: 0;
+    color: @color-muted;
+}
+
+.pilot-card-meta {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+// Panel
+.panel {
+    .panel-base();
+    .flex-column();
+    gap: @spacing-lg;
+
+    h3 {
+        margin: 0;
+        font-size: @font-size-lg;
+    }
+}
+
+// Side Panel
+.side-panel {
+    .flex-column();
+    gap: @spacing-lg;
+}
+
+.side-card {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: @spacing-lg;
+    .flex-column();
+    gap: @spacing-md;
+
+    h3 {
+        margin: 0;
+        font-size: 15px;
+    }
+
+    &.highlight {
+        background: linear-gradient(135deg, @color-primary-lighter, rgba(46, 125, 50, 0.08));
+    }
+}
+
+// Badges and Pills
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: @radius-full;
+    font-size: @font-size-xs;
+    font-weight: @font-weight-semibold;
+    background: rgba(95, 107, 122, 0.14);
+    color: @color-muted;
+
+    &.success {
+        background: rgba(47, 143, 91, 0.16);
+        color: @color-success;
+    }
+
+    &.redirect-exists {
+        margin-left: @spacing-sm;
+        background: @color-primary-light;
+        color: @color-primary;
+        font-size: @font-size-xs;
+        padding: 2px 8px;
+    }
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: @radius-full;
+    font-size: @font-size-sm;
+    font-weight: @font-weight-semibold;
+    background: rgba(95, 107, 122, 0.12);
+    color: @color-muted;
+
+    &.success {
+        background: rgba(47, 143, 91, 0.14);
+        color: @color-success;
+    }
+
+    &.warning {
+        background: rgba(192, 124, 26, 0.16);
+        color: @color-warning;
+    }
+
+    &.danger {
+        background: rgba(192, 57, 43, 0.16);
+        color: @color-danger;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-xl) {
+    .pilot-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .pilot-grid {
+        grid-template-columns: 1fr;
+    }
+}

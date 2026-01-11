@@ -1,0 +1,49 @@
+// ==========================================================================
+// WP SEO Pilot V2 - Main Stylesheet Entry Point
+// ==========================================================================
+//
+// This file imports all LESS partials in the correct order.
+// Compile this file to generate the final index.css for v2.
+//
+// Structure:
+// 1. Variables & Mixins (no output)
+// 2. Base styles (resets, typography, WordPress overrides)
+// 3. Components (reusable UI elements)
+// 4. Pages (page-specific styles)
+//
+// ==========================================================================
+
+// --------------------------------------------------------------------------
+// 1. Settings - Variables and Mixins (no CSS output)
+// --------------------------------------------------------------------------
+@import "_variables";
+@import "_mixins";
+
+// --------------------------------------------------------------------------
+// 2. Base - Resets, Typography, WordPress Overrides
+// --------------------------------------------------------------------------
+@import "_base";
+
+// --------------------------------------------------------------------------
+// 3. Components - Reusable UI Elements
+// --------------------------------------------------------------------------
+@import "components/_header";
+@import "components/_buttons";
+@import "components/_forms";
+@import "components/_cards";
+@import "components/_tables";
+@import "components/_progress";
+@import "components/_status";
+@import "components/_alerts";
+@import "components/_pagination";
+@import "components/_search-preview";
+@import "components/_variable-picker";
+@import "components/_template-input";
+
+// --------------------------------------------------------------------------
+// 4. Pages - Page-specific Styles
+// --------------------------------------------------------------------------
+@import "pages/_layout";
+@import "pages/_redirects";
+@import "pages/_sitemap";
+@import "pages/_search-appearance";

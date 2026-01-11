@@ -197,12 +197,13 @@ class Admin_V2 {
         }
 
         $controllers = [
-            'Settings'      => 'class-settings-controller.php',
-            'Redirects'     => 'class-redirects-controller.php',
-            'InternalLinks' => 'class-internallinks-controller.php',
-            'Sitemap'       => 'class-sitemap-controller.php',
-            'Audit'         => 'class-audit-controller.php',
-            'Ai'            => 'class-ai-controller.php',
+            'Settings'         => 'class-settings-controller.php',
+            'Redirects'        => 'class-redirects-controller.php',
+            'InternalLinks'    => 'class-internallinks-controller.php',
+            'Sitemap'          => 'class-sitemap-controller.php',
+            'Audit'            => 'class-audit-controller.php',
+            'Ai'               => 'class-ai-controller.php',
+            'SearchAppearance' => 'class-searchappearance-controller.php',
         ];
 
         foreach ( $controllers as $controller => $file ) {

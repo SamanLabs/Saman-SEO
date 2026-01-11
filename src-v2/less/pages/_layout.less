@@ -1,0 +1,77 @@
+// ==========================================================================
+// Layout - Page Structure and Content Areas
+// ==========================================================================
+
+// Content Area
+.content-area {
+    margin-top: @spacing-xl;
+    padding: @spacing-2xl;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-xl;
+    box-shadow: @shadow-md;
+}
+
+// Page Container
+.page {
+    .flex-column();
+    gap: @spacing-xl;
+}
+
+// Page Header
+.page-header {
+    .flex-between();
+    gap: @spacing-lg;
+
+    h1 {
+        margin: 0 0 6px;
+        font-size: @font-size-2xl;
+    }
+
+    p {
+        margin: 0;
+        color: @color-muted;
+    }
+}
+
+// Page Body Layouts
+.page-body.two-column {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+    gap: @spacing-xl;
+}
+
+// Sub Tabs
+.sub-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-sm;
+}
+
+.sub-tab {
+    border: 1px solid @color-border;
+    background: @color-surface;
+    padding: @spacing-sm @spacing-md;
+    border-radius: @radius-md;
+    color: @color-muted;
+    cursor: pointer;
+    font-weight: @font-weight-semibold;
+
+    &.is-active {
+        color: @color-primary;
+        border-color: rgba(34, 113, 177, 0.4);
+        background: @color-primary-lighter;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-body.two-column {
+        grid-template-columns: 1fr;
+    }
+}

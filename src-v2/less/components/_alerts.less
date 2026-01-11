@@ -1,0 +1,29 @@
+// ==========================================================================
+// Alerts - Alert Cards and Notifications
+// ==========================================================================
+
+.alert-card {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: @spacing-lg;
+    margin-bottom: @spacing-xl;
+
+    &.warning {
+        border-left: 4px solid @color-warning;
+        background: linear-gradient(90deg, rgba(192, 124, 26, 0.06), transparent 30%);
+    }
+
+    .alert-header {
+        margin-bottom: @spacing-sm;
+
+        h3 {
+            margin: 0;
+            font-size: @font-size-lg;
+        }
+    }
+
+    .suggestions-table {
+        margin-top: @spacing-md;
+    }
+}

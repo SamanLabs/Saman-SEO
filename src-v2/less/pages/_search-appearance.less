@@ -1,0 +1,123 @@
+// ==========================================================================
+// Search Appearance Page - SEO Title/Description Configuration
+// ==========================================================================
+
+// Separator Selector
+.separator-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-sm;
+}
+
+.separator-option {
+    width: 40px;
+    height: 40px;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    background: @color-surface;
+    font-size: @font-size-xl;
+    font-weight: @font-weight-medium;
+    color: @color-muted;
+    cursor: pointer;
+    .transition();
+    .flex-center();
+
+    &:hover {
+        border-color: @color-primary;
+        color: @color-primary;
+    }
+
+    &.active {
+        border-color: @color-primary;
+        background: @color-primary-light;
+        color: @color-primary;
+        box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.2);
+    }
+}
+
+// Type Editor
+.type-editor {
+    .flex-column();
+    gap: @spacing-xl;
+}
+
+.type-editor__header {
+    .flex-between();
+    padding-bottom: @spacing-lg;
+    border-bottom: 1px solid @color-border;
+
+    h4 {
+        margin: 0;
+        font-size: @font-size-xl;
+    }
+}
+
+// Archives Grid
+.archives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: @spacing-lg;
+    margin-bottom: @spacing-xl;
+}
+
+.archive-card {
+    background: @color-surface-muted;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: @spacing-lg;
+    .flex-column();
+    gap: @spacing-md;
+}
+
+.archive-card__header {
+    .flex-between();
+    gap: @spacing-md;
+
+    h4 {
+        margin: 0;
+        font-size: 15px;
+    }
+}
+
+.archive-card__template {
+    .flex-column();
+    gap: 4px;
+    font-size: @font-size-sm;
+
+    .label {
+        color: @color-muted;
+        font-weight: @font-weight-semibold;
+    }
+
+    code {
+        font-size: @font-size-xs;
+        word-break: break-all;
+    }
+}
+
+.archive-card__preview {
+    padding: @spacing-sm @spacing-md;
+    background: @color-surface;
+    border-radius: @radius-sm;
+    border: 1px solid @color-border;
+}
+
+// Template Preview Text
+.template-preview-text {
+    font-size: @font-size-sm;
+    color: @color-text;
+    max-width: 300px;
+    display: block;
+    .text-truncate();
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .archives-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .separator-selector {
+        justify-content: flex-start;
+    }
+}

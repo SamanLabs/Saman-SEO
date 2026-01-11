@@ -1,0 +1,136 @@
+// ==========================================================================
+// Template Input - Input with Variable Highlighting
+// ==========================================================================
+
+.template-input {
+    .flex-column();
+    gap: @spacing-sm;
+
+    &.is-focused .template-input__highlight {
+        border-color: @color-primary;
+    }
+
+    &.is-disabled {
+        .template-input__field,
+        .template-input__highlight {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.template-input__label {
+    font-size: @font-size-base;
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+}
+
+.template-input__wrapper {
+    display: flex;
+    gap: @spacing-sm;
+    align-items: flex-start;
+}
+
+.template-input__container {
+    flex: 1;
+    position: relative;
+    min-height: @input-height;
+}
+
+.template-input__highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 11px @spacing-md;
+    font-size: @font-size-base;
+    line-height: @line-height-normal;
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+    pointer-events: none;
+    border: 1px solid transparent;
+    border-radius: @radius-md;
+    background: @color-surface;
+
+    &.multiline {
+        white-space: pre-wrap;
+        min-height: 84px;
+    }
+}
+
+.template-input__var {
+    color: @color-primary;
+    background: @color-primary-light;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-weight: @font-weight-medium;
+}
+
+.template-input__placeholder {
+    color: @color-muted;
+}
+
+.template-input__field {
+    position: relative;
+    width: 100%;
+    padding: 11px @spacing-md;
+    font-size: @font-size-base;
+    line-height: @line-height-normal;
+    font-family: inherit;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    background: transparent;
+    color: transparent;
+    caret-color: @color-text;
+    resize: none;
+    transition: border-color @transition-normal, box-shadow @transition-normal;
+
+    &.multiline {
+        min-height: 84px;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: @color-primary;
+        .shadow-focus();
+    }
+}
+
+.template-input__actions {
+    flex-shrink: 0;
+}
+
+.template-input__footer {
+    .flex-between();
+    gap: @spacing-md;
+}
+
+.template-input__help {
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+.template-input__counter {
+    font-size: @font-size-sm;
+    color: @color-muted;
+    white-space: nowrap;
+
+    &.over-limit {
+        color: @color-danger;
+        font-weight: @font-weight-semibold;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-sm) {
+    .template-input__wrapper {
+        flex-direction: column;
+    }
+
+    .template-input__actions {
+        align-self: flex-start;
+    }
+}
