@@ -8,6 +8,16 @@ const aiTabs = [
     { id: 'custom-models', label: 'Custom Models' },
 ];
 
+// Provider info for display
+const PROVIDERS = {
+    openai: { name: 'OpenAI', logo: 'https://models.dev/logos/openai.svg' },
+    anthropic: { name: 'Anthropic', logo: 'https://models.dev/logos/anthropic.svg' },
+    google: { name: 'Google AI', logo: 'https://models.dev/logos/google.svg' },
+    openai_compatible: { name: 'OpenAI Compatible', logo: null },
+    lmstudio: { name: 'LM Studio', logo: null },
+    ollama: { name: 'Ollama', logo: null },
+};
+
 const AiAssistant = () => {
     const [activeTab, setActiveTab] = useUrlTab({ tabs: aiTabs, defaultTab: 'settings' });
 
@@ -41,6 +51,33 @@ const AiAssistant = () => {
     const [testContent, setTestContent] = useState('');
     const [generatedTitle, setGeneratedTitle] = useState('');
     const [generatedDescription, setGeneratedDescription] = useState('');
+
+    // Custom models state
+    const [customModels, setCustomModels] = useState([]);
+    const [customModelsLoading, setCustomModelsLoading] = useState(false);
+    const [providers, setProviders] = useState([]);
+    const [modelsDatabase, setModelsDatabase] = useState({ models: [], last_sync: null });
+    const [modelsDatabaseLoading, setModelsDatabaseLoading] = useState(false);
+    const [syncing, setSyncing] = useState(false);
+    const [modelSearch, setModelSearch] = useState('');
+    const [modelSearchResults, setModelSearchResults] = useState([]);
+    const [searching, setSearching] = useState(false);
+
+    // Edit/Add form state
+    const [editingModel, setEditingModel] = useState(null);
+    const [showModelForm, setShowModelForm] = useState(false);
+    const [modelFormData, setModelFormData] = useState({
+        name: '',
+        provider: 'openai_compatible',
+        model_id: '',
+        api_url: '',
+        api_key: '',
+        temperature: 0.7,
+        max_tokens: 2048,
+        is_active: true,
+    });
+    const [savingModel, setSavingModel] = useState(false);
+    const [testingModel, setTestingModel] = useState(null);
 
     // Messages
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -162,6 +199,234 @@ const AiAssistant = () => {
         } finally {
             setGenerating(false);
         }
+    };
+
+    // Fetch custom models data
+    const fetchCustomModelsData = useCallback(async () => {
+        setCustomModelsLoading(true);
+        try {
+            const [customModelsRes, providersRes] = await Promise.all([
+                apiFetch({ path: '/wpseopilot/v2/ai/custom-models' }),
+                apiFetch({ path: '/wpseopilot/v2/ai/providers' }),
+            ]);
+
+            if (customModelsRes.success) {
+                setCustomModels(Array.isArray(customModelsRes.data) ? customModelsRes.data : []);
+            }
+            if (providersRes.success) {
+                setProviders(Array.isArray(providersRes.data) ? providersRes.data : []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch custom models:', error);
+        } finally {
+            setCustomModelsLoading(false);
+        }
+    }, []);
+
+    // Fetch models database
+    const fetchModelsDatabase = useCallback(async () => {
+        setModelsDatabaseLoading(true);
+        try {
+            const res = await apiFetch({ path: '/wpseopilot/v2/ai/models-database' });
+            if (res.success && res.data) {
+                setModelsDatabase({
+                    models: Array.isArray(res.data.models) ? res.data.models : [],
+                    last_sync: res.data.last_sync || null,
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch models database:', error);
+        } finally {
+            setModelsDatabaseLoading(false);
+        }
+    }, []);
+
+    // Sync models database from models.dev
+    const handleSyncModelsDatabase = async () => {
+        setSyncing(true);
+        try {
+            const res = await apiFetch({
+                path: '/wpseopilot/v2/ai/models-database/sync',
+                method: 'POST',
+            });
+            if (res.success && res.data) {
+                const models = Array.isArray(res.data.models) ? res.data.models : [];
+                setModelsDatabase({
+                    models,
+                    last_sync: res.data.last_sync || null,
+                });
+                setMessage({ type: 'success', text: `Synced ${models.length} models from models.dev` });
+            }
+        } catch (error) {
+            console.error('Failed to sync models database:', error);
+            setMessage({ type: 'error', text: 'Failed to sync models database.' });
+        } finally {
+            setSyncing(false);
+        }
+    };
+
+    // Search models in database
+    const handleSearchModels = async (query) => {
+        if (!query.trim()) {
+            setModelSearchResults([]);
+            return;
+        }
+
+        setSearching(true);
+        try {
+            const res = await apiFetch({
+                path: `/wpseopilot/v2/ai/models-database/search?query=${encodeURIComponent(query)}`,
+            });
+            if (res.success) setModelSearchResults(Array.isArray(res.data) ? res.data : []);
+        } catch (error) {
+            console.error('Failed to search models:', error);
+        } finally {
+            setSearching(false);
+        }
+    };
+
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            handleSearchModels(modelSearch);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [modelSearch]);
+
+    // Load custom models when tab changes
+    useEffect(() => {
+        if (activeTab === 'custom-models') {
+            fetchCustomModelsData();
+            fetchModelsDatabase();
+        }
+    }, [activeTab, fetchCustomModelsData, fetchModelsDatabase]);
+
+    // Open add form
+    const handleAddModel = () => {
+        setEditingModel(null);
+        setModelFormData({
+            name: '',
+            provider: 'openai_compatible',
+            model_id: '',
+            api_url: '',
+            api_key: '',
+            temperature: 0.7,
+            max_tokens: 2048,
+            is_active: true,
+        });
+        setShowModelForm(true);
+    };
+
+    // Open edit form
+    const handleEditModel = (model) => {
+        setEditingModel(model);
+        setModelFormData({
+            name: model.name,
+            provider: model.provider,
+            model_id: model.model_id,
+            api_url: model.api_url || '',
+            api_key: model.api_key || '',
+            temperature: parseFloat(model.temperature) || 0.7,
+            max_tokens: parseInt(model.max_tokens, 10) || 2048,
+            is_active: !!model.is_active,
+        });
+        setShowModelForm(true);
+    };
+
+    // Pre-fill from models.dev model
+    const handleSelectDatabaseModel = (dbModel) => {
+        setModelFormData(prev => ({
+            ...prev,
+            name: dbModel.name,
+            model_id: dbModel.id,
+            provider: dbModel.provider?.toLowerCase().replace(/\s+/g, '_') || 'openai_compatible',
+        }));
+        setModelSearch('');
+        setModelSearchResults([]);
+    };
+
+    // Save custom model
+    const handleSaveModel = async () => {
+        if (!modelFormData.name.trim() || !modelFormData.model_id.trim()) {
+            setMessage({ type: 'error', text: 'Name and Model ID are required.' });
+            return;
+        }
+
+        setSavingModel(true);
+        try {
+            const method = editingModel ? 'PUT' : 'POST';
+            const path = editingModel
+                ? `/wpseopilot/v2/ai/custom-models/${editingModel.id}`
+                : '/wpseopilot/v2/ai/custom-models';
+
+            const res = await apiFetch({
+                path,
+                method,
+                data: modelFormData,
+            });
+
+            if (res.success) {
+                setMessage({ type: 'success', text: editingModel ? 'Model updated!' : 'Model added!' });
+                setShowModelForm(false);
+                fetchCustomModelsData();
+            }
+        } catch (error) {
+            console.error('Failed to save model:', error);
+            setMessage({ type: 'error', text: error.message || 'Failed to save model.' });
+        } finally {
+            setSavingModel(false);
+        }
+    };
+
+    // Delete custom model
+    const handleDeleteModel = async (id) => {
+        if (!window.confirm('Delete this custom model?')) return;
+
+        try {
+            const res = await apiFetch({
+                path: `/wpseopilot/v2/ai/custom-models/${id}`,
+                method: 'DELETE',
+            });
+
+            if (res.success) {
+                setMessage({ type: 'success', text: 'Model deleted.' });
+                fetchCustomModelsData();
+            }
+        } catch (error) {
+            console.error('Failed to delete model:', error);
+            setMessage({ type: 'error', text: 'Failed to delete model.' });
+        }
+    };
+
+    // Test custom model connection
+    const handleTestModel = async (id) => {
+        setTestingModel(id);
+        try {
+            const res = await apiFetch({
+                path: `/wpseopilot/v2/ai/custom-models/${id}/test`,
+                method: 'POST',
+            });
+
+            if (res.success) {
+                setMessage({ type: 'success', text: `Connection successful! Response: "${res.data.response?.substring(0, 50)}..."` });
+            }
+        } catch (error) {
+            console.error('Failed to test model:', error);
+            setMessage({ type: 'error', text: error.message || 'Connection test failed.' });
+        } finally {
+            setTestingModel(null);
+        }
+    };
+
+    // Format cost for display
+    const formatCost = (cost) => {
+        if (!cost) return '-';
+        return `$${parseFloat(cost).toFixed(4)}/1k`;
+    };
+
+    // Get provider display info
+    const getProviderInfo = (providerKey) => {
+        return PROVIDERS[providerKey] || { name: providerKey, logo: null };
     };
 
     if (loading) {
@@ -416,42 +681,350 @@ const AiAssistant = () => {
                     </div>
                 </div>
             ) : (
-                <div className="ai-coming-soon">
-                    <div className="ai-coming-soon-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 017 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <h2>Custom AI Models</h2>
-                    <p className="muted">Support for custom endpoints and providers coming soon.</p>
+                <div className="custom-models-layout">
+                    {/* Left Column - Model List & Form */}
+                    <div className="custom-models-main">
+                        {/* Model Form Modal/Card */}
+                        {showModelForm && (
+                            <div className="ai-card custom-model-form-card">
+                                <div className="ai-card-header">
+                                    <h3>{editingModel ? 'Edit Model' : 'Add Custom Model'}</h3>
+                                    <button
+                                        type="button"
+                                        className="link-button"
+                                        onClick={() => setShowModelForm(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                <div className="ai-card-body">
+                                    {/* Model Search from Database */}
+                                    <div className="model-search-section">
+                                        <div className="ai-form-field">
+                                            <label>Search models.dev database</label>
+                                            <input
+                                                type="text"
+                                                value={modelSearch}
+                                                onChange={(e) => setModelSearch(e.target.value)}
+                                                placeholder="Search for a model (e.g., GPT-4, Claude)..."
+                                            />
+                                        </div>
+                                        {modelSearchResults.length > 0 && (
+                                            <div className="model-search-results">
+                                                {modelSearchResults.slice(0, 5).map((m, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        type="button"
+                                                        className="model-search-item"
+                                                        onClick={() => handleSelectDatabaseModel(m)}
+                                                    >
+                                                        <div className="model-search-item-info">
+                                                            <strong>{m.name}</strong>
+                                                            <span className="model-search-item-id">{m.id}</span>
+                                                        </div>
+                                                        <span className="model-search-item-provider">{m.provider}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
-                    <div className="ai-coming-soon-list">
-                        <div className="ai-coming-soon-item">
-                            <span className="check">&#10003;</span>
-                            <span>OpenAI-compatible API endpoints</span>
-                        </div>
-                        <div className="ai-coming-soon-item">
-                            <span className="check">&#10003;</span>
-                            <span>Anthropic Claude, Google Gemini</span>
-                        </div>
-                        <div className="ai-coming-soon-item">
-                            <span className="check">&#10003;</span>
-                            <span>Local models via Ollama</span>
-                        </div>
-                        <div className="ai-coming-soon-item">
-                            <span className="check">&#10003;</span>
-                            <span>Custom parameters per model</span>
+                                    <div className="form-divider">
+                                        <span>or configure manually</span>
+                                    </div>
+
+                                    <div className="ai-form-grid">
+                                        <div className="ai-form-field">
+                                            <label htmlFor="model-name">Display Name *</label>
+                                            <input
+                                                type="text"
+                                                id="model-name"
+                                                value={modelFormData.name}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, name: e.target.value }))}
+                                                placeholder="My Custom Model"
+                                            />
+                                        </div>
+                                        <div className="ai-form-field">
+                                            <label htmlFor="model-provider">Provider</label>
+                                            <select
+                                                id="model-provider"
+                                                value={modelFormData.provider}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, provider: e.target.value }))}
+                                            >
+                                                {Object.entries(PROVIDERS).map(([key, info]) => (
+                                                    <option key={key} value={key}>{info.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="ai-form-field">
+                                        <label htmlFor="model-id">Model ID *</label>
+                                        <input
+                                            type="text"
+                                            id="model-id"
+                                            value={modelFormData.model_id}
+                                            onChange={(e) => setModelFormData(prev => ({ ...prev, model_id: e.target.value }))}
+                                            placeholder="gpt-4o, claude-3-opus, etc."
+                                        />
+                                    </div>
+
+                                    {(modelFormData.provider === 'openai_compatible' || modelFormData.provider === 'lmstudio' || modelFormData.provider === 'ollama') && (
+                                        <div className="ai-form-field">
+                                            <label htmlFor="model-url">API URL</label>
+                                            <input
+                                                type="text"
+                                                id="model-url"
+                                                value={modelFormData.api_url}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, api_url: e.target.value }))}
+                                                placeholder={
+                                                    modelFormData.provider === 'lmstudio' ? 'http://localhost:1234/v1/chat/completions' :
+                                                    modelFormData.provider === 'ollama' ? 'http://localhost:11434/api/chat' :
+                                                    'https://api.example.com/v1/chat/completions'
+                                                }
+                                            />
+                                        </div>
+                                    )}
+
+                                    {modelFormData.provider !== 'lmstudio' && modelFormData.provider !== 'ollama' && (
+                                        <div className="ai-form-field">
+                                            <label htmlFor="model-api-key">API Key</label>
+                                            <input
+                                                type="password"
+                                                id="model-api-key"
+                                                value={modelFormData.api_key}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, api_key: e.target.value }))}
+                                                placeholder="sk-... or leave empty to use default"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="ai-form-grid">
+                                        <div className="ai-form-field">
+                                            <label htmlFor="model-temp">Temperature</label>
+                                            <input
+                                                type="number"
+                                                id="model-temp"
+                                                value={modelFormData.temperature}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, temperature: parseFloat(e.target.value) || 0 }))}
+                                                min="0"
+                                                max="2"
+                                                step="0.1"
+                                            />
+                                        </div>
+                                        <div className="ai-form-field">
+                                            <label htmlFor="model-tokens">Max Tokens</label>
+                                            <input
+                                                type="number"
+                                                id="model-tokens"
+                                                value={modelFormData.max_tokens}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, max_tokens: parseInt(e.target.value, 10) || 2048 }))}
+                                                min="100"
+                                                max="128000"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="ai-form-field checkbox-field">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={modelFormData.is_active}
+                                                onChange={(e) => setModelFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+                                            />
+                                            Enable this model
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="ai-card-footer">
+                                    <button
+                                        type="button"
+                                        className="button primary"
+                                        onClick={handleSaveModel}
+                                        disabled={savingModel}
+                                    >
+                                        {savingModel ? 'Saving...' : (editingModel ? 'Update Model' : 'Add Model')}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Custom Models List */}
+                        <div className="ai-card">
+                            <div className="ai-card-header">
+                                <h3>Your Custom Models</h3>
+                                <button
+                                    type="button"
+                                    className="button small"
+                                    onClick={handleAddModel}
+                                >
+                                    + Add Model
+                                </button>
+                            </div>
+                            <div className="ai-card-body">
+                                {customModelsLoading ? (
+                                    <div className="loading-state">Loading custom models...</div>
+                                ) : customModels.length === 0 ? (
+                                    <div className="empty-state">
+                                        <p>No custom models configured yet.</p>
+                                        <p className="muted">Add a custom model to use alternative AI providers.</p>
+                                    </div>
+                                ) : (
+                                    <div className="custom-models-list">
+                                        {customModels.map(model => {
+                                            const providerInfo = getProviderInfo(model.provider);
+                                            return (
+                                                <div key={model.id} className={`custom-model-item ${model.is_active ? 'active' : 'inactive'}`}>
+                                                    <div className="custom-model-info">
+                                                        <div className="custom-model-header">
+                                                            {providerInfo.logo && (
+                                                                <img
+                                                                    src={providerInfo.logo}
+                                                                    alt={providerInfo.name}
+                                                                    className="provider-logo"
+                                                                />
+                                                            )}
+                                                            <div>
+                                                                <strong>{model.name}</strong>
+                                                                <span className="custom-model-id">{model.model_id}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="custom-model-meta">
+                                                            <span className="provider-badge">{providerInfo.name}</span>
+                                                            <span className={`status-badge ${model.is_active ? 'active' : 'inactive'}`}>
+                                                                {model.is_active ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="custom-model-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="button small"
+                                                            onClick={() => handleTestModel(model.id)}
+                                                            disabled={testingModel === model.id}
+                                                        >
+                                                            {testingModel === model.id ? 'Testing...' : 'Test'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="button small"
+                                                            onClick={() => handleEditModel(model)}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="button small danger"
+                                                            onClick={() => handleDeleteModel(model.id)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    <a
-                        href="https://github.com/jhd3197/WP-SEO-Pilot"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="button primary"
-                    >
-                        Follow on GitHub
-                    </a>
+                    {/* Right Column - Models Database */}
+                    <div className="custom-models-sidebar">
+                        <div className="ai-card">
+                            <div className="ai-card-header">
+                                <h3>Models Database</h3>
+                                <button
+                                    type="button"
+                                    className="link-button"
+                                    onClick={handleSyncModelsDatabase}
+                                    disabled={syncing}
+                                >
+                                    {syncing ? 'Syncing...' : 'Sync Now'}
+                                </button>
+                            </div>
+                            <div className="ai-card-body">
+                                {modelsDatabase.last_sync && (
+                                    <p className="sync-info">
+                                        Last synced: {new Date(modelsDatabase.last_sync).toLocaleDateString()}
+                                        <br />
+                                        <span className="muted">{(modelsDatabase.models || []).length} models in database</span>
+                                    </p>
+                                )}
+
+                                {modelsDatabaseLoading ? (
+                                    <div className="loading-state">Loading models database...</div>
+                                ) : (!modelsDatabase.models || modelsDatabase.models.length === 0) ? (
+                                    <div className="empty-state">
+                                        <p>No models in database.</p>
+                                        <button
+                                            type="button"
+                                            className="button primary"
+                                            onClick={handleSyncModelsDatabase}
+                                            disabled={syncing}
+                                        >
+                                            {syncing ? 'Syncing...' : 'Sync from models.dev'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="models-database-list">
+                                        {(modelsDatabase.models || []).slice(0, 15).map((m, idx) => (
+                                            <div key={idx} className="database-model-item">
+                                                <div className="database-model-info">
+                                                    <strong>{m.name}</strong>
+                                                    <span className="database-model-provider">{m.provider}</span>
+                                                </div>
+                                                <div className="database-model-costs">
+                                                    {m.inputCost && (
+                                                        <span className="cost-badge" title="Input cost per 1k tokens">
+                                                            In: {formatCost(m.inputCost)}
+                                                        </span>
+                                                    )}
+                                                    {m.outputCost && (
+                                                        <span className="cost-badge" title="Output cost per 1k tokens">
+                                                            Out: {formatCost(m.outputCost)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {(modelsDatabase.models || []).length > 15 && (
+                                            <p className="muted" style={{ textAlign: 'center', marginTop: '12px' }}>
+                                                +{(modelsDatabase.models || []).length - 15} more models...
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Provider Info Cards */}
+                        <div className="ai-info-grid">
+                            <div className="ai-info-card">
+                                <div className="ai-info-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                        <path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                    </svg>
+                                </div>
+                                <div className="ai-info-content">
+                                    <strong>Local Models</strong>
+                                    <p>Use Ollama or LM Studio for local, private AI</p>
+                                </div>
+                            </div>
+                            <div className="ai-info-card">
+                                <div className="ai-info-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div className="ai-info-content">
+                                    <strong>Any Provider</strong>
+                                    <p>OpenAI, Anthropic, Google, or any compatible API</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

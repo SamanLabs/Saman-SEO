@@ -3,7 +3,9 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import SearchAppearance from './pages/SearchAppearance';
 import Sitemap from './pages/Sitemap';
+import Tools from './pages/Tools';
 import Redirects from './pages/Redirects';
+import Log404 from './pages/Log404';
 import InternalLinking from './pages/InternalLinking';
 import Audit from './pages/Audit';
 import AiAssistant from './pages/AiAssistant';
@@ -15,7 +17,9 @@ const viewToPage = {
     dashboard: 'wpseopilot-v2-dashboard',
     'search-appearance': 'wpseopilot-v2-search-appearance',
     sitemap: 'wpseopilot-v2-sitemap',
+    tools: 'wpseopilot-v2-tools',
     redirects: 'wpseopilot-v2-redirects',
+    '404-log': 'wpseopilot-v2-404-log',
     'internal-linking': 'wpseopilot-v2-internal-linking',
     audit: 'wpseopilot-v2-audit',
     'ai-assistant': 'wpseopilot-v2-ai-assistant',
@@ -137,8 +141,12 @@ const App = ({ initialView = 'dashboard' }) => {
                 return <SearchAppearance />;
             case 'sitemap':
                 return <Sitemap />;
+            case 'tools':
+                return <Tools onNavigate={handleNavigate} />;
             case 'redirects':
                 return <Redirects />;
+            case '404-log':
+                return <Log404 onNavigate={handleNavigate} />;
             case 'internal-linking':
                 return <InternalLinking />;
             case 'audit':

@@ -269,16 +269,17 @@ const Sitemap = () => {
             {activeTab === 'xml-sitemap' ? (
                 <div className="page-body two-column">
                     <div className="main-column">
-                        {/* XML Sitemap Configuration */}
+                        {/* XML Sitemap Configuration - Single Panel */}
                         <section className="panel">
-                            <h3>XML Sitemap Configuration</h3>
-                            <p className="muted">Control which content appears in your XML sitemap and how it is organized.</p>
+                            <h3>XML Sitemap Settings</h3>
+                            <p className="muted">Configure your sitemap generation, content types, and additional options.</p>
 
                             <div className="settings-form">
-                                <div className="settings-row">
+                                {/* General Settings */}
+                                <div className="settings-row compact">
                                     <div className="settings-label">
                                         <label>Automatic Updates</label>
-                                        <p className="settings-help">Automatically regenerate sitemap on a schedule.</p>
+                                        <p className="settings-help">Regenerate sitemap on a schedule.</p>
                                     </div>
                                     <div className="settings-control">
                                         <select
@@ -292,10 +293,10 @@ const Sitemap = () => {
                                     </div>
                                 </div>
 
-                                <div className="settings-row">
+                                <div className="settings-row compact">
                                     <div className="settings-label">
                                         <label>Max URLs Per Page</label>
-                                        <p className="settings-help">Maximum number of URLs per sitemap page (recommended: 1000).</p>
+                                        <p className="settings-help">Maximum URLs per sitemap page.</p>
                                     </div>
                                     <div className="settings-control">
                                         <input
@@ -309,9 +310,9 @@ const Sitemap = () => {
                                     </div>
                                 </div>
 
-                                <div className="settings-row">
+                                <div className="settings-row compact">
                                     <div className="settings-label">
-                                        <label>Options</label>
+                                        <label>Generation Options</label>
                                     </div>
                                     <div className="settings-control">
                                         <label className="checkbox-row">
@@ -320,7 +321,7 @@ const Sitemap = () => {
                                                 checked={settings.enable_index === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, enable_index: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span>Enable sitemap indexes for better organization</span>
+                                            <span>Enable sitemap indexes</span>
                                         </label>
                                         <label className="checkbox-row">
                                             <input
@@ -328,7 +329,7 @@ const Sitemap = () => {
                                                 checked={settings.dynamic_generation === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, dynamic_generation: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span>Dynamically generate sitemap on-demand</span>
+                                            <span>Dynamic generation on-demand</span>
                                         </label>
                                         <label className="checkbox-row">
                                             <input
@@ -336,22 +337,16 @@ const Sitemap = () => {
                                                 checked={settings.exclude_images === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, exclude_images: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span>Exclude images from sitemap entries</span>
+                                            <span>Exclude images from entries</span>
                                         </label>
                                     </div>
                                 </div>
-                            </div>
-                        </section>
 
-                        {/* Content Types */}
-                        <section className="panel">
-                            <h3>Content Types</h3>
-                            <p className="muted">Select which post types and taxonomies should be included in your sitemap.</p>
-
-                            <div className="settings-form">
-                                <div className="settings-row">
+                                {/* Content Types */}
+                                <div className="settings-row compact">
                                     <div className="settings-label">
-                                        <label><strong>Post Types</strong></label>
+                                        <label>Post Types</label>
+                                        <p className="settings-help">Include in sitemap.</p>
                                     </div>
                                     <div className="settings-control">
                                         <div className="checkbox-grid">
@@ -369,9 +364,10 @@ const Sitemap = () => {
                                     </div>
                                 </div>
 
-                                <div className="settings-row">
+                                <div className="settings-row compact">
                                     <div className="settings-label">
-                                        <label><strong>Taxonomies</strong></label>
+                                        <label>Taxonomies</label>
+                                        <p className="settings-help">Include taxonomy archives.</p>
                                     </div>
                                     <div className="settings-control">
                                         <div className="checkbox-grid">
@@ -389,9 +385,9 @@ const Sitemap = () => {
                                     </div>
                                 </div>
 
-                                <div className="settings-row">
+                                <div className="settings-row compact">
                                     <div className="settings-label">
-                                        <label>Archives</label>
+                                        <label>Archive Pages</label>
                                     </div>
                                     <div className="settings-control">
                                         <label className="checkbox-row">
@@ -400,7 +396,7 @@ const Sitemap = () => {
                                                 checked={settings.include_author_pages === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, include_author_pages: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span>Include author archive pages</span>
+                                            <span>Include author pages</span>
                                         </label>
                                         <label className="checkbox-row">
                                             <input
@@ -408,20 +404,13 @@ const Sitemap = () => {
                                                 checked={settings.include_date_archives === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, include_date_archives: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span>Include date archive pages</span>
+                                            <span>Include date archives</span>
                                         </label>
                                     </div>
                                 </div>
-                            </div>
-                        </section>
 
-                        {/* Additional Sitemaps */}
-                        <section className="panel">
-                            <h3>Additional Sitemaps</h3>
-                            <p className="muted">Enable specialized sitemaps for RSS feeds and Google News.</p>
-
-                            <div className="settings-form">
-                                <div className="settings-row">
+                                {/* Additional Sitemaps */}
+                                <div className="settings-row compact">
                                     <div className="settings-label">
                                         <label>RSS Sitemap</label>
                                     </div>
@@ -432,12 +421,12 @@ const Sitemap = () => {
                                                 checked={settings.enable_rss === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, enable_rss: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span>Generate RSS sitemap with latest 50 posts</span>
+                                            <span>Generate RSS sitemap (latest 50 posts)</span>
                                         </label>
                                     </div>
                                 </div>
 
-                                <div className="settings-row">
+                                <div className="settings-row compact">
                                     <div className="settings-label">
                                         <label>Google News</label>
                                     </div>
@@ -448,122 +437,112 @@ const Sitemap = () => {
                                                 checked={settings.enable_google_news === '1'}
                                                 onChange={(e) => setSettings(prev => ({ ...prev, enable_google_news: e.target.checked ? '1' : '0' }))}
                                             />
-                                            <span><strong>Enable Google News sitemap</strong></span>
+                                            <span>Enable Google News sitemap</span>
                                         </label>
 
                                         {settings.enable_google_news === '1' && (
-                                            <>
-                                                <div style={{ marginTop: '12px' }}>
-                                                    <input
-                                                        type="text"
-                                                        value={settings.google_news_name}
-                                                        onChange={(e) => setSettings(prev => ({ ...prev, google_news_name: e.target.value }))}
-                                                        placeholder="Publication Name"
-                                                        style={{ width: '100%' }}
-                                                    />
-                                                    <p className="settings-help">The name of your publication for Google News.</p>
+                                            <div style={{ marginTop: '12px' }}>
+                                                <input
+                                                    type="text"
+                                                    value={settings.google_news_name}
+                                                    onChange={(e) => setSettings(prev => ({ ...prev, google_news_name: e.target.value }))}
+                                                    placeholder="Publication Name"
+                                                    style={{ width: '100%', marginBottom: '8px' }}
+                                                />
+                                                <div className="checkbox-grid">
+                                                    {postTypes.map(pt => (
+                                                        <label key={pt.name} className="checkbox-row">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={(settings.google_news_post_types || []).includes(pt.name)}
+                                                                onChange={() => toggleNewsPostType(pt.name)}
+                                                            />
+                                                            <span>{pt.label}</span>
+                                                        </label>
+                                                    ))}
                                                 </div>
-
-                                                <div style={{ marginTop: '12px' }}>
-                                                    <p className="settings-help">Post types to include:</p>
-                                                    <div className="checkbox-grid">
-                                                        {postTypes.map(pt => (
-                                                            <label key={pt.name} className="checkbox-row">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={(settings.google_news_post_types || []).includes(pt.name)}
-                                                                    onChange={() => toggleNewsPostType(pt.name)}
-                                                                />
-                                                                <span>{pt.label}</span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
-                            </div>
-                        </section>
 
-                        {/* Additional Pages */}
-                        <section className="panel">
-                            <h3>Additional Pages</h3>
-                            <p className="muted">Add custom URLs to your sitemap that are not managed by WordPress.</p>
-
-                            <div className="additional-pages-list">
-                                {(settings.additional_pages || []).map((page, index) => (
-                                    <div key={index} className="additional-page-row">
-                                        <input
-                                            type="url"
-                                            value={page.url}
-                                            onChange={(e) => updateAdditionalPage(index, 'url', e.target.value)}
-                                            placeholder="https://example.com/page"
-                                            className="page-url-input"
-                                        />
-                                        <input
-                                            type="text"
-                                            value={page.priority}
-                                            onChange={(e) => updateAdditionalPage(index, 'priority', e.target.value)}
-                                            placeholder="0.5"
-                                            className="page-priority-input"
-                                        />
-                                        <button
-                                            type="button"
-                                            className="button ghost small"
-                                            onClick={() => removeAdditionalPage(index)}
-                                        >
-                                            Remove
+                                {/* Additional Pages */}
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>Custom Pages</label>
+                                        <p className="settings-help">Add URLs not managed by WordPress.</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <div className="additional-pages-list">
+                                            {(settings.additional_pages || []).map((page, index) => (
+                                                <div key={index} className="additional-page-row">
+                                                    <input
+                                                        type="url"
+                                                        value={page.url}
+                                                        onChange={(e) => updateAdditionalPage(index, 'url', e.target.value)}
+                                                        placeholder="https://example.com/page"
+                                                        className="page-url-input"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={page.priority}
+                                                        onChange={(e) => updateAdditionalPage(index, 'priority', e.target.value)}
+                                                        placeholder="0.5"
+                                                        className="page-priority-input"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="button ghost small"
+                                                        onClick={() => removeAdditionalPage(index)}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button type="button" className="button ghost small" onClick={addAdditionalPage}>
+                                            + Add Page
                                         </button>
                                     </div>
-                                ))}
+                                </div>
                             </div>
 
-                            <button type="button" className="button ghost" onClick={addAdditionalPage}>
-                                Add Page
-                            </button>
-                            <p className="settings-help" style={{ marginTop: '8px' }}>
-                                Add custom URLs with their priority (0.0 to 1.0).
-                            </p>
+                            {/* Save Button inside panel */}
+                            <div className="form-actions" style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+                                <button
+                                    type="button"
+                                    className="button primary"
+                                    onClick={handleSaveSettings}
+                                    disabled={saving}
+                                >
+                                    {saving ? 'Saving...' : 'Save Changes'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="button ghost"
+                                    onClick={handleRegenerate}
+                                    disabled={regenerating}
+                                >
+                                    {regenerating ? 'Regenerating...' : 'Regenerate Now'}
+                                </button>
+                            </div>
                         </section>
-
-                        {/* Save Button */}
-                        <div className="form-actions">
-                            <button
-                                type="button"
-                                className="button primary"
-                                onClick={handleSaveSettings}
-                                disabled={saving}
-                            >
-                                {saving ? 'Saving...' : 'Save Changes'}
-                            </button>
-                            <button
-                                type="button"
-                                className="button ghost"
-                                onClick={handleRegenerate}
-                                disabled={regenerating}
-                            >
-                                {regenerating ? 'Regenerating...' : 'Regenerate Now'}
-                            </button>
-                        </div>
                     </div>
 
                     {/* Sidebar */}
                     <aside className="side-panel">
                         <div className="side-card highlight">
                             <h3>Your Sitemaps</h3>
-                            <p className="muted">Access your generated sitemaps below.</p>
-
                             <div className="sitemap-links">
                                 <div className="sitemap-link-item">
-                                    <strong>Main Index:</strong>
+                                    <strong>Main Index</strong>
                                     <a href={settings.sitemap_url} target="_blank" rel="noopener noreferrer">
                                         {settings.sitemap_url}
                                     </a>
                                 </div>
                                 {settings.enable_rss === '1' && (
                                     <div className="sitemap-link-item">
-                                        <strong>RSS:</strong>
+                                        <strong>RSS Feed</strong>
                                         <a href={settings.rss_sitemap_url} target="_blank" rel="noopener noreferrer">
                                             {settings.rss_sitemap_url}
                                         </a>
@@ -571,7 +550,7 @@ const Sitemap = () => {
                                 )}
                                 {settings.enable_google_news === '1' && (
                                     <div className="sitemap-link-item">
-                                        <strong>Google News:</strong>
+                                        <strong>Google News</strong>
                                         <a href={settings.news_sitemap_url} target="_blank" rel="noopener noreferrer">
                                             {settings.news_sitemap_url}
                                         </a>
@@ -581,23 +560,23 @@ const Sitemap = () => {
                         </div>
 
                         <div className="side-card">
-                            <h3>Sitemap Stats</h3>
+                            <h3>Statistics</h3>
                             <div className="stats-list">
                                 <div className="stat-item">
-                                    <span className="muted">Total URLs:</span>
+                                    <span className="muted">Total URLs</span>
                                     <span className="stat-value">{stats.total_urls.toLocaleString()}</span>
                                 </div>
                                 <div className="stat-item">
-                                    <span className="muted">Last Regenerated:</span>
+                                    <span className="muted">Last Updated</span>
                                     <span className="stat-value">{formatDate(stats.last_regenerated)}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="side-card">
-                            <h3>Tip</h3>
+                            <h3>Pro Tip</h3>
                             <p className="muted">
-                                Submit your sitemap to Google Search Console and Bing Webmaster Tools for better indexing.
+                                Submit your sitemap to Google Search Console and Bing Webmaster Tools for faster indexing.
                             </p>
                         </div>
                     </aside>
@@ -605,23 +584,20 @@ const Sitemap = () => {
             ) : (
                 <div className="page-body two-column">
                     <div className="main-column">
-                        {/* LLM.txt Introduction */}
+                        {/* LLM.txt - Single Panel */}
                         <section className="panel">
-                            <h3>LLM.txt</h3>
+                            <h3>LLM.txt Configuration</h3>
                             <p className="muted">
-                                The llm.txt is a specialized file designed to help AI engines (such as language models)
-                                discover the content on your site more easily. Similar to how XML sitemaps assist search
-                                engines, the llm.txt file guides AI crawlers by providing important details about the
-                                available site content.{' '}
-                                <a href="https://llmstxt.org/" target="_blank" rel="noopener noreferrer">
-                                    Learn More
-                                </a>
+                                Help AI engines discover your content. Similar to XML sitemaps for search engines,
+                                llm.txt guides AI crawlers like ChatGPT and Claude.{' '}
+                                <a href="https://llmstxt.org/" target="_blank" rel="noopener noreferrer">Learn more</a>
                             </p>
 
                             <div className="settings-form">
-                                <div className="settings-row">
+                                <div className="settings-row compact">
                                     <div className="settings-label">
                                         <label>Enable llm.txt</label>
+                                        <p className="settings-help">Generate and serve the llm.txt file.</p>
                                     </div>
                                     <div className="settings-control">
                                         <label className="toggle">
@@ -635,67 +611,45 @@ const Sitemap = () => {
                                                 {llmSettings.enable_llm_txt === '1' ? 'Enabled' : 'Disabled'}
                                             </span>
                                         </label>
-                                        {llmSettings.enable_llm_txt === '1' && (
-                                            <div style={{ marginTop: '12px' }}>
-                                                <a
-                                                    href={llmSettings.llm_txt_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="button ghost"
-                                                >
-                                                    Open llm.txt
-                                                </a>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
-                            </div>
-                        </section>
 
-                        {llmSettings.enable_llm_txt === '1' && (
-                            <>
-                                {/* LLM.txt Settings */}
-                                <section className="panel">
-                                    <h3>LLM.txt Settings</h3>
-                                    <p className="muted">Customize how your llm.txt file is generated and what content it includes.</p>
-
-                                    <div className="settings-form">
-                                        <div className="settings-row">
+                                {llmSettings.enable_llm_txt === '1' && (
+                                    <>
+                                        <div className="settings-row compact">
                                             <div className="settings-label">
                                                 <label>Title</label>
-                                                <p className="settings-help">The main title displayed at the top of your llm.txt file.</p>
+                                                <p className="settings-help">Main title in your llm.txt file.</p>
                                             </div>
                                             <div className="settings-control">
                                                 <input
                                                     type="text"
                                                     value={llmSettings.llm_txt_title}
                                                     onChange={(e) => setLlmSettings(prev => ({ ...prev, llm_txt_title: e.target.value }))}
-                                                    placeholder="Site Name"
+                                                    placeholder="Defaults to site name"
                                                 />
-                                                <p className="settings-help">Defaults to your site name if left empty.</p>
                                             </div>
                                         </div>
 
-                                        <div className="settings-row">
+                                        <div className="settings-row compact">
                                             <div className="settings-label">
                                                 <label>Description</label>
-                                                <p className="settings-help">A brief description of your site displayed below the title.</p>
+                                                <p className="settings-help">Brief description below the title.</p>
                                             </div>
                                             <div className="settings-control">
                                                 <textarea
                                                     value={llmSettings.llm_txt_description}
                                                     onChange={(e) => setLlmSettings(prev => ({ ...prev, llm_txt_description: e.target.value }))}
-                                                    placeholder="Site description"
+                                                    placeholder="Defaults to site tagline"
                                                     rows="3"
                                                 />
-                                                <p className="settings-help">Defaults to your site tagline if left empty.</p>
                                             </div>
                                         </div>
 
-                                        <div className="settings-row">
+                                        <div className="settings-row compact">
                                             <div className="settings-label">
                                                 <label>Max Posts Per Type</label>
-                                                <p className="settings-help">Limit the number of posts included per post type.</p>
+                                                <p className="settings-help">Limit posts included per type (1-500).</p>
                                             </div>
                                             <div className="settings-control">
                                                 <input
@@ -706,11 +660,10 @@ const Sitemap = () => {
                                                     max="500"
                                                     style={{ width: '120px' }}
                                                 />
-                                                <p className="settings-help">Set between 1-500 posts per post type (recommended: 50).</p>
                                             </div>
                                         </div>
 
-                                        <div className="settings-row">
+                                        <div className="settings-row compact">
                                             <div className="settings-label">
                                                 <label>Options</label>
                                             </div>
@@ -721,40 +674,42 @@ const Sitemap = () => {
                                                         checked={llmSettings.llm_txt_include_excerpt === '1'}
                                                         onChange={(e) => setLlmSettings(prev => ({ ...prev, llm_txt_include_excerpt: e.target.checked ? '1' : '0' }))}
                                                     />
-                                                    <span>Include post excerpts/descriptions in llm.txt</span>
+                                                    <span>Include post excerpts/descriptions</span>
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
-                                </section>
 
-                                {/* Content Types Preview */}
-                                <section className="panel">
-                                    <h3>Content Types Included</h3>
-                                    <p className="muted">The following post types will be included in your llm.txt file.</p>
-
-                                    <div className="post-types-preview">
-                                        {postTypes.map(pt => {
-                                            const willInclude = Math.min(pt.count, llmSettings.llm_txt_posts_per_type);
-                                            return (
-                                                <div key={pt.name} className="post-type-preview-item">
-                                                    <div className="post-type-icon">
-                                                        <span className="dashicon">&#128196;</span>
-                                                    </div>
-                                                    <div className="post-type-info">
-                                                        <strong>{pt.label}</strong>
-                                                        <span className="muted">
-                                                            Including {willInclude} of {pt.count} published posts
-                                                        </span>
-                                                    </div>
+                                        {/* Content Types Preview */}
+                                        <div className="settings-row compact">
+                                            <div className="settings-label">
+                                                <label>Content Included</label>
+                                                <p className="settings-help">Post types in your llm.txt file.</p>
+                                            </div>
+                                            <div className="settings-control">
+                                                <div className="post-types-preview">
+                                                    {postTypes.map(pt => {
+                                                        const willInclude = Math.min(pt.count, llmSettings.llm_txt_posts_per_type);
+                                                        return (
+                                                            <div key={pt.name} className="post-type-preview-item">
+                                                                <div className="post-type-info">
+                                                                    <strong>{pt.label}</strong>
+                                                                    <span className="muted">
+                                                                        {willInclude} of {pt.count} posts
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                </section>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
 
-                                {/* Save Button */}
-                                <div className="form-actions">
+                            {/* Save Button inside panel */}
+                            {llmSettings.enable_llm_txt === '1' && (
+                                <div className="form-actions" style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
                                     <button
                                         type="button"
                                         className="button primary"
@@ -763,44 +718,55 @@ const Sitemap = () => {
                                     >
                                         {saving ? 'Saving...' : 'Save Changes'}
                                     </button>
+                                    <a
+                                        href={llmSettings.llm_txt_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="button ghost"
+                                    >
+                                        View llm.txt
+                                    </a>
                                 </div>
-                            </>
-                        )}
+                            )}
+                        </section>
                     </div>
 
                     {/* Sidebar */}
-                    {llmSettings.enable_llm_txt === '1' && (
-                        <aside className="side-panel">
-                            <div className="side-card highlight">
-                                <h3>Quick Info</h3>
-                                <p className="muted">Your llm.txt file is accessible at:</p>
-                                <code className="url-display">{llmSettings.llm_txt_url}</code>
-                                <p className="muted" style={{ marginTop: '12px' }}>
-                                    Note: If the file is not accessible, visit Permalink Settings and save to flush rewrite rules.
-                                </p>
-                            </div>
+                    <aside className="side-panel">
+                        <div className="side-card highlight">
+                            <h3>Your llm.txt</h3>
+                            {llmSettings.enable_llm_txt === '1' ? (
+                                <>
+                                    <code className="url-display">{llmSettings.llm_txt_url}</code>
+                                    <p className="muted" style={{ marginTop: '12px', fontSize: '13px' }}>
+                                        If not accessible, go to Settings &gt; Permalinks and save to flush rewrite rules.
+                                    </p>
+                                </>
+                            ) : (
+                                <p className="muted">Enable llm.txt to generate your file.</p>
+                            )}
+                        </div>
 
-                            <div className="side-card">
-                                <h3>About llm.txt</h3>
-                                <p className="muted">
-                                    The llm.txt file helps AI language models like ChatGPT, Claude, and others discover
-                                    and understand your content structure.
-                                </p>
-                                <p className="muted">
-                                    This can improve how AI systems reference and cite your content when answering questions.
-                                </p>
-                                <a
-                                    href="https://llmstxt.org/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="button ghost"
-                                    style={{ marginTop: '12px' }}
-                                >
-                                    Learn More About llm.txt
-                                </a>
-                            </div>
-                        </aside>
-                    )}
+                        <div className="side-card">
+                            <h3>What is llm.txt?</h3>
+                            <p className="muted">
+                                A standardized file that helps AI language models like ChatGPT, Claude, and Gemini
+                                discover and understand your content structure.
+                            </p>
+                            <p className="muted" style={{ marginTop: '8px' }}>
+                                This improves how AI systems reference and cite your content when answering questions.
+                            </p>
+                            <a
+                                href="https://llmstxt.org/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="button ghost small"
+                                style={{ marginTop: '12px' }}
+                            >
+                                Learn More
+                            </a>
+                        </div>
+                    </aside>
                 </div>
             )}
         </div>

@@ -2,10 +2,7 @@ const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'search-appearance', label: 'Search Appearance' },
     { id: 'sitemap', label: 'Sitemap' },
-    { id: 'redirects', label: 'Redirects' },
-    { id: 'internal-linking', label: 'Internal Linking' },
-    { id: 'audit', label: 'Audit' },
-    { id: 'ai-assistant', label: 'AI Assistant' },
+    { id: 'tools', label: 'Tools' },
     { id: 'settings', label: 'Settings' },
     { id: 'more', label: 'More' },
 ];

@@ -418,3 +418,357 @@
         color: @color-danger;
     }
 }
+
+// ==========================================================================
+// Custom Models Tab Styles
+// ==========================================================================
+
+// Custom Models Layout
+.custom-models-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+
+    @media (max-width: @breakpoint-xl) {
+        grid-template-columns: 1fr 340px;
+    }
+
+    @media (max-width: @breakpoint-lg) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.custom-models-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.custom-models-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// Model Form Card
+.custom-model-form-card {
+    border-color: @color-primary;
+    box-shadow: 0 0 0 3px fade(@color-primary, 8%);
+}
+
+// Form Divider
+.form-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: @color-muted;
+    font-size: 12px;
+
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: @color-border-light;
+    }
+}
+
+// Model Search Section
+.model-search-section {
+    margin-bottom: 8px;
+}
+
+.model-search-results {
+    margin-top: 8px;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.model-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-bottom: 1px solid @color-border-light;
+    background: @color-surface;
+    cursor: pointer;
+    text-align: left;
+    transition: background @transition-fast;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: @color-surface-muted;
+    }
+}
+
+.model-search-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+        font-size: 13px;
+        font-weight: 600;
+    }
+}
+
+.model-search-item-id {
+    font-size: 11px;
+    color: @color-muted;
+    font-family: @font-family-mono;
+}
+
+.model-search-item-provider {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: @color-surface-muted;
+    border-radius: @radius-full;
+    color: @color-muted;
+}
+
+// Checkbox Field
+.checkbox-field {
+    label {
+        flex-direction: row !important;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+    }
+}
+
+// Custom Models List
+.custom-models-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.custom-model-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: @color-surface-muted;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-md;
+    transition: border-color @transition-fast;
+
+    &.active {
+        border-left: 3px solid @color-success;
+    }
+
+    &.inactive {
+        opacity: 0.7;
+        border-left: 3px solid @color-muted;
+    }
+
+    @media (max-width: @breakpoint-sm) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.custom-model-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.custom-model-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+
+    strong {
+        font-size: 14px;
+        font-weight: 600;
+    }
+}
+
+.provider-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: @radius-sm;
+    object-fit: contain;
+}
+
+.custom-model-id {
+    display: block;
+    font-size: 12px;
+    color: @color-muted;
+    font-family: @font-family-mono;
+}
+
+.custom-model-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.provider-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: fade(@color-primary, 10%);
+    color: @color-primary;
+    border-radius: @radius-full;
+    font-weight: 500;
+}
+
+.status-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: @radius-full;
+    font-weight: 500;
+
+    &.active {
+        background: fade(@color-success, 12%);
+        color: @color-success;
+    }
+
+    &.inactive {
+        background: fade(@color-muted, 15%);
+        color: @color-muted;
+    }
+}
+
+.custom-model-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+
+    @media (max-width: @breakpoint-sm) {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+// Models Database List
+.models-database-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.database-model-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: @color-surface-muted;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-sm;
+}
+
+.database-model-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+
+    strong {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.database-model-provider {
+    font-size: 11px;
+    color: @color-muted;
+}
+
+.database-model-costs {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.cost-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: @color-surface;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-sm;
+    color: @color-muted;
+    font-family: @font-family-mono;
+    white-space: nowrap;
+}
+
+// Sync Info
+.sync-info {
+    font-size: 13px;
+    margin: 0 0 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid @color-border-light;
+}
+
+// Empty State
+.empty-state {
+    text-align: center;
+    padding: 24px 16px;
+    color: @color-muted;
+
+    p {
+        margin: 0;
+
+        &:first-child {
+            font-weight: 500;
+            color: @color-text;
+        }
+
+        & + p {
+            margin-top: 4px;
+        }
+    }
+
+    .button {
+        margin-top: 16px;
+    }
+}
+
+// Loading State
+.loading-state {
+    text-align: center;
+    padding: 24px 16px;
+    color: @color-muted;
+    font-size: 14px;
+}
+
+// Button small variant
+.button.small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+// Button danger variant
+.button.danger {
+    color: @color-danger;
+    border-color: fade(@color-danger, 30%);
+
+    &:hover {
+        background: fade(@color-danger, 8%);
+        border-color: @color-danger;
+    }
+}

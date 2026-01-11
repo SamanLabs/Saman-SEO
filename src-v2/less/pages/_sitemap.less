@@ -2,6 +2,31 @@
 // Sitemap Page - Sitemap Configuration Styles
 // ==========================================================================
 
+// Stats List in Sidebar
+.stats-list {
+    .flex-column();
+    gap: @spacing-md;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: @spacing-sm;
+    border-bottom: 1px solid @color-border-light;
+
+    &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+}
+
+.stat-value {
+    font-weight: @font-weight-bold;
+    font-size: @font-size-lg;
+    color: @color-text;
+}
+
 // Additional Pages List
 .additional-pages-list {
     .flex-column();
@@ -13,6 +38,9 @@
     display: flex;
     align-items: center;
     gap: @spacing-md;
+    padding: @spacing-sm;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
 }
 
 .page-url-input {
@@ -29,23 +57,28 @@
 // Sitemap Links in Sidebar
 .sitemap-links {
     .flex-column();
-    gap: @spacing-sm;
+    gap: @spacing-md;
 }
 
 .sitemap-link-item {
     .flex-column();
     gap: 4px;
-    font-size: @font-size-sm;
+    padding: @spacing-sm @spacing-md;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
 
     strong {
         color: @color-muted;
-        font-size: @font-size-sm;
+        font-size: @font-size-xs;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     a {
         color: @color-primary;
         word-break: break-all;
         text-decoration: none;
+        font-size: @font-size-sm;
 
         &:hover {
             text-decoration: underline;
@@ -63,11 +96,13 @@
     font-size: @font-size-sm;
     color: @color-primary;
     margin-top: @spacing-sm;
+    font-family: @font-family-mono;
 }
 
 // Post Types Preview for LLM.txt
 .post-types-preview {
-    .flex-column();
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: @spacing-md;
 }
 
@@ -97,6 +132,7 @@
 .post-type-info {
     .flex-column();
     gap: 2px;
+    min-width: 0;
 
     strong {
         font-size: @font-size-base;
@@ -104,6 +140,20 @@
 
     .muted {
         font-size: @font-size-sm;
+    }
+}
+
+// Sitemap panel specific adjustments
+.page-body.two-column {
+    .panel {
+        h3 {
+            font-size: @font-size-lg;
+            margin-bottom: @spacing-xs;
+        }
+
+        > p.muted {
+            margin-bottom: @spacing-lg;
+        }
     }
 }
 
@@ -119,5 +169,9 @@
 
     .page-priority-input {
         flex: 0 0 80px;
+    }
+
+    .post-types-preview {
+        grid-template-columns: 1fr;
     }
 }

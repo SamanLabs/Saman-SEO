@@ -35,10 +35,31 @@
 }
 
 // Page Body Layouts
-.page-body.two-column {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
-    gap: @spacing-xl;
+.page-body {
+    &.two-column {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: @spacing-xl;
+        align-items: start;
+    }
+}
+
+// Main Column (left side in two-column layout)
+.main-column {
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-lg;
+    min-width: 0; // Prevent overflow
+
+    // Panels inside main column stack nicely
+    .panel {
+        margin: 0;
+    }
+
+    // Form actions at bottom
+    > .form-actions {
+        margin-top: @spacing-sm;
+    }
 }
 
 // Sub Tabs
@@ -64,6 +85,13 @@
     }
 }
 
+// Header Actions
+.header-actions {
+    display: flex;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+}
+
 // Responsive
 @media (max-width: @breakpoint-lg) {
     .page-header {
@@ -73,5 +101,9 @@
 
     .page-body.two-column {
         grid-template-columns: 1fr;
+    }
+
+    .side-panel {
+        order: -1; // Move sidebar above on mobile for quick access
     }
 }
