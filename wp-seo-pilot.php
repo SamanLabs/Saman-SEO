@@ -39,6 +39,18 @@ spl_autoload_register(
 			return;
 		}
 
+		// Handle Api namespace separately (in includes/Api/ directory)
+		if ( 0 === strpos( $class, 'WPSEOPilot\\Api\\' ) ) {
+			$class_name = str_replace( 'WPSEOPilot\\Api\\', '', $class );
+			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
+			$file       = WPSEOPILOT_PATH . 'includes/Api/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+			return;
+		}
+
 		$path = strtolower(
 			str_replace(
 				[ '\\', '_' ],
@@ -72,6 +84,11 @@ add_action(
 		}
 
 		\WPSEOPilot\Plugin::instance()->boot();
+
+		// Initialize V2 React Admin (runs alongside V1)
+		if ( is_admin() && class_exists( '\WPSEOPilot\Admin_V2' ) ) {
+			\WPSEOPilot\Admin_V2::get_instance();
+		}
 	}
 );
 
