@@ -42,6 +42,7 @@ class Admin_V2 {
         'wpseopilot-v2-internal-linking'   => 'internal-linking',
         'wpseopilot-v2-audit'              => 'audit',
         'wpseopilot-v2-ai-assistant'       => 'ai-assistant',
+        'wpseopilot-v2-assistants'         => 'assistants',
         'wpseopilot-v2-settings'           => 'settings',
         'wpseopilot-v2-more'               => 'more',
     ];
@@ -204,6 +205,7 @@ class Admin_V2 {
             'Ai'               => 'class-ai-controller.php',
             'SearchAppearance' => 'class-searchappearance-controller.php',
             'Dashboard'        => 'class-dashboard-controller.php',
+            'Assistants'       => 'class-assistants-controller.php',
         ];
 
         foreach ( $controllers as $controller => $file ) {

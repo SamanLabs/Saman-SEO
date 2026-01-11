@@ -1,5 +1,35 @@
 import { useState } from '@wordpress/element';
 
+// AI Assistants
+const aiAssistants = [
+    {
+        id: 'general-seo',
+        name: 'SEO Assistant',
+        description: 'Your helpful SEO buddy for all things search optimization. Ask about meta tags, keywords, content, and more.',
+        icon: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+                <path d="M11 8v6M8 11h6"/>
+            </svg>
+        ),
+        color: '#2271b1',
+    },
+    {
+        id: 'seo-reporter',
+        name: 'SEO Reporter',
+        description: 'Get quick reports on your site\'s SEO health. Find issues, track improvements, and get actionable tips.',
+        icon: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                <rect x="9" y="3" width="6" height="4" rx="1"/>
+                <path d="M9 12h6M9 16h6"/>
+            </svg>
+        ),
+        color: '#00a32a',
+    },
+];
+
 // Tools data sorted by popularity
 const tools = [
     // Popular Tools (working)
@@ -289,6 +319,12 @@ const Tools = ({ onNavigate }) => {
         }
     };
 
+    const handleAssistantClick = (assistant) => {
+        if (onNavigate) {
+            onNavigate('assistants');
+        }
+    };
+
     // Separate popular and other tools
     const popularTools = tools.filter(t => t.popular);
     const otherTools = tools.filter(t => !t.popular);
@@ -301,6 +337,39 @@ const Tools = ({ onNavigate }) => {
                     <p>SEO utilities and helpers to optimize your website.</p>
                 </div>
             </div>
+
+            {/* AI Assistants */}
+            <section className="tools-section">
+                <h2 className="tools-section__title">AI Assistants</h2>
+                <div className="tools-grid tools-grid--large">
+                    {aiAssistants.map((assistant) => (
+                        <button
+                            key={assistant.id}
+                            type="button"
+                            className={`tool-card ${hoveredTool === assistant.id ? 'tool-card--hover' : ''}`}
+                            onClick={() => handleAssistantClick(assistant)}
+                            onMouseEnter={() => setHoveredTool(assistant.id)}
+                            onMouseLeave={() => setHoveredTool(null)}
+                        >
+                            <div className="tool-card__icon" style={{ backgroundColor: `${assistant.color}15`, color: assistant.color }}>
+                                {assistant.icon}
+                            </div>
+                            <div className="tool-card__content">
+                                <div className="tool-card__header">
+                                    <h3 className="tool-card__name">{assistant.name}</h3>
+                                    <span className="tool-card__badge tool-card__badge--ai">AI</span>
+                                </div>
+                                <p className="tool-card__desc">{assistant.description}</p>
+                            </div>
+                            <div className="tool-card__arrow" style={{ color: assistant.color }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M9 18l6-6-6-6"/>
+                                </svg>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </section>
 
             {/* Popular Tools */}
             <section className="tools-section">

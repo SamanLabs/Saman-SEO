@@ -9,6 +9,7 @@ import Log404 from './pages/Log404';
 import InternalLinking from './pages/InternalLinking';
 import Audit from './pages/Audit';
 import AiAssistant from './pages/AiAssistant';
+import Assistants from './pages/Assistants';
 import Settings from './pages/Settings';
 import More from './pages/More';
 import './index.css';
@@ -23,6 +24,7 @@ const viewToPage = {
     'internal-linking': 'wpseopilot-v2-internal-linking',
     audit: 'wpseopilot-v2-audit',
     'ai-assistant': 'wpseopilot-v2-ai-assistant',
+    assistants: 'wpseopilot-v2-assistants',
     settings: 'wpseopilot-v2-settings',
     more: 'wpseopilot-v2-more',
 };
@@ -153,6 +155,8 @@ const App = ({ initialView = 'dashboard' }) => {
                 return <Audit />;
             case 'ai-assistant':
                 return <AiAssistant />;
+            case 'assistants':
+                return <Assistants />;
             case 'settings':
                 return <Settings />;
             case 'more':
