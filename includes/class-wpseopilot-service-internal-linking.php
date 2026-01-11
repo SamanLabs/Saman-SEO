@@ -92,7 +92,8 @@ class Internal_Linking {
 	 */
 	public function boot() {
 		add_action( 'admin_init', [ $this, 'ensure_role_capabilities' ] );
-		add_action( 'admin_menu', [ $this, 'register_menu' ] );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_post_wpseopilot_save_link_rule', [ $this, 'handle_save_rule' ] );
 		add_action( 'admin_post_wpseopilot_delete_link_rule', [ $this, 'handle_delete_rule' ] );

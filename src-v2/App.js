@@ -20,21 +20,21 @@ import SchemaBuilder from './pages/SchemaBuilder';
 import './index.css';
 
 const viewToPage = {
-    dashboard: 'wpseopilot-v2-dashboard',
-    'search-appearance': 'wpseopilot-v2-search-appearance',
-    sitemap: 'wpseopilot-v2-sitemap',
-    tools: 'wpseopilot-v2-tools',
-    redirects: 'wpseopilot-v2-redirects',
-    '404-log': 'wpseopilot-v2-404-log',
-    'internal-linking': 'wpseopilot-v2-internal-linking',
-    audit: 'wpseopilot-v2-audit',
-    'ai-assistant': 'wpseopilot-v2-ai-assistant',
-    assistants: 'wpseopilot-v2-assistants',
-    settings: 'wpseopilot-v2-settings',
-    more: 'wpseopilot-v2-more',
-    'bulk-editor': 'wpseopilot-v2-bulk-editor',
-    'content-gaps': 'wpseopilot-v2-content-gaps',
-    'schema-builder': 'wpseopilot-v2-schema-builder',
+    dashboard: 'wpseopilot-dashboard',
+    'search-appearance': 'wpseopilot-search-appearance',
+    sitemap: 'wpseopilot-sitemap',
+    tools: 'wpseopilot-tools',
+    redirects: 'wpseopilot-redirects',
+    '404-log': 'wpseopilot-404-log',
+    'internal-linking': 'wpseopilot-internal-linking',
+    audit: 'wpseopilot-audit',
+    'ai-assistant': 'wpseopilot-ai-assistant',
+    assistants: 'wpseopilot-assistants',
+    settings: 'wpseopilot-settings',
+    more: 'wpseopilot-more',
+    'bulk-editor': 'wpseopilot-bulk-editor',
+    'content-gaps': 'wpseopilot-content-gaps',
+    'schema-builder': 'wpseopilot-schema-builder',
 };
 
 const pageToView = Object.entries(viewToPage).reduce((acc, [view, page]) => {
@@ -78,12 +78,12 @@ const App = ({ initialView = 'dashboard' }) => {
             return;
         }
 
-        const menu = document.getElementById('toplevel_page_wpseopilot-v2');
+        const menu = document.getElementById('toplevel_page_wpseopilot');
         if (!menu) {
             return;
         }
 
-        const submenuLinks = menu.querySelectorAll('.wp-submenu a[href*="page=wpseopilot-v2"]');
+        const submenuLinks = menu.querySelectorAll('.wp-submenu a[href*="page=wpseopilot"]');
         submenuLinks.forEach((link) => {
             link.removeAttribute('aria-current');
             const listItem = link.closest('li');
@@ -149,13 +149,13 @@ const App = ({ initialView = 'dashboard' }) => {
                 return;
             }
 
-            const menu = document.getElementById('toplevel_page_wpseopilot-v2');
+            const menu = document.getElementById('toplevel_page_wpseopilot');
             if (!menu || !menu.contains(link)) {
                 return;
             }
 
             const href = link.getAttribute('href');
-            if (!href || !href.includes('page=wpseopilot-v2')) {
+            if (!href || !href.includes('page=wpseopilot')) {
                 return;
             }
 

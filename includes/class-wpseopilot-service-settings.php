@@ -84,7 +84,9 @@ class Settings {
 	 */
 	public function boot() {
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_action( 'admin_menu', [ $this, 'register_menu' ] );
+		// V1 menu disabled - React UI (Admin_V2) is now the primary interface
+		// Legacy V1 URLs are redirected to V2 equivalents in Admin_V2::handle_legacy_redirects()
+		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
 	}
 
 	/**

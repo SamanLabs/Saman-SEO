@@ -1,8 +1,8 @@
 <?php
 /**
- * WP SEO Pilot V2 Admin Loader
+ * WP SEO Pilot Admin Loader
  *
- * Handles the React-based admin interface for V2.
+ * Handles the React-based admin interface.
  *
  * @package WPSEOPilot
  * @since 0.2.0
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Admin_V2 class - Manages the V2 React admin interface.
+ * Admin_V2 class - Manages the React admin interface.
  */
 class Admin_V2 {
 
@@ -27,11 +27,37 @@ class Admin_V2 {
     private static $instance = null;
 
     /**
+     * Main menu slug.
+     *
+     * @var string
+     */
+    const MENU_SLUG = 'wpseopilot';
+
+    /**
      * View mapping for WordPress pages to React views.
+     * Maps both new URLs and legacy V2 URLs for backwards compatibility.
      *
      * @var array
      */
     private $view_map = [
+        // New URLs (primary)
+        'wpseopilot'                    => 'dashboard',
+        'wpseopilot-dashboard'          => 'dashboard',
+        'wpseopilot-search-appearance'  => 'search-appearance',
+        'wpseopilot-sitemap'            => 'sitemap',
+        'wpseopilot-tools'              => 'tools',
+        'wpseopilot-redirects'          => 'redirects',
+        'wpseopilot-404-log'            => '404-log',
+        'wpseopilot-internal-linking'   => 'internal-linking',
+        'wpseopilot-audit'              => 'audit',
+        'wpseopilot-ai-assistant'       => 'ai-assistant',
+        'wpseopilot-assistants'         => 'assistants',
+        'wpseopilot-settings'           => 'settings',
+        'wpseopilot-more'               => 'more',
+        'wpseopilot-bulk-editor'        => 'bulk-editor',
+        'wpseopilot-content-gaps'       => 'content-gaps',
+        'wpseopilot-schema-builder'     => 'schema-builder',
+        // Legacy V2 URLs (backwards compatibility)
         'wpseopilot-v2'                    => 'dashboard',
         'wpseopilot-v2-dashboard'          => 'dashboard',
         'wpseopilot-v2-search-appearance'  => 'search-appearance',
@@ -51,6 +77,22 @@ class Admin_V2 {
     ];
 
     /**
+     * Legacy V1 URL to new URL mapping for redirects.
+     *
+     * @var array
+     */
+    private $legacy_redirects = [
+        // Only include redirects where old URL differs from new URL
+        'wpseopilot-types'        => 'wpseopilot-search-appearance',
+        'wpseopilot-404-errors'   => 'wpseopilot-404-log',
+        'wpseopilot-internal'     => 'wpseopilot-internal-linking',
+        'wpseopilot-ai'           => 'wpseopilot-ai-assistant',
+        'wpseopilot-local-seo'    => 'wpseopilot-settings',
+        'wpseopilot-links'        => 'wpseopilot-internal-linking',
+        'wpseopilot-404'          => 'wpseopilot-404-log',
+    ];
+
+    /**
      * Get singleton instance.
      *
      * @return Admin_V2
@@ -66,28 +108,53 @@ class Admin_V2 {
      * Constructor - Register hooks.
      */
     private function __construct() {
-        add_action( 'admin_menu', [ $this, 'register_menu' ], 11 );
+        add_action( 'admin_menu', [ $this, 'register_menu' ], 5 ); // Priority 5 to run before V1
+        add_action( 'admin_init', [ $this, 'handle_legacy_redirects' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
         add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+    }
+
+    /**
+     * Handle redirects from legacy V1 and V2 URLs.
+     */
+    public function handle_legacy_redirects() {
+        if ( ! is_admin() || ! isset( $_GET['page'] ) ) {
+            return;
+        }
+
+        $page = sanitize_text_field( $_GET['page'] );
+
+        // Redirect legacy V1 URLs
+        if ( isset( $this->legacy_redirects[ $page ] ) ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=' . $this->legacy_redirects[ $page ] ) );
+            exit;
+        }
+
+        // Redirect old V2 URLs to new URLs (remove -v2 prefix)
+        if ( strpos( $page, 'wpseopilot-v2' ) === 0 ) {
+            $new_page = str_replace( 'wpseopilot-v2', 'wpseopilot', $page );
+            wp_safe_redirect( admin_url( 'admin.php?page=' . $new_page ) );
+            exit;
+        }
     }
 
     /**
      * Register admin menu and submenus.
      */
     public function register_menu() {
-        // Main V2 menu
+        // Main menu
         add_menu_page(
-            __( 'WP SEO Pilot V2', 'wp-seo-pilot' ),
-            __( 'WP SEO Pilot V2', 'wp-seo-pilot' ),
+            __( 'WP SEO Pilot', 'wp-seo-pilot' ),
+            __( 'WP SEO Pilot', 'wp-seo-pilot' ),
             'manage_options',
-            'wpseopilot-v2',
+            self::MENU_SLUG,
             [ $this, 'render_app' ],
             'dashicons-airplane',
-            99
+            58
         );
 
-        // Submenu items - matching Header.js navItems
-        $subpages = [
+        // Visible submenu items - matching Header.js navItems
+        $visible_subpages = [
             'dashboard'          => __( 'Dashboard', 'wp-seo-pilot' ),
             'search-appearance'  => __( 'Search Appearance', 'wp-seo-pilot' ),
             'sitemap'            => __( 'Sitemap', 'wp-seo-pilot' ),
@@ -96,19 +163,43 @@ class Admin_V2 {
             'more'               => __( 'More', 'wp-seo-pilot' ),
         ];
 
-        foreach ( $subpages as $slug => $title ) {
+        foreach ( $visible_subpages as $slug => $title ) {
             add_submenu_page(
-                'wpseopilot-v2',
+                self::MENU_SLUG,
                 $title,
                 $title,
                 'manage_options',
-                'wpseopilot-v2-' . $slug,
+                self::MENU_SLUG . '-' . $slug,
+                [ $this, 'render_app' ]
+            );
+        }
+
+        // Hidden subpages - accessible via React navigation but not shown in WP menu
+        $hidden_subpages = [
+            'redirects'        => __( 'Redirects', 'wp-seo-pilot' ),
+            '404-log'          => __( '404 Log', 'wp-seo-pilot' ),
+            'internal-linking' => __( 'Internal Linking', 'wp-seo-pilot' ),
+            'audit'            => __( 'Site Audit', 'wp-seo-pilot' ),
+            'ai-assistant'     => __( 'AI Assistant', 'wp-seo-pilot' ),
+            'assistants'       => __( 'AI Assistants', 'wp-seo-pilot' ),
+            'bulk-editor'      => __( 'Bulk Editor', 'wp-seo-pilot' ),
+            'content-gaps'     => __( 'Content Gaps', 'wp-seo-pilot' ),
+            'schema-builder'   => __( 'Schema Builder', 'wp-seo-pilot' ),
+        ];
+
+        foreach ( $hidden_subpages as $slug => $title ) {
+            add_submenu_page(
+                null, // null parent = hidden from menu
+                $title,
+                $title,
+                'manage_options',
+                self::MENU_SLUG . '-' . $slug,
                 [ $this, 'render_app' ]
             );
         }
 
         // Remove duplicate first submenu item (WordPress auto-creates it)
-        remove_submenu_page( 'wpseopilot-v2', 'wpseopilot-v2' );
+        remove_submenu_page( self::MENU_SLUG, self::MENU_SLUG );
     }
 
     /**
@@ -124,8 +215,8 @@ class Admin_V2 {
      * @param string $hook Current admin page hook.
      */
     public function enqueue_assets( $hook ) {
-        // Only load on our plugin pages
-        if ( strpos( $hook, 'wpseopilot-v2' ) === false ) {
+        // Only load on our plugin pages (both new and legacy URLs)
+        if ( strpos( $hook, 'wpseopilot' ) === false ) {
             return;
         }
 
@@ -159,7 +250,7 @@ class Admin_V2 {
         );
 
         // Determine initial view from page parameter
-        $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : 'wpseopilot-v2';
+        $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : self::MENU_SLUG;
         $initial_view = isset( $this->view_map[ $page ] ) ? $this->view_map[ $page ] : 'dashboard';
 
         // Pass configuration to React app
@@ -171,6 +262,7 @@ class Admin_V2 {
             'pluginUrl'   => WPSEOPILOT_URL,
             'version'     => WPSEOPILOT_VERSION,
             'viewMap'     => $this->view_map,
+            'menuSlug'    => self::MENU_SLUG,
         ] );
     }
 

@@ -25,7 +25,8 @@ class Local_SEO {
 			return;
 		}
 
-		add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
 	}

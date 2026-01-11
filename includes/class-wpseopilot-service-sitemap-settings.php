@@ -49,7 +49,8 @@ class Sitemap_Settings {
 	 */
 	public function boot() {
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_action( 'admin_menu', [ $this, 'register_menu' ], 20 );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_menu' ], 20 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'wp_ajax_wpseopilot_regenerate_sitemap', [ $this, 'ajax_regenerate_sitemap' ] );
 

@@ -71,7 +71,8 @@ class Redirect_Manager {
 		}
 
 		add_action( 'template_redirect', [ $this, 'maybe_redirect' ], 0 );
-		add_action( 'admin_menu', [ $this, 'register_menu' ] );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_post_wpseopilot_save_redirect', [ $this, 'handle_save' ] );
 		add_action( 'admin_post_wpseopilot_delete_redirect', [ $this, 'handle_delete' ] );
 		add_action( 'admin_post_wpseopilot_dismiss_slug', [ $this, 'handle_dismiss_slug' ] );

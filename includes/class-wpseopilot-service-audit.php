@@ -23,7 +23,8 @@ class Audit {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'admin_menu', [ $this, 'register_page' ] );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_page' ] );
 		add_filter( 'wpseopilot_link_suggestions', [ $this, 'link_suggestions' ], 10, 2 );
 	}
 

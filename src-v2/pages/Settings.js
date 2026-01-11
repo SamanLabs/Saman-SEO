@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
+import AnalyticsNotice from '../components/AnalyticsNotice';
 import useUrlTab from '../hooks/useUrlTab';
+import { analytics } from '../utils/analytics';
 
 const settingsTabs = [
     { id: 'general', label: 'General' },
@@ -409,15 +411,35 @@ const ModulesTab = ({ settings, updateSetting }) => {
         { key: 'module_llm_txt', name: 'LLM.txt', desc: 'Generate llm.txt file for AI crawlers and LLMs.', icon: '🤖' },
         { key: 'module_local_seo', name: 'Local SEO', desc: 'Local business schema and location pages.', icon: '📍' },
         { key: 'module_ai_assistant', name: 'AI Assistant', desc: 'AI-powered content optimization suggestions.', icon: '✨' },
-        { key: 'module_analytics', name: 'Analytics', desc: 'Built-in analytics tracking (Matomo compatible).', icon: '📈' },
         { key: 'module_search_console', name: 'Search Console', desc: 'Google Search Console integration.', icon: '🔍' },
     ];
 
     const enabledCount = modules.filter(m => settings[m.key]).length;
 
+    // Handle module toggle with analytics tracking
+    const handleModuleToggle = (key, enabled) => {
+        updateSetting(key, enabled);
+        analytics.settings.moduleToggle(key.replace('module_', ''), enabled);
+    };
+
+    // Handle analytics toggle separately (it's special)
+    const handleAnalyticsToggle = (enabled) => {
+        updateSetting('module_analytics', enabled);
+        // Note: Can't track disabling analytics since it would disable itself
+        if (enabled) {
+            analytics.settings.moduleToggle('analytics', true);
+        }
+    };
+
     return (
         <div className="settings-layout">
             <div className="settings-main">
+                {/* Analytics Notice - Always at top */}
+                <AnalyticsNotice
+                    isEnabled={settings.module_analytics}
+                    onToggle={handleAnalyticsToggle}
+                />
+
                 <section className="panel">
                     <div className="panel-header">
                         <div>
@@ -436,7 +458,11 @@ const ModulesTab = ({ settings, updateSetting }) => {
                                     <p>{module.desc}</p>
                                 </div>
                                 <label className="toggle">
-                                    <input type="checkbox" checked={settings[module.key]} onChange={(e) => updateSetting(module.key, e.target.checked)} />
+                                    <input
+                                        type="checkbox"
+                                        checked={settings[module.key]}
+                                        onChange={(e) => handleModuleToggle(module.key, e.target.checked)}
+                                    />
                                     <span className="toggle-track" />
                                 </label>
                             </div>
