@@ -150,6 +150,36 @@
     .text-truncate();
 }
 
+// Title Preview Cell (in tables)
+.title-preview-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 350px;
+}
+
+.title-preview-cell__title {
+    font-size: @font-size-base;
+    font-weight: @font-weight-medium;
+    color: @color-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.title-preview-cell__template {
+    font-size: 11px;
+    font-family: @font-family-mono;
+    color: @color-muted;
+    background: @color-surface-muted;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
 // Responsive
 @media (max-width: @breakpoint-lg) {
     .archives-grid {

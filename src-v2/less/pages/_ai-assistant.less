@@ -1,0 +1,420 @@
+// ==========================================================================
+// AI Assistant Page Styles
+// ==========================================================================
+
+// API Status Badge
+.api-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: @radius-full;
+    font-size: 13px;
+    font-weight: 600;
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    &.connected {
+        background: fade(@color-success, 12%);
+        color: @color-success;
+
+        .status-dot {
+            background: @color-success;
+            box-shadow: 0 0 0 3px fade(@color-success, 20%);
+        }
+    }
+
+    &.disconnected {
+        background: fade(@color-warning, 12%);
+        color: @color-warning;
+
+        .status-dot {
+            background: @color-warning;
+        }
+    }
+}
+
+// Main Layout - Two Column
+.ai-settings-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 20px;
+
+    @media (max-width: @breakpoint-xl) {
+        grid-template-columns: 1fr 360px;
+    }
+
+    @media (max-width: @breakpoint-lg) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ai-config-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ai-test-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// AI Card Component
+.ai-card {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    overflow: hidden;
+}
+
+.ai-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid @color-border-light;
+    background: @color-surface-muted;
+
+    h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+}
+
+.ai-card-body {
+    padding: 18px;
+}
+
+.ai-card-footer {
+    padding: 14px 18px;
+    border-top: 1px solid @color-border-light;
+    background: @color-surface-muted;
+}
+
+// Form Grid (API Key + Model side by side)
+.ai-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    @media (max-width: @breakpoint-sm) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ai-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        font-size: 13px;
+        font-weight: 600;
+        color: @color-text;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid @color-border;
+        border-radius: @radius-md;
+        font-size: 14px;
+        background: @color-surface;
+        transition: border-color @transition-fast, box-shadow @transition-fast;
+
+        &:focus {
+            outline: none;
+            border-color: @color-primary;
+            box-shadow: 0 0 0 3px fade(@color-primary, 12%);
+        }
+    }
+}
+
+// Prompts Stack
+.ai-prompts-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ai-prompts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    @media (max-width: @breakpoint-md) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ai-prompt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 13px;
+        font-weight: 600;
+        color: @color-text;
+    }
+
+    .label-hint {
+        font-weight: 400;
+        font-size: 11px;
+        color: @color-muted;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid @color-border;
+        border-radius: @radius-md;
+        font-size: 13px;
+        font-family: @font-family;
+        line-height: 1.5;
+        resize: vertical;
+        min-height: 60px;
+        transition: border-color @transition-fast, box-shadow @transition-fast;
+
+        &:focus {
+            outline: none;
+            border-color: @color-primary;
+            box-shadow: 0 0 0 3px fade(@color-primary, 12%);
+        }
+
+        &::placeholder {
+            color: @color-muted;
+        }
+    }
+}
+
+// Test Card
+.ai-test-card {
+    .ai-card-body {
+        padding: 16px;
+    }
+}
+
+.ai-test-input {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid @color-border;
+        border-radius: @radius-md;
+        font-size: 13px;
+        font-family: @font-family;
+        line-height: 1.5;
+        resize: vertical;
+        min-height: 100px;
+        transition: border-color @transition-fast;
+
+        &:focus {
+            outline: none;
+            border-color: @color-primary;
+            box-shadow: 0 0 0 3px fade(@color-primary, 12%);
+        }
+
+        &::placeholder {
+            color: @color-muted;
+        }
+    }
+
+    .button {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+// Spinner
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+// AI Results
+.ai-results {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid @color-border-light;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ai-result-item {
+    background: @color-surface-muted;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-md;
+    padding: 12px;
+}
+
+.ai-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.ai-result-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: @color-muted;
+}
+
+.ai-result-count {
+    font-size: 11px;
+    color: @color-muted;
+    font-variant-numeric: tabular-nums;
+}
+
+.ai-result-value {
+    font-size: 14px;
+    line-height: 1.5;
+    color: @color-text;
+}
+
+// Info Grid
+.ai-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ai-info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+}
+
+.ai-info-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: @radius-md;
+    background: fade(@color-primary, 10%);
+    color: @color-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ai-info-content {
+    flex: 1;
+    min-width: 0;
+
+    strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    p {
+        margin: 0;
+        font-size: 12px;
+        color: @color-muted;
+        line-height: 1.4;
+    }
+}
+
+// Coming Soon
+.ai-coming-soon {
+    text-align: center;
+    padding: 60px 40px;
+    max-width: 480px;
+    margin: 0 auto;
+
+    @media (max-width: @breakpoint-sm) {
+        padding: 40px 20px;
+    }
+
+    h2 {
+        margin: 16px 0 8px;
+        font-size: 22px;
+    }
+}
+
+.ai-coming-soon-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, fade(@color-primary, 12%), fade(@color-success, 8%));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: @color-primary;
+}
+
+.ai-coming-soon-list {
+    text-align: left;
+    max-width: 320px;
+    margin: 24px auto;
+    padding: 20px;
+    background: @color-surface-muted;
+    border-radius: @radius-lg;
+    border: 1px solid @color-border;
+}
+
+.ai-coming-soon-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+
+    .check {
+        color: @color-success;
+        font-weight: 700;
+    }
+}
+
+// Notice Messages
+.notice-message {
+    padding: 12px 16px;
+    border-radius: @radius-md;
+    font-size: 14px;
+    margin-bottom: 16px;
+
+    &.success {
+        background: fade(@color-success, 10%);
+        border: 1px solid fade(@color-success, 25%);
+        color: darken(@color-success, 10%);
+    }
+
+    &.error {
+        background: fade(@color-danger, 10%);
+        border: 1px solid fade(@color-danger, 25%);
+        color: @color-danger;
+    }
+}

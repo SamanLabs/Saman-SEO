@@ -10,6 +10,43 @@ const searchAppearanceTabs = [
     { id: 'content-types', label: 'Content Types' },
     { id: 'taxonomies', label: 'Taxonomies' },
     { id: 'archives', label: 'Archives' },
+    { id: 'social-settings', label: 'Social Settings' },
+    { id: 'social-cards', label: 'Social Cards' },
+];
+
+// Schema type options
+const schemaTypeOptions = [
+    { value: '', label: 'Use default (Article)' },
+    { value: 'article', label: 'Article' },
+    { value: 'blogposting', label: 'Blog posting' },
+    { value: 'newsarticle', label: 'News article' },
+    { value: 'product', label: 'Product' },
+    { value: 'profilepage', label: 'Profile page' },
+    { value: 'website', label: 'Website' },
+    { value: 'organization', label: 'Organization' },
+    { value: 'event', label: 'Event' },
+    { value: 'recipe', label: 'Recipe' },
+    { value: 'videoobject', label: 'Video object' },
+    { value: 'book', label: 'Book' },
+    { value: 'service', label: 'Service' },
+    { value: 'localbusiness', label: 'Local business' },
+];
+
+// Social card layout options
+const cardLayoutOptions = [
+    { value: 'default', label: 'Default', description: 'Title with accent bar at bottom' },
+    { value: 'centered', label: 'Centered', description: 'Centered text layout' },
+    { value: 'minimal', label: 'Minimal', description: 'Text only, no accent' },
+    { value: 'bold', label: 'Bold', description: 'Large accent block' },
+];
+
+// Logo position options
+const logoPositionOptions = [
+    { value: 'top-left', label: 'Top Left' },
+    { value: 'top-right', label: 'Top Right' },
+    { value: 'bottom-left', label: 'Bottom Left' },
+    { value: 'bottom-right', label: 'Bottom Right' },
+    { value: 'center', label: 'Center' },
 ];
 
 const SearchAppearance = () => {
@@ -47,6 +84,32 @@ const SearchAppearance = () => {
     const [archives, setArchives] = useState([]);
     const [editingArchive, setEditingArchive] = useState(null);
 
+    // Social Settings state
+    const [socialDefaults, setSocialDefaults] = useState({
+        og_title: '',
+        og_description: '',
+        twitter_title: '',
+        twitter_description: '',
+        image_source: '',
+        schema_itemtype: '',
+    });
+    const [postTypeSocialDefaults, setPostTypeSocialDefaults] = useState({});
+    const [editingPostTypeSocial, setEditingPostTypeSocial] = useState(null);
+
+    // Social Cards state
+    const [cardDesign, setCardDesign] = useState({
+        background_color: '#1a1a36',
+        accent_color: '#5a84ff',
+        text_color: '#ffffff',
+        title_font_size: 48,
+        site_font_size: 24,
+        logo_url: '',
+        logo_position: 'bottom-left',
+        layout: 'default',
+    });
+    const [cardPreviewTitle, setCardPreviewTitle] = useState('Sample Post Title - Understanding Core Web Vitals');
+    const [cardModuleEnabled, setCardModuleEnabled] = useState(true);
+
     // Fetch all data on mount
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -64,6 +127,28 @@ const SearchAppearance = () => {
                 setSiteInfo(data.site_info || {});
                 setVariables(data.variables || {});
                 setVariableValues(data.variable_values || {});
+                // Social settings
+                setSocialDefaults(data.social_defaults || {
+                    og_title: '',
+                    og_description: '',
+                    twitter_title: '',
+                    twitter_description: '',
+                    image_source: '',
+                    schema_itemtype: '',
+                });
+                setPostTypeSocialDefaults(data.post_type_social_defaults || {});
+                // Social cards
+                setCardDesign(data.card_design || {
+                    background_color: '#1a1a36',
+                    accent_color: '#5a84ff',
+                    text_color: '#ffffff',
+                    title_font_size: 48,
+                    site_font_size: 24,
+                    logo_url: '',
+                    logo_position: 'bottom-left',
+                    layout: 'default',
+                });
+                setCardModuleEnabled(data.card_module_enabled !== false);
             }
         } catch (error) {
             console.error('Failed to fetch search appearance settings:', error);
@@ -244,6 +329,68 @@ const SearchAppearance = () => {
         }
     };
 
+    // Save social defaults
+    const saveSocialDefaults = async () => {
+        setSaving(true);
+        try {
+            const response = await apiFetch({
+                path: '/wpseopilot/v2/search-appearance/social-defaults',
+                method: 'POST',
+                data: socialDefaults,
+            });
+            if (response.success) {
+                setSaveMessage('Social settings saved.');
+            }
+        } catch (error) {
+            console.error('Failed to save social defaults:', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Save post type social settings
+    const savePostTypeSocial = async (slug, settings) => {
+        setSaving(true);
+        try {
+            const response = await apiFetch({
+                path: `/wpseopilot/v2/search-appearance/social-defaults/${slug}`,
+                method: 'POST',
+                data: settings,
+            });
+            if (response.success) {
+                setPostTypeSocialDefaults(prev => ({
+                    ...prev,
+                    [slug]: settings,
+                }));
+                setEditingPostTypeSocial(null);
+                setSaveMessage('Post type social settings saved.');
+            }
+        } catch (error) {
+            console.error('Failed to save post type social settings:', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Save card design
+    const saveCardDesign = async () => {
+        setSaving(true);
+        try {
+            const response = await apiFetch({
+                path: '/wpseopilot/v2/search-appearance/card-design',
+                method: 'POST',
+                data: cardDesign,
+            });
+            if (response.success) {
+                setSaveMessage('Social card design saved.');
+            }
+        } catch (error) {
+            console.error('Failed to save card design:', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="page">
@@ -356,6 +503,23 @@ const SearchAppearance = () => {
                             </div>
                         </div>
 
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label htmlFor="home-keywords">Meta Keywords</label>
+                                <p className="settings-help">Comma-separated keywords (optional, less relevant for modern SEO).</p>
+                            </div>
+                            <div className="settings-control">
+                                <input
+                                    type="text"
+                                    id="home-keywords"
+                                    className="input"
+                                    value={homepage.meta_keywords || ''}
+                                    onChange={(e) => setHomepage({ ...homepage, meta_keywords: e.target.value })}
+                                    placeholder="keyword1, keyword2, keyword3"
+                                />
+                            </div>
+                        </div>
+
                         <div className="form-actions">
                             <button
                                 type="button"
@@ -405,34 +569,42 @@ const SearchAppearance = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {postTypes.map((pt) => (
-                                    <tr key={pt.slug}>
-                                        <td>
-                                            <strong>{pt.name}</strong>
-                                            <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{pt.slug}</span>
-                                        </td>
-                                        <td>
-                                            <span className="template-preview-text">
-                                                {renderTemplatePreview(pt.title_template || '{{post_title}} {{separator}} {{site_title}}')}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span className={`pill ${pt.noindex ? 'warning' : 'success'}`}>
-                                                {pt.noindex ? 'No' : 'Yes'}
-                                            </span>
-                                        </td>
-                                        <td>{pt.count}</td>
-                                        <td>
-                                            <button
-                                                type="button"
-                                                className="link-button"
-                                                onClick={() => setEditingPostType({ ...pt })}
-                                            >
-                                                Edit
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {postTypes.map((pt) => {
+                                    const template = pt.title_template || '{{post_title}} {{separator}} {{site_title}}';
+                                    return (
+                                        <tr key={pt.slug}>
+                                            <td>
+                                                <strong>{pt.name}</strong>
+                                                <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{pt.slug}</span>
+                                            </td>
+                                            <td>
+                                                <div className="title-preview-cell">
+                                                    <span className="title-preview-cell__title">
+                                                        {renderTemplatePreview(template)}
+                                                    </span>
+                                                    <code className="title-preview-cell__template">
+                                                        {template}
+                                                    </code>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`pill ${pt.noindex ? 'warning' : 'success'}`}>
+                                                    {pt.noindex ? 'No' : 'Yes'}
+                                                </span>
+                                            </td>
+                                            <td>{pt.count}</td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="link-button"
+                                                    onClick={() => setEditingPostType({ ...pt })}
+                                                >
+                                                    Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}
@@ -473,34 +645,42 @@ const SearchAppearance = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {taxonomies.map((tax) => (
-                                    <tr key={tax.slug}>
-                                        <td>
-                                            <strong>{tax.name}</strong>
-                                            <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{tax.slug}</span>
-                                        </td>
-                                        <td>
-                                            <span className="template-preview-text">
-                                                {renderTemplatePreview(tax.title_template || '{{term_title}} {{separator}} {{site_title}}')}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span className={`pill ${tax.noindex ? 'warning' : 'success'}`}>
-                                                {tax.noindex ? 'No' : 'Yes'}
-                                            </span>
-                                        </td>
-                                        <td>{tax.count}</td>
-                                        <td>
-                                            <button
-                                                type="button"
-                                                className="link-button"
-                                                onClick={() => setEditingTaxonomy({ ...tax })}
-                                            >
-                                                Edit
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {taxonomies.map((tax) => {
+                                    const template = tax.title_template || '{{term_title}} {{separator}} {{site_title}}';
+                                    return (
+                                        <tr key={tax.slug}>
+                                            <td>
+                                                <strong>{tax.name}</strong>
+                                                <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{tax.slug}</span>
+                                            </td>
+                                            <td>
+                                                <div className="title-preview-cell">
+                                                    <span className="title-preview-cell__title">
+                                                        {renderTemplatePreview(template)}
+                                                    </span>
+                                                    <code className="title-preview-cell__template">
+                                                        {template}
+                                                    </code>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`pill ${tax.noindex ? 'warning' : 'success'}`}>
+                                                    {tax.noindex ? 'No' : 'Yes'}
+                                                </span>
+                                            </td>
+                                            <td>{tax.count}</td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="link-button"
+                                                    onClick={() => setEditingTaxonomy({ ...tax })}
+                                                >
+                                                    Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}
@@ -534,44 +714,686 @@ const SearchAppearance = () => {
                             renderTemplatePreview={renderTemplatePreview}
                         />
                     ) : (
-                        <>
-                            <div className="archives-grid">
-                                {archives.map((archive) => (
-                                    <div key={archive.slug} className="archive-card">
-                                        <div className="archive-card__header">
-                                            <h4>{archive.name}</h4>
-                                            <span className={`pill ${archive.noindex ? 'warning' : 'success'}`}>
-                                                {archive.noindex ? 'Noindex' : 'Indexed'}
-                                            </span>
-                                        </div>
-                                        <p className="muted">{archive.description}</p>
-                                        <div className="archive-card__preview">
-                                            <span className="template-preview-text">
-                                                {renderTemplatePreview(archive.title_template)}
-                                            </span>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            className="link-button"
-                                            onClick={() => setEditingArchive({ ...archive })}
-                                        >
-                                            Edit Settings
-                                        </button>
-                                    </div>
-                                ))}
+                        <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Archive Type</th>
+                                    <th>Title Preview</th>
+                                    <th>Show in Search</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {archives.map((archive) => {
+                                    const template = archive.title_template || '{{archive_title}} {{separator}} {{site_title}}';
+                                    return (
+                                        <tr key={archive.slug}>
+                                            <td>
+                                                <strong>{archive.name}</strong>
+                                                <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{archive.description}</span>
+                                            </td>
+                                            <td>
+                                                <div className="title-preview-cell">
+                                                    <span className="title-preview-cell__title">
+                                                        {renderTemplatePreview(template)}
+                                                    </span>
+                                                    <code className="title-preview-cell__template">
+                                                        {template}
+                                                    </code>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`pill ${archive.noindex ? 'warning' : 'success'}`}>
+                                                    {archive.noindex ? 'No' : 'Yes'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="link-button"
+                                                    onClick={() => setEditingArchive({ ...archive })}
+                                                >
+                                                    Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    )}
+                </section>
+            )}
+
+            {/* Social Settings Tab */}
+            {activeTab === 'social-settings' && (
+                <section className="panel">
+                    <div className="table-toolbar">
+                        <div>
+                            <h3>Social Settings</h3>
+                            <p className="muted">Configure default Open Graph, Twitter, and schema values for social sharing.</p>
+                        </div>
+                    </div>
+
+                    {editingPostTypeSocial ? (
+                        <div className="settings-form">
+                            <div className="type-editor__header">
+                                <h4>Edit {editingPostTypeSocial.name} Social Settings</h4>
+                                <button
+                                    type="button"
+                                    className="link-button"
+                                    onClick={() => setEditingPostTypeSocial(null)}
+                                >
+                                    Cancel
+                                </button>
                             </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>OG Title</label>
+                                    <p className="settings-help">Open Graph title for Facebook shares.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <TemplateInput
+                                        value={editingPostTypeSocial.og_title || ''}
+                                        onChange={(val) => setEditingPostTypeSocial({ ...editingPostTypeSocial, og_title: val })}
+                                        placeholder="{{post_title}} {{separator}} {{site_title}}"
+                                        variables={variables}
+                                        variableValues={variableValues}
+                                        context="post"
+                                        maxLength={60}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>OG Description</label>
+                                    <p className="settings-help">Open Graph description for Facebook shares.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <TemplateInput
+                                        value={editingPostTypeSocial.og_description || ''}
+                                        onChange={(val) => setEditingPostTypeSocial({ ...editingPostTypeSocial, og_description: val })}
+                                        placeholder="{{post_excerpt}}"
+                                        variables={variables}
+                                        variableValues={variableValues}
+                                        context="post"
+                                        multiline
+                                        maxLength={160}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>Twitter Title</label>
+                                    <p className="settings-help">Twitter card title.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <TemplateInput
+                                        value={editingPostTypeSocial.twitter_title || ''}
+                                        onChange={(val) => setEditingPostTypeSocial({ ...editingPostTypeSocial, twitter_title: val })}
+                                        placeholder="{{post_title}} {{separator}} {{site_title}}"
+                                        variables={variables}
+                                        variableValues={variableValues}
+                                        context="post"
+                                        maxLength={60}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>Twitter Description</label>
+                                    <p className="settings-help">Twitter card description.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <TemplateInput
+                                        value={editingPostTypeSocial.twitter_description || ''}
+                                        onChange={(val) => setEditingPostTypeSocial({ ...editingPostTypeSocial, twitter_description: val })}
+                                        placeholder="{{post_excerpt}}"
+                                        variables={variables}
+                                        variableValues={variableValues}
+                                        context="post"
+                                        multiline
+                                        maxLength={160}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>Image URL</label>
+                                    <p className="settings-help">Fallback image for social sharing.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <input
+                                        type="url"
+                                        className="input"
+                                        value={editingPostTypeSocial.image_source || ''}
+                                        onChange={(e) => setEditingPostTypeSocial({ ...editingPostTypeSocial, image_source: e.target.value })}
+                                        placeholder="https://example.com/image.jpg"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>Schema Type</label>
+                                    <p className="settings-help">Schema.org type for this post type.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <select
+                                        className="input"
+                                        value={editingPostTypeSocial.schema_itemtype || ''}
+                                        onChange={(e) => setEditingPostTypeSocial({ ...editingPostTypeSocial, schema_itemtype: e.target.value })}
+                                    >
+                                        {schemaTypeOptions.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
                             <div className="form-actions">
                                 <button
                                     type="button"
                                     className="button primary"
-                                    onClick={saveArchives}
+                                    onClick={() => savePostTypeSocial(editingPostTypeSocial.slug, editingPostTypeSocial)}
                                     disabled={saving}
                                 >
-                                    {saving ? 'Saving...' : 'Save Archive Settings'}
+                                    {saving ? 'Saving...' : 'Save Settings'}
                                 </button>
+                                <button
+                                    type="button"
+                                    className="button"
+                                    onClick={() => setEditingPostTypeSocial(null)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Global Social Defaults */}
+                            <div className="settings-form" style={{ marginBottom: '32px' }}>
+                                <h4 style={{ marginBottom: '16px' }}>Global Social Defaults</h4>
+                                <p className="muted" style={{ marginBottom: '24px' }}>
+                                    These defaults apply when posts don't have custom social values.
+                                </p>
+
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>OG Title</label>
+                                        <p className="settings-help">Default Open Graph title for Facebook.</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <TemplateInput
+                                            value={socialDefaults.og_title || ''}
+                                            onChange={(val) => setSocialDefaults({ ...socialDefaults, og_title: val })}
+                                            placeholder="{{site_title}} {{separator}} {{tagline}}"
+                                            variables={variables}
+                                            variableValues={variableValues}
+                                            context="global"
+                                            maxLength={60}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>OG Description</label>
+                                        <p className="settings-help">Default Open Graph description.</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <TemplateInput
+                                            value={socialDefaults.og_description || ''}
+                                            onChange={(val) => setSocialDefaults({ ...socialDefaults, og_description: val })}
+                                            placeholder="{{tagline}}"
+                                            variables={variables}
+                                            variableValues={variableValues}
+                                            context="global"
+                                            multiline
+                                            maxLength={160}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>Twitter Title</label>
+                                        <p className="settings-help">Default Twitter card title.</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <TemplateInput
+                                            value={socialDefaults.twitter_title || ''}
+                                            onChange={(val) => setSocialDefaults({ ...socialDefaults, twitter_title: val })}
+                                            placeholder="{{site_title}} {{separator}} {{tagline}}"
+                                            variables={variables}
+                                            variableValues={variableValues}
+                                            context="global"
+                                            maxLength={60}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>Twitter Description</label>
+                                        <p className="settings-help">Default Twitter card description.</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <TemplateInput
+                                            value={socialDefaults.twitter_description || ''}
+                                            onChange={(val) => setSocialDefaults({ ...socialDefaults, twitter_description: val })}
+                                            placeholder="{{tagline}}"
+                                            variables={variables}
+                                            variableValues={variableValues}
+                                            context="global"
+                                            multiline
+                                            maxLength={160}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>Fallback Image URL</label>
+                                        <p className="settings-help">Used when posts don't have a featured image (1200x630px recommended).</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <input
+                                            type="url"
+                                            className="input"
+                                            value={socialDefaults.image_source || ''}
+                                            onChange={(e) => setSocialDefaults({ ...socialDefaults, image_source: e.target.value })}
+                                            placeholder="https://example.com/default-social.jpg"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="settings-row compact">
+                                    <div className="settings-label">
+                                        <label>Default Schema Type</label>
+                                        <p className="settings-help">Controls the og:type meta tag for content.</p>
+                                    </div>
+                                    <div className="settings-control">
+                                        <select
+                                            className="input"
+                                            value={socialDefaults.schema_itemtype || ''}
+                                            onChange={(e) => setSocialDefaults({ ...socialDefaults, schema_itemtype: e.target.value })}
+                                        >
+                                            {schemaTypeOptions.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-actions">
+                                    <button
+                                        type="button"
+                                        className="button primary"
+                                        onClick={saveSocialDefaults}
+                                        disabled={saving}
+                                    >
+                                        {saving ? 'Saving...' : 'Save Global Defaults'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Post Type Specific Settings */}
+                            <div style={{ marginTop: '32px' }}>
+                                <h4 style={{ marginBottom: '8px' }}>Post Type Specific Settings</h4>
+                                <p className="muted" style={{ marginBottom: '16px' }}>
+                                    Override default social settings for specific post types.
+                                </p>
+
+                                <table className="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Post Type</th>
+                                            <th>OG Title</th>
+                                            <th>Schema Type</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {postTypes.map((pt) => {
+                                            const socialSettings = postTypeSocialDefaults[pt.slug] || {};
+                                            return (
+                                                <tr key={pt.slug}>
+                                                    <td>
+                                                        <strong>{pt.name}</strong>
+                                                        <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{pt.slug}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="muted">
+                                                            {socialSettings.og_title || 'Using global default'}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="muted">
+                                                            {socialSettings.schema_itemtype || 'Article'}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            type="button"
+                                                            className="link-button"
+                                                            onClick={() => setEditingPostTypeSocial({
+                                                                slug: pt.slug,
+                                                                name: pt.name,
+                                                                ...socialSettings,
+                                                            })}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
                             </div>
                         </>
                     )}
+                </section>
+            )}
+
+            {/* Social Cards Tab */}
+            {activeTab === 'social-cards' && (
+                <section className="panel">
+                    <div className="table-toolbar">
+                        <div>
+                            <h3>Social Cards</h3>
+                            <p className="muted">Customize the appearance of dynamically generated social card images.</p>
+                        </div>
+                        <div>
+                            <span className={`pill ${cardModuleEnabled ? 'success' : 'warning'}`}>
+                                {cardModuleEnabled ? 'Active' : 'Disabled'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="settings-form">
+                        {/* Live Preview */}
+                        <div style={{ marginBottom: '32px', padding: '24px', background: '#f8f9fa', borderRadius: '8px' }}>
+                            <h4 style={{ marginBottom: '16px' }}>Live Preview</h4>
+                            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', alignItems: 'flex-end' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+                                        Sample Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        value={cardPreviewTitle}
+                                        onChange={(e) => setCardPreviewTitle(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                className="social-card-preview"
+                                style={{
+                                    width: '100%',
+                                    maxWidth: '600px',
+                                    aspectRatio: '1200/630',
+                                    background: cardDesign.background_color,
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: cardDesign.layout === 'centered' ? 'center' : 'flex-end',
+                                    alignItems: cardDesign.layout === 'centered' ? 'center' : 'flex-start',
+                                    padding: '32px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                {cardDesign.layout !== 'minimal' && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: cardDesign.layout === 'bold' ? '30%' : '6px',
+                                            background: cardDesign.accent_color,
+                                        }}
+                                    />
+                                )}
+                                {cardDesign.logo_url && (
+                                    <img
+                                        src={cardDesign.logo_url}
+                                        alt="Logo"
+                                        style={{
+                                            position: 'absolute',
+                                            width: '48px',
+                                            height: '48px',
+                                            objectFit: 'contain',
+                                            ...(cardDesign.logo_position === 'top-left' && { top: '24px', left: '24px' }),
+                                            ...(cardDesign.logo_position === 'top-right' && { top: '24px', right: '24px' }),
+                                            ...(cardDesign.logo_position === 'bottom-left' && { bottom: '24px', left: '24px' }),
+                                            ...(cardDesign.logo_position === 'bottom-right' && { bottom: '24px', right: '24px' }),
+                                            ...(cardDesign.logo_position === 'center' && { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }),
+                                        }}
+                                    />
+                                )}
+                                <h2
+                                    style={{
+                                        color: cardDesign.text_color,
+                                        fontSize: `${Math.max(16, cardDesign.title_font_size / 3)}px`,
+                                        fontWeight: 700,
+                                        margin: 0,
+                                        marginBottom: '8px',
+                                        textAlign: cardDesign.layout === 'centered' ? 'center' : 'left',
+                                        zIndex: 1,
+                                    }}
+                                >
+                                    {cardPreviewTitle}
+                                </h2>
+                                <span
+                                    style={{
+                                        color: cardDesign.text_color,
+                                        fontSize: `${Math.max(10, cardDesign.site_font_size / 3)}px`,
+                                        opacity: 0.8,
+                                        zIndex: 1,
+                                    }}
+                                >
+                                    {siteInfo.name || 'Your Site Name'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Layout Selection */}
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Layout Style</label>
+                                <p className="settings-help">Choose the overall layout for social cards.</p>
+                            </div>
+                            <div className="settings-control">
+                                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                    {cardLayoutOptions.map((layout) => (
+                                        <label
+                                            key={layout.value}
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                padding: '12px 16px',
+                                                border: `2px solid ${cardDesign.layout === layout.value ? '#2271b1' : '#ddd'}`,
+                                                borderRadius: '8px',
+                                                cursor: 'pointer',
+                                                background: cardDesign.layout === layout.value ? '#f0f6fc' : '#fff',
+                                                minWidth: '120px',
+                                            }}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="card-layout"
+                                                value={layout.value}
+                                                checked={cardDesign.layout === layout.value}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, layout: e.target.value })}
+                                                style={{ display: 'none' }}
+                                            />
+                                            <strong style={{ fontSize: '14px' }}>{layout.label}</strong>
+                                            <span style={{ fontSize: '12px', color: '#666' }}>{layout.description}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Colors */}
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Background Color</label>
+                            </div>
+                            <div className="settings-control">
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <input
+                                        type="color"
+                                        value={cardDesign.background_color}
+                                        onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
+                                        style={{ width: '48px', height: '36px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer' }}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        value={cardDesign.background_color}
+                                        onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
+                                        style={{ width: '100px' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Accent Color</label>
+                            </div>
+                            <div className="settings-control">
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <input
+                                        type="color"
+                                        value={cardDesign.accent_color}
+                                        onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
+                                        style={{ width: '48px', height: '36px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer' }}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        value={cardDesign.accent_color}
+                                        onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
+                                        style={{ width: '100px' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Text Color</label>
+                            </div>
+                            <div className="settings-control">
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <input
+                                        type="color"
+                                        value={cardDesign.text_color}
+                                        onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
+                                        style={{ width: '48px', height: '36px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer' }}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        value={cardDesign.text_color}
+                                        onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
+                                        style={{ width: '100px' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Font Sizes */}
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Title Font Size (px)</label>
+                            </div>
+                            <div className="settings-control">
+                                <input
+                                    type="number"
+                                    className="input"
+                                    value={cardDesign.title_font_size}
+                                    onChange={(e) => setCardDesign({ ...cardDesign, title_font_size: parseInt(e.target.value) || 48 })}
+                                    min={24}
+                                    max={96}
+                                    style={{ width: '100px' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Site Name Font Size (px)</label>
+                            </div>
+                            <div className="settings-control">
+                                <input
+                                    type="number"
+                                    className="input"
+                                    value={cardDesign.site_font_size}
+                                    onChange={(e) => setCardDesign({ ...cardDesign, site_font_size: parseInt(e.target.value) || 24 })}
+                                    min={12}
+                                    max={48}
+                                    style={{ width: '100px' }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Logo Settings */}
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Logo URL</label>
+                                <p className="settings-help">Upload a logo to display on social cards (200x200px recommended).</p>
+                            </div>
+                            <div className="settings-control">
+                                <input
+                                    type="url"
+                                    className="input"
+                                    value={cardDesign.logo_url}
+                                    onChange={(e) => setCardDesign({ ...cardDesign, logo_url: e.target.value })}
+                                    placeholder="https://example.com/logo.png"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Logo Position</label>
+                            </div>
+                            <div className="settings-control">
+                                <select
+                                    className="input"
+                                    value={cardDesign.logo_position}
+                                    onChange={(e) => setCardDesign({ ...cardDesign, logo_position: e.target.value })}
+                                >
+                                    {logoPositionOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="button primary"
+                                onClick={saveCardDesign}
+                                disabled={saving}
+                            >
+                                {saving ? 'Saving...' : 'Save Card Design'}
+                            </button>
+                        </div>
+                    </div>
                 </section>
             )}
         </div>
