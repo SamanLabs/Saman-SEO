@@ -277,6 +277,26 @@ class Admin_UI {
 			$asset['version']
 		);
 
+		// Get variables for the editor
+		$settings_svc = new Settings();
+		$variables    = $settings_svc->get_context_variables();
+		$ai_enabled   = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) )
+			|| ! empty( get_option( 'wpseopilot_anthropic_api_key', '' ) )
+			|| ! empty( get_option( 'wpseopilot_google_api_key', '' ) );
+
+		// Localize data for the React editor
+		wp_localize_script(
+			'wpseopilot-editor-v2',
+			'wpseopilotEditor',
+			[
+				'variables'  => $variables,
+				'aiEnabled'  => $ai_enabled,
+				'siteTitle'  => get_bloginfo( 'name' ),
+				'tagline'    => get_bloginfo( 'description' ),
+				'separator'  => get_option( 'wpseopilot_title_separator', '|' ),
+			]
+		);
+
 		$post_type_templates    = get_option( 'wpseopilot_post_type_title_templates', [] );
 		$post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
 

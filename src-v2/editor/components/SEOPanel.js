@@ -1,13 +1,15 @@
 /**
  * SEO Panel Component
  *
- * Main panel containing all SEO fields and previews.
+ * Main panel containing all SEO fields and previews with AI and Variables support.
  */
 
-import { useState } from '@wordpress/element';
-import { PanelBody, TextControl, TextareaControl, ToggleControl, Button } from '@wordpress/components';
+import { useState, useCallback } from '@wordpress/element';
+import { Button } from '@wordpress/components';
 import SearchPreview from './SearchPreview';
 import ScoreGauge from './ScoreGauge';
+import TemplateInput from './TemplateInput';
+import AiGenerateModal from './AiGenerateModal';
 
 const SEOPanel = ({
     seoMeta,
@@ -17,10 +19,19 @@ const SEOPanel = ({
     effectiveDescription,
     postUrl,
     postTitle,
+    postContent,
     featuredImage,
     hasChanges,
+    variables,
+    variableValues,
+    aiEnabled,
 }) => {
     const [activeTab, setActiveTab] = useState('general');
+    const [aiModal, setAiModal] = useState({
+        isOpen: false,
+        fieldType: 'title',
+        onApply: null,
+    });
 
     // Character limits
     const TITLE_MAX = 60;
@@ -42,6 +53,30 @@ const SEOPanel = ({
         if (descLength > DESC_MAX) return 'long';
         return 'good';
     };
+
+    // AI Modal handlers
+    const openAiModal = useCallback((fieldType, onApply) => {
+        setAiModal({
+            isOpen: true,
+            fieldType,
+            onApply,
+        });
+    }, []);
+
+    const closeAiModal = useCallback(() => {
+        setAiModal({
+            isOpen: false,
+            fieldType: 'title',
+            onApply: null,
+        });
+    }, []);
+
+    const handleAiGenerate = useCallback((result) => {
+        if (aiModal.onApply && result) {
+            aiModal.onApply(result);
+        }
+        closeAiModal();
+    }, [aiModal, closeAiModal]);
 
     return (
         <div className="wpseopilot-editor-panel">
@@ -97,58 +132,50 @@ const SEOPanel = ({
                     </div>
 
                     {/* Focus Keyphrase */}
-                    <div className="wpseopilot-field">
-                        <TextControl
-                            label="Focus Keyphrase"
-                            value={seoMeta.focus_keyphrase}
-                            onChange={(value) => updateMeta('focus_keyphrase', value)}
+                    <div className="wpseopilot-field wpseopilot-field--keyphrase">
+                        <div className="wpseopilot-field-header">
+                            <label>Focus Keyphrase</label>
+                        </div>
+                        <input
+                            type="text"
+                            className="wpseopilot-field-input"
+                            value={seoMeta.focus_keyphrase || ''}
+                            onChange={(e) => updateMeta('focus_keyphrase', e.target.value)}
                             placeholder="Enter your target keyword"
-                            help="The main keyword you want this page to rank for"
                         />
+                        <p className="wpseopilot-field-help">The main keyword you want this page to rank for</p>
                     </div>
 
-                    {/* SEO Title */}
-                    <div className="wpseopilot-field">
-                        <div className="wpseopilot-field-header">
-                            <label>SEO Title</label>
-                            <span className={`wpseopilot-char-count ${getTitleStatus()}`}>
-                                {titleLength}/{TITLE_MAX}
-                            </span>
-                        </div>
-                        <TextControl
-                            value={seoMeta.title}
-                            onChange={(value) => updateMeta('title', value)}
-                            placeholder={postTitle || 'Enter SEO title'}
-                        />
-                        <div className="wpseopilot-progress-bar">
-                            <div
-                                className={`wpseopilot-progress-fill ${getTitleStatus()}`}
-                                style={{ width: `${Math.min((titleLength / TITLE_MAX) * 100, 100)}%` }}
-                            />
-                        </div>
-                    </div>
+                    {/* SEO Title with AI and Variables */}
+                    <TemplateInput
+                        label="SEO Title"
+                        id="wpseopilot-seo-title"
+                        value={seoMeta.title || ''}
+                        onChange={(value) => updateMeta('title', value)}
+                        placeholder={postTitle || 'Enter SEO title'}
+                        maxLength={TITLE_MAX}
+                        variables={variables}
+                        variableValues={variableValues}
+                        context="post"
+                        showAiButton={aiEnabled}
+                        onAiClick={aiEnabled ? () => openAiModal('title', (val) => updateMeta('title', val)) : null}
+                    />
 
-                    {/* Meta Description */}
-                    <div className="wpseopilot-field">
-                        <div className="wpseopilot-field-header">
-                            <label>Meta Description</label>
-                            <span className={`wpseopilot-char-count ${getDescStatus()}`}>
-                                {descLength}/{DESC_MAX}
-                            </span>
-                        </div>
-                        <TextareaControl
-                            value={seoMeta.description}
-                            onChange={(value) => updateMeta('description', value)}
-                            placeholder="Enter meta description"
-                            rows={3}
-                        />
-                        <div className="wpseopilot-progress-bar">
-                            <div
-                                className={`wpseopilot-progress-fill ${getDescStatus()}`}
-                                style={{ width: `${Math.min((descLength / DESC_MAX) * 100, 100)}%` }}
-                            />
-                        </div>
-                    </div>
+                    {/* Meta Description with AI and Variables */}
+                    <TemplateInput
+                        label="Meta Description"
+                        id="wpseopilot-meta-desc"
+                        value={seoMeta.description || ''}
+                        onChange={(value) => updateMeta('description', value)}
+                        placeholder="Enter meta description"
+                        maxLength={DESC_MAX}
+                        multiline
+                        variables={variables}
+                        variableValues={variableValues}
+                        context="post"
+                        showAiButton={aiEnabled}
+                        onAiClick={aiEnabled ? () => openAiModal('description', (val) => updateMeta('description', val)) : null}
+                    />
 
                     {/* Quick Analysis */}
                     {seoScore?.issues?.length > 0 && (
@@ -174,33 +201,48 @@ const SEOPanel = ({
                 <div className="wpseopilot-tab-content">
                     {/* Canonical URL */}
                     <div className="wpseopilot-field">
-                        <TextControl
-                            label="Canonical URL"
-                            value={seoMeta.canonical}
-                            onChange={(value) => updateMeta('canonical', value)}
-                            placeholder={postUrl}
-                            help="Leave empty to use the default URL"
+                        <div className="wpseopilot-field-header">
+                            <label>Canonical URL</label>
+                        </div>
+                        <input
                             type="url"
+                            className="wpseopilot-field-input"
+                            value={seoMeta.canonical || ''}
+                            onChange={(e) => updateMeta('canonical', e.target.value)}
+                            placeholder={postUrl}
                         />
+                        <p className="wpseopilot-field-help">Leave empty to use the default URL</p>
                     </div>
 
                     {/* Robots Settings */}
                     <div className="wpseopilot-robots-section">
                         <label className="wpseopilot-section-label">Search Engine Visibility</label>
 
-                        <ToggleControl
-                            label="Hide from search results"
-                            help="Add noindex meta tag to prevent indexing"
-                            checked={seoMeta.noindex}
-                            onChange={(value) => updateMeta('noindex', value)}
-                        />
+                        <label className="wpseopilot-toggle">
+                            <input
+                                type="checkbox"
+                                checked={seoMeta.noindex || false}
+                                onChange={(e) => updateMeta('noindex', e.target.checked)}
+                            />
+                            <span className="wpseopilot-toggle-slider"></span>
+                            <span className="wpseopilot-toggle-label">
+                                Hide from search results
+                                <small>Add noindex meta tag</small>
+                            </span>
+                        </label>
 
-                        <ToggleControl
-                            label="Don't follow links"
-                            help="Add nofollow meta tag to links on this page"
-                            checked={seoMeta.nofollow}
-                            onChange={(value) => updateMeta('nofollow', value)}
-                        />
+                        <label className="wpseopilot-toggle">
+                            <input
+                                type="checkbox"
+                                checked={seoMeta.nofollow || false}
+                                onChange={(e) => updateMeta('nofollow', e.target.checked)}
+                            />
+                            <span className="wpseopilot-toggle-slider"></span>
+                            <span className="wpseopilot-toggle-label">
+                                Don't follow links
+                                <small>Add nofollow meta tag</small>
+                            </span>
+                        </label>
                     </div>
 
                     {/* Robots Preview */}
@@ -246,14 +288,17 @@ const SEOPanel = ({
 
                     {/* OG Image */}
                     <div className="wpseopilot-field">
-                        <TextControl
-                            label="Social Image URL"
-                            value={seoMeta.og_image}
-                            onChange={(value) => updateMeta('og_image', value)}
-                            placeholder="https://..."
-                            help="Override the featured image for social sharing (1200x630 recommended)"
+                        <div className="wpseopilot-field-header">
+                            <label>Social Image URL</label>
+                        </div>
+                        <input
                             type="url"
+                            className="wpseopilot-field-input"
+                            value={seoMeta.og_image || ''}
+                            onChange={(e) => updateMeta('og_image', e.target.value)}
+                            placeholder="https://..."
                         />
+                        <p className="wpseopilot-field-help">1200x630 recommended. Leave empty to use featured image.</p>
                         {!seoMeta.og_image && featuredImage && (
                             <p className="wpseopilot-field-note">
                                 Using featured image as fallback
@@ -287,6 +332,18 @@ const SEOPanel = ({
                     </Button>
                 </div>
             )}
+
+            {/* AI Generate Modal */}
+            <AiGenerateModal
+                isOpen={aiModal.isOpen}
+                onClose={closeAiModal}
+                onGenerate={handleAiGenerate}
+                fieldType={aiModal.fieldType}
+                currentValue={aiModal.fieldType === 'title' ? seoMeta.title : seoMeta.description}
+                postTitle={postTitle}
+                postContent={postContent}
+                variableValues={variableValues}
+            />
         </div>
     );
 };

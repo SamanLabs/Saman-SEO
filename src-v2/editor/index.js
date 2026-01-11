@@ -22,6 +22,11 @@ const PluginIcon = () => (
     </svg>
 );
 
+// Get localized data
+const editorData = window.wpseopilotEditor || {};
+const variables = editorData.variables || {};
+const aiEnabled = editorData.aiEnabled || false;
+
 /**
  * Main SEO Sidebar Component
  */
@@ -38,6 +43,7 @@ const SEOSidebar = () => {
     const [seoScore, setSeoScore] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
+    const [variableValues, setVariableValues] = useState({});
 
     // Get post data from editor
     const { postId, postTitle, postExcerpt, postContent, postType, postSlug, featuredImage } = useSelect((select) => {
@@ -121,6 +127,19 @@ const SEOSidebar = () => {
         return () => clearTimeout(timer);
     }, [postId, seoMeta, postTitle, postContent]);
 
+    // Build variable values from current post data
+    useEffect(() => {
+        const values = {
+            post_title: postTitle || '',
+            post_excerpt: postExcerpt || '',
+            site_title: editorData.siteTitle || '',
+            tagline: editorData.tagline || '',
+            separator: editorData.separator || '-',
+            current_year: new Date().getFullYear().toString(),
+        };
+        setVariableValues(values);
+    }, [postTitle, postExcerpt]);
+
     // Update meta field
     const updateMeta = useCallback((field, value) => {
         setSeoMeta((prev) => ({ ...prev, [field]: value }));
@@ -170,8 +189,12 @@ const SEOSidebar = () => {
                     effectiveDescription={effectiveDescription}
                     postUrl={postUrl}
                     postTitle={postTitle}
+                    postContent={postContent}
                     featuredImage={featuredImage}
                     hasChanges={hasChanges}
+                    variables={variables}
+                    variableValues={variableValues}
+                    aiEnabled={aiEnabled}
                 />
             </PluginSidebar>
         </>
