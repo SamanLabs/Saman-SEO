@@ -1,0 +1,194 @@
+// Analytics Notice Component Styles
+
+.analytics-notice {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.analytics-notice__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+
+    h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 600;
+        color: @color-text;
+    }
+
+    p {
+        margin: 0;
+        font-size: 13px;
+        color: @color-text-secondary;
+        line-height: 1.5;
+    }
+}
+
+.analytics-notice__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: fade(@color-primary, 10%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: @color-primary;
+}
+
+.analytics-notice__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.analytics-notice__expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: @color-surface-muted;
+    border: none;
+    border-top: 1px solid @color-border;
+    color: @color-primary;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: darken(@color-surface-muted, 2%);
+    }
+
+    svg {
+        transition: transform 0.2s ease;
+    }
+}
+
+.analytics-notice__details {
+    border-top: 1px solid @color-border;
+    padding: 20px;
+    background: @color-surface-muted;
+}
+
+.analytics-privacy-info {
+    h5 {
+        margin: 0 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: @color-text;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &:not(:first-child) {
+            margin-top: 24px;
+        }
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 13px;
+        color: @color-text;
+        line-height: 1.4;
+
+        svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+            color: @color-success;
+        }
+    }
+
+    &__never li svg {
+        color: @color-danger;
+    }
+}
+
+.analytics-privacy-info__measures {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.privacy-measure {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: @color-surface;
+    border-radius: @radius-sm;
+    border: 1px solid @color-border;
+
+    &__icon {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        background: fade(@color-primary, 10%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: @color-primary;
+    }
+
+    strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: @color-text;
+        margin-bottom: 2px;
+    }
+
+    span {
+        font-size: 12px;
+        color: @color-text-secondary;
+        line-height: 1.4;
+    }
+}
+
+.analytics-privacy-info__footer {
+    margin: 24px 0 0;
+    padding: 16px;
+    background: fade(@color-primary, 8%);
+    border-radius: @radius-sm;
+    font-size: 13px;
+    color: @color-text-secondary;
+    line-height: 1.5;
+    text-align: center;
+}
+
+// Version badge for settings sidebar
+.version-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: fade(@color-primary, 10%);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: @color-primary;
+
+    &--new {
+        background: fade(@color-success, 10%);
+        color: @color-success;
+    }
+}

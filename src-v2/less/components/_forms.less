@@ -1,0 +1,276 @@
+// ==========================================================================
+// Forms - Form Controls and Settings
+// ==========================================================================
+
+// Settings Form Layout
+.settings-form {
+    .flex-column();
+    gap: @spacing-lg;
+}
+
+.settings-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: @spacing-lg;
+    padding-bottom: @spacing-lg;
+    border-bottom: 1px solid rgba(214, 217, 224, 0.6);
+
+    &.compact {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
+    }
+
+    &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+}
+
+.settings-label {
+    label {
+        font-weight: @font-weight-semibold;
+    }
+}
+
+.settings-help {
+    margin: 6px 0 0;
+    color: @color-muted;
+    font-size: @font-size-sm;
+
+    code {
+        margin: 0 2px;
+        padding: 2px 5px;
+        font-size: @font-size-xs;
+        background: @color-primary-lighter;
+        border-radius: 4px;
+    }
+}
+
+.settings-control {
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+        .input-base();
+    }
+}
+
+// Form Field
+.form-field {
+    .flex-column();
+    gap: 6px;
+    flex: 1;
+    min-width: 180px;
+
+    &.narrow {
+        flex: 0 0 140px;
+        min-width: 140px;
+    }
+
+    &.button-field {
+        flex: 0 0 auto;
+        min-width: auto;
+    }
+
+    label {
+        font-size: @font-size-sm;
+        font-weight: @font-weight-semibold;
+        color: @color-muted;
+    }
+
+    input,
+    select {
+        .input-base();
+    }
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-md;
+    align-items: flex-end;
+}
+
+.form-error {
+    color: @color-danger;
+    font-size: @font-size-sm;
+    margin: @spacing-sm 0 0;
+}
+
+// Radio Group
+.radio-group {
+    .flex-column();
+    gap: @spacing-sm;
+    color: @color-muted;
+}
+
+// Toggle Switch
+.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: @spacing-sm;
+    position: relative;
+    font-weight: @font-weight-semibold;
+
+    input {
+        position: absolute;
+        opacity: 0;
+    }
+}
+
+.toggle-track {
+    width: 44px;
+    height: 24px;
+    background: #c8d0dc;
+    border-radius: @radius-full;
+    position: relative;
+    .transition(background);
+
+    &::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        top: 3px;
+        left: 3px;
+        .transition(transform);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.toggle input:checked + .toggle-track {
+    background: @color-primary;
+
+    &::after {
+        transform: translateX(20px);
+    }
+}
+
+.toggle-text {
+    color: @color-muted;
+    font-size: @font-size-sm;
+}
+
+// Checkbox
+.checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: @spacing-sm;
+    font-weight: @font-weight-semibold;
+}
+
+.checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-sm @spacing-xl;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: @color-primary;
+    }
+
+    span {
+        font-size: @font-size-base;
+        color: @color-text;
+    }
+}
+
+// Inline Form
+.inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-sm;
+    align-items: center;
+
+    input {
+        padding: @spacing-sm @spacing-sm;
+        border-radius: @radius-md;
+        border: 1px solid @color-border;
+        min-width: 180px;
+        font-family: inherit;
+    }
+}
+
+// Filter Form
+.filter-form {
+    margin-bottom: @spacing-lg;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-lg;
+    align-items: center;
+}
+
+.filter-field {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+
+    span {
+        font-size: @font-size-sm;
+        color: @color-muted;
+    }
+
+    select {
+        padding: @spacing-sm @spacing-md;
+        border-radius: @radius-md;
+        border: 1px solid @color-border;
+        background: @color-surface;
+        font-family: inherit;
+        font-size: @font-size-sm;
+    }
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    span {
+        font-size: @font-size-sm;
+        color: @color-text;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .settings-row,
+    .settings-row.compact {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-field,
+    .form-field.narrow {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

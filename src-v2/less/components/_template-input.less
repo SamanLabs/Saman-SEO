@@ -1,0 +1,323 @@
+// ==========================================================================
+// Template Input V2 - Syntax Highlighted Variable Input
+// ==========================================================================
+
+// Variable colors by type
+@var-global: #2271b1;       // Blue - site/global vars
+@var-separator: #8b5cf6;    // Purple - separator
+@var-post: #7c3aed;         // Violet - post vars
+@var-taxonomy: #059669;     // Green - taxonomy vars
+@var-author: #ea580c;       // Orange - author vars
+@var-archive: #0891b2;      // Teal - archive vars
+
+.template-input-v2 {
+    .flex-column();
+    gap: @spacing-sm;
+
+    &.is-focused .template-input-v2__container {
+        border-color: @color-primary;
+        box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.12);
+    }
+
+    &.is-disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+}
+
+.template-input-v2__label {
+    font-size: @font-size-base;
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+}
+
+.template-input-v2__container {
+    position: relative;
+    min-height: @input-height;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    background: @color-surface;
+    transition: border-color @transition-normal, box-shadow @transition-normal;
+
+    // Multiline container needs more height
+    &:has(.template-input-v2__field.multiline) {
+        min-height: 100px;
+    }
+}
+
+// Highlight overlay - shows the styled content
+.template-input-v2__highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 56px;
+    bottom: 0;
+    padding: 10px 12px;
+    font-size: @font-size-base;
+    line-height: 1.5;
+    font-family: inherit;
+    white-space: pre;
+    overflow: hidden;
+    pointer-events: none;
+    color: @color-text;
+    z-index: 1;
+
+    &.multiline {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        min-height: 100px;
+        overflow-y: auto;
+    }
+}
+
+.template-input-v2__placeholder {
+    color: @color-muted;
+}
+
+// Variable wrapper - allows hover detection
+.template-input-v2__var {
+    position: relative;
+    display: inline;
+    pointer-events: auto;
+    cursor: default;
+    border-radius: 3px;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: fade(@var-global, 8%);
+    }
+
+    // Color variants
+    &--global { .template-input-v2__bracket { color: @var-global; } }
+    &--global:hover { background: fade(@var-global, 8%); }
+
+    &--separator { .template-input-v2__bracket { color: @var-separator; } }
+    &--separator:hover { background: fade(@var-separator, 8%); }
+
+    &--post { .template-input-v2__bracket { color: @var-post; } }
+    &--post:hover { background: fade(@var-post, 8%); }
+
+    &--taxonomy { .template-input-v2__bracket { color: @var-taxonomy; } }
+    &--taxonomy:hover { background: fade(@var-taxonomy, 8%); }
+
+    &--author { .template-input-v2__bracket { color: @var-author; } }
+    &--author:hover { background: fade(@var-author, 8%); }
+
+    &--archive { .template-input-v2__bracket { color: @var-archive; } }
+    &--archive:hover { background: fade(@var-archive, 8%); }
+}
+
+// Brackets {{ }} - colored differently
+.template-input-v2__bracket {
+    font-weight: @font-weight-bold;
+    opacity: 0.7;
+}
+
+// Variable tag name - normal weight
+.template-input-v2__tag {
+    color: @color-text;
+}
+
+// Hover tooltip showing preview value
+.template-input-v2__tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    background: @color-text;
+    color: @color-surface;
+    font-size: @font-size-sm;
+    font-weight: @font-weight-normal;
+    border-radius: @radius-sm;
+    white-space: nowrap;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: @z-tooltip;
+    box-shadow: @shadow-lg;
+    pointer-events: none;
+
+    // Arrow
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: @color-text;
+    }
+}
+
+// The actual input field - completely invisible text
+.template-input-v2__field {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px 12px;
+    padding-right: 56px;
+    font-size: @font-size-base;
+    line-height: 1.5;
+    font-family: inherit;
+    border: none !important;
+    border-radius: @radius-md;
+    background: transparent !important;
+    color: transparent !important;
+    caret-color: @color-text;
+    resize: none;
+    box-shadow: none !important;
+    z-index: 2;
+
+    &::selection {
+        background: fade(@color-primary, 30%);
+    }
+
+    &.multiline {
+        min-height: 100px;
+        white-space: pre-wrap;
+        overflow-y: auto;
+    }
+
+    &:focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+// Floating action buttons
+.template-input-v2__actions {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    z-index: 10;
+
+    // When dropdown is open, boost z-index even higher
+    &:has(.variable-picker__dropdown) {
+        z-index: 10000;
+    }
+}
+
+// For multiline, position at top
+.template-input-v2__container:has(.template-input-v2__field.multiline) .template-input-v2__actions {
+    top: 8px;
+    transform: none;
+}
+
+.template-input-v2__action-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: @radius-sm;
+    background: @color-surface;
+    color: @color-muted;
+    cursor: pointer;
+    .flex-center();
+    .transition-fast();
+
+    &:hover:not(:disabled) {
+        background: @color-surface-muted;
+        color: @color-text;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    &--ai:hover:not(:disabled):not(.is-disabled) {
+        background: fade(@var-separator, 12%);
+        color: @var-separator;
+    }
+
+    &--ai.is-disabled {
+        opacity: 0.5;
+        cursor: pointer;
+
+        &:hover {
+            background: @color-surface-muted;
+            color: @color-muted;
+        }
+    }
+
+    &--vars:hover:not(:disabled) {
+        background: fade(@var-global, 12%);
+        color: @var-global;
+    }
+
+    svg {
+        display: block;
+    }
+}
+
+.template-input-v2__footer {
+    .flex-between();
+    gap: @spacing-md;
+}
+
+.template-input-v2__help {
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+.template-input-v2__counter {
+    font-size: @font-size-sm;
+    color: @color-muted;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+
+    &.over-limit {
+        color: @color-danger;
+        font-weight: @font-weight-semibold;
+    }
+}
+
+
+// Override WordPress/settings-control input styles
+// Only target the main field, NOT the variable picker search input
+.settings-control .template-input-v2 {
+    > .template-input-v2__container > .template-input-v2__field {
+        position: absolute !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: transparent !important;
+        padding: 10px 12px !important;
+        padding-right: 56px !important;
+
+        &:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-sm) {
+    .template-input-v2__highlight {
+        right: 48px;
+    }
+
+    .template-input-v2__field {
+        padding-right: 52px !important;
+    }
+
+    .template-input-v2__action-btn {
+        width: 24px;
+        height: 24px;
+    }
+
+    .template-input-v2__tooltip {
+        max-width: 180px;
+    }
+}

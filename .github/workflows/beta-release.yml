@@ -1,0 +1,165 @@
+name: Create Beta Release
+
+on:
+  # Manual trigger with version input
+  workflow_dispatch:
+    inputs:
+      beta_number:
+        description: 'Beta number (e.g., 1, 2, 3)'
+        required: true
+        default: '1'
+      description:
+        description: 'Beta release description'
+        required: false
+        default: 'Beta release for testing'
+
+  # Auto-trigger on push to dev branch
+  push:
+    branches:
+      - dev
+      - beta
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  beta-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from plugin file
+        id: get_version
+        run: |
+          VERSION=$(grep -oP "^\s*\*\s*Version:\s*\K[\d.]+" wp-seo-pilot.php | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Base version: $VERSION"
+
+      - name: Determine beta number
+        id: beta_number
+        run: |
+          BASE_VERSION=${{ steps.get_version.outputs.version }}
+
+          # If manual trigger, use input
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            BETA_NUM=${{ github.event.inputs.beta_number }}
+          else
+            # Auto-increment: find highest existing beta for this version
+            EXISTING_BETAS=$(git tag -l "v${BASE_VERSION}-beta.*" | grep -oP "beta\.\K\d+" | sort -n | tail -1)
+            if [ -z "$EXISTING_BETAS" ]; then
+              BETA_NUM=1
+            else
+              BETA_NUM=$((EXISTING_BETAS + 1))
+            fi
+          fi
+
+          BETA_VERSION="${BASE_VERSION}-beta.${BETA_NUM}"
+          ZIP_VERSION=$(echo $BETA_VERSION | sed 's/\./-/g')
+
+          echo "beta_num=$BETA_NUM" >> $GITHUB_OUTPUT
+          echo "beta_version=$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "zip_version=$ZIP_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "Beta version: $BETA_VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "${{ steps.beta_number.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "::error::Tag ${{ steps.beta_number.outputs.tag }} already exists!"
+            exit 1
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Create plugin zip
+        run: |
+          # Create temp directory for clean plugin
+          mkdir -p wp-seo-pilot
+
+          # Copy only production files
+          cp -r assets wp-seo-pilot/
+          cp -r build-v2 wp-seo-pilot/
+          cp -r build-editor wp-seo-pilot/
+          cp -r build-admin-list wp-seo-pilot/
+          cp -r includes wp-seo-pilot/
+          cp -r languages wp-seo-pilot/ 2>/dev/null || mkdir -p wp-seo-pilot/languages
+          cp wp-seo-pilot.php wp-seo-pilot/
+          cp readme.txt wp-seo-pilot/ 2>/dev/null || true
+          cp LICENSE wp-seo-pilot/ 2>/dev/null || true
+
+          # Create the zip
+          zip -r wp-seo-pilot-${{ steps.beta_number.outputs.zip_version }}.zip wp-seo-pilot
+
+          # Cleanup
+          rm -rf wp-seo-pilot
+
+          echo "Created wp-seo-pilot-${{ steps.beta_number.outputs.zip_version }}.zip"
+
+      - name: Prepare release notes
+        id: release_notes
+        run: |
+          DESCRIPTION="${{ github.event.inputs.description }}"
+          if [ -z "$DESCRIPTION" ]; then
+            DESCRIPTION="Beta release for testing new features."
+          fi
+
+          {
+            echo "## Beta Release ${{ steps.beta_number.outputs.beta_version }}"
+            echo ""
+            echo "⚠️ **This is a pre-release version for testing purposes.**"
+            echo ""
+            echo "### Description"
+            echo "$DESCRIPTION"
+            echo ""
+            echo "### How to Install"
+            echo "1. Go to **SEO Pilot → More**"
+            echo "2. Click **Check for Updates** to find this beta"
+            echo "3. Click **Update** to install this beta"
+            echo ""
+            echo "### Feedback"
+            echo "Please report any issues at: https://github.com/${{ github.repository }}/issues"
+            echo ""
+            echo "---"
+            echo ""
+            echo "Base version: ${{ steps.get_version.outputs.version }}"
+            echo "Commit: ${{ github.sha }}"
+          } > release_notes.md
+
+          cat release_notes.md
+
+      - name: Create Pre-Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.beta_number.outputs.tag }}
+          name: WP SEO Pilot ${{ steps.beta_number.outputs.beta_version }} (Beta)
+          body_path: release_notes.md
+          draft: false
+          prerelease: true
+          files: wp-seo-pilot-${{ steps.beta_number.outputs.zip_version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "## Beta Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.beta_number.outputs.beta_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ steps.beta_number.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Zip:** wp-seo-pilot-${{ steps.beta_number.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY

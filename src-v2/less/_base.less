@@ -1,0 +1,79 @@
+// ==========================================================================
+// Base - Core Styles and WordPress Overrides
+// ==========================================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+// Font inheritance fix
+.wp-seo-pilot-admin button,
+.wp-seo-pilot-admin input {
+    font-family: inherit;
+}
+
+// WordPress body overrides
+body[class*="wpseopilot"] #wpcontent {
+    padding-left: 0;
+    min-height: 0;
+}
+
+body[class*="wpseopilot"] #wpwrap {
+    background: @color-background;
+}
+
+body[class*="wpseopilot"] #wpbody-content {
+    padding-bottom: 0;
+}
+
+// Main admin container
+.wp-seo-pilot-admin {
+    // CSS Custom Properties (for runtime theming if needed)
+    --color-primary: @color-primary;
+    --color-primary-strong: @color-primary-hover;
+    --color-surface: @color-surface;
+    --color-surface-muted: @color-surface-muted;
+    --color-border: @color-border;
+    --color-text: @color-text;
+    --color-muted: @color-muted;
+    --color-success: @color-success;
+    --color-warning: @color-warning;
+    --color-danger: @color-danger;
+    --shadow-soft: @shadow-md;
+
+    color: @color-text;
+    font-family: @font-family;
+    padding: @spacing-xl;
+    min-height: 100vh;
+    box-sizing: border-box;
+    background:
+        radial-gradient(circle at top left, @color-primary-light, transparent 45%),
+        radial-gradient(circle at top right, rgba(46, 125, 50, 0.06), transparent 40%),
+        @color-background;
+}
+
+body.admin-bar .wp-seo-pilot-admin {
+    min-height: calc(100vh - 32px);
+}
+
+@media (max-width: @breakpoint-md) {
+    body.admin-bar .wp-seo-pilot-admin {
+        min-height: calc(100vh - 46px);
+    }
+}
+
+// Shell container
+.wp-seo-pilot-shell {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+// Box sizing reset
+.wp-seo-pilot-admin *,
+.wp-seo-pilot-admin *::before,
+.wp-seo-pilot-admin *::after {
+    box-sizing: border-box;
+}
+
+// Code styling
+code {
+    .code-text();
+}

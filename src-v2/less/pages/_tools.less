@@ -1,0 +1,247 @@
+// ==========================================================================
+// Tools Page - Grid Layout for SEO Tools
+// ==========================================================================
+
+// Section
+.tools-section {
+    margin-bottom: @spacing-2xl;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.tools-section__title {
+    font-size: @font-size-lg;
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+    margin: 0 0 @spacing-lg;
+    padding-bottom: @spacing-sm;
+    border-bottom: 1px solid @color-border;
+}
+
+// Tools Grid
+.tools-grid {
+    display: grid;
+    gap: @spacing-lg;
+
+    &--large {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    &--small {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+// Tool Card
+.tool-card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-lg;
+    padding: @spacing-xl;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    .transition();
+    .shadow-card();
+
+    &:hover:not(.tool-card--disabled) {
+        border-color: @color-primary;
+        box-shadow: 0 8px 24px rgba(34, 113, 177, 0.12);
+        transform: translateY(-2px);
+
+        .tool-card__arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    &:focus {
+        outline: none;
+        border-color: @color-primary;
+        box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.15);
+    }
+
+    &--disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+
+        .tool-card__icon {
+            filter: grayscale(0.5);
+        }
+    }
+
+    &--compact {
+        flex-direction: column;
+        padding: @spacing-lg;
+        gap: @spacing-md;
+
+        .tool-card__icon {
+            width: 44px;
+            height: 44px;
+        }
+
+        .tool-card__name {
+            font-size: @font-size-base;
+        }
+
+        .tool-card__desc {
+            font-size: @font-size-sm;
+            -webkit-line-clamp: 2;
+        }
+    }
+}
+
+// Tool Icon
+.tool-card__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: @radius-lg;
+    .flex-center();
+    flex-shrink: 0;
+
+    svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    &--small {
+        width: 44px;
+        height: 44px;
+
+        svg {
+            width: 22px;
+            height: 22px;
+        }
+    }
+}
+
+// Tool Content
+.tool-card__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tool-card__header {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    margin-bottom: @spacing-xs;
+}
+
+.tool-card__name {
+    margin: 0;
+    font-size: @font-size-lg;
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+}
+
+.tool-card__badge {
+    padding: 2px 8px;
+    font-size: @font-size-xs;
+    font-weight: @font-weight-semibold;
+    color: @color-muted;
+    background: @color-surface-muted;
+    border-radius: @radius-full;
+    white-space: nowrap;
+}
+
+.tool-card__desc {
+    margin: 0;
+    font-size: @font-size-base;
+    color: @color-muted;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// Stats (right side)
+.tool-card__stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: @spacing-sm @spacing-md;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.tool-card__stat-value {
+    font-size: @font-size-xl;
+    font-weight: @font-weight-bold;
+    line-height: 1.2;
+}
+
+.tool-card__stat-label {
+    font-size: @font-size-xs;
+    font-weight: @font-weight-medium;
+    opacity: 0.7;
+}
+
+// Arrow indicator
+.tool-card__arrow {
+    position: absolute;
+    right: @spacing-lg;
+    top: 50%;
+    transform: translateX(-8px) translateY(-50%);
+    opacity: 0;
+    .transition();
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-xl) {
+    .tools-grid--small {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: @breakpoint-lg) {
+    .tools-grid--large {
+        grid-template-columns: 1fr;
+    }
+
+    .tools-grid--small {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tool-card__stats {
+        display: none;
+    }
+
+    .tool-card__arrow {
+        display: none;
+    }
+}
+
+@media (max-width: @breakpoint-sm) {
+    .tools-grid--small {
+        grid-template-columns: 1fr;
+    }
+
+    .tool-card {
+        padding: @spacing-lg;
+    }
+
+    .tool-card__icon {
+        width: 48px;
+        height: 48px;
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}

@@ -40,22 +40,25 @@ class Post_Meta {
 		$schema = [
 			'type'       => 'object',
 			'properties' => [
-				'title'       => [
+				'title'           => [
 					'type' => 'string',
 				],
-				'description' => [
+				'description'     => [
 					'type' => 'string',
 				],
-				'canonical'   => [
+				'focus_keyphrase' => [
 					'type' => 'string',
 				],
-				'noindex'     => [
+				'canonical'       => [
 					'type' => 'string',
 				],
-				'nofollow'    => [
+				'noindex'         => [
 					'type' => 'string',
 				],
-				'og_image'    => [
+				'nofollow'        => [
+					'type' => 'string',
+				],
+				'og_image'        => [
 					'type' => 'string',
 				],
 			],
@@ -110,12 +113,13 @@ class Post_Meta {
 
 		$clean = [];
 
-		$clean['title']       = isset( $value['title'] ) ? sanitize_text_field( $value['title'] ) : '';
-		$clean['description'] = isset( $value['description'] ) ? sanitize_textarea_field( $value['description'] ) : '';
-		$clean['canonical']   = isset( $value['canonical'] ) ? esc_url_raw( $value['canonical'] ) : '';
-		$clean['noindex']     = ! empty( $value['noindex'] ) ? '1' : '';
-		$clean['nofollow']    = ! empty( $value['nofollow'] ) ? '1' : '';
-		$clean['og_image']    = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
+		$clean['title']           = isset( $value['title'] ) ? sanitize_text_field( $value['title'] ) : '';
+		$clean['description']     = isset( $value['description'] ) ? sanitize_textarea_field( $value['description'] ) : '';
+		$clean['focus_keyphrase'] = isset( $value['focus_keyphrase'] ) ? sanitize_text_field( $value['focus_keyphrase'] ) : '';
+		$clean['canonical']       = isset( $value['canonical'] ) ? esc_url_raw( $value['canonical'] ) : '';
+		$clean['noindex']         = ! empty( $value['noindex'] ) ? '1' : '';
+		$clean['nofollow']        = ! empty( $value['nofollow'] ) ? '1' : '';
+		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
 
 		return $clean;
 	}

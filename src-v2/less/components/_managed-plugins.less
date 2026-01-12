@@ -1,0 +1,274 @@
+// ==========================================================================
+// Managed Plugins - Plugin Cards with Beta Toggle
+// ==========================================================================
+
+// Color variables for beta
+@color-beta: #8b5cf6;
+
+// Grid layout
+.managed-plugins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: @spacing-xl;
+    margin-top: @spacing-lg;
+}
+
+// Plugin Card
+.managed-plugin-card {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: @spacing-xl;
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-md;
+    transition: box-shadow @transition-fast, border-color @transition-fast;
+
+    &:hover {
+        box-shadow: @shadow-md;
+    }
+
+    &.active {
+        border-color: fade(@color-success, 40%);
+        background: linear-gradient(135deg, fade(@color-success, 3%) 0%, @color-surface 100%);
+    }
+
+    &.has-update {
+        border-color: fade(@color-warning, 50%);
+        background: linear-gradient(135deg, fade(@color-warning, 5%) 0%, @color-surface 100%);
+    }
+
+    &.has-beta-update {
+        border-color: fade(@color-beta, 50%);
+        background: linear-gradient(135deg, fade(@color-beta, 5%) 0%, @color-surface 100%);
+    }
+}
+
+// Header section
+.managed-plugin-header {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-md;
+}
+
+.managed-plugin-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: @radius-md;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.managed-plugin-icon-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: @radius-md;
+    color: white;
+
+    svg {
+        width: 28px;
+        height: 28px;
+        fill: currentColor;
+    }
+
+    &.seo {
+        background: @color-primary;
+    }
+
+    &.ai {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    }
+
+    &.security {
+        background: @color-success;
+    }
+}
+
+.managed-plugin-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.managed-plugin-title {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+
+    h3 {
+        margin: 0;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+    }
+}
+
+.managed-plugin-version {
+    margin: 4px 0 0;
+    font-size: @font-size-sm;
+    color: @color-muted;
+    font-weight: @font-weight-medium;
+}
+
+.managed-plugin-description {
+    margin: 0;
+    font-size: @font-size-base;
+    color: @color-text;
+    line-height: @line-height-normal;
+}
+
+.managed-plugin-tagline {
+    margin: 0;
+    font-size: @font-size-sm;
+    color: @color-muted;
+    font-style: italic;
+}
+
+// Beta Toggle
+.managed-plugin-beta {
+    margin: @spacing-sm 0;
+    padding-top: @spacing-sm;
+    border-top: 1px solid @color-border-light;
+}
+
+.beta-toggle {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .beta-toggle-slider {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        background: @color-border;
+        border-radius: @radius-full;
+        transition: background @transition-fast;
+        flex-shrink: 0;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform @transition-fast;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    input:checked + .beta-toggle-slider {
+        background: @color-beta;
+
+        &::after {
+            transform: translateX(16px);
+        }
+    }
+
+    input:disabled + .beta-toggle-slider {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .beta-toggle-label {
+        font-size: @font-size-sm;
+        color: @color-muted;
+    }
+
+    .beta-available-hint {
+        color: @color-beta;
+        font-weight: @font-weight-medium;
+    }
+}
+
+// Actions
+.managed-plugin-actions {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: @spacing-md;
+
+    .button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &.beta {
+            background: @color-beta;
+            color: white;
+            border-color: @color-beta;
+
+            &:hover {
+                background: darken(@color-beta, 8%);
+                border-color: darken(@color-beta, 8%);
+            }
+        }
+
+        &.warning {
+            background: @color-warning;
+            color: white;
+            border-color: @color-warning;
+
+            &:hover {
+                background: darken(@color-warning, 8%);
+                border-color: darken(@color-warning, 8%);
+            }
+        }
+
+        .spinner {
+            float: none;
+            margin: 0;
+        }
+    }
+}
+
+// Badges
+.badge {
+    &.beta {
+        background: fade(@color-beta, 16%);
+        color: @color-beta;
+    }
+}
+
+// Empty state
+.empty-state {
+    text-align: center;
+    padding: @spacing-4xl;
+    color: @color-muted;
+
+    p {
+        margin: 0;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-md) {
+    .managed-plugins-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .managed-plugin-card {
+        padding: @spacing-lg;
+    }
+}

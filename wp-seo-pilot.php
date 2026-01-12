@@ -39,6 +39,30 @@ spl_autoload_register(
 			return;
 		}
 
+		// Handle Api namespace separately (in includes/Api/ directory)
+		if ( 0 === strpos( $class, 'WPSEOPilot\\Api\\' ) ) {
+			$class_name = str_replace( 'WPSEOPilot\\Api\\', '', $class );
+			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
+			$file       = WPSEOPILOT_PATH . 'includes/Api/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+			return;
+		}
+
+		// Handle Integration namespace (in includes/Integration/ directory)
+		if ( 0 === strpos( $class, 'WPSEOPilot\\Integration\\' ) ) {
+			$class_name = str_replace( 'WPSEOPilot\\Integration\\', '', $class );
+			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
+			$file       = WPSEOPILOT_PATH . 'includes/Integration/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+			return;
+		}
+
 		$path = strtolower(
 			str_replace(
 				[ '\\', '_' ],
@@ -72,6 +96,20 @@ add_action(
 		}
 
 		\WPSEOPilot\Plugin::instance()->boot();
+
+		// Initialize WP AI Pilot integration (registers assistants, hooks for AI features).
+		if ( class_exists( '\WPSEOPilot\Integration\AI_Pilot' ) ) {
+			\WPSEOPilot\Integration\AI_Pilot::init();
+		}
+
+		// Initialize V2 React Admin (runs alongside V1)
+		// Also load for REST API requests so endpoints are registered
+		$is_rest_request = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+			( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], '/wp-json/' ) !== false );
+
+		if ( ( is_admin() || $is_rest_request ) && class_exists( '\WPSEOPilot\Admin_V2' ) ) {
+			\WPSEOPilot\Admin_V2::get_instance();
+		}
 	}
 );
 

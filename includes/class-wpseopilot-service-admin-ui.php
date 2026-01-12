@@ -9,6 +9,7 @@ namespace WPSEOPilot\Service;
 
 defined( 'ABSPATH' ) || exit;
 
+use WPSEOPilot\Integration\AI_Pilot;
 use function WPSEOPilot\Helpers\calculate_seo_score;
 use function WPSEOPilot\Helpers\generate_title_from_template;
 use function WPSEOPilot\Helpers\replace_template_variables;
@@ -71,11 +72,20 @@ class Admin_UI {
 	}
 
 	/**
-	 * Register classic meta box.
+	 * Register classic meta box (only for classic editor).
+	 *
+	 * In the block editor, we use the React sidebar instead.
 	 *
 	 * @return void
 	 */
 	public function register_meta_box() {
+		$screen = get_current_screen();
+
+		// Skip registration if we're in the block editor
+		if ( $screen && method_exists( $screen, 'is_block_editor' ) && $screen->is_block_editor() ) {
+			return;
+		}
+
 		add_meta_box(
 			'wpseopilot-meta',
 			__( 'WP SEO Pilot', 'wp-seo-pilot' ),
@@ -195,27 +205,107 @@ class Admin_UI {
 				],
 			]
 		);
+
+		// Enqueue React admin list badge for edit.php (posts list).
+		if ( 'edit.php' === $hook || false !== strpos( $hook, 'edit.php' ) ) {
+			$this->enqueue_admin_list_assets();
+		}
 	}
 
 	/**
-	 * Gutenberg sidebar assets.
+	 * Admin list React badge assets.
 	 *
 	 * @return void
 	 */
-	public function enqueue_editor_assets() {
+	public function enqueue_admin_list_assets() {
+		$build_dir = WPSEOPILOT_PATH . 'build-admin-list/';
+		$build_url = WPSEOPILOT_URL . 'build-admin-list/';
+
+		$asset_file = $build_dir . 'index.asset.php';
+		$asset      = file_exists( $asset_file )
+			? require $asset_file
+			: [
+				'dependencies' => [ 'wp-element', 'react', 'react-dom' ],
+				'version'      => WPSEOPILOT_VERSION,
+			];
+
 		wp_enqueue_script(
-			'wpseopilot-editor',
-			WPSEOPILOT_URL . 'assets/js/editor-sidebar.js',
-			[ 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-compose' ],
-			WPSEOPILOT_VERSION,
+			'wpseopilot-admin-list',
+			$build_url . 'index.js',
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-editor',
-			WPSEOPILOT_URL . 'assets/css/editor.css',
+			'wpseopilot-admin-list',
+			$build_url . 'index.css',
 			[],
-			WPSEOPILOT_VERSION
+			$asset['version']
+		);
+	}
+
+	/**
+	 * Gutenberg sidebar assets (V2 React).
+	 *
+	 * @return void
+	 */
+	public function enqueue_editor_assets() {
+		// Load V2 React editor sidebar
+		$build_dir = WPSEOPILOT_PATH . 'build-editor/';
+		$build_url = WPSEOPILOT_URL . 'build-editor/';
+
+		$asset_file = $build_dir . 'index.asset.php';
+		$asset      = file_exists( $asset_file )
+			? require $asset_file
+			: [
+				'dependencies' => [ 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch' ],
+				'version'      => WPSEOPILOT_VERSION,
+			];
+
+		wp_enqueue_script(
+			'wpseopilot-editor-v2',
+			$build_url . 'index.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		wp_enqueue_style(
+			'wpseopilot-editor-v2',
+			$build_url . 'index.css',
+			[],
+			$asset['version']
+		);
+
+		// Get variables for the editor
+		$settings_svc = new Settings();
+		$variables    = $settings_svc->get_context_variables();
+
+		// Get AI status from integration
+		$ai_status   = AI_Pilot::get_status();
+		$ai_enabled  = AI_Pilot::ai_enabled();
+		$ai_provider = AI_Pilot::get_provider();
+
+		// Localize data for the React editor
+		wp_localize_script(
+			'wpseopilot-editor-v2',
+			'wpseopilotEditor',
+			[
+				'variables'  => $variables,
+				'aiEnabled'  => $ai_enabled,
+				'aiProvider' => $ai_provider, // 'wp-ai-pilot', 'native', or 'none'
+				'aiPilot'    => [
+					'installed'   => $ai_status['installed'],
+					'active'      => $ai_status['active'],
+					'ready'       => $ai_status['ready'],
+					'version'     => $ai_status['version'] ?? null,
+					'settingsUrl' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+				],
+				'siteTitle'  => get_bloginfo( 'name' ),
+				'tagline'    => get_bloginfo( 'description' ),
+				'separator'  => get_option( 'wpseopilot_title_separator', '|' ),
+			]
 		);
 
 		$post_type_templates    = get_option( 'wpseopilot_post_type_title_templates', [] );
@@ -303,8 +393,7 @@ class Admin_UI {
 			$flags[] = 'nofollow';
 		}
 
-		$score       = calculate_seo_score( $post_id );
-		$badge_class = 'wpseopilot-score-badge--' . sanitize_html_class( $score['level'] );
+		$score = calculate_seo_score( $post_id );
 
 		$issues = array_values(
 			array_filter(
@@ -322,40 +411,16 @@ class Admin_UI {
 			$issues
 		);
 
-		$issue_summary = $issue_labels ? implode( ' • ', array_slice( $issue_labels, 0, 2 ) ) : __( 'All baseline checks look good.', 'wp-seo-pilot' );
-		if ( count( $issue_labels ) > 2 ) {
-			$issue_summary .= sprintf(
-				/* translators: %d is the number of remaining issues. */
-				__( ' +%d more', 'wp-seo-pilot' ),
-				count( $issue_labels ) - 2
-			);
-		}
-
-		$details = implode(
-			' | ',
-			array_map(
-				static function ( $metric ) {
-					return $metric['label'] . ': ' . $metric['status'];
-				},
-				$score['metrics']
-			)
+		// Output placeholder for React hydration.
+		printf(
+			'<div class="wpseopilot-badge-placeholder" data-post-id="%d" data-score="%d" data-level="%s" data-label="%s" data-issues="%s" data-flags="%s"></div>',
+			absint( $post_id ),
+			absint( $score['score'] ),
+			esc_attr( $score['level'] ),
+			esc_attr( $score['label'] ),
+			esc_attr( wp_json_encode( $issue_labels ) ),
+			esc_attr( wp_json_encode( $flags ) )
 		);
-
-		?>
-		<div class="wpseopilot-score-cell">
-			<span class="wpseopilot-score-badge <?php echo esc_attr( $badge_class ); ?>" title="<?php echo esc_attr( $details ); ?>">
-				<strong><?php echo esc_html( $score['score'] ); ?></strong>
-				<span>/100</span>
-			</span>
-			<span class="wpseopilot-score-label"><?php echo esc_html( $score['label'] ); ?></span>
-		</div>
-		<p class="wpseopilot-score-issues">
-			<?php echo esc_html( $issue_summary ); ?>
-			<?php if ( $flags ) : ?>
-				<span class="wpseopilot-flag"><?php echo esc_html( implode( ', ', $flags ) ); ?></span>
-			<?php endif; ?>
-		</p>
-		<?php
 	}
 
 	/**

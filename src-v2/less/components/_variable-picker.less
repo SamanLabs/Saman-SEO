@@ -1,0 +1,255 @@
+// ==========================================================================
+// Variable Picker - Template Variable Selection Component
+// ==========================================================================
+
+// Tag colors
+@tag-global: #2271b1;
+@tag-post: #7c3aed;
+@tag-taxonomy: #059669;
+@tag-author: #ea580c;
+@tag-archive: #0891b2;
+
+// Base container
+.variable-picker {
+    position: relative;
+}
+
+// Full trigger button (non-compact mode)
+.variable-picker__trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: @spacing-sm @spacing-md;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-sm;
+    font-size: @font-size-sm;
+    font-weight: @font-weight-medium;
+    color: @color-text;
+    cursor: pointer;
+    .transition();
+    white-space: nowrap;
+
+    &:hover {
+        border-color: @color-primary;
+        color: @color-primary;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+// ==========================================================================
+// Dropdown Styles (shared between full and compact mode)
+// ==========================================================================
+
+.variable-picker__dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 320px;
+    max-height: 420px;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    z-index: 9999; // Very high to be above everything
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+// Search section
+.variable-picker__search {
+    flex-shrink: 0;
+    padding: 12px;
+    background: @color-surface;
+    border-bottom: 1px solid @color-border;
+
+    input,
+    input[type="text"] {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        height: 36px !important;
+        padding: 0 12px !important;
+        background: @color-surface-muted !important;
+        border: 1px solid @color-border !important;
+        border-radius: @radius-md !important;
+        font-family: inherit !important;
+        font-size: @font-size-sm !important;
+        color: @color-text !important;
+        outline: none !important;
+        box-sizing: border-box !important;
+        caret-color: @color-text !important;
+
+        &::placeholder {
+            color: @color-muted !important;
+        }
+
+        &:focus {
+            border-color: @color-primary !important;
+            background: @color-surface !important;
+            box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.1) !important;
+        }
+    }
+}
+
+// Groups container (scrollable)
+.variable-picker__groups {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+// Individual group
+.variable-picker__group {
+    &:not(:last-child) {
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid @color-border-light;
+    }
+}
+
+// Group label
+.variable-picker__group-label {
+    display: block;
+    padding: 6px 12px;
+    font-size: 10px;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: @color-muted;
+
+    // Color variants
+    &--global { color: @tag-global; }
+    &--post { color: @tag-post; }
+    &--taxonomy { color: @tag-taxonomy; }
+    &--author { color: @tag-author; }
+    &--archive { color: @tag-archive; }
+}
+
+// Items container
+.variable-picker__items {
+    display: flex;
+    flex-direction: column;
+}
+
+// Individual item button
+.variable-picker__item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.1s ease;
+
+    &:hover {
+        background: @color-surface-muted;
+    }
+}
+
+// Item header (tag + label)
+.variable-picker__item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+// Variable tag code
+.variable-picker__tag {
+    display: inline-block;
+    padding: 2px 6px;
+    font-family: @font-family-mono;
+    font-size: 11px;
+    font-weight: @font-weight-medium;
+    background: fade(@tag-global, 12%);
+    color: @tag-global;
+    border-radius: 4px;
+
+    &--global {
+        background: fade(@tag-global, 12%);
+        color: @tag-global;
+    }
+
+    &--post {
+        background: fade(@tag-post, 12%);
+        color: @tag-post;
+    }
+
+    &--taxonomy {
+        background: fade(@tag-taxonomy, 12%);
+        color: @tag-taxonomy;
+    }
+
+    &--author {
+        background: fade(@tag-author, 12%);
+        color: @tag-author;
+    }
+
+    &--archive {
+        background: fade(@tag-archive, 12%);
+        color: @tag-archive;
+    }
+}
+
+// Variable label
+.variable-picker__label {
+    font-size: @font-size-sm;
+    font-weight: @font-weight-medium;
+    color: @color-text;
+}
+
+// Preview text
+.variable-picker__preview {
+    font-size: 12px;
+    color: @color-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+}
+
+// Empty state
+.variable-picker__empty {
+    padding: 24px 12px;
+    text-align: center;
+    color: @color-muted;
+    font-size: @font-size-sm;
+}
+
+// ==========================================================================
+// Compact Mode (inside template inputs)
+// ==========================================================================
+
+.variable-picker--compact {
+    position: relative;
+
+    // Compact dropdown positions from the button
+    .variable-picker__dropdown {
+        top: calc(100% + 8px);
+        right: 0;
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-sm) {
+    .variable-picker__dropdown {
+        width: 280px;
+    }
+
+    .variable-picker__preview {
+        max-width: 240px;
+    }
+}

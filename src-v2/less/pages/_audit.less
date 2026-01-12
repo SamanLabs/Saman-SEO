@@ -1,0 +1,347 @@
+// ==========================================================================
+// SEO Audit Page Styles
+// ==========================================================================
+
+// Cache Badge
+.cache-badge {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    background: @color-surface-muted;
+    border: 1px solid @color-border;
+    border-radius: @radius-full;
+    color: @color-muted;
+}
+
+// Stats Grid
+.audit-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+
+    @media (max-width: @breakpoint-lg) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: @breakpoint-sm) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Stat Card
+.audit-stat-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    transition: border-color @transition-fast, box-shadow @transition-fast;
+
+    &.has-issues {
+        border-left: 3px solid @color-warning;
+    }
+
+    &.no-issues {
+        .audit-stat-icon.danger,
+        .audit-stat-icon.warning {
+            background: fade(@color-success, 10%);
+            color: @color-success;
+        }
+    }
+
+    &.info {
+        background: @color-surface-muted;
+    }
+}
+
+.audit-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: @radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &.danger {
+        background: fade(@color-danger, 10%);
+        color: @color-danger;
+    }
+
+    &.warning {
+        background: fade(@color-warning, 10%);
+        color: @color-warning;
+    }
+
+    &.muted {
+        background: fade(@color-muted, 10%);
+        color: @color-muted;
+    }
+
+    &.info {
+        background: fade(@color-primary, 10%);
+        color: @color-primary;
+    }
+}
+
+.audit-stat-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.audit-stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: @color-text;
+}
+
+.audit-stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: @color-text;
+    margin-top: 2px;
+}
+
+.audit-stat-desc {
+    font-size: 12px;
+    color: @color-muted;
+    margin-top: 4px;
+}
+
+// Audit Section
+.audit-section {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.audit-section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid @color-border-light;
+    background: @color-surface-muted;
+
+    h2 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    p {
+        margin: 0;
+        font-size: 13px;
+    }
+}
+
+// Issues List
+.audit-issues-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.audit-issue-group {
+    border-bottom: 1px solid @color-border-light;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &.expanded {
+        .audit-issue-header {
+            background: @color-surface-muted;
+        }
+    }
+}
+
+.audit-issue-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background @transition-fast;
+
+    &:hover {
+        background: @color-surface-muted;
+    }
+}
+
+.audit-issue-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.severity-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.danger {
+        background: @color-danger;
+    }
+
+    &.warning {
+        background: @color-warning;
+    }
+
+    &.muted {
+        background: @color-muted;
+    }
+}
+
+.audit-issue-type {
+    font-size: 14px;
+    font-weight: 500;
+    color: @color-text;
+}
+
+.chevron {
+    color: @color-muted;
+    transition: transform @transition-fast;
+
+    &.expanded {
+        transform: rotate(180deg);
+    }
+}
+
+.audit-issue-posts {
+    padding: 0 20px 16px;
+    background: @color-surface-muted;
+
+    .data-table {
+        margin: 0;
+
+        &.compact {
+            font-size: 13px;
+
+            th, td {
+                padding: 10px 12px;
+            }
+        }
+    }
+}
+
+// Recommendations List
+.recommendations-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 16px 20px;
+
+    @media (max-width: @breakpoint-lg) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.recommendation-card {
+    background: @color-surface-muted;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-md;
+    padding: 16px;
+}
+
+.recommendation-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+}
+
+.recommendation-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.suggestion-item {
+    label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: @color-muted;
+        margin-bottom: 4px;
+    }
+}
+
+.suggestion-value {
+    font-size: 13px;
+    color: @color-text;
+    line-height: 1.5;
+    padding: 8px 10px;
+    background: @color-surface;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-sm;
+}
+
+.recommendation-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+// Empty State in Audit
+.audit-section .empty-state {
+    padding: 48px 24px;
+    text-align: center;
+
+    svg {
+        margin-bottom: 12px;
+    }
+
+    h3 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        font-weight: 600;
+        color: @color-success;
+    }
+
+    p {
+        margin: 0;
+        color: @color-muted;
+    }
+}
+
+// Pill variants for audit
+.pill {
+    &.danger {
+        background: fade(@color-danger, 12%);
+        color: @color-danger;
+    }
+
+    &.warning {
+        background: fade(@color-warning, 12%);
+        color: @color-warning;
+    }
+
+    &.muted {
+        background: fade(@color-muted, 12%);
+        color: @color-muted;
+    }
+}
+
+// Button small variant (if not already defined)
+.button.small,
+.link-button.small {
+    padding: 6px 12px;
+    font-size: 12px;
+}

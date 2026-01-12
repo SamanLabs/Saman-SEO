@@ -49,7 +49,8 @@ class Request_Monitor {
 		}
 
 		add_action( 'template_redirect', [ $this, 'maybe_log_404' ] );
-		add_action( 'admin_menu', [ $this, 'register_page' ] );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_page' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 	}
 

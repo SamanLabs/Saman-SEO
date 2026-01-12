@@ -1,0 +1,115 @@
+// ==========================================================================
+// Progress - Gauges, Progress Bars, and Charts
+// ==========================================================================
+
+// Gauge
+.gauge {
+    --value: 85;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: conic-gradient(@color-primary calc(var(--value) * 1%), #e8ecf4 0);
+    display: grid;
+    place-items: center;
+    margin: 0 auto;
+    position: relative;
+
+    &::after {
+        content: "";
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: @color-surface;
+        border: 1px solid @color-border;
+    }
+}
+
+.gauge-center {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.gauge-value {
+    font-size: 28px;
+    font-weight: @font-weight-bold;
+}
+
+.gauge-label {
+    color: @color-muted;
+    font-size: @font-size-base;
+}
+
+// Spark Bars
+.spark-bars {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    height: 100px;
+    align-items: end;
+
+    span {
+        display: block;
+        background: linear-gradient(180deg, rgba(34, 113, 177, 0.9), rgba(34, 113, 177, 0.4));
+        border-radius: 6px;
+    }
+}
+
+// Progress Bar
+.progress-bar {
+    height: 10px;
+    background: #e3e7ef;
+    border-radius: @radius-full;
+    overflow: hidden;
+
+    span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, @color-primary, #4da3e6);
+    }
+}
+
+.progress-header {
+    .flex-between();
+    font-size: @font-size-sm;
+    margin-bottom: @spacing-sm;
+}
+
+// Scan Components
+.scan-layout {
+    display: grid;
+    gap: @spacing-lg;
+}
+
+.scan-action {
+    .flex-column();
+    gap: @spacing-sm;
+}
+
+.scan-progress {
+    background: @color-surface-muted;
+    border-radius: @radius-lg;
+    padding: @spacing-md;
+    border: 1px solid rgba(214, 217, 224, 0.7);
+}
+
+.scan-results {
+    .flex-column();
+    gap: @spacing-sm;
+}
+
+.result-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    .flex-column();
+    gap: @spacing-sm;
+    font-size: @font-size-base;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: @spacing-sm;
+    }
+}

@@ -24,7 +24,8 @@ class AI_Assistant {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'admin_menu', [ $this, 'register_page' ] );
+		// V1 menu disabled - React UI handles menu registration
+		// add_action( 'admin_menu', [ $this, 'register_page' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'wp_ajax_wpseopilot_generate_ai', [ $this, 'handle_generation' ] );
 		add_action( 'admin_post_wpseopilot_ai_reset', [ $this, 'handle_reset' ] );

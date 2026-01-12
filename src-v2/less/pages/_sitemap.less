@@ -1,0 +1,177 @@
+// ==========================================================================
+// Sitemap Page - Sitemap Configuration Styles
+// ==========================================================================
+
+// Stats List in Sidebar
+.stats-list {
+    .flex-column();
+    gap: @spacing-md;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: @spacing-sm;
+    border-bottom: 1px solid @color-border-light;
+
+    &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+}
+
+.stat-value {
+    font-weight: @font-weight-bold;
+    font-size: @font-size-lg;
+    color: @color-text;
+}
+
+// Additional Pages List
+.additional-pages-list {
+    .flex-column();
+    gap: @spacing-sm;
+    margin-bottom: @spacing-md;
+}
+
+.additional-page-row {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    padding: @spacing-sm;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
+}
+
+.page-url-input {
+    flex: 1;
+    .input-base();
+}
+
+.page-priority-input {
+    width: 80px;
+    .input-base();
+    text-align: center;
+}
+
+// Sitemap Links in Sidebar
+.sitemap-links {
+    .flex-column();
+    gap: @spacing-md;
+}
+
+.sitemap-link-item {
+    .flex-column();
+    gap: 4px;
+    padding: @spacing-sm @spacing-md;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
+
+    strong {
+        color: @color-muted;
+        font-size: @font-size-xs;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    a {
+        color: @color-primary;
+        word-break: break-all;
+        text-decoration: none;
+        font-size: @font-size-sm;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// URL Display
+.url-display {
+    display: block;
+    word-break: break-all;
+    padding: @spacing-sm @spacing-md;
+    background: rgba(34, 113, 177, 0.06);
+    border-radius: @radius-md;
+    font-size: @font-size-sm;
+    color: @color-primary;
+    margin-top: @spacing-sm;
+    font-family: @font-family-mono;
+}
+
+// Post Types Preview for LLM.txt
+.post-types-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: @spacing-md;
+}
+
+.post-type-preview-item {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    padding: @spacing-md;
+    background: @color-surface-muted;
+    border-radius: @radius-md;
+    border: 1px solid @color-border;
+}
+
+.post-type-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: @radius-md;
+    background: @color-primary-light;
+    .flex-center();
+    flex-shrink: 0;
+
+    .dashicon {
+        font-size: 20px;
+    }
+}
+
+.post-type-info {
+    .flex-column();
+    gap: 2px;
+    min-width: 0;
+
+    strong {
+        font-size: @font-size-base;
+    }
+
+    .muted {
+        font-size: @font-size-sm;
+    }
+}
+
+// Sitemap panel specific adjustments
+.page-body.two-column {
+    .panel {
+        h3 {
+            font-size: @font-size-lg;
+            margin-bottom: @spacing-xs;
+        }
+
+        > p.muted {
+            margin-bottom: @spacing-lg;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .additional-page-row {
+        flex-wrap: wrap;
+    }
+
+    .page-url-input {
+        flex: 1 1 100%;
+    }
+
+    .page-priority-input {
+        flex: 0 0 80px;
+    }
+
+    .post-types-preview {
+        grid-template-columns: 1fr;
+    }
+}

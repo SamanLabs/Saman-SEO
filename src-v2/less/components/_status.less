@@ -1,0 +1,112 @@
+// ==========================================================================
+// Status - Status Indicators and Lists
+// ==========================================================================
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+}
+
+.status-title {
+    font-weight: @font-weight-semibold;
+}
+
+.status-subtitle {
+    color: @color-muted;
+    font-size: @font-size-sm;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+
+    &.success {
+        background: @color-success;
+    }
+
+    &.warning {
+        background: @color-warning;
+    }
+
+    &.danger {
+        background: @color-danger;
+    }
+}
+
+.status-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: @spacing-sm;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: @spacing-sm;
+        font-size: @font-size-sm;
+    }
+}
+
+// Stats List
+.stats-list {
+    .flex-column();
+    gap: @spacing-sm;
+}
+
+.stat-item {
+    .flex-between();
+    font-size: @font-size-base;
+}
+
+.stat-value {
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+}
+
+// Log Stats
+.log-stats {
+    font-size: @font-size-sm;
+    color: @color-muted;
+    margin: 0 0 @spacing-md;
+}
+
+// Loading and Empty States
+.loading-state {
+    text-align: center;
+    padding: @spacing-4xl @spacing-xl;
+    color: @color-muted;
+    font-size: @font-size-base;
+}
+
+.empty-state {
+    text-align: center;
+    padding: @spacing-3xl;
+    background: @color-surface-muted;
+    border-radius: @radius-lg;
+    border: 1px dashed rgba(214, 217, 224, 0.9);
+}
+
+// Muted Helper
+.muted {
+    color: @color-muted;
+    font-size: @font-size-sm;
+}
+
+// Code Display
+.code {
+    font-family: @font-family-mono;
+    background: @color-primary-lighter;
+    padding: 6px 8px;
+    border-radius: @radius-sm;
+}
+
+// Key Preview
+.key-preview {
+    .flex-column();
+    gap: 4px;
+    font-size: @font-size-sm;
+}

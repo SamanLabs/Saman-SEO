@@ -1,0 +1,504 @@
+// ==========================================================================
+// Dashboard Page Styles
+// ==========================================================================
+
+// Dashboard Notifications
+.dashboard-notifications {
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-sm;
+    margin-bottom: @spacing-2xl;
+}
+
+.notification-banner {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    padding: @spacing-md @spacing-lg;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    min-height: 56px;
+
+    // Type variants using BEM modifier
+    &--error {
+        background: @color-danger-bg;
+        border-color: fade(@color-danger, 20%);
+
+        .notification-icon {
+            color: @color-danger;
+        }
+    }
+
+    &--warning {
+        background: @color-warning-bg;
+        border-color: fade(@color-warning, 20%);
+
+        .notification-icon {
+            color: darken(@color-warning, 10%);
+        }
+    }
+
+    &--info {
+        background: fade(@color-primary, 8%);
+        border-color: fade(@color-primary, 15%);
+
+        .notification-icon {
+            color: @color-primary;
+        }
+    }
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+
+    strong {
+        font-size: @font-size-sm;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+        white-space: nowrap;
+    }
+
+    span {
+        font-size: @font-size-sm;
+        color: @color-muted;
+        line-height: @line-height-normal;
+    }
+}
+
+.notification-actions {
+    display: flex;
+    align-items: center;
+    gap: @spacing-xs;
+    flex-shrink: 0;
+
+    .button.ghost.small {
+        padding: @spacing-xs;
+        min-width: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+            flex-shrink: 0;
+        }
+    }
+}
+
+// Toggle to show more notifications
+.notifications-toggle {
+    display: block;
+    width: 100%;
+    padding: @spacing-sm @spacing-lg;
+    background: transparent;
+    border: 1px dashed @color-border;
+    border-radius: @radius-md;
+    font-size: @font-size-sm;
+    font-weight: @font-weight-medium;
+    color: @color-primary;
+    cursor: pointer;
+    transition: all @transition-fast;
+    text-align: center;
+
+    &:hover {
+        background: @color-primary-lighter;
+        border-color: @color-primary;
+    }
+}
+
+// Dashboard Grid - Two column layout for main cards
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: @spacing-2xl;
+    margin-bottom: @spacing-2xl;
+
+    @media (max-width: @breakpoint-lg) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Dashboard Card Base
+.dashboard-card {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    padding: @spacing-2xl;
+    transition: box-shadow @transition-fast;
+
+    &:hover {
+        box-shadow: @shadow-md;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: @spacing-xl;
+
+        h3 {
+            margin: 0;
+            font-size: @font-size-lg;
+            font-weight: @font-weight-semibold;
+            color: @color-text;
+        }
+    }
+
+    .card-note {
+        margin: @spacing-lg 0 0;
+        font-size: @font-size-sm;
+        color: @color-muted;
+    }
+}
+
+// SEO Score Card
+.seo-score-card {
+    .seo-score-content {
+        display: flex;
+        align-items: center;
+        gap: @spacing-3xl;
+
+        @media (max-width: @breakpoint-md) {
+            flex-direction: column;
+            gap: @spacing-xl;
+        }
+    }
+}
+
+// Score Gauge
+.score-gauge {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+
+    .gauge-svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+        stroke: @color-border-light;
+    }
+
+    .gauge-fill {
+        transition: stroke-dasharray @transition-slow;
+    }
+}
+
+.gauge-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+
+    .gauge-value {
+        font-size: @font-size-2xl;
+        font-weight: @font-weight-bold;
+        color: @color-text;
+        line-height: 1;
+    }
+
+    .gauge-label {
+        font-size: @font-size-sm;
+        color: @color-muted;
+        margin-top: @spacing-xs;
+    }
+}
+
+// Score Breakdown
+.score-breakdown {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-md;
+}
+
+.breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+}
+
+.breakdown-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: @radius-full;
+    flex-shrink: 0;
+
+    &.excellent {
+        background: @color-success;
+    }
+
+    &.good {
+        background: #22c55e;
+    }
+
+    &.fair {
+        background: @color-warning;
+    }
+
+    &.poor {
+        background: @color-danger;
+    }
+}
+
+.breakdown-label {
+    flex: 1;
+    font-size: @font-size-base;
+    color: @color-text;
+}
+
+.breakdown-value {
+    font-size: @font-size-base;
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+    min-width: 30px;
+    text-align: right;
+}
+
+// Content Coverage Card
+.content-coverage-card {
+    .coverage-content {
+        display: flex;
+        align-items: flex-end;
+        gap: @spacing-3xl;
+
+        @media (max-width: @breakpoint-md) {
+            flex-direction: column;
+            align-items: stretch;
+            gap: @spacing-xl;
+        }
+    }
+}
+
+// Coverage Chart (Spark Bars)
+.coverage-chart {
+    flex: 1;
+    min-width: 0;
+}
+
+.spark-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: @spacing-sm;
+    height: 100px;
+}
+
+.spark-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    cursor: default;
+
+    span:first-child {
+        width: 100%;
+        max-width: 28px;
+        background: linear-gradient(to top, @color-primary, @color-primary-hover);
+        border-radius: @radius-sm @radius-sm 0 0;
+        margin-top: auto;
+        transition: height @transition-normal, background @transition-fast;
+    }
+
+    &:hover span:first-child {
+        background: linear-gradient(to top, @color-primary-hover, darken(@color-primary-hover, 5%));
+    }
+
+    .spark-label {
+        font-size: @font-size-xs;
+        color: @color-muted;
+        margin-top: @spacing-xs;
+        text-align: center;
+    }
+}
+
+// Coverage Stats
+.coverage-stats {
+    display: flex;
+    gap: @spacing-xl;
+    flex-shrink: 0;
+
+    @media (max-width: @breakpoint-md) {
+        justify-content: center;
+    }
+}
+
+.coverage-stat {
+    text-align: center;
+    padding: @spacing-lg;
+    background: @color-success-bg;
+    border-radius: @radius-md;
+    min-width: 90px;
+
+    &.pending {
+        background: @color-warning-bg;
+    }
+}
+
+.coverage-stat-value {
+    font-size: @font-size-2xl;
+    font-weight: @font-weight-bold;
+    color: @color-text;
+    line-height: 1;
+}
+
+.coverage-stat-label {
+    font-size: @font-size-sm;
+    color: @color-muted;
+    margin-top: @spacing-xs;
+}
+
+// Quick Actions Section
+.dashboard-actions {
+    margin-top: @spacing-3xl;
+
+    h3 {
+        margin: 0 0 @spacing-lg;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: @spacing-lg;
+
+    @media (max-width: @breakpoint-lg) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: @breakpoint-sm) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.action-card {
+    display: flex;
+    align-items: center;
+    gap: @spacing-lg;
+    padding: @spacing-xl;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    text-decoration: none;
+    transition: all @transition-fast;
+
+    &:hover {
+        border-color: @color-primary;
+        box-shadow: @shadow-md;
+        transform: translateY(-2px);
+
+        .action-icon {
+            background: @color-primary;
+            color: @color-surface;
+        }
+    }
+
+    &:focus {
+        outline: 2px solid @color-primary;
+        outline-offset: 2px;
+    }
+}
+
+.action-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: @color-primary-light;
+    border-radius: @radius-md;
+    color: @color-primary;
+    flex-shrink: 0;
+    transition: all @transition-fast;
+}
+
+.action-content {
+    flex: 1;
+    min-width: 0;
+
+    strong {
+        display: block;
+        font-size: @font-size-base;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+        margin-bottom: @spacing-xs;
+    }
+
+    span {
+        font-size: @font-size-sm;
+        color: @color-muted;
+    }
+}
+
+// Status row improvements for dashboard cards
+.card .status-row {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-md;
+    margin-bottom: @spacing-md;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: @radius-full;
+    margin-top: 4px;
+    flex-shrink: 0;
+
+    &.success {
+        background: @color-success;
+    }
+
+    &.warning {
+        background: @color-warning;
+    }
+
+    &.danger {
+        background: @color-danger;
+    }
+}
+
+.status-title {
+    font-size: @font-size-base;
+    font-weight: @font-weight-medium;
+    color: @color-text;
+    line-height: @line-height-tight;
+}
+
+.status-subtitle {
+    font-size: @font-size-sm;
+    color: @color-muted;
+    margin-top: @spacing-xs;
+}
+
+// Loading state
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: @spacing-4xl;
+    font-size: @font-size-base;
+    color: @color-muted;
+}

@@ -71,10 +71,13 @@ class Plugin {
 		$this->register( 'llm_txt', new Service\LLM_TXT_Generator() );
 		$this->register( 'local_seo', new Service\Local_SEO() );
 		$this->register( 'analytics', new Service\Analytics() );
+		$this->register( 'admin_bar', new Service\Admin_Bar() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->register( 'cli', new Service\CLI() );
 		}
+
+		// Note: AI Pilot integration is handled in wp-seo-pilot.php via AI_Pilot::init()
 
 		do_action( 'wpseopilot_booted', $this );
 	}
@@ -139,6 +142,7 @@ class Plugin {
 		add_option( 'wpseopilot_llm_txt_description', '' );
 		add_option( 'wpseopilot_llm_txt_include_excerpt', '1' );
 		add_option( 'wpseopilot_enable_analytics', '1' );
+		add_option( 'wpseopilot_enable_admin_bar', '1' );
 
 		// Sitemap settings defaults
 		add_option( 'wpseopilot_sitemap_enabled', '1' );

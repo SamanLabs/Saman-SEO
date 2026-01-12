@@ -1,0 +1,56 @@
+// ==========================================================================
+// Pagination - Pagination Controls
+// ==========================================================================
+
+.pagination {
+    .flex-between();
+    margin-top: @spacing-xl;
+    padding-top: @spacing-lg;
+    border-top: 1px solid @color-border;
+}
+
+.pagination-info {
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+.pagination-links {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+}
+
+.pagination-btn {
+    padding: @spacing-sm @spacing-md;
+    border-radius: @radius-md;
+    border: 1px solid @color-border;
+    background: @color-surface;
+    font-family: inherit;
+    font-size: @font-size-sm;
+    color: @color-text;
+    cursor: pointer;
+    .transition();
+
+    &:hover:not(:disabled) {
+        border-color: @color-primary;
+        color: @color-primary;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.pagination-current {
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+// Responsive
+@media (max-width: @breakpoint-lg) {
+    .pagination {
+        flex-direction: column;
+        gap: @spacing-md;
+    }
+}
