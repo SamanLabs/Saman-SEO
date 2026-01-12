@@ -76,31 +76,9 @@ class Plugin {
 			$this->register( 'cli', new Service\CLI() );
 		}
 
-		// Register with WP AI Pilot if available
-		$this->register_with_ai_pilot();
-
-		// Register SEO Assistant with WP AI Pilot
-		add_action( 'init', [ $this, 'register_seo_assistant' ] );
+		// Note: AI Pilot integration is handled in wp-seo-pilot.php via AI_Pilot::init()
 
 		do_action( 'wpseopilot_booted', $this );
-	}
-
-	/**
-	 * Register with WP AI Pilot if available.
-	 *
-	 * @return void
-	 */
-	public function register_with_ai_pilot() {
-		Integration\AI_Pilot::register_plugin();
-	}
-
-	/**
-	 * Register SEO Assistant with WP AI Pilot.
-	 *
-	 * @return void
-	 */
-	public function register_seo_assistant() {
-		Integration\AI_Pilot::register_assistant();
 	}
 
 	/**

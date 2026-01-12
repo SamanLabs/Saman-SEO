@@ -97,6 +97,11 @@ add_action(
 
 		\WPSEOPilot\Plugin::instance()->boot();
 
+		// Initialize WP AI Pilot integration (registers assistants, hooks for AI features).
+		if ( class_exists( '\WPSEOPilot\Integration\AI_Pilot' ) ) {
+			\WPSEOPilot\Integration\AI_Pilot::init();
+		}
+
 		// Initialize V2 React Admin (runs alongside V1)
 		// Also load for REST API requests so endpoints are registered
 		$is_rest_request = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
