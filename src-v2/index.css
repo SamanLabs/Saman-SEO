@@ -552,10 +552,15 @@ code {
   gap: 12px;
   box-shadow: 0 12px 24px rgba(20, 30, 45, 0.06);
   overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .pilot-card.active {
   border-color: rgba(34, 113, 177, 0.45);
   box-shadow: 0 18px 32px rgba(34, 113, 177, 0.12);
+}
+.pilot-card.has-update {
+  border-color: rgba(219, 166, 23, 0.5);
+  background: linear-gradient(135deg, rgba(219, 166, 23, 0.05) 0%, #ffffff 100%);
 }
 .pilot-card-head {
   display: flex;
@@ -641,6 +646,53 @@ code {
 .pilot-card-link svg {
   flex-shrink: 0;
 }
+.pilot-card-version {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+.pilot-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.pilot-card-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pilot-card-actions .button.warning {
+  background: #dba617;
+  color: white;
+  border-color: #dba617;
+}
+.pilot-card-actions .button.warning:hover {
+  background: #b68a13;
+  border-color: #b68a13;
+}
+.pilot-card-actions .button .spinner {
+  float: none;
+  margin: 0;
+}
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 12px;
+  color: #6b7280;
+}
+.loading-state .spinner {
+  float: none;
+  margin: 0;
+}
+.loading-state p {
+  margin: 0;
+}
 .panel {
   background: #ffffff;
   border: 1px solid #e0e0e0;
@@ -688,6 +740,10 @@ code {
 .badge.success {
   background: rgba(47, 143, 91, 0.16);
   color: #00a32a;
+}
+.badge.warning {
+  background: rgba(219, 166, 23, 0.16);
+  color: #dba617;
 }
 .badge.redirect-exists {
   margin-left: 8px;

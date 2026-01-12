@@ -11,6 +11,7 @@
 namespace WPSEOPilot;
 
 use WPSEOPilot\Integration\AI_Pilot;
+use WPSEOPilot\Updater\GitHub_Updater;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -110,10 +111,29 @@ class Admin_V2 {
      * Constructor - Register hooks.
      */
     private function __construct() {
+        $this->load_updater_classes();
+
         add_action( 'admin_menu', [ $this, 'register_menu' ], 5 ); // Priority 5 to run before V1
         add_action( 'admin_init', [ $this, 'handle_legacy_redirects' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
         add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+
+        // Initialize GitHub Updater.
+        GitHub_Updater::get_instance();
+    }
+
+    /**
+     * Load updater classes.
+     */
+    private function load_updater_classes() {
+        $updater_dir = WPSEOPILOT_PATH . 'includes/Updater/';
+
+        if ( file_exists( $updater_dir . 'class-github-updater.php' ) ) {
+            require_once $updater_dir . 'class-github-updater.php';
+        }
+        if ( file_exists( $updater_dir . 'class-plugin-installer.php' ) ) {
+            require_once $updater_dir . 'class-plugin-installer.php';
+        }
     }
 
     /**
@@ -319,6 +339,7 @@ class Admin_V2 {
             'Assistants'       => 'class-assistants-controller.php',
             'Setup'            => 'class-setup-controller.php',
             'Tools'            => 'class-tools-controller.php',
+            'Updater'          => 'class-updater-controller.php',
         ];
 
         foreach ( $controllers as $controller => $file ) {
