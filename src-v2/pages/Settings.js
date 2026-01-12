@@ -46,6 +46,7 @@ const defaultSettings = {
     facebook_app_id: '',
     facebook_admin_id: '',
     // Advanced
+    enable_admin_bar: true,
     output_clean_head: true,
     remove_shortlinks: true,
     remove_rsd_link: true,
@@ -646,6 +647,24 @@ const AdvancedTab = ({ settings, updateSetting }) => {
     return (
         <div className="settings-layout">
             <div className="settings-main">
+                <section className="panel">
+                    <h3>User Interface</h3>
+                    <p className="panel-desc">Customize how WP SEO Pilot appears in your WordPress admin.</p>
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Admin Bar Menu</label>
+                            <p className="settings-help">Show SEO Pilot menu in the WordPress admin bar with quick access to features and SEO score on posts/pages.</p>
+                        </div>
+                        <div className="settings-control">
+                            <label className="toggle">
+                                <input type="checkbox" checked={settings.enable_admin_bar} onChange={(e) => updateSetting('enable_admin_bar', e.target.checked)} />
+                                <span className="toggle-track" />
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
                 <section className="panel">
                     <h3>WordPress Head Cleanup</h3>
                     <p className="panel-desc">Remove unnecessary tags from your site's &lt;head&gt; section.</p>

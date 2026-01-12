@@ -172,8 +172,9 @@ const SEOPanel = ({
                         variables={variables}
                         variableValues={variableValues}
                         context="post"
-                        showAiButton={aiEnabled}
-                        onAiClick={aiEnabled ? () => openAiModal('title', (val) => updateMeta('title', val)) : null}
+                        showAiButton={true}
+                        aiEnabled={aiEnabled}
+                        onAiClick={() => openAiModal('title', (val) => updateMeta('title', val))}
                     />
 
                     {/* Meta Description with AI and Variables */}
@@ -188,8 +189,9 @@ const SEOPanel = ({
                         variables={variables}
                         variableValues={variableValues}
                         context="post"
-                        showAiButton={aiEnabled}
-                        onAiClick={aiEnabled ? () => openAiModal('description', (val) => updateMeta('description', val)) : null}
+                        showAiButton={true}
+                        aiEnabled={aiEnabled}
+                        onAiClick={() => openAiModal('description', (val) => updateMeta('description', val))}
                     />
 
                     {/* Quick Analysis */}

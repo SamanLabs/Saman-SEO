@@ -74,6 +74,7 @@ const TemplateInput = ({
     disabled = false,
     onAiClick = null,
     showAiButton = true,
+    aiEnabled = true,
 }) => {
     const inputRef = useRef(null);
     const highlightRef = useRef(null);
@@ -234,11 +235,20 @@ const TemplateInput = ({
 
                 {/* Floating action buttons */}
                 <div className="wpseopilot-template-input__actions">
-                    {showAiButton && onAiClick && (
+                    {showAiButton && (
                         <button
                             type="button"
-                            className="wpseopilot-template-input__action-btn wpseopilot-template-input__action-btn--ai"
-                            onClick={onAiClick}
+                            className={`wpseopilot-template-input__action-btn wpseopilot-template-input__action-btn--ai ${!aiEnabled ? 'is-disabled' : ''}`}
+                            onClick={() => {
+                                if (aiEnabled && onAiClick) {
+                                    onAiClick();
+                                } else if (!aiEnabled) {
+                                    // Show alert when AI is disabled
+                                    if (window.confirm('AI features require WP AI Pilot to be configured.\n\nWould you like to open the AI settings now?')) {
+                                        window.open('admin.php?page=wp-ai-pilot', '_blank');
+                                    }
+                                }
+                            }}
                             disabled={disabled}
                             title="Generate with AI"
                         >

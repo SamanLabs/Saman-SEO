@@ -669,6 +669,17 @@
     color: #7c3aed;
 }
 
+.wpseopilot-template-input__action-btn--ai.is-disabled {
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.wpseopilot-template-input__action-btn--ai.is-disabled:hover {
+    border-color: #ddd;
+    color: #757575;
+    background: #f6f7f7;
+}
+
 .wpseopilot-template-input__footer {
     margin-top: 4px;
 }

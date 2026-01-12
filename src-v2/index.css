@@ -1587,9 +1587,17 @@ code {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.template-input-v2__action-btn--ai:hover:not(:disabled) {
+.template-input-v2__action-btn--ai:hover:not(:disabled):not(.is-disabled) {
   background: rgba(139, 92, 246, 0.12);
   color: #8b5cf6;
+}
+.template-input-v2__action-btn--ai.is-disabled {
+  opacity: 0.5;
+  cursor: pointer;
+}
+.template-input-v2__action-btn--ai.is-disabled:hover {
+  background: #f6f7f7;
+  color: #6b7280;
 }
 .template-input-v2__action-btn--vars:hover:not(:disabled) {
   background: rgba(34, 113, 177, 0.12);

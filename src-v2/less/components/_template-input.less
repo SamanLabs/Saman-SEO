@@ -234,9 +234,19 @@
         cursor: not-allowed;
     }
 
-    &--ai:hover:not(:disabled) {
+    &--ai:hover:not(:disabled):not(.is-disabled) {
         background: fade(@var-separator, 12%);
         color: @var-separator;
+    }
+
+    &--ai.is-disabled {
+        opacity: 0.5;
+        cursor: pointer;
+
+        &:hover {
+            background: @color-surface-muted;
+            color: @color-muted;
+        }
     }
 
     &--vars:hover:not(:disabled) {
