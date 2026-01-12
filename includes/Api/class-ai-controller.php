@@ -8,6 +8,8 @@
 
 namespace WPSEOPilot\Api;
 
+use WPSEOPilot\Integration\AI_Pilot;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -405,6 +407,11 @@ class Ai_Controller extends REST_Controller {
             return $this->error( __( 'Content is required for AI generation.', 'wp-seo-pilot' ), 'missing_content', 400 );
         }
 
+        // Use WP AI Pilot if available
+        if ( AI_Pilot::is_ready() ) {
+            return $this->generate_via_ai_pilot( $content, $type );
+        }
+
         // Get settings
         $model = $model_id ?? get_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
         $system_prompt = get_option( 'wpseopilot_ai_prompt_system', $this->defaults['wpseopilot_ai_prompt_system'] );
@@ -445,6 +452,38 @@ class Ai_Controller extends REST_Controller {
     }
 
     /**
+     * Generate via WP AI Pilot.
+     *
+     * @param string $content Content to analyze.
+     * @param string $type    Generation type (title, description, both).
+     *
+     * @return \WP_REST_Response
+     */
+    private function generate_via_ai_pilot( string $content, string $type ) {
+        $results = [];
+
+        if ( 'title' === $type || 'both' === $type ) {
+            $result = AI_Pilot::generate( $content, 'title' );
+            if ( is_wp_error( $result ) ) {
+                return $this->error( $result->get_error_message(), 'api_error', 500 );
+            }
+            $results['title'] = trim( $result );
+        }
+
+        if ( 'description' === $type || 'both' === $type ) {
+            $result = AI_Pilot::generate( $content, 'description' );
+            if ( is_wp_error( $result ) ) {
+                return $this->error( $result->get_error_message(), 'api_error', 500 );
+            }
+            $results['description'] = trim( $result );
+        }
+
+        return $this->success( $results, __( 'AI generation completed.', 'wp-seo-pilot' ), [
+            'provider' => 'wp-ai-pilot',
+        ] );
+    }
+
+    /**
      * Get API status.
      *
      * @param \WP_REST_Request $request Request object.
@@ -454,18 +493,65 @@ class Ai_Controller extends REST_Controller {
         $api_key = get_option( 'wpseopilot_openai_api_key', '' );
         $custom_models_count = count( $this->get_custom_models_list() );
 
-        if ( empty( $api_key ) && $custom_models_count === 0 ) {
+        // Get WP AI Pilot status
+        $ai_pilot_status = AI_Pilot::get_status();
+        $ai_provider     = AI_Pilot::get_provider();
+        $ai_enabled      = AI_Pilot::ai_enabled();
+
+        // If WP AI Pilot is ready, use it as primary provider
+        if ( AI_Pilot::is_ready() ) {
             return $this->success( [
+                'configured'          => true,
+                'status'              => 'configured',
+                'message'             => __( 'Connected to WP AI Pilot', 'wp-seo-pilot' ),
+                'provider'            => 'wp-ai-pilot',
+                'ai_pilot'            => [
+                    'installed'   => $ai_pilot_status['installed'],
+                    'active'      => $ai_pilot_status['active'],
+                    'ready'       => $ai_pilot_status['ready'],
+                    'version'     => $ai_pilot_status['version'] ?? null,
+                    'settings_url' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+                ],
+                'openai_configured'   => ! empty( $api_key ),
+                'custom_models_count' => $custom_models_count,
+            ] );
+        }
+
+        // WP AI Pilot installed but not ready
+        if ( $ai_pilot_status['installed'] && ! $ai_pilot_status['ready'] ) {
+            $base_status = [
+                'ai_pilot' => [
+                    'installed'    => true,
+                    'active'       => $ai_pilot_status['active'],
+                    'ready'        => false,
+                    'version'      => $ai_pilot_status['version'] ?? null,
+                    'settings_url' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+                ],
+            ];
+        } else {
+            $base_status = [
+                'ai_pilot' => [
+                    'installed' => false,
+                    'active'    => false,
+                    'ready'     => false,
+                ],
+            ];
+        }
+
+        // Fall back to native API check
+        if ( empty( $api_key ) && $custom_models_count === 0 ) {
+            return $this->success( array_merge( $base_status, [
                 'configured'          => false,
                 'status'              => 'not_configured',
                 'message'             => __( 'No API configured', 'wp-seo-pilot' ),
+                'provider'            => 'none',
                 'custom_models_count' => 0,
-            ] );
+            ] ) );
         }
 
         $is_valid_format = ! empty( $api_key ) && strpos( $api_key, 'sk-' ) === 0 && strlen( $api_key ) > 20;
 
-        return $this->success( [
+        return $this->success( array_merge( $base_status, [
             'configured'          => ! empty( $api_key ) || $custom_models_count > 0,
             'openai_configured'   => ! empty( $api_key ),
             'valid_format'        => $is_valid_format,
@@ -473,8 +559,9 @@ class Ai_Controller extends REST_Controller {
             'message'             => $is_valid_format
                 ? __( 'API configured', 'wp-seo-pilot' )
                 : ( $custom_models_count > 0 ? __( 'Custom models available', 'wp-seo-pilot' ) : __( 'API key format may be invalid', 'wp-seo-pilot' ) ),
+            'provider'            => 'native',
             'custom_models_count' => $custom_models_count,
-        ] );
+        ] ) );
     }
 
     // =========================================================================

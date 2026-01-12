@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { AssistantProvider, AssistantChat } from '../assistants';
 
+// Get AI status from global settings
+const globalSettings = window?.wpseopilotV2Settings || {};
+const aiEnabled = globalSettings.aiEnabled || false;
+const aiProvider = globalSettings.aiProvider || 'none';
+const aiPilot = globalSettings.aiPilot || null;
+
 /**
  * Assistants page - Management view with create + stats.
  */
@@ -362,11 +368,51 @@ const Assistants = ({ initialAssistant = null }) => {
                     <p>Manage your AI assistants and track usage.</p>
                 </div>
                 <div className="page-header__actions">
+                    {aiProvider === 'wp-ai-pilot' && (
+                        <a
+                            href={aiPilot?.settingsUrl || 'admin.php?page=wp-ai-pilot'}
+                            className="button ghost"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            WP AI Pilot
+                        </a>
+                    )}
                     <button type="button" className="button primary" onClick={handleCreateNew}>
                         + Create Assistant
                     </button>
                 </div>
             </div>
+
+            {/* AI Not Configured Notice */}
+            {!aiEnabled && (
+                <div className="assistants-notice">
+                    <div className="assistants-notice__icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div className="assistants-notice__content">
+                        <h3>AI Assistants Powered by WP AI Pilot</h3>
+                        {aiPilot?.installed ? (
+                            <>
+                                <p>WP AI Pilot is installed but needs configuration. Add an API key to enable AI assistants.</p>
+                                <a href={aiPilot.settingsUrl || 'admin.php?page=wp-ai-pilot'} className="button primary">
+                                    Configure WP AI Pilot
+                                </a>
+                            </>
+                        ) : (
+                            <>
+                                <p>Install WP AI Pilot to access AI-powered assistants for SEO optimization, content generation, and more.</p>
+                                <a href="plugin-install.php?s=wp+ai+pilot&tab=search" className="button primary">
+                                    Install WP AI Pilot
+                                </a>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Stats Cards */}
             {stats && (

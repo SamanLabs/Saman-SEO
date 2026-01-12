@@ -10,6 +10,8 @@
 
 namespace WPSEOPilot;
 
+use WPSEOPilot\Integration\AI_Pilot;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -253,6 +255,11 @@ class Admin_V2 {
         $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : self::MENU_SLUG;
         $initial_view = isset( $this->view_map[ $page ] ) ? $this->view_map[ $page ] : 'dashboard';
 
+        // Get AI status
+        $ai_status   = AI_Pilot::get_status();
+        $ai_enabled  = AI_Pilot::ai_enabled();
+        $ai_provider = AI_Pilot::get_provider();
+
         // Pass configuration to React app
         wp_localize_script( 'wpseopilot-admin-v2', 'wpseopilotV2Settings', [
             'initialView' => $initial_view,
@@ -263,6 +270,15 @@ class Admin_V2 {
             'version'     => WPSEOPILOT_VERSION,
             'viewMap'     => $this->view_map,
             'menuSlug'    => self::MENU_SLUG,
+            'aiEnabled'   => $ai_enabled,
+            'aiProvider'  => $ai_provider,
+            'aiPilot'     => [
+                'installed'   => $ai_status['installed'],
+                'active'      => $ai_status['active'],
+                'ready'       => $ai_status['ready'],
+                'version'     => $ai_status['version'] ?? null,
+                'settingsUrl' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+            ],
         ] );
     }
 

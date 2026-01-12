@@ -6,6 +6,12 @@ import TemplateInput from '../components/TemplateInput';
 import AiGenerateModal from '../components/AiGenerateModal';
 import useUrlTab from '../hooks/useUrlTab';
 
+// Get AI status from global settings
+const globalSettings = window?.wpseopilotV2Settings || {};
+const aiEnabled = globalSettings.aiEnabled || false;
+const aiProvider = globalSettings.aiProvider || 'none';
+const aiPilot = globalSettings.aiPilot || null;
+
 const searchAppearanceTabs = [
     { id: 'homepage', label: 'Homepage' },
     { id: 'content-types', label: 'Content Types' },
@@ -484,6 +490,7 @@ const SearchAppearance = () => {
                                     context="global"
                                     maxLength={60}
                                     onAiClick={() => openAiModal('title', (val) => setHomepage({ ...homepage, meta_title: val }), { type: 'Homepage' })}
+                                    aiEnabled={aiEnabled}
                                 />
                             </div>
                         </div>
@@ -505,6 +512,7 @@ const SearchAppearance = () => {
                                     multiline
                                     maxLength={160}
                                     onAiClick={() => openAiModal('description', (val) => setHomepage({ ...homepage, meta_description: val }), { type: 'Homepage' })}
+                                    aiEnabled={aiEnabled}
                                 />
                             </div>
                         </div>

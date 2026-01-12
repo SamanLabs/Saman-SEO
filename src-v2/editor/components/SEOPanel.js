@@ -25,6 +25,8 @@ const SEOPanel = ({
     variables,
     variableValues,
     aiEnabled,
+    aiProvider = 'none',
+    aiPilot = null,
 }) => {
     const [activeTab, setActiveTab] = useState('general');
     const [aiModal, setAiModal] = useState({
@@ -343,6 +345,8 @@ const SEOPanel = ({
                 postTitle={postTitle}
                 postContent={postContent}
                 variableValues={variableValues}
+                aiProvider={aiProvider}
+                aiPilot={aiPilot}
             />
         </div>
     );

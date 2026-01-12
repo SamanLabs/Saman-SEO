@@ -1163,3 +1163,109 @@
     color: #757575;
     margin-top: 2px;
 }
+
+/* ========================================
+   AI Provider Badge
+   ======================================== */
+
+.wpseopilot-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+.wpseopilot-ai-badge svg {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========================================
+   AI Notice Styles
+   ======================================== */
+
+.wpseopilot-ai-modal--notice {
+    max-width: 380px;
+}
+
+.wpseopilot-ai-notice {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.wpseopilot-ai-notice--info {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe;
+}
+
+.wpseopilot-ai-notice--warning {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fcd34d;
+}
+
+.wpseopilot-ai-notice--success {
+    background: linear-gradient(135deg, #ecfdf5 0%, #dcfce7 100%);
+    border: 1px solid #86efac;
+}
+
+.wpseopilot-ai-notice__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.wpseopilot-ai-notice--info .wpseopilot-ai-notice__icon {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.wpseopilot-ai-notice--warning .wpseopilot-ai-notice__icon {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.wpseopilot-ai-notice--success .wpseopilot-ai-notice__icon {
+    background: #10b981;
+    color: #fff;
+}
+
+.wpseopilot-ai-notice__content {
+    flex: 1;
+}
+
+.wpseopilot-ai-notice__content h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+.wpseopilot-ai-notice__content p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #4b5563;
+}
+
+.wpseopilot-ai-notice__content a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.wpseopilot-ai-notice__content a:hover {
+    text-decoration: underline;
+}

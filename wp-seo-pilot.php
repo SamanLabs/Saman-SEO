@@ -51,6 +51,18 @@ spl_autoload_register(
 			return;
 		}
 
+		// Handle Integration namespace (in includes/Integration/ directory)
+		if ( 0 === strpos( $class, 'WPSEOPilot\\Integration\\' ) ) {
+			$class_name = str_replace( 'WPSEOPilot\\Integration\\', '', $class );
+			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
+			$file       = WPSEOPILOT_PATH . 'includes/Integration/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+			return;
+		}
+
 		$path = strtolower(
 			str_replace(
 				[ '\\', '_' ],

@@ -74,6 +74,8 @@ const TemplateInput = ({
     disabled = false,
     onAiClick = null,
     showAiButton = true,
+    aiEnabled = true,
+    aiDisabledReason = null,
 }) => {
     const inputRef = useRef(null);
     const highlightRef = useRef(null);
@@ -228,18 +230,26 @@ const TemplateInput = ({
                 {/* Floating action buttons */}
                 <div className="template-input-v2__actions">
                     {showAiButton && (
-                        <button
-                            type="button"
-                            className="template-input-v2__action-btn template-input-v2__action-btn--ai"
-                            onClick={onAiClick}
-                            disabled={disabled || !onAiClick}
-                            title="Generate with AI"
-                        >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" />
-                                <circle cx="12" cy="12" r="4" />
-                            </svg>
-                        </button>
+                        <div className="template-input-v2__ai-wrapper">
+                            <button
+                                type="button"
+                                className={`template-input-v2__action-btn template-input-v2__action-btn--ai ${!aiEnabled ? 'is-disabled' : ''}`}
+                                onClick={aiEnabled ? onAiClick : undefined}
+                                disabled={disabled || !aiEnabled || !onAiClick}
+                                title={aiEnabled ? 'Generate with AI' : (aiDisabledReason || 'Configure WP AI Pilot to enable AI')}
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" />
+                                    <circle cx="12" cy="12" r="4" />
+                                </svg>
+                            </button>
+                            {!aiEnabled && (
+                                <div className="template-input-v2__ai-tooltip">
+                                    <span>AI requires WP AI Pilot</span>
+                                    <a href="admin.php?page=wp-ai-pilot" className="template-input-v2__ai-tooltip-link">Configure</a>
+                                </div>
+                            )}
+                        </div>
                     )}
                     <VariablePicker
                         variables={variables}

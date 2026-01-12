@@ -26,6 +26,8 @@ const PluginIcon = () => (
 const editorData = window.wpseopilotEditor || {};
 const variables = editorData.variables || {};
 const aiEnabled = editorData.aiEnabled || false;
+const aiProvider = editorData.aiProvider || 'none';
+const aiPilot = editorData.aiPilot || null;
 
 /**
  * Main SEO Sidebar Component
@@ -195,6 +197,8 @@ const SEOSidebar = () => {
                     variables={variables}
                     variableValues={variableValues}
                     aiEnabled={aiEnabled}
+                    aiProvider={aiProvider}
+                    aiPilot={aiPilot}
                 />
             </PluginSidebar>
         </>

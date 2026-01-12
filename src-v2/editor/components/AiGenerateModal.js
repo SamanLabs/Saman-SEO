@@ -17,6 +17,8 @@ const AiGenerateModal = ({
     context = {},
     postTitle = '',
     postContent = '',
+    aiProvider = 'none', // 'wp-ai-pilot', 'native', or 'none'
+    aiPilot = null, // { installed, active, ready, settingsUrl }
 }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
@@ -120,6 +122,88 @@ const AiGenerateModal = ({
 
     if (!isOpen) return null;
 
+    // Show configuration notice if AI is not configured
+    if (aiProvider === 'none') {
+        return (
+            <div className="wpseopilot-ai-modal-overlay" onClick={handleClose}>
+                <div className="wpseopilot-ai-modal wpseopilot-ai-modal--notice" onClick={(e) => e.stopPropagation()}>
+                    <div className="wpseopilot-ai-modal__header">
+                        <h3>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 8v4m0 4h.01" />
+                            </svg>
+                            AI Not Configured
+                        </h3>
+                        <button
+                            type="button"
+                            className="wpseopilot-ai-modal__close"
+                            onClick={handleClose}
+                            aria-label="Close"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="wpseopilot-ai-modal__body">
+                        {aiPilot?.installed ? (
+                            <div className="wpseopilot-ai-notice wpseopilot-ai-notice--warning">
+                                <div className="wpseopilot-ai-notice__icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                    </svg>
+                                </div>
+                                <div className="wpseopilot-ai-notice__content">
+                                    <h4>WP AI Pilot Needs Configuration</h4>
+                                    <p>WP AI Pilot is installed but not yet configured. Add an API key to enable AI-powered SEO suggestions.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="wpseopilot-ai-notice wpseopilot-ai-notice--info">
+                                <div className="wpseopilot-ai-notice__icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                    </svg>
+                                </div>
+                                <div className="wpseopilot-ai-notice__content">
+                                    <h4>Enhance with WP AI Pilot</h4>
+                                    <p>Install WP AI Pilot to unlock AI-powered title and meta description generation.</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="wpseopilot-ai-modal__footer">
+                        <button
+                            type="button"
+                            className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--secondary"
+                            onClick={handleClose}
+                        >
+                            Cancel
+                        </button>
+                        {aiPilot?.installed ? (
+                            <a
+                                href={aiPilot.settingsUrl}
+                                className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--primary"
+                            >
+                                Configure WP AI Pilot
+                            </a>
+                        ) : (
+                            <a
+                                href="/wp-admin/plugin-install.php?s=wp+ai+pilot&tab=search"
+                                className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--primary"
+                            >
+                                Install WP AI Pilot
+                            </a>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="wpseopilot-ai-modal-overlay" onClick={handleClose}>
             <div className="wpseopilot-ai-modal" onClick={(e) => e.stopPropagation()}>
@@ -131,6 +215,14 @@ const AiGenerateModal = ({
                         </svg>
                         Generate {fieldType === 'title' ? 'Title' : 'Description'}
                     </h3>
+                    {aiProvider === 'wp-ai-pilot' && (
+                        <span className="wpseopilot-ai-badge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            WP AI Pilot
+                        </span>
+                    )}
                     <button
                         type="button"
                         className="wpseopilot-ai-modal__close"

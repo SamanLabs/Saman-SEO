@@ -813,29 +813,52 @@ const AdvancedTab = ({ settings, updateSetting }) => {
                     </div>
                 </section>
 
-                <section className="panel">
-                    <h3>API Keys</h3>
-                    <p className="panel-desc">Connect external services for enhanced features.</p>
+                <section className="panel panel--deprecated">
+                    <h3>API Keys <span className="deprecated-badge">Deprecated</span></h3>
+                    <p className="panel-desc">API key management has moved to WP AI Pilot for centralized AI configuration.</p>
 
-                    <div className="settings-row">
-                        <div className="settings-label">
-                            <label htmlFor="openai-key">OpenAI API Key</label>
-                            <p className="settings-help">For AI-powered content suggestions.</p>
+                    <div className="deprecation-notice deprecation-notice--block">
+                        <div className="deprecation-notice__icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
                         </div>
-                        <div className="settings-control">
-                            <input id="openai-key" type="password" value={settings.openai_api_key} onChange={(e) => updateSetting('openai_api_key', e.target.value)} placeholder="sk-..." />
+                        <div className="deprecation-notice__content">
+                            <h4>AI Features Now Powered by WP AI Pilot</h4>
+                            <p>Configure your OpenAI, Anthropic, Google AI, and other API keys in WP AI Pilot. This provides unified AI management across all your WordPress plugins that support it.</p>
+                            <div className="deprecation-notice__actions">
+                                <a href="admin.php?page=wp-ai-pilot" className="button primary">
+                                    Open WP AI Pilot
+                                </a>
+                                <a href="plugin-install.php?s=wp+ai+pilot&tab=search" className="button ghost">
+                                    Install WP AI Pilot
+                                </a>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="settings-row">
-                        <div className="settings-label">
-                            <label htmlFor="google-key">Google API Key</label>
-                            <p className="settings-help">For Search Console and other Google services.</p>
+                    <details className="legacy-settings-toggle">
+                        <summary>Show legacy API key fields (for reference only)</summary>
+                        <div className="legacy-settings-content">
+                            <p className="muted">These fields are read-only. Use WP AI Pilot to manage API keys.</p>
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label htmlFor="openai-key">OpenAI API Key</label>
+                                </div>
+                                <div className="settings-control">
+                                    <input id="openai-key" type="password" value={settings.openai_api_key ? '••••••••••••' : ''} disabled placeholder="Configured in WP AI Pilot" />
+                                </div>
+                            </div>
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label htmlFor="google-key">Google API Key</label>
+                                </div>
+                                <div className="settings-control">
+                                    <input id="google-key" type="password" value={settings.google_api_key ? '••••••••••••' : ''} disabled placeholder="Configured in WP AI Pilot" />
+                                </div>
+                            </div>
                         </div>
-                        <div className="settings-control">
-                            <input id="google-key" type="password" value={settings.google_api_key} onChange={(e) => updateSetting('google_api_key', e.target.value)} placeholder="AIza..." />
-                        </div>
-                    </div>
+                    </details>
                 </section>
 
                 <section className="panel">

@@ -9,6 +9,7 @@ namespace WPSEOPilot\Service;
 
 defined( 'ABSPATH' ) || exit;
 
+use WPSEOPilot\Integration\AI_Pilot;
 use function WPSEOPilot\Helpers\calculate_seo_score;
 use function WPSEOPilot\Helpers\generate_title_from_template;
 use function WPSEOPilot\Helpers\replace_template_variables;
@@ -280,9 +281,11 @@ class Admin_UI {
 		// Get variables for the editor
 		$settings_svc = new Settings();
 		$variables    = $settings_svc->get_context_variables();
-		$ai_enabled   = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) )
-			|| ! empty( get_option( 'wpseopilot_anthropic_api_key', '' ) )
-			|| ! empty( get_option( 'wpseopilot_google_api_key', '' ) );
+
+		// Get AI status from integration
+		$ai_status   = AI_Pilot::get_status();
+		$ai_enabled  = AI_Pilot::ai_enabled();
+		$ai_provider = AI_Pilot::get_provider();
 
 		// Localize data for the React editor
 		wp_localize_script(
@@ -291,6 +294,14 @@ class Admin_UI {
 			[
 				'variables'  => $variables,
 				'aiEnabled'  => $ai_enabled,
+				'aiProvider' => $ai_provider, // 'wp-ai-pilot', 'native', or 'none'
+				'aiPilot'    => [
+					'installed'   => $ai_status['installed'],
+					'active'      => $ai_status['active'],
+					'ready'       => $ai_status['ready'],
+					'version'     => $ai_status['version'] ?? null,
+					'settingsUrl' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+				],
 				'siteTitle'  => get_bloginfo( 'name' ),
 				'tagline'    => get_bloginfo( 'description' ),
 				'separator'  => get_option( 'wpseopilot_title_separator', '|' ),
