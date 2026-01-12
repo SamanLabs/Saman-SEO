@@ -1269,3 +1269,233 @@
 .wpseopilot-ai-notice__content a:hover {
     text-decoration: underline;
 }
+
+/* ========================================
+   Keyphrase Hint
+   ======================================== */
+
+.wpseopilot-keyphrase-hint {
+    font-size: 10px;
+    color: #7c3aed;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* View All Link */
+.wpseopilot-view-all-link {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #2271b1;
+    background: #f0f6fc;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+}
+
+.wpseopilot-view-all-link:hover {
+    background: #e5f0fa;
+    color: #135e96;
+}
+
+/* ========================================
+   Metrics Breakdown Component
+   ======================================== */
+
+.wpseopilot-metrics-breakdown {
+    padding: 0;
+}
+
+.wpseopilot-metric-group {
+    margin-bottom: 16px;
+}
+
+.wpseopilot-metric-group__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f6f7f7;
+    border-left: 3px solid #2271b1;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 8px;
+}
+
+.wpseopilot-metric-group__icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.wpseopilot-metric-group__label {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+.wpseopilot-metric-group__score {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #fff;
+    color: #757575;
+}
+
+.wpseopilot-metric-group__score--good {
+    background: #edfaef;
+    color: #00a32a;
+}
+
+.wpseopilot-metric-group__score--fair {
+    background: #fcf9e8;
+    color: #b26200;
+}
+
+.wpseopilot-metric-group__score--poor {
+    background: #fcf0f1;
+    color: #d63638;
+}
+
+.wpseopilot-metric-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.wpseopilot-metric-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    transition: all 0.15s ease;
+}
+
+.wpseopilot-metric-item--fail {
+    background: #fcf0f1;
+    border-color: #f1b3b6;
+}
+
+.wpseopilot-metric-item--partial {
+    background: #fcf9e8;
+    border-color: #f0d88c;
+}
+
+.wpseopilot-metric-item--pass {
+    background: #edfaef;
+    border-color: #a8e6b0;
+}
+
+.wpseopilot-metric-item__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.wpseopilot-metric-item__indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wpseopilot-metric-item__indicator--pass {
+    background: #00a32a;
+}
+
+.wpseopilot-metric-item__indicator--partial {
+    background: #dba617;
+}
+
+.wpseopilot-metric-item__indicator--fail {
+    background: #d63638;
+}
+
+.wpseopilot-metric-item__label {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1e1e1e;
+}
+
+.wpseopilot-metric-item__score {
+    font-size: 11px;
+    font-weight: 600;
+    color: #757575;
+}
+
+.wpseopilot-metric-item__status {
+    font-size: 11px;
+    color: #555;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.wpseopilot-metric-item__bar {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.wpseopilot-metric-item__fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.wpseopilot-metric-item__fill--pass {
+    background: #00a32a;
+}
+
+.wpseopilot-metric-item__fill--partial {
+    background: #dba617;
+}
+
+.wpseopilot-metric-item__fill--fail {
+    background: #d63638;
+}
+
+/* Keyphrase Notice */
+.wpseopilot-keyphrase-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f5f0ff 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.wpseopilot-keyphrase-notice__icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.wpseopilot-keyphrase-notice__content {
+    flex: 1;
+}
+
+.wpseopilot-keyphrase-notice__content strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4338ca;
+    margin-bottom: 4px;
+}
+
+.wpseopilot-keyphrase-notice__content p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #5b52b0;
+}

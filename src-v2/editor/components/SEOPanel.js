@@ -10,6 +10,7 @@ import SearchPreview from './SearchPreview';
 import ScoreGauge from './ScoreGauge';
 import TemplateInput from './TemplateInput';
 import AiGenerateModal from './AiGenerateModal';
+import MetricsBreakdown from './MetricsBreakdown';
 
 const SEOPanel = ({
     seoMeta,
@@ -92,6 +93,11 @@ const SEOPanel = ({
                             ? `${seoScore.issues.length} issue${seoScore.issues.length !== 1 ? 's' : ''} found`
                             : 'Looking good!'}
                     </div>
+                    {!seoMeta.focus_keyphrase && (
+                        <div className="wpseopilot-keyphrase-hint">
+                            Add keyphrase for full analysis
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -103,6 +109,13 @@ const SEOPanel = ({
                     onClick={() => setActiveTab('general')}
                 >
                     General
+                </button>
+                <button
+                    type="button"
+                    className={`wpseopilot-tab ${activeTab === 'analysis' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('analysis')}
+                >
+                    Analysis
                 </button>
                 <button
                     type="button"
@@ -182,19 +195,39 @@ const SEOPanel = ({
                     {/* Quick Analysis */}
                     {seoScore?.issues?.length > 0 && (
                         <div className="wpseopilot-issues">
-                            <label className="wpseopilot-section-label">Analysis</label>
+                            <label className="wpseopilot-section-label">Issues</label>
                             <ul className="wpseopilot-issues-list">
                                 {seoScore.issues.slice(0, 5).map((issue, idx) => (
                                     <li key={idx} className={`wpseopilot-issue wpseopilot-issue--${issue.severity || 'warning'}`}>
                                         <span className="wpseopilot-issue-icon">
-                                            {issue.severity === 'error' ? '!' : '?'}
+                                            {issue.severity === 'high' ? '!' : '?'}
                                         </span>
                                         <span className="wpseopilot-issue-text">{issue.message}</span>
                                     </li>
                                 ))}
                             </ul>
+                            {seoScore.issues.length > 5 && (
+                                <button
+                                    type="button"
+                                    className="wpseopilot-view-all-link"
+                                    onClick={() => setActiveTab('analysis')}
+                                >
+                                    View all {seoScore.issues.length} issues →
+                                </button>
+                            )}
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* Analysis Tab */}
+            {activeTab === 'analysis' && (
+                <div className="wpseopilot-tab-content">
+                    <MetricsBreakdown
+                        metrics={seoScore?.metrics || []}
+                        metricsByCategory={seoScore?.metrics_by_category}
+                        hasKeyphrase={!!seoMeta.focus_keyphrase}
+                    />
                 </div>
             )}
 

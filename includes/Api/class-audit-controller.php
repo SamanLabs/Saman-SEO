@@ -156,6 +156,9 @@ class Audit_Controller extends REST_Controller {
     /**
      * Get issues for a specific post.
      *
+     * Uses the enhanced calculate_seo_score() function that returns
+     * 14 metrics across 4 categories.
+     *
      * @param \WP_REST_Request $request Request object.
      * @return \WP_REST_Response
      */
@@ -167,17 +170,118 @@ class Audit_Controller extends REST_Controller {
             return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
         }
 
-        $issues = $this->analyze_single_post( $post );
+        // Use the enhanced scoring function.
+        $score_data = calculate_seo_score( $post );
+
+        // Get focus keyphrase for context.
+        $meta            = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
+        $focus_keyphrase = isset( $meta['focus_keyphrase'] ) ? $meta['focus_keyphrase'] : '';
+
+        // Extract failing metrics as issues.
+        $issues = $this->extract_issues_from_metrics( $score_data['metrics'] ?? [] );
+
+        // Build recommendation if needed.
+        $recommendation = $this->build_recommendation( $post );
 
         return $this->success( [
-            'post_id'   => $post_id,
-            'title'     => get_the_title( $post ),
-            'edit_url'  => get_edit_post_link( $post_id, 'raw' ),
-            'permalink' => get_permalink( $post_id ),
-            'issues'    => $issues['issues'],
-            'score'     => $issues['score'],
-            'recommendation' => $issues['recommendation'],
+            'post_id'             => $post_id,
+            'title'               => get_the_title( $post ),
+            'edit_url'            => get_edit_post_link( $post_id, 'raw' ),
+            'permalink'           => get_permalink( $post_id ),
+            'score'               => $score_data['score'],
+            'level'               => $score_data['level'],
+            'label'               => $score_data['label'],
+            'summary'             => $score_data['summary'],
+            'focus_keyphrase'     => $focus_keyphrase,
+            'has_keyphrase'       => $score_data['has_keyphrase'] ?? ! empty( $focus_keyphrase ),
+            'metrics'             => $score_data['metrics'],
+            'metrics_by_category' => $this->group_metrics_by_category( $score_data['metrics'] ?? [] ),
+            'issues'              => $issues,
+            'recommendation'      => $recommendation,
         ] );
+    }
+
+    /**
+     * Group metrics by category for UI display.
+     *
+     * @param array $metrics Metrics array.
+     * @return array Grouped metrics.
+     */
+    private function group_metrics_by_category( $metrics ) {
+        $groups = [
+            'basic'     => [ 'label' => __( 'Basic SEO', 'wp-seo-pilot' ), 'items' => [] ],
+            'keyword'   => [ 'label' => __( 'Keyword Optimization', 'wp-seo-pilot' ), 'items' => [] ],
+            'structure' => [ 'label' => __( 'Content Structure', 'wp-seo-pilot' ), 'items' => [] ],
+            'links'     => [ 'label' => __( 'Links & Media', 'wp-seo-pilot' ), 'items' => [] ],
+        ];
+
+        foreach ( $metrics as $metric ) {
+            $category = $metric['category'] ?? 'basic';
+            if ( isset( $groups[ $category ] ) ) {
+                $groups[ $category ]['items'][] = $metric;
+            }
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Extract failing metrics as issues list.
+     *
+     * @param array $metrics Metrics array.
+     * @return array Issues array.
+     */
+    private function extract_issues_from_metrics( $metrics ) {
+        $issues = [];
+
+        foreach ( $metrics as $metric ) {
+            if ( empty( $metric['is_pass'] ) ) {
+                $issues[] = [
+                    'key'         => $metric['key'],
+                    'severity'    => $metric['score'] === 0 ? 'high' : 'medium',
+                    'issue_label' => $metric['issue_label'] ?? $metric['label'],
+                    'message'     => $metric['status'],
+                    'type'        => $metric['key'],
+                    'category'    => $metric['category'] ?? 'basic',
+                ];
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Build recommendation for a post.
+     *
+     * @param \WP_Post $post Post object.
+     * @return array|null Recommendation data.
+     */
+    private function build_recommendation( $post ) {
+        $meta = (array) get_post_meta( $post->ID, Post_Meta::META_KEY, true );
+
+        if ( ! empty( $meta['title'] ) && ! empty( $meta['description'] ) ) {
+            return null;
+        }
+
+        $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+
+        $title_suggestion = '';
+        if ( function_exists( 'WPSEOPilot\Helpers\generate_title_from_template' ) ) {
+            $title_suggestion = generate_title_from_template( $post );
+        }
+        if ( empty( $title_suggestion ) ) {
+            $title_suggestion = get_the_title( $post );
+        }
+
+        $excerpt = $post->post_excerpt ?: wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+        if ( empty( $excerpt ) && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
+            $excerpt = $post_type_descriptions[ $post->post_type ];
+        }
+
+        return [
+            'suggested_title'       => $title_suggestion,
+            'suggested_description' => $excerpt,
+        ];
     }
 
     /**
