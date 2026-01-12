@@ -3,7 +3,7 @@
  * GitHub Plugin Updater
  *
  * Checks GitHub releases for plugin updates and integrates
- * with WordPress update system.
+ * with WordPress update system. Supports both stable and beta releases.
  *
  * @package WPSEOPilot
  * @since 0.2.0
@@ -33,9 +33,14 @@ class GitHub_Updater {
     private const GITHUB_API = 'https://api.github.com';
 
     /**
-     * Cache duration (12 hours).
+     * Cache duration for stable releases (12 hours).
      */
     private const CACHE_DURATION = 43200;
+
+    /**
+     * Cache duration for beta releases (6 hours).
+     */
+    private const BETA_CACHE_DURATION = 21600;
 
     /**
      * Singleton instance.
@@ -139,15 +144,40 @@ class GitHub_Updater {
             }
 
             $current_version = $transient->checked[ $plugin_file ];
-            $remote_version  = $this->get_remote_version( $plugin_data['repo'] );
+            $slug            = $plugin_data['slug'];
+            $beta_enabled    = $this->is_beta_enabled( $slug );
 
-            if ( $remote_version && version_compare( $remote_version['version'], $current_version, '>' ) ) {
+            // Get stable version.
+            $remote = $this->get_remote_version( $plugin_data['repo'] );
+
+            // Get beta version if enabled.
+            $beta = $beta_enabled ? $this->get_beta_version( $plugin_data['repo'] ) : null;
+
+            // Determine which version to offer.
+            $update_version  = null;
+            $update_url      = null;
+
+            if ( $beta_enabled && $beta && $this->compare_versions( $beta['version'], $current_version ) > 0 ) {
+                // Beta is newer than current and beta is enabled.
+                if ( ! $remote || $this->compare_versions( $beta['version'], $remote['version'] ) >= 0 ) {
+                    $update_version = $beta['version'];
+                    $update_url     = $beta['download_url'];
+                }
+            }
+
+            // Fall back to stable if no beta update or stable is newer.
+            if ( ! $update_version && $remote && $this->compare_versions( $remote['version'], $current_version ) > 0 ) {
+                $update_version = $remote['version'];
+                $update_url     = $remote['download_url'];
+            }
+
+            if ( $update_version && $update_url ) {
                 $transient->response[ $plugin_file ] = (object) [
                     'slug'        => $plugin_data['slug'],
                     'plugin'      => $plugin_file,
-                    'new_version' => $remote_version['version'],
+                    'new_version' => $update_version,
                     'url'         => 'https://github.com/' . $plugin_data['repo'],
-                    'package'     => $remote_version['download_url'],
+                    'package'     => $update_url,
                     'icons'       => [
                         '1x' => $plugin_data['icon'],
                         '2x' => $plugin_data['icon'],
@@ -166,7 +196,7 @@ class GitHub_Updater {
     }
 
     /**
-     * Get remote version from GitHub.
+     * Get remote stable version from GitHub.
      *
      * @param string $repo GitHub repository (owner/repo).
      * @return array|null Remote version data or null on error.
@@ -176,7 +206,7 @@ class GitHub_Updater {
         $cached    = get_transient( $cache_key );
 
         if ( false !== $cached ) {
-            return $cached;
+            return $cached ?: null;
         }
 
         $url = self::GITHUB_API . '/repos/' . $repo . '/releases/latest';
@@ -190,12 +220,20 @@ class GitHub_Updater {
         ] );
 
         if ( is_wp_error( $response ) ) {
+            set_transient( $cache_key, [], self::CACHE_DURATION );
+            return null;
+        }
+
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+            set_transient( $cache_key, [], self::CACHE_DURATION );
             return null;
         }
 
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( empty( $body['tag_name'] ) ) {
+            set_transient( $cache_key, [], self::CACHE_DURATION );
             return null;
         }
 
@@ -206,7 +244,7 @@ class GitHub_Updater {
         $download_url = null;
         if ( ! empty( $body['assets'] ) ) {
             foreach ( $body['assets'] as $asset ) {
-                if ( str_ends_with( $asset['name'], '.zip' ) ) {
+                if ( isset( $asset['name'] ) && substr( $asset['name'], -4 ) === '.zip' ) {
                     $download_url = $asset['browser_download_url'];
                     break;
                 }
@@ -224,11 +262,168 @@ class GitHub_Updater {
             'changelog'    => $body['body'] ?? '',
             'published_at' => $body['published_at'] ?? '',
             'html_url'     => $body['html_url'] ?? '',
+            'is_beta'      => false,
         ];
 
         set_transient( $cache_key, $result, self::CACHE_DURATION );
 
         return $result;
+    }
+
+    /**
+     * Get beta version from GitHub pre-releases.
+     *
+     * @param string $repo GitHub repository (owner/repo).
+     * @return array|null Beta version data or null if not found.
+     */
+    public function get_beta_version( string $repo ): ?array {
+        $cache_key = 'wpseopilot_gh_beta_' . md5( $repo );
+        $cached    = get_transient( $cache_key );
+
+        if ( false !== $cached ) {
+            return $cached ?: null;
+        }
+
+        // Get all releases (includes pre-releases).
+        $url = self::GITHUB_API . '/repos/' . $repo . '/releases';
+
+        $response = wp_remote_get( $url, [
+            'headers' => [
+                'Accept'     => 'application/vnd.github.v3+json',
+                'User-Agent' => 'WP-SEO-Pilot-Updater',
+            ],
+            'timeout' => 10,
+        ] );
+
+        if ( is_wp_error( $response ) ) {
+            set_transient( $cache_key, [], self::BETA_CACHE_DURATION );
+            return null;
+        }
+
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+            set_transient( $cache_key, [], self::BETA_CACHE_DURATION );
+            return null;
+        }
+
+        $releases = json_decode( wp_remote_retrieve_body( $response ), true );
+
+        if ( empty( $releases ) || ! is_array( $releases ) ) {
+            set_transient( $cache_key, [], self::BETA_CACHE_DURATION );
+            return null;
+        }
+
+        // Find the latest pre-release.
+        $latest_beta = null;
+        foreach ( $releases as $release ) {
+            if ( ! empty( $release['prerelease'] ) && ! empty( $release['tag_name'] ) ) {
+                $latest_beta = $release;
+                break; // Releases are sorted by date, first prerelease is latest.
+            }
+        }
+
+        if ( ! $latest_beta ) {
+            set_transient( $cache_key, [], self::BETA_CACHE_DURATION );
+            return null;
+        }
+
+        // Parse version from tag.
+        $version = ltrim( $latest_beta['tag_name'], 'v' );
+
+        // Find the zip asset.
+        $download_url = null;
+        if ( ! empty( $latest_beta['assets'] ) ) {
+            foreach ( $latest_beta['assets'] as $asset ) {
+                if ( isset( $asset['name'] ) && substr( $asset['name'], -4 ) === '.zip' ) {
+                    $download_url = $asset['browser_download_url'];
+                    break;
+                }
+            }
+        }
+
+        // Fallback to zipball.
+        if ( ! $download_url && ! empty( $latest_beta['zipball_url'] ) ) {
+            $download_url = $latest_beta['zipball_url'];
+        }
+
+        if ( ! $download_url ) {
+            set_transient( $cache_key, [], self::BETA_CACHE_DURATION );
+            return null;
+        }
+
+        $result = [
+            'version'      => $version,
+            'download_url' => $download_url,
+            'changelog'    => $latest_beta['body'] ?? '',
+            'published_at' => $latest_beta['published_at'] ?? '',
+            'html_url'     => $latest_beta['html_url'] ?? '',
+            'is_beta'      => true,
+        ];
+
+        set_transient( $cache_key, $result, self::BETA_CACHE_DURATION );
+
+        return $result;
+    }
+
+    /**
+     * Compare two version strings, handling beta/alpha/rc tags.
+     *
+     * @param string $version1 First version.
+     * @param string $version2 Second version.
+     * @return int -1, 0, or 1.
+     */
+    public function compare_versions( string $version1, string $version2 ): int {
+        // Normalize versions.
+        $v1 = $this->normalize_version( $version1 );
+        $v2 = $this->normalize_version( $version2 );
+
+        return version_compare( $v1, $v2 );
+    }
+
+    /**
+     * Normalize version string for comparison.
+     *
+     * @param string $version Version string.
+     * @return string Normalized version.
+     */
+    private function normalize_version( string $version ): string {
+        // Replace common pre-release tags with comparable versions.
+        $version = strtolower( $version );
+        $version = str_replace( [ '-alpha', '-beta', '-rc' ], [ '.alpha.', '.beta.', '.rc.' ], $version );
+        $version = preg_replace( '/\.+/', '.', $version );
+        $version = trim( $version, '.' );
+
+        return $version;
+    }
+
+    /**
+     * Check if beta is enabled for a plugin.
+     *
+     * @param string $slug Plugin slug.
+     * @return bool
+     */
+    public function is_beta_enabled( string $slug ): bool {
+        $beta_settings = get_option( 'wpseopilot_beta_plugins', [] );
+        return ! empty( $beta_settings[ $slug ] );
+    }
+
+    /**
+     * Set beta enabled/disabled for a plugin.
+     *
+     * @param string $slug    Plugin slug.
+     * @param bool   $enabled Whether beta is enabled.
+     * @return bool Success.
+     */
+    public function set_beta_enabled( string $slug, bool $enabled ): bool {
+        $beta_settings = get_option( 'wpseopilot_beta_plugins', [] );
+
+        if ( $enabled ) {
+            $beta_settings[ $slug ] = true;
+        } else {
+            unset( $beta_settings[ $slug ] );
+        }
+
+        return update_option( 'wpseopilot_beta_plugins', $beta_settings );
     }
 
     /**
@@ -357,6 +552,7 @@ class GitHub_Updater {
         // Clear transients to force fresh check.
         foreach ( $this->plugins as $plugin_file => $plugin_data ) {
             delete_transient( 'wpseopilot_gh_' . md5( $plugin_data['repo'] ) );
+            delete_transient( 'wpseopilot_gh_beta_' . md5( $plugin_data['repo'] ) );
         }
 
         // Trigger WordPress update check.
@@ -375,9 +571,11 @@ class GitHub_Updater {
         foreach ( $this->plugins as $plugin_file => $plugin_data ) {
             // Clear cache.
             delete_transient( 'wpseopilot_gh_' . md5( $plugin_data['repo'] ) );
+            delete_transient( 'wpseopilot_gh_beta_' . md5( $plugin_data['repo'] ) );
 
-            // Get fresh version.
+            // Get fresh versions.
             $remote = $this->get_remote_version( $plugin_data['repo'] );
+            $beta   = $this->get_beta_version( $plugin_data['repo'] );
 
             // Get current version.
             $current_version = null;
@@ -391,7 +589,8 @@ class GitHub_Updater {
                 'installed'        => $current_version !== null,
                 'current_version'  => $current_version,
                 'remote_version'   => $remote['version'] ?? null,
-                'update_available' => $remote && $current_version && version_compare( $remote['version'], $current_version, '>' ),
+                'beta_version'     => $beta['version'] ?? null,
+                'update_available' => $remote && $current_version && $this->compare_versions( $remote['version'], $current_version ) > 0,
                 'download_url'     => $remote['download_url'] ?? null,
                 'changelog'        => $remote['changelog'] ?? '',
             ];
@@ -404,38 +603,127 @@ class GitHub_Updater {
     }
 
     /**
-     * Get all managed plugins with status.
+     * Get all managed plugins with status including beta info.
      *
      * @return array Plugins status.
      */
     public function get_plugins_status(): array {
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            include_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        // Clear the plugins cache to get fresh data.
+        wp_cache_delete( 'plugins', 'plugins' );
+
+        // Get fresh list of installed plugins.
+        $installed_plugins = get_plugins();
+
         $status = [];
 
         foreach ( $this->plugins as $plugin_file => $plugin_data ) {
-            $installed       = file_exists( WP_PLUGIN_DIR . '/' . $plugin_file );
-            $active          = is_plugin_active( $plugin_file );
+            $slug            = $plugin_data['slug'];
             $current_version = null;
 
-            if ( $installed ) {
-                $plugin_info     = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin_file );
-                $current_version = $plugin_info['Version'];
+            // First, try exact match.
+            $actual_plugin_file = $plugin_file;
+            $installed          = isset( $installed_plugins[ $plugin_file ] );
+
+            // If not found, search by main file name (handles folder rename issues).
+            if ( ! $installed ) {
+                $main_file = basename( $plugin_file );
+                foreach ( $installed_plugins as $installed_file => $installed_data ) {
+                    if ( basename( $installed_file ) === $main_file ) {
+                        $actual_plugin_file = $installed_file;
+                        $installed          = true;
+                        break;
+                    }
+                }
             }
 
+            // If still not found, search by slug in folder name.
+            if ( ! $installed ) {
+                foreach ( $installed_plugins as $installed_file => $installed_data ) {
+                    $folder = dirname( $installed_file );
+                    if ( stripos( $folder, $slug ) !== false || stripos( $folder, str_replace( '-', '_', $slug ) ) !== false ) {
+                        $actual_plugin_file = $installed_file;
+                        $installed          = true;
+                        break;
+                    }
+                }
+            }
+
+            $active = $installed ? is_plugin_active( $actual_plugin_file ) : false;
+
+            if ( $installed ) {
+                $current_version = $installed_plugins[ $actual_plugin_file ]['Version'];
+            }
+
+            // Get stable version.
             $remote = $this->get_remote_version( $plugin_data['repo'] );
 
-            $status[ $plugin_data['slug'] ] = [
-                'plugin_file'      => $plugin_file,
-                'name'             => $plugin_data['name'],
-                'description'      => $plugin_data['description'],
-                'repo'             => $plugin_data['repo'],
-                'installed'        => $installed,
-                'active'           => $active,
-                'current_version'  => $current_version,
-                'remote_version'   => $remote['version'] ?? null,
-                'update_available' => $installed && $remote && version_compare( $remote['version'] ?? '0', $current_version ?? '0', '>' ),
-                'download_url'     => $remote['download_url'] ?? null,
-                'github_url'       => 'https://github.com/' . $plugin_data['repo'],
-                'icon'             => $plugin_data['icon'],
+            // Get beta version.
+            $beta = $this->get_beta_version( $plugin_data['repo'] );
+
+            // Check beta settings.
+            $beta_enabled = $this->is_beta_enabled( $slug );
+
+            // Determine what version to show as update.
+            $update_version   = null;
+            $update_url       = null;
+            $update_is_beta   = false;
+            $update_available = false;
+
+            if ( $installed && $current_version ) {
+                // Check stable update.
+                $stable_update = $remote && $this->compare_versions( $remote['version'], $current_version ) > 0;
+
+                // Check beta update (only if beta enabled).
+                $beta_update = false;
+                if ( $beta_enabled && $beta ) {
+                    $beta_update = $this->compare_versions( $beta['version'], $current_version ) > 0;
+
+                    // If beta is newer than stable, prefer beta.
+                    if ( $beta_update && ( ! $remote || $this->compare_versions( $beta['version'], $remote['version'] ) > 0 ) ) {
+                        $update_version   = $beta['version'];
+                        $update_url       = $beta['download_url'];
+                        $update_is_beta   = true;
+                        $update_available = true;
+                    } elseif ( $stable_update ) {
+                        $update_version   = $remote['version'];
+                        $update_url       = $remote['download_url'];
+                        $update_is_beta   = false;
+                        $update_available = true;
+                    }
+                } elseif ( $stable_update ) {
+                    $update_version   = $remote['version'];
+                    $update_url       = $remote['download_url'];
+                    $update_is_beta   = false;
+                    $update_available = true;
+                }
+            }
+
+            $status[ $slug ] = [
+                'plugin_file'       => $actual_plugin_file,
+                'expected_file'     => $plugin_file,
+                'name'              => $plugin_data['name'],
+                'description'       => $plugin_data['description'],
+                'repo'              => $plugin_data['repo'],
+                'installed'         => $installed,
+                'active'            => $active,
+                'current_version'   => $current_version,
+                'remote_version'    => $remote['version'] ?? null,
+                'update_available'  => $update_available,
+                'update_version'    => $update_version,
+                'update_is_beta'    => $update_is_beta,
+                'download_url'      => $update_url ?? ( $remote['download_url'] ?? null ),
+                'github_url'        => 'https://github.com/' . $plugin_data['repo'],
+                'icon'              => $plugin_data['icon'],
+                // Beta info.
+                'beta_enabled'      => $beta_enabled,
+                'beta_available'    => $beta !== null,
+                'beta_version'      => $beta['version'] ?? null,
+                'beta_download_url' => $beta['download_url'] ?? null,
+                'beta_changelog'    => $beta['changelog'] ?? null,
             ];
         }
 
@@ -448,6 +736,15 @@ class GitHub_Updater {
      * @return array Plugins configuration.
      */
     public function get_plugins(): array {
+        return $this->plugins;
+    }
+
+    /**
+     * Get managed plugins (alias for compatibility).
+     *
+     * @return array Plugins configuration.
+     */
+    public function get_managed_plugins(): array {
         return $this->plugins;
     }
 }

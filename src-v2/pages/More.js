@@ -45,6 +45,7 @@ const More = () => {
     const [loading, setLoading] = useState(true);
     const [checking, setChecking] = useState(false);
     const [actionLoading, setActionLoading] = useState({});
+    const [betaLoading, setBetaLoading] = useState({});
     const [notice, setNotice] = useState(null);
 
     // Load plugins on mount
@@ -76,6 +77,7 @@ const More = () => {
     // Check for updates
     const checkForUpdates = async () => {
         setChecking(true);
+        setNotice(null);
         try {
             await apiFetch({ path: '/wpseopilot/v2/updater/check', method: 'POST' });
             await loadPlugins();
@@ -91,6 +93,7 @@ const More = () => {
     // Handle install/update/activate/deactivate
     const handleAction = async (slug, action) => {
         setActionLoading(prev => ({ ...prev, [slug]: action }));
+        setNotice(null);
         try {
             const response = await apiFetch({
                 path: `/wpseopilot/v2/updater/${action}`,
@@ -107,6 +110,26 @@ const More = () => {
         }
     };
 
+    // Handle beta toggle
+    const handleToggleBeta = async (slug, currentEnabled) => {
+        setBetaLoading(prev => ({ ...prev, [slug]: true }));
+        setNotice(null);
+        try {
+            const response = await apiFetch({
+                path: '/wpseopilot/v2/updater/beta',
+                method: 'POST',
+                data: { slug, enabled: !currentEnabled },
+            });
+            setNotice({ type: 'success', message: response.message });
+            await loadPlugins();
+        } catch (error) {
+            console.error('Failed to toggle beta:', error);
+            setNotice({ type: 'error', message: error.message || 'Failed to toggle beta versions.' });
+        } finally {
+            setBetaLoading(prev => ({ ...prev, [slug]: false }));
+        }
+    };
+
     // Get icon config for a plugin
     const getIconConfig = (slug) => PLUGIN_ICONS[slug] || PLUGIN_ICONS['wp-seo-pilot'];
 
@@ -115,36 +138,70 @@ const More = () => {
 
     // Determine card state classes
     const getCardClasses = (plugin) => {
-        const classes = ['pilot-card'];
+        const classes = ['managed-plugin-card'];
         if (plugin.active) classes.push('active');
         if (plugin.update_available) classes.push('has-update');
+        if (plugin.update_is_beta) classes.push('has-beta-update');
         return classes.join(' ');
     };
 
-    // Get badge for plugin state
-    const getBadge = (plugin) => {
-        if (!plugin.installed) return <span className="badge">Available</span>;
-        if (plugin.update_available) return <span className="badge warning">Update Available</span>;
-        if (plugin.active) return <span className="badge success">Active</span>;
+    // Get status badge for plugin state
+    const getStatusBadge = (plugin) => {
+        if (!plugin.installed) {
+            return <span className="badge">Not Installed</span>;
+        }
+        if (plugin.update_available && plugin.update_is_beta) {
+            return <span className="badge beta">Beta Update</span>;
+        }
+        if (plugin.update_available) {
+            return <span className="badge warning">Update Available</span>;
+        }
+        if (plugin.active) {
+            return <span className="badge success">Active</span>;
+        }
         return <span className="badge">Inactive</span>;
     };
 
-    // Get pill for plugin state
-    const getPill = (plugin) => {
-        if (!plugin.installed) return <span className="pill warning">Not Installed</span>;
-        if (plugin.active) return <span className="pill success">Active</span>;
-        return <span className="pill">Inactive</span>;
-    };
-
     // Get version display
-    const getVersionDisplay = (plugin) => {
+    const getVersionInfo = (plugin) => {
         if (!plugin.installed) {
-            return plugin.remote_version ? `v${plugin.remote_version} available` : '';
+            return plugin.remote_version ? `v${plugin.remote_version} available` : 'Checking...';
         }
         if (plugin.update_available) {
-            return `v${plugin.current_version} → v${plugin.remote_version}`;
+            const updateVersion = plugin.update_version || plugin.remote_version;
+            const betaLabel = plugin.update_is_beta ? ' (beta)' : '';
+            return `v${plugin.current_version} → v${updateVersion}${betaLabel}`;
         }
         return plugin.current_version ? `v${plugin.current_version}` : '';
+    };
+
+    // Render plugin icon
+    const renderPluginIcon = (slug, plugin) => {
+        const iconConfig = getIconConfig(slug);
+
+        if (plugin.icon) {
+            return (
+                <>
+                    <img
+                        src={plugin.icon}
+                        alt={plugin.name}
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                        }}
+                    />
+                    <div className={`managed-plugin-icon-fallback ${iconConfig.className}`} style={{ display: 'none' }}>
+                        {iconConfig.svg}
+                    </div>
+                </>
+            );
+        }
+
+        return (
+            <div className={`managed-plugin-icon-fallback ${iconConfig.className}`}>
+                {iconConfig.svg}
+            </div>
+        );
     };
 
     // Render action buttons
@@ -152,13 +209,13 @@ const More = () => {
         const isLoading = actionLoading[slug];
 
         return (
-            <div className="pilot-card-actions">
+            <div className="managed-plugin-actions">
                 {/* Install button */}
                 {!plugin.installed && (
                     <button
                         className="button primary"
                         onClick={() => handleAction(slug, 'install')}
-                        disabled={isLoading}
+                        disabled={isLoading || !plugin.download_url}
                     >
                         {isLoading === 'install' ? (
                             <>
@@ -174,7 +231,7 @@ const More = () => {
                 {/* Update button */}
                 {plugin.installed && plugin.update_available && (
                     <button
-                        className="button warning"
+                        className={`button ${plugin.update_is_beta ? 'beta' : 'warning'}`}
                         onClick={() => handleAction(slug, 'update')}
                         disabled={isLoading}
                     >
@@ -184,38 +241,37 @@ const More = () => {
                                 Updating...
                             </>
                         ) : (
-                            'Update'
+                            plugin.update_is_beta ? 'Install Beta' : 'Update'
                         )}
                     </button>
                 )}
 
-                {/* Activate button */}
-                {plugin.installed && !plugin.active && (
-                    <button
-                        className="button primary"
-                        onClick={() => handleAction(slug, 'activate')}
-                        disabled={isLoading}
-                    >
-                        {isLoading === 'activate' ? (
-                            <>
-                                <span className="spinner is-active"></span>
-                                Activating...
-                            </>
-                        ) : (
-                            'Activate'
-                        )}
-                    </button>
-                )}
-
-                {/* Deactivate button */}
-                {plugin.installed && plugin.active && (
-                    <button
-                        className="button ghost"
-                        onClick={() => handleAction(slug, 'deactivate')}
-                        disabled={isLoading}
-                    >
-                        {isLoading === 'deactivate' ? 'Deactivating...' : 'Deactivate'}
-                    </button>
+                {/* Activate/Deactivate button */}
+                {plugin.installed && (
+                    plugin.active ? (
+                        <button
+                            className="button ghost"
+                            onClick={() => handleAction(slug, 'deactivate')}
+                            disabled={isLoading}
+                        >
+                            {isLoading === 'deactivate' ? 'Deactivating...' : 'Deactivate'}
+                        </button>
+                    ) : (
+                        <button
+                            className="button primary"
+                            onClick={() => handleAction(slug, 'activate')}
+                            disabled={isLoading}
+                        >
+                            {isLoading === 'activate' ? (
+                                <>
+                                    <span className="spinner is-active"></span>
+                                    Activating...
+                                </>
+                            ) : (
+                                'Activate'
+                            )}
+                        </button>
+                    )
                 )}
 
                 {/* GitHub link */}
@@ -223,11 +279,8 @@ const More = () => {
                     href={plugin.github_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="pilot-card-link"
+                    className="button ghost"
                 >
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                        <path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.6 2.9 8.5 6.9 9.9.5.1.7-.2.7-.5v-1.9c-2.8.6-3.3-1.2-3.3-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.7 1.7 2.6 1.2.1-.8.4-1.2.7-1.5-2.2-.2-4.5-1.2-4.5-5.2 0-1.1.4-2 1-2.7-.1-.2-.4-1.3.1-2.7 0 0 .8-.2 2.7 1a9.2 9.2 0 0 1 4.9 0c1.9-1.2 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7.6.7 1 1.6 1 2.7 0 4-2.3 5-4.5 5.2.4.3.8 1 .8 2.1v3c0 .3.2.6.7.5 4-1.4 6.9-5.3 6.9-9.9C22 6.6 17.5 2 12 2z"/>
-                    </svg>
                     GitHub
                 </a>
             </div>
@@ -238,8 +291,8 @@ const More = () => {
         <div className="page">
             <div className="page-header">
                 <div>
-                    <h1>More from Pilot</h1>
-                    <p>Expand your WordPress toolkit with trusted companion plugins from the Pilot family.</p>
+                    <h1>Pilot Plugins</h1>
+                    <p>Install and manage plugins from the Pilot ecosystem.</p>
                 </div>
                 <button
                     className="button ghost"
@@ -277,34 +330,56 @@ const More = () => {
 
             {/* Plugin grid */}
             {!loading && (
-                <div className="pilot-grid">
-                    {Object.entries(plugins).map(([slug, plugin]) => {
-                        const iconConfig = getIconConfig(slug);
-                        return (
-                            <div key={slug} className={getCardClasses(plugin)}>
-                                <div className="pilot-card-head">
-                                    <div className="pilot-card-identity">
-                                        <span className={`pilot-card-mark ${iconConfig.className}`} aria-hidden="true">
-                                            {iconConfig.svg}
-                                        </span>
-                                        <div>
-                                            <div className="pilot-card-title">
-                                                <h3>{plugin.name}</h3>
-                                                {getBadge(plugin)}
-                                            </div>
-                                            <p className="pilot-card-tagline">{getTagline(slug)}</p>
-                                        </div>
-                                    </div>
+                <div className="managed-plugins-grid">
+                    {Object.entries(plugins).map(([slug, plugin]) => (
+                        <div key={slug} className={getCardClasses(plugin)}>
+                            <div className="managed-plugin-header">
+                                <div className="managed-plugin-icon">
+                                    {renderPluginIcon(slug, plugin)}
                                 </div>
-                                <p className="pilot-card-desc">{plugin.description}</p>
-                                <p className="pilot-card-version">{getVersionDisplay(plugin)}</p>
-                                <div className="pilot-card-meta">
-                                    {getPill(plugin)}
-                                    {renderActions(slug, plugin)}
+                                <div className="managed-plugin-info">
+                                    <div className="managed-plugin-title">
+                                        <h3>{plugin.name}</h3>
+                                        {getStatusBadge(plugin)}
+                                    </div>
+                                    <p className="managed-plugin-version">{getVersionInfo(plugin)}</p>
                                 </div>
                             </div>
-                        );
-                    })}
+
+                            <p className="managed-plugin-description">{plugin.description}</p>
+                            <p className="managed-plugin-tagline">{getTagline(slug)}</p>
+
+                            {/* Beta Toggle - only show for installed plugins */}
+                            {plugin.installed && (
+                                <div className="managed-plugin-beta">
+                                    <label className="beta-toggle">
+                                        <input
+                                            type="checkbox"
+                                            checked={plugin.beta_enabled || false}
+                                            onChange={() => handleToggleBeta(slug, plugin.beta_enabled)}
+                                            disabled={betaLoading[slug]}
+                                        />
+                                        <span className="beta-toggle-slider"></span>
+                                        <span className="beta-toggle-label">
+                                            Beta versions
+                                            {plugin.beta_available && !plugin.beta_enabled && plugin.beta_version && (
+                                                <span className="beta-available-hint"> (v{plugin.beta_version} available)</span>
+                                            )}
+                                        </span>
+                                    </label>
+                                </div>
+                            )}
+
+                            {renderActions(slug, plugin)}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Empty state */}
+            {!loading && Object.keys(plugins).length === 0 && (
+                <div className="empty-state">
+                    <p>No managed plugins found.</p>
                 </div>
             )}
         </div>

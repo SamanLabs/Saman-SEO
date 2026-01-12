@@ -102,6 +102,24 @@ class Updater_Controller extends REST_Controller {
                 ],
             ],
         ] );
+
+        // Toggle beta versions for a plugin.
+        register_rest_route( $this->namespace, '/' . $this->rest_base . '/beta', [
+            'methods'             => 'POST',
+            'callback'            => [ $this, 'toggle_beta' ],
+            'permission_callback' => [ $this, 'install_permission_check' ],
+            'args'                => [
+                'slug' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'enabled' => [
+                    'required'          => true,
+                    'type'              => 'boolean',
+                ],
+            ],
+        ] );
     }
 
     /**
@@ -319,5 +337,54 @@ class Updater_Controller extends REST_Controller {
         }
 
         return $this->success( null, $result['message'] );
+    }
+
+    /**
+     * Toggle beta versions for a plugin.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function toggle_beta( $request ) {
+        $slug    = $request->get_param( 'slug' );
+        $enabled = $request->get_param( 'enabled' );
+        $updater = GitHub_Updater::get_instance();
+
+        // Verify plugin exists in managed plugins.
+        $plugins = $updater->get_managed_plugins();
+        $found   = false;
+        foreach ( $plugins as $plugin_file => $plugin_data ) {
+            if ( $plugin_data['slug'] === $slug ) {
+                $found = true;
+                // Clear caches to refresh data.
+                delete_transient( 'wpseopilot_gh_' . md5( $plugin_data['repo'] ) );
+                delete_transient( 'wpseopilot_gh_beta_' . md5( $plugin_data['repo'] ) );
+                break;
+            }
+        }
+
+        if ( ! $found ) {
+            return $this->error(
+                __( 'Plugin not found in managed plugins list.', 'wp-seo-pilot' ),
+                'invalid_plugin',
+                404
+            );
+        }
+
+        // Update beta setting.
+        $updater->set_beta_enabled( $slug, $enabled );
+
+        // Clear update transient.
+        delete_site_transient( 'update_plugins' );
+
+        return $this->success(
+            [
+                'slug'         => $slug,
+                'beta_enabled' => $enabled,
+            ],
+            $enabled
+                ? __( 'Beta updates enabled. Checking for updates...', 'wp-seo-pilot' )
+                : __( 'Beta updates disabled.', 'wp-seo-pilot' )
+        );
     }
 }
