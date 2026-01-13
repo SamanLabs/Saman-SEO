@@ -8,3 +8,217 @@
 }
 
 // Responsive adjustments already in _forms.less
+
+// ==========================================================================
+// Create Redirect Modal (from 404 page)
+// ==========================================================================
+
+.redirect-modal {
+    max-width: 560px;
+}
+
+.source-url {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: @color-surface-muted;
+    border: 1px solid @color-border;
+    border-radius: @radius-sm;
+
+    code {
+        flex: 1;
+        word-break: break-all;
+    }
+}
+
+.suggestions-loading {
+    padding: 24px;
+    text-align: center;
+    color: @color-muted;
+}
+
+.suggestions-label {
+    font-size: 13px;
+    color: @color-muted;
+    margin: 0 0 8px 0;
+}
+
+.suggestions-list {
+    margin-bottom: 16px;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid @color-border;
+    border-radius: @radius-sm;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover {
+        border-color: @color-primary;
+        background: rgba(34, 113, 177, 0.02);
+    }
+
+    input[type="radio"] {
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+    &:has(input:checked) {
+        border-color: @color-primary;
+        background: rgba(34, 113, 177, 0.04);
+    }
+}
+
+.suggestion-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggestion-title {
+    display: block;
+    font-weight: 600;
+    color: @color-text;
+    margin-bottom: 2px;
+}
+
+.suggestion-url {
+    display: block;
+    font-size: 12px;
+    color: @color-muted;
+    word-break: break-all;
+}
+
+.suggestion-score {
+    display: inline-block;
+    font-size: 11px;
+    color: @color-primary;
+    background: rgba(34, 113, 177, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 4px;
+}
+
+.custom-url-option {
+    .suggestion-item {
+        margin-bottom: 8px;
+    }
+}
+
+.custom-url-input {
+    width: 100%;
+    margin-top: 8px;
+}
+
+// ==========================================================================
+// Ignore Pattern Manager Modal
+// ==========================================================================
+
+.ignore-pattern-modal {
+    max-width: 680px;
+}
+
+.pattern-form {
+    padding: 16px;
+    background: @color-surface-muted;
+    border: 1px solid @color-border;
+    border-radius: @radius-sm;
+    margin-bottom: 24px;
+
+    .form-row--split {
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+
+        .form-field {
+            flex: 1;
+        }
+
+        .form-checkbox {
+            flex: none;
+            padding-bottom: 8px;
+        }
+    }
+
+    .form-error {
+        color: @color-danger;
+        font-size: 13px;
+        margin: 8px 0 0;
+    }
+}
+
+.patterns-list {
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+    }
+
+    .empty-state.small {
+        padding: 24px;
+
+        p {
+            margin: 0;
+            color: @color-muted;
+        }
+    }
+
+    .data-table.compact {
+        font-size: 13px;
+
+        th, td {
+            padding: 8px 12px;
+        }
+
+        code {
+            font-size: 12px;
+            background: @color-surface-muted;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    }
+}
+
+// Action buttons in table rows
+.action-cell {
+    white-space: nowrap;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+// Ignored row styling
+.is-ignored-row {
+    opacity: 0.65;
+    background: @color-surface-muted;
+}
+
+// Badge variants
+.badge {
+    &.warning {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    &.info {
+        background: #cce5ff;
+        color: #004085;
+    }
+}
+
+// Danger button variant
+.button.danger {
+    color: @color-danger;
+
+    &:hover {
+        background: fade(@color-danger, 8%);
+    }
+}

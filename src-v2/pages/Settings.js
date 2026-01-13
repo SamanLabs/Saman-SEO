@@ -31,6 +31,13 @@ const defaultSettings = {
     module_redirects: true,
     module_404_log: true,
     module_social_cards: true,
+    // 404 Monitor settings
+    show_404_dashboard_widget: true,
+    enable_404_cleanup: false,
+    cleanup_404_days: 30,
+    enable_404_notifications: false,
+    notification_404_threshold: 10,
+    notification_404_email: '',
     module_llm_txt: false,
     module_local_seo: false,
     module_internal_linking: true,
@@ -878,6 +885,106 @@ const AdvancedTab = ({ settings, updateSetting }) => {
                             </div>
                         </div>
                     </details>
+                </section>
+
+                <section className="panel">
+                    <h3>404 Monitor</h3>
+                    <p className="panel-desc">Configure 404 error logging and cleanup options.</p>
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Dashboard Widget</label>
+                            <p className="settings-help">Show 404 summary widget on the WordPress dashboard.</p>
+                        </div>
+                        <div className="settings-control">
+                            <label className="toggle">
+                                <input type="checkbox" checked={settings.show_404_dashboard_widget !== false} onChange={(e) => updateSetting('show_404_dashboard_widget', e.target.checked)} />
+                                <span className="toggle-track" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Auto-Cleanup</label>
+                            <p className="settings-help">Automatically delete old 404 entries to keep the database clean.</p>
+                        </div>
+                        <div className="settings-control">
+                            <label className="toggle">
+                                <input type="checkbox" checked={settings.enable_404_cleanup} onChange={(e) => updateSetting('enable_404_cleanup', e.target.checked)} />
+                                <span className="toggle-track" />
+                            </label>
+                        </div>
+                    </div>
+
+                    {settings.enable_404_cleanup && (
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label>Cleanup Age (days)</label>
+                                <p className="settings-help">Delete 404 entries older than this many days.</p>
+                            </div>
+                            <div className="settings-control">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="365"
+                                    value={settings.cleanup_404_days || 30}
+                                    onChange={(e) => updateSetting('cleanup_404_days', parseInt(e.target.value, 10) || 30)}
+                                    style={{ width: '80px' }}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Email Notifications</label>
+                            <p className="settings-help">Send email alerts when a URL hits the notification threshold.</p>
+                        </div>
+                        <div className="settings-control">
+                            <label className="toggle">
+                                <input type="checkbox" checked={settings.enable_404_notifications} onChange={(e) => updateSetting('enable_404_notifications', e.target.checked)} />
+                                <span className="toggle-track" />
+                            </label>
+                        </div>
+                    </div>
+
+                    {settings.enable_404_notifications && (
+                        <>
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>Hit Threshold</label>
+                                    <p className="settings-help">Send notification when a 404 URL reaches this many hits.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="1000"
+                                        value={settings.notification_404_threshold || 10}
+                                        onChange={(e) => updateSetting('notification_404_threshold', parseInt(e.target.value, 10) || 10)}
+                                        style={{ width: '80px' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="settings-row compact">
+                                <div className="settings-label">
+                                    <label>Notification Email</label>
+                                    <p className="settings-help">Leave empty to use admin email.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <input
+                                        type="email"
+                                        value={settings.notification_404_email || ''}
+                                        onChange={(e) => updateSetting('notification_404_email', e.target.value)}
+                                        placeholder="admin@example.com"
+                                        style={{ width: '220px' }}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </section>
 
                 <section className="panel">

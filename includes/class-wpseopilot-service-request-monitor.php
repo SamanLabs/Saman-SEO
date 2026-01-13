@@ -14,22 +14,30 @@ defined( 'ABSPATH' ) || exit;
  */
 class Request_Monitor {
 
-	private const SCHEMA_VERSION = 4;
+	private const SCHEMA_VERSION = 5;
 	private const SCHEMA_OPTION  = 'wpseopilot_404_log_schema';
 
 	/**
-	 * Table name.
+	 * Main log table name.
 	 *
 	 * @var string
 	 */
 	private $table;
 
 	/**
+	 * Ignore patterns table name.
+	 *
+	 * @var string
+	 */
+	private $patterns_table;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		global $wpdb;
-		$this->table = $wpdb->prefix . 'wpseopilot_404_log';
+		$this->table          = $wpdb->prefix . 'wpseopilot_404_log';
+		$this->patterns_table = $wpdb->prefix . 'wpseopilot_404_ignore_patterns';
 	}
 
 	/**
@@ -52,6 +60,156 @@ class Request_Monitor {
 		// V1 menu disabled - React UI handles menu registration
 		// add_action( 'admin_menu', [ $this, 'register_page' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+
+		// Setup scheduled cleanup
+		add_action( 'wpseopilot_404_cleanup', [ $this, 'run_scheduled_cleanup' ] );
+		$this->maybe_schedule_cleanup();
+	}
+
+	/**
+	 * Schedule or unschedule cleanup based on settings.
+	 *
+	 * @return void
+	 */
+	public function maybe_schedule_cleanup() {
+		$settings = get_option( 'wpseopilot_settings', [] );
+		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
+
+		if ( $enabled ) {
+			if ( ! wp_next_scheduled( 'wpseopilot_404_cleanup' ) ) {
+				wp_schedule_event( time(), 'daily', 'wpseopilot_404_cleanup' );
+			}
+		} else {
+			$this->unschedule_cleanup();
+		}
+	}
+
+	/**
+	 * Unschedule cleanup cron.
+	 *
+	 * @return void
+	 */
+	public function unschedule_cleanup() {
+		$timestamp = wp_next_scheduled( 'wpseopilot_404_cleanup' );
+		if ( $timestamp ) {
+			wp_unschedule_event( $timestamp, 'wpseopilot_404_cleanup' );
+		}
+	}
+
+	/**
+	 * Run scheduled cleanup.
+	 *
+	 * @return void
+	 */
+	public function run_scheduled_cleanup() {
+		$settings = get_option( 'wpseopilot_settings', [] );
+		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
+
+		if ( ! $enabled ) {
+			return;
+		}
+
+		$days = isset( $settings['cleanup_404_days'] ) ? (int) $settings['cleanup_404_days'] : 30;
+		$this->cleanup_old_entries( $days );
+	}
+
+	/**
+	 * Delete entries older than the specified number of days.
+	 *
+	 * @param int $days Days threshold.
+	 * @return int Number of deleted entries.
+	 */
+	public function cleanup_old_entries( $days = 30 ) {
+		global $wpdb;
+
+		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return $wpdb->query( $wpdb->prepare(
+			"DELETE FROM {$this->table} WHERE last_seen < %s",
+			$cutoff
+		) );
+	}
+
+	/**
+	 * Maybe send a notification for a 404 URL reaching threshold.
+	 *
+	 * @param string $request_uri The 404 URL.
+	 * @param int    $hits        Current hit count.
+	 * @param int    $entry_id    The log entry ID.
+	 * @return void
+	 */
+	private function maybe_send_notification( $request_uri, $hits, $entry_id ) {
+		$settings = get_option( 'wpseopilot_settings', [] );
+		$enabled  = isset( $settings['enable_404_notifications'] ) ? $settings['enable_404_notifications'] : false;
+
+		if ( ! $enabled ) {
+			return;
+		}
+
+		$threshold = isset( $settings['notification_404_threshold'] ) ? (int) $settings['notification_404_threshold'] : 10;
+
+		// Only notify exactly when threshold is reached (not every hit after)
+		if ( $hits !== $threshold ) {
+			return;
+		}
+
+		// Check if we've already notified for this entry
+		$notified_key = 'wpseopilot_404_notified_' . $entry_id;
+		if ( get_transient( $notified_key ) ) {
+			return;
+		}
+
+		// Mark as notified (expires in 7 days)
+		set_transient( $notified_key, true, 7 * DAY_IN_SECONDS );
+
+		$this->send_notification_email( $request_uri, $hits );
+	}
+
+	/**
+	 * Send the notification email.
+	 *
+	 * @param string $request_uri The 404 URL.
+	 * @param int    $hits        Current hit count.
+	 * @return bool Whether email was sent.
+	 */
+	private function send_notification_email( $request_uri, $hits ) {
+		$settings = get_option( 'wpseopilot_settings', [] );
+		$email    = isset( $settings['notification_404_email'] ) && ! empty( $settings['notification_404_email'] )
+			? sanitize_email( $settings['notification_404_email'] )
+			: get_option( 'admin_email' );
+
+		$site_name = get_bloginfo( 'name' );
+		$site_url  = home_url();
+		$admin_url = admin_url( 'admin.php?page=wpseopilot-v2#/404-log' );
+
+		$subject = sprintf(
+			/* translators: %s: Site name */
+			__( '[%s] 404 Error Alert - URL Needs Attention', 'wp-seo-pilot' ),
+			$site_name
+		);
+
+		$message = sprintf(
+			/* translators: 1: request URI, 2: hit count, 3: site URL, 4: admin URL */
+			__(
+				"Hello,\n\nA 404 error on your site has reached the notification threshold.\n\n" .
+				"URL: %1\$s\n" .
+				"Hits: %2\$d\n\n" .
+				"Site: %3\$s\n\n" .
+				"You may want to create a redirect for this URL to improve user experience and SEO.\n\n" .
+				"View and manage 404 errors:\n%4\$s\n\n" .
+				"--\nThis notification was sent by WP SEO Pilot.\nYou can disable these notifications in Settings > Advanced > 404 Monitor.",
+				'wp-seo-pilot'
+			),
+			$request_uri,
+			$hits,
+			$site_url,
+			$admin_url
+		);
+
+		$headers = [ 'Content-Type: text/plain; charset=UTF-8' ];
+
+		return wp_mail( $email, $subject, $message, $headers );
 	}
 
 	/**
@@ -64,21 +222,51 @@ class Request_Monitor {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		$charset = $wpdb->get_charset_collate();
-		$sql     = "CREATE TABLE {$this->table} (
+
+		// Main 404 log table
+		$sql = "CREATE TABLE {$this->table} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			request_uri varchar(255) NOT NULL,
 			user_agent varchar(255) DEFAULT '',
 			device_label varchar(80) DEFAULT '',
 			hits bigint(20) unsigned NOT NULL DEFAULT 1,
 			last_seen datetime NOT NULL,
+			is_bot tinyint(1) NOT NULL DEFAULT 0,
+			is_ignored tinyint(1) NOT NULL DEFAULT 0,
+			referrer varchar(500) DEFAULT '',
+			first_seen datetime DEFAULT NULL,
 			PRIMARY KEY (id),
-			KEY request_uri (request_uri)
+			KEY request_uri (request_uri),
+			KEY is_bot (is_bot),
+			KEY is_ignored (is_ignored)
 		) {$charset};";
 
 		dbDelta( $sql );
 
+		// Ignore patterns table
+		$patterns_sql = "CREATE TABLE {$this->patterns_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			pattern varchar(255) NOT NULL,
+			is_regex tinyint(1) NOT NULL DEFAULT 0,
+			reason varchar(255) DEFAULT '',
+			created_at datetime DEFAULT NULL,
+			PRIMARY KEY (id),
+			KEY pattern (pattern)
+		) {$charset};";
+
+		dbDelta( $patterns_sql );
+
 		update_option( self::SCHEMA_OPTION, (string) self::SCHEMA_VERSION );
 
+	}
+
+	/**
+	 * Get patterns table name.
+	 *
+	 * @return string
+	 */
+	public function get_patterns_table() {
+		return $this->patterns_table;
 	}
 
 	/**
@@ -91,6 +279,12 @@ class Request_Monitor {
 
 		if ( $current < self::SCHEMA_VERSION ) {
 			$this->create_tables();
+
+			// Migrate existing entries: backfill first_seen = last_seen for old entries
+			if ( $current > 0 && $current < 5 ) {
+				$this->migrate_to_version_5();
+			}
+
 			return;
 		}
 
@@ -98,6 +292,31 @@ class Request_Monitor {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema corrections require direct queries.
 			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN device_label varchar(80) DEFAULT ''" );
+		}
+	}
+
+	/**
+	 * Migrate data for version 5 schema.
+	 *
+	 * @return void
+	 */
+	private function migrate_to_version_5() {
+		global $wpdb;
+
+		// Backfill first_seen = last_seen for existing entries where first_seen is NULL
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Data migration requires direct queries.
+		$wpdb->query( "UPDATE {$this->table} SET first_seen = last_seen WHERE first_seen IS NULL" );
+
+		// Backfill is_bot flag based on user_agent for existing entries
+		$bot_patterns = $this->get_bot_patterns();
+		foreach ( $bot_patterns as $pattern ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Data migration requires direct queries.
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$this->table} SET is_bot = 1 WHERE is_bot = 0 AND LOWER(user_agent) LIKE %s",
+					'%' . $wpdb->esc_like( $pattern ) . '%'
+				)
+			);
 		}
 	}
 
@@ -232,30 +451,48 @@ class Request_Monitor {
 		}
 
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$referrer   = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 		$device     = $this->describe_device_from_user_agent( $user_agent );
+		$is_bot     = $this->detect_is_bot( $user_agent ) ? 1 : 0;
 		$now        = current_time( 'mysql' );
 
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Each request URI must be checked against the custom 404 log table directly.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT id, hits, user_agent FROM ' . $this->table . ' WHERE request_uri = %s LIMIT 1',
+				'SELECT id, hits, user_agent, is_bot FROM ' . $this->table . ' WHERE request_uri = %s LIMIT 1',
 				$request
 			)
 		);
 
 		if ( $row ) {
+			$update_data = [
+				'hits'         => (int) $row->hits + 1,
+				'last_seen'    => $now,
+				'user_agent'   => $user_agent ?: $row->user_agent,
+				'device_label' => $device,
+			];
+
+			// Update referrer if not empty and we don't have one yet
+			if ( $referrer ) {
+				$update_data['referrer'] = $referrer;
+			}
+
+			// If this hit is from a bot and the entry wasn't already marked as bot, update it
+			if ( $is_bot && ! (int) $row->is_bot ) {
+				$update_data['is_bot'] = 1;
+			}
+
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Updating the custom 404 log table requires a direct query.
 			$wpdb->update(
 				$this->table,
-				[
-					'hits'         => (int) $row->hits + 1,
-					'last_seen'    => $now,
-					'user_agent'   => $user_agent ?: $row->user_agent,
-					'device_label' => $device,
-				],
+				$update_data,
 				[ 'id' => $row->id ]
 			);
+
+			// Check if we should send a notification
+			$new_hits = (int) $row->hits + 1;
+			$this->maybe_send_notification( $request, $new_hits, (int) $row->id );
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Inserting new 404 rows requires writing to the custom table directly.
 			$wpdb->insert(
@@ -266,8 +503,11 @@ class Request_Monitor {
 					'device_label' => $device,
 					'hits'         => 1,
 					'last_seen'    => $now,
+					'first_seen'   => $now,
+					'is_bot'       => $is_bot,
+					'referrer'     => $referrer,
 				],
-				[ '%s', '%s', '%s', '%d', '%s' ]
+				[ '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s' ]
 			);
 		}
 	}
@@ -516,6 +756,263 @@ class Request_Monitor {
 			'%.wav',
 			'%.ogg',
 		];
+	}
+
+	/**
+	 * Bot/crawler user agent patterns for detection.
+	 *
+	 * @return string[]
+	 */
+	private function get_bot_patterns() {
+		return [
+			// Search engine bots
+			'googlebot',
+			'bingbot',
+			'slurp',
+			'duckduckbot',
+			'baiduspider',
+			'yandexbot',
+			'sogou',
+			'exabot',
+			'ia_archiver',
+
+			// Social media crawlers
+			'facebookexternalhit',
+			'twitterbot',
+			'linkedinbot',
+			'pinterest',
+			'whatsapp',
+			'telegrambot',
+			'discordbot',
+			'slackbot',
+
+			// SEO tools
+			'ahrefsbot',
+			'semrushbot',
+			'mj12bot',
+			'dotbot',
+			'rogerbot',
+			'screaming frog',
+			'seokicks',
+			'sistrix',
+			'blexbot',
+			'petalbot',
+			'dataforseo',
+			'serpstatbot',
+
+			// Generic bot patterns
+			'bot',
+			'spider',
+			'crawler',
+			'scraper',
+			'headless',
+
+			// HTTP clients / tools
+			'wget',
+			'curl',
+			'python-requests',
+			'python-urllib',
+			'java/',
+			'libwww',
+			'httpclient',
+			'http_request',
+			'go-http-client',
+			'okhttp',
+			'axios',
+			'node-fetch',
+			'postman',
+			'insomnia',
+
+			// Monitoring / Uptime
+			'uptimerobot',
+			'pingdom',
+			'statuscake',
+			'newrelic',
+			'datadog',
+			'site24x7',
+			'gtmetrix',
+
+			// Feed readers
+			'feedfetcher',
+			'feedly',
+			'newsblur',
+		];
+	}
+
+	/**
+	 * Detect if a user agent belongs to a bot/crawler.
+	 *
+	 * @param string $user_agent Raw user agent string.
+	 * @return bool
+	 */
+	public function detect_is_bot( $user_agent ) {
+		if ( empty( $user_agent ) ) {
+			return false;
+		}
+
+		$ua_lower = strtolower( $user_agent );
+
+		foreach ( $this->get_bot_patterns() as $pattern ) {
+			if ( false !== strpos( $ua_lower, $pattern ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a URL should be ignored based on patterns.
+	 *
+	 * @param string $request_uri The request URI to check.
+	 * @return bool
+	 */
+	public function is_url_ignored( $request_uri ) {
+		global $wpdb;
+
+		// Check if patterns table exists
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$has_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $this->patterns_table ) );
+		if ( $this->patterns_table !== $has_table ) {
+			return false;
+		}
+
+		// Get all patterns
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$patterns = $wpdb->get_results( "SELECT pattern, is_regex FROM {$this->patterns_table}" );
+
+		if ( ! $patterns ) {
+			return false;
+		}
+
+		foreach ( $patterns as $p ) {
+			if ( $p->is_regex ) {
+				// Regex pattern
+				$regex = '/' . str_replace( '/', '\\/', $p->pattern ) . '/i';
+				if ( @preg_match( $regex, $request_uri ) ) {
+					return true;
+				}
+			} else {
+				// Simple wildcard pattern - convert * to regex
+				if ( false !== strpos( $p->pattern, '*' ) ) {
+					$regex = '/^' . str_replace( [ '\\*', '/' ], [ '.*', '\\/' ], preg_quote( $p->pattern, '/' ) ) . '$/i';
+					if ( @preg_match( $regex, $request_uri ) ) {
+						return true;
+					}
+				} else {
+					// Exact match
+					if ( $request_uri === $p->pattern ) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get all ignore patterns.
+	 *
+	 * @return array
+	 */
+	public function get_ignore_patterns() {
+		global $wpdb;
+
+		// Check if patterns table exists
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$has_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $this->patterns_table ) );
+		if ( $this->patterns_table !== $has_table ) {
+			return [];
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return $wpdb->get_results( "SELECT * FROM {$this->patterns_table} ORDER BY created_at DESC" );
+	}
+
+	/**
+	 * Add an ignore pattern.
+	 *
+	 * @param string $pattern  The pattern to add.
+	 * @param bool   $is_regex Whether it's a regex pattern.
+	 * @param string $reason   Optional reason/note.
+	 * @return int|false The inserted ID or false on failure.
+	 */
+	public function add_ignore_pattern( $pattern, $is_regex = false, $reason = '' ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$result = $wpdb->insert(
+			$this->patterns_table,
+			[
+				'pattern'    => $pattern,
+				'is_regex'   => $is_regex ? 1 : 0,
+				'reason'     => $reason,
+				'created_at' => current_time( 'mysql' ),
+			],
+			[ '%s', '%d', '%s', '%s' ]
+		);
+
+		if ( false === $result ) {
+			return false;
+		}
+
+		return $wpdb->insert_id;
+	}
+
+	/**
+	 * Delete an ignore pattern.
+	 *
+	 * @param int $id Pattern ID.
+	 * @return bool
+	 */
+	public function delete_ignore_pattern( $id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (bool) $wpdb->delete(
+			$this->patterns_table,
+			[ 'id' => $id ],
+			[ '%d' ]
+		);
+	}
+
+	/**
+	 * Mark a 404 entry as ignored.
+	 *
+	 * @param int $id Entry ID.
+	 * @return bool
+	 */
+	public function ignore_entry( $id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (bool) $wpdb->update(
+			$this->table,
+			[ 'is_ignored' => 1 ],
+			[ 'id' => $id ],
+			[ '%d' ],
+			[ '%d' ]
+		);
+	}
+
+	/**
+	 * Unignore a 404 entry.
+	 *
+	 * @param int $id Entry ID.
+	 * @return bool
+	 */
+	public function unignore_entry( $id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (bool) $wpdb->update(
+			$this->table,
+			[ 'is_ignored' => 0 ],
+			[ 'id' => $id ],
+			[ '%d' ],
+			[ '%d' ]
+		);
 	}
 
 	/**

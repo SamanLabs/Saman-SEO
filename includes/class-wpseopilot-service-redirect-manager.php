@@ -15,6 +15,11 @@ defined( 'ABSPATH' ) || exit;
 class Redirect_Manager {
 
 	/**
+	 * Schema version for migrations.
+	 */
+	public const SCHEMA_VERSION = 2;
+
+	/**
 	 * Cache settings shared with CLI helpers.
 	 */
 	public const CACHE_GROUP     = 'wpseopilot_redirects';
@@ -212,18 +217,33 @@ class Redirect_Manager {
 	 * @param string $source      Source URL path.
 	 * @param string $target      Target URL.
 	 * @param int    $status_code HTTP status code (301, 302, 307, 410).
+	 * @param array  $extra       Optional extra fields (is_regex, group_name, start_date, end_date, notes).
 	 *
 	 * @return int|\WP_Error Inserted redirect ID or WP_Error on failure.
 	 */
-	public function create_redirect( $source, $target, $status_code = 301 ) {
+	public function create_redirect( $source, $target, $status_code = 301, $extra = [] ) {
 		if ( empty( $source ) || empty( $target ) ) {
 			return new \WP_Error( 'invalid_data', __( 'Source and target are required.', 'wp-seo-pilot' ) );
 		}
 
 		global $wpdb;
 
-		$normalized = '/' . ltrim( $source, '/' );
-		$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+		$is_regex   = ! empty( $extra['is_regex'] );
+		$normalized = $source;
+
+		// Only normalize non-regex sources.
+		if ( ! $is_regex ) {
+			$normalized = '/' . ltrim( $source, '/' );
+			$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+		}
+
+		// Validate regex pattern if applicable.
+		if ( $is_regex ) {
+			$validation = $this->validate_regex( $source );
+			if ( is_wp_error( $validation ) ) {
+				return $validation;
+			}
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s", $normalized ) );
@@ -234,16 +254,22 @@ class Redirect_Manager {
 
 		$status_code = in_array( $status_code, [ 301, 302, 307, 410 ], true ) ? $status_code : 301;
 
+		$data = [
+			'source'      => $normalized,
+			'target'      => $target,
+			'status_code' => $status_code,
+			'is_regex'    => $is_regex ? 1 : 0,
+			'group_name'  => isset( $extra['group_name'] ) ? sanitize_text_field( $extra['group_name'] ) : '',
+			'start_date'  => ! empty( $extra['start_date'] ) ? sanitize_text_field( $extra['start_date'] ) : null,
+			'end_date'    => ! empty( $extra['end_date'] ) ? sanitize_text_field( $extra['end_date'] ) : null,
+			'notes'       => isset( $extra['notes'] ) ? sanitize_textarea_field( $extra['notes'] ) : null,
+			'created_at'  => current_time( 'mysql' ),
+		];
+
+		$formats = [ '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s' ];
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$inserted = $wpdb->insert(
-			$this->table,
-			[
-				'source'      => $normalized,
-				'target'      => $target,
-				'status_code' => $status_code,
-			],
-			[ '%s', '%s', '%d' ]
-		);
+		$inserted = $wpdb->insert( $this->table, $data, $formats );
 
 		if ( ! $inserted ) {
 			return new \WP_Error( 'db_error', __( 'Could not insert redirect into database.', 'wp-seo-pilot' ) );
@@ -260,6 +286,185 @@ class Redirect_Manager {
 		}
 
 		return $wpdb->insert_id;
+	}
+
+	/**
+	 * Update an existing redirect.
+	 *
+	 * @param int   $id   Redirect ID.
+	 * @param array $data Data to update.
+	 *
+	 * @return bool|\WP_Error True on success, WP_Error on failure.
+	 */
+	public function update_redirect( $id, $data ) {
+		global $wpdb;
+
+		$id = absint( $id );
+		if ( ! $id ) {
+			return new \WP_Error( 'invalid_id', __( 'Invalid redirect ID.', 'wp-seo-pilot' ) );
+		}
+
+		// Check if redirect exists.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE id = %d", $id ) );
+		if ( ! $exists ) {
+			return new \WP_Error( 'not_found', __( 'Redirect not found.', 'wp-seo-pilot' ) );
+		}
+
+		$update  = [];
+		$formats = [];
+
+		// Source.
+		if ( isset( $data['source'] ) ) {
+			$is_regex   = ! empty( $data['is_regex'] );
+			$normalized = $data['source'];
+
+			if ( ! $is_regex ) {
+				$normalized = '/' . ltrim( $data['source'], '/' );
+				$normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+			}
+
+			// Validate regex if applicable.
+			if ( $is_regex ) {
+				$validation = $this->validate_regex( $data['source'] );
+				if ( is_wp_error( $validation ) ) {
+					return $validation;
+				}
+			}
+
+			// Check if new source conflicts with another redirect.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$conflict = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s AND id != %d", $normalized, $id ) );
+			if ( $conflict ) {
+				return new \WP_Error( 'redirect_exists', __( 'Another redirect with this source already exists.', 'wp-seo-pilot' ) );
+			}
+
+			$update['source'] = $normalized;
+			$formats[]        = '%s';
+		}
+
+		// Target.
+		if ( isset( $data['target'] ) ) {
+			$update['target'] = esc_url_raw( $data['target'] );
+			$formats[]        = '%s';
+		}
+
+		// Status code.
+		if ( isset( $data['status_code'] ) ) {
+			$status_code          = absint( $data['status_code'] );
+			$update['status_code'] = in_array( $status_code, [ 301, 302, 307, 410 ], true ) ? $status_code : 301;
+			$formats[]            = '%d';
+		}
+
+		// Is regex.
+		if ( isset( $data['is_regex'] ) ) {
+			$update['is_regex'] = ! empty( $data['is_regex'] ) ? 1 : 0;
+			$formats[]          = '%d';
+		}
+
+		// Group name.
+		if ( isset( $data['group_name'] ) ) {
+			$update['group_name'] = sanitize_text_field( $data['group_name'] );
+			$formats[]            = '%s';
+		}
+
+		// Start date.
+		if ( array_key_exists( 'start_date', $data ) ) {
+			$update['start_date'] = ! empty( $data['start_date'] ) ? sanitize_text_field( $data['start_date'] ) : null;
+			$formats[]            = '%s';
+		}
+
+		// End date.
+		if ( array_key_exists( 'end_date', $data ) ) {
+			$update['end_date'] = ! empty( $data['end_date'] ) ? sanitize_text_field( $data['end_date'] ) : null;
+			$formats[]          = '%s';
+		}
+
+		// Notes.
+		if ( isset( $data['notes'] ) ) {
+			$update['notes'] = sanitize_textarea_field( $data['notes'] );
+			$formats[]       = '%s';
+		}
+
+		if ( empty( $update ) ) {
+			return new \WP_Error( 'no_data', __( 'No data to update.', 'wp-seo-pilot' ) );
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->update( $this->table, $update, [ 'id' => $id ], $formats, [ '%d' ] );
+
+		if ( false === $result ) {
+			return new \WP_Error( 'db_error', __( 'Could not update redirect.', 'wp-seo-pilot' ) );
+		}
+
+		self::flush_cache();
+
+		return true;
+	}
+
+	/**
+	 * Get a single redirect by ID.
+	 *
+	 * @param int $id Redirect ID.
+	 *
+	 * @return object|null Redirect object or null if not found.
+	 */
+	public function get_redirect( $id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$this->table} WHERE id = %d", absint( $id ) ) );
+	}
+
+	/**
+	 * Delete a redirect by ID.
+	 *
+	 * @param int $id Redirect ID.
+	 *
+	 * @return bool|\WP_Error True on success, WP_Error on failure.
+	 */
+	public function delete_redirect( $id ) {
+		global $wpdb;
+
+		$id = absint( $id );
+		if ( ! $id ) {
+			return new \WP_Error( 'invalid_id', __( 'Invalid redirect ID.', 'wp-seo-pilot' ) );
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->delete( $this->table, [ 'id' => $id ], [ '%d' ] );
+
+		if ( false === $result ) {
+			return new \WP_Error( 'db_error', __( 'Could not delete redirect.', 'wp-seo-pilot' ) );
+		}
+
+		self::flush_cache();
+
+		return true;
+	}
+
+	/**
+	 * Validate a regex pattern.
+	 *
+	 * @param string $pattern Regex pattern to validate.
+	 *
+	 * @return true|\WP_Error True if valid, WP_Error if invalid.
+	 */
+	public function validate_regex( $pattern ) {
+		if ( empty( $pattern ) ) {
+			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'wp-seo-pilot' ) );
+		}
+
+		// Test the pattern by trying to use it.
+		// Using @ to suppress warnings for invalid patterns.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$result = @preg_match( '#' . $pattern . '#', '' );
+
+		if ( false === $result ) {
+			return new \WP_Error( 'invalid_regex', __( 'Invalid regex pattern. Please check the syntax.', 'wp-seo-pilot' ) );
+		}
+
+		return true;
 	}
 
 	/**
@@ -302,15 +507,85 @@ class Redirect_Manager {
 		$sql     = "CREATE TABLE {$this->table} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			source varchar(255) NOT NULL,
-			target varchar(255) NOT NULL,
+			target varchar(500) NOT NULL,
 			status_code int(3) NOT NULL DEFAULT 301,
 			hits bigint(20) unsigned NOT NULL DEFAULT 0,
 			last_hit datetime DEFAULT NULL,
+			is_regex tinyint(1) NOT NULL DEFAULT 0,
+			group_name varchar(100) DEFAULT '',
+			start_date datetime DEFAULT NULL,
+			end_date datetime DEFAULT NULL,
+			notes text DEFAULT NULL,
+			created_at datetime DEFAULT NULL,
 			PRIMARY KEY  (id),
-			KEY source (source)
+			KEY source (source),
+			KEY is_regex (is_regex),
+			KEY group_name (group_name)
 		) $charset;";
 
 		dbDelta( $sql );
+
+		// Run migrations for existing installations.
+		$this->maybe_migrate_schema();
+	}
+
+	/**
+	 * Check and run schema migrations if needed.
+	 *
+	 * @return void
+	 */
+	private function maybe_migrate_schema() {
+		$current_version = (int) get_option( 'wpseopilot_redirects_schema_version', 1 );
+
+		if ( $current_version >= self::SCHEMA_VERSION ) {
+			return;
+		}
+
+		global $wpdb;
+
+		// Migration from version 1 to 2: Add new columns.
+		if ( $current_version < 2 ) {
+			$columns = $wpdb->get_col( "DESCRIBE {$this->table}", 0 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+			// Add is_regex column if missing.
+			if ( ! in_array( 'is_regex', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN is_regex tinyint(1) NOT NULL DEFAULT 0" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->query( "ALTER TABLE {$this->table} ADD KEY is_regex (is_regex)" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+
+			// Add group_name column if missing.
+			if ( ! in_array( 'group_name', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN group_name varchar(100) DEFAULT ''" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->query( "ALTER TABLE {$this->table} ADD KEY group_name (group_name)" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+
+			// Add start_date column if missing.
+			if ( ! in_array( 'start_date', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN start_date datetime DEFAULT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+
+			// Add end_date column if missing.
+			if ( ! in_array( 'end_date', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN end_date datetime DEFAULT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+
+			// Add notes column if missing.
+			if ( ! in_array( 'notes', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN notes text DEFAULT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+
+			// Add created_at column if missing.
+			if ( ! in_array( 'created_at', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN created_at datetime DEFAULT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				// Set created_at to current time for existing rows.
+				$wpdb->query( $wpdb->prepare( "UPDATE {$this->table} SET created_at = %s WHERE created_at IS NULL", current_time( 'mysql' ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+
+			// Extend target column to 500 chars if needed.
+			$wpdb->query( "ALTER TABLE {$this->table} MODIFY COLUMN target varchar(500) NOT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		}
+
+		update_option( 'wpseopilot_redirects_schema_version', self::SCHEMA_VERSION );
 	}
 
 	/**
@@ -478,19 +753,67 @@ class Redirect_Manager {
 		}
 
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Each request URI must be checked directly against the redirect table.
+
+		// First, try exact match (non-regex redirects).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT * FROM ' . $this->table . ' WHERE source = %s LIMIT 1',
+				'SELECT * FROM ' . $this->table . ' WHERE source = %s AND is_regex = 0 LIMIT 1',
 				$request
 			)
 		);
 
+		$target         = null;
+		$matched_source = $request;
+
+		if ( $row ) {
+			// Check if timed redirect is active.
+			if ( ! $this->is_redirect_active( $row ) ) {
+				$row = null;
+			} else {
+				$target = $row->target;
+			}
+		}
+
+		// If no exact match, try regex redirects.
 		if ( ! $row ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$regex_redirects = $wpdb->get_results(
+				'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1'
+			);
+
+			if ( $regex_redirects ) {
+				foreach ( $regex_redirects as $regex_row ) {
+					// Check if timed redirect is active.
+					if ( ! $this->is_redirect_active( $regex_row ) ) {
+						continue;
+					}
+
+					// Test regex pattern.
+					// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					if ( @preg_match( '#' . $regex_row->source . '#', $request, $matches ) ) {
+						$row            = $regex_row;
+						$matched_source = $request;
+
+						// Replace backreferences in target ($1, $2, etc.).
+						$target = $regex_row->target;
+						if ( count( $matches ) > 1 ) {
+							for ( $i = 1; $i < count( $matches ); $i++ ) {
+								$target = str_replace( '$' . $i, $matches[ $i ], $target );
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		if ( ! $row || ! $target ) {
 			return;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Updating redirect hit metadata requires manipulating the custom table directly.
+		// Update hit stats.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
 			$this->table,
 			[
@@ -500,7 +823,7 @@ class Redirect_Manager {
 			[ 'id' => $row->id ]
 		);
 
-		$target = esc_url_raw( $row->target );
+		$target = esc_url_raw( $target );
 		add_filter(
 			'allowed_redirect_hosts',
 			static function ( $hosts ) use ( $target ) {
@@ -514,6 +837,29 @@ class Redirect_Manager {
 
 		wp_safe_redirect( $target, (int) $row->status_code );
 		exit;
+	}
+
+	/**
+	 * Check if a timed redirect is currently active.
+	 *
+	 * @param object $redirect Redirect row object.
+	 *
+	 * @return bool True if active, false otherwise.
+	 */
+	public function is_redirect_active( $redirect ) {
+		$now = current_time( 'mysql' );
+
+		// Check start date - if set and in the future, redirect is not active yet.
+		if ( ! empty( $redirect->start_date ) && $now < $redirect->start_date ) {
+			return false;
+		}
+
+		// Check end date - if set and in the past, redirect has expired.
+		if ( ! empty( $redirect->end_date ) && $now > $redirect->end_date ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

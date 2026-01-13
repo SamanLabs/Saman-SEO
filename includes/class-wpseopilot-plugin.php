@@ -72,6 +72,7 @@ class Plugin {
 		$this->register( 'local_seo', new Service\Local_SEO() );
 		$this->register( 'analytics', new Service\Analytics() );
 		$this->register( 'admin_bar', new Service\Admin_Bar() );
+		$this->register( 'dashboard_widget', new Service\Dashboard_Widget() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->register( 'cli', new Service\CLI() );
