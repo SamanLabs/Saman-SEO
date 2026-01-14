@@ -1,25 +1,40 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import Header from './components/Header';
-import Dashboard from './pages/Dashboard';
-import SearchAppearance from './pages/SearchAppearance';
-import Sitemap from './pages/Sitemap';
-import Tools from './pages/Tools';
-import Redirects from './pages/Redirects';
-import Log404 from './pages/Log404';
-import InternalLinking from './pages/InternalLinking';
-import Audit from './pages/Audit';
-import AiAssistant from './pages/AiAssistant';
-import Assistants from './pages/Assistants';
-import Settings from './pages/Settings';
-import More from './pages/More';
-import Setup from './pages/Setup';
-import BulkEditor from './pages/BulkEditor';
-import ContentGaps from './pages/ContentGaps';
-import SchemaBuilder from './pages/SchemaBuilder';
-import LinkHealth from './pages/LinkHealth';
-import LocalSeo from './pages/LocalSeo';
 import './index.css';
+
+// Lazy load page components for better performance
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const SearchAppearance = lazy(() => import('./pages/SearchAppearance'));
+const Sitemap = lazy(() => import('./pages/Sitemap'));
+const Tools = lazy(() => import('./pages/Tools'));
+const Redirects = lazy(() => import('./pages/Redirects'));
+const Log404 = lazy(() => import('./pages/Log404'));
+const InternalLinking = lazy(() => import('./pages/InternalLinking'));
+const Audit = lazy(() => import('./pages/Audit'));
+const AiAssistant = lazy(() => import('./pages/AiAssistant'));
+const Assistants = lazy(() => import('./pages/Assistants'));
+const Settings = lazy(() => import('./pages/Settings'));
+const More = lazy(() => import('./pages/More'));
+const Setup = lazy(() => import('./pages/Setup'));
+const BulkEditor = lazy(() => import('./pages/BulkEditor'));
+const ContentGaps = lazy(() => import('./pages/ContentGaps'));
+const SchemaBuilder = lazy(() => import('./pages/SchemaBuilder'));
+const LinkHealth = lazy(() => import('./pages/LinkHealth'));
+const LocalSeo = lazy(() => import('./pages/LocalSeo'));
+const RobotsTxt = lazy(() => import('./pages/RobotsTxt'));
+const ImageSeo = lazy(() => import('./pages/ImageSeo'));
+const InstantIndexing = lazy(() => import('./pages/InstantIndexing'));
+const SchemaValidator = lazy(() => import('./pages/SchemaValidator'));
+const HtaccessEditor = lazy(() => import('./pages/HtaccessEditor'));
+const MobileFriendly = lazy(() => import('./pages/MobileFriendly'));
+
+// Loading spinner for lazy-loaded components
+const PageLoader = () => (
+    <div className="page-loader">
+        <div className="page-loader__spinner" />
+    </div>
+);
 
 const viewToPage = {
     dashboard: 'wpseopilot-dashboard',
@@ -39,6 +54,12 @@ const viewToPage = {
     'schema-builder': 'wpseopilot-schema-builder',
     'link-health': 'wpseopilot-link-health',
     'local-seo': 'wpseopilot-local-seo',
+    'robots-txt': 'wpseopilot-robots-txt',
+    'image-seo': 'wpseopilot-image-seo',
+    'instant-indexing': 'wpseopilot-instant-indexing',
+    'schema-validator': 'wpseopilot-schema-validator',
+    'htaccess-editor': 'wpseopilot-htaccess-editor',
+    'mobile-friendly': 'wpseopilot-mobile-friendly',
 };
 
 const pageToView = Object.entries(viewToPage).reduce((acc, [view, page]) => {
@@ -211,6 +232,18 @@ const App = ({ initialView = 'dashboard' }) => {
                 return <LinkHealth onNavigate={handleNavigate} />;
             case 'local-seo':
                 return <LocalSeo />;
+            case 'robots-txt':
+                return <RobotsTxt />;
+            case 'image-seo':
+                return <ImageSeo />;
+            case 'instant-indexing':
+                return <InstantIndexing onNavigate={handleNavigate} />;
+            case 'schema-validator':
+                return <SchemaValidator onNavigate={handleNavigate} />;
+            case 'htaccess-editor':
+                return <HtaccessEditor onNavigate={handleNavigate} />;
+            case 'mobile-friendly':
+                return <MobileFriendly onNavigate={handleNavigate} />;
             default:
                 return <Dashboard onNavigate={handleNavigate} />;
         }
@@ -233,7 +266,9 @@ const App = ({ initialView = 'dashboard' }) => {
     if (showSetup) {
         return (
             <div className="wp-seo-pilot-admin">
-                <Setup onComplete={handleSetupComplete} onSkip={handleSetupSkip} />
+                <Suspense fallback={<PageLoader />}>
+                    <Setup onComplete={handleSetupComplete} onSkip={handleSetupSkip} />
+                </Suspense>
             </div>
         );
     }
@@ -243,7 +278,9 @@ const App = ({ initialView = 'dashboard' }) => {
             <div className="wp-seo-pilot-shell">
                 <Header currentView={currentView} onNavigate={handleNavigate} />
                 <div className="content-area">
-                    {renderView()}
+                    <Suspense fallback={<PageLoader />}>
+                        {renderView()}
+                    </Suspense>
                 </div>
             </div>
         </div>

@@ -184,6 +184,7 @@ const SEOSidebar = () => {
                 icon={<PluginIcon />}
             >
                 <SEOPanel
+                    postId={postId}
                     seoMeta={seoMeta}
                     updateMeta={updateMeta}
                     seoScore={seoScore}

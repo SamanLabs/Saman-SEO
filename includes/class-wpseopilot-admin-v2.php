@@ -62,6 +62,12 @@ class Admin_V2 {
         'wpseopilot-schema-builder'     => 'schema-builder',
         'wpseopilot-link-health'        => 'link-health',
         'wpseopilot-local-seo'          => 'local-seo',
+        'wpseopilot-robots-txt'         => 'robots-txt',
+        'wpseopilot-image-seo'          => 'image-seo',
+        'wpseopilot-instant-indexing'   => 'instant-indexing',
+        'wpseopilot-schema-validator'   => 'schema-validator',
+        'wpseopilot-htaccess-editor'    => 'htaccess-editor',
+        'wpseopilot-mobile-friendly'    => 'mobile-friendly',
         // Legacy V2 URLs (backwards compatibility)
         'wpseopilot-v2'                    => 'dashboard',
         'wpseopilot-v2-dashboard'          => 'dashboard',
@@ -212,6 +218,12 @@ class Admin_V2 {
             'schema-builder'   => __( 'Schema Builder', 'wp-seo-pilot' ),
             'link-health'      => __( 'Link Health', 'wp-seo-pilot' ),
             'local-seo'        => __( 'Local SEO', 'wp-seo-pilot' ),
+            'robots-txt'        => __( 'robots.txt Editor', 'wp-seo-pilot' ),
+            'image-seo'         => __( 'Image SEO', 'wp-seo-pilot' ),
+            'instant-indexing'  => __( 'Instant Indexing', 'wp-seo-pilot' ),
+            'schema-validator'  => __( 'Schema Validator', 'wp-seo-pilot' ),
+            'htaccess-editor'   => __( '.htaccess Editor', 'wp-seo-pilot' ),
+            'mobile-friendly'   => __( 'Mobile Friendly Test', 'wp-seo-pilot' ),
         ];
 
         foreach ( $hidden_subpages as $slug => $title ) {
@@ -348,6 +360,9 @@ class Admin_V2 {
             'Link_Health'      => 'class-link-health-controller.php',
             'Breadcrumbs'      => 'class-breadcrumbs-controller.php',
             'IndexNow'         => 'class-indexnow-controller.php',
+            'Schema_Validator' => 'class-schema-validator-controller.php',
+            'Htaccess'         => 'class-htaccess-controller.php',
+            'Mobile_Test'      => 'class-mobile-test-controller.php',
         ];
 
         foreach ( $controllers as $controller => $file ) {

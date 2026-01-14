@@ -49,6 +49,12 @@ class Post_Meta {
 				'focus_keyphrase' => [
 					'type' => 'string',
 				],
+				'secondary_keyphrases' => [
+					'type'  => 'array',
+					'items' => [
+						'type' => 'string',
+					],
+				],
 				'canonical'       => [
 					'type' => 'string',
 				],
@@ -120,6 +126,18 @@ class Post_Meta {
 		$clean['noindex']         = ! empty( $value['noindex'] ) ? '1' : '';
 		$clean['nofollow']        = ! empty( $value['nofollow'] ) ? '1' : '';
 		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
+
+		// Handle secondary keyphrases (max 4 additional keywords).
+		$clean['secondary_keyphrases'] = [];
+		if ( isset( $value['secondary_keyphrases'] ) && is_array( $value['secondary_keyphrases'] ) ) {
+			$secondary = array_slice( $value['secondary_keyphrases'], 0, 4 );
+			foreach ( $secondary as $keyphrase ) {
+				$sanitized = sanitize_text_field( $keyphrase );
+				if ( ! empty( $sanitized ) ) {
+					$clean['secondary_keyphrases'][] = $sanitized;
+				}
+			}
+		}
 
 		return $clean;
 	}

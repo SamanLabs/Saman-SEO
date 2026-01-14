@@ -8,35 +8,48 @@ WP SEO Pilot is a comprehensive WordPress SEO plugin that prioritizes **practica
 
 ## Current State (v0.2.x)
 
-### Existing Features
+### Core Features
 - SEO title/description management with template variables
 - Meta tags & Open Graph output
-- JSON-LD schema (Article, Organization, WebSite, LocalBusiness)
-- XML Sitemaps with custom configuration
-- 404 Error Logging & Monitoring
-- Redirect Manager (301, 302, 307, 410)
+- JSON-LD schema (Article, Organization, WebSite, LocalBusiness, Product, FAQ, HowTo, Video, News)
+- XML Sitemaps with custom configuration (standard, news, video)
+- Breadcrumbs with BreadcrumbList schema
+- Multi-keyword support (3-5 keywords per post)
+- Canonical URL management
+
+### Redirect & 404
+- Redirect Manager (301, 302, 307, 410) with regex, groups, import/export
+- 404 Monitor with smart suggestions and bot filtering
+- Link Health Checker (broken links, orphan pages)
+
+### Indexing & Search
+- IndexNow Integration (Bing, Yandex, Seznam, Naver)
+- Instant Indexing UI (bulk submit, per-post button)
+- robots.txt Editor with presets and path tester
+
+### Content Tools
 - SEO Audit with 14-factor scoring
+- Bulk Editor (spreadsheet view)
+- Content Gap Analysis
+- Image SEO (bulk alt text editor)
+- Content Templates with variables
 - Internal Linking Rules
+
+### Local & E-Commerce
+- Local SEO with multi-location support
+- WooCommerce Product schema
+- FAQ & HowTo blocks with schema
+
+### Additional
 - Social Card Generator
 - LLM.txt Generator
-- Bulk Editor
-- Content Gap Analysis
 - WP-CLI Support
 - Admin Bar SEO Indicator
 
 ### What We're Missing (vs Yoast, Rank Math, AIOSEO)
-- Breadcrumbs (navigation + schema)
-- robots.txt Editor UI
-- Multiple Focus Keywords
-- IndexNow Integration
 - Google Search Console Integration
-- Video SEO / Video Schema
-- FAQ & HowTo Block Support
-- Canonical URL Management UI
-- WooCommerce SEO
 - Rank/Keyword Tracking
-- Image SEO (bulk alt text)
-- Multiple Location Local SEO UI
+- Import from other SEO plugins
 
 ---
 
@@ -136,11 +149,12 @@ WP SEO Pilot is a comprehensive WordPress SEO plugin that prioritizes **practica
 - [ ] Conditional schema (show only if conditions met)
 - [ ] Custom schema code editor
 
-### 3.3 FAQ & HowTo Integration
-- [ ] FAQ block with automatic schema
-- [ ] HowTo block with step schema
-- [ ] Import existing FAQ content
-- [ ] Accordion style options
+### 3.3 FAQ & HowTo Integration ✅ COMPLETED
+- [x] FAQ block with automatic FAQPage schema
+- [x] HowTo block with step schema (HowToStep)
+- [x] Tools and supplies support for HowTo
+- [x] Accordion style for FAQ frontend
+- [ ] Import existing FAQ content (future)
 
 ---
 
@@ -166,11 +180,11 @@ WP SEO Pilot is a comprehensive WordPress SEO plugin that prioritizes **practica
 - [ ] Submit URLs to Google
 - [ ] Crawl stats overview
 
-### 4.3 Instant Indexing
-- [ ] Manual "Request Indexing" button per post
-- [ ] Bulk indexing requests
-- [ ] Indexing queue management
-- [ ] Status tracking (indexed, pending, error)
+### 4.3 Instant Indexing ✅ COMPLETED
+- [x] Manual "Request Indexing" button per post (in editor Advanced tab)
+- [x] Bulk indexing page (Tools > Instant Indexing)
+- [x] Indexing queue management with filters
+- [x] Status tracking (indexed, pending, failed)
 
 ---
 
@@ -178,37 +192,42 @@ WP SEO Pilot is a comprehensive WordPress SEO plugin that prioritizes **practica
 
 **Goal:** Provide tools to optimize existing content at scale.
 
-### 5.1 Multi-Keyword Support
-- [ ] Support 3-5 focus keywords per post
-- [ ] Keyword density for each keyword
-- [ ] Keyword placement analysis for each
-- [ ] Keyword cannibalization detection
+### 5.1 Multi-Keyword Support ✅ COMPLETED
+- [x] Support 3-5 focus keywords per post
+- [x] Keyword density for each keyword
+- [x] Keyword placement analysis for each
+- [ ] Keyword cannibalization detection (future)
 
-### 5.2 Image SEO
-- [ ] Bulk image alt text editor
-- [ ] Auto-generate alt text from filename
-- [ ] Missing alt text report
-- [ ] Image title optimization
-- [ ] WebP/image format recommendations
+### 5.2 Image SEO ✅ COMPLETED
+- [x] Bulk image alt text editor (Tools > Image SEO)
+- [x] Auto-generate alt text from filename
+- [x] Missing alt text report
+- [x] Image title optimization
+- [ ] WebP/image format recommendations (future)
 
-### 5.3 Content Templates
-- [ ] Reusable SEO templates
-- [ ] Apply template to multiple posts
-- [ ] Template variables support
-- [ ] Default templates per post type
+### 5.3 Content Templates ✅ COMPLETED
+- [x] Reusable SEO templates
+- [x] Apply template to multiple posts
+- [x] Template variables support (title, sitename, separator, etc.)
+- [x] Default templates per post type
 
-### 5.4 robots.txt & htaccess Editor
-- [ ] Visual robots.txt editor
-- [ ] Common rules presets
-- [ ] Syntax validation
-- [ ] Backup before changes
-- [ ] .htaccess editor (with caution warnings)
+### 5.4 robots.txt & htaccess Editor ✅ COMPLETED
+- [x] Visual robots.txt editor
+- [x] Common rules presets (5 presets)
+- [x] Syntax validation with errors/warnings
+- [x] Path tester (check if URL is allowed/blocked)
+- [x] Quick insert directives
+- [x] .htaccess editor with backups and presets
 
-### 5.5 Canonical URL Manager
-- [ ] Canonical URL field in editor
-- [ ] Bulk canonical editor
-- [ ] Duplicate content detection
-- [ ] Cross-domain canonical support
+### 5.5 Additional Tools ✅ COMPLETED
+- [x] Schema Validator (test JSON-LD from any URL)
+- [x] Mobile Friendly Test (viewport, touch targets, font sizes)
+
+### 5.6 Canonical URL Manager ✅ PARTIALLY COMPLETED
+- [x] Canonical URL field in editor (Advanced tab)
+- [ ] Bulk canonical editor (future)
+- [ ] Duplicate content detection (future)
+- [ ] Cross-domain canonical support (future)
 
 ---
 
@@ -246,19 +265,19 @@ WP SEO Pilot is a comprehensive WordPress SEO plugin that prioritizes **practica
 
 **Goal:** Optimize performance, improve developer experience, finalize branding.
 
-### 7.1 Branding Consistency
-- [ ] "WP SEO Pilot" everywhere
-- [ ] Updated plugin header
-- [ ] Consistent admin menu labels
-- [ ] Updated setup wizard branding
-- [ ] Documentation site/pages
+### 7.1 Branding Consistency ✅ COMPLETED
+- [x] "WP SEO Pilot" everywhere
+- [x] Updated plugin header
+- [x] Consistent admin menu labels
+- [x] Updated setup wizard branding
+- [ ] Documentation site/pages (future)
 
-### 7.2 Performance Optimization
-- [ ] Lazy load admin components
-- [ ] Database query optimization
-- [ ] Caching layer for schema/sitemaps
-- [ ] Reduce frontend footprint
-- [ ] Code splitting for admin JS
+### 7.2 Performance Optimization ✅ COMPLETED
+- [x] Lazy load admin components (React.lazy)
+- [x] Database query optimization
+- [x] Caching layer for schema/sitemaps (transient caching)
+- [x] Reduce frontend footprint
+- [x] Code splitting for admin JS (21 separate chunks)
 
 ### 7.3 Developer Experience
 - [ ] REST API documentation
@@ -327,16 +346,24 @@ WP SEO Pilot will integrate WITH WP AI Pilot for AI features, but will not dupli
 | SEO Titles/Desc | Yes | Yes | Yes | Yes |
 | Redirects | Yes | Premium | Free | Pro |
 | 404 Monitor | Yes | No | Free | Pro |
-| Breadcrumbs | Planned | Yes | Yes | Yes |
-| IndexNow | Planned | No | Pro | Pro |
+| Breadcrumbs | Yes | Yes | Yes | Yes |
+| IndexNow | Yes | No | Pro | Pro |
 | Search Console | Planned | No | Free | Pro |
-| Multi Keywords | Planned | Premium | Free | Pro |
-| Local SEO | Basic | Addon | Pro | Pro |
-| WooCommerce | Planned | Addon | Pro | Pro |
-| Schema Types | 12+ | 5+ | 20+ | 15+ |
+| Multi Keywords | Yes | Premium | Free | Pro |
+| Local SEO | Yes | Addon | Pro | Pro |
+| WooCommerce | Yes | Addon | Pro | Pro |
+| Image SEO | Yes | Premium | Free | Pro |
+| Schema Types | 15+ | 5+ | 20+ | 15+ |
 | AI Integration | Via WP AI Pilot | Built-in | Built-in | Built-in |
 
 ---
 
+### Admin Experience
+- **Tools Hub**: Central navigation page with categorized tools (Popular, AI-Powered, More Tools, Coming Soon)
+- **Modern React UI**: Component-based admin with lazy loading and code splitting
+- **Responsive Design**: Full mobile support for all admin pages
+
+---
+
 *Last Updated: January 2026*
-*Version: 2.0*
+*Version: 2.1*

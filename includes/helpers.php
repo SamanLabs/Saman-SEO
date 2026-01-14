@@ -380,23 +380,27 @@ namespace WPSEOPilot\Helpers {
 
 		$default_summary = \__( 'Add content to generate a score.', 'wp-seo-pilot' );
 		$default_result  = [
-			'score'         => 0,
-			'level'         => 'low',
-			'label'         => \__( 'Needs attention', 'wp-seo-pilot' ),
-			'summary'       => $default_summary,
-			'has_keyphrase' => false,
-			'metrics'       => [],
+			'score'                => 0,
+			'level'                => 'low',
+			'label'                => \__( 'Needs attention', 'wp-seo-pilot' ),
+			'summary'              => $default_summary,
+			'has_keyphrase'        => false,
+			'metrics'              => [],
+			'secondary_keyphrases' => [],
 		];
 
 		if ( ! $post instanceof WP_Post ) {
 			return $default_result;
 		}
 
-		// Get SEO meta including focus keyphrase.
-		$meta            = get_post_meta( $post );
-		$all_meta        = (array) \get_post_meta( $post->ID, '_wpseopilot_meta', true );
-		$focus_keyphrase = isset( $all_meta['focus_keyphrase'] ) ? trim( sanitize_text_field( $all_meta['focus_keyphrase'] ) ) : '';
-		$has_keyphrase   = ! empty( $focus_keyphrase );
+		// Get SEO meta including focus keyphrase and secondary keyphrases.
+		$meta                  = get_post_meta( $post );
+		$all_meta              = (array) \get_post_meta( $post->ID, '_wpseopilot_meta', true );
+		$focus_keyphrase       = isset( $all_meta['focus_keyphrase'] ) ? trim( sanitize_text_field( $all_meta['focus_keyphrase'] ) ) : '';
+		$has_keyphrase         = ! empty( $focus_keyphrase );
+		$secondary_keyphrases  = isset( $all_meta['secondary_keyphrases'] ) && is_array( $all_meta['secondary_keyphrases'] )
+			? array_filter( array_map( 'sanitize_text_field', $all_meta['secondary_keyphrases'] ) )
+			: [];
 
 		$title_text  = trim( $meta['title'] ?: $post->post_title );
 		$desc_text   = trim( $meta['description'] );
@@ -654,6 +658,57 @@ namespace WPSEOPilot\Helpers {
 		}
 
 		// =====================================================
+		// SECONDARY KEYPHRASES (informational only, no score impact)
+		// =====================================================
+		$secondary_analysis = [];
+		if ( ! empty( $secondary_keyphrases ) ) {
+			foreach ( $secondary_keyphrases as $idx => $sec_keyphrase ) {
+				if ( empty( $sec_keyphrase ) ) {
+					continue;
+				}
+
+				$sec_in_title   = contains_keyphrase( $title_text, $sec_keyphrase );
+				$sec_in_desc    = contains_keyphrase( $desc_text, $sec_keyphrase );
+				$sec_in_content = contains_keyphrase( $content_text, $sec_keyphrase );
+				$sec_in_h1      = $has_h1 && contains_keyphrase( $h1_text, $sec_keyphrase );
+				$sec_density    = calculate_keyphrase_density( $content_text, $sec_keyphrase, $word_count );
+
+				$sec_checks_passed = (int) $sec_in_title + (int) $sec_in_desc + (int) $sec_in_content + (int) $sec_in_h1;
+
+				$secondary_analysis[] = [
+					'keyphrase'  => $sec_keyphrase,
+					'in_title'   => $sec_in_title,
+					'in_desc'    => $sec_in_desc,
+					'in_content' => $sec_in_content,
+					'in_h1'      => $sec_in_h1,
+					'density'    => round( $sec_density, 2 ),
+					'coverage'   => $sec_checks_passed . '/4',
+					'status'     => $sec_checks_passed >= 2 ? 'good' : ( $sec_checks_passed >= 1 ? 'fair' : 'poor' ),
+				];
+
+				// Add informational metric for the analysis tab.
+				$sec_status = sprintf(
+					/* translators: %1$s: coverage score, %2$.1f: density percentage */
+					\__( 'Coverage: %1$s • Density: %2$.1f%%', 'wp-seo-pilot' ),
+					$sec_checks_passed . '/4',
+					$sec_density
+				);
+
+				$metrics[] = [
+					'key'         => 'secondary_keyphrase_' . ( $idx + 1 ),
+					'label'       => sprintf( \__( 'Secondary: "%s"', 'wp-seo-pilot' ), $sec_keyphrase ),
+					'issue_label' => sprintf( \__( 'Secondary #%d', 'wp-seo-pilot' ), $idx + 1 ),
+					'status'      => $sec_status,
+					'score'       => 0, // Informational only.
+					'max'         => 0,
+					'is_pass'     => $sec_checks_passed >= 2,
+					'category'    => 'secondary_keyword',
+					'value'       => $sec_checks_passed,
+				];
+			}
+		}
+
+		// =====================================================
 		// CONTENT STRUCTURE (15 points max)
 		// =====================================================
 
@@ -891,12 +946,13 @@ namespace WPSEOPilot\Helpers {
 		}
 
 		$result = [
-			'score'         => $total_score,
-			'level'         => $level,
-			'label'         => $label,
-			'summary'       => $summary,
-			'has_keyphrase' => $has_keyphrase,
-			'metrics'       => $metrics,
+			'score'                => $total_score,
+			'level'                => $level,
+			'label'                => $label,
+			'summary'              => $summary,
+			'has_keyphrase'        => $has_keyphrase,
+			'metrics'              => $metrics,
+			'secondary_keyphrases' => $secondary_analysis,
 		];
 
 		return \apply_filters( 'wpseopilot_seo_score', $result, $post );

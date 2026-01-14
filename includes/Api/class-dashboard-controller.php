@@ -100,7 +100,13 @@ class Dashboard_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_dashboard( $request ) {
-        return $this->success( [
+        // Check cache first (2 minute cache for dashboard overview)
+        $cached = get_transient( 'wpseopilot_dashboard_data' );
+        if ( $cached !== false ) {
+            return $this->success( $cached );
+        }
+
+        $data = [
             'seo_score'        => $this->calculate_overall_seo_score(),
             'content_coverage' => $this->get_content_coverage_data(),
             'sitemap'          => $this->get_sitemap_data(),
@@ -108,7 +114,12 @@ class Dashboard_Controller extends REST_Controller {
             'errors_404'       => $this->get_404_data(),
             'schema'           => $this->get_schema_data(),
             'notifications'    => $this->get_notifications_data(),
-        ] );
+        ];
+
+        // Cache for 2 minutes
+        set_transient( 'wpseopilot_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
+
+        return $this->success( $data );
     }
 
     /**
@@ -303,6 +314,12 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_content_coverage_data() {
+        // Check cache first (5 minute cache for coverage data)
+        $cached = get_transient( 'wpseopilot_content_coverage' );
+        if ( $cached !== false ) {
+            return $cached;
+        }
+
         global $wpdb;
 
         // Count posts with SEO meta vs without
@@ -356,7 +373,7 @@ class Dashboard_Controller extends REST_Controller {
             ];
         }
 
-        return [
+        $result = [
             'total'           => (int) $total_posts,
             'with_title'      => (int) $with_title,
             'with_description'=> (int) $with_desc,
@@ -365,6 +382,11 @@ class Dashboard_Controller extends REST_Controller {
             'coverage_pct'    => $total_posts > 0 ? round( ( min( $with_title, $with_desc ) / $total_posts ) * 100 ) : 0,
             'daily_stats'     => $daily_stats,
         ];
+
+        // Cache for 5 minutes
+        set_transient( 'wpseopilot_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
+
+        return $result;
     }
 
     /**

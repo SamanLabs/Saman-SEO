@@ -1510,3 +1510,323 @@
     line-height: 1.4;
     color: #5b52b0;
 }
+
+/* ========================================
+   Multi-Keyphrase Component
+   ======================================== */
+
+.wpseopilot-field--keyphrases {
+    margin-bottom: 20px;
+}
+
+.wpseopilot-field--keyphrases .wpseopilot-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.wpseopilot-field-count {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    background: #f0f6fc;
+    color: #2271b1;
+    border-radius: 10px;
+}
+
+.wpseopilot-keyphrase-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.wpseopilot-keyphrase-badge {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.wpseopilot-keyphrase-primary .wpseopilot-keyphrase-badge {
+    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+    color: #fff;
+}
+
+.wpseopilot-keyphrase-secondary .wpseopilot-keyphrase-badge {
+    background: #f0f0f1;
+    color: #757575;
+}
+
+.wpseopilot-keyphrase-item .wpseopilot-field-input {
+    flex: 1;
+}
+
+.wpseopilot-keyphrase-remove {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #757575;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wpseopilot-keyphrase-remove:hover {
+    background: #fcf0f1;
+    border-color: #f1b3b6;
+    color: #d63638;
+}
+
+.wpseopilot-keyphrase-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #2271b1;
+    background: #f0f6fc;
+    border: 1px dashed #2271b1;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wpseopilot-keyphrase-add:hover {
+    background: #e5f0fa;
+    border-style: solid;
+}
+
+.wpseopilot-keyphrase-add svg {
+    flex-shrink: 0;
+}
+
+/* ========================================
+   Quick Templates Component
+   ======================================== */
+
+.wpseopilot-field--templates {
+    margin-bottom: 16px;
+}
+
+.wpseopilot-templates-header {
+    margin-bottom: 0;
+}
+
+.wpseopilot-templates-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d2327;
+    background: #f6f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wpseopilot-templates-toggle:hover {
+    background: #f0f0f1;
+    border-color: #c3c4c7;
+}
+
+.wpseopilot-templates-toggle.active {
+    background: #f0f6fc;
+    border-color: #2271b1;
+    color: #2271b1;
+    border-radius: 4px 4px 0 0;
+}
+
+.wpseopilot-templates-toggle svg:last-child {
+    margin-left: auto;
+}
+
+.wpseopilot-templates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background: #fafafa;
+    border: 1px solid #2271b1;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+}
+
+.wpseopilot-template-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+.wpseopilot-template-item:hover {
+    background: #f0f6fc;
+    border-color: #2271b1;
+}
+
+.wpseopilot-template-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpseopilot-template-preview {
+    font-size: 11px;
+    color: #757575;
+    font-family: monospace;
+}
+
+/* ==========================================================================
+   Instant Indexing Section
+   ========================================================================== */
+
+.wpseopilot-indexing-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.wpseopilot-indexing-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.wpseopilot-indexing-notice svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.wpseopilot-indexing-notice--info {
+    background: #f0f6fc;
+    color: #135e96;
+}
+
+.wpseopilot-indexing-notice--error {
+    background: #fcf0f1;
+    color: #d63638;
+}
+
+.wpseopilot-indexing-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #f6f7f7;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.wpseopilot-indexing-status--success {
+    background: #edfaef;
+}
+
+.wpseopilot-indexing-status--success .wpseopilot-indexing-status-icon {
+    color: #00a32a;
+}
+
+.wpseopilot-indexing-status--failed {
+    background: #fcf0f1;
+}
+
+.wpseopilot-indexing-status--failed .wpseopilot-indexing-status-icon {
+    color: #d63638;
+}
+
+.wpseopilot-indexing-status--never {
+    background: #f0f0f1;
+}
+
+.wpseopilot-indexing-status--never .wpseopilot-indexing-status-icon {
+    color: #757575;
+}
+
+.wpseopilot-indexing-status-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.wpseopilot-indexing-status-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wpseopilot-indexing-status-text strong {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpseopilot-indexing-status-text span {
+    font-size: 11px;
+    color: #757575;
+}
+
+.wpseopilot-indexing-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+}
+
+.wpseopilot-indexing-button svg {
+    flex-shrink: 0;
+}
+
+.wpseopilot-indexing-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #e0e0e0;
+    border-top-color: #2271b1;
+    border-radius: 50%;
+    animation: wpseopilot-spin 0.8s linear infinite;
+}
+
+@keyframes wpseopilot-spin {
+    to { transform: rotate(360deg); }
+}

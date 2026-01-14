@@ -161,6 +161,108 @@ class IndexNow_Controller extends REST_Controller {
 				],
 			]
 		);
+
+		// Submit a single post by ID.
+		register_rest_route(
+			$this->namespace,
+			'/indexnow/submit-post/(?P<id>\d+)',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'submit_post' ],
+					'permission_callback' => [ $this, 'permission_check' ],
+					'args'                => [
+						'id' => [
+							'required'          => true,
+							'type'              => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+					],
+				],
+			]
+		);
+
+		// Get indexing status for a single post.
+		register_rest_route(
+			$this->namespace,
+			'/indexnow/post-status/(?P<id>\d+)',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_post_status' ],
+					'permission_callback' => [ $this, 'permission_check' ],
+					'args'                => [
+						'id' => [
+							'required'          => true,
+							'type'              => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+					],
+				],
+			]
+		);
+
+		// Bulk submit multiple posts by IDs.
+		register_rest_route(
+			$this->namespace,
+			'/indexnow/bulk-submit',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'bulk_submit_posts' ],
+					'permission_callback' => [ $this, 'permission_check' ],
+					'args'                => [
+						'post_ids' => [
+							'required'          => true,
+							'type'              => 'array',
+							'sanitize_callback' => function ( $ids ) {
+								return array_map( 'absint', (array) $ids );
+							},
+						],
+					],
+				],
+			]
+		);
+
+		// Get posts available for bulk indexing.
+		register_rest_route(
+			$this->namespace,
+			'/indexnow/posts',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_posts_for_indexing' ],
+					'permission_callback' => [ $this, 'permission_check' ],
+					'args'                => [
+						'page'      => [
+							'type'              => 'integer',
+							'default'           => 1,
+							'sanitize_callback' => 'absint',
+						],
+						'per_page'  => [
+							'type'              => 'integer',
+							'default'           => 50,
+							'sanitize_callback' => 'absint',
+						],
+						'post_type' => [
+							'type'              => 'string',
+							'default'           => 'post',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'search'    => [
+							'type'              => 'string',
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'status_filter' => [
+							'type'              => 'string',
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
 	}
 
 	/**
@@ -432,6 +534,291 @@ class IndexNow_Controller extends REST_Controller {
 		return $this->success( [
 			'search_engines' => $service->get_search_engines(),
 			'post_types'     => $post_types,
+		] );
+	}
+
+	/**
+	 * Submit a single post to IndexNow.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function submit_post( $request ) {
+		$service = $this->get_service();
+
+		if ( ! $service ) {
+			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+		}
+
+		$post_id = $request->get_param( 'id' );
+		$post    = get_post( $post_id );
+
+		if ( ! $post ) {
+			return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+		}
+
+		if ( 'publish' !== $post->post_status ) {
+			return $this->error( __( 'Only published posts can be submitted.', 'wp-seo-pilot' ) );
+		}
+
+		$settings = $service->get_settings();
+
+		if ( empty( $settings['enabled'] ) ) {
+			return $this->error( __( 'IndexNow is not enabled. Enable it in Settings first.', 'wp-seo-pilot' ) );
+		}
+
+		if ( empty( $settings['api_key'] ) ) {
+			return $this->error( __( 'No API key configured. Generate one in Settings first.', 'wp-seo-pilot' ) );
+		}
+
+		$url     = get_permalink( $post_id );
+		$success = $service->submit_url( $url, $post_id );
+
+		if ( $success ) {
+			return $this->success(
+				[
+					'post_id' => $post_id,
+					'url'     => $url,
+					'status'  => 'submitted',
+				],
+				__( 'URL submitted for indexing successfully.', 'wp-seo-pilot' )
+			);
+		}
+
+		return $this->error( __( 'Failed to submit URL. Check the logs for details.', 'wp-seo-pilot' ) );
+	}
+
+	/**
+	 * Get indexing status for a single post.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function get_post_status( $request ) {
+		global $wpdb;
+
+		$service = $this->get_service();
+
+		if ( ! $service ) {
+			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+		}
+
+		$post_id = $request->get_param( 'id' );
+		$post    = get_post( $post_id );
+
+		if ( ! $post ) {
+			return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+		}
+
+		$table = $wpdb->prefix . 'wpseopilot_indexnow_log';
+
+		// Get the most recent submission for this post.
+		$latest = $wpdb->get_row( $wpdb->prepare(
+			"SELECT * FROM {$table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$post_id
+		) );
+
+		// Get total submissions for this post.
+		$total_submissions = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$table} WHERE post_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$post_id
+		) );
+
+		$settings = $service->get_settings();
+		$enabled  = ! empty( $settings['enabled'] ) && ! empty( $settings['api_key'] );
+
+		return $this->success( [
+			'post_id'           => $post_id,
+			'url'               => get_permalink( $post_id ),
+			'indexnow_enabled'  => $enabled,
+			'has_been_indexed'  => ! empty( $latest ),
+			'last_submission'   => $latest ? [
+				'status'           => $latest->status,
+				'response_code'    => (int) $latest->response_code,
+				'submitted_at'     => $latest->submitted_at,
+				'search_engine'    => $latest->search_engine,
+				'time_ago'         => human_time_diff( strtotime( $latest->submitted_at ) ) . ' ago',
+			] : null,
+			'total_submissions' => (int) $total_submissions,
+		] );
+	}
+
+	/**
+	 * Bulk submit multiple posts to IndexNow.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function bulk_submit_posts( $request ) {
+		$service = $this->get_service();
+
+		if ( ! $service ) {
+			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+		}
+
+		$settings = $service->get_settings();
+
+		if ( empty( $settings['enabled'] ) ) {
+			return $this->error( __( 'IndexNow is not enabled. Enable it in Settings first.', 'wp-seo-pilot' ) );
+		}
+
+		if ( empty( $settings['api_key'] ) ) {
+			return $this->error( __( 'No API key configured. Generate one in Settings first.', 'wp-seo-pilot' ) );
+		}
+
+		$post_ids = $request->get_param( 'post_ids' );
+
+		if ( empty( $post_ids ) ) {
+			return $this->error( __( 'No posts selected.', 'wp-seo-pilot' ) );
+		}
+
+		// Limit to 100 posts at a time.
+		$post_ids = array_slice( $post_ids, 0, 100 );
+
+		$urls       = [];
+		$skipped    = 0;
+		$post_id_map = [];
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( $post && 'publish' === $post->post_status ) {
+				$url              = get_permalink( $post_id );
+				$urls[]           = $url;
+				$post_id_map[$url] = $post_id;
+			} else {
+				$skipped++;
+			}
+		}
+
+		if ( empty( $urls ) ) {
+			return $this->error( __( 'No valid published posts to submit.', 'wp-seo-pilot' ) );
+		}
+
+		// Submit in batches (IndexNow accepts up to 10,000 but we'll batch for better UX).
+		$success_count = 0;
+		$failed_count  = 0;
+
+		foreach ( array_chunk( $urls, 100 ) as $batch ) {
+			$success = $service->submit_urls( $batch );
+			if ( $success ) {
+				$success_count += count( $batch );
+			} else {
+				$failed_count += count( $batch );
+			}
+		}
+
+		return $this->success(
+			[
+				'submitted' => $success_count,
+				'failed'    => $failed_count,
+				'skipped'   => $skipped,
+				'total'     => count( $post_ids ),
+			],
+			sprintf(
+				/* translators: %d: number of URLs */
+				__( '%d URLs submitted for indexing.', 'wp-seo-pilot' ),
+				$success_count
+			)
+		);
+	}
+
+	/**
+	 * Get posts available for bulk indexing with their status.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function get_posts_for_indexing( $request ) {
+		global $wpdb;
+
+		$service = $this->get_service();
+
+		if ( ! $service ) {
+			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+		}
+
+		$page          = $request->get_param( 'page' );
+		$per_page      = min( $request->get_param( 'per_page' ), 100 );
+		$post_type     = $request->get_param( 'post_type' );
+		$search        = $request->get_param( 'search' );
+		$status_filter = $request->get_param( 'status_filter' );
+
+		// Build query args.
+		$args = [
+			'post_type'      => $post_type,
+			'post_status'    => 'publish',
+			'posts_per_page' => $per_page,
+			'paged'          => $page,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		];
+
+		if ( ! empty( $search ) ) {
+			$args['s'] = $search;
+		}
+
+		$query = new \WP_Query( $args );
+		$posts = [];
+
+		$log_table = $wpdb->prefix . 'wpseopilot_indexnow_log';
+
+		foreach ( $query->posts as $post ) {
+			// Get latest submission for this post.
+			$latest = $wpdb->get_row( $wpdb->prepare(
+				"SELECT status, submitted_at FROM {$log_table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$post->ID
+			) );
+
+			$indexing_status = 'never';
+			$last_indexed    = null;
+
+			if ( $latest ) {
+				$indexing_status = $latest->status;
+				$last_indexed    = $latest->submitted_at;
+			}
+
+			// Apply status filter.
+			if ( ! empty( $status_filter ) ) {
+				if ( 'never' === $status_filter && $latest ) {
+					continue;
+				}
+				if ( 'indexed' === $status_filter && ( ! $latest || 'success' !== $latest->status ) ) {
+					continue;
+				}
+				if ( 'failed' === $status_filter && ( ! $latest || 'failed' !== $latest->status ) ) {
+					continue;
+				}
+			}
+
+			$posts[] = [
+				'id'              => $post->ID,
+				'title'           => $post->post_title,
+				'url'             => get_permalink( $post->ID ),
+				'post_type'       => $post->post_type,
+				'date'            => $post->post_date,
+				'indexing_status' => $indexing_status,
+				'last_indexed'    => $last_indexed,
+				'last_indexed_ago' => $last_indexed ? human_time_diff( strtotime( $last_indexed ) ) . ' ago' : null,
+			];
+		}
+
+		// Get stats for header.
+		$total_published = wp_count_posts( $post_type )->publish;
+		$total_indexed   = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(DISTINCT post_id) FROM {$log_table} WHERE status = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			'success'
+		) );
+
+		return $this->success( [
+			'posts'       => $posts,
+			'total'       => $query->found_posts,
+			'pages'       => $query->max_num_pages,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'stats'       => [
+				'total_published' => (int) $total_published,
+				'total_indexed'   => (int) $total_indexed,
+			],
 		] );
 	}
 }

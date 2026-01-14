@@ -131,6 +131,74 @@ class Tools_Controller extends REST_Controller {
 				'permission_callback' => [ $this, 'permission_check' ],
 			],
 		] );
+
+		// === Robots.txt Routes ===
+		register_rest_route( $this->namespace, '/tools/robots-txt', [
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_robots_txt' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			],
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'save_robots_txt' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/tools/robots-txt/reset', [
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'reset_robots_txt' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/tools/robots-txt/test', [
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'test_robots_txt' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			],
+		] );
+
+		// === Image SEO Routes ===
+		register_rest_route( $this->namespace, '/images', [
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_images' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+				'args'                => [
+					'filter'   => [ 'type' => 'string', 'default' => 'all' ],
+					'page'     => [ 'type' => 'integer', 'default' => 1 ],
+					'per_page' => [ 'type' => 'integer', 'default' => 20 ],
+					'search'   => [ 'type' => 'string', 'default' => '' ],
+				],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/images/(?P<id>\d+)', [
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'update_image_alt' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+				'args'                => [
+					'id'  => [ 'type' => 'integer', 'required' => true ],
+					'alt' => [ 'type' => 'string', 'default' => '' ],
+				],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/images/(?P<id>\d+)/generate-alt', [
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'generate_image_alt' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+				'args'                => [
+					'id' => [ 'type' => 'integer', 'required' => true ],
+				],
+			],
+		] );
     }
 
 	/**
@@ -796,6 +864,153 @@ class Tools_Controller extends REST_Controller {
     }
 
     // =========================================================================
+    // ROBOTS.TXT
+    // =========================================================================
+
+    /**
+     * Get robots.txt content.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function get_robots_txt( $request ) {
+        $content = get_option( 'wpseopilot_robots_txt', '' );
+        $site_url = home_url();
+        $sitemap_url = home_url( '/sitemap.xml' );
+
+        return $this->success( [
+            'content'     => $content,
+            'site_url'    => $site_url,
+            'sitemap_url' => $sitemap_url,
+        ] );
+    }
+
+    /**
+     * Save robots.txt content.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function save_robots_txt( $request ) {
+        $params = $request->get_json_params();
+        if ( empty( $params ) ) {
+            $params = $request->get_params();
+        }
+
+        $content = isset( $params['content'] ) ? $params['content'] : '';
+
+        // Sanitize - allow only safe characters
+        $content = wp_kses( $content, [] );
+
+        update_option( 'wpseopilot_robots_txt', $content );
+
+        return $this->success( [
+            'content' => $content,
+        ], __( 'robots.txt saved successfully.', 'wp-seo-pilot' ) );
+    }
+
+    /**
+     * Reset robots.txt to default.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function reset_robots_txt( $request ) {
+        delete_option( 'wpseopilot_robots_txt' );
+
+        // Generate default content
+        $default = "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: " . home_url( '/sitemap.xml' );
+
+        return $this->success( [
+            'content' => $default,
+        ], __( 'robots.txt reset to default.', 'wp-seo-pilot' ) );
+    }
+
+    /**
+     * Test a path against robots.txt rules.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function test_robots_txt( $request ) {
+        $params = $request->get_json_params();
+        if ( empty( $params ) ) {
+            $params = $request->get_params();
+        }
+
+        $path = isset( $params['path'] ) ? $params['path'] : '/';
+        $content = isset( $params['content'] ) ? $params['content'] : '';
+
+        // Parse robots.txt rules
+        $lines = explode( "\n", $content );
+        $rules = [];
+        $current_agents = [];
+
+        foreach ( $lines as $line ) {
+            $line = trim( $line );
+
+            // Skip empty lines and comments
+            if ( empty( $line ) || strpos( $line, '#' ) === 0 ) {
+                continue;
+            }
+
+            // Parse directive
+            $parts = explode( ':', $line, 2 );
+            if ( count( $parts ) !== 2 ) {
+                continue;
+            }
+
+            $directive = strtolower( trim( $parts[0] ) );
+            $value = trim( $parts[1] );
+
+            if ( $directive === 'user-agent' ) {
+                $current_agents = [ $value ];
+            } elseif ( in_array( $directive, [ 'disallow', 'allow' ], true ) ) {
+                foreach ( $current_agents as $agent ) {
+                    if ( $agent === '*' || strtolower( $agent ) === 'googlebot' ) {
+                        $rules[] = [
+                            'type'  => $directive,
+                            'path'  => $value,
+                            'agent' => $agent,
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Test path against rules (more specific rules take precedence)
+        $allowed = true;
+        $matching_rule = null;
+        $best_match_length = -1;
+
+        foreach ( $rules as $rule ) {
+            $rule_path = $rule['path'];
+
+            // Empty Disallow means allow all
+            if ( $rule['type'] === 'disallow' && empty( $rule_path ) ) {
+                continue;
+            }
+
+            // Check if rule matches
+            if ( strpos( $path, $rule_path ) === 0 || fnmatch( $rule_path . '*', $path ) ) {
+                $match_length = strlen( $rule_path );
+
+                if ( $match_length > $best_match_length ) {
+                    $best_match_length = $match_length;
+                    $allowed = ( $rule['type'] === 'allow' );
+                    $matching_rule = $rule['type'] . ': ' . $rule_path;
+                }
+            }
+        }
+
+        return $this->success( [
+            'path'    => $path,
+            'allowed' => $allowed,
+            'rule'    => $matching_rule,
+        ] );
+    }
+
+    // =========================================================================
     // HELPER METHODS
     // =========================================================================
 
@@ -1040,5 +1255,200 @@ class Tools_Controller extends REST_Controller {
         }
 
         return trim( $body['message']['content'] ?? '' );
+    }
+
+    // =========================================================================
+    // IMAGE SEO
+    // =========================================================================
+
+    /**
+     * Get images from media library with alt text status.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function get_images( $request ) {
+        $filter   = sanitize_text_field( $request->get_param( 'filter' ) ?? 'all' );
+        $page     = max( 1, intval( $request->get_param( 'page' ) ?? 1 ) );
+        $per_page = min( 100, max( 1, intval( $request->get_param( 'per_page' ) ?? 20 ) ) );
+        $search   = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+
+        // Build query args.
+        $args = [
+            'post_type'      => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status'    => 'inherit',
+            'posts_per_page' => $per_page,
+            'paged'          => $page,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        ];
+
+        if ( ! empty( $search ) ) {
+            $args['s'] = $search;
+        }
+
+        // Filter by alt text status.
+        if ( $filter === 'missing' ) {
+            $args['meta_query'] = [
+                'relation' => 'OR',
+                [
+                    'key'     => '_wp_attachment_image_alt',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key'     => '_wp_attachment_image_alt',
+                    'value'   => '',
+                    'compare' => '=',
+                ],
+            ];
+        } elseif ( $filter === 'has-alt' ) {
+            $args['meta_query'] = [
+                [
+                    'key'     => '_wp_attachment_image_alt',
+                    'value'   => '',
+                    'compare' => '!=',
+                ],
+            ];
+        }
+
+        $query = new \WP_Query( $args );
+        $images = [];
+
+        foreach ( $query->posts as $attachment ) {
+            $meta = wp_get_attachment_metadata( $attachment->ID );
+            $alt = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+
+            $images[] = [
+                'id'        => $attachment->ID,
+                'filename'  => basename( get_attached_file( $attachment->ID ) ),
+                'url'       => wp_get_attachment_url( $attachment->ID ),
+                'thumbnail' => wp_get_attachment_image_url( $attachment->ID, 'thumbnail' ),
+                'alt'       => $alt ?: '',
+                'title'     => $attachment->post_title,
+                'width'     => $meta['width'] ?? 0,
+                'height'    => $meta['height'] ?? 0,
+                'date'      => $attachment->post_date,
+            ];
+        }
+
+        // Get overall stats.
+        $stats = $this->get_image_stats();
+
+        return $this->success( [
+            'images'      => $images,
+            'total'       => $query->found_posts,
+            'total_pages' => $query->max_num_pages,
+            'page'        => $page,
+            'stats'       => $stats,
+        ] );
+    }
+
+    /**
+     * Get image statistics.
+     *
+     * @return array
+     */
+    private function get_image_stats() {
+        global $wpdb;
+
+        // Total images.
+        $total = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->posts}
+             WHERE post_type = 'attachment'
+             AND post_mime_type LIKE 'image/%'
+             AND post_status = 'inherit'"
+        );
+
+        // Images with alt text.
+        $with_alt = (int) $wpdb->get_var(
+            "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p
+             INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+             WHERE p.post_type = 'attachment'
+             AND p.post_mime_type LIKE 'image/%'
+             AND p.post_status = 'inherit'
+             AND pm.meta_key = '_wp_attachment_image_alt'
+             AND pm.meta_value != ''"
+        );
+
+        return [
+            'total'      => $total,
+            'withAlt'    => $with_alt,
+            'missingAlt' => $total - $with_alt,
+            'emptyAlt'   => 0, // Not tracking separately.
+        ];
+    }
+
+    /**
+     * Update image alt text.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function update_image_alt( $request ) {
+        $image_id = intval( $request->get_param( 'id' ) );
+        $alt = sanitize_text_field( $request->get_param( 'alt' ) ?? '' );
+
+        if ( ! $image_id ) {
+            return $this->error( __( 'Image ID is required.', 'wp-seo-pilot' ), 'missing_id', 400 );
+        }
+
+        $attachment = get_post( $image_id );
+        if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+            return $this->error( __( 'Image not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+        }
+
+        if ( ! current_user_can( 'edit_post', $image_id ) ) {
+            return $this->error( __( 'Permission denied.', 'wp-seo-pilot' ), 'permission_denied', 403 );
+        }
+
+        update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
+
+        return $this->success( [
+            'id'  => $image_id,
+            'alt' => $alt,
+        ], __( 'Alt text updated.', 'wp-seo-pilot' ) );
+    }
+
+    /**
+     * Generate alt text from filename.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function generate_image_alt( $request ) {
+        $image_id = intval( $request->get_param( 'id' ) );
+
+        if ( ! $image_id ) {
+            return $this->error( __( 'Image ID is required.', 'wp-seo-pilot' ), 'missing_id', 400 );
+        }
+
+        $attachment = get_post( $image_id );
+        if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+            return $this->error( __( 'Image not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+        }
+
+        if ( ! current_user_can( 'edit_post', $image_id ) ) {
+            return $this->error( __( 'Permission denied.', 'wp-seo-pilot' ), 'permission_denied', 403 );
+        }
+
+        // Generate alt text from filename.
+        $filename = pathinfo( get_attached_file( $image_id ), PATHINFO_FILENAME );
+
+        // Clean up filename: replace hyphens/underscores with spaces, remove numbers.
+        $alt = str_replace( [ '-', '_' ], ' ', $filename );
+        $alt = preg_replace( '/\d+/', '', $alt );
+        $alt = preg_replace( '/\s+/', ' ', $alt );
+        $alt = trim( $alt );
+        $alt = ucfirst( strtolower( $alt ) );
+
+        if ( ! empty( $alt ) ) {
+            update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
+        }
+
+        return $this->success( [
+            'id'  => $image_id,
+            'alt' => $alt,
+        ], __( 'Alt text generated from filename.', 'wp-seo-pilot' ) );
     }
 }

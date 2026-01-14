@@ -163,6 +163,11 @@ add_action(
 		if ( class_exists( '\WPSEOPilot\Service\Job_Posting_Schema' ) ) {
 			new \WPSEOPilot\Service\Job_Posting_Schema();
 		}
+
+		// Initialize Schema Blocks (FAQ and HowTo Gutenberg blocks with schema).
+		if ( class_exists( '\WPSEOPilot\Service\Schema_Blocks' ) ) {
+			( new \WPSEOPilot\Service\Schema_Blocks() )->boot();
+		}
 	}
 );
 
