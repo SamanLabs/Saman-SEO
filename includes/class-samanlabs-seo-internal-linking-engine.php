@@ -1113,7 +1113,7 @@ class Engine {
 	 * @return string
 	 */
 	private function get_cache_key( $post_id ) {
-		return 'wpseopilot_linked_' . absint( $post_id );
+		return 'samanlabs_seo_linked_' . absint( $post_id );
 	}
 
 	/**

@@ -36,7 +36,7 @@ class Dashboard_Widget {
      */
     public function boot() {
         // Only show widget if enabled (default is true)
-        $settings = get_option( 'wpseopilot_settings', [] );
+        $settings = get_option( 'samanlabs_seo_settings', [] );
         $show_widget = isset( $settings['show_404_dashboard_widget'] ) ? $settings['show_404_dashboard_widget'] : true;
 
         if ( ! $show_widget ) {
@@ -56,7 +56,7 @@ class Dashboard_Widget {
         }
 
         wp_add_dashboard_widget(
-            'wpseopilot_404_widget',
+            'samanlabs_seo_404_widget',
             __( '404 Monitor - WP SEO Pilot', 'saman-labs-seo' ),
             [ $this, 'render_widget' ]
         );

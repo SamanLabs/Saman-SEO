@@ -52,15 +52,15 @@ class Analytics {
 	 */
 	public function is_enabled() {
 		// Check module setting (new React UI uses this)
-		$module_enabled = get_option( 'wpseopilot_module_analytics', '0' );
+		$module_enabled = get_option( 'samanlabs_seo_module_analytics', '0' );
 
 		// Also check legacy setting for backwards compatibility
-		$legacy_enabled = get_option( 'wpseopilot_enable_analytics', '1' );
+		$legacy_enabled = get_option( 'samanlabs_seo_enable_analytics', '1' );
 
 		// Enabled if either setting is on
 		$setting_enabled = '1' === $module_enabled || '1' === $legacy_enabled;
 
-		return apply_filters( 'wpseopilot_analytics_enabled', $setting_enabled );
+		return apply_filters( 'samanlabs_seo_analytics_enabled', $setting_enabled );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Analytics {
 			return;
 		}
 
-		update_option( 'wpseopilot_track_activation', time() );
+		update_option( 'samanlabs_seo_track_activation', time() );
 	}
 
 	/**
@@ -132,7 +132,7 @@ class Analytics {
 			true
 		);
 
-		$activation_time = get_option( 'wpseopilot_track_activation', 0 );
+		$activation_time = get_option( 'samanlabs_seo_track_activation', 0 );
 		$page_name       = str_replace( 'wpseopilot-', '', $page );
 		$page_name       = str_replace( 'wpseopilot', 'dashboard', $page_name );
 		$page_name       = str_replace( 'v2-', '', $page_name ); // Clean up v2 prefix
@@ -197,7 +197,7 @@ class Analytics {
 			$matomo_config .= "
 				_paq.push(['trackEvent', 'Plugin', 'Activate', '{$plugin_version}']);
 			";
-			delete_option( 'wpseopilot_track_activation' );
+			delete_option( 'samanlabs_seo_track_activation' );
 		}
 
 		wp_add_inline_script( 'wpseopilot-matomo', $matomo_config, 'before' );

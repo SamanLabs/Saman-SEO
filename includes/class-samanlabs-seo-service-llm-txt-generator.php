@@ -20,11 +20,11 @@ class LLM_TXT_Generator {
 	 * @return void
 	 */
 	public function boot() {
-		if ( '1' !== get_option( 'wpseopilot_enable_llm_txt', '0' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_enable_llm_txt', '0' ) ) {
 			return;
 		}
 
-		if ( ! apply_filters( 'wpseopilot_feature_toggle', true, 'llm_txt' ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_feature_toggle', true, 'llm_txt' ) ) {
 			return;
 		}
 
@@ -48,7 +48,7 @@ class LLM_TXT_Generator {
 	 * @return void
 	 */
 	public function render_llm_txt() {
-		if ( ! get_query_var( 'wpseopilot_llm_txt' ) ) {
+		if ( ! get_query_var( 'samanlabs_seo_llm_txt' ) ) {
 			return;
 		}
 
@@ -86,11 +86,11 @@ class LLM_TXT_Generator {
 		$output[] = '';
 
 		// Site title and description
-		$custom_title = get_option( 'wpseopilot_llm_txt_title', '' );
+		$custom_title = get_option( 'samanlabs_seo_llm_txt_title', '' );
 		$title = ! empty( $custom_title ) ? $custom_title : get_bloginfo( 'name' );
 		$output[] = '# ' . $title;
 
-		$custom_description = get_option( 'wpseopilot_llm_txt_description', '' );
+		$custom_description = get_option( 'samanlabs_seo_llm_txt_description', '' );
 		$description = ! empty( $custom_description ) ? $custom_description : get_bloginfo( 'description' );
 		if ( $description ) {
 			$output[] = '';
@@ -103,7 +103,7 @@ class LLM_TXT_Generator {
 		$output[] = '';
 
 		// Add sitemap if enabled
-		if ( '1' === get_option( 'wpseopilot_enable_sitemap_enhancer', '0' ) ) {
+		if ( '1' === get_option( 'samanlabs_seo_enable_sitemap_enhancer', '0' ) ) {
 			$output[] = '- [XML Sitemap](' . home_url( '/sitemap_index.xml' ) . '): Contains all public & indexable URLs for this website.';
 		} else {
 			// Fallback to WordPress core sitemap
@@ -122,10 +122,10 @@ class LLM_TXT_Generator {
 
 		unset( $post_types['attachment'] );
 
-		$posts_per_type = absint( get_option( 'wpseopilot_llm_txt_posts_per_type', 50 ) );
+		$posts_per_type = absint( get_option( 'samanlabs_seo_llm_txt_posts_per_type', 50 ) );
 		$posts_per_type = max( 1, min( 500, $posts_per_type ) ); // Clamp between 1 and 500
 
-		$include_excerpt = get_option( 'wpseopilot_llm_txt_include_excerpt', '1' );
+		$include_excerpt = get_option( 'samanlabs_seo_llm_txt_include_excerpt', '1' );
 
 		// Generate sections for each post type
 		foreach ( $post_types as $post_type ) {
@@ -173,7 +173,7 @@ class LLM_TXT_Generator {
 		 *
 		 * @param array $output Array of lines to be joined.
 		 */
-		$output = apply_filters( 'wpseopilot_llm_txt_content', $output );
+		$output = apply_filters( 'samanlabs_seo_llm_txt_content', $output );
 
 		return implode( "\n", $output );
 	}

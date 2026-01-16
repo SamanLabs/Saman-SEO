@@ -49,7 +49,7 @@ class Compatibility {
 
 		if ( $this->active_conflict ) {
 			add_action( 'admin_notices', [ $this, 'conflict_notice' ] );
-			add_filter( 'wpseopilot_feature_toggle', [ $this, 'maybe_disable' ], 10, 2 );
+			add_filter( 'samanlabs_seo_feature_toggle', [ $this, 'maybe_disable' ], 10, 2 );
 		}
 	}
 

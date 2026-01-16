@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 class Link_Health {
 
 	private const SCHEMA_VERSION = 1;
-	private const SCHEMA_OPTION  = 'wpseopilot_link_health_schema';
+	private const SCHEMA_OPTION  = 'samanlabs_seo_link_health_schema';
 
 	/**
 	 * Links table name.
@@ -50,7 +50,7 @@ class Link_Health {
 		$this->maybe_upgrade_schema();
 
 		// Schedule periodic scans if enabled.
-		add_action( 'wpseopilot_link_health_scan', [ $this, 'run_scheduled_scan' ] );
+		add_action( 'samanlabs_seo_link_health_scan', [ $this, 'run_scheduled_scan' ] );
 		$this->maybe_schedule_scan();
 
 		// Update link data when posts are saved.
@@ -126,12 +126,12 @@ class Link_Health {
 	 * Schedule or unschedule scan based on settings.
 	 */
 	public function maybe_schedule_scan() {
-		$settings = get_option( 'wpseopilot_settings', [] );
+		$settings = get_option( 'samanlabs_seo_settings', [] );
 		$enabled  = isset( $settings['enable_link_health_scan'] ) ? $settings['enable_link_health_scan'] : false;
 
 		if ( $enabled ) {
-			if ( ! wp_next_scheduled( 'wpseopilot_link_health_scan' ) ) {
-				wp_schedule_event( time(), 'weekly', 'wpseopilot_link_health_scan' );
+			if ( ! wp_next_scheduled( 'samanlabs_seo_link_health_scan' ) ) {
+				wp_schedule_event( time(), 'weekly', 'samanlabs_seo_link_health_scan' );
 			}
 		} else {
 			$this->unschedule_scan();
@@ -142,9 +142,9 @@ class Link_Health {
 	 * Unschedule scan cron.
 	 */
 	public function unschedule_scan() {
-		$timestamp = wp_next_scheduled( 'wpseopilot_link_health_scan' );
+		$timestamp = wp_next_scheduled( 'samanlabs_seo_link_health_scan' );
 		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, 'wpseopilot_link_health_scan' );
+			wp_unschedule_event( $timestamp, 'samanlabs_seo_link_health_scan' );
 		}
 	}
 

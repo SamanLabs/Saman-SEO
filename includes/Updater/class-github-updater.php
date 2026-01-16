@@ -101,7 +101,7 @@ class GitHub_Updater {
         ];
 
         // Allow filtering.
-        $this->plugins = apply_filters( 'wpseopilot_managed_plugins', $this->plugins );
+        $this->plugins = apply_filters( 'samanlabs_seo_managed_plugins', $this->plugins );
     }
 
     /**
@@ -118,11 +118,11 @@ class GitHub_Updater {
         add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
 
         // Daily cron check.
-        add_action( 'wpseopilot_check_updates', [ $this, 'cron_check_updates' ] );
+        add_action( 'samanlabs_seo_check_updates', [ $this, 'cron_check_updates' ] );
 
         // Schedule cron if not scheduled.
-        if ( ! wp_next_scheduled( 'wpseopilot_check_updates' ) ) {
-            wp_schedule_event( time(), 'daily', 'wpseopilot_check_updates' );
+        if ( ! wp_next_scheduled( 'samanlabs_seo_check_updates' ) ) {
+            wp_schedule_event( time(), 'daily', 'samanlabs_seo_check_updates' );
         }
     }
 
@@ -202,7 +202,7 @@ class GitHub_Updater {
      * @return array|null Remote version data or null on error.
      */
     public function get_remote_version( string $repo ): ?array {
-        $cache_key = 'wpseopilot_gh_' . md5( $repo );
+        $cache_key = 'samanlabs_seo_gh_' . md5( $repo );
         $cached    = get_transient( $cache_key );
 
         if ( false !== $cached ) {
@@ -277,7 +277,7 @@ class GitHub_Updater {
      * @return array|null Beta version data or null if not found.
      */
     public function get_beta_version( string $repo ): ?array {
-        $cache_key = 'wpseopilot_gh_beta_' . md5( $repo );
+        $cache_key = 'samanlabs_seo_gh_beta_' . md5( $repo );
         $cached    = get_transient( $cache_key );
 
         if ( false !== $cached ) {
@@ -403,7 +403,7 @@ class GitHub_Updater {
      * @return bool
      */
     public function is_beta_enabled( string $slug ): bool {
-        $beta_settings = get_option( 'wpseopilot_beta_plugins', [] );
+        $beta_settings = get_option( 'samanlabs_seo_beta_plugins', [] );
         return ! empty( $beta_settings[ $slug ] );
     }
 
@@ -415,7 +415,7 @@ class GitHub_Updater {
      * @return bool Success.
      */
     public function set_beta_enabled( string $slug, bool $enabled ): bool {
-        $beta_settings = get_option( 'wpseopilot_beta_plugins', [] );
+        $beta_settings = get_option( 'samanlabs_seo_beta_plugins', [] );
 
         if ( $enabled ) {
             $beta_settings[ $slug ] = true;
@@ -423,7 +423,7 @@ class GitHub_Updater {
             unset( $beta_settings[ $slug ] );
         }
 
-        return update_option( 'wpseopilot_beta_plugins', $beta_settings );
+        return update_option( 'samanlabs_seo_beta_plugins', $beta_settings );
     }
 
     /**
@@ -551,8 +551,8 @@ class GitHub_Updater {
     public function cron_check_updates() {
         // Clear transients to force fresh check.
         foreach ( $this->plugins as $plugin_file => $plugin_data ) {
-            delete_transient( 'wpseopilot_gh_' . md5( $plugin_data['repo'] ) );
-            delete_transient( 'wpseopilot_gh_beta_' . md5( $plugin_data['repo'] ) );
+            delete_transient( 'samanlabs_seo_gh_' . md5( $plugin_data['repo'] ) );
+            delete_transient( 'samanlabs_seo_gh_beta_' . md5( $plugin_data['repo'] ) );
         }
 
         // Trigger WordPress update check.
@@ -570,8 +570,8 @@ class GitHub_Updater {
 
         foreach ( $this->plugins as $plugin_file => $plugin_data ) {
             // Clear cache.
-            delete_transient( 'wpseopilot_gh_' . md5( $plugin_data['repo'] ) );
-            delete_transient( 'wpseopilot_gh_beta_' . md5( $plugin_data['repo'] ) );
+            delete_transient( 'samanlabs_seo_gh_' . md5( $plugin_data['repo'] ) );
+            delete_transient( 'samanlabs_seo_gh_beta_' . md5( $plugin_data['repo'] ) );
 
             // Get fresh versions.
             $remote = $this->get_remote_version( $plugin_data['repo'] );

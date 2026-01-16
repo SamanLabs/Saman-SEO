@@ -61,7 +61,7 @@ defined( 'ABSPATH' ) || exit;
 			aria-labelledby="wpseopilot-tab-link-sitemap"
 		>
 			<form method="post" action="">
-				<?php wp_nonce_field( 'wpseopilot_sitemap_settings' ); ?>
+				<?php wp_nonce_field( 'samanlabs_seo_sitemap_settings' ); ?>
 
 				<div class="wpseopilot-settings-grid">
 					<!-- Main Settings Column -->
@@ -80,7 +80,7 @@ defined( 'ABSPATH' ) || exit;
 										<label><?php esc_html_e( 'Automatic Updates', 'saman-labs-seo' ); ?></label>
 									</div>
 									<div class="wpseopilot-form-control">
-										<select name="wpseopilot_sitemap_schedule_updates" class="wpseopilot-select">
+										<select name="samanlabs_seo_sitemap_schedule_updates" class="wpseopilot-select">
 											<?php foreach ( $schedule_options as $value => $label ) : ?>
 												<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $schedule_updates, $value ); ?>>
 													<?php echo esc_html( $label ); ?>
@@ -97,7 +97,7 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<input type="number"
-											   name="wpseopilot_sitemap_max_urls"
+											   name="samanlabs_seo_sitemap_max_urls"
 											   value="<?php echo esc_attr( $max_urls ); ?>"
 											   min="1"
 											   max="50000"
@@ -112,15 +112,15 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="enable-index" name="wpseopilot_sitemap_enable_index" value="1" <?php checked( $enable_index, '1' ); ?>>
+											<input type="checkbox" id="enable-index" name="samanlabs_seo_sitemap_enable_index" value="1" <?php checked( $enable_index, '1' ); ?>>
 											<label for="enable-index"><?php esc_html_e( 'Enable sitemap indexes for better organization', 'saman-labs-seo' ); ?></label>
 										</div>
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="dynamic-gen" name="wpseopilot_sitemap_dynamic_generation" value="1" <?php checked( $dynamic_generation, '1' ); ?>>
+											<input type="checkbox" id="dynamic-gen" name="samanlabs_seo_sitemap_dynamic_generation" value="1" <?php checked( $dynamic_generation, '1' ); ?>>
 											<label for="dynamic-gen"><?php esc_html_e( 'Dynamically generate sitemap on-demand', 'saman-labs-seo' ); ?></label>
 										</div>
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="exclude-images" name="wpseopilot_sitemap_exclude_images" value="1" <?php checked( $exclude_images, '1' ); ?>>
+											<input type="checkbox" id="exclude-images" name="samanlabs_seo_sitemap_exclude_images" value="1" <?php checked( $exclude_images, '1' ); ?>>
 											<label for="exclude-images"><?php esc_html_e( 'Exclude images from sitemap entries', 'saman-labs-seo' ); ?></label>
 										</div>
 									</div>
@@ -147,7 +147,7 @@ defined( 'ABSPATH' ) || exit;
 												<div class="wpseopilot-toggle">
 													<input type="checkbox"
 														   id="pt-<?php echo esc_attr( $post_type->name ); ?>"
-														   name="wpseopilot_sitemap_post_types[]"
+														   name="samanlabs_seo_sitemap_post_types[]"
 														   value="<?php echo esc_attr( $post_type->name ); ?>"
 														   <?php checked( in_array( $post_type->name, $selected_post_types, true ) ); ?>>
 													<label for="pt-<?php echo esc_attr( $post_type->name ); ?>"><?php echo esc_html( $post_type->label ); ?></label>
@@ -167,7 +167,7 @@ defined( 'ABSPATH' ) || exit;
 												<div class="wpseopilot-toggle">
 													<input type="checkbox"
 														   id="tax-<?php echo esc_attr( $taxonomy->name ); ?>"
-														   name="wpseopilot_sitemap_taxonomies[]"
+														   name="samanlabs_seo_sitemap_taxonomies[]"
 														   value="<?php echo esc_attr( $taxonomy->name ); ?>"
 														   <?php checked( in_array( $taxonomy->name, $selected_taxonomies, true ) ); ?>>
 													<label for="tax-<?php echo esc_attr( $taxonomy->name ); ?>"><?php echo esc_html( $taxonomy->label ); ?></label>
@@ -183,11 +183,11 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="include-author" name="wpseopilot_sitemap_include_author_pages" value="1" <?php checked( $include_author, '1' ); ?>>
+											<input type="checkbox" id="include-author" name="samanlabs_seo_sitemap_include_author_pages" value="1" <?php checked( $include_author, '1' ); ?>>
 											<label for="include-author"><?php esc_html_e( 'Include author archive pages', 'saman-labs-seo' ); ?></label>
 										</div>
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="include-date" name="wpseopilot_sitemap_include_date_archives" value="1" <?php checked( $include_date, '1' ); ?>>
+											<input type="checkbox" id="include-date" name="samanlabs_seo_sitemap_include_date_archives" value="1" <?php checked( $include_date, '1' ); ?>>
 											<label for="include-date"><?php esc_html_e( 'Include date archive pages', 'saman-labs-seo' ); ?></label>
 										</div>
 									</div>
@@ -210,7 +210,7 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="enable-rss" name="wpseopilot_sitemap_enable_rss" value="1" <?php checked( $enable_rss, '1' ); ?>>
+											<input type="checkbox" id="enable-rss" name="samanlabs_seo_sitemap_enable_rss" value="1" <?php checked( $enable_rss, '1' ); ?>>
 											<label for="enable-rss"><?php esc_html_e( 'Generate RSS sitemap with latest 50 posts', 'saman-labs-seo' ); ?></label>
 										</div>
 									</div>
@@ -222,13 +222,13 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="enable-news" name="wpseopilot_sitemap_enable_google_news" value="1" <?php checked( $enable_google_news, '1' ); ?>>
+											<input type="checkbox" id="enable-news" name="samanlabs_seo_sitemap_enable_google_news" value="1" <?php checked( $enable_google_news, '1' ); ?>>
 											<label for="enable-news"><strong><?php esc_html_e( 'Enable Google News sitemap', 'saman-labs-seo' ); ?></strong></label>
 										</div>
 
 										<div style="margin-top: 12px;">
 											<input type="text"
-												   name="wpseopilot_sitemap_google_news_name"
+												   name="samanlabs_seo_sitemap_google_news_name"
 												   value="<?php echo esc_attr( $google_news_name ); ?>"
 												   placeholder="<?php esc_attr_e( 'Publication Name', 'saman-labs-seo' ); ?>"
 												   class="wpseopilot-input">
@@ -240,7 +240,7 @@ defined( 'ABSPATH' ) || exit;
 												<?php foreach ( $post_types as $post_type ) : ?>
 													<label>
 														<input type="checkbox"
-															   name="wpseopilot_sitemap_google_news_post_types[]"
+															   name="samanlabs_seo_sitemap_google_news_post_types[]"
 															   value="<?php echo esc_attr( $post_type->name ); ?>"
 															   <?php checked( in_array( $post_type->name, $google_news_post_types, true ) ); ?>>
 														<?php echo esc_html( $post_type->label ); ?>
@@ -268,12 +268,12 @@ defined( 'ABSPATH' ) || exit;
 											<?php foreach ( $additional_pages as $index => $page ) : ?>
 												<div class="additional-page-row">
 													<input type="url"
-														   name="wpseopilot_sitemap_additional_pages[<?php echo esc_attr( $index ); ?>][url]"
+														   name="samanlabs_seo_sitemap_additional_pages[<?php echo esc_attr( $index ); ?>][url]"
 														   value="<?php echo esc_url( $page['url'] ?? '' ); ?>"
 														   placeholder="https://example.com/page"
 														   class="wpseopilot-input">
 													<input type="text"
-														   name="wpseopilot_sitemap_additional_pages[<?php echo esc_attr( $index ); ?>][priority]"
+														   name="samanlabs_seo_sitemap_additional_pages[<?php echo esc_attr( $index ); ?>][priority]"
 														   value="<?php echo esc_attr( $page['priority'] ?? '0.5' ); ?>"
 														   placeholder="0.5">
 													<button type="button" class="button remove-page"><?php esc_html_e( 'Remove', 'saman-labs-seo' ); ?></button>
@@ -289,7 +289,7 @@ defined( 'ABSPATH' ) || exit;
 
 						<!-- Save Button -->
 						<p class="submit" style="margin-top: 20px;">
-							<input type="submit" name="wpseopilot_sitemap_submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', 'saman-labs-seo' ); ?>">
+							<input type="submit" name="samanlabs_seo_sitemap_submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', 'saman-labs-seo' ); ?>">
 							<button type="button" class="button" id="regenerate-sitemap"><?php esc_html_e( 'Regenerate Now', 'saman-labs-seo' ); ?></button>
 						</p>
 
@@ -350,7 +350,7 @@ defined( 'ABSPATH' ) || exit;
 			aria-labelledby="wpseopilot-tab-link-llm"
 		>
 			<form method="post" action="">
-				<?php wp_nonce_field( 'wpseopilot_llm_txt_settings' ); ?>
+				<?php wp_nonce_field( 'samanlabs_seo_llm_txt_settings' ); ?>
 
 				<div class="wpseopilot-settings-grid">
 					<!-- Main Settings Column -->
@@ -371,7 +371,7 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="enable-llm-txt" name="wpseopilot_enable_llm_txt" value="1" <?php checked( $llm_enabled, '1' ); ?>>
+											<input type="checkbox" id="enable-llm-txt" name="samanlabs_seo_enable_llm_txt" value="1" <?php checked( $llm_enabled, '1' ); ?>>
 											<label for="enable-llm-txt"><?php esc_html_e( 'Generate an llm.txt file to help AI engines discover the content on your site more easily.', 'saman-labs-seo' ); ?></label>
 										</div>
 										<?php if ( '1' === $llm_enabled ) : ?>
@@ -402,7 +402,7 @@ defined( 'ABSPATH' ) || exit;
 									<div class="wpseopilot-form-control">
 										<input type="text"
 											   id="llm-txt-title"
-											   name="wpseopilot_llm_txt_title"
+											   name="samanlabs_seo_llm_txt_title"
 											   value="<?php echo esc_attr( $llm_title ); ?>"
 											   class="wpseopilot-input"
 											   placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
@@ -418,7 +418,7 @@ defined( 'ABSPATH' ) || exit;
 									<div class="wpseopilot-form-control">
 										<textarea
 											id="llm-txt-description"
-											name="wpseopilot_llm_txt_description"
+											name="samanlabs_seo_llm_txt_description"
 											rows="3"
 											class="wpseopilot-textarea"
 											placeholder="<?php echo esc_attr( get_bloginfo( 'description' ) ); ?>"><?php echo esc_textarea( $llm_description ); ?></textarea>
@@ -434,7 +434,7 @@ defined( 'ABSPATH' ) || exit;
 									<div class="wpseopilot-form-control">
 										<input type="number"
 											   id="llm-txt-posts-per-type"
-											   name="wpseopilot_llm_txt_posts_per_type"
+											   name="samanlabs_seo_llm_txt_posts_per_type"
 											   value="<?php echo esc_attr( $llm_posts_per_type ); ?>"
 											   min="1"
 											   max="500"
@@ -449,7 +449,7 @@ defined( 'ABSPATH' ) || exit;
 									</div>
 									<div class="wpseopilot-form-control">
 										<div class="wpseopilot-toggle">
-											<input type="checkbox" id="include-excerpt" name="wpseopilot_llm_txt_include_excerpt" value="1" <?php checked( $llm_include_excerpt, '1' ); ?>>
+											<input type="checkbox" id="include-excerpt" name="samanlabs_seo_llm_txt_include_excerpt" value="1" <?php checked( $llm_include_excerpt, '1' ); ?>>
 											<label for="include-excerpt"><?php esc_html_e( 'Include post excerpts/descriptions in llm.txt', 'saman-labs-seo' ); ?></label>
 										</div>
 									</div>
@@ -492,7 +492,7 @@ defined( 'ABSPATH' ) || exit;
 
 						<!-- Save Button -->
 						<p class="submit" style="margin-top: 20px;">
-							<input type="submit" name="wpseopilot_llm_txt_submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', 'saman-labs-seo' ); ?>">
+							<input type="submit" name="samanlabs_seo_llm_txt_submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', 'saman-labs-seo' ); ?>">
 						</p>
 						<?php endif; ?>
 
@@ -599,8 +599,8 @@ jQuery(document).ready(function($) {
 	$('#add-additional-page').on('click', function() {
 		var index = $('#additional-pages-container .additional-page-row').length;
 		var html = '<div class="additional-page-row">' +
-			'<input type="url" name="wpseopilot_sitemap_additional_pages[' + index + '][url]" placeholder="https://example.com/page" class="wpseopilot-input">' +
-			'<input type="text" name="wpseopilot_sitemap_additional_pages[' + index + '][priority]" value="0.5" placeholder="0.5">' +
+			'<input type="url" name="samanlabs_seo_sitemap_additional_pages[' + index + '][url]" placeholder="https://example.com/page" class="wpseopilot-input">' +
+			'<input type="text" name="samanlabs_seo_sitemap_additional_pages[' + index + '][priority]" value="0.5" placeholder="0.5">' +
 			'<button type="button" class="button remove-page"><?php esc_html_e( 'Remove', 'saman-labs-seo' ); ?></button>' +
 			'</div>';
 		$('#additional-pages-container').append(html);
@@ -617,7 +617,7 @@ jQuery(document).ready(function($) {
 		$btn.prop('disabled', true).text(WPSEOPilotSitemap.strings.regenerating);
 
 		$.post(WPSEOPilotSitemap.ajax_url, {
-			action: 'wpseopilot_regenerate_sitemap',
+			action: 'samanlabs_seo_regenerate_sitemap',
 			nonce: WPSEOPilotSitemap.nonce
 		}, function(response) {
 			if (response.success) {

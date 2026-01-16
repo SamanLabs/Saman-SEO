@@ -17,7 +17,7 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 <div class="wrap wpseopilot-page">
 
 	<?php
-	$suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+	$suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 	if ( ! empty( $suggestions ) ) :
 		?>
 		<div class="wpseopilot-card" style="margin-bottom: 20px; border-left: 4px solid #ffba00;">
@@ -44,7 +44,7 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 									document.getElementById('source').focus();
 								"><?php esc_html_e( 'Use', 'saman-labs-seo' ); ?></a>
 								
-								<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_dismiss_slug', 'key' => $key ], admin_url( 'admin-post.php' ) ), 'wpseopilot_dismiss_slug' ) ); ?>" class="button button-small button-link-delete" style="color: #a00;"><?php esc_html_e( 'Dismiss', 'saman-labs-seo' ); ?></a>
+								<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'samanlabs_seo_dismiss_slug', 'key' => $key ], admin_url( 'admin-post.php' ) ), 'samanlabs_seo_dismiss_slug' ) ); ?>" class="button button-small button-link-delete" style="color: #a00;"><?php esc_html_e( 'Dismiss', 'saman-labs-seo' ); ?></a>
 							</td>
 						</tr>
 					<?php endforeach; ?>
@@ -54,8 +54,8 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 	<?php endif; ?>
 
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-card">
-		<?php wp_nonce_field( 'wpseopilot_redirect' ); ?>
-		<input type="hidden" name="action" value="wpseopilot_save_redirect" />
+		<?php wp_nonce_field( 'samanlabs_seo_redirect' ); ?>
+		<input type="hidden" name="action" value="samanlabs_seo_save_redirect" />
 		<table class="form-table">
 			<tr>
 				<th scope="row"><label for="source"><?php esc_html_e( 'Source path', 'saman-labs-seo' ); ?></label></th>
@@ -101,7 +101,7 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 						<td><?php echo esc_html( $wpseopilot_redirect->hits ); ?></td>
 						<td><?php echo esc_html( $wpseopilot_redirect->last_hit ?: '—' ); ?></td>
 						<td>
-							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_redirect', 'id' => $wpseopilot_redirect->id ], admin_url( 'admin-post.php' ) ), 'wpseopilot_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
+							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'samanlabs_seo_delete_redirect', 'id' => $wpseopilot_redirect->id ], admin_url( 'admin-post.php' ) ), 'samanlabs_seo_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>

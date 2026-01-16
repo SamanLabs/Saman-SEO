@@ -207,7 +207,7 @@ class SearchAppearance_Controller extends REST_Controller {
      */
     public function get_settings( $request ) {
         $homepage  = $this->get_homepage_defaults_data();
-        $separator = get_option( 'wpseopilot_title_separator', '-' );
+        $separator = get_option( 'samanlabs_seo_title_separator', '-' );
         $post_types = $this->get_post_types_data();
         $taxonomies = $this->get_taxonomies_data();
         $archives   = $this->get_archives_data();
@@ -253,9 +253,9 @@ class SearchAppearance_Controller extends REST_Controller {
      */
     private function get_homepage_defaults_data() {
         return [
-            'meta_title'       => get_option( 'wpseopilot_homepage_title', '' ),
-            'meta_description' => get_option( 'wpseopilot_homepage_description', '' ),
-            'meta_keywords'    => get_option( 'wpseopilot_homepage_keywords', '' ),
+            'meta_title'       => get_option( 'samanlabs_seo_homepage_title', '' ),
+            'meta_description' => get_option( 'samanlabs_seo_homepage_description', '' ),
+            'meta_keywords'    => get_option( 'samanlabs_seo_homepage_keywords', '' ),
         ];
     }
 
@@ -272,12 +272,12 @@ class SearchAppearance_Controller extends REST_Controller {
         $meta_description = isset( $params['meta_description'] ) ? sanitize_textarea_field( $params['meta_description'] ) : '';
         $meta_keywords    = isset( $params['meta_keywords'] ) ? sanitize_text_field( $params['meta_keywords'] ) : '';
 
-        update_option( 'wpseopilot_homepage_title', $meta_title );
-        update_option( 'wpseopilot_homepage_description', $meta_description );
-        update_option( 'wpseopilot_homepage_keywords', $meta_keywords );
+        update_option( 'samanlabs_seo_homepage_title', $meta_title );
+        update_option( 'samanlabs_seo_homepage_description', $meta_description );
+        update_option( 'samanlabs_seo_homepage_keywords', $meta_keywords );
 
         // Also update the consolidated option
-        update_option( 'wpseopilot_homepage_defaults', [
+        update_option( 'samanlabs_seo_homepage_defaults', [
             'meta_title'       => $meta_title,
             'meta_description' => $meta_description,
             'meta_keywords'    => $meta_keywords,
@@ -298,7 +298,7 @@ class SearchAppearance_Controller extends REST_Controller {
      */
     public function get_separator( $request ) {
         return $this->success( [
-            'separator' => get_option( 'wpseopilot_title_separator', '-' ),
+            'separator' => get_option( 'samanlabs_seo_title_separator', '-' ),
             'options'   => $this->separator_options,
         ] );
     }
@@ -320,7 +320,7 @@ class SearchAppearance_Controller extends REST_Controller {
         // Limit to 3 characters
         $separator = mb_substr( $separator, 0, 3 );
 
-        update_option( 'wpseopilot_title_separator', $separator );
+        update_option( 'samanlabs_seo_title_separator', $separator );
 
         return $this->success( [
             'separator' => $separator,
@@ -354,10 +354,10 @@ class SearchAppearance_Controller extends REST_Controller {
         // Remove attachment
         unset( $post_types['attachment'] );
 
-        $defaults = get_option( 'wpseopilot_post_type_defaults', [] );
-        $settings = get_option( 'wpseopilot_post_type_settings', [] );
-        $title_templates = get_option( 'wpseopilot_post_type_title_templates', [] );
-        $meta_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+        $defaults = get_option( 'samanlabs_seo_post_type_defaults', [] );
+        $settings = get_option( 'samanlabs_seo_post_type_settings', [] );
+        $title_templates = get_option( 'samanlabs_seo_post_type_title_templates', [] );
+        $meta_descriptions = get_option( 'samanlabs_seo_post_type_meta_descriptions', [] );
 
         $data = [];
         foreach ( $post_types as $slug => $post_type ) {
@@ -429,8 +429,8 @@ class SearchAppearance_Controller extends REST_Controller {
             ];
         }
 
-        update_option( 'wpseopilot_post_type_defaults', $defaults );
-        update_option( 'wpseopilot_post_type_settings', $settings );
+        update_option( 'samanlabs_seo_post_type_defaults', $defaults );
+        update_option( 'samanlabs_seo_post_type_settings', $settings );
 
         return $this->success( $this->get_post_types_data(), __( 'Post type settings saved.', 'saman-labs-seo' ) );
     }
@@ -445,8 +445,8 @@ class SearchAppearance_Controller extends REST_Controller {
         $slug   = sanitize_key( $request->get_param( 'slug' ) );
         $params = $request->get_json_params();
 
-        $defaults = get_option( 'wpseopilot_post_type_defaults', [] );
-        $settings = get_option( 'wpseopilot_post_type_settings', [] );
+        $defaults = get_option( 'samanlabs_seo_post_type_defaults', [] );
+        $settings = get_option( 'samanlabs_seo_post_type_settings', [] );
 
         $defaults[ $slug ] = [
             'noindex'              => ! empty( $params['noindex'] ) ? '1' : '0',
@@ -462,8 +462,8 @@ class SearchAppearance_Controller extends REST_Controller {
             'analysis_fields' => isset( $params['analysis_fields'] ) ? sanitize_text_field( $params['analysis_fields'] ) : '',
         ];
 
-        update_option( 'wpseopilot_post_type_defaults', $defaults );
-        update_option( 'wpseopilot_post_type_settings', $settings );
+        update_option( 'samanlabs_seo_post_type_defaults', $defaults );
+        update_option( 'samanlabs_seo_post_type_settings', $settings );
 
         return $this->success( null, __( 'Post type settings saved.', 'saman-labs-seo' ) );
     }
@@ -492,8 +492,8 @@ class SearchAppearance_Controller extends REST_Controller {
             'objects'
         );
 
-        $defaults = get_option( 'wpseopilot_taxonomy_defaults', [] );
-        $settings = get_option( 'wpseopilot_taxonomy_settings', [] );
+        $defaults = get_option( 'samanlabs_seo_taxonomy_defaults', [] );
+        $settings = get_option( 'samanlabs_seo_taxonomy_settings', [] );
 
         $data = [];
         foreach ( $taxonomies as $slug => $taxonomy ) {
@@ -561,8 +561,8 @@ class SearchAppearance_Controller extends REST_Controller {
             ];
         }
 
-        update_option( 'wpseopilot_taxonomy_defaults', $defaults );
-        update_option( 'wpseopilot_taxonomy_settings', $settings );
+        update_option( 'samanlabs_seo_taxonomy_defaults', $defaults );
+        update_option( 'samanlabs_seo_taxonomy_settings', $settings );
 
         return $this->success( $this->get_taxonomies_data(), __( 'Taxonomy settings saved.', 'saman-labs-seo' ) );
     }
@@ -577,8 +577,8 @@ class SearchAppearance_Controller extends REST_Controller {
         $slug   = sanitize_key( $request->get_param( 'slug' ) );
         $params = $request->get_json_params();
 
-        $defaults = get_option( 'wpseopilot_taxonomy_defaults', [] );
-        $settings = get_option( 'wpseopilot_taxonomy_settings', [] );
+        $defaults = get_option( 'samanlabs_seo_taxonomy_defaults', [] );
+        $settings = get_option( 'samanlabs_seo_taxonomy_settings', [] );
 
         $defaults[ $slug ] = [
             'noindex'              => ! empty( $params['noindex'] ) ? '1' : '0',
@@ -593,8 +593,8 @@ class SearchAppearance_Controller extends REST_Controller {
             'description' => isset( $params['description_template'] ) ? sanitize_textarea_field( $params['description_template'] ) : '',
         ];
 
-        update_option( 'wpseopilot_taxonomy_defaults', $defaults );
-        update_option( 'wpseopilot_taxonomy_settings', $settings );
+        update_option( 'samanlabs_seo_taxonomy_defaults', $defaults );
+        update_option( 'samanlabs_seo_taxonomy_settings', $settings );
 
         return $this->success( null, __( 'Taxonomy settings saved.', 'saman-labs-seo' ) );
     }
@@ -615,8 +615,8 @@ class SearchAppearance_Controller extends REST_Controller {
      * @return array
      */
     private function get_archives_data() {
-        $defaults = get_option( 'wpseopilot_archive_defaults', [] );
-        $settings = get_option( 'wpseopilot_archive_settings', [] );
+        $defaults = get_option( 'samanlabs_seo_archive_defaults', [] );
+        $settings = get_option( 'samanlabs_seo_archive_settings', [] );
 
         $archive_types = [
             'author' => [
@@ -724,8 +724,8 @@ class SearchAppearance_Controller extends REST_Controller {
             ];
         }
 
-        update_option( 'wpseopilot_archive_defaults', $defaults );
-        update_option( 'wpseopilot_archive_settings', $settings );
+        update_option( 'samanlabs_seo_archive_defaults', $defaults );
+        update_option( 'samanlabs_seo_archive_settings', $settings );
 
         return $this->success( $this->get_archives_data(), __( 'Archive settings saved.', 'saman-labs-seo' ) );
     }
@@ -746,7 +746,7 @@ class SearchAppearance_Controller extends REST_Controller {
      * @return array
      */
     private function get_variables_data() {
-        $separator = get_option( 'wpseopilot_title_separator', '-' );
+        $separator = get_option( 'samanlabs_seo_title_separator', '-' );
         $site_name = get_bloginfo( 'name' );
         $tagline   = get_bloginfo( 'description' );
 

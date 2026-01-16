@@ -270,7 +270,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 		];
 
 		// Temporarily filter breadcrumbs to use sample data.
-		add_filter( 'wpseopilot_breadcrumb_items', function() use ( $sample_crumbs ) {
+		add_filter( 'samanlabs_seo_breadcrumb_items', function() use ( $sample_crumbs ) {
 			return $sample_crumbs;
 		}, 999 );
 

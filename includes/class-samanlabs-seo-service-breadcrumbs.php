@@ -63,10 +63,10 @@ class Breadcrumbs {
 	 */
 	public function boot() {
 		// Add JSON-LD schema to head.
-		add_filter( 'wpseopilot_jsonld', [ $this, 'add_breadcrumb_schema' ], 15 );
+		add_filter( 'samanlabs_seo_jsonld', [ $this, 'add_breadcrumb_schema' ], 15 );
 
 		// Register shortcode (replaces existing one).
-		add_shortcode( 'wpseopilot_breadcrumbs', [ $this, 'shortcode' ] );
+		add_shortcode( 'samanlabs_seo_breadcrumbs', [ $this, 'shortcode' ] );
 
 		// Register Gutenberg block.
 		add_action( 'init', [ $this, 'register_block' ] );
@@ -81,7 +81,7 @@ class Breadcrumbs {
 	 * @return array
 	 */
 	public function get_settings() {
-		$settings = get_option( 'wpseopilot_breadcrumb_settings', [] );
+		$settings = get_option( 'samanlabs_seo_breadcrumb_settings', [] );
 
 		if ( ! is_array( $settings ) ) {
 			$settings = [];
@@ -112,7 +112,7 @@ class Breadcrumbs {
 			'taxonomy_labels'   => $this->sanitize_labels( $settings['taxonomy_labels'] ?? [] ),
 		];
 
-		return update_option( 'wpseopilot_breadcrumb_settings', $sanitized );
+		return update_option( 'samanlabs_seo_breadcrumb_settings', $sanitized );
 	}
 
 	/**
@@ -169,7 +169,7 @@ class Breadcrumbs {
 		$crumbs = $this->build_trail( $crumbs, $args );
 
 		// Apply filter for customization.
-		$crumbs = apply_filters( 'wpseopilot_breadcrumb_items', $crumbs, $args );
+		$crumbs = apply_filters( 'samanlabs_seo_breadcrumb_items', $crumbs, $args );
 
 		// Truncate titles if needed.
 		if ( ! empty( $args['truncate_length'] ) && $args['truncate_length'] > 0 ) {
@@ -695,7 +695,7 @@ class Breadcrumbs {
 				'style'        => '',
 			],
 			$atts,
-			'wpseopilot_breadcrumbs'
+			'samanlabs_seo_breadcrumbs'
 		);
 
 		$args = [];

@@ -43,7 +43,7 @@ $current_rule = $rule_to_edit ?: $rule_defaults;
 ?>
 <div class="wrap wpseopilot-page wpseopilot-links">
 
-	<?php settings_errors( 'wpseopilot_links' ); ?>
+	<?php settings_errors( 'samanlabs_seo_links' ); ?>
 
 	<h2 class="nav-tab-wrapper wpseopilot-links__tabs">
 		<?php foreach ( $tabs as $tab => $label ) : ?>

@@ -55,7 +55,7 @@ $editing     = $template_to_edit ?? null;
 							</td>
 							<td>
 								<a href="<?php echo esc_url( add_query_arg( [ 'tab' => 'utms', 'template' => $template['id'] ], $page_url ) ); ?>"><?php esc_html_e( 'Edit', 'saman-labs-seo' ); ?></a>
-								<?php $delete_url = wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_link_template', 'template' => $template['id'] ], admin_url( 'admin-post.php' ) ), 'wpseopilot_delete_link_template' ); ?>
+								<?php $delete_url = wp_nonce_url( add_query_arg( [ 'action' => 'samanlabs_seo_delete_link_template', 'template' => $template['id'] ], admin_url( 'admin-post.php' ) ), 'samanlabs_seo_delete_link_template' ); ?>
 								| <a class="submitdelete" href="<?php echo esc_url( $delete_url ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
 							</td>
 						</tr>
@@ -68,8 +68,8 @@ $editing     = $template_to_edit ?? null;
 	<div class="wpseopilot-card">
 		<h3><?php echo esc_html( $editing ? __( 'Edit template', 'saman-labs-seo' ) : __( 'Add template', 'saman-labs-seo' ) ); ?></h3>
 		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__utm-form">
-			<?php wp_nonce_field( 'wpseopilot_save_link_template' ); ?>
-			<input type="hidden" name="action" value="wpseopilot_save_link_template" />
+			<?php wp_nonce_field( 'samanlabs_seo_save_link_template' ); ?>
+			<input type="hidden" name="action" value="samanlabs_seo_save_link_template" />
 			<?php if ( $editing ) : ?>
 				<input type="hidden" name="template[id]" value="<?php echo esc_attr( $editing['id'] ); ?>" />
 				<input type="hidden" name="template[created_at]" value="<?php echo esc_attr( $editing['created_at'] ?? time() ); ?>" />

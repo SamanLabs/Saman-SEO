@@ -101,7 +101,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     public function get_dashboard( $request ) {
         // Check cache first (2 minute cache for dashboard overview)
-        $cached = get_transient( 'wpseopilot_dashboard_data' );
+        $cached = get_transient( 'samanlabs_seo_dashboard_data' );
         if ( $cached !== false ) {
             return $this->success( $cached );
         }
@@ -117,7 +117,7 @@ class Dashboard_Controller extends REST_Controller {
         ];
 
         // Cache for 2 minutes
-        set_transient( 'wpseopilot_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
+        set_transient( 'samanlabs_seo_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
 
         return $this->success( $data );
     }
@@ -151,13 +151,13 @@ class Dashboard_Controller extends REST_Controller {
     public function dismiss_notification( $request ) {
         $id = $request->get_param( 'id' );
 
-        $dismissed = get_option( 'wpseopilot_dismissed_notifications', [] );
+        $dismissed = get_option( 'samanlabs_seo_dismissed_notifications', [] );
         if ( ! is_array( $dismissed ) ) {
             $dismissed = [];
         }
 
         $dismissed[ $id ] = time();
-        update_option( 'wpseopilot_dismissed_notifications', $dismissed );
+        update_option( 'samanlabs_seo_dismissed_notifications', $dismissed );
 
         return $this->success( null, __( 'Notification dismissed.', 'saman-labs-seo' ) );
     }
@@ -179,7 +179,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     private function calculate_overall_seo_score() {
         // Check cache first
-        $cached = get_transient( 'wpseopilot_dashboard_seo_score' );
+        $cached = get_transient( 'samanlabs_seo_dashboard_seo_score' );
         if ( $cached ) {
             return $cached;
         }
@@ -251,7 +251,7 @@ class Dashboard_Controller extends REST_Controller {
         ];
 
         // Cache for 30 minutes
-        set_transient( 'wpseopilot_dashboard_seo_score', $result, 30 * MINUTE_IN_SECONDS );
+        set_transient( 'samanlabs_seo_dashboard_seo_score', $result, 30 * MINUTE_IN_SECONDS );
 
         return $result;
     }
@@ -262,7 +262,7 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_score_trend() {
-        $history = get_option( 'wpseopilot_score_history', [] );
+        $history = get_option( 'samanlabs_seo_score_history', [] );
         if ( ! is_array( $history ) ) {
             $history = [];
         }
@@ -281,7 +281,7 @@ class Dashboard_Controller extends REST_Controller {
                 unset( $history[ $date ] );
             }
         }
-        update_option( 'wpseopilot_score_history', $history );
+        update_option( 'samanlabs_seo_score_history', $history );
 
         // Calculate trend
         $last_week = array_filter( $history, function( $date ) {
@@ -304,7 +304,7 @@ class Dashboard_Controller extends REST_Controller {
      * @return int
      */
     private function get_current_week_score() {
-        $cached = get_transient( 'wpseopilot_dashboard_seo_score' );
+        $cached = get_transient( 'samanlabs_seo_dashboard_seo_score' );
         return $cached['score'] ?? 0;
     }
 
@@ -315,7 +315,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     private function get_content_coverage_data() {
         // Check cache first (5 minute cache for coverage data)
-        $cached = get_transient( 'wpseopilot_content_coverage' );
+        $cached = get_transient( 'samanlabs_seo_content_coverage' );
         if ( $cached !== false ) {
             return $cached;
         }
@@ -384,7 +384,7 @@ class Dashboard_Controller extends REST_Controller {
         ];
 
         // Cache for 5 minutes
-        set_transient( 'wpseopilot_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
+        set_transient( 'samanlabs_seo_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
 
         return $result;
     }
@@ -395,11 +395,11 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_sitemap_data() {
-        $enabled = get_option( 'wpseopilot_sitemap_enabled', '1' ) === '1';
-        $last_regen = get_option( 'wpseopilot_sitemap_last_regenerated', 0 );
+        $enabled = get_option( 'samanlabs_seo_sitemap_enabled', '1' ) === '1';
+        $last_regen = get_option( 'samanlabs_seo_sitemap_last_regenerated', 0 );
 
         // Count URLs
-        $post_types = get_option( 'wpseopilot_sitemap_post_types', [ 'post', 'page' ] );
+        $post_types = get_option( 'samanlabs_seo_sitemap_post_types', [ 'post', 'page' ] );
         if ( ! is_array( $post_types ) ) {
             $post_types = [ 'post', 'page' ];
         }
@@ -413,7 +413,7 @@ class Dashboard_Controller extends REST_Controller {
         }
 
         // Add taxonomy URLs
-        $taxonomies = get_option( 'wpseopilot_sitemap_taxonomies', [ 'category' ] );
+        $taxonomies = get_option( 'samanlabs_seo_sitemap_taxonomies', [ 'category' ] );
         if ( is_array( $taxonomies ) ) {
             foreach ( $taxonomies as $tax ) {
                 $terms = wp_count_terms( [ 'taxonomy' => $tax, 'hide_empty' => true ] );
@@ -436,9 +436,9 @@ class Dashboard_Controller extends REST_Controller {
             'errors'         => $errors,
             'types_enabled'  => [
                 'main'   => $enabled,
-                'rss'    => get_option( 'wpseopilot_sitemap_enable_rss', '0' ) === '1',
-                'news'   => get_option( 'wpseopilot_sitemap_enable_google_news', '0' ) === '1',
-                'llm'    => get_option( 'wpseopilot_enable_llm_txt', '0' ) === '1',
+                'rss'    => get_option( 'samanlabs_seo_sitemap_enable_rss', '0' ) === '1',
+                'news'   => get_option( 'samanlabs_seo_sitemap_enable_google_news', '0' ) === '1',
+                'llm'    => get_option( 'samanlabs_seo_enable_llm_txt', '0' ) === '1',
             ],
         ];
     }
@@ -488,7 +488,7 @@ class Dashboard_Controller extends REST_Controller {
         ) );
 
         // Get pending suggestions
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
         $suggestions_count = is_array( $suggestions ) ? count( $suggestions ) : 0;
 
         // Top redirects by hits
@@ -520,7 +520,7 @@ class Dashboard_Controller extends REST_Controller {
     private function get_404_data() {
         global $wpdb;
 
-        $logging_enabled = get_option( 'wpseopilot_enable_404_logging', '1' ) === '1';
+        $logging_enabled = get_option( 'samanlabs_seo_enable_404_logging', '1' ) === '1';
 
         // Check if table exists
         $table_exists = $wpdb->get_var( $wpdb->prepare(
@@ -580,8 +580,8 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_schema_data() {
-        $org_name = get_option( 'wpseopilot_homepage_organization_name', '' );
-        $local_enabled = get_option( 'wpseopilot_enable_local_seo', '0' ) === '1';
+        $org_name = get_option( 'samanlabs_seo_homepage_organization_name', '' );
+        $local_enabled = get_option( 'samanlabs_seo_enable_local_seo', '0' ) === '1';
 
         $schema_types = [ 'Website', 'WebPage' ];
         if ( ! empty( $org_name ) ) {
@@ -615,7 +615,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     private function get_notifications_data() {
         $notifications = [];
-        $dismissed = get_option( 'wpseopilot_dismissed_notifications', [] );
+        $dismissed = get_option( 'samanlabs_seo_dismissed_notifications', [] );
         if ( ! is_array( $dismissed ) ) {
             $dismissed = [];
         }
@@ -625,10 +625,10 @@ class Dashboard_Controller extends REST_Controller {
         $dismissed = array_filter( $dismissed, function( $timestamp ) use ( $cutoff ) {
             return $timestamp > $cutoff;
         } );
-        update_option( 'wpseopilot_dismissed_notifications', $dismissed );
+        update_option( 'samanlabs_seo_dismissed_notifications', $dismissed );
 
         // Priority 1: Check for slug change suggestions (redirects needed)
-        $slug_suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $slug_suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
         if ( is_array( $slug_suggestions ) && count( $slug_suggestions ) > 0 ) {
             // Only show one notification for multiple slug changes
             $count = count( $slug_suggestions );

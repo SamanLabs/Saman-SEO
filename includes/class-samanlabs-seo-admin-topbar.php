@@ -121,7 +121,7 @@ class Admin_Topbar {
 		];
 
 		// Only show Local SEO if module is enabled.
-		if ( '1' === get_option( 'wpseopilot_enable_local_seo', '0' ) ) {
+		if ( '1' === get_option( 'samanlabs_seo_enable_local_seo', '0' ) ) {
 			$items['local-seo'] = [
 				'label' => __( 'Local SEO', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-local-seo' ),

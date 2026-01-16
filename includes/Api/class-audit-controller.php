@@ -113,7 +113,7 @@ class Audit_Controller extends REST_Controller {
      */
     public function get_audit( $request ) {
         // Check for cached results (valid for 1 hour)
-        $cached = get_transient( 'wpseopilot_audit_results' );
+        $cached = get_transient( 'samanlabs_seo_audit_results' );
 
         if ( $cached ) {
             $cached['from_cache'] = true;
@@ -125,7 +125,7 @@ class Audit_Controller extends REST_Controller {
         $results['from_cache'] = false;
 
         // Cache for 1 hour
-        set_transient( 'wpseopilot_audit_results', $results, HOUR_IN_SECONDS );
+        set_transient( 'samanlabs_seo_audit_results', $results, HOUR_IN_SECONDS );
 
         return $this->success( $results );
     }
@@ -141,14 +141,14 @@ class Audit_Controller extends REST_Controller {
         $limit     = min( absint( $request->get_param( 'limit' ) ), 500 ); // Max 500 posts
 
         // Clear old cache
-        delete_transient( 'wpseopilot_audit_results' );
+        delete_transient( 'samanlabs_seo_audit_results' );
 
         $results = $this->collect_issues( $post_type, $limit );
         $results['from_cache'] = false;
         $results['ran_at'] = current_time( 'mysql' );
 
         // Cache results
-        set_transient( 'wpseopilot_audit_results', $results, HOUR_IN_SECONDS );
+        set_transient( 'samanlabs_seo_audit_results', $results, HOUR_IN_SECONDS );
 
         return $this->success( $results, __( 'Audit completed successfully.', 'saman-labs-seo' ) );
     }
@@ -263,7 +263,7 @@ class Audit_Controller extends REST_Controller {
             return null;
         }
 
-        $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+        $post_type_descriptions = get_option( 'samanlabs_seo_post_type_meta_descriptions', [] );
 
         $title_suggestion = '';
         if ( function_exists( 'SamanLabs\SEO\Helpers\generate_title_from_template' ) ) {
@@ -318,7 +318,7 @@ class Audit_Controller extends REST_Controller {
             update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
 
             // Clear audit cache
-            delete_transient( 'wpseopilot_audit_results' );
+            delete_transient( 'samanlabs_seo_audit_results' );
         }
 
         return $this->success( [
@@ -334,7 +334,7 @@ class Audit_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_summary( $request ) {
-        $cached = get_transient( 'wpseopilot_audit_results' );
+        $cached = get_transient( 'samanlabs_seo_audit_results' );
 
         if ( $cached ) {
             return $this->success( [
@@ -385,7 +385,7 @@ class Audit_Controller extends REST_Controller {
             'no_found_rows'  => true,
         ] );
 
-        $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+        $post_type_descriptions = get_option( 'samanlabs_seo_post_type_meta_descriptions', [] );
         if ( ! is_array( $post_type_descriptions ) ) {
             $post_type_descriptions = [];
         }
@@ -603,7 +603,7 @@ class Audit_Controller extends REST_Controller {
         // Build recommendation
         $recommendation = null;
         if ( empty( $meta['title'] ) || empty( $meta['description'] ) ) {
-            $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+            $post_type_descriptions = get_option( 'samanlabs_seo_post_type_meta_descriptions', [] );
 
             $title_suggestion = '';
             if ( function_exists( 'SamanLabs\SEO\Helpers\generate_title_from_template' ) ) {

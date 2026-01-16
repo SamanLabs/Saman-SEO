@@ -19,11 +19,11 @@ class Repository {
 	/**
 	 * Option keys.
 	 */
-	private const OPTION_RULES      = 'wpseopilot_link_rules';
-	private const OPTION_CATEGORIES = 'wpseopilot_link_categories';
-	private const OPTION_TEMPLATES  = 'wpseopilot_link_utm_templates';
-	private const OPTION_SETTINGS   = 'wpseopilot_link_settings';
-	private const OPTION_VERSION    = 'wpseopilot_link_version';
+	private const OPTION_RULES      = 'samanlabs_seo_link_rules';
+	private const OPTION_CATEGORIES = 'samanlabs_seo_link_categories';
+	private const OPTION_TEMPLATES  = 'samanlabs_seo_link_utm_templates';
+	private const OPTION_SETTINGS   = 'samanlabs_seo_link_settings';
+	private const OPTION_VERSION    = 'samanlabs_seo_link_version';
 
 	/**
 	 * Cached lookups.
@@ -276,7 +276,7 @@ class Repository {
 		$rule = $this->get_rule( $rule_id );
 
 		if ( ! $rule ) {
-			return new WP_Error( 'wpseopilot_rule_missing', __( 'Rule not found.', 'saman-labs-seo' ) );
+			return new WP_Error( 'samanlabs_seo_rule_missing', __( 'Rule not found.', 'saman-labs-seo' ) );
 		}
 
 		unset( $rule['id'] );
@@ -357,7 +357,7 @@ class Repository {
 		$categories = $this->get_option_array( self::OPTION_CATEGORIES );
 
 		if ( ! isset( $categories[ $category_id ] ) ) {
-			return new WP_Error( 'wpseopilot_category_missing', __( 'Category not found.', 'saman-labs-seo' ) );
+			return new WP_Error( 'samanlabs_seo_category_missing', __( 'Category not found.', 'saman-labs-seo' ) );
 		}
 
 		$rules  = $this->get_option_array( self::OPTION_RULES );
@@ -370,11 +370,11 @@ class Repository {
 
 		if ( ! empty( $in_use ) ) {
 			if ( empty( $reassign ) ) {
-				return new WP_Error( 'wpseopilot_category_in_use', __( 'Category still assigned to rules.', 'saman-labs-seo' ) );
+				return new WP_Error( 'samanlabs_seo_category_in_use', __( 'Category still assigned to rules.', 'saman-labs-seo' ) );
 			}
 
 			if ( '__none__' !== $reassign && ! isset( $categories[ $reassign ] ) ) {
-				return new WP_Error( 'wpseopilot_category_reassign', __( 'Reassignment category not found.', 'saman-labs-seo' ) );
+				return new WP_Error( 'samanlabs_seo_category_reassign', __( 'Reassignment category not found.', 'saman-labs-seo' ) );
 			}
 
 			foreach ( $rules as $rule_id => $rule ) {
@@ -718,11 +718,11 @@ class Repository {
 		$keywords = $this->sanitize_keywords( $data['keywords'] ?? [] );
 
 		if ( empty( $title ) ) {
-			return new WP_Error( 'wpseopilot_rule_title', __( 'Internal Title is required.', 'saman-labs-seo' ) );
+			return new WP_Error( 'samanlabs_seo_rule_title', __( 'Internal Title is required.', 'saman-labs-seo' ) );
 		}
 
 		if ( empty( $keywords ) ) {
-			return new WP_Error( 'wpseopilot_rule_keywords', __( 'Add at least one keyword.', 'saman-labs-seo' ) );
+			return new WP_Error( 'samanlabs_seo_rule_keywords', __( 'Add at least one keyword.', 'saman-labs-seo' ) );
 		}
 
 		$destination_type = ( isset( $data['destination']['type'] ) && 'url' === $data['destination']['type'] ) ? 'url' : 'post';
@@ -731,15 +731,15 @@ class Repository {
 
 		if ( 'post' === $destination_type ) {
 			if ( ! $destination_post ) {
-				return new WP_Error( 'wpseopilot_rule_destination', __( 'Select a destination post.', 'saman-labs-seo' ) );
+				return new WP_Error( 'samanlabs_seo_rule_destination', __( 'Select a destination post.', 'saman-labs-seo' ) );
 			}
 
 			if ( ! get_post( $destination_post ) ) {
-				return new WP_Error( 'wpseopilot_rule_destination', __( 'Destination post not found.', 'saman-labs-seo' ) );
+				return new WP_Error( 'samanlabs_seo_rule_destination', __( 'Destination post not found.', 'saman-labs-seo' ) );
 			}
 		} else {
 			if ( empty( $destination_url ) ) {
-				return new WP_Error( 'wpseopilot_rule_destination', __( 'Enter a destination URL.', 'saman-labs-seo' ) );
+				return new WP_Error( 'samanlabs_seo_rule_destination', __( 'Enter a destination URL.', 'saman-labs-seo' ) );
 			}
 		}
 
@@ -863,7 +863,7 @@ class Repository {
 		$cap         = isset( $data['category_cap'] ) ? absint( $data['category_cap'] ) : 0;
 
 		if ( empty( $name ) ) {
-			return new WP_Error( 'wpseopilot_category_name', __( 'Name is required.', 'saman-labs-seo' ) );
+			return new WP_Error( 'samanlabs_seo_category_name', __( 'Name is required.', 'saman-labs-seo' ) );
 		}
 
 		return [
@@ -893,7 +893,7 @@ class Repository {
 		$name        = isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '';
 
 		if ( empty( $name ) ) {
-			return new WP_Error( 'wpseopilot_template_name', __( 'Template name is required.', 'saman-labs-seo' ) );
+			return new WP_Error( 'samanlabs_seo_template_name', __( 'Template name is required.', 'saman-labs-seo' ) );
 		}
 
 		$apply_to    = isset( $data['apply_to'] ) ? sanitize_key( $data['apply_to'] ) : 'both';

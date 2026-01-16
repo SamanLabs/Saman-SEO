@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 class Request_Monitor {
 
 	private const SCHEMA_VERSION = 5;
-	private const SCHEMA_OPTION  = 'wpseopilot_404_log_schema';
+	private const SCHEMA_OPTION  = 'samanlabs_seo_404_log_schema';
 
 	/**
 	 * Main log table name.
@@ -48,11 +48,11 @@ class Request_Monitor {
 	public function boot() {
 		$this->maybe_upgrade_schema();
 
-		if ( false === get_option( 'wpseopilot_enable_404_logging', false ) ) {
-			add_option( 'wpseopilot_enable_404_logging', '1' );
+		if ( false === get_option( 'samanlabs_seo_enable_404_logging', false ) ) {
+			add_option( 'samanlabs_seo_enable_404_logging', '1' );
 		}
 
-		if ( '1' !== get_option( 'wpseopilot_enable_404_logging', '1' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_enable_404_logging', '1' ) ) {
 			return;
 		}
 
@@ -62,7 +62,7 @@ class Request_Monitor {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
 		// Setup scheduled cleanup
-		add_action( 'wpseopilot_404_cleanup', [ $this, 'run_scheduled_cleanup' ] );
+		add_action( 'samanlabs_seo_404_cleanup', [ $this, 'run_scheduled_cleanup' ] );
 		$this->maybe_schedule_cleanup();
 	}
 
@@ -72,12 +72,12 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function maybe_schedule_cleanup() {
-		$settings = get_option( 'wpseopilot_settings', [] );
+		$settings = get_option( 'samanlabs_seo_settings', [] );
 		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
 
 		if ( $enabled ) {
-			if ( ! wp_next_scheduled( 'wpseopilot_404_cleanup' ) ) {
-				wp_schedule_event( time(), 'daily', 'wpseopilot_404_cleanup' );
+			if ( ! wp_next_scheduled( 'samanlabs_seo_404_cleanup' ) ) {
+				wp_schedule_event( time(), 'daily', 'samanlabs_seo_404_cleanup' );
 			}
 		} else {
 			$this->unschedule_cleanup();
@@ -90,9 +90,9 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function unschedule_cleanup() {
-		$timestamp = wp_next_scheduled( 'wpseopilot_404_cleanup' );
+		$timestamp = wp_next_scheduled( 'samanlabs_seo_404_cleanup' );
 		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, 'wpseopilot_404_cleanup' );
+			wp_unschedule_event( $timestamp, 'samanlabs_seo_404_cleanup' );
 		}
 	}
 
@@ -102,7 +102,7 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function run_scheduled_cleanup() {
-		$settings = get_option( 'wpseopilot_settings', [] );
+		$settings = get_option( 'samanlabs_seo_settings', [] );
 		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
 
 		if ( ! $enabled ) {
@@ -140,7 +140,7 @@ class Request_Monitor {
 	 * @return void
 	 */
 	private function maybe_send_notification( $request_uri, $hits, $entry_id ) {
-		$settings = get_option( 'wpseopilot_settings', [] );
+		$settings = get_option( 'samanlabs_seo_settings', [] );
 		$enabled  = isset( $settings['enable_404_notifications'] ) ? $settings['enable_404_notifications'] : false;
 
 		if ( ! $enabled ) {
@@ -155,7 +155,7 @@ class Request_Monitor {
 		}
 
 		// Check if we've already notified for this entry
-		$notified_key = 'wpseopilot_404_notified_' . $entry_id;
+		$notified_key = 'samanlabs_seo_404_notified_' . $entry_id;
 		if ( get_transient( $notified_key ) ) {
 			return;
 		}
@@ -174,7 +174,7 @@ class Request_Monitor {
 	 * @return bool Whether email was sent.
 	 */
 	private function send_notification_email( $request_uri, $hits ) {
-		$settings = get_option( 'wpseopilot_settings', [] );
+		$settings = get_option( 'samanlabs_seo_settings', [] );
 		$email    = isset( $settings['notification_404_email'] ) && ! empty( $settings['notification_404_email'] )
 			? sanitize_email( $settings['notification_404_email'] )
 			: get_option( 'admin_email' );

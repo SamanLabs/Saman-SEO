@@ -21,7 +21,7 @@ class IndexNow {
 	 *
 	 * @var string
 	 */
-	private $table_name = 'wpseopilot_indexnow_log';
+	private $table_name = 'samanlabs_seo_indexnow_log';
 
 	/**
 	 * Schema version for migrations.
@@ -75,7 +75,7 @@ class IndexNow {
 			return;
 		}
 
-		if ( ! apply_filters( 'wpseopilot_feature_toggle', true, 'indexnow' ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_feature_toggle', true, 'indexnow' ) ) {
 			return;
 		}
 
@@ -95,7 +95,7 @@ class IndexNow {
 	 * @return array
 	 */
 	public function get_settings() {
-		$settings = get_option( 'wpseopilot_indexnow_settings', [] );
+		$settings = get_option( 'samanlabs_seo_indexnow_settings', [] );
 
 		if ( ! is_array( $settings ) ) {
 			$settings = [];
@@ -127,7 +127,7 @@ class IndexNow {
 			$sanitized['api_key'] = $this->generate_api_key();
 		}
 
-		$result = update_option( 'wpseopilot_indexnow_settings', $sanitized );
+		$result = update_option( 'samanlabs_seo_indexnow_settings', $sanitized );
 
 		// Flush rewrite rules if key changed.
 		if ( $result && $sanitized['api_key'] !== $current['api_key'] ) {
@@ -192,7 +192,7 @@ class IndexNow {
 	 * @return array
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = 'wpseopilot_indexnow_key';
+		$vars[] = 'samanlabs_seo_indexnow_key';
 		return $vars;
 	}
 
@@ -202,7 +202,7 @@ class IndexNow {
 	 * @return void
 	 */
 	public function serve_key_file() {
-		$requested_key = get_query_var( 'wpseopilot_indexnow_key' );
+		$requested_key = get_query_var( 'samanlabs_seo_indexnow_key' );
 
 		if ( empty( $requested_key ) ) {
 			return;
@@ -296,7 +296,7 @@ class IndexNow {
 		}
 
 		// Allow filtering.
-		if ( ! apply_filters( 'wpseopilot_indexnow_should_submit', true, $post ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_indexnow_should_submit', true, $post ) ) {
 			return false;
 		}
 
@@ -378,7 +378,7 @@ class IndexNow {
 			$this->log_submission( $url, $post_id, $status, $response_code, $response_message, $search_engine );
 		}
 
-		do_action( 'wpseopilot_indexnow_submitted', $urls, $success, $response_code );
+		do_action( 'samanlabs_seo_indexnow_submitted', $urls, $success, $response_code );
 
 		return $success;
 	}
@@ -554,7 +554,7 @@ class IndexNow {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
-		update_option( 'wpseopilot_indexnow_schema_version', self::SCHEMA_VERSION );
+		update_option( 'samanlabs_seo_indexnow_schema_version', self::SCHEMA_VERSION );
 	}
 
 	/**

@@ -101,7 +101,7 @@ class Social_Settings {
 		}
 
 		// Get social defaults
-		$social_defaults = get_option( 'wpseopilot_social_defaults', [] );
+		$social_defaults = get_option( 'samanlabs_seo_social_defaults', [] );
 		if ( ! is_array( $social_defaults ) ) {
 			$social_defaults = [];
 		}
@@ -118,7 +118,7 @@ class Social_Settings {
 		$social_defaults = wp_parse_args( $social_defaults, $social_field_defaults );
 
 		// Get post type social defaults
-		$post_type_social_defaults = get_option( 'wpseopilot_post_type_social_defaults', [] );
+		$post_type_social_defaults = get_option( 'samanlabs_seo_post_type_social_defaults', [] );
 		if ( ! is_array( $post_type_social_defaults ) ) {
 			$post_type_social_defaults = [];
 		}

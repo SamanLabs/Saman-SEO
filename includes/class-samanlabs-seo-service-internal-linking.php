@@ -30,7 +30,7 @@ class Internal_Linking {
 	/**
 	 * Flash transient key.
 	 */
-	private const NOTICE_TRANSIENT = 'wpseopilot_links_notices';
+	private const NOTICE_TRANSIENT = 'samanlabs_seo_links_notices';
 
 	/**
 	 * Admin page hook suffix.
@@ -69,12 +69,12 @@ class Internal_Linking {
 	 * @return void
 	 */
 	public static function activate() {
-		add_option( 'wpseopilot_link_rules', [] );
-		add_option( 'wpseopilot_link_categories', [] );
-		add_option( 'wpseopilot_link_utm_templates', [] );
+		add_option( 'samanlabs_seo_link_rules', [] );
+		add_option( 'samanlabs_seo_link_categories', [] );
+		add_option( 'samanlabs_seo_link_utm_templates', [] );
 
 		$repository = new Repository();
-		add_option( 'wpseopilot_link_settings', $repository->get_default_settings() );
+		add_option( 'samanlabs_seo_link_settings', $repository->get_default_settings() );
 		$repository->get_version();
 
 		foreach ( [ 'administrator' ] as $role_name ) {
@@ -176,7 +176,7 @@ class Internal_Linking {
 			'WPSEOPilotLinks',
 			[
 				'ajax'   => admin_url( 'admin-ajax.php' ),
-				'nonce'  => wp_create_nonce( 'wpseopilot_link_admin' ),
+				'nonce'  => wp_create_nonce( 'samanlabs_seo_link_admin' ),
 				'labels' => [
 					'empty'           => __( 'No rules yet. Create your first internal link rule.', 'saman-labs-seo' ),
 					'keyword_hint'    => __( 'Use Enter to add each keyword. Exact phrase match; word boundaries recommended.', 'saman-labs-seo' ),
@@ -247,7 +247,7 @@ class Internal_Linking {
 		}
 
 		foreach ( $this->consume_notices() as $notice ) {
-			add_settings_error( 'wpseopilot_links', $notice['code'], $notice['message'], $notice['type'] );
+			add_settings_error( 'samanlabs_seo_links', $notice['code'], $notice['message'], $notice['type'] );
 		}
 
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'rules';
@@ -330,7 +330,7 @@ class Internal_Linking {
 	 */
 	public function handle_save_rule() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_save_link_rule' );
+		check_admin_referer( 'samanlabs_seo_save_link_rule' );
 
 		$payload = isset( $_POST['rule'] ) ? (array) $_POST['rule'] : [];
 		$payload = wp_unslash( $payload );
@@ -372,7 +372,7 @@ class Internal_Linking {
 	 */
 	public function handle_delete_rule() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_delete_link_rule' );
+		check_admin_referer( 'samanlabs_seo_delete_link_rule' );
 
 		$rule_id = isset( $_GET['rule'] ) ? sanitize_key( wp_unslash( $_GET['rule'] ) ) : '';
 		if ( $rule_id ) {
@@ -391,7 +391,7 @@ class Internal_Linking {
 	 */
 	public function handle_bulk_rules() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_bulk_link_rules' );
+		check_admin_referer( 'samanlabs_seo_bulk_link_rules' );
 
 		$rule_ids = isset( $_POST['rule_ids'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['rule_ids'] ) ) : [];
 		$action   = isset( $_POST['bulk_action'] ) ? sanitize_key( wp_unslash( $_POST['bulk_action'] ) ) : '';
@@ -420,7 +420,7 @@ class Internal_Linking {
 	 */
 	public function handle_duplicate_rule() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_duplicate_link_rule' );
+		check_admin_referer( 'samanlabs_seo_duplicate_link_rule' );
 
 		$rule_id = isset( $_GET['rule'] ) ? sanitize_key( wp_unslash( $_GET['rule'] ) ) : '';
 		if ( $rule_id ) {
@@ -443,7 +443,7 @@ class Internal_Linking {
 	 */
 	public function handle_toggle_rule() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_toggle_link_rule' );
+		check_admin_referer( 'samanlabs_seo_toggle_link_rule' );
 
 		$rule_id = isset( $_GET['rule'] ) ? sanitize_key( wp_unslash( $_GET['rule'] ) ) : '';
 		$status  = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'active';
@@ -469,7 +469,7 @@ class Internal_Linking {
 	 */
 	public function handle_save_category() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_save_link_category' );
+		check_admin_referer( 'samanlabs_seo_save_link_category' );
 
 		$data   = isset( $_POST['category'] ) ? (array) wp_unslash( $_POST['category'] ) : [];
 		$result = $this->repository->save_category( $data );
@@ -491,7 +491,7 @@ class Internal_Linking {
 	 */
 	public function handle_delete_category() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_delete_link_category' );
+		check_admin_referer( 'samanlabs_seo_delete_link_category' );
 
 		$category_id = isset( $_GET['category'] ) ? sanitize_key( wp_unslash( $_GET['category'] ) ) : '';
 		$reassign    = isset( $_GET['reassign'] ) ? sanitize_key( wp_unslash( $_GET['reassign'] ) ) : null;
@@ -516,7 +516,7 @@ class Internal_Linking {
 	 */
 	public function handle_save_template() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_save_link_template' );
+		check_admin_referer( 'samanlabs_seo_save_link_template' );
 
 		$data   = isset( $_POST['template'] ) ? (array) wp_unslash( $_POST['template'] ) : [];
 		$result = $this->repository->save_template( $data );
@@ -538,7 +538,7 @@ class Internal_Linking {
 	 */
 	public function handle_delete_template() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_delete_link_template' );
+		check_admin_referer( 'samanlabs_seo_delete_link_template' );
 
 		$template_id = isset( $_GET['template'] ) ? sanitize_key( wp_unslash( $_GET['template'] ) ) : '';
 		if ( $template_id ) {
@@ -557,7 +557,7 @@ class Internal_Linking {
 	 */
 	public function handle_save_settings() {
 		$this->guard_capability();
-		check_admin_referer( 'wpseopilot_save_link_settings' );
+		check_admin_referer( 'samanlabs_seo_save_link_settings' );
 
 		$data = isset( $_POST['settings'] ) ? (array) wp_unslash( $_POST['settings'] ) : [];
 		$this->repository->save_settings( $data );
@@ -574,7 +574,7 @@ class Internal_Linking {
 	 */
 	public function handle_preview() {
 		$this->guard_capability();
-		check_ajax_referer( 'wpseopilot_link_admin', 'nonce' );
+		check_ajax_referer( 'samanlabs_seo_link_admin', 'nonce' );
 
 		$payload = isset( $_POST['rule'] ) ? (array) wp_unslash( $_POST['rule'] ) : [];
 		$rule    = $this->repository->validate_rule( $payload );
@@ -631,7 +631,7 @@ class Internal_Linking {
 			wp_send_json_error( __( 'Permission denied.', 'saman-labs-seo' ), 403 );
 		}
 
-		check_ajax_referer( 'wpseopilot_link_admin', 'nonce' );
+		check_ajax_referer( 'samanlabs_seo_link_admin', 'nonce' );
 
 		$term       = isset( $_GET['term'] ) ? sanitize_text_field( wp_unslash( $_GET['term'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$post_types = $this->get_supported_post_types();
@@ -709,14 +709,14 @@ class Internal_Linking {
 	 */
 	private function fetch_preview_body( $url ) {
 		if ( empty( $url ) ) {
-			return new \WP_Error( 'wpseopilot_preview_url', __( 'Enter a preview URL.', 'saman-labs-seo' ) );
+			return new \WP_Error( 'samanlabs_seo_preview_url', __( 'Enter a preview URL.', 'saman-labs-seo' ) );
 		}
 
 		$site_host   = wp_parse_url( home_url(), PHP_URL_HOST );
 		$target_host = wp_parse_url( $url, PHP_URL_HOST );
 
 		if ( $target_host && $site_host && strtolower( $target_host ) !== strtolower( $site_host ) ) {
-			return new \WP_Error( 'wpseopilot_preview_host', __( 'Preview URLs must be on this site.', 'saman-labs-seo' ) );
+			return new \WP_Error( 'samanlabs_seo_preview_host', __( 'Preview URLs must be on this site.', 'saman-labs-seo' ) );
 		}
 
 		$response = wp_remote_get( $url, [ 'timeout' => 10 ] );
@@ -726,7 +726,7 @@ class Internal_Linking {
 
 		$body = wp_remote_retrieve_body( $response );
 		if ( empty( $body ) ) {
-			return new \WP_Error( 'wpseopilot_preview_body', __( 'No content returned for preview URL.', 'saman-labs-seo' ) );
+			return new \WP_Error( 'samanlabs_seo_preview_body', __( 'No content returned for preview URL.', 'saman-labs-seo' ) );
 		}
 
 		if ( strlen( $body ) > 200000 ) {
@@ -753,7 +753,7 @@ class Internal_Linking {
 	 * @return void
 	 */
 	public function ensure_role_capabilities() {
-		$roles = apply_filters( 'wpseopilot_internal_link_roles', [ 'administrator' ] );
+		$roles = apply_filters( 'samanlabs_seo_internal_link_roles', [ 'administrator' ] );
 		$roles = array_unique( array_filter( (array) $roles ) );
 
 		foreach ( $roles as $role_name ) {
@@ -930,7 +930,7 @@ class Internal_Linking {
 		$notices   = get_transient( self::NOTICE_TRANSIENT );
 		$notices   = is_array( $notices ) ? $notices : [];
 		$notices[] = [
-			'code'    => uniqid( 'wpseopilot_links_', true ),
+			'code'    => uniqid( 'samanlabs_seo_links_', true ),
 			'message' => wp_kses_post( $message ),
 			'type'    => ( 'error' === $type ) ? 'error' : 'updated',
 		];

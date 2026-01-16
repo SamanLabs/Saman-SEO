@@ -26,7 +26,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function boot() {
-		if ( ! apply_filters( 'wpseopilot_feature_toggle', true, 'frontend_head' ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_feature_toggle', true, 'frontend_head' ) ) {
 			return;
 		}
 
@@ -38,7 +38,7 @@ class Frontend {
 		add_action( 'wp_head', [ $this, 'render_json_ld' ], 20 );
 		add_action( 'wp_head', [ $this, 'render_hreflang' ], 8 );
 		add_action( 'wp_head', [ $this, 'render_pagination_links' ], 9 );
-		add_shortcode( 'wpseopilot_breadcrumbs', [ $this, 'breadcrumbs_shortcode' ] );
+		add_shortcode( 'samanlabs_seo_breadcrumbs', [ $this, 'breadcrumbs_shortcode' ] );
 	}
 
 	/**
@@ -72,13 +72,13 @@ class Frontend {
 
 		$post = $this->get_context_post();
 		$meta = $this->get_meta( $post );
-		$post_type_descriptions = $this->get_post_type_option( 'wpseopilot_post_type_meta_descriptions' );
-		$post_type_keywords     = $this->get_post_type_option( 'wpseopilot_post_type_keywords' );
+		$post_type_descriptions = $this->get_post_type_option( 'samanlabs_seo_post_type_meta_descriptions' );
+		$post_type_keywords     = $this->get_post_type_option( 'samanlabs_seo_post_type_keywords' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 		$is_home_view           = is_front_page() || is_home();
-		$homepage_title         = $is_home_view ? get_option( 'wpseopilot_homepage_title', '' ) : '';
-		$homepage_description   = $is_home_view ? get_option( 'wpseopilot_homepage_description', '' ) : '';
-		$homepage_keywords      = $is_home_view ? trim( (string) get_option( 'wpseopilot_homepage_keywords', '' ) ) : '';
+		$homepage_title         = $is_home_view ? get_option( 'samanlabs_seo_homepage_title', '' ) : '';
+		$homepage_description   = $is_home_view ? get_option( 'samanlabs_seo_homepage_description', '' ) : '';
+		$homepage_keywords      = $is_home_view ? trim( (string) get_option( 'samanlabs_seo_homepage_keywords', '' ) ) : '';
 
 
 
@@ -125,7 +125,7 @@ class Frontend {
 			$description = $content_snippet;
 		}
 		if ( empty( $description ) ) {
-			$description = get_option( 'wpseopilot_default_meta_description', get_bloginfo( 'description' ) );
+			$description = get_option( 'samanlabs_seo_default_meta_description', get_bloginfo( 'description' ) );
 		}
 		if ( empty( $description ) ) {
 			$description = get_bloginfo( 'description' );
@@ -133,10 +133,10 @@ class Frontend {
 		
 		// Run Variable Replacer
 		$description = replace_template_variables( $description, $post );
-		$description = apply_filters( 'wpseopilot_description', $description, $post );
+		$description = apply_filters( 'samanlabs_seo_description', $description, $post );
 
 		$canonical = $this->get_canonical( $post, $meta );
-		$canonical = apply_filters( 'wpseopilot_canonical', $canonical, $post );
+		$canonical = apply_filters( 'samanlabs_seo_canonical', $canonical, $post );
 
 		$robots = $this->get_robots( $meta );
 		$keywords = $homepage_keywords;
@@ -165,7 +165,7 @@ class Frontend {
 
 		// Run Replacer on Keywords too
 		$keywords = replace_template_variables( $keywords, $post );
-		$keywords = apply_filters( 'wpseopilot_keywords', $keywords, $post );
+		$keywords = apply_filters( 'samanlabs_seo_keywords', $keywords, $post );
 
 
 
@@ -201,11 +201,11 @@ class Frontend {
 		$post = $this->get_context_post();
 		$meta = $this->get_meta( $post );
 		$canonical_url = $this->get_canonical( $post, $meta );
-		$canonical_url = apply_filters( 'wpseopilot_canonical', $canonical_url, $post );
+		$canonical_url = apply_filters( 'samanlabs_seo_canonical', $canonical_url, $post );
 
 		// OG URL should match canonical URL by default
-		$url = apply_filters( 'wpseopilot_og_url', $canonical_url, $post );
-		$post_type_descriptions = $this->get_post_type_option( 'wpseopilot_post_type_meta_descriptions' );
+		$url = apply_filters( 'samanlabs_seo_og_url', $canonical_url, $post );
+		$post_type_descriptions = $this->get_post_type_option( 'samanlabs_seo_post_type_meta_descriptions' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 		$social_defaults        = $this->get_social_defaults( $post );
 
@@ -225,7 +225,7 @@ class Frontend {
 		
 		// Run Replacer
 		$raw_title = replace_template_variables( $raw_title, $post );
-		$title = apply_filters( 'wpseopilot_og_title', $raw_title, $post );
+		$title = apply_filters( 'samanlabs_seo_og_title', $raw_title, $post );
 
 		$description = $meta['description'] ?? '';
 		if ( $is_home_view && empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
@@ -238,7 +238,7 @@ class Frontend {
 			$description = $content_snippet;
 		}
 		if ( empty( $description ) ) {
-			$description = get_option( 'wpseopilot_default_meta_description', '' );
+			$description = get_option( 'samanlabs_seo_default_meta_description', '' );
 		}
 		if ( empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
 			$description = $social_defaults['og_description'];
@@ -249,7 +249,7 @@ class Frontend {
 		
 		// Run Replacer
 		$description = replace_template_variables( $description, $post );
-		$description = apply_filters( 'wpseopilot_og_description', $description, $post );
+		$description = apply_filters( 'samanlabs_seo_og_description', $description, $post );
 		$image = $this->get_social_image( $post, $meta, $social_defaults );
 
 		$twitter_title = $title;
@@ -269,12 +269,12 @@ class Frontend {
 
 		}
 
-		$twitter_title       = apply_filters( 'wpseopilot_twitter_title', $twitter_title, $post );
-		$twitter_description = apply_filters( 'wpseopilot_twitter_description', $twitter_description, $post );
+		$twitter_title       = apply_filters( 'samanlabs_seo_twitter_title', $twitter_title, $post );
+		$twitter_description = apply_filters( 'samanlabs_seo_twitter_description', $twitter_description, $post );
 		
 		// Twitter image is same as OG by default unless overridden here, or if the user wants separate filter content.
 		// We use $image for both initially.
-		$twitter_image = apply_filters( 'wpseopilot_twitter_image', $image, $post );
+		$twitter_image = apply_filters( 'samanlabs_seo_twitter_image', $image, $post );
 
 		// Determine OG type based on context
 		// Homepage and pages should use 'website', only blog posts should use 'article'
@@ -290,7 +290,7 @@ class Frontend {
 		}
 
 		// Allow override via filter
-		$og_type = apply_filters( 'wpseopilot_og_type', $og_type, $post );
+		$og_type = apply_filters( 'samanlabs_seo_og_type', $og_type, $post );
 
 		$tags = [
 			'og:title'       => $title,
@@ -305,7 +305,7 @@ class Frontend {
 			'twitter:image'       => $twitter_image,
 		];
 
-		$tags = apply_filters( 'wpseopilot_social_tags', $tags, $post, $meta, $social_defaults );
+		$tags = apply_filters( 'samanlabs_seo_social_tags', $tags, $post, $meta, $social_defaults );
 		$tags = $this->normalize_social_tags( $tags );
 		$tags = $this->dedupe_social_tags( $tags );
 
@@ -339,7 +339,7 @@ class Frontend {
 		$post = $this->get_context_post();
 		$meta = $this->get_meta( $post );
 		$is_home_view   = is_front_page() || is_home();
-		$homepage_title = $is_home_view ? get_option( 'wpseopilot_homepage_title', '' ) : '';
+		$homepage_title = $is_home_view ? get_option( 'samanlabs_seo_homepage_title', '' ) : '';
 
 		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
 
@@ -364,7 +364,7 @@ class Frontend {
 				$title = replace_template_variables( $title_template, null );
 			} else {
 				// Fallback defaults if template is empty
-				$separator = get_option( 'wpseopilot_title_separator', '-' );
+				$separator = get_option( 'samanlabs_seo_title_separator', '-' );
 				if ( '404' === $archive_type ) {
 					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
 				} elseif ( 'search' === $archive_type ) {
@@ -376,7 +376,7 @@ class Frontend {
 				}
 			}
 
-			$title = apply_filters( 'wpseopilot_title', $title, null );
+			$title = apply_filters( 'samanlabs_seo_title', $title, null );
 		}
 
 		if ( empty( $title ) ) {
@@ -394,7 +394,7 @@ class Frontend {
 	public function render_json_ld() {
 		$post = get_post();
 
-		$payload = apply_filters( 'wpseopilot_jsonld', [], $post );
+		$payload = apply_filters( 'samanlabs_seo_jsonld', [], $post );
 
 		if ( empty( $payload ) ) {
 			return;
@@ -412,7 +412,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function render_hreflang() {
-		$map = get_option( 'wpseopilot_hreflang_map' );
+		$map = get_option( 'samanlabs_seo_hreflang_map' );
 		if ( empty( $map ) ) {
 			return;
 		}
@@ -575,15 +575,15 @@ class Frontend {
 			$directives[] = 'noindex';
 		}
 
-		if ( ! empty( $meta['noindex'] ) || '1' === get_option( 'wpseopilot_default_noindex' ) ) {
+		if ( ! empty( $meta['noindex'] ) || '1' === get_option( 'samanlabs_seo_default_noindex' ) ) {
 			$directives[] = 'noindex';
 		}
 
-		if ( ! empty( $meta['nofollow'] ) || '1' === get_option( 'wpseopilot_default_nofollow' ) ) {
+		if ( ! empty( $meta['nofollow'] ) || '1' === get_option( 'samanlabs_seo_default_nofollow' ) ) {
 			$directives[] = 'nofollow';
 		}
 
-		$global = get_option( 'wpseopilot_global_robots' );
+		$global = get_option( 'samanlabs_seo_global_robots' );
 		if ( $global ) {
 			$directives = array_merge( $directives, array_map( 'trim', explode( ',', $global ) ) );
 		}
@@ -591,7 +591,7 @@ class Frontend {
 		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
 
 		// Filter the array of directives (e.g. ['noindex', 'nofollow']).
-		$directives = apply_filters( 'wpseopilot_robots_array', $directives );
+		$directives = apply_filters( 'samanlabs_seo_robots_array', $directives );
 
 		if ( ! is_array( $directives ) ) {
 			$directives = [];
@@ -600,7 +600,7 @@ class Frontend {
 		$robots_string = implode( ', ', $directives );
 
 		// Filter the final string (e.g. 'noindex, nofollow').
-		return apply_filters( 'wpseopilot_robots', $robots_string );
+		return apply_filters( 'samanlabs_seo_robots', $robots_string );
 	}
 
 	/**
@@ -641,7 +641,7 @@ class Frontend {
 
 		// 4. Site-wide Default
 		if ( empty( $image ) ) {
-			$fallback = get_option( 'wpseopilot_default_og_image', '' );
+			$fallback = get_option( 'samanlabs_seo_default_og_image', '' );
 			if ( ! empty( $fallback ) ) {
 				$image = $fallback;
 			}
@@ -651,7 +651,7 @@ class Frontend {
 		if ( empty( $image ) && $post instanceof WP_Post ) {
 			$image = add_query_arg(
 				[
-					'wpseopilot_social_card' => 1,
+					'samanlabs_seo_social_card' => 1,
 					'title'                  => get_the_title( $post ),
 				],
 				home_url( '/' )
@@ -666,7 +666,7 @@ class Frontend {
 		 * @param array   $meta            The custom SEO meta for this post.
 		 * @param array   $social_defaults Social default settings.
 		 */
-		return apply_filters( 'wpseopilot_og_image', $image, $post, $meta, $social_defaults );
+		return apply_filters( 'samanlabs_seo_og_image', $image, $post, $meta, $social_defaults );
 	}
 
 	/**
@@ -677,7 +677,7 @@ class Frontend {
 	 * @return array<string,string>
 	 */
 	private function get_social_defaults( $post ) {
-		$global = get_option( 'wpseopilot_social_defaults', [] );
+		$global = get_option( 'samanlabs_seo_social_defaults', [] );
 		if ( ! is_array( $global ) ) {
 			$global = [];
 		}
@@ -700,7 +700,7 @@ class Frontend {
 		);
 
 		if ( $post instanceof WP_Post ) {
-			$post_type_defaults = $this->get_post_type_option( 'wpseopilot_post_type_social_defaults' );
+			$post_type_defaults = $this->get_post_type_option( 'samanlabs_seo_post_type_social_defaults' );
 			if ( isset( $post_type_defaults[ $post->post_type ] ) && is_array( $post_type_defaults[ $post->post_type ] ) ) {
 				$per_type = array_filter(
 					$post_type_defaults[ $post->post_type ],
@@ -744,7 +744,7 @@ class Frontend {
 			$title = get_bloginfo( 'name' );
 		}
 
-		return apply_filters( 'wpseopilot_title', $title, $post );
+		return apply_filters( 'samanlabs_seo_title', $title, $post );
 	}
 
 	/**
@@ -826,7 +826,7 @@ class Frontend {
 			'twitter:image',
 		];
 
-		$multi = apply_filters( 'wpseopilot_social_multi_tags', $multi );
+		$multi = apply_filters( 'samanlabs_seo_social_multi_tags', $multi );
 		$multi = array_map( 'strtolower', array_filter( array_map( 'strval', (array) $multi ) ) );
 
 		$deduped = [];
@@ -905,7 +905,7 @@ class Frontend {
 	 * @return array
 	 */
 	private function get_archive_defaults() {
-		$archive_defaults = get_option( 'wpseopilot_archive_defaults', [] );
+		$archive_defaults = get_option( 'samanlabs_seo_archive_defaults', [] );
 		if ( ! is_array( $archive_defaults ) ) {
 			$archive_defaults = [];
 		}

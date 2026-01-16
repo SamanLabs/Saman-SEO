@@ -240,7 +240,7 @@ class Mobile_Test_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_recent() {
-        $recent = get_option( 'wpseopilot_mobile_tests', [] );
+        $recent = get_option( 'samanlabs_seo_mobile_tests', [] );
         return $this->success( $recent );
     }
 
@@ -366,7 +366,7 @@ class Mobile_Test_Controller extends REST_Controller {
      * @param int    $score Score.
      */
     private function save_recent_test( $url, $score ) {
-        $recent = get_option( 'wpseopilot_mobile_tests', [] );
+        $recent = get_option( 'samanlabs_seo_mobile_tests', [] );
 
         // Remove existing entry for same URL
         $recent = array_filter( $recent, function ( $item ) use ( $url ) {
@@ -383,6 +383,6 @@ class Mobile_Test_Controller extends REST_Controller {
         // Keep only last 10
         $recent = array_slice( $recent, 0, 10 );
 
-        update_option( 'wpseopilot_mobile_tests', $recent );
+        update_option( 'samanlabs_seo_mobile_tests', $recent );
     }
 }

@@ -21,12 +21,12 @@ class Social_Card_Generator {
 	 */
 	public function boot() {
 		// Check if module is enabled
-		if ( '1' !== get_option( 'wpseopilot_enable_og_preview', '1' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_enable_og_preview', '1' ) ) {
 			return;
 		}
 
 		// Allow further filtering
-		if ( ! apply_filters( 'wpseopilot_feature_toggle', true, 'social_card_generator' ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_feature_toggle', true, 'social_card_generator' ) ) {
 			return;
 		}
 
@@ -39,7 +39,7 @@ class Social_Card_Generator {
 	 * @return void
 	 */
 	public function maybe_render_card() {
-		if ( empty( $_GET['wpseopilot_social_card'] ) ) {
+		if ( empty( $_GET['samanlabs_seo_social_card'] ) ) {
 			return;
 		}
 
@@ -49,8 +49,8 @@ class Social_Card_Generator {
 		}
 
 		$title = sanitize_text_field( wp_unslash( $_GET['title'] ?? get_bloginfo( 'name' ) ) );
-		$width = (int) get_option( 'wpseopilot_default_social_width', 1200 );
-		$height = (int) get_option( 'wpseopilot_default_social_height', 630 );
+		$width = (int) get_option( 'samanlabs_seo_default_social_width', 1200 );
+		$height = (int) get_option( 'samanlabs_seo_default_social_height', 630 );
 
 		// Ensure width and height are valid
 		if ( $width <= 0 ) {
@@ -61,7 +61,7 @@ class Social_Card_Generator {
 		}
 
 		// Load design settings
-		$design_settings = get_option( 'wpseopilot_social_card_design', [] );
+		$design_settings = get_option( 'samanlabs_seo_social_card_design', [] );
 		if ( ! is_array( $design_settings ) ) {
 			$design_settings = [];
 		}

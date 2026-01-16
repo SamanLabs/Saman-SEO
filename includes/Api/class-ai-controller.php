@@ -236,9 +236,9 @@ class Ai_Controller extends REST_Controller {
 	 */
 	public function get_settings( $request ) {
 		$settings = [
-			'ai_prompt_system'      => get_option( 'wpseopilot_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' ),
-			'ai_prompt_title'       => get_option( 'wpseopilot_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' ),
-			'ai_prompt_description' => get_option( 'wpseopilot_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' ),
+			'ai_prompt_system'      => get_option( 'samanlabs_seo_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' ),
+			'ai_prompt_title'       => get_option( 'samanlabs_seo_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' ),
+			'ai_prompt_description' => get_option( 'samanlabs_seo_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' ),
 		];
 
 		return $this->success( $settings );
@@ -258,21 +258,21 @@ class Ai_Controller extends REST_Controller {
 		}
 
 		if ( isset( $params['ai_prompt_system'] ) ) {
-			update_option( 'wpseopilot_ai_prompt_system', sanitize_textarea_field( $params['ai_prompt_system'] ) );
+			update_option( 'samanlabs_seo_ai_prompt_system', sanitize_textarea_field( $params['ai_prompt_system'] ) );
 		}
 
 		if ( isset( $params['ai_prompt_title'] ) ) {
-			update_option( 'wpseopilot_ai_prompt_title', sanitize_textarea_field( $params['ai_prompt_title'] ) );
+			update_option( 'samanlabs_seo_ai_prompt_title', sanitize_textarea_field( $params['ai_prompt_title'] ) );
 		}
 
 		if ( isset( $params['ai_prompt_description'] ) ) {
-			update_option( 'wpseopilot_ai_prompt_description', sanitize_textarea_field( $params['ai_prompt_description'] ) );
+			update_option( 'samanlabs_seo_ai_prompt_description', sanitize_textarea_field( $params['ai_prompt_description'] ) );
 		}
 
 		return $this->success( [
-			'ai_prompt_system'      => get_option( 'wpseopilot_ai_prompt_system' ),
-			'ai_prompt_title'       => get_option( 'wpseopilot_ai_prompt_title' ),
-			'ai_prompt_description' => get_option( 'wpseopilot_ai_prompt_description' ),
+			'ai_prompt_system'      => get_option( 'samanlabs_seo_ai_prompt_system' ),
+			'ai_prompt_title'       => get_option( 'samanlabs_seo_ai_prompt_title' ),
+			'ai_prompt_description' => get_option( 'samanlabs_seo_ai_prompt_description' ),
 		], __( 'Settings saved.', 'saman-labs-seo' ) );
 	}
 
@@ -289,9 +289,9 @@ class Ai_Controller extends REST_Controller {
 			'ai_prompt_description' => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
 		];
 
-		update_option( 'wpseopilot_ai_prompt_system', $defaults['ai_prompt_system'] );
-		update_option( 'wpseopilot_ai_prompt_title', $defaults['ai_prompt_title'] );
-		update_option( 'wpseopilot_ai_prompt_description', $defaults['ai_prompt_description'] );
+		update_option( 'samanlabs_seo_ai_prompt_system', $defaults['ai_prompt_system'] );
+		update_option( 'samanlabs_seo_ai_prompt_title', $defaults['ai_prompt_title'] );
+		update_option( 'samanlabs_seo_ai_prompt_description', $defaults['ai_prompt_description'] );
 
 		return $this->success( $defaults, __( 'Settings reset to defaults.', 'saman-labs-seo' ) );
 	}

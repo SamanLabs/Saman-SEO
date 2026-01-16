@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Get social card design settings
-$design_settings = get_option( 'wpseopilot_social_card_design', [] );
+$design_settings = get_option( 'samanlabs_seo_social_card_design', [] );
 if ( ! is_array( $design_settings ) ) {
 	$design_settings = [];
 }
@@ -27,7 +27,7 @@ $design_defaults = [
 $design_settings = wp_parse_args( $design_settings, $design_defaults );
 
 // Check if module is enabled
-$module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
+$module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 ?>
 
 <div class="wpseopilot-settings-grid">
@@ -117,7 +117,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 							<label class="wpseopilot-layout-option">
 								<input
 									type="radio"
-									name="wpseopilot_social_card_design[layout]"
+									name="samanlabs_seo_social_card_design[layout]"
 									value="<?php echo esc_attr( $layout_key ); ?>"
 									<?php echo $checked; ?>
 								/>
@@ -138,7 +138,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<input
 						type="color"
 						id="wpseopilot-background-color"
-						name="wpseopilot_social_card_design[background_color]"
+						name="samanlabs_seo_social_card_design[background_color]"
 						class="wpseopilot-color-picker"
 						value="<?php echo esc_attr( $design_settings['background_color'] ); ?>"
 					/>
@@ -157,7 +157,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<input
 						type="color"
 						id="wpseopilot-accent-color"
-						name="wpseopilot_social_card_design[accent_color]"
+						name="samanlabs_seo_social_card_design[accent_color]"
 						class="wpseopilot-color-picker"
 						value="<?php echo esc_attr( $design_settings['accent_color'] ); ?>"
 					/>
@@ -176,7 +176,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<input
 						type="color"
 						id="wpseopilot-text-color"
-						name="wpseopilot_social_card_design[text_color]"
+						name="samanlabs_seo_social_card_design[text_color]"
 						class="wpseopilot-color-picker"
 						value="<?php echo esc_attr( $design_settings['text_color'] ); ?>"
 					/>
@@ -196,7 +196,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<input
 						type="number"
 						id="wpseopilot-title-font-size"
-						name="wpseopilot_social_card_design[title_font_size]"
+						name="samanlabs_seo_social_card_design[title_font_size]"
 						class="small-text"
 						value="<?php echo esc_attr( $design_settings['title_font_size'] ); ?>"
 						min="24"
@@ -212,7 +212,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<input
 						type="number"
 						id="wpseopilot-site-font-size"
-						name="wpseopilot_social_card_design[site_font_size]"
+						name="samanlabs_seo_social_card_design[site_font_size]"
 						class="small-text"
 						value="<?php echo esc_attr( $design_settings['site_font_size'] ); ?>"
 						min="12"
@@ -230,7 +230,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 						<input
 							type="url"
 							id="wpseopilot-logo-url"
-							name="wpseopilot_social_card_design[logo_url]"
+							name="samanlabs_seo_social_card_design[logo_url]"
 							class="regular-text"
 							value="<?php echo esc_attr( $design_settings['logo_url'] ); ?>"
 						/>
@@ -247,7 +247,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<label for="wpseopilot-logo-position">
 						<?php esc_html_e( 'Logo Position', 'saman-labs-seo' ); ?>
 					</label>
-					<select id="wpseopilot-logo-position" name="wpseopilot_social_card_design[logo_position]">
+					<select id="wpseopilot-logo-position" name="samanlabs_seo_social_card_design[logo_position]">
 						<option value="top-left" <?php selected( $design_settings['logo_position'], 'top-left' ); ?>>
 							<?php esc_html_e( 'Top Left', 'saman-labs-seo' ); ?>
 						</option>

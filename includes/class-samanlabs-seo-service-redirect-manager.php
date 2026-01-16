@@ -22,7 +22,7 @@ class Redirect_Manager {
 	/**
 	 * Cache settings shared with CLI helpers.
 	 */
-	public const CACHE_GROUP     = 'wpseopilot_redirects';
+	public const CACHE_GROUP     = 'samanlabs_seo_redirects';
 	public const CACHE_KEY_ADMIN = 'redirect_manager_admin_list';
 	public const CACHE_KEY_CLI   = 'redirect_manager_cli_list';
 	public const CACHE_TTL       = 30;
@@ -67,11 +67,11 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	public function boot() {
-		if ( '1' !== get_option( 'wpseopilot_enable_redirect_manager', '1' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_enable_redirect_manager', '1' ) ) {
 			return;
 		}
 
-		if ( ! apply_filters( 'wpseopilot_feature_toggle', true, 'redirects' ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_feature_toggle', true, 'redirects' ) ) {
 			return;
 		}
 
@@ -139,7 +139,7 @@ class Redirect_Manager {
 		// Store in transient for the current user.
 		$user_id = get_current_user_id();
 		set_transient(
-			'wpseopilot_slug_changed_' . $user_id,
+			'samanlabs_seo_slug_changed_' . $user_id,
 			[
 				'post_id' => $post_id,
 				'old_url' => $source,
@@ -149,7 +149,7 @@ class Redirect_Manager {
 		);
 
 		// Also store in persistent option for the "Recommended Redirects" list.
-		$suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+		$suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 		$key         = md5( $source ); // Use hash of source as key to avoid special char issues in keys.
 		
 		$suggestions[ $key ] = [
@@ -159,7 +159,7 @@ class Redirect_Manager {
 			'date'    => current_time( 'mysql' ),
 		];
 
-		update_option( 'wpseopilot_monitor_slugs', $suggestions );
+		update_option( 'samanlabs_seo_monitor_slugs', $suggestions );
 	}
 
 	/**
@@ -174,7 +174,7 @@ class Redirect_Manager {
 		}
 
 		$user_id = get_current_user_id();
-		$data    = get_transient( 'wpseopilot_slug_changed_' . $user_id );
+		$data    = get_transient( 'samanlabs_seo_slug_changed_' . $user_id );
 
 		if ( ! $data ) {
 			return;
@@ -184,7 +184,7 @@ class Redirect_Manager {
 		// We'll delete it in the AJAX handler or let it expire.
 		// Actually, if we don't delete different page loads might show it.
 		// Let's delete it NOW so it only shows once.
-		delete_transient( 'wpseopilot_slug_changed_' . $user_id );
+		delete_transient( 'samanlabs_seo_slug_changed_' . $user_id );
 
 		?>
 		<div class="notice notice-info is-dismissible wpseopilot-slug-notice">
@@ -203,7 +203,7 @@ class Redirect_Manager {
 					class="button button-primary wpseopilot-create-redirect-btn"
 					data-source="<?php echo esc_attr( $data['old_url'] ); ?>"
 					data-target="<?php echo esc_attr( $data['new_url'] ); ?>"
-					data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpseopilot_create_redirect' ) ); ?>">
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'samanlabs_seo_create_redirect' ) ); ?>">
 					<?php esc_html_e( 'Create Redirect', 'saman-labs-seo' ); ?>
 				</button>
 			</p>
@@ -278,11 +278,11 @@ class Redirect_Manager {
 		self::flush_cache();
 
 		// Cleanup from suggestions if exists.
-		$suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+		$suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 		$key         = md5( $normalized );
 		if ( isset( $suggestions[ $key ] ) ) {
 			unset( $suggestions[ $key ] );
-			update_option( 'wpseopilot_monitor_slugs', $suggestions );
+			update_option( 'samanlabs_seo_monitor_slugs', $suggestions );
 		}
 
 		return $wpdb->insert_id;
@@ -473,7 +473,7 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	public function ajax_create_redirect() {
-		check_ajax_referer( 'wpseopilot_create_redirect', 'nonce' );
+		check_ajax_referer( 'samanlabs_seo_create_redirect', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Permission denied.', 'saman-labs-seo' ) );
@@ -489,7 +489,7 @@ class Redirect_Manager {
 		}
 
 		// Cleanup transient just in case it wasn't cleared by the render method (e.g. if we moved to dismissing manually).
-		delete_transient( 'wpseopilot_slug_changed_' . get_current_user_id() );
+		delete_transient( 'samanlabs_seo_slug_changed_' . get_current_user_id() );
 
 		wp_send_json_success( __( 'Redirect created successfully.', 'saman-labs-seo' ) );
 	}
@@ -535,7 +535,7 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	private function maybe_migrate_schema() {
-		$current_version = (int) get_option( 'wpseopilot_redirects_schema_version', 1 );
+		$current_version = (int) get_option( 'samanlabs_seo_redirects_schema_version', 1 );
 
 		if ( $current_version >= self::SCHEMA_VERSION ) {
 			return;
@@ -585,7 +585,7 @@ class Redirect_Manager {
 			$wpdb->query( "ALTER TABLE {$this->table} MODIFY COLUMN target varchar(500) NOT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		}
 
-		update_option( 'wpseopilot_redirects_schema_version', self::SCHEMA_VERSION );
+		update_option( 'samanlabs_seo_redirects_schema_version', self::SCHEMA_VERSION );
 	}
 
 	/**
@@ -650,7 +650,7 @@ class Redirect_Manager {
 			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
-		check_admin_referer( 'wpseopilot_redirect' );
+		check_admin_referer( 'samanlabs_seo_redirect' );
 
 		$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : '';
 		$target = isset( $_POST['target'] ) ? esc_url_raw( wp_unslash( $_POST['target'] ) ) : '';
@@ -681,7 +681,7 @@ class Redirect_Manager {
 			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
-		check_admin_referer( 'wpseopilot_redirect_delete' );
+		check_admin_referer( 'samanlabs_seo_redirect_delete' );
 
 		$id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
@@ -709,15 +709,15 @@ class Redirect_Manager {
 			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
-		check_admin_referer( 'wpseopilot_dismiss_slug' );
+		check_admin_referer( 'samanlabs_seo_dismiss_slug' );
 
 		$key = isset( $_GET['key'] ) ? sanitize_text_field( $_GET['key'] ) : '';
 
 		if ( $key ) {
-			$suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+			$suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 			if ( isset( $suggestions[ $key ] ) ) {
 				unset( $suggestions[ $key ] );
-				update_option( 'wpseopilot_monitor_slugs', $suggestions );
+				update_option( 'samanlabs_seo_monitor_slugs', $suggestions );
 			}
 		}
 

@@ -46,9 +46,9 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 
 <div class="wpseopilot-fields">
 	<p>
-		<label for="wpseopilot_title"><strong><?php esc_html_e( 'Meta title', 'saman-labs-seo' ); ?></strong></label>
-		<input type="text" name="wpseopilot_title" id="wpseopilot_title" class="widefat" value="<?php echo esc_attr( $meta['title'] ); ?>" maxlength="160" />
-		<span class="wpseopilot-counter" data-target="wpseopilot_title"></span>
+		<label for="samanlabs_seo_title"><strong><?php esc_html_e( 'Meta title', 'saman-labs-seo' ); ?></strong></label>
+		<input type="text" name="samanlabs_seo_title" id="samanlabs_seo_title" class="widefat" value="<?php echo esc_attr( $meta['title'] ); ?>" maxlength="160" />
+		<span class="wpseopilot-counter" data-target="samanlabs_seo_title"></span>
 		<?php if ( $wpseopilot_ai_enabled ) : ?>
 			<span class="wpseopilot-ai-inline">
 				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="title" data-target="#wpseopilot_title" data-post="<?php echo esc_attr( $post->ID ); ?>">
@@ -60,9 +60,9 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 	</p>
 
 	<p>
-		<label for="wpseopilot_description"><strong><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></strong></label>
-		<textarea name="wpseopilot_description" id="wpseopilot_description" class="widefat" rows="3" maxlength="320"><?php echo esc_textarea( $meta['description'] ); ?></textarea>
-		<span class="wpseopilot-counter" data-target="wpseopilot_description"></span>
+		<label for="samanlabs_seo_description"><strong><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></strong></label>
+		<textarea name="samanlabs_seo_description" id="samanlabs_seo_description" class="widefat" rows="3" maxlength="320"><?php echo esc_textarea( $meta['description'] ); ?></textarea>
+		<span class="wpseopilot-counter" data-target="samanlabs_seo_description"></span>
 		<?php if ( $wpseopilot_ai_enabled ) : ?>
 			<span class="wpseopilot-ai-inline">
 				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="description" data-target="#wpseopilot_description" data-post="<?php echo esc_attr( $post->ID ); ?>">
@@ -74,25 +74,25 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 	</p>
 
 	<p>
-		<label for="wpseopilot_canonical"><strong><?php esc_html_e( 'Canonical URL override', 'saman-labs-seo' ); ?></strong></label>
-		<input type="url" name="wpseopilot_canonical" id="wpseopilot_canonical" class="widefat" value="<?php echo esc_url( $meta['canonical'] ); ?>" />
+		<label for="samanlabs_seo_canonical"><strong><?php esc_html_e( 'Canonical URL override', 'saman-labs-seo' ); ?></strong></label>
+		<input type="url" name="samanlabs_seo_canonical" id="samanlabs_seo_canonical" class="widefat" value="<?php echo esc_url( $meta['canonical'] ); ?>" />
 	</p>
 
 	<p>
 		<label>
-			<input type="checkbox" name="wpseopilot_noindex" value="1" <?php checked( $meta['noindex'], '1' ); ?> />
+			<input type="checkbox" name="samanlabs_seo_noindex" value="1" <?php checked( $meta['noindex'], '1' ); ?> />
 			<?php esc_html_e( 'Mark as noindex', 'saman-labs-seo' ); ?>
 		</label>
 		<br />
 		<label>
-			<input type="checkbox" name="wpseopilot_nofollow" value="1" <?php checked( $meta['nofollow'], '1' ); ?> />
+			<input type="checkbox" name="samanlabs_seo_nofollow" value="1" <?php checked( $meta['nofollow'], '1' ); ?> />
 			<?php esc_html_e( 'Mark as nofollow', 'saman-labs-seo' ); ?>
 		</label>
 	</p>
 
 	<p>
-		<label for="wpseopilot_og_image"><strong><?php esc_html_e( 'Social image override', 'saman-labs-seo' ); ?></strong></label>
-		<input type="url" name="wpseopilot_og_image" id="wpseopilot_og_image" class="widefat" value="<?php echo esc_url( $meta['og_image'] ); ?>" />
+		<label for="samanlabs_seo_og_image"><strong><?php esc_html_e( 'Social image override', 'saman-labs-seo' ); ?></strong></label>
+		<input type="url" name="samanlabs_seo_og_image" id="samanlabs_seo_og_image" class="widefat" value="<?php echo esc_url( $meta['og_image'] ); ?>" />
 		<span class="description"><?php esc_html_e( 'Ideal size 1200×630. Keep key content centered to avoid crop.', 'saman-labs-seo' ); ?></span>
 	</p>
 </div>
@@ -121,7 +121,7 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 	</div>
 </div>
 
-<?php $wpseopilot_suggestions = apply_filters( 'wpseopilot_link_suggestions', [], $post->ID ); ?>
+<?php $wpseopilot_suggestions = apply_filters( 'samanlabs_seo_link_suggestions', [], $post->ID ); ?>
 <?php if ( $wpseopilot_suggestions ) : ?>
 	<div class="wpseopilot-links">
 		<h4><?php esc_html_e( 'Internal link suggestions', 'saman-labs-seo' ); ?></h4>

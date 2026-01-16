@@ -7,7 +7,7 @@
  * @package WPSEOPilot
  */
 
-$social_defaults = get_option( 'wpseopilot_social_defaults', [] );
+$social_defaults = get_option( 'samanlabs_seo_social_defaults', [] );
 if ( ! is_array( $social_defaults ) ) {
 	$social_defaults = [];
 }
@@ -23,7 +23,7 @@ $social_field_defaults = [
 
 $social_defaults = wp_parse_args( $social_defaults, $social_field_defaults );
 
-$post_type_social_defaults = get_option( 'wpseopilot_post_type_social_defaults', [] );
+$post_type_social_defaults = get_option( 'samanlabs_seo_post_type_social_defaults', [] );
 if ( ! is_array( $post_type_social_defaults ) ) {
 	$post_type_social_defaults = [];
 }
@@ -156,39 +156,39 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 							<th scope="row"><?php esc_html_e( 'Index by default', 'saman-labs-seo' ); ?></th>
 							<td>
 								<label>
-									<input type="checkbox" name="wpseopilot_default_noindex" value="1" <?php checked( get_option( 'wpseopilot_default_noindex' ), '1' ); ?> />
+									<input type="checkbox" name="samanlabs_seo_default_noindex" value="1" <?php checked( get_option( 'samanlabs_seo_default_noindex' ), '1' ); ?> />
 									<?php esc_html_e( 'Treat new content as noindex', 'saman-labs-seo' ); ?>
 								</label>
 								<br />
 								<label>
-									<input type="checkbox" name="wpseopilot_default_nofollow" value="1" <?php checked( get_option( 'wpseopilot_default_nofollow' ), '1' ); ?> />
+									<input type="checkbox" name="samanlabs_seo_default_nofollow" value="1" <?php checked( get_option( 'samanlabs_seo_default_nofollow' ), '1' ); ?> />
 									<?php esc_html_e( 'Treat new content as nofollow', 'saman-labs-seo' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr>
 							<th scope="row">
-								<label for="wpseopilot_global_robots"><?php esc_html_e( 'Global robots meta', 'saman-labs-seo' ); ?></label>
+								<label for="samanlabs_seo_global_robots"><?php esc_html_e( 'Global robots meta', 'saman-labs-seo' ); ?></label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" id="wpseopilot_global_robots" name="wpseopilot_global_robots" value="<?php echo esc_attr( get_option( 'wpseopilot_global_robots' ) ); ?>" />
+								<input type="text" class="regular-text" id="samanlabs_seo_global_robots" name="samanlabs_seo_global_robots" value="<?php echo esc_attr( get_option( 'samanlabs_seo_global_robots' ) ); ?>" />
 								<p class="description"><?php esc_html_e( 'Comma separated instructions (index, follow, max-snippet, etc.)', 'saman-labs-seo' ); ?></p>
 							</td>
 						</tr>
 						<tr>
 							<th scope="row">
-								<label for="wpseopilot_hreflang_map"><?php esc_html_e( 'Hreflang map (JSON)', 'saman-labs-seo' ); ?></label>
+								<label for="samanlabs_seo_hreflang_map"><?php esc_html_e( 'Hreflang map (JSON)', 'saman-labs-seo' ); ?></label>
 							</th>
 							<td>
-								<textarea class="large-text code" rows="3" id="wpseopilot_hreflang_map" name="wpseopilot_hreflang_map" placeholder='{"en-us":"https://example.com/","es-es":"https://example.com/es/"}'><?php echo esc_textarea( get_option( 'wpseopilot_hreflang_map' ) ); ?></textarea>
+								<textarea class="large-text code" rows="3" id="samanlabs_seo_hreflang_map" name="samanlabs_seo_hreflang_map" placeholder='{"en-us":"https://example.com/","es-es":"https://example.com/es/"}'><?php echo esc_textarea( get_option( 'samanlabs_seo_hreflang_map' ) ); ?></textarea>
 							</td>
 						</tr>
 						<tr>
 							<th scope="row">
-								<label for="wpseopilot_robots_txt"><?php esc_html_e( 'Robots.txt override', 'saman-labs-seo' ); ?></label>
+								<label for="samanlabs_seo_robots_txt"><?php esc_html_e( 'Robots.txt override', 'saman-labs-seo' ); ?></label>
 							</th>
 							<td>
-								<textarea class="large-text code" rows="6" id="wpseopilot_robots_txt" name="wpseopilot_robots_txt"><?php echo esc_textarea( get_option( 'wpseopilot_robots_txt' ) ); ?></textarea>
+								<textarea class="large-text code" rows="6" id="samanlabs_seo_robots_txt" name="samanlabs_seo_robots_txt"><?php echo esc_textarea( get_option( 'samanlabs_seo_robots_txt' ) ); ?></textarea>
 								<p class="description"><?php esc_html_e( 'Leave blank to respect WP core output.', 'saman-labs-seo' ); ?></p>
 							</td>
 						</tr>
@@ -212,7 +212,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( 'Sitemap Enhancer', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_sitemap_enhancer" value="1" <?php checked( get_option( 'wpseopilot_enable_sitemap_enhancer' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_sitemap_enhancer" value="1" <?php checked( get_option( 'samanlabs_seo_enable_sitemap_enhancer' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
@@ -234,7 +234,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( 'Redirect Manager', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_redirect_manager" value="1" <?php checked( get_option( 'wpseopilot_enable_redirect_manager' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_redirect_manager" value="1" <?php checked( get_option( 'samanlabs_seo_enable_redirect_manager' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
@@ -256,7 +256,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( '404 Error Logging', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_404_logging" value="1" <?php checked( get_option( 'wpseopilot_enable_404_logging' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_404_logging" value="1" <?php checked( get_option( 'samanlabs_seo_enable_404_logging' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
@@ -278,14 +278,14 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( 'Dynamic Social Card Generator', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_og_preview" value="1" <?php checked( get_option( 'wpseopilot_enable_og_preview', '1' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_og_preview" value="1" <?php checked( get_option( 'samanlabs_seo_enable_og_preview', '1' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
 						<p class="wpseopilot-module-description">
 							<?php esc_html_e( 'Generate dynamic PNG social card images on-the-fly for sharing. Note: This only controls dynamic image generation, not Open Graph meta tags.', 'saman-labs-seo' ); ?>
 						</p>
-					<?php if ( '1' === get_option( 'wpseopilot_enable_og_preview', '1' ) ) : ?>
+					<?php if ( '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' ) ) : ?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-types#social-cards' ) ); ?>" class="wpseopilot-module-link">
 							<?php esc_html_e( 'Customize Social Cards →', 'saman-labs-seo' ); ?>
 						</a>
@@ -302,7 +302,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( 'LLM.txt Generator', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_llm_txt" value="1" <?php checked( get_option( 'wpseopilot_enable_llm_txt', '1' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_llm_txt" value="1" <?php checked( get_option( 'samanlabs_seo_enable_llm_txt', '1' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
@@ -324,14 +324,14 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( 'Local SEO', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_local_seo" value="1" <?php checked( get_option( 'wpseopilot_enable_local_seo', '0' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_local_seo" value="1" <?php checked( get_option( 'samanlabs_seo_enable_local_seo', '0' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
 						<p class="wpseopilot-module-description">
 							<?php esc_html_e( 'Add Local Business schema markup with business info, opening hours, and location data for better local search visibility.', 'saman-labs-seo' ); ?>
 						</p>
-						<?php if ( '1' === get_option( 'wpseopilot_enable_local_seo', '0' ) ) : ?>
+						<?php if ( '1' === get_option( 'samanlabs_seo_enable_local_seo', '0' ) ) : ?>
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-local-seo' ) ); ?>" class="wpseopilot-module-link">
 								<?php esc_html_e( 'Configure Local SEO →', 'saman-labs-seo' ); ?>
 							</a>
@@ -348,7 +348,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						<div class="wpseopilot-module-header">
 							<h3><?php esc_html_e( 'Usage Analytics', 'saman-labs-seo' ); ?></h3>
 							<label class="wpseopilot-toggle-switch">
-								<input type="checkbox" name="wpseopilot_enable_analytics" value="1" <?php checked( get_option( 'wpseopilot_enable_analytics', '1' ), '1' ); ?> />
+								<input type="checkbox" name="samanlabs_seo_enable_analytics" value="1" <?php checked( get_option( 'samanlabs_seo_enable_analytics', '1' ), '1' ); ?> />
 								<span class="wpseopilot-toggle-slider"></span>
 							</label>
 						</div>
@@ -375,37 +375,37 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 				<h2><?php esc_html_e( 'Knowledge Graph & Schema.org', 'saman-labs-seo' ); ?></h2>
 				<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google’s Knowledge Graph and other rich results.', 'saman-labs-seo' ); ?></p>
 					<form action="options.php" method="post">
-						<?php settings_fields( 'wpseopilot_knowledge' ); ?>
+						<?php settings_fields( 'samanlabs_seo_knowledge' ); ?>
 					<table class="form-table" role="presentation">
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Site represents', 'saman-labs-seo' ); ?></th>
 							<td>
 								<label>
-									<input type="radio" name="wpseopilot_homepage_knowledge_type" value="organization" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'organization' ); ?> />
+									<input type="radio" name="samanlabs_seo_homepage_knowledge_type" value="organization" <?php checked( get_option( 'samanlabs_seo_homepage_knowledge_type', 'organization' ), 'organization' ); ?> />
 									<?php esc_html_e( 'Organization', 'saman-labs-seo' ); ?>
 								</label>
 								<br />
 								<label>
-									<input type="radio" name="wpseopilot_homepage_knowledge_type" value="person" <?php checked( get_option( 'wpseopilot_homepage_knowledge_type', 'organization' ), 'person' ); ?> />
+									<input type="radio" name="samanlabs_seo_homepage_knowledge_type" value="person" <?php checked( get_option( 'samanlabs_seo_homepage_knowledge_type', 'organization' ), 'person' ); ?> />
 									<?php esc_html_e( 'Person', 'saman-labs-seo' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr>
 							<th scope="row">
-								<label for="wpseopilot_homepage_organization_name"><?php esc_html_e( 'Organization name', 'saman-labs-seo' ); ?></label>
+								<label for="samanlabs_seo_homepage_organization_name"><?php esc_html_e( 'Organization name', 'saman-labs-seo' ); ?></label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" id="wpseopilot_homepage_organization_name" name="wpseopilot_homepage_organization_name" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_organization_name' ) ); ?>" />
+								<input type="text" class="regular-text" id="samanlabs_seo_homepage_organization_name" name="samanlabs_seo_homepage_organization_name" value="<?php echo esc_attr( get_option( 'samanlabs_seo_homepage_organization_name' ) ); ?>" />
 							</td>
 						</tr>
 						<tr>
 							<th scope="row">
-								<label for="wpseopilot_homepage_organization_logo"><?php esc_html_e( 'Organization logo', 'saman-labs-seo' ); ?></label>
+								<label for="samanlabs_seo_homepage_organization_logo"><?php esc_html_e( 'Organization logo', 'saman-labs-seo' ); ?></label>
 							</th>
 							<td>
 								<div class="wpseopilot-media-field">
-									<input type="url" class="regular-text" id="wpseopilot_homepage_organization_logo" name="wpseopilot_homepage_organization_logo" value="<?php echo esc_url( get_option( 'wpseopilot_homepage_organization_logo' ) ); ?>" />
+									<input type="url" class="regular-text" id="samanlabs_seo_homepage_organization_logo" name="samanlabs_seo_homepage_organization_logo" value="<?php echo esc_url( get_option( 'samanlabs_seo_homepage_organization_logo' ) ); ?>" />
 									<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'saman-labs-seo' ); ?></button>
 								</div>
 								<p class="description"><?php esc_html_e( 'Recommended: square logo at least 112×112 px. Used in structured data and social previews.', 'saman-labs-seo' ); ?></p>
@@ -426,8 +426,8 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 			<section class="wpseopilot-card">
 				<h2><?php esc_html_e( 'Export / Backup', 'saman-labs-seo' ); ?></h2>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-					<?php wp_nonce_field( 'wpseopilot_export' ); ?>
-					<input type="hidden" name="action" value="wpseopilot_export" />
+					<?php wp_nonce_field( 'samanlabs_seo_export' ); ?>
+					<input type="hidden" name="action" value="samanlabs_seo_export" />
 					<?php submit_button( __( 'Download JSON', 'saman-labs-seo' ), 'secondary', 'submit', false ); ?>
 				</form>
 			</section>

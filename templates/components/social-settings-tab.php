@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Get social defaults
-$social_defaults = get_option( 'wpseopilot_social_defaults', [] );
+$social_defaults = get_option( 'samanlabs_seo_social_defaults', [] );
 if ( ! is_array( $social_defaults ) ) {
 	$social_defaults = [];
 }
@@ -25,7 +25,7 @@ $social_field_defaults = [
 $social_defaults = wp_parse_args( $social_defaults, $social_field_defaults );
 
 // Get post type social defaults
-$post_type_social_defaults = get_option( 'wpseopilot_post_type_social_defaults', [] );
+$post_type_social_defaults = get_option( 'samanlabs_seo_post_type_social_defaults', [] );
 if ( ! is_array( $post_type_social_defaults ) ) {
 	$post_type_social_defaults = [];
 }
@@ -109,20 +109,20 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					<h3><?php esc_html_e( 'Open Graph (Facebook)', 'saman-labs-seo' ); ?></h3>
 					<div class="wpseopilot-form-row">
 						<div class="wpseopilot-form-label">
-							<label for="wpseopilot_social_defaults_og_title"><?php esc_html_e( 'Fallback Title', 'saman-labs-seo' ); ?></label>
+							<label for="samanlabs_seo_social_defaults_og_title"><?php esc_html_e( 'Fallback Title', 'saman-labs-seo' ); ?></label>
 						</div>
 						<div class="wpseopilot-form-control">
-							<input type="text" class="regular-text" id="wpseopilot_social_defaults_og_title" name="wpseopilot_social_defaults[og_title]" value="<?php echo esc_attr( $social_defaults['og_title'] ); ?>" />
+							<input type="text" class="regular-text" id="samanlabs_seo_social_defaults_og_title" name="samanlabs_seo_social_defaults[og_title]" value="<?php echo esc_attr( $social_defaults['og_title'] ); ?>" />
 							<span class="wpseopilot-helper-text"><?php esc_html_e( 'Default title for Facebook shares', 'saman-labs-seo' ); ?></span>
 						</div>
 					</div>
 
 					<div class="wpseopilot-form-row">
 						<div class="wpseopilot-form-label">
-							<label for="wpseopilot_social_defaults_og_description"><?php esc_html_e( 'Fallback Description', 'saman-labs-seo' ); ?></label>
+							<label for="samanlabs_seo_social_defaults_og_description"><?php esc_html_e( 'Fallback Description', 'saman-labs-seo' ); ?></label>
 						</div>
 						<div class="wpseopilot-form-control">
-							<textarea class="large-text" rows="3" id="wpseopilot_social_defaults_og_description" name="wpseopilot_social_defaults[og_description]"><?php echo esc_textarea( $social_defaults['og_description'] ); ?></textarea>
+							<textarea class="large-text" rows="3" id="samanlabs_seo_social_defaults_og_description" name="samanlabs_seo_social_defaults[og_description]"><?php echo esc_textarea( $social_defaults['og_description'] ); ?></textarea>
 							<span class="wpseopilot-helper-text"><?php esc_html_e( 'Default description for Facebook shares', 'saman-labs-seo' ); ?></span>
 						</div>
 					</div>
@@ -133,20 +133,20 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					<h3><?php esc_html_e( 'Twitter Card', 'saman-labs-seo' ); ?></h3>
 					<div class="wpseopilot-form-row">
 						<div class="wpseopilot-form-label">
-							<label for="wpseopilot_social_defaults_twitter_title"><?php esc_html_e( 'Fallback Title', 'saman-labs-seo' ); ?></label>
+							<label for="samanlabs_seo_social_defaults_twitter_title"><?php esc_html_e( 'Fallback Title', 'saman-labs-seo' ); ?></label>
 						</div>
 						<div class="wpseopilot-form-control">
-							<input type="text" class="regular-text" id="wpseopilot_social_defaults_twitter_title" name="wpseopilot_social_defaults[twitter_title]" value="<?php echo esc_attr( $social_defaults['twitter_title'] ); ?>" />
+							<input type="text" class="regular-text" id="samanlabs_seo_social_defaults_twitter_title" name="samanlabs_seo_social_defaults[twitter_title]" value="<?php echo esc_attr( $social_defaults['twitter_title'] ); ?>" />
 							<span class="wpseopilot-helper-text"><?php esc_html_e( 'Default title for Twitter shares', 'saman-labs-seo' ); ?></span>
 						</div>
 					</div>
 
 					<div class="wpseopilot-form-row">
 						<div class="wpseopilot-form-label">
-							<label for="wpseopilot_social_defaults_twitter_description"><?php esc_html_e( 'Fallback Description', 'saman-labs-seo' ); ?></label>
+							<label for="samanlabs_seo_social_defaults_twitter_description"><?php esc_html_e( 'Fallback Description', 'saman-labs-seo' ); ?></label>
 						</div>
 						<div class="wpseopilot-form-control">
-							<textarea class="large-text" rows="3" id="wpseopilot_social_defaults_twitter_description" name="wpseopilot_social_defaults[twitter_description]"><?php echo esc_textarea( $social_defaults['twitter_description'] ); ?></textarea>
+							<textarea class="large-text" rows="3" id="samanlabs_seo_social_defaults_twitter_description" name="samanlabs_seo_social_defaults[twitter_description]"><?php echo esc_textarea( $social_defaults['twitter_description'] ); ?></textarea>
 							<span class="wpseopilot-helper-text"><?php esc_html_e( 'Default description for Twitter shares', 'saman-labs-seo' ); ?></span>
 						</div>
 					</div>
@@ -157,10 +157,10 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					<h3><?php esc_html_e( 'Social Image', 'saman-labs-seo' ); ?></h3>
 					<div class="wpseopilot-form-row">
 						<div class="wpseopilot-form-label">
-							<label for="wpseopilot_social_defaults_image_source"><?php esc_html_e( 'Fallback Image URL', 'saman-labs-seo' ); ?></label>
+							<label for="samanlabs_seo_social_defaults_image_source"><?php esc_html_e( 'Fallback Image URL', 'saman-labs-seo' ); ?></label>
 						</div>
 						<div class="wpseopilot-form-control">
-							<input type="url" class="regular-text" id="wpseopilot_social_defaults_image_source" name="wpseopilot_social_defaults[image_source]" value="<?php echo esc_url( $social_defaults['image_source'] ); ?>" />
+							<input type="url" class="regular-text" id="samanlabs_seo_social_defaults_image_source" name="samanlabs_seo_social_defaults[image_source]" value="<?php echo esc_url( $social_defaults['image_source'] ); ?>" />
 							<span class="wpseopilot-helper-text"><?php esc_html_e( 'Used when posts don\'t have a featured image (1200x630px recommended)', 'saman-labs-seo' ); ?></span>
 						</div>
 					</div>
@@ -171,14 +171,14 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					<h3><?php esc_html_e( 'Schema.org Type', 'saman-labs-seo' ); ?></h3>
 					<div class="wpseopilot-form-row">
 						<div class="wpseopilot-form-label">
-							<label for="wpseopilot_social_defaults_schema_itemtype"><?php esc_html_e( 'Default Schema Type', 'saman-labs-seo' ); ?></label>
+							<label for="samanlabs_seo_social_defaults_schema_itemtype"><?php esc_html_e( 'Default Schema Type', 'saman-labs-seo' ); ?></label>
 						</div>
 						<div class="wpseopilot-form-control">
 							<?php
 							$render_schema_control(
-								'wpseopilot_social_defaults[schema_itemtype]',
+								'samanlabs_seo_social_defaults[schema_itemtype]',
 								$social_defaults['schema_itemtype'],
-								'wpseopilot_social_defaults_schema_itemtype'
+								'samanlabs_seo_social_defaults_schema_itemtype'
 							);
 							?>
 							<span class="wpseopilot-helper-text"><?php esc_html_e( 'Controls the og:type meta tag for content without specific overrides', 'saman-labs-seo' ); ?></span>
@@ -213,61 +213,61 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 							<!-- Open Graph -->
 							<div class="wpseopilot-form-row">
 								<div class="wpseopilot-form-label">
-									<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_title"><?php esc_html_e( 'OG Title', 'saman-labs-seo' ); ?></label>
+									<label for="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_og_title"><?php esc_html_e( 'OG Title', 'saman-labs-seo' ); ?></label>
 								</div>
 								<div class="wpseopilot-form-control">
-									<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_title" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_title]" value="<?php echo esc_attr( $values['og_title'] ); ?>" />
+									<input type="text" class="regular-text" id="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_og_title" name="samanlabs_seo_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_title]" value="<?php echo esc_attr( $values['og_title'] ); ?>" />
 								</div>
 							</div>
 
 							<div class="wpseopilot-form-row">
 								<div class="wpseopilot-form-label">
-									<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_description"><?php esc_html_e( 'OG Description', 'saman-labs-seo' ); ?></label>
+									<label for="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_og_description"><?php esc_html_e( 'OG Description', 'saman-labs-seo' ); ?></label>
 								</div>
 								<div class="wpseopilot-form-control">
-									<textarea class="large-text" rows="2" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_og_description" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_description]"><?php echo esc_textarea( $values['og_description'] ); ?></textarea>
+									<textarea class="large-text" rows="2" id="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_og_description" name="samanlabs_seo_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][og_description]"><?php echo esc_textarea( $values['og_description'] ); ?></textarea>
 								</div>
 							</div>
 
 							<!-- Twitter -->
 							<div class="wpseopilot-form-row">
 								<div class="wpseopilot-form-label">
-									<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_title"><?php esc_html_e( 'Twitter Title', 'saman-labs-seo' ); ?></label>
+									<label for="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_twitter_title"><?php esc_html_e( 'Twitter Title', 'saman-labs-seo' ); ?></label>
 								</div>
 								<div class="wpseopilot-form-control">
-									<input type="text" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_title" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_title]" value="<?php echo esc_attr( $values['twitter_title'] ); ?>" />
+									<input type="text" class="regular-text" id="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_twitter_title" name="samanlabs_seo_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_title]" value="<?php echo esc_attr( $values['twitter_title'] ); ?>" />
 								</div>
 							</div>
 
 							<div class="wpseopilot-form-row">
 								<div class="wpseopilot-form-label">
-									<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_description"><?php esc_html_e( 'Twitter Description', 'saman-labs-seo' ); ?></label>
+									<label for="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_twitter_description"><?php esc_html_e( 'Twitter Description', 'saman-labs-seo' ); ?></label>
 								</div>
 								<div class="wpseopilot-form-control">
-									<textarea class="large-text" rows="2" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_twitter_description" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_description]"><?php echo esc_textarea( $values['twitter_description'] ); ?></textarea>
+									<textarea class="large-text" rows="2" id="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_twitter_description" name="samanlabs_seo_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][twitter_description]"><?php echo esc_textarea( $values['twitter_description'] ); ?></textarea>
 								</div>
 							</div>
 
 							<!-- Image and Schema -->
 							<div class="wpseopilot-form-row">
 								<div class="wpseopilot-form-label">
-									<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_image_source"><?php esc_html_e( 'Image URL', 'saman-labs-seo' ); ?></label>
+									<label for="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_image_source"><?php esc_html_e( 'Image URL', 'saman-labs-seo' ); ?></label>
 								</div>
 								<div class="wpseopilot-form-control">
-									<input type="url" class="regular-text" id="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_image_source" name="wpseopilot_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][image_source]" value="<?php echo esc_url( $values['image_source'] ); ?>" />
+									<input type="url" class="regular-text" id="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_image_source" name="samanlabs_seo_post_type_social_defaults[<?php echo esc_attr( $slug ); ?>][image_source]" value="<?php echo esc_url( $values['image_source'] ); ?>" />
 								</div>
 							</div>
 
 							<div class="wpseopilot-form-row">
 								<div class="wpseopilot-form-label">
-									<label for="wpseopilot_social_<?php echo esc_attr( $slug ); ?>_schema_itemtype"><?php esc_html_e( 'Schema Type', 'saman-labs-seo' ); ?></label>
+									<label for="samanlabs_seo_social_<?php echo esc_attr( $slug ); ?>_schema_itemtype"><?php esc_html_e( 'Schema Type', 'saman-labs-seo' ); ?></label>
 								</div>
 								<div class="wpseopilot-form-control">
 									<?php
 									$render_schema_control(
-										"wpseopilot_post_type_social_defaults[{$slug}][schema_itemtype]",
+										"samanlabs_seo_post_type_social_defaults[{$slug}][schema_itemtype]",
 										$values['schema_itemtype'],
-										"wpseopilot_social_{$slug}_schema_itemtype"
+										"samanlabs_seo_social_{$slug}_schema_itemtype"
 									);
 									?>
 								</div>

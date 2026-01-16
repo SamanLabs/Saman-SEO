@@ -53,9 +53,9 @@ foreach ( $utm_templates as $template ) {
 							<a href="<?php echo esc_url( add_query_arg( [ 'tab' => 'categories', 'category' => $category['id'] ], $page_url ) ); ?>"><?php esc_html_e( 'Edit', 'saman-labs-seo' ); ?></a>
 							<div>
 								<form method="get" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-links__delete-category">
-									<input type="hidden" name="action" value="wpseopilot_delete_link_category" />
+									<input type="hidden" name="action" value="samanlabs_seo_delete_link_category" />
 									<input type="hidden" name="category" value="<?php echo esc_attr( $category['id'] ); ?>" />
-									<?php wp_nonce_field( 'wpseopilot_delete_link_category' ); ?>
+									<?php wp_nonce_field( 'samanlabs_seo_delete_link_category' ); ?>
 									<?php if ( $count > 0 ) : ?>
 										<label>
 											<span class="screen-reader-text"><?php esc_html_e( 'Reassign rules to', 'saman-labs-seo' ); ?></span>
@@ -85,8 +85,8 @@ foreach ( $utm_templates as $template ) {
 	<div class="wpseopilot-card">
 		<h3><?php echo esc_html( $editing ? __( 'Edit category', 'saman-labs-seo' ) : __( 'Add category', 'saman-labs-seo' ) ); ?></h3>
 		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__category-form">
-			<?php wp_nonce_field( 'wpseopilot_save_link_category' ); ?>
-			<input type="hidden" name="action" value="wpseopilot_save_link_category" />
+			<?php wp_nonce_field( 'samanlabs_seo_save_link_category' ); ?>
+			<input type="hidden" name="action" value="samanlabs_seo_save_link_category" />
 			<?php if ( $editing ) : ?>
 				<input type="hidden" name="category[id]" value="<?php echo esc_attr( $category_id ); ?>" />
 				<input type="hidden" name="category[created_at]" value="<?php echo esc_attr( $editing['created_at'] ?? time() ); ?>" />

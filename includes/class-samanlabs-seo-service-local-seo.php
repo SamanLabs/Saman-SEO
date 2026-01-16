@@ -21,14 +21,14 @@ class Local_SEO {
 	 */
 	public function boot() {
 		// Only initialize if module is enabled.
-		if ( '1' !== get_option( 'wpseopilot_enable_local_seo', '0' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_enable_local_seo', '0' ) ) {
 			return;
 		}
 
 		// V1 menu disabled - React UI handles menu registration
 		// add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
+		add_filter( 'samanlabs_seo_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
 	}
 
 	/**
@@ -53,40 +53,40 @@ class Local_SEO {
 	 * @return void
 	 */
 	public function register_settings() {
-		$group = 'wpseopilot_local_seo';
+		$group = 'samanlabs_seo_local_seo';
 
 		// Business Information.
-		register_setting( $group, 'wpseopilot_local_business_name', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_local_business_type', [ $this, 'sanitize_business_type' ] );
-		register_setting( $group, 'wpseopilot_local_description', 'sanitize_textarea_field' );
-		register_setting( $group, 'wpseopilot_local_logo', 'esc_url_raw' );
-		register_setting( $group, 'wpseopilot_local_image', 'esc_url_raw' );
-		register_setting( $group, 'wpseopilot_local_price_range', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_business_name', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_business_type', [ $this, 'sanitize_business_type' ] );
+		register_setting( $group, 'samanlabs_seo_local_description', 'sanitize_textarea_field' );
+		register_setting( $group, 'samanlabs_seo_local_logo', 'esc_url_raw' );
+		register_setting( $group, 'samanlabs_seo_local_image', 'esc_url_raw' );
+		register_setting( $group, 'samanlabs_seo_local_price_range', 'sanitize_text_field' );
 
 		// Contact Information.
-		register_setting( $group, 'wpseopilot_local_phone', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_local_email', 'sanitize_email' );
+		register_setting( $group, 'samanlabs_seo_local_phone', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_email', 'sanitize_email' );
 
 		// Address.
-		register_setting( $group, 'wpseopilot_local_street', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_local_city', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_local_state', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_local_zip', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_local_country', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_street', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_city', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_state', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_zip', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_local_country', 'sanitize_text_field' );
 
 		// Geo Coordinates.
-		register_setting( $group, 'wpseopilot_local_latitude', [ $this, 'sanitize_coordinate' ] );
-		register_setting( $group, 'wpseopilot_local_longitude', [ $this, 'sanitize_coordinate' ] );
+		register_setting( $group, 'samanlabs_seo_local_latitude', [ $this, 'sanitize_coordinate' ] );
+		register_setting( $group, 'samanlabs_seo_local_longitude', [ $this, 'sanitize_coordinate' ] );
 
 		// Social Profiles.
-		register_setting( $group, 'wpseopilot_local_social_profiles', [ $this, 'sanitize_social_profiles' ] );
+		register_setting( $group, 'samanlabs_seo_local_social_profiles', [ $this, 'sanitize_social_profiles' ] );
 
 		// Opening Hours.
-		register_setting( $group, 'wpseopilot_local_opening_hours', [ $this, 'sanitize_opening_hours' ] );
+		register_setting( $group, 'samanlabs_seo_local_opening_hours', [ $this, 'sanitize_opening_hours' ] );
 
 		// Multiple Locations.
-		register_setting( $group, 'wpseopilot_local_enable_locations', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'wpseopilot_local_locations', [ $this, 'sanitize_locations' ] );
+		register_setting( $group, 'samanlabs_seo_local_enable_locations', [ $this, 'sanitize_bool' ] );
+		register_setting( $group, 'samanlabs_seo_local_locations', [ $this, 'sanitize_locations' ] );
 	}
 
 	/**
@@ -245,11 +245,11 @@ class Local_SEO {
 		}
 
 		// Check if multi-location is enabled.
-		$enable_locations = get_option( 'wpseopilot_local_enable_locations', '0' );
+		$enable_locations = get_option( 'samanlabs_seo_local_enable_locations', '0' );
 
 		if ( '1' === $enable_locations ) {
 			// Output schema for each enabled location.
-			$locations = get_option( 'wpseopilot_local_locations', [] );
+			$locations = get_option( 'samanlabs_seo_local_locations', [] );
 
 			if ( ! empty( $locations ) && is_array( $locations ) ) {
 				foreach ( $locations as $index => $location ) {
@@ -300,7 +300,7 @@ class Local_SEO {
 		];
 
 		// Use primary business logo.
-		$logo = get_option( 'wpseopilot_local_logo', '' );
+		$logo = get_option( 'samanlabs_seo_local_logo', '' );
 		if ( ! empty( $logo ) ) {
 			$schema['logo'] = $logo;
 		}
@@ -378,14 +378,14 @@ class Local_SEO {
 	 * @return array|null
 	 */
 	private function build_schema() {
-		$business_name = get_option( 'wpseopilot_local_business_name', '' );
+		$business_name = get_option( 'samanlabs_seo_local_business_name', '' );
 
 		// Require at minimum a business name.
 		if ( empty( $business_name ) ) {
 			return null;
 		}
 
-		$business_type = get_option( 'wpseopilot_local_business_type', 'LocalBusiness' );
+		$business_type = get_option( 'samanlabs_seo_local_business_type', 'LocalBusiness' );
 		$site_url = home_url( '/' );
 
 		$schema = [
@@ -397,37 +397,37 @@ class Local_SEO {
 		];
 
 		// Logo.
-		$logo = get_option( 'wpseopilot_local_logo', '' );
+		$logo = get_option( 'samanlabs_seo_local_logo', '' );
 		if ( ! empty( $logo ) ) {
 			$schema['logo'] = $logo;
 		}
 
 		// Image.
-		$image = get_option( 'wpseopilot_local_image', '' );
+		$image = get_option( 'samanlabs_seo_local_image', '' );
 		if ( ! empty( $image ) ) {
 			$schema['image'] = $image;
 		}
 
 		// Description.
-		$description = get_option( 'wpseopilot_local_description', '' );
+		$description = get_option( 'samanlabs_seo_local_description', '' );
 		if ( ! empty( $description ) ) {
 			$schema['description'] = $description;
 		}
 
 		// Phone.
-		$phone = get_option( 'wpseopilot_local_phone', '' );
+		$phone = get_option( 'samanlabs_seo_local_phone', '' );
 		if ( ! empty( $phone ) ) {
 			$schema['telephone'] = $phone;
 		}
 
 		// Email.
-		$email = get_option( 'wpseopilot_local_email', '' );
+		$email = get_option( 'samanlabs_seo_local_email', '' );
 		if ( ! empty( $email ) ) {
 			$schema['email'] = $email;
 		}
 
 		// Price Range.
-		$price_range = get_option( 'wpseopilot_local_price_range', '' );
+		$price_range = get_option( 'samanlabs_seo_local_price_range', '' );
 		if ( ! empty( $price_range ) ) {
 			$schema['priceRange'] = $price_range;
 		}
@@ -451,7 +451,7 @@ class Local_SEO {
 		}
 
 		// Social Profiles.
-		$social_profiles = get_option( 'wpseopilot_local_social_profiles', [] );
+		$social_profiles = get_option( 'samanlabs_seo_local_social_profiles', [] );
 		if ( ! empty( $social_profiles ) && is_array( $social_profiles ) ) {
 			$schema['sameAs'] = $social_profiles;
 		}
@@ -465,11 +465,11 @@ class Local_SEO {
 	 * @return array|null
 	 */
 	private function build_address() {
-		$street  = get_option( 'wpseopilot_local_street', '' );
-		$city    = get_option( 'wpseopilot_local_city', '' );
-		$state   = get_option( 'wpseopilot_local_state', '' );
-		$zip     = get_option( 'wpseopilot_local_zip', '' );
-		$country = get_option( 'wpseopilot_local_country', '' );
+		$street  = get_option( 'samanlabs_seo_local_street', '' );
+		$city    = get_option( 'samanlabs_seo_local_city', '' );
+		$state   = get_option( 'samanlabs_seo_local_state', '' );
+		$zip     = get_option( 'samanlabs_seo_local_zip', '' );
+		$country = get_option( 'samanlabs_seo_local_country', '' );
 
 		// Require at least street and city.
 		if ( empty( $street ) || empty( $city ) ) {
@@ -509,8 +509,8 @@ class Local_SEO {
 	 * @return array|null
 	 */
 	private function build_geo() {
-		$latitude  = get_option( 'wpseopilot_local_latitude', '' );
-		$longitude = get_option( 'wpseopilot_local_longitude', '' );
+		$latitude  = get_option( 'samanlabs_seo_local_latitude', '' );
+		$longitude = get_option( 'samanlabs_seo_local_longitude', '' );
 
 		if ( empty( $latitude ) || empty( $longitude ) ) {
 			return null;
@@ -529,7 +529,7 @@ class Local_SEO {
 	 * @return array
 	 */
 	private function build_opening_hours() {
-		$hours = get_option( 'wpseopilot_local_opening_hours', [] );
+		$hours = get_option( 'samanlabs_seo_local_opening_hours', [] );
 
 		if ( empty( $hours ) || ! is_array( $hours ) ) {
 			return [];

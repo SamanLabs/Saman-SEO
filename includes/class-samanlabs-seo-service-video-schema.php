@@ -53,7 +53,7 @@ class Video_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_video_schema_to_graph' ], 25, 1 );
+		add_filter( 'samanlabs_seo_jsonld_graph', [ $this, 'add_video_schema_to_graph' ], 25, 1 );
 	}
 
 	/**
@@ -211,7 +211,7 @@ class Video_Schema {
 	 * @return array|null
 	 */
 	private function get_youtube_oembed( $video_id ) {
-		$cache_key = 'wpseopilot_youtube_oembed_' . $video_id;
+		$cache_key = 'samanlabs_seo_youtube_oembed_' . $video_id;
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
@@ -242,7 +242,7 @@ class Video_Schema {
 	 * @return array|null
 	 */
 	private function get_vimeo_oembed( $video_id ) {
-		$cache_key = 'wpseopilot_vimeo_oembed_' . $video_id;
+		$cache_key = 'samanlabs_seo_vimeo_oembed_' . $video_id;
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {

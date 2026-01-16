@@ -10,23 +10,23 @@
 defined( 'ABSPATH' ) || exit;
 
 // Get current values.
-$business_name  = get_option( 'wpseopilot_local_business_name', '' );
-$business_type  = get_option( 'wpseopilot_local_business_type', 'LocalBusiness' );
-$description    = get_option( 'wpseopilot_local_description', '' );
-$logo           = get_option( 'wpseopilot_local_logo', '' );
-$image          = get_option( 'wpseopilot_local_image', '' );
-$price_range    = get_option( 'wpseopilot_local_price_range', '' );
-$phone          = get_option( 'wpseopilot_local_phone', '' );
-$email          = get_option( 'wpseopilot_local_email', '' );
-$street         = get_option( 'wpseopilot_local_street', '' );
-$city           = get_option( 'wpseopilot_local_city', '' );
-$state          = get_option( 'wpseopilot_local_state', '' );
-$zip            = get_option( 'wpseopilot_local_zip', '' );
-$country        = get_option( 'wpseopilot_local_country', '' );
-$latitude       = get_option( 'wpseopilot_local_latitude', '' );
-$longitude      = get_option( 'wpseopilot_local_longitude', '' );
-$social_profiles = get_option( 'wpseopilot_local_social_profiles', [] );
-$opening_hours  = get_option( 'wpseopilot_local_opening_hours', [] );
+$business_name  = get_option( 'samanlabs_seo_local_business_name', '' );
+$business_type  = get_option( 'samanlabs_seo_local_business_type', 'LocalBusiness' );
+$description    = get_option( 'samanlabs_seo_local_description', '' );
+$logo           = get_option( 'samanlabs_seo_local_logo', '' );
+$image          = get_option( 'samanlabs_seo_local_image', '' );
+$price_range    = get_option( 'samanlabs_seo_local_price_range', '' );
+$phone          = get_option( 'samanlabs_seo_local_phone', '' );
+$email          = get_option( 'samanlabs_seo_local_email', '' );
+$street         = get_option( 'samanlabs_seo_local_street', '' );
+$city           = get_option( 'samanlabs_seo_local_city', '' );
+$state          = get_option( 'samanlabs_seo_local_state', '' );
+$zip            = get_option( 'samanlabs_seo_local_zip', '' );
+$country        = get_option( 'samanlabs_seo_local_country', '' );
+$latitude       = get_option( 'samanlabs_seo_local_latitude', '' );
+$longitude      = get_option( 'samanlabs_seo_local_longitude', '' );
+$social_profiles = get_option( 'samanlabs_seo_local_social_profiles', [] );
+$opening_hours  = get_option( 'samanlabs_seo_local_opening_hours', [] );
 
 // Ensure social profiles is array.
 if ( ! is_array( $social_profiles ) ) {
@@ -84,7 +84,7 @@ if ( ! is_array( $social_profiles ) ) {
 			aria-labelledby="wpseopilot-tab-link-business-info"
 		>
 			<form action="options.php" method="post">
-				<?php settings_fields( 'wpseopilot_local_seo' ); ?>
+				<?php settings_fields( 'samanlabs_seo_local_seo' ); ?>
 
 				<!-- Business Details Card -->
 				<div class="wpseopilot-card">
@@ -95,14 +95,14 @@ if ( ! is_array( $social_profiles ) ) {
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_business_name">
+							<label for="samanlabs_seo_local_business_name">
 								<strong><?php esc_html_e( 'Business Name', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Official name of your business (required)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_business_name"
-								name="wpseopilot_local_business_name"
+								id="samanlabs_seo_local_business_name"
+								name="samanlabs_seo_local_business_name"
 								value="<?php echo esc_attr( $business_name ); ?>"
 								class="regular-text"
 								required
@@ -110,11 +110,11 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_business_type">
+							<label for="samanlabs_seo_local_business_type">
 								<strong><?php esc_html_e( 'Business Type', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Select the type that best describes your business', 'saman-labs-seo' ); ?></span>
 							</label>
-							<select id="wpseopilot_local_business_type" name="wpseopilot_local_business_type" class="regular-text">
+							<select id="samanlabs_seo_local_business_type" name="samanlabs_seo_local_business_type" class="regular-text">
 								<?php foreach ( $business_types as $value => $label ) : ?>
 									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $business_type, $value ); ?>>
 										<?php echo esc_html( $label ); ?>
@@ -124,28 +124,28 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_description">
+							<label for="samanlabs_seo_local_description">
 								<strong><?php esc_html_e( 'Business Description', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Short, human-readable description of your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<textarea
-								id="wpseopilot_local_description"
-								name="wpseopilot_local_description"
+								id="samanlabs_seo_local_description"
+								name="samanlabs_seo_local_description"
 								rows="3"
 								class="large-text"
 							><?php echo esc_textarea( $description ); ?></textarea>
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_logo">
+							<label for="samanlabs_seo_local_logo">
 								<strong><?php esc_html_e( 'Business Logo', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Official logo of your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<div class="wpseopilot-media-field">
 								<input
 									type="url"
-									id="wpseopilot_local_logo"
-									name="wpseopilot_local_logo"
+									id="samanlabs_seo_local_logo"
+									name="samanlabs_seo_local_logo"
 									value="<?php echo esc_url( $logo ); ?>"
 									class="regular-text"
 								/>
@@ -154,15 +154,15 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_image">
+							<label for="samanlabs_seo_local_image">
 								<strong><?php esc_html_e( 'Cover Image', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Featured image representing your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<div class="wpseopilot-media-field">
 								<input
 									type="url"
-									id="wpseopilot_local_image"
-									name="wpseopilot_local_image"
+									id="samanlabs_seo_local_image"
+									name="samanlabs_seo_local_image"
 									value="<?php echo esc_url( $image ); ?>"
 									class="regular-text"
 								/>
@@ -171,14 +171,14 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_price_range">
+							<label for="samanlabs_seo_local_price_range">
 								<strong><?php esc_html_e( 'Price Range', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Use $ symbols (e.g., $, $$, $$$, $$$$)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_price_range"
-								name="wpseopilot_local_price_range"
+								id="samanlabs_seo_local_price_range"
+								name="samanlabs_seo_local_price_range"
 								value="<?php echo esc_attr( $price_range ); ?>"
 								class="small-text"
 								placeholder="$$"
@@ -197,14 +197,14 @@ if ( ! is_array( $social_profiles ) ) {
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_phone">
+							<label for="samanlabs_seo_local_phone">
 								<strong><?php esc_html_e( 'Phone Number', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Include country code (e.g., +1-305-555-1234)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="tel"
-								id="wpseopilot_local_phone"
-								name="wpseopilot_local_phone"
+								id="samanlabs_seo_local_phone"
+								name="samanlabs_seo_local_phone"
 								value="<?php echo esc_attr( $phone ); ?>"
 								class="regular-text"
 								placeholder="+1-555-555-5555"
@@ -212,14 +212,14 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_email">
+							<label for="samanlabs_seo_local_email">
 								<strong><?php esc_html_e( 'Email Address', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Public contact email for your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="email"
-								id="wpseopilot_local_email"
-								name="wpseopilot_local_email"
+								id="samanlabs_seo_local_email"
+								name="samanlabs_seo_local_email"
 								value="<?php echo esc_attr( $email ); ?>"
 								class="regular-text"
 								placeholder="contact@example.com"
@@ -238,13 +238,13 @@ if ( ! is_array( $social_profiles ) ) {
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_street">
+							<label for="samanlabs_seo_local_street">
 								<strong><?php esc_html_e( 'Street Address', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_street"
-								name="wpseopilot_local_street"
+								id="samanlabs_seo_local_street"
+								name="samanlabs_seo_local_street"
 								value="<?php echo esc_attr( $street ); ?>"
 								class="regular-text"
 								placeholder="123 Main Street"
@@ -252,13 +252,13 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_city">
+							<label for="samanlabs_seo_local_city">
 								<strong><?php esc_html_e( 'City', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_city"
-								name="wpseopilot_local_city"
+								id="samanlabs_seo_local_city"
+								name="samanlabs_seo_local_city"
 								value="<?php echo esc_attr( $city ); ?>"
 								class="regular-text"
 								placeholder="Miami"
@@ -266,13 +266,13 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_state">
+							<label for="samanlabs_seo_local_state">
 								<strong><?php esc_html_e( 'State / Province', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_state"
-								name="wpseopilot_local_state"
+								id="samanlabs_seo_local_state"
+								name="samanlabs_seo_local_state"
 								value="<?php echo esc_attr( $state ); ?>"
 								class="regular-text"
 								placeholder="FL"
@@ -280,13 +280,13 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_zip">
+							<label for="samanlabs_seo_local_zip">
 								<strong><?php esc_html_e( 'Postal Code', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_zip"
-								name="wpseopilot_local_zip"
+								id="samanlabs_seo_local_zip"
+								name="samanlabs_seo_local_zip"
 								value="<?php echo esc_attr( $zip ); ?>"
 								class="small-text"
 								placeholder="33101"
@@ -294,14 +294,14 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_country">
+							<label for="samanlabs_seo_local_country">
 								<strong><?php esc_html_e( 'Country', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Two-letter country code (e.g., US, GB, CA)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_country"
-								name="wpseopilot_local_country"
+								id="samanlabs_seo_local_country"
+								name="samanlabs_seo_local_country"
 								value="<?php echo esc_attr( $country ); ?>"
 								class="small-text"
 								placeholder="US"
@@ -321,13 +321,13 @@ if ( ! is_array( $social_profiles ) ) {
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_latitude">
+							<label for="samanlabs_seo_local_latitude">
 								<strong><?php esc_html_e( 'Latitude', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_latitude"
-								name="wpseopilot_local_latitude"
+								id="samanlabs_seo_local_latitude"
+								name="samanlabs_seo_local_latitude"
 								value="<?php echo esc_attr( $latitude ); ?>"
 								class="regular-text"
 								placeholder="25.761681"
@@ -335,13 +335,13 @@ if ( ! is_array( $social_profiles ) ) {
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_local_longitude">
+							<label for="samanlabs_seo_local_longitude">
 								<strong><?php esc_html_e( 'Longitude', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
-								id="wpseopilot_local_longitude"
-								name="wpseopilot_local_longitude"
+								id="samanlabs_seo_local_longitude"
+								name="samanlabs_seo_local_longitude"
 								value="<?php echo esc_attr( $longitude ); ?>"
 								class="regular-text"
 								placeholder="-80.191788"
@@ -375,13 +375,13 @@ if ( ! is_array( $social_profiles ) ) {
 							$profile_url = $social_profiles[ $i ] ?? '';
 							?>
 							<div class="wpseopilot-form-row">
-								<label for="wpseopilot_local_social_<?php echo esc_attr( $i ); ?>">
+								<label for="samanlabs_seo_local_social_<?php echo esc_attr( $i ); ?>">
 									<strong><?php echo esc_html( sprintf( __( 'Social Profile %d', 'saman-labs-seo' ), $i + 1 ) ); ?></strong>
 								</label>
 								<input
 									type="url"
-									id="wpseopilot_local_social_<?php echo esc_attr( $i ); ?>"
-									name="wpseopilot_local_social_profiles[]"
+									id="samanlabs_seo_local_social_<?php echo esc_attr( $i ); ?>"
+									name="samanlabs_seo_local_social_profiles[]"
 									value="<?php echo esc_url( $profile_url ); ?>"
 									class="regular-text"
 									placeholder="https://facebook.com/yourpage"
@@ -408,7 +408,7 @@ if ( ! is_array( $social_profiles ) ) {
 			aria-labelledby="wpseopilot-tab-link-opening-hours"
 		>
 			<form action="options.php" method="post">
-				<?php settings_fields( 'wpseopilot_local_seo' ); ?>
+				<?php settings_fields( 'samanlabs_seo_local_seo' ); ?>
 
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
@@ -438,7 +438,7 @@ if ( ! is_array( $social_profiles ) ) {
 								<label class="wpseopilot-day-toggle">
 									<input
 										type="checkbox"
-										name="wpseopilot_local_opening_hours[<?php echo esc_attr( $day ); ?>][enabled]"
+										name="samanlabs_seo_local_opening_hours[<?php echo esc_attr( $day ); ?>][enabled]"
 										value="1"
 										<?php checked( $enabled ); ?>
 									/>
@@ -447,14 +447,14 @@ if ( ! is_array( $social_profiles ) ) {
 								<div class="wpseopilot-hours-inputs">
 									<input
 										type="time"
-										name="wpseopilot_local_opening_hours[<?php echo esc_attr( $day ); ?>][open]"
+										name="samanlabs_seo_local_opening_hours[<?php echo esc_attr( $day ); ?>][open]"
 										value="<?php echo esc_attr( $open ); ?>"
 										class="wpseopilot-time-input"
 									/>
 									<span class="wpseopilot-hours-separator">—</span>
 									<input
 										type="time"
-										name="wpseopilot_local_opening_hours[<?php echo esc_attr( $day ); ?>][close]"
+										name="samanlabs_seo_local_opening_hours[<?php echo esc_attr( $day ); ?>][close]"
 										value="<?php echo esc_attr( $close ); ?>"
 										class="wpseopilot-time-input"
 									/>

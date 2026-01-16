@@ -20,7 +20,7 @@ class Music_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_music_schema_to_graph' ], 20, 2 );
+		add_filter( 'samanlabs_seo_jsonld_graph', [ $this, 'add_music_schema_to_graph' ], 20, 2 );
 	}
 
 	/**

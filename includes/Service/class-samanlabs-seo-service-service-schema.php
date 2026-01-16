@@ -20,7 +20,7 @@ class Service_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_service_schema_to_graph' ], 20, 2 );
+		add_filter( 'samanlabs_seo_jsonld_graph', [ $this, 'add_service_schema_to_graph' ], 20, 2 );
 	}
 
 	/**

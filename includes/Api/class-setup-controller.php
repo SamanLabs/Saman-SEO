@@ -74,9 +74,9 @@ class Setup_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_status( $request ) {
-        $completed = get_option( 'wpseopilot_setup_completed', false );
-        $skipped = get_option( 'wpseopilot_setup_skipped', false );
-        $setup_data = get_option( 'wpseopilot_setup_data', [] );
+        $completed = get_option( 'samanlabs_seo_setup_completed', false );
+        $skipped = get_option( 'samanlabs_seo_setup_skipped', false );
+        $setup_data = get_option( 'samanlabs_seo_setup_data', [] );
 
         return $this->success( [
             'completed'   => (bool) $completed,
@@ -156,26 +156,26 @@ class Setup_Controller extends REST_Controller {
             'completed_at'  => current_time( 'mysql' ),
         ];
 
-        update_option( 'wpseopilot_setup_data', $setup_data );
+        update_option( 'samanlabs_seo_setup_data', $setup_data );
 
         // Save AI settings
         if ( ! empty( $params['ai_provider'] ) ) {
-            update_option( 'wpseopilot_ai_active_provider', sanitize_text_field( $params['ai_provider'] ) );
+            update_option( 'samanlabs_seo_ai_active_provider', sanitize_text_field( $params['ai_provider'] ) );
         }
 
         if ( ! empty( $params['ai_api_key'] ) ) {
-            update_option( 'wpseopilot_openai_api_key', sanitize_text_field( $params['ai_api_key'] ) );
+            update_option( 'samanlabs_seo_openai_api_key', sanitize_text_field( $params['ai_api_key'] ) );
         }
 
         if ( ! empty( $params['ai_model'] ) ) {
-            update_option( 'wpseopilot_ai_model', sanitize_text_field( $params['ai_model'] ) );
+            update_option( 'samanlabs_seo_ai_model', sanitize_text_field( $params['ai_model'] ) );
         }
 
         // Save module settings
         $modules_to_toggle = [
-            'enable_sitemap'   => 'wpseopilot_module_sitemap',
-            'enable_404_log'   => 'wpseopilot_module_404_log',
-            'enable_redirects' => 'wpseopilot_module_redirects',
+            'enable_sitemap'   => 'samanlabs_seo_module_sitemap',
+            'enable_404_log'   => 'samanlabs_seo_module_404_log',
+            'enable_redirects' => 'samanlabs_seo_module_redirects',
         ];
 
         foreach ( $modules_to_toggle as $param_key => $option_key ) {
@@ -186,12 +186,12 @@ class Setup_Controller extends REST_Controller {
 
         // Save title template
         if ( ! empty( $params['title_template'] ) ) {
-            update_option( 'wpseopilot_title_template', sanitize_text_field( $params['title_template'] ) );
+            update_option( 'samanlabs_seo_title_template', sanitize_text_field( $params['title_template'] ) );
         }
 
         // Mark setup as completed
-        update_option( 'wpseopilot_setup_completed', true );
-        delete_option( 'wpseopilot_setup_skipped' );
+        update_option( 'samanlabs_seo_setup_completed', true );
+        delete_option( 'samanlabs_seo_setup_skipped' );
 
         return $this->success( null, __( 'Setup completed successfully!', 'saman-labs-seo' ) );
     }
@@ -203,7 +203,7 @@ class Setup_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function skip_setup( $request ) {
-        update_option( 'wpseopilot_setup_skipped', true );
+        update_option( 'samanlabs_seo_setup_skipped', true );
 
         return $this->success( null, __( 'Setup skipped.', 'saman-labs-seo' ) );
     }
@@ -215,9 +215,9 @@ class Setup_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function reset_setup( $request ) {
-        delete_option( 'wpseopilot_setup_completed' );
-        delete_option( 'wpseopilot_setup_skipped' );
-        delete_option( 'wpseopilot_setup_data' );
+        delete_option( 'samanlabs_seo_setup_completed' );
+        delete_option( 'samanlabs_seo_setup_skipped' );
+        delete_option( 'samanlabs_seo_setup_data' );
 
         return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'saman-labs-seo' ) );
     }

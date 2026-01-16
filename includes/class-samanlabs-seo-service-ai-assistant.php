@@ -55,7 +55,7 @@ class AI_Assistant {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
-		if ( 'wpseopilot_page_wpseopilot-ai' !== $hook ) {
+		if ( 'samanlabs_seo_page_wpseopilot-ai' !== $hook ) {
 			return;
 		}
 
@@ -91,13 +91,13 @@ class AI_Assistant {
 			SAMANLABS_SEO_VERSION
 		);
 
-		$api_key = get_option( 'wpseopilot_openai_api_key', '' );
+		$api_key = get_option( 'samanlabs_seo_openai_api_key', '' );
 		$settings = new Settings();
 		$defaults = $settings->get_defaults();
-		$model   = get_option( 'wpseopilot_ai_model', $defaults['wpseopilot_ai_model'] ?? 'gpt-4o-mini' );
-		$prompt_system = get_option( 'wpseopilot_ai_prompt_system', $defaults['wpseopilot_ai_prompt_system'] ?? '' );
-		$prompt_title  = get_option( 'wpseopilot_ai_prompt_title', $defaults['wpseopilot_ai_prompt_title'] ?? '' );
-		$prompt_description = get_option( 'wpseopilot_ai_prompt_description', $defaults['wpseopilot_ai_prompt_description'] ?? '' );
+		$model   = get_option( 'samanlabs_seo_ai_model', $defaults['samanlabs_seo_ai_model'] ?? 'gpt-4o-mini' );
+		$prompt_system = get_option( 'samanlabs_seo_ai_prompt_system', $defaults['samanlabs_seo_ai_prompt_system'] ?? '' );
+		$prompt_title  = get_option( 'samanlabs_seo_ai_prompt_title', $defaults['samanlabs_seo_ai_prompt_title'] ?? '' );
+		$prompt_description = get_option( 'samanlabs_seo_ai_prompt_description', $defaults['samanlabs_seo_ai_prompt_description'] ?? '' );
 
 		$models   = $settings->get_ai_models();
 
@@ -110,7 +110,7 @@ class AI_Assistant {
 	 * @return void
 	 */
 	public function handle_generation() {
-		check_ajax_referer( 'wpseopilot_ai_generate', 'nonce' );
+		check_ajax_referer( 'samanlabs_seo_ai_generate', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( __( 'Permission denied.', 'saman-labs-seo' ), 403 );
@@ -129,7 +129,7 @@ class AI_Assistant {
 			wp_send_json_error( __( 'Post not found.', 'saman-labs-seo' ), 404 );
 		}
 
-		$api_key = get_option( 'wpseopilot_openai_api_key', '' );
+		$api_key = get_option( 'samanlabs_seo_openai_api_key', '' );
 
 		if ( empty( $api_key ) ) {
 			wp_send_json_error( __( 'Add your OpenAI API key first.', 'saman-labs-seo' ), 400 );
@@ -141,10 +141,10 @@ class AI_Assistant {
 		$settings = new Settings();
 		$defaults = $settings->get_defaults();
 
-		$model           = get_option( 'wpseopilot_ai_model', $defaults['wpseopilot_ai_model'] ?? 'gpt-4o-mini' );
-		$system_prompt   = get_option( 'wpseopilot_ai_prompt_system', $defaults['wpseopilot_ai_prompt_system'] ?? __( 'You are an SEO assistant generating concise metadata. Respond with plain text only.', 'saman-labs-seo' ) );
-		$title_prompt    = get_option( 'wpseopilot_ai_prompt_title', $defaults['wpseopilot_ai_prompt_title'] ?? __( 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.', 'saman-labs-seo' ) );
-		$description_prompt = get_option( 'wpseopilot_ai_prompt_description', $defaults['wpseopilot_ai_prompt_description'] ?? __( 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.', 'saman-labs-seo' ) );
+		$model           = get_option( 'samanlabs_seo_ai_model', $defaults['samanlabs_seo_ai_model'] ?? 'gpt-4o-mini' );
+		$system_prompt   = get_option( 'samanlabs_seo_ai_prompt_system', $defaults['samanlabs_seo_ai_prompt_system'] ?? __( 'You are an SEO assistant generating concise metadata. Respond with plain text only.', 'saman-labs-seo' ) );
+		$title_prompt    = get_option( 'samanlabs_seo_ai_prompt_title', $defaults['samanlabs_seo_ai_prompt_title'] ?? __( 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.', 'saman-labs-seo' ) );
+		$description_prompt = get_option( 'samanlabs_seo_ai_prompt_description', $defaults['samanlabs_seo_ai_prompt_description'] ?? __( 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.', 'saman-labs-seo' ) );
 
 		$instructions = ( 'title' === $field ) ? $title_prompt : $description_prompt;
 
@@ -219,16 +219,16 @@ class AI_Assistant {
 			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
-		check_admin_referer( 'wpseopilot_ai_reset' );
+		check_admin_referer( 'samanlabs_seo_ai_reset' );
 
 		$settings = new Settings();
 		$defaults = $settings->get_defaults();
 
 		$keys = [
-			'wpseopilot_ai_model',
-			'wpseopilot_ai_prompt_system',
-			'wpseopilot_ai_prompt_title',
-			'wpseopilot_ai_prompt_description',
+			'samanlabs_seo_ai_model',
+			'samanlabs_seo_ai_prompt_system',
+			'samanlabs_seo_ai_prompt_title',
+			'samanlabs_seo_ai_prompt_description',
 		];
 
 		foreach ( $keys as $key ) {
@@ -240,7 +240,7 @@ class AI_Assistant {
 		$redirect_url = add_query_arg(
 			[
 				'page'                => 'wpseopilot-ai',
-				'wpseopilot_ai_reset' => '1',
+				'samanlabs_seo_ai_reset' => '1',
 			],
 			admin_url( 'admin.php' )
 		);

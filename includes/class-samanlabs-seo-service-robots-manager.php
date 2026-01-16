@@ -32,7 +32,7 @@ class Robots_Manager {
 	 * @return string
 	 */
 	public function filter_robots( $output, $public ) {
-		$custom = get_option( 'wpseopilot_robots_txt', '' );
+		$custom = get_option( 'samanlabs_seo_robots_txt', '' );
 
 		if ( $custom ) {
 			return $custom;

@@ -102,8 +102,8 @@ $rules_empty = empty( $rules );
 		</div>
 	<?php else : ?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-links__table-form" data-bulk-form>
-			<?php wp_nonce_field( 'wpseopilot_bulk_link_rules' ); ?>
-			<input type="hidden" name="action" value="wpseopilot_bulk_link_rules" />
+			<?php wp_nonce_field( 'samanlabs_seo_bulk_link_rules' ); ?>
+			<input type="hidden" name="action" value="samanlabs_seo_bulk_link_rules" />
 
 			<table class="wp-list-table widefat striped">
 				<thead>
@@ -153,35 +153,35 @@ $rules_empty = empty( $rules );
 						$duplicate_url = wp_nonce_url(
 							add_query_arg(
 								[
-									'action' => 'wpseopilot_duplicate_link_rule',
+									'action' => 'samanlabs_seo_duplicate_link_rule',
 									'rule'   => $rule['id'],
 								],
 								admin_url( 'admin-post.php' )
 							),
-							'wpseopilot_duplicate_link_rule'
+							'samanlabs_seo_duplicate_link_rule'
 						);
 
 						$toggle_url = wp_nonce_url(
 							add_query_arg(
 								[
-									'action' => 'wpseopilot_toggle_link_rule',
+									'action' => 'samanlabs_seo_toggle_link_rule',
 									'rule'   => $rule['id'],
 									'status' => ( 'active' === $status ) ? 'inactive' : 'active',
 								],
 								admin_url( 'admin-post.php' )
 							),
-							'wpseopilot_toggle_link_rule'
+							'samanlabs_seo_toggle_link_rule'
 						);
 
 						$delete_url = wp_nonce_url(
 							add_query_arg(
 								[
-									'action' => 'wpseopilot_delete_link_rule',
+									'action' => 'samanlabs_seo_delete_link_rule',
 									'rule'   => $rule['id'],
 								],
 								admin_url( 'admin-post.php' )
 							),
-							'wpseopilot_delete_link_rule'
+							'samanlabs_seo_delete_link_rule'
 						);
 					?>
 					<tr>

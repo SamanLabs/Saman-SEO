@@ -90,8 +90,8 @@ $post_type_options = array_keys( $post_types );
 	</div>
 
 	<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__rule-form" autocomplete="off">
-		<?php wp_nonce_field( 'wpseopilot_save_link_rule' ); ?>
-		<input type="hidden" name="action" value="wpseopilot_save_link_rule" />
+		<?php wp_nonce_field( 'samanlabs_seo_save_link_rule' ); ?>
+		<input type="hidden" name="action" value="samanlabs_seo_save_link_rule" />
 		<?php if ( $is_edit ) : ?>
 			<input type="hidden" name="rule[id]" value="<?php echo esc_attr( $current_rule['id'] ); ?>" />
 			<input type="hidden" name="rule[created_at]" value="<?php echo esc_attr( $current_rule['created_at'] ?? time() ); ?>" />

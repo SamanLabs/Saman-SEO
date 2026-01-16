@@ -357,8 +357,8 @@ class Updater_Controller extends REST_Controller {
             if ( $plugin_data['slug'] === $slug ) {
                 $found = true;
                 // Clear caches to refresh data.
-                delete_transient( 'wpseopilot_gh_' . md5( $plugin_data['repo'] ) );
-                delete_transient( 'wpseopilot_gh_beta_' . md5( $plugin_data['repo'] ) );
+                delete_transient( 'samanlabs_seo_gh_' . md5( $plugin_data['repo'] ) );
+                delete_transient( 'samanlabs_seo_gh_beta_' . md5( $plugin_data['repo'] ) );
                 break;
             }
         }

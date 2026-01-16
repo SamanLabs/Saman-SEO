@@ -89,7 +89,7 @@ namespace SamanLabs\SEO\Helpers {
 			'site_title'    => \get_bloginfo( 'name' ),
 			'sitename'      => \get_bloginfo( 'name' ), // Add sitename here too
 			'tagline'       => \get_bloginfo( 'description' ),
-			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
+			'separator'     => get_option( 'samanlabs_seo_title_separator', '-' ),
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),
@@ -171,7 +171,7 @@ namespace SamanLabs\SEO\Helpers {
 			return '';
 		}
 
-		$post_type_templates = \get_option( 'wpseopilot_post_type_title_templates', [] );
+		$post_type_templates = \get_option( 'samanlabs_seo_post_type_title_templates', [] );
 		if ( ! is_array( $post_type_templates ) ) {
 			$post_type_templates = [];
 		}
@@ -179,7 +179,7 @@ namespace SamanLabs\SEO\Helpers {
 		if ( ! empty( $post->post_type ) && ! empty( $post_type_templates[ $post->post_type ] ) ) {
 			$template = $post_type_templates[ $post->post_type ];
 		} else {
-			$template = get_option( 'wpseopilot_default_title_template', '{{post_title}} | {{site_title}}' );
+			$template = get_option( 'samanlabs_seo_default_title_template', '{{post_title}} | {{site_title}}' );
 		}
 
 		return replace_template_variables( $template, $post );
@@ -955,7 +955,7 @@ namespace SamanLabs\SEO\Helpers {
 			'secondary_keyphrases' => $secondary_analysis,
 		];
 
-		return \apply_filters( 'wpseopilot_seo_score', $result, $post );
+		return \apply_filters( 'samanlabs_seo_seo_score', $result, $post );
 	}
 
 	/**

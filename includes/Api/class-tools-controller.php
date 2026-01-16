@@ -208,7 +208,7 @@ class Tools_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function get_schema_templates( $request ) {
-		$templates = get_option( 'wpseopilot_schema_templates', [] );
+		$templates = get_option( 'samanlabs_seo_schema_templates', [] );
 		return $this->success( $templates );
 	}
 
@@ -220,9 +220,9 @@ class Tools_Controller extends REST_Controller {
 	 */
 	public function save_schema_template( $request ) {
 		$params = $request->get_json_params();
-		$templates = get_option( 'wpseopilot_schema_templates', [] );
+		$templates = get_option( 'samanlabs_seo_schema_templates', [] );
 		$templates[] = $params;
-		update_option( 'wpseopilot_schema_templates', $templates );
+		update_option( 'samanlabs_seo_schema_templates', $templates );
 		return $this->success( $templates );
 	}
 
@@ -874,7 +874,7 @@ class Tools_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_robots_txt( $request ) {
-        $content = get_option( 'wpseopilot_robots_txt', '' );
+        $content = get_option( 'samanlabs_seo_robots_txt', '' );
         $site_url = home_url();
         $sitemap_url = home_url( '/sitemap.xml' );
 
@@ -902,7 +902,7 @@ class Tools_Controller extends REST_Controller {
         // Sanitize - allow only safe characters
         $content = wp_kses( $content, [] );
 
-        update_option( 'wpseopilot_robots_txt', $content );
+        update_option( 'samanlabs_seo_robots_txt', $content );
 
         return $this->success( [
             'content' => $content,
@@ -916,7 +916,7 @@ class Tools_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function reset_robots_txt( $request ) {
-        delete_option( 'wpseopilot_robots_txt' );
+        delete_option( 'samanlabs_seo_robots_txt' );
 
         // Generate default content
         $default = "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: " . home_url( '/sitemap.xml' );
@@ -1054,7 +1054,7 @@ class Tools_Controller extends REST_Controller {
      * @return string|\WP_Error
      */
     private function call_ai( $system, $prompt, $max_tokens = 500 ) {
-        $model = get_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
+        $model = get_option( 'samanlabs_seo_ai_model', 'gpt-4o-mini' );
 
         // Check if using custom model
         if ( strpos( $model, 'custom_' ) === 0 ) {
@@ -1062,7 +1062,7 @@ class Tools_Controller extends REST_Controller {
         }
 
         // Use OpenAI
-        $api_key = get_option( 'wpseopilot_openai_api_key', '' );
+        $api_key = get_option( 'samanlabs_seo_openai_api_key', '' );
         if ( empty( $api_key ) ) {
             return new \WP_Error( 'no_api_key', __( 'OpenAI API key is not configured.', 'saman-labs-seo' ) );
         }

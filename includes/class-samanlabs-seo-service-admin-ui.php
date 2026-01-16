@@ -25,7 +25,7 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function boot() {
-		$metabox_enabled = apply_filters( 'wpseopilot_feature_toggle', true, 'metabox' );
+		$metabox_enabled = apply_filters( 'samanlabs_seo_feature_toggle', true, 'metabox' );
 
 		if ( $metabox_enabled ) {
 			add_action( 'add_meta_boxes', [ $this, 'register_meta_box' ] );
@@ -63,7 +63,7 @@ class Admin_UI {
 			unset( $post_types['attachment'] );
 		}
 
-		$post_types = apply_filters( 'wpseopilot_score_post_types', array_values( $post_types ) );
+		$post_types = apply_filters( 'samanlabs_seo_score_post_types', array_values( $post_types ) );
 
 		foreach ( $post_types as $post_type ) {
 			add_filter( "manage_{$post_type}_posts_columns", [ $this, 'add_posts_column' ] );
@@ -117,9 +117,9 @@ class Admin_UI {
 			]
 		);
 
-		wp_nonce_field( 'wpseopilot_meta', 'wpseopilot_meta_nonce' );
+		wp_nonce_field( 'samanlabs_seo_meta', 'samanlabs_seo_meta_nonce' );
 
-		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
 		$seo_score  = calculate_seo_score( $post );
 
 		include SAMANLABS_SEO_PATH . 'templates/meta-box.php';
@@ -176,14 +176,14 @@ class Admin_UI {
 			true
 		);
 
-		if ( '1' === get_option( 'wpseopilot_show_tour', '0' ) && ( false !== strpos( $hook, 'post.php' ) || false !== strpos( $hook, 'post-new.php' ) ) && apply_filters( 'wpseopilot_feature_toggle', true, 'metabox' ) ) {
+		if ( '1' === get_option( 'samanlabs_seo_show_tour', '0' ) && ( false !== strpos( $hook, 'post.php' ) || false !== strpos( $hook, 'post-new.php' ) ) && apply_filters( 'samanlabs_seo_feature_toggle', true, 'metabox' ) ) {
 			wp_enqueue_style( 'wp-pointer' );
 			wp_enqueue_script( 'wp-pointer' );
 			add_action( 'admin_print_footer_scripts', [ $this, 'print_pointer' ] );
-			update_option( 'wpseopilot_show_tour', '0' );
+			update_option( 'samanlabs_seo_show_tour', '0' );
 		}
 
-		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
 		$settings_svc = new Settings();
 		wp_localize_script(
 			'wpseopilot-admin',
@@ -195,7 +195,7 @@ class Admin_UI {
 				'ai'          => [
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),
-					'nonce'   => wp_create_nonce( 'wpseopilot_ai_generate' ),
+					'nonce'   => wp_create_nonce( 'samanlabs_seo_ai_generate' ),
 					'strings' => [
 						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'saman-labs-seo' ),
 						'running'  => __( 'Asking AI for ideas…', 'saman-labs-seo' ),
@@ -304,12 +304,12 @@ class Admin_UI {
 				],
 				'siteTitle'  => get_bloginfo( 'name' ),
 				'tagline'    => get_bloginfo( 'description' ),
-				'separator'  => get_option( 'wpseopilot_title_separator', '|' ),
+				'separator'  => get_option( 'samanlabs_seo_title_separator', '|' ),
 			]
 		);
 
-		$post_type_templates    = get_option( 'wpseopilot_post_type_title_templates', [] );
-		$post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+		$post_type_templates    = get_option( 'samanlabs_seo_post_type_title_templates', [] );
+		$post_type_descriptions = get_option( 'samanlabs_seo_post_type_meta_descriptions', [] );
 
 		if ( ! is_array( $post_type_templates ) ) {
 			$post_type_templates = [];
@@ -319,34 +319,34 @@ class Admin_UI {
 			$post_type_descriptions = [];
 		}
 
-		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
+		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
 
 		// Check for pending slug change redirect for this user.
 		$user_id     = get_current_user_id();
-		$slug_change = get_transient( 'wpseopilot_slug_changed_' . $user_id );
+		$slug_change = get_transient( 'samanlabs_seo_slug_changed_' . $user_id );
 
 		if ( $slug_change ) {
 			// Clear it so it doesn't persist.
-			delete_transient( 'wpseopilot_slug_changed_' . $user_id );
-			$slug_change['nonce'] = wp_create_nonce( 'wpseopilot_create_redirect' );
+			delete_transient( 'samanlabs_seo_slug_changed_' . $user_id );
+			$slug_change['nonce'] = wp_create_nonce( 'samanlabs_seo_create_redirect' );
 		}
 
 		wp_localize_script(
 			'wpseopilot-editor',
 			'WPSEOPilotEditor',
 			[
-				'defaultTitle'       => get_option( 'wpseopilot_default_title_template', '{{post_title}} | {{site_title}}' ),
-				'defaultDescription' => get_option( 'wpseopilot_default_meta_description', '' ),
-				'defaultOg'          => get_option( 'wpseopilot_default_og_image', '' ),
+				'defaultTitle'       => get_option( 'samanlabs_seo_default_title_template', '{{post_title}} | {{site_title}}' ),
+				'defaultDescription' => get_option( 'samanlabs_seo_default_meta_description', '' ),
+				'defaultOg'          => get_option( 'samanlabs_seo_default_og_image', '' ),
 				'postTypeTemplates'  => $post_type_templates,
 				'postTypeDescriptions' => $post_type_descriptions,
 				'postTypeDescriptions' => $post_type_descriptions,
 				'slugChange'         => $slug_change,
-				'redirectNonce'      => wp_create_nonce( 'wpseopilot_create_redirect' ),
+				'redirectNonce'      => wp_create_nonce( 'samanlabs_seo_create_redirect' ),
 				'ai'                 => [
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),
-					'nonce'   => wp_create_nonce( 'wpseopilot_ai_generate' ),
+					'nonce'   => wp_create_nonce( 'samanlabs_seo_ai_generate' ),
 					'strings' => [
 						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'saman-labs-seo' ),
 						'running'  => __( 'Asking AI for ideas…', 'saman-labs-seo' ),
@@ -436,36 +436,36 @@ class Admin_UI {
 			return $actions;
 		}
 
-		$actions['wpseopilot_edit'] = sprintf(
+		$actions['samanlabs_seo_edit'] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( get_edit_post_link( $post->ID ) . '#wpseopilot' ),
 			esc_html__( 'Edit SEO', 'saman-labs-seo' )
 		);
 
-		$actions['wpseopilot_noindex'] = sprintf(
+		$actions['samanlabs_seo_noindex'] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url(
 				wp_nonce_url(
 					add_query_arg(
 						[
-							'action'  => 'wpseopilot_toggle_noindex',
+							'action'  => 'samanlabs_seo_toggle_noindex',
 							'post_id' => $post->ID,
 						],
 						admin_url( 'admin-post.php' )
 					),
-					'wpseopilot_toggle_noindex'
+					'samanlabs_seo_toggle_noindex'
 				)
 			),
 			esc_html__( 'Toggle noindex', 'saman-labs-seo' )
 		);
 		
-		if ( '1' === get_option( 'wpseopilot_enable_og_preview', '1' ) ) {
-			$actions['wpseopilot_og_preview'] = sprintf(
+		if ( '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' ) ) {
+			$actions['samanlabs_seo_og_preview'] = sprintf(
 				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
 				esc_url(
 					add_query_arg(
 						[
-							'wpseopilot_social_card' => 1,
+							'samanlabs_seo_social_card' => 1,
 							'title'                  => $post->post_title,
 						],
 						home_url( '/' )
@@ -486,10 +486,10 @@ class Admin_UI {
 	 * @return array
 	 */
 	public function bulk_actions( $actions ) {
-		$actions['wpseopilot_noindex'] = __( 'Mark as noindex', 'saman-labs-seo' );
-		$actions['wpseopilot_index']   = __( 'Mark as index', 'saman-labs-seo' );
-		$actions['wpseopilot_regen_canonical'] = __( 'Regenerate canonical', 'saman-labs-seo' );
-		$actions['wpseopilot_apply_template']  = __( 'Apply title template', 'saman-labs-seo' );
+		$actions['samanlabs_seo_noindex'] = __( 'Mark as noindex', 'saman-labs-seo' );
+		$actions['samanlabs_seo_index']   = __( 'Mark as index', 'saman-labs-seo' );
+		$actions['samanlabs_seo_regen_canonical'] = __( 'Regenerate canonical', 'saman-labs-seo' );
+		$actions['samanlabs_seo_apply_template']  = __( 'Apply title template', 'saman-labs-seo' );
 		return $actions;
 	}
 
@@ -503,22 +503,22 @@ class Admin_UI {
 	 * @return string
 	 */
 	public function handle_bulk_actions( $redirect, $action, $post_ids ) {
-		if ( ! in_array( $action, [ 'wpseopilot_noindex', 'wpseopilot_index', 'wpseopilot_regen_canonical', 'wpseopilot_apply_template' ], true ) ) {
+		if ( ! in_array( $action, [ 'samanlabs_seo_noindex', 'samanlabs_seo_index', 'samanlabs_seo_regen_canonical', 'samanlabs_seo_apply_template' ], true ) ) {
 			return $redirect;
 		}
 
 		foreach ( $post_ids as $post_id ) {
 			$meta = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 
-			if ( in_array( $action, [ 'wpseopilot_noindex', 'wpseopilot_index' ], true ) ) {
-				$meta['noindex'] = 'wpseopilot_noindex' === $action ? '1' : '';
+			if ( in_array( $action, [ 'samanlabs_seo_noindex', 'samanlabs_seo_index' ], true ) ) {
+				$meta['noindex'] = 'samanlabs_seo_noindex' === $action ? '1' : '';
 			}
 
-			if ( 'wpseopilot_regen_canonical' === $action ) {
+			if ( 'samanlabs_seo_regen_canonical' === $action ) {
 				$meta['canonical'] = '';
 			}
 
-			if ( 'wpseopilot_apply_template' === $action ) {
+			if ( 'samanlabs_seo_apply_template' === $action ) {
 				$post              = get_post( $post_id );
 				$meta['title']     = $post ? generate_title_from_template( $post ) : '';
 				$meta['description'] = $post ? wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 ) : '';
@@ -527,7 +527,7 @@ class Admin_UI {
 			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
 		}
 
-		return add_query_arg( 'wpseopilot_bulk_updated', count( $post_ids ), $redirect );
+		return add_query_arg( 'samanlabs_seo_bulk_updated', count( $post_ids ), $redirect );
 	}
 
 	/**
@@ -540,7 +540,7 @@ class Admin_UI {
 			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
-		check_admin_referer( 'wpseopilot_toggle_noindex' );
+		check_admin_referer( 'samanlabs_seo_toggle_noindex' );
 
 		$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 
@@ -584,7 +584,7 @@ class Admin_UI {
 	 * AJAX handler for live template preview.
 	 */
 	public function ajax_render_preview() {
-		check_ajax_referer( 'wpseopilot_ai_generate', 'nonce' );
+		check_ajax_referer( 'samanlabs_seo_ai_generate', 'nonce' );
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( 'Permission denied' );
 		}
@@ -664,7 +664,7 @@ class Admin_UI {
 			'site_title'    => get_bloginfo( 'name' ),
 			'sitename'      => get_bloginfo( 'name' ),
 			'tagline'       => get_bloginfo( 'description' ),
-			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
+			'separator'     => get_option( 'samanlabs_seo_title_separator', '-' ),
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),
@@ -721,7 +721,7 @@ class Admin_UI {
 			'site_title'    => get_bloginfo( 'name' ),
 			'sitename'      => get_bloginfo( 'name' ),
 			'tagline'       => get_bloginfo( 'description' ),
-			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
+			'separator'     => get_option( 'samanlabs_seo_title_separator', '-' ),
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),

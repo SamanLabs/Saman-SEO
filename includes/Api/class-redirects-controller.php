@@ -1708,7 +1708,7 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function get_slug_suggestions( $request ) {
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 
         $data = [];
         foreach ( $suggestions as $key => $suggestion ) {
@@ -1733,14 +1733,14 @@ class Redirects_Controller extends REST_Controller {
     public function dismiss_slug_suggestion( $request ) {
         $key = $request->get_param( 'key' );
 
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 
         if ( ! isset( $suggestions[ $key ] ) ) {
             return $this->error( __( 'Suggestion not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         unset( $suggestions[ $key ] );
-        update_option( 'wpseopilot_monitor_slugs', $suggestions );
+        update_option( 'samanlabs_seo_monitor_slugs', $suggestions );
 
         return $this->success( null, __( 'Suggestion dismissed.', 'saman-labs-seo' ) );
     }
@@ -1754,7 +1754,7 @@ class Redirects_Controller extends REST_Controller {
     public function apply_slug_suggestion( $request ) {
         $key = $request->get_param( 'key' );
 
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 
         if ( ! isset( $suggestions[ $key ] ) ) {
             return $this->error( __( 'Suggestion not found.', 'saman-labs-seo' ), 'not_found', 404 );

@@ -33,7 +33,7 @@ class WooCommerce {
 			return;
 		}
 
-		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_product_schema' ], 25, 1 );
+		add_filter( 'samanlabs_seo_jsonld_graph', [ $this, 'add_product_schema' ], 25, 1 );
 	}
 
 	/**

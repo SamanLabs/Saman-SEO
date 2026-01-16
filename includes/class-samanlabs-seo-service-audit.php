@@ -25,7 +25,7 @@ class Audit {
 	public function boot() {
 		// V1 menu disabled - React UI handles menu registration
 		// add_action( 'admin_menu', [ $this, 'register_page' ] );
-		add_filter( 'wpseopilot_link_suggestions', [ $this, 'link_suggestions' ], 10, 2 );
+		add_filter( 'samanlabs_seo_link_suggestions', [ $this, 'link_suggestions' ], 10, 2 );
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Audit {
 			]
 		);
 
-		$post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+		$post_type_descriptions = get_option( 'samanlabs_seo_post_type_meta_descriptions', [] );
 		if ( ! is_array( $post_type_descriptions ) ) {
 			$post_type_descriptions = [];
 		}

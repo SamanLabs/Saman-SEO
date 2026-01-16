@@ -20,29 +20,29 @@ class Settings {
 	 * @var array<string,mixed>
 	 */
 	private $defaults = [
-		'wpseopilot_default_title_template' => '{{post_title}} | {{site_title}}',
-		'wpseopilot_post_type_title_templates' => [],
-		'wpseopilot_post_type_meta_descriptions' => [],
-		'wpseopilot_post_type_keywords' => [],
-		'wpseopilot_post_type_settings' => [],
-		'wpseopilot_taxonomy_settings' => [],
-		'wpseopilot_archive_settings' => [],
-		'wpseopilot_ai_model' => 'gpt-4o-mini',
-		'wpseopilot_ai_prompt_system' => 'You are an SEO assistant generating concise metadata. Respond with plain text only.',
-		'wpseopilot_ai_prompt_title' => 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.',
-		'wpseopilot_ai_prompt_description' => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
-		'wpseopilot_homepage_title' => '',
-		'wpseopilot_homepage_description' => '',
-		'wpseopilot_homepage_keywords' => '',
-		'wpseopilot_homepage_description_prompt' => '',
-		'wpseopilot_homepage_knowledge_type' => 'organization',
-		'wpseopilot_homepage_organization_name' => '',
-		'wpseopilot_homepage_organization_logo' => '',
-		'wpseopilot_title_separator' => '-',
-		'wpseopilot_openai_api_key' => '',
-		'wpseopilot_default_meta_description' => '',
-		'wpseopilot_default_og_image' => '',
-		'wpseopilot_social_defaults' => [
+		'samanlabs_seo_default_title_template' => '{{post_title}} | {{site_title}}',
+		'samanlabs_seo_post_type_title_templates' => [],
+		'samanlabs_seo_post_type_meta_descriptions' => [],
+		'samanlabs_seo_post_type_keywords' => [],
+		'samanlabs_seo_post_type_settings' => [],
+		'samanlabs_seo_taxonomy_settings' => [],
+		'samanlabs_seo_archive_settings' => [],
+		'samanlabs_seo_ai_model' => 'gpt-4o-mini',
+		'samanlabs_seo_ai_prompt_system' => 'You are an SEO assistant generating concise metadata. Respond with plain text only.',
+		'samanlabs_seo_ai_prompt_title' => 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.',
+		'samanlabs_seo_ai_prompt_description' => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
+		'samanlabs_seo_homepage_title' => '',
+		'samanlabs_seo_homepage_description' => '',
+		'samanlabs_seo_homepage_keywords' => '',
+		'samanlabs_seo_homepage_description_prompt' => '',
+		'samanlabs_seo_homepage_knowledge_type' => 'organization',
+		'samanlabs_seo_homepage_organization_name' => '',
+		'samanlabs_seo_homepage_organization_logo' => '',
+		'samanlabs_seo_title_separator' => '-',
+		'samanlabs_seo_openai_api_key' => '',
+		'samanlabs_seo_default_meta_description' => '',
+		'samanlabs_seo_default_og_image' => '',
+		'samanlabs_seo_social_defaults' => [
 			'og_title'            => '',
 			'og_description'      => '',
 			'twitter_title'       => '',
@@ -50,22 +50,22 @@ class Settings {
 			'image_source'        => '',
 			'schema_itemtype'     => '',
 		],
-		'wpseopilot_post_type_social_defaults' => [],
-		'wpseopilot_default_social_width' => 1200,
-		'wpseopilot_default_social_height' => 630,
-		'wpseopilot_default_noindex' => '0',
-		'wpseopilot_default_nofollow' => '0',
-		'wpseopilot_global_robots' => 'index, follow',
-		'wpseopilot_hreflang_map' => '',
-		'wpseopilot_robots_txt' => '',
-		'wpseopilot_enable_sitemap_enhancer' => '1',
-		'wpseopilot_enable_redirect_manager' => '1',
-		'wpseopilot_enable_404_logging' => '1',
-		'wpseopilot_enable_og_preview' => '1',
-		'wpseopilot_enable_llm_txt' => '1',
-		'wpseopilot_enable_local_seo' => '0',
-		'wpseopilot_enable_analytics' => '1',
-		'wpseopilot_social_card_design' => [
+		'samanlabs_seo_post_type_social_defaults' => [],
+		'samanlabs_seo_default_social_width' => 1200,
+		'samanlabs_seo_default_social_height' => 630,
+		'samanlabs_seo_default_noindex' => '0',
+		'samanlabs_seo_default_nofollow' => '0',
+		'samanlabs_seo_global_robots' => 'index, follow',
+		'samanlabs_seo_hreflang_map' => '',
+		'samanlabs_seo_robots_txt' => '',
+		'samanlabs_seo_enable_sitemap_enhancer' => '1',
+		'samanlabs_seo_enable_redirect_manager' => '1',
+		'samanlabs_seo_enable_404_logging' => '1',
+		'samanlabs_seo_enable_og_preview' => '1',
+		'samanlabs_seo_enable_llm_txt' => '1',
+		'samanlabs_seo_enable_local_seo' => '0',
+		'samanlabs_seo_enable_analytics' => '1',
+		'samanlabs_seo_social_card_design' => [
 			'background_color' => '#1a1a36',
 			'accent_color'     => '#5a84ff',
 			'text_color'       => '#ffffff',
@@ -112,61 +112,61 @@ class Settings {
 			add_option( $key, $default );
 		}
 
-		register_setting( 'wpseopilot', 'wpseopilot_default_title_template', [ $this, 'sanitize_template' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_title_template', [ $this, 'sanitize_template' ] );
 
 		// Consolidated Search Appearance Settings
-		$group = 'wpseopilot_search_appearance';
-		register_setting( $group, 'wpseopilot_post_type_title_templates', [ $this, 'sanitize_post_type_templates' ] );
-		register_setting( $group, 'wpseopilot_post_type_meta_descriptions', [ $this, 'sanitize_post_type_descriptions' ] );
-		register_setting( $group, 'wpseopilot_post_type_keywords', [ $this, 'sanitize_post_type_keywords' ] );
-		register_setting( $group, 'wpseopilot_post_type_settings', [ $this, 'sanitize_post_type_settings' ] );
-		register_setting( $group, 'wpseopilot_taxonomy_settings', [ $this, 'sanitize_taxonomy_settings' ] );
-		register_setting( $group, 'wpseopilot_archive_settings', [ $this, 'sanitize_archive_settings' ] );
-		register_setting( $group, 'wpseopilot_homepage_title', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_homepage_description', 'sanitize_textarea_field' );
-		register_setting( $group, 'wpseopilot_homepage_keywords', 'sanitize_text_field' );
-		register_setting( $group, 'wpseopilot_title_separator', [ $this, 'sanitize_separator' ] );
+		$group = 'samanlabs_seo_search_appearance';
+		register_setting( $group, 'samanlabs_seo_post_type_title_templates', [ $this, 'sanitize_post_type_templates' ] );
+		register_setting( $group, 'samanlabs_seo_post_type_meta_descriptions', [ $this, 'sanitize_post_type_descriptions' ] );
+		register_setting( $group, 'samanlabs_seo_post_type_keywords', [ $this, 'sanitize_post_type_keywords' ] );
+		register_setting( $group, 'samanlabs_seo_post_type_settings', [ $this, 'sanitize_post_type_settings' ] );
+		register_setting( $group, 'samanlabs_seo_taxonomy_settings', [ $this, 'sanitize_taxonomy_settings' ] );
+		register_setting( $group, 'samanlabs_seo_archive_settings', [ $this, 'sanitize_archive_settings' ] );
+		register_setting( $group, 'samanlabs_seo_homepage_title', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_homepage_description', 'sanitize_textarea_field' );
+		register_setting( $group, 'samanlabs_seo_homepage_keywords', 'sanitize_text_field' );
+		register_setting( $group, 'samanlabs_seo_title_separator', [ $this, 'sanitize_separator' ] );
 
 		// New consolidated options for Search Appearance page redesign
-		register_setting( $group, 'wpseopilot_homepage_defaults', [ $this, 'sanitize_homepage_defaults' ] );
-		register_setting( $group, 'wpseopilot_post_type_defaults', [ $this, 'sanitize_post_type_defaults' ] );
-		register_setting( $group, 'wpseopilot_taxonomy_defaults', [ $this, 'sanitize_taxonomy_defaults' ] );
-		register_setting( $group, 'wpseopilot_archive_defaults', [ $this, 'sanitize_archive_defaults_new' ] );
+		register_setting( $group, 'samanlabs_seo_homepage_defaults', [ $this, 'sanitize_homepage_defaults' ] );
+		register_setting( $group, 'samanlabs_seo_post_type_defaults', [ $this, 'sanitize_post_type_defaults' ] );
+		register_setting( $group, 'samanlabs_seo_taxonomy_defaults', [ $this, 'sanitize_taxonomy_defaults' ] );
+		register_setting( $group, 'samanlabs_seo_archive_defaults', [ $this, 'sanitize_archive_defaults_new' ] );
 
 		// Social settings (also registered under search_appearance group)
-		register_setting( $group, 'wpseopilot_social_defaults', [ $this, 'sanitize_social_defaults' ] );
-		register_setting( $group, 'wpseopilot_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
-		register_setting( $group, 'wpseopilot_social_card_design', [ $this, 'sanitize_social_card_design' ] );
+		register_setting( $group, 'samanlabs_seo_social_defaults', [ $this, 'sanitize_social_defaults' ] );
+		register_setting( $group, 'samanlabs_seo_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
+		register_setting( $group, 'samanlabs_seo_social_card_design', [ $this, 'sanitize_social_card_design' ] );
 
 		// Other settings
-		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_model', [ $this, 'sanitize_ai_model' ] );
-		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_system', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_title', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_ai_tuning', 'wpseopilot_ai_prompt_description', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_ai_key', 'wpseopilot_openai_api_key', [ $this, 'sanitize_api_key' ] );
+		register_setting( 'samanlabs_seo_ai_tuning', 'samanlabs_seo_ai_model', [ $this, 'sanitize_ai_model' ] );
+		register_setting( 'samanlabs_seo_ai_tuning', 'samanlabs_seo_ai_prompt_system', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs_seo_ai_tuning', 'samanlabs_seo_ai_prompt_title', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs_seo_ai_tuning', 'samanlabs_seo_ai_prompt_description', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs_seo_ai_key', 'samanlabs_seo_openai_api_key', [ $this, 'sanitize_api_key' ] );
 		
-		register_setting( 'wpseopilot', 'wpseopilot_homepage_description_prompt', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot_knowledge', 'wpseopilot_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
-		register_setting( 'wpseopilot_knowledge', 'wpseopilot_homepage_organization_name', 'sanitize_text_field' );
-		register_setting( 'wpseopilot_knowledge', 'wpseopilot_homepage_organization_logo', 'esc_url_raw' );
-		register_setting( 'wpseopilot', 'wpseopilot_default_meta_description', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot', 'wpseopilot_default_og_image', 'esc_url_raw' );
-		register_setting( 'wpseopilot_social', 'wpseopilot_social_defaults', [ $this, 'sanitize_social_defaults' ] );
-		register_setting( 'wpseopilot_social', 'wpseopilot_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_default_social_width', 'absint' );
-		register_setting( 'wpseopilot', 'wpseopilot_default_social_height', 'absint' );
-		register_setting( 'wpseopilot', 'wpseopilot_default_noindex', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_default_nofollow', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_global_robots', 'sanitize_text_field' );
-		register_setting( 'wpseopilot', 'wpseopilot_hreflang_map', [ $this, 'sanitize_json' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_robots_txt', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_sitemap_enhancer', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_redirect_manager', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_404_logging', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_og_preview', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_llm_txt', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_local_seo', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'wpseopilot_enable_analytics', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_homepage_description_prompt', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs_seo_knowledge', 'samanlabs_seo_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
+		register_setting( 'samanlabs_seo_knowledge', 'samanlabs_seo_homepage_organization_name', 'sanitize_text_field' );
+		register_setting( 'samanlabs_seo_knowledge', 'samanlabs_seo_homepage_organization_logo', 'esc_url_raw' );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_meta_description', 'sanitize_textarea_field' );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_og_image', 'esc_url_raw' );
+		register_setting( 'samanlabs_seo_social', 'samanlabs_seo_social_defaults', [ $this, 'sanitize_social_defaults' ] );
+		register_setting( 'samanlabs_seo_social', 'samanlabs_seo_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_social_width', 'absint' );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_social_height', 'absint' );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_noindex', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_default_nofollow', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_global_robots', 'sanitize_text_field' );
+		register_setting( 'wpseopilot', 'samanlabs_seo_hreflang_map', [ $this, 'sanitize_json' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_robots_txt', 'sanitize_textarea_field' );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_sitemap_enhancer', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_redirect_manager', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_404_logging', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_og_preview', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_llm_txt', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_local_seo', [ $this, 'sanitize_bool' ] );
+		register_setting( 'wpseopilot', 'samanlabs_seo_enable_analytics', [ $this, 'sanitize_bool' ] );
 	}
 
 	/**
@@ -181,7 +181,7 @@ class Settings {
 				'vars'  => [
 					[ 'tag' => 'site_title', 'label' => __( 'Site Title', 'saman-labs-seo' ), 'desc' => __( 'The main title of your site', 'saman-labs-seo' ), 'preview' => get_bloginfo( 'name' ) ],
 					[ 'tag' => 'tagline', 'label' => __( 'Tagline', 'saman-labs-seo' ), 'desc' => __( 'Site description / tagline', 'saman-labs-seo' ), 'preview' => get_bloginfo( 'description' ) ],
-					[ 'tag' => 'separator', 'label' => __( 'Separator', 'saman-labs-seo' ), 'desc' => __( 'Separator character (e.g. -)', 'saman-labs-seo' ), 'preview' => $this->get( 'wpseopilot_title_separator' ) ],
+					[ 'tag' => 'separator', 'label' => __( 'Separator', 'saman-labs-seo' ), 'desc' => __( 'Separator character (e.g. -)', 'saman-labs-seo' ), 'preview' => $this->get( 'samanlabs_seo_title_separator' ) ],
 					[ 'tag' => 'current_year', 'label' => __( 'Current Year', 'saman-labs-seo' ), 'desc' => __( 'The current year (4 digits)', 'saman-labs-seo' ), 'preview' => date_i18n( 'Y' ) ],
 				],
 			],
@@ -655,9 +655,9 @@ class Settings {
 		}
 
 		// Also update individual options for backward compatibility
-		update_option( 'wpseopilot_homepage_title', sanitize_text_field( $value['meta_title'] ?? '' ) );
-		update_option( 'wpseopilot_homepage_description', sanitize_textarea_field( $value['meta_description'] ?? '' ) );
-		update_option( 'wpseopilot_homepage_keywords', sanitize_text_field( $value['meta_keywords'] ?? '' ) );
+		update_option( 'samanlabs_seo_homepage_title', sanitize_text_field( $value['meta_title'] ?? '' ) );
+		update_option( 'samanlabs_seo_homepage_description', sanitize_textarea_field( $value['meta_description'] ?? '' ) );
+		update_option( 'samanlabs_seo_homepage_keywords', sanitize_text_field( $value['meta_keywords'] ?? '' ) );
 
 		return [
 			'meta_title'       => sanitize_text_field( $value['meta_title'] ?? '' ),
@@ -805,7 +805,7 @@ class Settings {
 	 */
 	public function sanitize_social_card_design( $value ) {
 		if ( ! is_array( $value ) ) {
-			return $this->defaults['wpseopilot_social_card_design'];
+			return $this->defaults['samanlabs_seo_social_card_design'];
 		}
 
 		return [
@@ -968,25 +968,25 @@ class Settings {
 
 		// Prepare homepage defaults
 		$homepage_defaults = [
-			'meta_title'       => get_option( 'wpseopilot_homepage_title', '' ),
-			'meta_description' => get_option( 'wpseopilot_homepage_description', '' ),
-			'meta_keywords'    => get_option( 'wpseopilot_homepage_keywords', '' ),
+			'meta_title'       => get_option( 'samanlabs_seo_homepage_title', '' ),
+			'meta_description' => get_option( 'samanlabs_seo_homepage_description', '' ),
+			'meta_keywords'    => get_option( 'samanlabs_seo_homepage_keywords', '' ),
 		];
 
 		// Prepare post type defaults
-		$post_type_defaults = get_option( 'wpseopilot_post_type_defaults', [] );
+		$post_type_defaults = get_option( 'samanlabs_seo_post_type_defaults', [] );
 		if ( ! is_array( $post_type_defaults ) ) {
 			$post_type_defaults = [];
 		}
 
 		// Prepare taxonomy defaults
-		$taxonomy_defaults = get_option( 'wpseopilot_taxonomy_defaults', [] );
+		$taxonomy_defaults = get_option( 'samanlabs_seo_taxonomy_defaults', [] );
 		if ( ! is_array( $taxonomy_defaults ) ) {
 			$taxonomy_defaults = [];
 		}
 
 		// Prepare archive defaults with fallback values
-		$archive_defaults = get_option( 'wpseopilot_archive_defaults', [] );
+		$archive_defaults = get_option( 'samanlabs_seo_archive_defaults', [] );
 		if ( ! is_array( $archive_defaults ) ) {
 			$archive_defaults = [];
 		}

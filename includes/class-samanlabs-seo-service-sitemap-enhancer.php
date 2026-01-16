@@ -85,11 +85,11 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	public function boot() {
-		if ( '1' !== get_option( 'wpseopilot_enable_sitemap_enhancer', '0' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_enable_sitemap_enhancer', '0' ) ) {
 			return;
 		}
 
-		if ( ! apply_filters( 'wpseopilot_feature_toggle', true, 'sitemaps' ) ) {
+		if ( ! apply_filters( 'samanlabs_seo_feature_toggle', true, 'sitemaps' ) ) {
 			return;
 		}
 
@@ -132,7 +132,7 @@ class Sitemap_Enhancer {
 		$entry['priority']   = 0.7;
 		$entry['changefreq'] = 'weekly';
 
-		$exclude_images = get_option( 'wpseopilot_sitemap_exclude_images', '0' );
+		$exclude_images = get_option( 'samanlabs_seo_sitemap_exclude_images', '0' );
 
 		if ( '1' !== $exclude_images ) {
 			$content = get_post_field( 'post_content', $post_id );
@@ -162,7 +162,7 @@ class Sitemap_Enhancer {
 			];
 		}
 
-		return apply_filters( 'wpseopilot_sitemap_entry', $entry, $post_id, $post_type );
+		return apply_filters( 'samanlabs_seo_sitemap_entry', $entry, $post_id, $post_type );
 	}
 
 	/**
@@ -234,7 +234,7 @@ class Sitemap_Enhancer {
 		 * @param array<int,array<string,string>> $images  Image entries.
 		 * @param int                             $post_id Post ID.
 		 */
-		return apply_filters( 'wpseopilot_sitemap_images', $images, $post_id );
+		return apply_filters( 'samanlabs_seo_sitemap_images', $images, $post_id );
 	}
 
 	/**
@@ -289,7 +289,7 @@ class Sitemap_Enhancer {
 		 * @param array  $args      WP_Query args.
 		 * @param string $post_type Post type slug.
 		 */
-		return apply_filters( 'wpseopilot_sitemap_post_query_args', $args, $post_type );
+		return apply_filters( 'samanlabs_seo_sitemap_post_query_args', $args, $post_type );
 	}
 
 	/**
@@ -347,44 +347,44 @@ class Sitemap_Enhancer {
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_stylesheet' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_stylesheet' ) ) {
 			$this->render_sitemap_stylesheet();
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_root' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_root' ) ) {
 			$this->redirect_pretty_sitemap();
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_index' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_index' ) ) {
 			$this->render_sitemap_index();
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_rss' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_rss' ) ) {
 			$this->render_rss_sitemap();
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_news' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_news' ) ) {
 			$this->render_google_news_sitemap();
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_video' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_video' ) ) {
 			$this->render_video_sitemap();
 			return;
 		}
 
-		if ( get_query_var( 'wpseopilot_sitemap_additional' ) ) {
+		if ( get_query_var( 'samanlabs_seo_sitemap_additional' ) ) {
 			$this->render_additional_pages_sitemap();
 			return;
 		}
 
-		$slug = get_query_var( 'wpseopilot_sitemap_slug' );
+		$slug = get_query_var( 'samanlabs_seo_sitemap_slug' );
 		if ( $slug ) {
-			$page = absint( get_query_var( 'wpseopilot_sitemap_page' ) );
+			$page = absint( get_query_var( 'samanlabs_seo_sitemap_page' ) );
 			$page = max( 1, $page );
 
 			$this->render_single_sitemap( $slug, $page );
@@ -455,7 +455,7 @@ class Sitemap_Enhancer {
 		}
 
 		// Add additional pages if configured
-		$additional_pages = get_option( 'wpseopilot_sitemap_additional_pages', [] );
+		$additional_pages = get_option( 'samanlabs_seo_sitemap_additional_pages', [] );
 		if ( ! empty( $additional_pages ) && is_array( $additional_pages ) ) {
 			// Create a custom sitemap for additional pages
 			$items[] = [
@@ -463,7 +463,7 @@ class Sitemap_Enhancer {
 			];
 		}
 
-		return apply_filters( 'wpseopilot_sitemap_index_items', $items );
+		return apply_filters( 'samanlabs_seo_sitemap_index_items', $items );
 	}
 
 	/**
@@ -549,9 +549,9 @@ class Sitemap_Enhancer {
 		$providers = $server->registry->get_providers();
 
 		// Get enabled post types and taxonomies from settings
-		$enabled_post_types = get_option( 'wpseopilot_sitemap_post_types', null );
-		$enabled_taxonomies = get_option( 'wpseopilot_sitemap_taxonomies', null );
-		$include_author     = get_option( 'wpseopilot_sitemap_include_author_pages', '0' );
+		$enabled_post_types = get_option( 'samanlabs_seo_sitemap_post_types', null );
+		$enabled_taxonomies = get_option( 'samanlabs_seo_sitemap_taxonomies', null );
+		$include_author     = get_option( 'samanlabs_seo_sitemap_include_author_pages', '0' );
 
 		// If null, this is first time - get all available post types
 		if ( null === $enabled_post_types ) {
@@ -627,7 +627,7 @@ class Sitemap_Enhancer {
 		 *
 		 * @param array<int,array<string,mixed>> $map Sitemap map.
 		 */
-		$this->sitemap_map = apply_filters( 'wpseopilot_sitemap_map', $map );
+		$this->sitemap_map = apply_filters( 'samanlabs_seo_sitemap_map', $map );
 
 		return $this->sitemap_map;
 	}
@@ -783,7 +783,7 @@ class Sitemap_Enhancer {
 	 * @return string
 	 */
 	private function get_sitemap_lastmod( $group, $page ) {
-		$filtered_lastmod = apply_filters( 'wpseopilot_sitemap_lastmod', '', $group, $page );
+		$filtered_lastmod = apply_filters( 'samanlabs_seo_sitemap_lastmod', '', $group, $page );
 		$timestamp        = $this->parse_lastmod_timestamp( $filtered_lastmod );
 
 		if ( ! $timestamp ) {
@@ -898,7 +898,7 @@ class Sitemap_Enhancer {
 		}
 
 		// Get from settings first
-		$limit = (int) get_option( 'wpseopilot_sitemap_max_urls', $this->default_max_urls_per_page );
+		$limit = (int) get_option( 'samanlabs_seo_sitemap_max_urls', $this->default_max_urls_per_page );
 
 		if ( null !== $core_default ) {
 			$limit = min( (int) $core_default, $limit );
@@ -909,7 +909,7 @@ class Sitemap_Enhancer {
 		}
 
 		$limit = (int) apply_filters(
-			'wpseopilot_sitemap_max_urls',
+			'samanlabs_seo_sitemap_max_urls',
 			$limit,
 			$core_default ?? $this->default_max_urls_per_page
 		);
@@ -995,7 +995,7 @@ class Sitemap_Enhancer {
 		$defaults = $this->default_excluded_term_slugs[ $taxonomy ] ?? [];
 
 		$slugs = (array) apply_filters(
-			'wpseopilot_sitemap_excluded_terms',
+			'samanlabs_seo_sitemap_excluded_terms',
 			$defaults,
 			$taxonomy
 		);
@@ -1046,7 +1046,7 @@ class Sitemap_Enhancer {
 		 * @param int|null                 $count Current count (null when unknown).
 		 * @param array<string,mixed>      $group Group metadata.
 		 */
-		$count = apply_filters( 'wpseopilot_sitemap_group_count', $count, $group );
+		$count = apply_filters( 'samanlabs_seo_sitemap_group_count', $count, $group );
 
 		if ( null !== $count ) {
 			$count = max( 0, (int) $count );
@@ -1069,7 +1069,7 @@ class Sitemap_Enhancer {
 
 		$counts            = wp_count_posts( $post_type, 'readable' );
 		$allowed_statuses  = (array) apply_filters(
-			'wpseopilot_sitemap_count_statuses',
+			'samanlabs_seo_sitemap_count_statuses',
 			[ 'publish', 'inherit' ],
 			$post_type
 		);
@@ -1180,7 +1180,7 @@ class Sitemap_Enhancer {
 			return $enabled;
 		}
 
-		$should_disable = apply_filters( 'wpseopilot_disable_core_sitemaps', true );
+		$should_disable = apply_filters( 'samanlabs_seo_disable_core_sitemaps', true );
 
 		return $should_disable ? false : $enabled;
 	}
@@ -1200,7 +1200,7 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	private function redirect_core_sitemap() {
-		$target = apply_filters( 'wpseopilot_sitemap_redirect', home_url( '/sitemap_index.xml' ) );
+		$target = apply_filters( 'samanlabs_seo_sitemap_redirect', home_url( '/sitemap_index.xml' ) );
 		$this->send_sitemap_redirect( $target );
 	}
 
@@ -1211,8 +1211,8 @@ class Sitemap_Enhancer {
 	 */
 	private function redirect_pretty_sitemap() {
 		$target = apply_filters(
-			'wpseopilot_pretty_sitemap_redirect',
-			apply_filters( 'wpseopilot_sitemap_redirect', home_url( '/sitemap_index.xml' ) )
+			'samanlabs_seo_pretty_sitemap_redirect',
+			apply_filters( 'samanlabs_seo_sitemap_redirect', home_url( '/sitemap_index.xml' ) )
 		);
 
 		$this->send_sitemap_redirect( $target );
@@ -1368,7 +1368,7 @@ class Sitemap_Enhancer {
 	 * @return string
 	 */
 	private function get_stylesheet_url() {
-		return apply_filters( 'wpseopilot_sitemap_stylesheet', home_url( '/sitemap-style.xsl' ) );
+		return apply_filters( 'samanlabs_seo_sitemap_stylesheet', home_url( '/sitemap-style.xsl' ) );
 	}
 
 	/**
@@ -1377,7 +1377,7 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	private function render_rss_sitemap() {
-		if ( '1' !== get_option( 'wpseopilot_sitemap_enable_rss', '0' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_sitemap_enable_rss', '0' ) ) {
 			$this->bail_404();
 			return;
 		}
@@ -1429,13 +1429,13 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	private function render_google_news_sitemap() {
-		if ( '1' !== get_option( 'wpseopilot_sitemap_enable_google_news', '0' ) ) {
+		if ( '1' !== get_option( 'samanlabs_seo_sitemap_enable_google_news', '0' ) ) {
 			$this->bail_404();
 			return;
 		}
 
-		$post_types    = get_option( 'wpseopilot_sitemap_google_news_post_types', [] );
-		$pub_name      = get_option( 'wpseopilot_sitemap_google_news_name', get_bloginfo( 'name' ) );
+		$post_types    = get_option( 'samanlabs_seo_sitemap_google_news_post_types', [] );
+		$pub_name      = get_option( 'samanlabs_seo_sitemap_google_news_name', get_bloginfo( 'name' ) );
 
 		if ( empty( $post_types ) ) {
 			$post_types = [ 'post' ];
@@ -1559,7 +1559,7 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	private function render_additional_pages_sitemap() {
-		$additional_pages = get_option( 'wpseopilot_sitemap_additional_pages', [] );
+		$additional_pages = get_option( 'samanlabs_seo_sitemap_additional_pages', [] );
 
 		if ( empty( $additional_pages ) || ! is_array( $additional_pages ) ) {
 			$this->bail_404();

@@ -17,7 +17,7 @@
 ?>
 <div class="wrap wpseopilot-page wpseopilot-ai-page">
 
-	<?php if ( isset( $_GET['wpseopilot_ai_reset'] ) ) : ?>
+	<?php if ( isset( $_GET['samanlabs_seo_ai_reset'] ) ) : ?>
 		<div class="notice notice-success is-dismissible">
 			<p><?php esc_html_e( 'AI settings restored to defaults. Remember to save if you make further tweaks.', 'saman-labs-seo' ); ?></p>
 		</div>
@@ -64,10 +64,10 @@
 				</div>
 				<div class="wpseopilot-card-body">
 					<form action="options.php" method="post">
-						<?php settings_fields( 'wpseopilot_ai_key' ); ?>
+						<?php settings_fields( 'samanlabs_seo_ai_key' ); ?>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_openai_api_key">
+							<label for="samanlabs_seo_openai_api_key">
 								<strong><?php esc_html_e( 'OpenAI API Key', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
 									<?php esc_html_e( 'Create a key on platform.openai.com, paste it here, and save.', 'saman-labs-seo' ); ?>
@@ -76,8 +76,8 @@
 							<input
 								type="password"
 								class="regular-text"
-								id="wpseopilot_openai_api_key"
-								name="wpseopilot_openai_api_key"
+								id="samanlabs_seo_openai_api_key"
+								name="samanlabs_seo_openai_api_key"
 								value="<?php echo esc_attr( $api_key ); ?>"
 								autocomplete="off"
 								placeholder="sk-..."
@@ -99,23 +99,23 @@
 					<div class="wpseopilot-card-toolbar">
 						<span><?php esc_html_e( 'Need a clean slate?', 'saman-labs-seo' ); ?></span>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display: inline;">
-							<?php wp_nonce_field( 'wpseopilot_ai_reset' ); ?>
-							<input type="hidden" name="action" value="wpseopilot_ai_reset" />
+							<?php wp_nonce_field( 'samanlabs_seo_ai_reset' ); ?>
+							<input type="hidden" name="action" value="samanlabs_seo_ai_reset" />
 							<button type="submit" class="button button-link-delete"><?php esc_html_e( 'Reset to defaults', 'saman-labs-seo' ); ?></button>
 						</form>
 					</div>
 
 					<form action="options.php" method="post">
-						<?php settings_fields( 'wpseopilot_ai_tuning' ); ?>
+						<?php settings_fields( 'samanlabs_seo_ai_tuning' ); ?>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_ai_model">
+							<label for="samanlabs_seo_ai_model">
 								<strong><?php esc_html_e( 'Model', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
 									<?php esc_html_e( 'Pick the balance of quality, latency, and price that fits your workflow.', 'saman-labs-seo' ); ?>
 								</span>
 							</label>
-							<select id="wpseopilot_ai_model" name="wpseopilot_ai_model" class="regular-text">
+							<select id="samanlabs_seo_ai_model" name="samanlabs_seo_ai_model" class="regular-text">
 								<?php foreach ( $models as $value => $label ) : ?>
 									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $model, $value ); ?>>
 										<?php echo esc_html( $label ); ?>
@@ -125,7 +125,7 @@
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_ai_prompt_system">
+							<label for="samanlabs_seo_ai_prompt_system">
 								<strong><?php esc_html_e( 'System Prompt', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
 									<?php esc_html_e( 'Used for every request. Great place to enforce voice, POV, or formatting rules.', 'saman-labs-seo' ); ?>
@@ -134,13 +134,13 @@
 							<textarea
 								class="large-text code"
 								rows="3"
-								id="wpseopilot_ai_prompt_system"
-								name="wpseopilot_ai_prompt_system"
+								id="samanlabs_seo_ai_prompt_system"
+								name="samanlabs_seo_ai_prompt_system"
 							><?php echo esc_textarea( $prompt_system ); ?></textarea>
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_ai_prompt_title">
+							<label for="samanlabs_seo_ai_prompt_title">
 								<strong><?php esc_html_e( 'Title Instructions', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
 									<?php esc_html_e( 'Customize how AI should craft titles — length, tone, keywords, emojis, etc.', 'saman-labs-seo' ); ?>
@@ -149,13 +149,13 @@
 							<textarea
 								class="large-text"
 								rows="3"
-								id="wpseopilot_ai_prompt_title"
-								name="wpseopilot_ai_prompt_title"
+								id="samanlabs_seo_ai_prompt_title"
+								name="samanlabs_seo_ai_prompt_title"
 							><?php echo esc_textarea( $prompt_title ); ?></textarea>
 						</div>
 
 						<div class="wpseopilot-form-row">
-							<label for="wpseopilot_ai_prompt_description">
+							<label for="samanlabs_seo_ai_prompt_description">
 								<strong><?php esc_html_e( 'Description Instructions', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
 									<?php esc_html_e( 'Control summary length, CTAs, tone, or localization hints for descriptions.', 'saman-labs-seo' ); ?>
@@ -164,8 +164,8 @@
 							<textarea
 								class="large-text"
 								rows="3"
-								id="wpseopilot_ai_prompt_description"
-								name="wpseopilot_ai_prompt_description"
+								id="samanlabs_seo_ai_prompt_description"
+								name="samanlabs_seo_ai_prompt_description"
 							><?php echo esc_textarea( $prompt_description ); ?></textarea>
 						</div>
 

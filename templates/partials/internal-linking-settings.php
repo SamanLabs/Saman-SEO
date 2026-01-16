@@ -13,8 +13,8 @@ $heading_levels     = $settings['default_heading_levels'] ?? [];
 <div class="wpseopilot-card">
 	<h3><?php esc_html_e( 'Module settings', 'saman-labs-seo' ); ?></h3>
 	<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__settings-form">
-		<?php wp_nonce_field( 'wpseopilot_save_link_settings' ); ?>
-		<input type="hidden" name="action" value="wpseopilot_save_link_settings" />
+		<?php wp_nonce_field( 'samanlabs_seo_save_link_settings' ); ?>
+		<input type="hidden" name="action" value="samanlabs_seo_save_link_settings" />
 
 		<section>
 			<h4><?php esc_html_e( 'Global Defaults', 'saman-labs-seo' ); ?></h4>

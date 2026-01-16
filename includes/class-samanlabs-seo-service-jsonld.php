@@ -22,7 +22,7 @@ class JsonLD {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'wpseopilot_jsonld', [ $this, 'build_payload' ], 10, 2 );
+		add_filter( 'samanlabs_seo_jsonld', [ $this, 'build_payload' ], 10, 2 );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class JsonLD {
 			'@id'   => $site_id,
 			'url'   => home_url( '/' ),
 			'name'  => get_bloginfo( 'name' ),
-			'description' => get_option( 'wpseopilot_default_meta_description', get_bloginfo( 'description' ) ),
+			'description' => get_option( 'samanlabs_seo_default_meta_description', get_bloginfo( 'description' ) ),
 			'publisher'   => [
 				'@type' => 'Organization',
 				'name'  => get_bloginfo( 'name' ),
@@ -68,16 +68,16 @@ class JsonLD {
 				'breadcrumb'    => [ '@id' => $url . '#breadcrumb' ],
 				'primaryImageOfPage' => [
 					'@type' => 'ImageObject',
-					'url'   => get_the_post_thumbnail_url( $post, 'full' ) ?: get_option( 'wpseopilot_default_og_image' ),
+					'url'   => get_the_post_thumbnail_url( $post, 'full' ) ?: get_option( 'samanlabs_seo_default_og_image' ),
 				],
 			];
 
-			$graph[] = apply_filters( 'wpseopilot_schema_webpage', $webpage_schema, $post );
+			$graph[] = apply_filters( 'samanlabs_seo_schema_webpage', $webpage_schema, $post );
 
 			// Determine schema type - check post type settings for custom type.
 			$schema_type   = 'Article';
 			$post_type     = get_post_type( $post );
-			$type_settings = get_option( 'wpseopilot_post_type_seo_settings', [] );
+			$type_settings = get_option( 'samanlabs_seo_post_type_seo_settings', [] );
 
 			if ( isset( $type_settings[ $post_type ]['schema_type'] ) && ! empty( $type_settings[ $post_type ]['schema_type'] ) ) {
 				$schema_type = $type_settings[ $post_type ]['schema_type'];
@@ -94,7 +94,7 @@ class JsonLD {
 						'name'  => get_the_author_meta( 'display_name', $post->post_author ),
 					],
 					'image'        => [
-						get_the_post_thumbnail_url( $post, 'full' ) ?: get_option( 'wpseopilot_default_og_image' ),
+						get_the_post_thumbnail_url( $post, 'full' ) ?: get_option( 'samanlabs_seo_default_og_image' ),
 					],
 					'datePublished' => get_the_date( DATE_W3C, $post ),
 					'dateModified'  => get_the_modified_date( DATE_W3C, $post ),
@@ -119,7 +119,7 @@ class JsonLD {
 					$article_schema['wordCount'] = str_word_count( wp_strip_all_tags( $post->post_content ) );
 				}
 
-				$graph[] = apply_filters( 'wpseopilot_schema_article', $article_schema, $post );
+				$graph[] = apply_filters( 'samanlabs_seo_schema_article', $article_schema, $post );
 			}
 
 			$graph[] = $this->breadcrumb_ld( $post );
@@ -127,7 +127,7 @@ class JsonLD {
 
 		return [
 			'@context' => 'https://schema.org',
-			'@graph'   => apply_filters( 'wpseopilot_jsonld_graph', $graph ),
+			'@graph'   => apply_filters( 'samanlabs_seo_jsonld_graph', $graph ),
 		];
 	}
 

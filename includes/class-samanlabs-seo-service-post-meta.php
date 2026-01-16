@@ -159,17 +159,17 @@ class Post_Meta {
 			return;
 		}
 
-		if ( ! isset( $_POST['wpseopilot_meta_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['wpseopilot_meta_nonce'] ), 'wpseopilot_meta' ) ) {
+		if ( ! isset( $_POST['samanlabs_seo_meta_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['samanlabs_seo_meta_nonce'] ), 'samanlabs_seo_meta' ) ) {
 			return;
 		}
 
 		$data = [
-			'title'       => isset( $_POST['wpseopilot_title'] ) ? sanitize_text_field( wp_unslash( $_POST['wpseopilot_title'] ) ) : '',
-			'description' => isset( $_POST['wpseopilot_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['wpseopilot_description'] ) ) : '',
-			'canonical'   => isset( $_POST['wpseopilot_canonical'] ) ? esc_url_raw( wp_unslash( $_POST['wpseopilot_canonical'] ) ) : '',
-			'noindex'     => ! empty( $_POST['wpseopilot_noindex'] ) ? '1' : '',
-			'nofollow'    => ! empty( $_POST['wpseopilot_nofollow'] ) ? '1' : '',
-			'og_image'    => isset( $_POST['wpseopilot_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['wpseopilot_og_image'] ) ) : '',
+			'title'       => isset( $_POST['samanlabs_seo_title'] ) ? sanitize_text_field( wp_unslash( $_POST['samanlabs_seo_title'] ) ) : '',
+			'description' => isset( $_POST['samanlabs_seo_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['samanlabs_seo_description'] ) ) : '',
+			'canonical'   => isset( $_POST['samanlabs_seo_canonical'] ) ? esc_url_raw( wp_unslash( $_POST['samanlabs_seo_canonical'] ) ) : '',
+			'noindex'     => ! empty( $_POST['samanlabs_seo_noindex'] ) ? '1' : '',
+			'nofollow'    => ! empty( $_POST['samanlabs_seo_nofollow'] ) ? '1' : '',
+			'og_image'    => isset( $_POST['samanlabs_seo_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['samanlabs_seo_og_image'] ) ) : '',
 		];
 
 		update_post_meta( $post_id, self::META_KEY, $data );
