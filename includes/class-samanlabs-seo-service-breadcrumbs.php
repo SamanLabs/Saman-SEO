@@ -264,7 +264,7 @@ class Breadcrumbs {
 		$post_type_object = get_post_type_object( $post_type );
 
 		// Check for per-post breadcrumb override.
-		$override = get_post_meta( $post->ID, '_wpseopilot_breadcrumb_override', true );
+		$override = get_post_meta( $post->ID, '_samanlabs_seo_breadcrumb_override', true );
 		if ( ! empty( $override ) && is_array( $override ) ) {
 			return array_merge( $crumbs, $override );
 		}
@@ -322,7 +322,7 @@ class Breadcrumbs {
 
 		if ( empty( $primary_term_id ) ) {
 			// Check for our own primary category meta.
-			$primary_term_id = get_post_meta( $post->ID, '_wpseopilot_primary_category', true );
+			$primary_term_id = get_post_meta( $post->ID, '_samanlabs_seo_primary_category', true );
 		}
 
 		if ( ! empty( $primary_term_id ) ) {

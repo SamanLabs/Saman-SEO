@@ -9,7 +9,7 @@
 
 ?>
 <?php
-$wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslash( $_GET['prefill'] ) ) : '';
+$samanlabs_seo_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslash( $_GET['prefill'] ) ) : '';
 
 // Render top bar
 \WPSEOPilot\Admin_Topbar::render( 'redirects' );
@@ -59,7 +59,7 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 		<table class="form-table">
 			<tr>
 				<th scope="row"><label for="source"><?php esc_html_e( 'Source path', 'saman-labs-seo' ); ?></label></th>
-				<td><input type="text" name="source" id="source" class="regular-text" placeholder="/old-url" value="<?php echo esc_attr( $wpseopilot_prefill ); ?>" required /></td>
+				<td><input type="text" name="source" id="source" class="regular-text" placeholder="/old-url" value="<?php echo esc_attr( $samanlabs_seo_prefill ); ?>" required /></td>
 			</tr>
 			<tr>
 				<th scope="row"><label for="target"><?php esc_html_e( 'Target URL', 'saman-labs-seo' ); ?></label></th>
@@ -93,15 +93,15 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 		</thead>
 		<tbody>
 			<?php if ( $redirects ) : ?>
-				<?php foreach ( $redirects as $wpseopilot_redirect ) : ?>
+				<?php foreach ( $redirects as $samanlabs_seo_redirect ) : ?>
 					<tr>
-						<td><?php echo esc_html( $wpseopilot_redirect->source ); ?></td>
-						<td><a href="<?php echo esc_url( $wpseopilot_redirect->target ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $wpseopilot_redirect->target ); ?></a></td>
-						<td><?php echo esc_html( $wpseopilot_redirect->status_code ); ?></td>
-						<td><?php echo esc_html( $wpseopilot_redirect->hits ); ?></td>
-						<td><?php echo esc_html( $wpseopilot_redirect->last_hit ?: '—' ); ?></td>
+						<td><?php echo esc_html( $samanlabs_seo_redirect->source ); ?></td>
+						<td><a href="<?php echo esc_url( $samanlabs_seo_redirect->target ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $samanlabs_seo_redirect->target ); ?></a></td>
+						<td><?php echo esc_html( $samanlabs_seo_redirect->status_code ); ?></td>
+						<td><?php echo esc_html( $samanlabs_seo_redirect->hits ); ?></td>
+						<td><?php echo esc_html( $samanlabs_seo_redirect->last_hit ?: '—' ); ?></td>
 						<td>
-							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'samanlabs_seo_delete_redirect', 'id' => $wpseopilot_redirect->id ], admin_url( 'admin-post.php' ) ), 'samanlabs_seo_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
+							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'samanlabs_seo_delete_redirect', 'id' => $samanlabs_seo_redirect->id ], admin_url( 'admin-post.php' ) ), 'samanlabs_seo_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>

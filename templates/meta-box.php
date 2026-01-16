@@ -10,33 +10,33 @@
  * @package WPSEOPilot
  */
 
-$wpseopilot_ai_enabled = ! empty( $ai_enabled );
-$wpseopilot_score      = is_array( $seo_score ) ? $seo_score : [];
-$wpseopilot_score_level = isset( $wpseopilot_score['level'] ) ? sanitize_html_class( $wpseopilot_score['level'] ) : 'low';
-$wpseopilot_score_value = isset( $wpseopilot_score['score'] ) ? (int) $wpseopilot_score['score'] : 0;
-$wpseopilot_score_label = isset( $wpseopilot_score['label'] ) ? $wpseopilot_score['label'] : __( 'Needs attention', 'saman-labs-seo' );
-$wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_score['summary'] : __( 'Add content to generate a score.', 'saman-labs-seo' );
+$samanlabs_seo_ai_enabled = ! empty( $ai_enabled );
+$samanlabs_seo_score      = is_array( $seo_score ) ? $seo_score : [];
+$samanlabs_seo_score_level = isset( $samanlabs_seo_score['level'] ) ? sanitize_html_class( $samanlabs_seo_score['level'] ) : 'low';
+$samanlabs_seo_score_value = isset( $samanlabs_seo_score['score'] ) ? (int) $samanlabs_seo_score['score'] : 0;
+$samanlabs_seo_score_label = isset( $samanlabs_seo_score['label'] ) ? $samanlabs_seo_score['label'] : __( 'Needs attention', 'saman-labs-seo' );
+$samanlabs_seo_score_summary = isset( $samanlabs_seo_score['summary'] ) ? $samanlabs_seo_score['summary'] : __( 'Add content to generate a score.', 'saman-labs-seo' );
 ?>
 
-<?php if ( $wpseopilot_score ) : ?>
+<?php if ( $samanlabs_seo_score ) : ?>
 	<div class="wpseopilot-score-card" id="wpseopilot-score">
 		<div class="wpseopilot-score-card__header">
-			<span class="wpseopilot-score-badge <?php echo esc_attr( 'wpseopilot-score-badge--' . $wpseopilot_score_level ); ?>">
-				<strong><?php echo esc_html( $wpseopilot_score_value ); ?></strong>
+			<span class="wpseopilot-score-badge <?php echo esc_attr( 'wpseopilot-score-badge--' . $samanlabs_seo_score_level ); ?>">
+				<strong><?php echo esc_html( $samanlabs_seo_score_value ); ?></strong>
 				<span>/100</span>
 			</span>
 			<div>
 				<p class="wpseopilot-score-card__title"><?php esc_html_e( 'SEO score', 'saman-labs-seo' ); ?></p>
-				<p class="wpseopilot-score-card__label"><?php echo esc_html( $wpseopilot_score_label ); ?></p>
-				<p class="wpseopilot-score-card__summary"><?php echo esc_html( $wpseopilot_score_summary ); ?></p>
+				<p class="wpseopilot-score-card__label"><?php echo esc_html( $samanlabs_seo_score_label ); ?></p>
+				<p class="wpseopilot-score-card__summary"><?php echo esc_html( $samanlabs_seo_score_summary ); ?></p>
 			</div>
 		</div>
-		<?php if ( ! empty( $wpseopilot_score['metrics'] ) ) : ?>
+		<?php if ( ! empty( $samanlabs_seo_score['metrics'] ) ) : ?>
 			<ul class="wpseopilot-score-card__metrics">
-				<?php foreach ( $wpseopilot_score['metrics'] as $wpseopilot_metric ) : ?>
-					<li class="<?php echo esc_attr( ! empty( $wpseopilot_metric['is_pass'] ) ? 'is-pass' : 'is-issue' ); ?>">
-						<span class="wpseopilot-score-card__metric-label"><?php echo esc_html( $wpseopilot_metric['label'] ); ?></span>
-						<span class="wpseopilot-score-card__metric-status"><?php echo esc_html( $wpseopilot_metric['status'] ); ?></span>
+				<?php foreach ( $samanlabs_seo_score['metrics'] as $samanlabs_seo_metric ) : ?>
+					<li class="<?php echo esc_attr( ! empty( $samanlabs_seo_metric['is_pass'] ) ? 'is-pass' : 'is-issue' ); ?>">
+						<span class="wpseopilot-score-card__metric-label"><?php echo esc_html( $samanlabs_seo_metric['label'] ); ?></span>
+						<span class="wpseopilot-score-card__metric-status"><?php echo esc_html( $samanlabs_seo_metric['status'] ); ?></span>
 					</li>
 				<?php endforeach; ?>
 			</ul>
@@ -49,9 +49,9 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 		<label for="samanlabs_seo_title"><strong><?php esc_html_e( 'Meta title', 'saman-labs-seo' ); ?></strong></label>
 		<input type="text" name="samanlabs_seo_title" id="samanlabs_seo_title" class="widefat" value="<?php echo esc_attr( $meta['title'] ); ?>" maxlength="160" />
 		<span class="wpseopilot-counter" data-target="samanlabs_seo_title"></span>
-		<?php if ( $wpseopilot_ai_enabled ) : ?>
+		<?php if ( $samanlabs_seo_ai_enabled ) : ?>
 			<span class="wpseopilot-ai-inline">
-				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="title" data-target="#wpseopilot_title" data-post="<?php echo esc_attr( $post->ID ); ?>">
+				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="title" data-target="#samanlabs_seo_title" data-post="<?php echo esc_attr( $post->ID ); ?>">
 					<?php esc_html_e( 'Generate title with AI', 'saman-labs-seo' ); ?>
 				</button>
 				<span class="wpseopilot-ai-status" data-ai-status="title"></span>
@@ -63,9 +63,9 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 		<label for="samanlabs_seo_description"><strong><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></strong></label>
 		<textarea name="samanlabs_seo_description" id="samanlabs_seo_description" class="widefat" rows="3" maxlength="320"><?php echo esc_textarea( $meta['description'] ); ?></textarea>
 		<span class="wpseopilot-counter" data-target="samanlabs_seo_description"></span>
-		<?php if ( $wpseopilot_ai_enabled ) : ?>
+		<?php if ( $samanlabs_seo_ai_enabled ) : ?>
 			<span class="wpseopilot-ai-inline">
-				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="description" data-target="#wpseopilot_description" data-post="<?php echo esc_attr( $post->ID ); ?>">
+				<button type="button" class="button button-secondary wpseopilot-ai-button" data-field="description" data-target="#samanlabs_seo_description" data-post="<?php echo esc_attr( $post->ID ); ?>">
 					<?php esc_html_e( 'Generate description with AI', 'saman-labs-seo' ); ?>
 				</button>
 				<span class="wpseopilot-ai-status" data-ai-status="description"></span>
@@ -121,13 +121,13 @@ $wpseopilot_score_summary = isset( $wpseopilot_score['summary'] ) ? $wpseopilot_
 	</div>
 </div>
 
-<?php $wpseopilot_suggestions = apply_filters( 'samanlabs_seo_link_suggestions', [], $post->ID ); ?>
-<?php if ( $wpseopilot_suggestions ) : ?>
+<?php $samanlabs_seo_suggestions = apply_filters( 'samanlabs_seo_link_suggestions', [], $post->ID ); ?>
+<?php if ( $samanlabs_seo_suggestions ) : ?>
 	<div class="wpseopilot-links">
 		<h4><?php esc_html_e( 'Internal link suggestions', 'saman-labs-seo' ); ?></h4>
 		<ul>
-			<?php foreach ( $wpseopilot_suggestions as $wpseopilot_suggestion ) : ?>
-				<li><a href="<?php echo esc_url( $wpseopilot_suggestion['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $wpseopilot_suggestion['title'] ); ?></a></li>
+			<?php foreach ( $samanlabs_seo_suggestions as $samanlabs_seo_suggestion ) : ?>
+				<li><a href="<?php echo esc_url( $samanlabs_seo_suggestion['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $samanlabs_seo_suggestion['title'] ); ?></a></li>
 			<?php endforeach; ?>
 		</ul>
 	</div>

@@ -9,7 +9,7 @@ add_action('admin_notices', function() {
         return;
     }
 
-    if (isset($_GET['test_wpseopilot_analytics'])) {
+    if (isset($_GET['test_samanlabs_seo_analytics'])) {
         $analytics = \WPSEOPilot\Plugin::instance()->get('analytics');
 
         if (!$analytics) {

@@ -53,7 +53,7 @@ namespace SamanLabs\SEO\Helpers {
 			];
 		}
 
-		$meta = (array) \get_post_meta( $post->ID, '_wpseopilot_meta', true );
+		$meta = (array) \get_post_meta( $post->ID, '_samanlabs_seo_meta', true );
 
 		$defaults = [
 			'title'       => '',
@@ -395,7 +395,7 @@ namespace SamanLabs\SEO\Helpers {
 
 		// Get SEO meta including focus keyphrase and secondary keyphrases.
 		$meta                  = get_post_meta( $post );
-		$all_meta              = (array) \get_post_meta( $post->ID, '_wpseopilot_meta', true );
+		$all_meta              = (array) \get_post_meta( $post->ID, '_samanlabs_seo_meta', true );
 		$focus_keyphrase       = isset( $all_meta['focus_keyphrase'] ) ? trim( sanitize_text_field( $all_meta['focus_keyphrase'] ) ) : '';
 		$has_keyphrase         = ! empty( $focus_keyphrase );
 		$secondary_keyphrases  = isset( $all_meta['secondary_keyphrases'] ) && is_array( $all_meta['secondary_keyphrases'] )
@@ -1006,7 +1006,7 @@ namespace {
 	 *
 	 * @return string|null
 	 */
-	function wpseopilot_breadcrumbs( $args = null, $echo = true ) {
+	function samanlabs_seo_breadcrumbs( $args = null, $echo = true ) {
 		return \SamanLabs\SEO\Helpers\breadcrumbs( $args, $echo );
 	}
 
@@ -1019,7 +1019,7 @@ namespace {
 	 *
 	 * @return int|\WP_Error Redirect ID or WP_Error.
 	 */
-	function wpseopilot_create_redirect( $source, $target, $status_code = 301 ) {
+	function samanlabs_seo_create_redirect( $source, $target, $status_code = 301 ) {
 		$plugin = \SamanLabs\SEO\Plugin::instance();
 		$svc    = $plugin->get( 'redirects' );
 

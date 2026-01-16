@@ -52,7 +52,7 @@ class Sitemap_Settings {
 		// V1 menu disabled - React UI handles menu registration
 		// add_action( 'admin_menu', [ $this, 'register_menu' ], 20 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		add_action( 'wp_ajax_wpseopilot_regenerate_sitemap', [ $this, 'ajax_regenerate_sitemap' ] );
+		add_action( 'wp_ajax_samanlabs_seo_regenerate_sitemap', [ $this, 'ajax_regenerate_sitemap' ] );
 
 		// Schedule sitemap regeneration if enabled
 		if ( get_option( 'samanlabs_seo_sitemap_schedule_updates', '' ) ) {

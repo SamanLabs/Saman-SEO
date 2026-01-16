@@ -38,8 +38,8 @@ class LLM_TXT_Generator {
 	 * @return void
 	 */
 	public function register_rewrite_rules() {
-		add_rewrite_rule( '^llm\.txt$', 'index.php?wpseopilot_llm_txt=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_llm_txt%', '1' );
+		add_rewrite_rule( '^llm\.txt$', 'index.php?samanlabs_seo_llm_txt=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_llm_txt%', '1' );
 	}
 
 	/**
@@ -153,7 +153,7 @@ class LLM_TXT_Generator {
 				// Get excerpt or meta description if enabled
 				$description = '';
 				if ( '1' === $include_excerpt ) {
-					$meta_desc = get_post_meta( $post->ID, '_wpseopilot_meta_description', true );
+					$meta_desc = get_post_meta( $post->ID, '_samanlabs_seo_meta_description', true );
 
 					if ( $meta_desc ) {
 						$description = ' - ' . wp_trim_words( $meta_desc, 20, '...' );

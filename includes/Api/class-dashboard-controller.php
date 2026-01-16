@@ -330,7 +330,7 @@ class Dashboard_Controller extends REST_Controller {
             "SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-             WHERE pm.meta_key = '_wpseopilot_meta'
+             WHERE pm.meta_key = '_samanlabs_seo_meta'
              AND p.post_status = 'publish'
              AND pm.meta_value LIKE '%\"title\"%'
              AND pm.meta_value NOT LIKE '%\"title\":\"\"%'"
@@ -341,7 +341,7 @@ class Dashboard_Controller extends REST_Controller {
             "SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-             WHERE pm.meta_key = '_wpseopilot_meta'
+             WHERE pm.meta_key = '_samanlabs_seo_meta'
              AND p.post_status = 'publish'
              AND pm.meta_value LIKE '%\"description\"%'
              AND pm.meta_value NOT LIKE '%\"description\":\"\"%'"
@@ -357,7 +357,7 @@ class Dashboard_Controller extends REST_Controller {
                 "SELECT COUNT(DISTINCT pm.post_id)
                  FROM {$wpdb->postmeta} pm
                  JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-                 WHERE pm.meta_key = '_wpseopilot_meta'
+                 WHERE pm.meta_key = '_samanlabs_seo_meta'
                  AND p.post_status = 'publish'
                  AND DATE(p.post_date) <= %s
                  AND pm.meta_value LIKE '%\"title\"%'

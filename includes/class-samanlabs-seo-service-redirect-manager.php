@@ -78,14 +78,14 @@ class Redirect_Manager {
 		add_action( 'template_redirect', [ $this, 'maybe_redirect' ], 0 );
 		// V1 menu disabled - React UI handles menu registration
 		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
-		add_action( 'admin_post_wpseopilot_save_redirect', [ $this, 'handle_save' ] );
-		add_action( 'admin_post_wpseopilot_delete_redirect', [ $this, 'handle_delete' ] );
-		add_action( 'admin_post_wpseopilot_dismiss_slug', [ $this, 'handle_dismiss_slug' ] );
+		add_action( 'admin_post_samanlabs_seo_save_redirect', [ $this, 'handle_save' ] );
+		add_action( 'admin_post_samanlabs_seo_delete_redirect', [ $this, 'handle_delete' ] );
+		add_action( 'admin_post_samanlabs_seo_dismiss_slug', [ $this, 'handle_dismiss_slug' ] );
 
 		// Slug change detection.
 		add_action( 'post_updated', [ $this, 'detect_slug_change' ], 10, 3 );
 		add_action( 'admin_notices', [ $this, 'render_slug_change_notice' ] );
-		add_action( 'wp_ajax_wpseopilot_create_automatic_redirect', [ $this, 'ajax_create_redirect' ] );
+		add_action( 'wp_ajax_samanlabs_seo_create_automatic_redirect', [ $this, 'ajax_create_redirect' ] );
 	}
 
 	/**

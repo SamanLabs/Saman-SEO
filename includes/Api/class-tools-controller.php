@@ -304,11 +304,11 @@ class Tools_Controller extends REST_Controller {
             $args['meta_query'] = [
                 'relation' => 'OR',
                 [
-                    'key'     => '_wpseopilot_title',
+                    'key'     => '_samanlabs_seo_title',
                     'compare' => 'NOT EXISTS',
                 ],
                 [
-                    'key'     => '_wpseopilot_title',
+                    'key'     => '_samanlabs_seo_title',
                     'value'   => '',
                     'compare' => '=',
                 ],
@@ -317,11 +317,11 @@ class Tools_Controller extends REST_Controller {
             $args['meta_query'] = [
                 'relation' => 'OR',
                 [
-                    'key'     => '_wpseopilot_description',
+                    'key'     => '_samanlabs_seo_description',
                     'compare' => 'NOT EXISTS',
                 ],
                 [
-                    'key'     => '_wpseopilot_description',
+                    'key'     => '_samanlabs_seo_description',
                     'value'   => '',
                     'compare' => '=',
                 ],
@@ -332,8 +332,8 @@ class Tools_Controller extends REST_Controller {
         $posts = [];
 
         foreach ( $query->posts as $post ) {
-            $seo_title = get_post_meta( $post->ID, '_wpseopilot_title', true );
-            $seo_desc = get_post_meta( $post->ID, '_wpseopilot_description', true );
+            $seo_title = get_post_meta( $post->ID, '_samanlabs_seo_title', true );
+            $seo_desc = get_post_meta( $post->ID, '_samanlabs_seo_description', true );
 
             $posts[] = [
                 'id'               => $post->ID,
@@ -437,11 +437,11 @@ class Tools_Controller extends REST_Controller {
             }
 
             if ( isset( $change['seo_title'] ) ) {
-                update_post_meta( $post_id, '_wpseopilot_title', sanitize_text_field( $change['seo_title'] ) );
+                update_post_meta( $post_id, '_samanlabs_seo_title', sanitize_text_field( $change['seo_title'] ) );
             }
 
             if ( isset( $change['seo_description'] ) ) {
-                update_post_meta( $post_id, '_wpseopilot_description', sanitize_textarea_field( $change['seo_description'] ) );
+                update_post_meta( $post_id, '_samanlabs_seo_description', sanitize_textarea_field( $change['seo_description'] ) );
             }
 
             $saved++;
@@ -858,7 +858,7 @@ class Tools_Controller extends REST_Controller {
             $schema = wp_json_encode( $schema );
         }
 
-        update_post_meta( $post_id, '_wpseopilot_schema', $schema );
+        update_post_meta( $post_id, '_samanlabs_seo_schema', $schema );
 
         return $this->success( null, __( 'Schema saved successfully.', 'saman-labs-seo' ) );
     }

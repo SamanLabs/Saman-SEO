@@ -108,12 +108,12 @@ class WooCommerce {
 		}
 
 		// GTIN/MPN/ISBN.
-		$gtin = get_post_meta( $product->get_id(), '_wpseopilot_gtin', true );
+		$gtin = get_post_meta( $product->get_id(), '_samanlabs_seo_gtin', true );
 		if ( $gtin ) {
 			$schema['gtin'] = $gtin;
 		}
 
-		$mpn = get_post_meta( $product->get_id(), '_wpseopilot_mpn', true );
+		$mpn = get_post_meta( $product->get_id(), '_samanlabs_seo_mpn', true );
 		if ( $mpn ) {
 			$schema['mpn'] = $mpn;
 		}
@@ -144,7 +144,7 @@ class WooCommerce {
 	 */
 	private function get_product_brand( $product ): ?string {
 		// Check custom field first.
-		$brand = get_post_meta( $product->get_id(), '_wpseopilot_brand', true );
+		$brand = get_post_meta( $product->get_id(), '_samanlabs_seo_brand', true );
 		if ( $brand ) {
 			return $brand;
 		}
@@ -186,7 +186,7 @@ class WooCommerce {
 		}
 
 		// Item condition.
-		$condition = get_post_meta( $product->get_id(), '_wpseopilot_condition', true );
+		$condition = get_post_meta( $product->get_id(), '_samanlabs_seo_condition', true );
 		if ( $condition ) {
 			$offer['itemCondition'] = 'https://schema.org/' . $condition;
 		} else {
@@ -293,22 +293,22 @@ class WooCommerce {
 	 */
 	public static function get_meta_fields(): array {
 		return [
-			'_wpseopilot_brand'     => [
+			'_samanlabs_seo_brand'     => [
 				'label'       => __( 'Brand', 'saman-labs-seo' ),
 				'description' => __( 'Product brand name for schema.', 'saman-labs-seo' ),
 				'type'        => 'text',
 			],
-			'_wpseopilot_gtin'      => [
+			'_samanlabs_seo_gtin'      => [
 				'label'       => __( 'GTIN/UPC/EAN', 'saman-labs-seo' ),
 				'description' => __( 'Global Trade Item Number (barcode).', 'saman-labs-seo' ),
 				'type'        => 'text',
 			],
-			'_wpseopilot_mpn'       => [
+			'_samanlabs_seo_mpn'       => [
 				'label'       => __( 'MPN', 'saman-labs-seo' ),
 				'description' => __( 'Manufacturer Part Number.', 'saman-labs-seo' ),
 				'type'        => 'text',
 			],
-			'_wpseopilot_condition' => [
+			'_samanlabs_seo_condition' => [
 				'label'       => __( 'Condition', 'saman-labs-seo' ),
 				'description' => __( 'Product condition for schema.', 'saman-labs-seo' ),
 				'type'        => 'select',

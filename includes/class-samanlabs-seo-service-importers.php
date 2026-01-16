@@ -20,7 +20,7 @@ class Importers {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'admin_post_wpseopilot_export', [ $this, 'handle_export' ] );
+		add_action( 'admin_post_samanlabs_seo_export', [ $this, 'handle_export' ] );
 	}
 
 	/**

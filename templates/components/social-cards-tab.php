@@ -69,7 +69,7 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 					</div>
 					<img
 						id="wpseopilot-social-card-preview-img"
-						src="<?php echo esc_url( home_url( '/?wpseopilot_social_card=1&title=' . urlencode( 'Sample Post Title - Understanding Core Web Vitals' ) ) ); ?>"
+						src="<?php echo esc_url( home_url( '/?samanlabs_seo_social_card=1&title=' . urlencode( 'Sample Post Title - Understanding Core Web Vitals' ) ) ); ?>"
 						alt="<?php esc_attr_e( 'Social card preview', 'saman-labs-seo' ); ?>"
 					/>
 				</div>

@@ -298,42 +298,42 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	public function register_custom_sitemap() {
-		add_rewrite_rule( '^sitemap_index\.xml$', 'index.php?wpseopilot_sitemap_index=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_index%', '1' );
-		add_rewrite_rule( '^sitemap\.xml$', 'index.php?wpseopilot_sitemap_root=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_root%', '1' );
+		add_rewrite_rule( '^sitemap_index\.xml$', 'index.php?samanlabs_seo_sitemap_index=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_index%', '1' );
+		add_rewrite_rule( '^sitemap\.xml$', 'index.php?samanlabs_seo_sitemap_root=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_root%', '1' );
 
 		add_rewrite_rule(
 			'^([a-z0-9_-]+)-sitemap([0-9]+)\.xml$',
-			'index.php?wpseopilot_sitemap_slug=$matches[1]&wpseopilot_sitemap_page=$matches[2]',
+			'index.php?samanlabs_seo_sitemap_slug=$matches[1]&samanlabs_seo_sitemap_page=$matches[2]',
 			'top'
 		);
 		add_rewrite_rule(
 			'^([a-z0-9_-]+)-sitemap\.xml$',
-			'index.php?wpseopilot_sitemap_slug=$matches[1]',
+			'index.php?samanlabs_seo_sitemap_slug=$matches[1]',
 			'top'
 		);
-		add_rewrite_tag( '%wpseopilot_sitemap_slug%', '([a-z0-9_-]+)' );
-		add_rewrite_tag( '%wpseopilot_sitemap_page%', '([0-9]+)' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_slug%', '([a-z0-9_-]+)' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_page%', '([0-9]+)' );
 
-		add_rewrite_rule( '^sitemap-style\.xsl$', 'index.php?wpseopilot_sitemap_stylesheet=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_stylesheet%', '1' );
+		add_rewrite_rule( '^sitemap-style\.xsl$', 'index.php?samanlabs_seo_sitemap_stylesheet=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_stylesheet%', '1' );
 
 		// RSS Sitemap
-		add_rewrite_rule( '^sitemap-rss\.xml$', 'index.php?wpseopilot_sitemap_rss=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_rss%', '1' );
+		add_rewrite_rule( '^sitemap-rss\.xml$', 'index.php?samanlabs_seo_sitemap_rss=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_rss%', '1' );
 
 		// Google News Sitemap
-		add_rewrite_rule( '^sitemap-news\.xml$', 'index.php?wpseopilot_sitemap_news=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_news%', '1' );
+		add_rewrite_rule( '^sitemap-news\.xml$', 'index.php?samanlabs_seo_sitemap_news=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_news%', '1' );
 
 		// Video Sitemap
-		add_rewrite_rule( '^sitemap-video\.xml$', 'index.php?wpseopilot_sitemap_video=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_video%', '1' );
+		add_rewrite_rule( '^sitemap-video\.xml$', 'index.php?samanlabs_seo_sitemap_video=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_video%', '1' );
 
 		// Additional Pages Sitemap
-		add_rewrite_rule( '^additional-sitemap\.xml$', 'index.php?wpseopilot_sitemap_additional=1', 'top' );
-		add_rewrite_tag( '%wpseopilot_sitemap_additional%', '1' );
+		add_rewrite_rule( '^additional-sitemap\.xml$', 'index.php?samanlabs_seo_sitemap_additional=1', 'top' );
+		add_rewrite_tag( '%samanlabs_seo_sitemap_additional%', '1' );
 	}
 
 	/**

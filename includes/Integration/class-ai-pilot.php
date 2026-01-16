@@ -492,8 +492,8 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 				$parts[] = '- Type: ' . $post->post_type;
 				$parts[] = '- Status: ' . $post->post_status;
 
-				$meta_title = get_post_meta( $post->ID, '_wpseopilot_title', true );
-				$meta_desc  = get_post_meta( $post->ID, '_wpseopilot_description', true );
+				$meta_title = get_post_meta( $post->ID, '_samanlabs_seo_title', true );
+				$meta_desc  = get_post_meta( $post->ID, '_samanlabs_seo_description', true );
 
 				if ( $meta_title ) {
 					$parts[] = '- SEO Title: ' . $meta_title;

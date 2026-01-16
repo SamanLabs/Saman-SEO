@@ -37,8 +37,8 @@ class Admin_UI {
 		add_filter( 'post_row_actions', [ $this, 'post_row_actions' ], 10, 2 );
 		add_filter( 'bulk_actions-edit-post', [ $this, 'bulk_actions' ] );
 		add_filter( 'handle_bulk_actions-edit-post', [ $this, 'handle_bulk_actions' ], 10, 3 );
-		add_action( 'admin_post_wpseopilot_toggle_noindex', [ $this, 'handle_toggle_noindex' ] );
-		add_action( 'wp_ajax_wpseopilot_render_preview', [ $this, 'ajax_render_preview' ] );
+		add_action( 'admin_post_samanlabs_seo_toggle_noindex', [ $this, 'handle_toggle_noindex' ] );
+		add_action( 'wp_ajax_samanlabs_seo_render_preview', [ $this, 'ajax_render_preview' ] );
 	}
 
 	/**

@@ -19,7 +19,7 @@ class Post_Meta {
 	 *
 	 * @var string
 	 */
-	const META_KEY = '_wpseopilot_meta';
+	const META_KEY = '_samanlabs_seo_meta';
 
 	/**
 	 * Boot hooks.
