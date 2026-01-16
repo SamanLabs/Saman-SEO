@@ -5,7 +5,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Internal_Linking;
+namespace SamanLabs\SEO\Internal_Linking;
 
 use DOMDocument;
 use DOMElement;

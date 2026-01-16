@@ -8,7 +8,7 @@
  * @since 0.2.0
  */
 
-namespace WPSEOPilot;
+namespace SamanLabs\SEO;
 
 use WPSEOPilot\Integration\AI_Pilot;
 use WPSEOPilot\Updater\GitHub_Updater;

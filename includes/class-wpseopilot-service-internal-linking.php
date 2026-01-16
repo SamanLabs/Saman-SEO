@@ -5,7 +5,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Service;
+namespace SamanLabs\SEO\Service;
 
 use WPSEOPilot\Internal_Linking\Engine as Linking_Engine;
 use WPSEOPilot\Internal_Linking\Repository;

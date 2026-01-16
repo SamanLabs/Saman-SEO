@@ -6,7 +6,7 @@
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api\Assistants;
+namespace SamanLabs\SEO\Api\Assistants;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;

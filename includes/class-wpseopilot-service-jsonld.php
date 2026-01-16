@@ -5,7 +5,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Service;
+namespace SamanLabs\SEO\Service;
 
 use function WPSEOPilot\Helpers\breadcrumbs;
 

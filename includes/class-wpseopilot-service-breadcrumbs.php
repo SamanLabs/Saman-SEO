@@ -7,7 +7,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Service;
+namespace SamanLabs\SEO\Service;
 
 use WP_Post;
 use WP_Term;

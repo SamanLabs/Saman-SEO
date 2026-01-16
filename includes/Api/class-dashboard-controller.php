@@ -6,7 +6,7 @@
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace SamanLabs\SEO\Api;
 
 use WPSEOPilot\Service\Post_Meta;
 use function WPSEOPilot\Helpers\calculate_seo_score;

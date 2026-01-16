@@ -5,7 +5,7 @@
  * @package WP_SEO_Pilot
  */
 
-namespace WPSEOPilot\Service;
+namespace SamanLabs\SEO\Service;
 
 defined( 'ABSPATH' ) || exit;
 

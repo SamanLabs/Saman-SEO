@@ -5,7 +5,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Helpers {
+namespace SamanLabs\SEO\Helpers {
 
 	use WP_Post;
 

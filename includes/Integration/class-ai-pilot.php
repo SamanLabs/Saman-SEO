@@ -8,7 +8,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Integration;
+namespace SamanLabs\SEO\Integration;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -5,7 +5,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Api;
+namespace SamanLabs\SEO\Api;
 
 use WP_REST_Controller;
 use WP_REST_Server;

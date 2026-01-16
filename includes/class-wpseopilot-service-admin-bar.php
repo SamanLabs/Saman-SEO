@@ -8,7 +8,7 @@
  * @package WPSEOPilot
  */
 
-namespace WPSEOPilot\Service;
+namespace SamanLabs\SEO\Service;
 
 use WP_Post;
 use function WPSEOPilot\Helpers\calculate_seo_score;

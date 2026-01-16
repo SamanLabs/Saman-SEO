@@ -8,7 +8,7 @@
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Updater;
+namespace SamanLabs\SEO\Updater;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
