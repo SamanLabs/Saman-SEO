@@ -904,8 +904,8 @@ class Sitemap_Enhancer {
 			$limit = min( (int) $core_default, $limit );
 		}
 
-		if ( defined( 'WPSEOPILOT_SITEMAP_MAX_URLS' ) ) {
-			$limit = (int) WPSEOPILOT_SITEMAP_MAX_URLS;
+		if ( defined( 'SAMANLABS_SEO_SITEMAP_MAX_URLS' ) ) {
+			$limit = (int) SAMANLABS_SEO_SITEMAP_MAX_URLS;
 		}
 
 		$limit = (int) apply_filters(

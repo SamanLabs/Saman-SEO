@@ -75,7 +75,7 @@ $taxonomies = get_taxonomies(
 								$preview_title = $homepage_defaults['meta_title'] ?? get_bloginfo( 'name' );
 								$preview_description = $homepage_defaults['meta_description'] ?? get_bloginfo( 'description' );
 								$preview_url = home_url();
-								include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+								include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 								?>
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
@@ -254,7 +254,7 @@ $taxonomies = get_taxonomies(
 									$preview_title = $settings['title_template'] ?? '{{post_title}} {{separator}} {{site_title}}';
 									$preview_description = $settings['description_template'] ?? '{{post_excerpt}}';
 									$preview_url = home_url();
-									include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+									include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 									?>
 								</div>
 
@@ -305,7 +305,7 @@ $taxonomies = get_taxonomies(
 										class="wpseopilot-accordion-tab-panel is-active"
 										role="tabpanel"
 									>
-										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/title-description.php'; ?>
+										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/title-description.php'; ?>
 									</div>
 
 									<div
@@ -313,7 +313,7 @@ $taxonomies = get_taxonomies(
 										class="wpseopilot-accordion-tab-panel"
 										role="tabpanel"
 									>
-										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/schema.php'; ?>
+										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/schema.php'; ?>
 									</div>
 
 									<div
@@ -321,7 +321,7 @@ $taxonomies = get_taxonomies(
 										class="wpseopilot-accordion-tab-panel"
 										role="tabpanel"
 									>
-										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/custom-fields.php'; ?>
+										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/custom-fields.php'; ?>
 									</div>
 
 									<div
@@ -329,7 +329,7 @@ $taxonomies = get_taxonomies(
 										class="wpseopilot-accordion-tab-panel"
 										role="tabpanel"
 									>
-										<?php include WPSEOPILOT_PATH . 'templates/components/post-type-fields/advanced.php'; ?>
+										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/advanced.php'; ?>
 									</div>
 								</div>
 
@@ -365,7 +365,7 @@ $taxonomies = get_taxonomies(
 								$preview_title = ! empty( $settings['title_template'] ) ? $settings['title_template'] : '{{term}} Archives {{separator}} {{sitename}}';
 								$preview_description = ! empty( $settings['description_template'] ) ? $settings['description_template'] : '{{term_description}}';
 								$preview_url = home_url();
-								include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+								include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 								?>
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
@@ -470,7 +470,7 @@ $taxonomies = get_taxonomies(
 								$preview_title = $settings['title_template'] ?? '';
 								$preview_description = $settings['description_template'] ?? '';
 								$preview_url = home_url();
-								include WPSEOPILOT_PATH . 'templates/components/google-preview.php';
+								include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 								?>
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">

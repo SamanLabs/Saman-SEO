@@ -126,17 +126,17 @@ class Sitemap_Settings {
 		// Enqueue new modern plugin styles
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		// Enqueue admin.js for tab switching functionality
 		wp_enqueue_script(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/js/admin.js',
+			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
@@ -249,7 +249,7 @@ class Sitemap_Settings {
 		$llm_include_excerpt = get_option( 'wpseopilot_llm_txt_include_excerpt', '1' );
 
 		// Load template
-		include WPSEOPILOT_PATH . 'templates/sitemap-settings.php';
+		include SAMANLABS_SEO_PATH . 'templates/sitemap-settings.php';
 	}
 
 	/**

@@ -14,16 +14,16 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! defined( 'WPSEOPILOT_VERSION' ) ) {
-	define( 'WPSEOPILOT_VERSION', '0.1.41' );
+if ( ! defined( 'SAMANLABS_SEO_VERSION' ) ) {
+	define( 'SAMANLABS_SEO_VERSION', '1.0.0' );
 }
 
-if ( ! defined( 'WPSEOPILOT_PATH' ) ) {
-	define( 'WPSEOPILOT_PATH', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'SAMANLABS_SEO_PATH' ) ) {
+	define( 'SAMANLABS_SEO_PATH', plugin_dir_path( __FILE__ ) );
 }
 
-if ( ! defined( 'WPSEOPILOT_URL' ) ) {
-	define( 'WPSEOPILOT_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'SAMANLABS_SEO_URL' ) ) {
+	define( 'SAMANLABS_SEO_URL', plugin_dir_url( __FILE__ ) );
 }
 
 /**
@@ -43,7 +43,7 @@ spl_autoload_register(
 		if ( 0 === strpos( $class, 'WPSEOPilot\\Api\\' ) ) {
 			$class_name = str_replace( 'WPSEOPilot\\Api\\', '', $class );
 			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
-			$file       = WPSEOPILOT_PATH . 'includes/Api/' . $file_name;
+			$file       = SAMANLABS_SEO_PATH . 'includes/Api/' . $file_name;
 
 			if ( file_exists( $file ) ) {
 				require_once $file;
@@ -55,7 +55,7 @@ spl_autoload_register(
 		if ( 0 === strpos( $class, 'WPSEOPilot\\Integration\\' ) ) {
 			$class_name = str_replace( 'WPSEOPilot\\Integration\\', '', $class );
 			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
-			$file       = WPSEOPILOT_PATH . 'includes/Integration/' . $file_name;
+			$file       = SAMANLABS_SEO_PATH . 'includes/Integration/' . $file_name;
 
 			if ( file_exists( $file ) ) {
 				require_once $file;
@@ -68,9 +68,9 @@ spl_autoload_register(
 		$class_name = str_replace( 'WPSEOPilot\\Service\\', '', $class );
 		$slug       = strtolower( str_replace( [ '_' ], '-', $class_name ) );
 		$candidates = [
-			WPSEOPILOT_PATH . 'includes/Service/class-wpseopilot-service-' . $slug . '.php',
-			WPSEOPILOT_PATH . 'includes/class-wpseopilot-service-' . $slug . '.php',
-			WPSEOPILOT_PATH . 'includes/Service/class-' . $slug . '.php',
+			SAMANLABS_SEO_PATH . 'includes/Service/class-wpseopilot-service-' . $slug . '.php',
+			SAMANLABS_SEO_PATH . 'includes/class-wpseopilot-service-' . $slug . '.php',
+			SAMANLABS_SEO_PATH . 'includes/Service/class-' . $slug . '.php',
 		];
 
 		foreach ( $candidates as $file ) {
@@ -90,7 +90,7 @@ spl_autoload_register(
 			)
 		);
 
-		$file = WPSEOPILOT_PATH . 'includes/class-' . $path . '.php';
+		$file = SAMANLABS_SEO_PATH . 'includes/class-' . $path . '.php';
 
 		if ( file_exists( $file ) ) {
 			require_once $file;
@@ -98,10 +98,10 @@ spl_autoload_register(
 	}
 );
 
-require_once WPSEOPILOT_PATH . 'includes/helpers.php';
+require_once SAMANLABS_SEO_PATH . 'includes/helpers.php';
 
-if ( file_exists( WPSEOPILOT_PATH . 'test-analytics-simple.php' ) ) {
-	require_once WPSEOPILOT_PATH . 'test-analytics-simple.php';
+if ( file_exists( SAMANLABS_SEO_PATH . 'test-analytics-simple.php' ) ) {
+	require_once SAMANLABS_SEO_PATH . 'test-analytics-simple.php';
 }
 
 /**

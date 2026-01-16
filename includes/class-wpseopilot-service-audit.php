@@ -57,16 +57,16 @@ class Audit {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		$results = $this->collect_issues();
@@ -75,7 +75,7 @@ class Audit {
 		$scanned = $results['scanned'];
 		$recommendations = $results['recommendations'];
 
-		include WPSEOPILOT_PATH . 'templates/audit.php';
+		include SAMANLABS_SEO_PATH . 'templates/audit.php';
 	}
 
 	/**

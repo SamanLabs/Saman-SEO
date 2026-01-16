@@ -632,12 +632,12 @@ class Redirect_Manager {
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
-		include WPSEOPILOT_PATH . 'templates/redirects.php';
+		include SAMANLABS_SEO_PATH . 'templates/redirects.php';
 	}
 
 	/**

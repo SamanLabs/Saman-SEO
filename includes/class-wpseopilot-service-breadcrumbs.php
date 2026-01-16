@@ -736,9 +736,9 @@ class Breadcrumbs {
 		// Register the editor script.
 		wp_register_script(
 			'wpseopilot-breadcrumbs-block',
-			WPSEOPILOT_URL . 'blocks/breadcrumbs/index.js',
+			SAMANLABS_SEO_URL . 'blocks/breadcrumbs/index.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-server-side-render', 'wp-i18n' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
@@ -883,9 +883,9 @@ class Breadcrumbs {
 
 		wp_enqueue_style(
 			'wpseopilot-breadcrumbs',
-			WPSEOPILOT_URL . 'assets/css/breadcrumbs.css',
+			SAMANLABS_SEO_URL . 'assets/css/breadcrumbs.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 	}
 

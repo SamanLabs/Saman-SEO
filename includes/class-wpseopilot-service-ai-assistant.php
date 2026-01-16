@@ -61,9 +61,9 @@ class AI_Assistant {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 	}
 
@@ -79,16 +79,16 @@ class AI_Assistant {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		$api_key = get_option( 'wpseopilot_openai_api_key', '' );
@@ -101,7 +101,7 @@ class AI_Assistant {
 
 		$models   = $settings->get_ai_models();
 
-		include WPSEOPILOT_PATH . 'templates/ai-assistant.php';
+		include SAMANLABS_SEO_PATH . 'templates/ai-assistant.php';
 	}
 
 	/**

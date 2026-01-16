@@ -333,9 +333,9 @@ class Request_Monitor {
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 	}
 
@@ -423,7 +423,7 @@ class Request_Monitor {
 		$total_pages = max( 1, (int) ceil( $total_count / $per_page ) );
 		$base_url    = menu_page_url( 'wpseopilot-404', false );
 
-		include WPSEOPILOT_PATH . 'templates/404-log.php';
+		include SAMANLABS_SEO_PATH . 'templates/404-log.php';
 	}
 
 	/**
@@ -1103,7 +1103,7 @@ class Request_Monitor {
 			return true;
 		}
 
-		$parser = WPSEOPILOT_PATH . 'includes/useragent_detect_browser.php';
+		$parser = SAMANLABS_SEO_PATH . 'includes/useragent_detect_browser.php';
 
 		if ( file_exists( $parser ) ) {
 			require_once $parser;

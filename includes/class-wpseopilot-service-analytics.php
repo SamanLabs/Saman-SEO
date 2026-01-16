@@ -128,7 +128,7 @@ class Analytics {
 			'wpseopilot-matomo',
 			$this->matomo_url . '/matomo.js',
 			[],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
@@ -142,7 +142,7 @@ class Analytics {
 		$visitor_id = substr( md5( home_url() . get_current_user_id() ), 0, 16 );
 
 		// Get version info
-		$plugin_version = WPSEOPILOT_VERSION;
+		$plugin_version = SAMANLABS_SEO_VERSION;
 		$wp_version     = $this->get_wp_version();
 		$php_version    = $this->get_php_version();
 		$interface      = $this->get_interface_type( $page );

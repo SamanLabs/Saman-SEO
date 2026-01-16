@@ -67,31 +67,31 @@ class Schema_Blocks {
 		// FAQ Block.
 		wp_register_script(
 			'wpseopilot-faq-block',
-			WPSEOPILOT_URL . 'blocks/faq/index.js',
+			SAMANLABS_SEO_URL . 'blocks/faq/index.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
 		// HowTo Block.
 		wp_register_script(
 			'wpseopilot-howto-block',
-			WPSEOPILOT_URL . 'blocks/howto/index.js',
+			SAMANLABS_SEO_URL . 'blocks/howto/index.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
 		// Editor styles.
 		wp_register_style(
 			'wpseopilot-schema-blocks-editor',
-			WPSEOPILOT_URL . 'assets/css/schema-blocks-editor.css',
+			SAMANLABS_SEO_URL . 'assets/css/schema-blocks-editor.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		// Create inline editor styles if file doesn't exist.
-		if ( ! file_exists( WPSEOPILOT_PATH . 'assets/css/schema-blocks-editor.css' ) ) {
+		if ( ! file_exists( SAMANLABS_SEO_PATH . 'assets/css/schema-blocks-editor.css' ) ) {
 			wp_add_inline_style( 'wpseopilot-schema-blocks-editor', $this->get_editor_styles() );
 		}
 	}
@@ -118,13 +118,13 @@ class Schema_Blocks {
 		if ( $has_faq || $has_howto ) {
 			wp_register_style(
 				'wpseopilot-schema-blocks',
-				WPSEOPILOT_URL . 'assets/css/schema-blocks.css',
+				SAMANLABS_SEO_URL . 'assets/css/schema-blocks.css',
 				[],
-				WPSEOPILOT_VERSION
+				SAMANLABS_SEO_VERSION
 			);
 
 			// Create inline styles if file doesn't exist.
-			if ( ! file_exists( WPSEOPILOT_PATH . 'assets/css/schema-blocks.css' ) ) {
+			if ( ! file_exists( SAMANLABS_SEO_PATH . 'assets/css/schema-blocks.css' ) ) {
 				wp_add_inline_style( 'wpseopilot-schema-blocks', $this->get_frontend_styles() );
 			}
 

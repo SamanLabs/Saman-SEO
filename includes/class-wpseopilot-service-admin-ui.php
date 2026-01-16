@@ -122,7 +122,7 @@ class Admin_UI {
 		$ai_enabled = ! empty( get_option( 'wpseopilot_openai_api_key', '' ) );
 		$seo_score  = calculate_seo_score( $post );
 
-		include WPSEOPILOT_PATH . 'templates/meta-box.php';
+		include SAMANLABS_SEO_PATH . 'templates/meta-box.php';
 	}
 
 	/**
@@ -155,24 +155,24 @@ class Admin_UI {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/js/admin.js',
+			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
 		wp_enqueue_script(
 			'wpseopilot-seo-tags',
-			WPSEOPILOT_URL . 'assets/js/seo-tags.js',
+			SAMANLABS_SEO_URL . 'assets/js/seo-tags.js',
 			[ 'jquery', 'wpseopilot-admin' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
@@ -218,15 +218,15 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function enqueue_admin_list_assets() {
-		$build_dir = WPSEOPILOT_PATH . 'build-admin-list/';
-		$build_url = WPSEOPILOT_URL . 'build-admin-list/';
+		$build_dir = SAMANLABS_SEO_PATH . 'build-admin-list/';
+		$build_url = SAMANLABS_SEO_URL . 'build-admin-list/';
 
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
 			: [
 				'dependencies' => [ 'wp-element', 'react', 'react-dom' ],
-				'version'      => WPSEOPILOT_VERSION,
+				'version'      => SAMANLABS_SEO_VERSION,
 			];
 
 		wp_enqueue_script(
@@ -252,15 +252,15 @@ class Admin_UI {
 	 */
 	public function enqueue_editor_assets() {
 		// Load V2 React editor sidebar
-		$build_dir = WPSEOPILOT_PATH . 'build-editor/';
-		$build_url = WPSEOPILOT_URL . 'build-editor/';
+		$build_dir = SAMANLABS_SEO_PATH . 'build-editor/';
+		$build_url = SAMANLABS_SEO_URL . 'build-editor/';
 
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
 			: [
 				'dependencies' => [ 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch' ],
-				'version'      => WPSEOPILOT_VERSION,
+				'version'      => SAMANLABS_SEO_VERSION,
 			];
 
 		wp_enqueue_script(

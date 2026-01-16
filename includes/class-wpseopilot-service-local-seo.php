@@ -603,28 +603,28 @@ class Local_SEO {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/js/admin.js',
+			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
 		$business_types = $this->get_business_types();
 
-		include WPSEOPILOT_PATH . 'templates/local-seo.php';
+		include SAMANLABS_SEO_PATH . 'templates/local-seo.php';
 	}
 }

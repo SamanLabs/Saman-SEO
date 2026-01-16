@@ -135,7 +135,7 @@ class Admin_V2 {
      * Load updater classes.
      */
     private function load_updater_classes() {
-        $updater_dir = WPSEOPILOT_PATH . 'includes/Updater/';
+        $updater_dir = SAMANLABS_SEO_PATH . 'includes/Updater/';
 
         if ( file_exists( $updater_dir . 'class-github-updater.php' ) ) {
             require_once $updater_dir . 'class-github-updater.php';
@@ -260,15 +260,15 @@ class Admin_V2 {
         }
 
         // @wordpress/scripts outputs to build-v2/ folder
-        $build_dir = WPSEOPILOT_PATH . 'build-v2/';
-        $build_url = WPSEOPILOT_URL . 'build-v2/';
+        $build_dir = SAMANLABS_SEO_PATH . 'build-v2/';
+        $build_url = SAMANLABS_SEO_URL . 'build-v2/';
 
         $asset_file = $build_dir . 'index.asset.php';
         $asset = file_exists( $asset_file )
             ? require $asset_file
             : [
                 'dependencies' => [ 'wp-api-fetch', 'wp-element' ],
-                'version'      => WPSEOPILOT_VERSION,
+                'version'      => SAMANLABS_SEO_VERSION,
             ];
 
         // Enqueue React app script
@@ -303,8 +303,8 @@ class Admin_V2 {
             'restUrl'     => rest_url( 'wpseopilot/v2/' ),
             'nonce'       => wp_create_nonce( 'wp_rest' ),
             'adminUrl'    => admin_url(),
-            'pluginUrl'   => WPSEOPILOT_URL,
-            'version'     => WPSEOPILOT_VERSION,
+            'pluginUrl'   => SAMANLABS_SEO_URL,
+            'version'     => SAMANLABS_SEO_VERSION,
             'viewMap'     => $this->view_map,
             'menuSlug'    => self::MENU_SLUG,
             'aiEnabled'   => $ai_enabled,
@@ -331,7 +331,7 @@ class Admin_V2 {
      * Load and initialize REST API controllers.
      */
     private function load_rest_controllers() {
-        $controllers_dir = WPSEOPILOT_PATH . 'includes/Api/';
+        $controllers_dir = SAMANLABS_SEO_PATH . 'includes/Api/';
 
         // Only proceed if directory exists
         if ( ! is_dir( $controllers_dir ) ) {

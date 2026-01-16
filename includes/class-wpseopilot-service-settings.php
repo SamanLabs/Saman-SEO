@@ -902,9 +902,9 @@ class Settings {
 		wp_enqueue_media();
 		wp_enqueue_script(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/js/admin.js',
+			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
@@ -919,19 +919,19 @@ class Settings {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
-		include WPSEOPILOT_PATH . 'templates/settings-page.php';
+		include SAMANLABS_SEO_PATH . 'templates/settings-page.php';
 	}
 
 	/**
@@ -946,24 +946,24 @@ class Settings {
 
 		wp_enqueue_script(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/js/admin.js',
+			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		// Prepare homepage defaults
@@ -1032,6 +1032,6 @@ class Settings {
 			}
 		}
 
-		include WPSEOPILOT_PATH . 'templates/search-appearance.php';
+		include SAMANLABS_SEO_PATH . 'templates/search-appearance.php';
 	}
 }

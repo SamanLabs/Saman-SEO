@@ -144,30 +144,30 @@ class Internal_Linking {
 
 		wp_enqueue_style(
 			'wpseopilot-admin',
-			WPSEOPILOT_URL . 'assets/css/admin.css',
+			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-plugin',
-			WPSEOPILOT_URL . 'assets/css/plugin.css',
+			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'wpseopilot-internal-linking',
-			WPSEOPILOT_URL . 'assets/css/internal-linking.css',
+			SAMANLABS_SEO_URL . 'assets/css/internal-linking.css',
 			[ 'wpseopilot-admin' ],
-			WPSEOPILOT_VERSION
+			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
 			'wpseopilot-internal-linking',
-			WPSEOPILOT_URL . 'assets/js/internal-linking.js',
+			SAMANLABS_SEO_URL . 'assets/js/internal-linking.js',
 			[ 'jquery', 'wp-util' ],
-			WPSEOPILOT_VERSION,
+			SAMANLABS_SEO_VERSION,
 			true
 		);
 
@@ -320,7 +320,7 @@ class Internal_Linking {
 		];
 
 		extract( $context ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract -- Template convenience.
-		include WPSEOPILOT_PATH . 'templates/internal-linking.php';
+		include SAMANLABS_SEO_PATH . 'templates/internal-linking.php';
 	}
 
 	/**
