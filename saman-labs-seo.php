@@ -68,8 +68,13 @@ spl_autoload_register(
 		$class_name = str_replace( 'SamanLabs\SEO\\Service\\', '', $class );
 		$slug       = strtolower( str_replace( [ '_' ], '-', $class_name ) );
 		$candidates = [
+			// New naming convention (samanlabs-seo-service-*)
+			SAMANLABS_SEO_PATH . 'includes/Service/class-samanlabs-seo-service-' . $slug . '.php',
+			SAMANLABS_SEO_PATH . 'includes/class-samanlabs-seo-service-' . $slug . '.php',
+			// Legacy naming convention (wpseopilot-service-*) - keep for transition
 			SAMANLABS_SEO_PATH . 'includes/Service/class-wpseopilot-service-' . $slug . '.php',
 			SAMANLABS_SEO_PATH . 'includes/class-wpseopilot-service-' . $slug . '.php',
+			// Simple naming (class-*)
 			SAMANLABS_SEO_PATH . 'includes/Service/class-' . $slug . '.php',
 		];
 
@@ -82,18 +87,25 @@ spl_autoload_register(
 		return;
 	}
 
-		$path = strtolower(
-			str_replace(
-				[ '\\', '_' ],
-				'-',
-				$class
-			)
-		);
+		// Convert class name to slug for file lookup
+		$class_name = str_replace( 'SamanLabs\SEO\\', '', $class );
+		$slug       = strtolower( str_replace( [ '\\', '_' ], '-', $class_name ) );
 
-		$file = SAMANLABS_SEO_PATH . 'includes/class-' . $path . '.php';
+		// Try multiple naming conventions
+		$candidates = [
+			// New naming convention (samanlabs-seo-*)
+			SAMANLABS_SEO_PATH . 'includes/class-samanlabs-seo-' . $slug . '.php',
+			// Legacy naming convention (wpseopilot-*)
+			SAMANLABS_SEO_PATH . 'includes/class-wpseopilot-' . $slug . '.php',
+			// Simple naming (class-*)
+			SAMANLABS_SEO_PATH . 'includes/class-' . $slug . '.php',
+		];
 
-		if ( file_exists( $file ) ) {
-			require_once $file;
+		foreach ( $candidates as $file ) {
+			if ( file_exists( $file ) ) {
+				require_once $file;
+				break;
+			}
 		}
 	}
 );
