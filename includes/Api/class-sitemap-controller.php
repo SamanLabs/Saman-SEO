@@ -185,7 +185,7 @@ class Sitemap_Controller extends REST_Controller {
         // Clear any sitemap caches
         delete_transient( 'wpseopilot_sitemap_stats' );
 
-        return $this->success( null, __( 'Settings saved successfully.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Settings saved successfully.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -268,7 +268,7 @@ class Sitemap_Controller extends REST_Controller {
 
         return $this->success( [
             'regenerated_at' => current_time( 'mysql' ),
-        ], __( 'Sitemap regenerated successfully.', 'wp-seo-pilot' ) );
+        ], __( 'Sitemap regenerated successfully.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -354,7 +354,7 @@ class Sitemap_Controller extends REST_Controller {
             }
         }
 
-        return $this->success( null, __( 'LLM.txt settings saved successfully.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'LLM.txt settings saved successfully.', 'saman-labs-seo' ) );
     }
 
     /**

@@ -75,7 +75,7 @@ class GitHub_Updater {
     private function register_plugins() {
         $this->plugins = [
             'wp-seo-pilot/wp-seo-pilot.php' => [
-                'slug'        => 'wp-seo-pilot',
+                'slug'        => 'saman-labs-seo',
                 'repo'        => 'jhd3197/WP-SEO-Pilot',
                 'name'        => 'WP SEO Pilot',
                 'description' => 'AI-powered SEO optimization for WordPress',

@@ -14,8 +14,8 @@
 	const { __ } = i18n;
 
 	registerBlockType( 'wpseopilot/howto', {
-		title: __( 'How To', 'wp-seo-pilot' ),
-		description: __( 'Create step-by-step instructions with automatic schema markup for rich results.', 'wp-seo-pilot' ),
+		title: __( 'How To', 'saman-labs-seo' ),
+		description: __( 'Create step-by-step instructions with automatic schema markup for rich results.', 'saman-labs-seo' ),
 		category: 'widgets',
 		icon: 'list-view',
 		keywords: [ 'howto', 'how to', 'steps', 'instructions', 'schema', 'seo', 'tutorial' ],
@@ -112,46 +112,46 @@
 					null,
 					el(
 						PanelBody,
-						{ title: __( 'HowTo Settings', 'wp-seo-pilot' ), initialOpen: true },
+						{ title: __( 'HowTo Settings', 'saman-labs-seo' ), initialOpen: true },
 						el( ToggleControl, {
-							label: __( 'Include HowTo Schema', 'wp-seo-pilot' ),
-							help: __( 'Add structured data for Google rich results.', 'wp-seo-pilot' ),
+							label: __( 'Include HowTo Schema', 'saman-labs-seo' ),
+							help: __( 'Add structured data for Google rich results.', 'saman-labs-seo' ),
 							checked: showSchema,
 							onChange: function( value ) {
 								setAttributes( { showSchema: value } );
 							},
 						} ),
 						el( TextControl, {
-							label: __( 'Total Time (e.g., 30 minutes)', 'wp-seo-pilot' ),
+							label: __( 'Total Time (e.g., 30 minutes)', 'saman-labs-seo' ),
 							value: totalTime,
 							onChange: ( value ) => setAttributes( { totalTime: value } ),
 						} ),
 						el( TextControl, {
-							label: __( 'Estimated Cost', 'wp-seo-pilot' ),
+							label: __( 'Estimated Cost', 'saman-labs-seo' ),
 							value: estimatedCost,
 							onChange: ( value ) => setAttributes( { estimatedCost: value } ),
 							type: 'number',
 						} ),
 						el( TextControl, {
-							label: __( 'Currency', 'wp-seo-pilot' ),
+							label: __( 'Currency', 'saman-labs-seo' ),
 							value: currency,
 							onChange: ( value ) => setAttributes( { currency: value } ),
 						} )
 					),
 					el(
 						PanelBody,
-						{ title: __( 'Tools & Supplies', 'wp-seo-pilot' ), initialOpen: false },
+						{ title: __( 'Tools & Supplies', 'saman-labs-seo' ), initialOpen: false },
 						el( TextControl, {
-							label: __( 'Tools Required (one per line)', 'wp-seo-pilot' ),
+							label: __( 'Tools Required (one per line)', 'saman-labs-seo' ),
 							value: tools.join( '\n' ),
 							onChange: updateTools,
-							help: __( 'List each tool on a new line', 'wp-seo-pilot' ),
+							help: __( 'List each tool on a new line', 'saman-labs-seo' ),
 						} ),
 						el( TextControl, {
-							label: __( 'Supplies Needed (one per line)', 'wp-seo-pilot' ),
+							label: __( 'Supplies Needed (one per line)', 'saman-labs-seo' ),
 							value: supplies.join( '\n' ),
 							onChange: updateSupplies,
-							help: __( 'List each supply/material on a new line', 'wp-seo-pilot' ),
+							help: __( 'List each supply/material on a new line', 'saman-labs-seo' ),
 						} )
 					)
 				),
@@ -160,13 +160,13 @@
 					blockProps,
 					el( 'div', { className: 'wpseopilot-howto-header' },
 						el( 'span', { className: 'wpseopilot-howto-icon' }, '1-2-3' ),
-						el( 'span', { className: 'wpseopilot-howto-label' }, __( 'How-To Block', 'wp-seo-pilot' ) ),
-						showSchema && el( 'span', { className: 'wpseopilot-howto-badge' }, __( 'Schema Enabled', 'wp-seo-pilot' ) )
+						el( 'span', { className: 'wpseopilot-howto-label' }, __( 'How-To Block', 'saman-labs-seo' ) ),
+						showSchema && el( 'span', { className: 'wpseopilot-howto-badge' }, __( 'Schema Enabled', 'saman-labs-seo' ) )
 					),
 					el( RichText, {
 						tagName: 'h3',
 						className: 'wpseopilot-howto-title',
-						placeholder: __( 'How to... (enter title)', 'wp-seo-pilot' ),
+						placeholder: __( 'How to... (enter title)', 'saman-labs-seo' ),
 						value: title,
 						onChange: ( value ) => setAttributes( { title: value } ),
 						allowedFormats: [],
@@ -174,7 +174,7 @@
 					el( RichText, {
 						tagName: 'p',
 						className: 'wpseopilot-howto-description',
-						placeholder: __( 'Brief description of what this guide covers...', 'wp-seo-pilot' ),
+						placeholder: __( 'Brief description of what this guide covers...', 'saman-labs-seo' ),
 						value: description,
 						onChange: ( value ) => setAttributes( { description: value } ),
 						allowedFormats: [ 'core/bold', 'core/italic' ],
@@ -185,13 +185,13 @@
 						tools.length > 0 && el(
 							'div',
 							{ className: 'wpseopilot-howto-tools' },
-							el( 'strong', null, __( 'Tools: ', 'wp-seo-pilot' ) ),
+							el( 'strong', null, __( 'Tools: ', 'saman-labs-seo' ) ),
 							tools.join( ', ' )
 						),
 						supplies.length > 0 && el(
 							'div',
 							{ className: 'wpseopilot-howto-supplies' },
-							el( 'strong', null, __( 'Supplies: ', 'wp-seo-pilot' ) ),
+							el( 'strong', null, __( 'Supplies: ', 'saman-labs-seo' ) ),
 							supplies.join( ', ' )
 						)
 					),
@@ -205,27 +205,27 @@
 								el(
 									'div',
 									{ className: 'wpseopilot-howto-step-header' },
-									el( 'span', { className: 'wpseopilot-howto-step-number' }, __( 'Step', 'wp-seo-pilot' ) + ' ' + ( index + 1 ) ),
+									el( 'span', { className: 'wpseopilot-howto-step-number' }, __( 'Step', 'saman-labs-seo' ) + ' ' + ( index + 1 ) ),
 									el(
 										'div',
 										{ className: 'wpseopilot-howto-controls' },
 										el( Button, {
 											icon: 'arrow-up-alt2',
-											label: __( 'Move up', 'wp-seo-pilot' ),
+											label: __( 'Move up', 'saman-labs-seo' ),
 											onClick: () => moveStep( index, -1 ),
 											disabled: index === 0,
 											isSmall: true,
 										} ),
 										el( Button, {
 											icon: 'arrow-down-alt2',
-											label: __( 'Move down', 'wp-seo-pilot' ),
+											label: __( 'Move down', 'saman-labs-seo' ),
 											onClick: () => moveStep( index, 1 ),
 											disabled: index === steps.length - 1,
 											isSmall: true,
 										} ),
 										el( Button, {
 											icon: 'trash',
-											label: __( 'Remove', 'wp-seo-pilot' ),
+											label: __( 'Remove', 'saman-labs-seo' ),
 											onClick: () => removeStep( index ),
 											isSmall: true,
 											isDestructive: true,
@@ -235,7 +235,7 @@
 								el( RichText, {
 									tagName: 'div',
 									className: 'wpseopilot-howto-step-title',
-									placeholder: __( 'Step title...', 'wp-seo-pilot' ),
+									placeholder: __( 'Step title...', 'saman-labs-seo' ),
 									value: step.title,
 									onChange: ( value ) => updateStep( index, 'title', value ),
 									allowedFormats: [],
@@ -243,7 +243,7 @@
 								el( RichText, {
 									tagName: 'div',
 									className: 'wpseopilot-howto-step-description',
-									placeholder: __( 'Step instructions...', 'wp-seo-pilot' ),
+									placeholder: __( 'Step instructions...', 'saman-labs-seo' ),
 									value: step.description,
 									onChange: ( value ) => updateStep( index, 'description', value ),
 									allowedFormats: [ 'core/bold', 'core/italic', 'core/link' ],
@@ -266,12 +266,12 @@
 														isSmall: true,
 														isDestructive: true,
 														onClick: () => updateStep( index, 'image', null ),
-													}, __( 'Remove', 'wp-seo-pilot' ) )
+													}, __( 'Remove', 'saman-labs-seo' ) )
 												)
 												: el( Button, {
 													isSmall: true,
 													onClick: open,
-												}, __( 'Add Image (optional)', 'wp-seo-pilot' ) )
+												}, __( 'Add Image (optional)', 'saman-labs-seo' ) )
 										),
 									} )
 								)
@@ -285,7 +285,7 @@
 							icon: 'plus-alt2',
 							onClick: addStep,
 						},
-						__( 'Add Step', 'wp-seo-pilot' )
+						__( 'Add Step', 'saman-labs-seo' )
 					)
 				)
 			);
@@ -373,20 +373,20 @@
 						totalTime && el(
 							'span',
 							{ className: 'wpseopilot-howto-time' },
-							__( 'Time: ', 'wp-seo-pilot' ),
+							__( 'Time: ', 'saman-labs-seo' ),
 							el( 'span', { itemProp: 'totalTime', content: parseTime( totalTime ) }, totalTime )
 						),
 						estimatedCost && el(
 							'span',
 							{ className: 'wpseopilot-howto-cost', itemProp: 'estimatedCost', itemScope: true, itemType: 'https://schema.org/MonetaryAmount' },
-							__( 'Cost: ', 'wp-seo-pilot' ),
+							__( 'Cost: ', 'saman-labs-seo' ),
 							el( 'span', { itemProp: 'value' }, estimatedCost ),
 							el( 'span', { itemProp: 'currency', content: currency }, ' ' + currency )
 						),
 						tools.length > 0 && el(
 							'div',
 							{ className: 'wpseopilot-howto-tools' },
-							el( 'strong', null, __( 'Tools: ', 'wp-seo-pilot' ) ),
+							el( 'strong', null, __( 'Tools: ', 'saman-labs-seo' ) ),
 							tools.map( ( tool, i ) => el( 'span', { key: i, itemProp: 'tool', itemScope: true, itemType: 'https://schema.org/HowToTool' },
 								el( 'span', { itemProp: 'name' }, tool ),
 								i < tools.length - 1 ? ', ' : ''
@@ -395,7 +395,7 @@
 						supplies.length > 0 && el(
 							'div',
 							{ className: 'wpseopilot-howto-supplies' },
-							el( 'strong', null, __( 'Supplies: ', 'wp-seo-pilot' ) ),
+							el( 'strong', null, __( 'Supplies: ', 'saman-labs-seo' ) ),
 							supplies.map( ( supply, i ) => el( 'span', { key: i, itemProp: 'supply', itemScope: true, itemType: 'https://schema.org/HowToSupply' },
 								el( 'span', { itemProp: 'name' }, supply ),
 								i < supplies.length - 1 ? ', ' : ''

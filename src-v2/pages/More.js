@@ -3,7 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Plugin icon configurations
 const PLUGIN_ICONS = {
-    'wp-seo-pilot': {
+    'saman-labs-seo': {
         className: 'seo',
         svg: (
             <svg viewBox="0 0 24 24" role="img" focusable="false">
@@ -35,7 +35,7 @@ const PLUGIN_ICONS = {
 
 // Plugin taglines
 const PLUGIN_TAGLINES = {
-    'wp-seo-pilot': 'Performance-led SEO insights.',
+    'saman-labs-seo': 'Performance-led SEO insights.',
     'wp-ai-pilot': 'Centralized AI management.',
     'wp-security-pilot': 'Open standard security.',
 };
@@ -131,7 +131,7 @@ const More = () => {
     };
 
     // Get icon config for a plugin
-    const getIconConfig = (slug) => PLUGIN_ICONS[slug] || PLUGIN_ICONS['wp-seo-pilot'];
+    const getIconConfig = (slug) => PLUGIN_ICONS[slug] || PLUGIN_ICONS['saman-labs-seo'];
 
     // Get tagline for a plugin
     const getTagline = (slug) => PLUGIN_TAGLINES[slug] || '';

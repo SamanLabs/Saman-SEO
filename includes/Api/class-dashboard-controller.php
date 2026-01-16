@@ -159,7 +159,7 @@ class Dashboard_Controller extends REST_Controller {
         $dismissed[ $id ] = time();
         update_option( 'wpseopilot_dismissed_notifications', $dismissed );
 
-        return $this->success( null, __( 'Notification dismissed.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Notification dismissed.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -640,18 +640,18 @@ class Dashboard_Controller extends REST_Controller {
                     'type'     => 'warning',
                     'priority' => 1,
                     'category' => 'redirects',
-                    'title'    => __( 'URL Changes Detected', 'wp-seo-pilot' ),
+                    'title'    => __( 'URL Changes Detected', 'saman-labs-seo' ),
                     'message'  => $count === 1
                         ? sprintf(
-                            __( '"%s" has a new URL. Create a redirect to avoid broken links.', 'wp-seo-pilot' ),
+                            __( '"%s" has a new URL. Create a redirect to avoid broken links.', 'saman-labs-seo' ),
                             get_the_title( $first_suggestion['post_id'] ?? 0 )
                         )
                         : sprintf(
-                            __( '%d pages have new URLs. Create redirects to avoid broken links.', 'wp-seo-pilot' ),
+                            __( '%d pages have new URLs. Create redirects to avoid broken links.', 'saman-labs-seo' ),
                             $count
                         ),
                     'action'   => [
-                        'label' => __( 'Review Changes', 'wp-seo-pilot' ),
+                        'label' => __( 'Review Changes', 'saman-labs-seo' ),
                     ],
                 ];
             }
@@ -665,13 +665,13 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => $errors_404['last_7_days'] >= 20 ? 'error' : 'warning',
                 'priority' => $errors_404['last_7_days'] >= 20 ? 1 : 2,
                 'category' => '404',
-                'title'    => __( '404 Errors Detected', 'wp-seo-pilot' ),
+                'title'    => __( '404 Errors Detected', 'saman-labs-seo' ),
                 'message'  => sprintf(
-                    __( '%d broken links found this week. Fix them to improve user experience.', 'wp-seo-pilot' ),
+                    __( '%d broken links found this week. Fix them to improve user experience.', 'saman-labs-seo' ),
                     $errors_404['last_7_days']
                 ),
                 'action'   => [
-                    'label' => __( 'View Errors', 'wp-seo-pilot' ),
+                    'label' => __( 'View Errors', 'saman-labs-seo' ),
                 ],
             ];
         }
@@ -684,13 +684,13 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => 'error',
                 'priority' => 1,
                 'category' => 'seo',
-                'title'    => __( 'Low SEO Score', 'wp-seo-pilot' ),
+                'title'    => __( 'Low SEO Score', 'saman-labs-seo' ),
                 'message'  => sprintf(
-                    __( 'Average score is %d%%. Run an audit to find quick wins.', 'wp-seo-pilot' ),
+                    __( 'Average score is %d%%. Run an audit to find quick wins.', 'saman-labs-seo' ),
                     $seo_score['score']
                 ),
                 'action'   => [
-                    'label' => __( 'Run Audit', 'wp-seo-pilot' ),
+                    'label' => __( 'Run Audit', 'saman-labs-seo' ),
                 ],
             ];
         }
@@ -703,10 +703,10 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => 'info',
                 'priority' => 3,
                 'category' => 'sitemap',
-                'title'    => __( 'Sitemap Not Active', 'wp-seo-pilot' ),
-                'message'  => __( 'Enable your XML sitemap to help search engines discover content.', 'wp-seo-pilot' ),
+                'title'    => __( 'Sitemap Not Active', 'saman-labs-seo' ),
+                'message'  => __( 'Enable your XML sitemap to help search engines discover content.', 'saman-labs-seo' ),
                 'action'   => [
-                    'label' => __( 'Enable', 'wp-seo-pilot' ),
+                    'label' => __( 'Enable', 'saman-labs-seo' ),
                 ],
             ];
         }
@@ -720,14 +720,14 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => 'warning',
                 'priority' => 2,
                 'category' => 'content',
-                'title'    => __( 'Missing SEO Data', 'wp-seo-pilot' ),
+                'title'    => __( 'Missing SEO Data', 'saman-labs-seo' ),
                 'message'  => sprintf(
-                    __( '%d of %d pages need SEO optimization.', 'wp-seo-pilot' ),
+                    __( '%d of %d pages need SEO optimization.', 'saman-labs-seo' ),
                     $coverage['pending'],
                     $coverage['total']
                 ),
                 'action'   => [
-                    'label' => __( 'View Audit', 'wp-seo-pilot' ),
+                    'label' => __( 'View Audit', 'saman-labs-seo' ),
                 ],
             ];
         }

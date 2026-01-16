@@ -277,7 +277,7 @@ class InternalLinks_Controller extends REST_Controller {
         $rule = $this->repository->get_rule( $request->get_param( 'id' ) );
 
         if ( ! $rule ) {
-            return $this->error( __( 'Rule not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Rule not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         return $this->success( $this->enrich_rule( $rule ) );
@@ -297,7 +297,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $this->enrich_rule( $result ), __( 'Rule created.', 'wp-seo-pilot' ) );
+        return $this->success( $this->enrich_rule( $result ), __( 'Rule created.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -311,7 +311,7 @@ class InternalLinks_Controller extends REST_Controller {
         $existing = $this->repository->get_rule( $id );
 
         if ( ! $existing ) {
-            return $this->error( __( 'Rule not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Rule not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         $data = $request->get_json_params();
@@ -324,7 +324,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $this->enrich_rule( $result ), __( 'Rule updated.', 'wp-seo-pilot' ) );
+        return $this->success( $this->enrich_rule( $result ), __( 'Rule updated.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -337,10 +337,10 @@ class InternalLinks_Controller extends REST_Controller {
         $deleted = $this->repository->delete_rule( $request->get_param( 'id' ) );
 
         if ( ! $deleted ) {
-            return $this->error( __( 'Rule not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Rule not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
-        return $this->success( null, __( 'Rule deleted.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Rule deleted.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -356,7 +356,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $this->enrich_rule( $result ), __( 'Rule duplicated.', 'wp-seo-pilot' ) );
+        return $this->success( $this->enrich_rule( $result ), __( 'Rule duplicated.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -370,7 +370,7 @@ class InternalLinks_Controller extends REST_Controller {
         $rule = $this->repository->get_rule( $id );
 
         if ( ! $rule ) {
-            return $this->error( __( 'Rule not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Rule not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         $rule['status'] = ( 'active' === $rule['status'] ) ? 'inactive' : 'active';
@@ -451,7 +451,7 @@ class InternalLinks_Controller extends REST_Controller {
         $category = $this->repository->get_category( $request->get_param( 'id' ) );
 
         if ( ! $category ) {
-            return $this->error( __( 'Category not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Category not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         return $this->success( $category );
@@ -471,7 +471,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $result, __( 'Category created.', 'wp-seo-pilot' ) );
+        return $this->success( $result, __( 'Category created.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -485,7 +485,7 @@ class InternalLinks_Controller extends REST_Controller {
         $existing = $this->repository->get_category( $id );
 
         if ( ! $existing ) {
-            return $this->error( __( 'Category not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Category not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         $data = $request->get_json_params();
@@ -498,7 +498,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $result, __( 'Category updated.', 'wp-seo-pilot' ) );
+        return $this->success( $result, __( 'Category updated.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -517,7 +517,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( null, __( 'Category deleted.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Category deleted.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -540,7 +540,7 @@ class InternalLinks_Controller extends REST_Controller {
         $template = $this->repository->get_template( $request->get_param( 'id' ) );
 
         if ( ! $template ) {
-            return $this->error( __( 'Template not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Template not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         return $this->success( $template );
@@ -560,7 +560,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $result, __( 'Template created.', 'wp-seo-pilot' ) );
+        return $this->success( $result, __( 'Template created.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -574,7 +574,7 @@ class InternalLinks_Controller extends REST_Controller {
         $existing = $this->repository->get_template( $id );
 
         if ( ! $existing ) {
-            return $this->error( __( 'Template not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Template not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         $data = $request->get_json_params();
@@ -587,7 +587,7 @@ class InternalLinks_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 400 );
         }
 
-        return $this->success( $result, __( 'Template updated.', 'wp-seo-pilot' ) );
+        return $this->success( $result, __( 'Template updated.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -600,10 +600,10 @@ class InternalLinks_Controller extends REST_Controller {
         $deleted = $this->repository->delete_template( $request->get_param( 'id' ) );
 
         if ( ! $deleted ) {
-            return $this->error( __( 'Template not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Template not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
-        return $this->success( null, __( 'Template deleted.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Template deleted.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -626,7 +626,7 @@ class InternalLinks_Controller extends REST_Controller {
         $data = $request->get_json_params();
         $result = $this->repository->save_settings( $data );
 
-        return $this->success( $result, __( 'Settings saved.', 'wp-seo-pilot' ) );
+        return $this->success( $result, __( 'Settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -700,7 +700,7 @@ class InternalLinks_Controller extends REST_Controller {
                 $rule['destination_label'] = sprintf( '%s (%s)', get_the_title( $post ), $post->post_type );
                 $rule['destination_url'] = get_permalink( $post );
             } else {
-                $rule['destination_label'] = __( 'Post not found', 'wp-seo-pilot' );
+                $rule['destination_label'] = __( 'Post not found', 'saman-labs-seo' );
                 $rule['destination_url'] = '';
             }
         } elseif ( ! empty( $destination['url'] ) ) {

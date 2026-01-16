@@ -192,7 +192,7 @@ class Redirect_Manager {
 				<?php
 				printf(
 					/* translators: 1: Old path, 2: New path */
-					esc_html__( 'We noticed the post slug changed from %1$s to %2$s. Would you like to create a redirect?', 'wp-seo-pilot' ),
+					esc_html__( 'We noticed the post slug changed from %1$s to %2$s. Would you like to create a redirect?', 'saman-labs-seo' ),
 					'<strong>' . esc_html( $data['old_url'] ) . '</strong>',
 					'<strong>' . esc_html( wp_parse_url( $data['new_url'], PHP_URL_PATH ) ) . '</strong>'
 				);
@@ -204,7 +204,7 @@ class Redirect_Manager {
 					data-source="<?php echo esc_attr( $data['old_url'] ); ?>"
 					data-target="<?php echo esc_attr( $data['new_url'] ); ?>"
 					data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpseopilot_create_redirect' ) ); ?>">
-					<?php esc_html_e( 'Create Redirect', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Create Redirect', 'saman-labs-seo' ); ?>
 				</button>
 			</p>
 		</div>
@@ -223,7 +223,7 @@ class Redirect_Manager {
 	 */
 	public function create_redirect( $source, $target, $status_code = 301, $extra = [] ) {
 		if ( empty( $source ) || empty( $target ) ) {
-			return new \WP_Error( 'invalid_data', __( 'Source and target are required.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'invalid_data', __( 'Source and target are required.', 'saman-labs-seo' ) );
 		}
 
 		global $wpdb;
@@ -249,7 +249,7 @@ class Redirect_Manager {
 		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s", $normalized ) );
 
 		if ( $exists ) {
-			return new \WP_Error( 'redirect_exists', __( 'Redirect already exists.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'redirect_exists', __( 'Redirect already exists.', 'saman-labs-seo' ) );
 		}
 
 		$status_code = in_array( $status_code, [ 301, 302, 307, 410 ], true ) ? $status_code : 301;
@@ -272,7 +272,7 @@ class Redirect_Manager {
 		$inserted = $wpdb->insert( $this->table, $data, $formats );
 
 		if ( ! $inserted ) {
-			return new \WP_Error( 'db_error', __( 'Could not insert redirect into database.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'db_error', __( 'Could not insert redirect into database.', 'saman-labs-seo' ) );
 		}
 
 		self::flush_cache();
@@ -301,14 +301,14 @@ class Redirect_Manager {
 
 		$id = absint( $id );
 		if ( ! $id ) {
-			return new \WP_Error( 'invalid_id', __( 'Invalid redirect ID.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'invalid_id', __( 'Invalid redirect ID.', 'saman-labs-seo' ) );
 		}
 
 		// Check if redirect exists.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE id = %d", $id ) );
 		if ( ! $exists ) {
-			return new \WP_Error( 'not_found', __( 'Redirect not found.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'not_found', __( 'Redirect not found.', 'saman-labs-seo' ) );
 		}
 
 		$update  = [];
@@ -336,7 +336,7 @@ class Redirect_Manager {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$conflict = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s AND id != %d", $normalized, $id ) );
 			if ( $conflict ) {
-				return new \WP_Error( 'redirect_exists', __( 'Another redirect with this source already exists.', 'wp-seo-pilot' ) );
+				return new \WP_Error( 'redirect_exists', __( 'Another redirect with this source already exists.', 'saman-labs-seo' ) );
 			}
 
 			$update['source'] = $normalized;
@@ -387,14 +387,14 @@ class Redirect_Manager {
 		}
 
 		if ( empty( $update ) ) {
-			return new \WP_Error( 'no_data', __( 'No data to update.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'no_data', __( 'No data to update.', 'saman-labs-seo' ) );
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->update( $this->table, $update, [ 'id' => $id ], $formats, [ '%d' ] );
 
 		if ( false === $result ) {
-			return new \WP_Error( 'db_error', __( 'Could not update redirect.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'db_error', __( 'Could not update redirect.', 'saman-labs-seo' ) );
 		}
 
 		self::flush_cache();
@@ -428,14 +428,14 @@ class Redirect_Manager {
 
 		$id = absint( $id );
 		if ( ! $id ) {
-			return new \WP_Error( 'invalid_id', __( 'Invalid redirect ID.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'invalid_id', __( 'Invalid redirect ID.', 'saman-labs-seo' ) );
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->delete( $this->table, [ 'id' => $id ], [ '%d' ] );
 
 		if ( false === $result ) {
-			return new \WP_Error( 'db_error', __( 'Could not delete redirect.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'db_error', __( 'Could not delete redirect.', 'saman-labs-seo' ) );
 		}
 
 		self::flush_cache();
@@ -452,7 +452,7 @@ class Redirect_Manager {
 	 */
 	public function validate_regex( $pattern ) {
 		if ( empty( $pattern ) ) {
-			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'saman-labs-seo' ) );
 		}
 
 		// Test the pattern by trying to use it.
@@ -461,7 +461,7 @@ class Redirect_Manager {
 		$result = @preg_match( '#' . $pattern . '#', '' );
 
 		if ( false === $result ) {
-			return new \WP_Error( 'invalid_regex', __( 'Invalid regex pattern. Please check the syntax.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'invalid_regex', __( 'Invalid regex pattern. Please check the syntax.', 'saman-labs-seo' ) );
 		}
 
 		return true;
@@ -476,7 +476,7 @@ class Redirect_Manager {
 		check_ajax_referer( 'wpseopilot_create_redirect', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_send_json_error( __( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : '';
@@ -491,7 +491,7 @@ class Redirect_Manager {
 		// Cleanup transient just in case it wasn't cleared by the render method (e.g. if we moved to dismissing manually).
 		delete_transient( 'wpseopilot_slug_changed_' . get_current_user_id() );
 
-		wp_send_json_success( __( 'Redirect created successfully.', 'wp-seo-pilot' ) );
+		wp_send_json_success( __( 'Redirect created successfully.', 'saman-labs-seo' ) );
 	}
 
 	/**
@@ -596,8 +596,8 @@ class Redirect_Manager {
 	public function register_menu() {
 		add_submenu_page(
 			'wpseopilot',
-			__( 'Redirect Manager', 'wp-seo-pilot' ),
-			__( 'Redirects', 'wp-seo-pilot' ),
+			__( 'Redirect Manager', 'saman-labs-seo' ),
+			__( 'Redirects', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot-redirects',
 			[ $this, 'render_page' ],
@@ -647,7 +647,7 @@ class Redirect_Manager {
 	 */
 	public function handle_save() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		check_admin_referer( 'wpseopilot_redirect' );
@@ -678,7 +678,7 @@ class Redirect_Manager {
 	 */
 	public function handle_delete() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		check_admin_referer( 'wpseopilot_redirect_delete' );
@@ -706,7 +706,7 @@ class Redirect_Manager {
 	 */
 	public function handle_dismiss_slug() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		check_admin_referer( 'wpseopilot_dismiss_slug' );

@@ -68,8 +68,8 @@ class Sitemap_Settings {
 	public function register_menu() {
 		add_submenu_page(
 			'wpseopilot',
-			__( 'Sitemap Settings', 'wp-seo-pilot' ),
-			__( 'Sitemap', 'wp-seo-pilot' ),
+			__( 'Sitemap Settings', 'saman-labs-seo' ),
+			__( 'Sitemap', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot-sitemap',
 			[ $this, 'render_settings_page' ]
@@ -148,9 +148,9 @@ class Sitemap_Settings {
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( 'wpseopilot_sitemap_action' ),
 				'strings'  => [
-					'regenerating' => __( 'Regenerating sitemap...', 'wp-seo-pilot' ),
-					'success'      => __( 'Sitemap regenerated successfully!', 'wp-seo-pilot' ),
-					'error'        => __( 'Failed to regenerate sitemap.', 'wp-seo-pilot' ),
+					'regenerating' => __( 'Regenerating sitemap...', 'saman-labs-seo' ),
+					'success'      => __( 'Sitemap regenerated successfully!', 'saman-labs-seo' ),
+					'error'        => __( 'Failed to regenerate sitemap.', 'saman-labs-seo' ),
 				],
 			]
 		);
@@ -169,14 +169,14 @@ class Sitemap_Settings {
 		// Handle sitemap form submission
 		if ( isset( $_POST['wpseopilot_sitemap_submit'] ) && check_admin_referer( 'wpseopilot_sitemap_settings' ) ) {
 			$this->save_settings();
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved successfully!', 'wp-seo-pilot' ) . '</p></div>';
+			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved successfully!', 'saman-labs-seo' ) . '</p></div>';
 		}
 
 		// Handle LLM.txt form submission
 		if ( isset( $_POST['wpseopilot_llm_txt_submit'] ) && check_admin_referer( 'wpseopilot_llm_txt_settings' ) ) {
 			$this->save_llm_txt_settings();
 			flush_rewrite_rules();
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'LLM.txt settings saved successfully!', 'wp-seo-pilot' ) . '</p></div>';
+			echo '<div class="notice notice-success"><p>' . esc_html__( 'LLM.txt settings saved successfully!', 'saman-labs-seo' ) . '</p></div>';
 		}
 
 		// Prepare all variables for template
@@ -234,11 +234,11 @@ class Sitemap_Settings {
 
 		// Schedule options
 		$schedule_options = [
-			''         => __( 'No Schedule', 'wp-seo-pilot' ),
-			'hourly'   => __( 'Hourly', 'wp-seo-pilot' ),
-			'twicedaily' => __( 'Twice Daily', 'wp-seo-pilot' ),
-			'daily'    => __( 'Daily', 'wp-seo-pilot' ),
-			'weekly'   => __( 'Weekly', 'wp-seo-pilot' ),
+			''         => __( 'No Schedule', 'saman-labs-seo' ),
+			'hourly'   => __( 'Hourly', 'saman-labs-seo' ),
+			'twicedaily' => __( 'Twice Daily', 'saman-labs-seo' ),
+			'daily'    => __( 'Daily', 'saman-labs-seo' ),
+			'weekly'   => __( 'Weekly', 'saman-labs-seo' ),
 		];
 
 		// LLM.txt variables
@@ -353,7 +353,7 @@ class Sitemap_Settings {
 
 		$this->regenerate_sitemap();
 
-		wp_send_json_success( [ 'message' => __( 'Sitemap regenerated successfully!', 'wp-seo-pilot' ) ] );
+		wp_send_json_success( [ 'message' => __( 'Sitemap regenerated successfully!', 'saman-labs-seo' ) ] );
 	}
 
 	/**

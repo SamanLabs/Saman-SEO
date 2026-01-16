@@ -104,7 +104,7 @@ class Admin_Bar {
 			'href'  => get_edit_post_link( $post->ID ),
 			'meta'  => [
 				'class' => 'wpseopilot-admin-bar-item wpseopilot-admin-bar-item--has-score',
-				'title' => sprintf( __( 'SEO Score: %d/100', 'wp-seo-pilot' ), $score ),
+				'title' => sprintf( __( 'SEO Score: %d/100', 'saman-labs-seo' ), $score ),
 			],
 		] );
 
@@ -114,7 +114,7 @@ class Admin_Bar {
 			'parent' => 'wpseopilot-seo',
 			'title'  => sprintf(
 				'<span class="wpseopilot-ab-label">%s</span><span class="wpseopilot-ab-value">%d/100</span>',
-				__( 'Score', 'wp-seo-pilot' ),
+				__( 'Score', 'saman-labs-seo' ),
 				$score
 			),
 			'meta'   => [ 'class' => 'wpseopilot-ab-score-item' ],
@@ -127,7 +127,7 @@ class Admin_Bar {
 			'parent' => 'wpseopilot-seo',
 			'title'  => sprintf(
 				'<span class="wpseopilot-ab-label">%s</span><span class="wpseopilot-ab-status wpseopilot-ab-status--%s">%s</span>',
-				__( 'Status', 'wp-seo-pilot' ),
+				__( 'Status', 'saman-labs-seo' ),
 				esc_attr( $level ),
 				esc_html( $status_text )
 			),
@@ -142,7 +142,7 @@ class Admin_Bar {
 				'parent' => 'wpseopilot-seo',
 				'title'  => sprintf(
 					'<span class="wpseopilot-ab-label">%s</span><span class="wpseopilot-ab-value wpseopilot-ab-issues">%d</span>',
-					__( 'Issues', 'wp-seo-pilot' ),
+					__( 'Issues', 'saman-labs-seo' ),
 					$issue_count
 				),
 				'meta'   => [ 'class' => 'wpseopilot-ab-issues-item' ],
@@ -182,7 +182,7 @@ class Admin_Bar {
 			'parent' => 'wpseopilot-seo',
 			'title'  => sprintf(
 				'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> %s',
-				__( 'Edit SEO Settings', 'wp-seo-pilot' )
+				__( 'Edit SEO Settings', 'saman-labs-seo' )
 			),
 			'href'   => get_edit_post_link( $post->ID ) . '#wpseopilot-seo-panel',
 			'meta'   => [ 'class' => 'wpseopilot-ab-action-link' ],
@@ -194,7 +194,7 @@ class Admin_Bar {
 			'parent' => 'wpseopilot-seo',
 			'title'  => sprintf(
 				'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> %s',
-				__( 'Full Analysis', 'wp-seo-pilot' )
+				__( 'Full Analysis', 'saman-labs-seo' )
 			),
 			'href'   => admin_url( 'admin.php?page=wpseopilot-audit&post_id=' . $post->ID ),
 			'meta'   => [ 'class' => 'wpseopilot-ab-action-link' ],
@@ -226,7 +226,7 @@ class Admin_Bar {
 			'href'  => admin_url( 'admin.php?page=wpseopilot' ),
 			'meta'  => [
 				'class' => 'wpseopilot-admin-bar-item',
-				'title' => __( 'WP SEO Pilot', 'wp-seo-pilot' ),
+				'title' => __( 'WP SEO Pilot', 'saman-labs-seo' ),
 			],
 		] );
 
@@ -253,27 +253,27 @@ class Admin_Bar {
 
 		$nav_items = [
 			'dashboard'  => [
-				'label' => __( 'Dashboard', 'wp-seo-pilot' ),
+				'label' => __( 'Dashboard', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot' ),
 			],
 			'redirects'  => [
-				'label' => __( 'Redirects', 'wp-seo-pilot' ),
+				'label' => __( 'Redirects', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-redirects' ),
 			],
 			'404'        => [
-				'label' => __( '404 Monitor', 'wp-seo-pilot' ),
+				'label' => __( '404 Monitor', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-404' ),
 			],
 			'audit'      => [
-				'label' => __( 'Site Audit', 'wp-seo-pilot' ),
+				'label' => __( 'Site Audit', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-audit' ),
 			],
 			'sitemap'    => [
-				'label' => __( 'Sitemap', 'wp-seo-pilot' ),
+				'label' => __( 'Sitemap', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-sitemap' ),
 			],
 			'settings'   => [
-				'label' => __( 'Settings', 'wp-seo-pilot' ),
+				'label' => __( 'Settings', 'saman-labs-seo' ),
 				'url'   => admin_url( 'admin.php?page=wpseopilot-settings' ),
 			],
 		];
@@ -362,12 +362,12 @@ class Admin_Bar {
 	 */
 	private function get_status_text( $level ) {
 		$texts = [
-			'good' => __( 'Good', 'wp-seo-pilot' ),
-			'fair' => __( 'Needs Work', 'wp-seo-pilot' ),
-			'poor' => __( 'Poor', 'wp-seo-pilot' ),
+			'good' => __( 'Good', 'saman-labs-seo' ),
+			'fair' => __( 'Needs Work', 'saman-labs-seo' ),
+			'poor' => __( 'Poor', 'saman-labs-seo' ),
 		];
 
-		return $texts[ $level ] ?? __( 'Unknown', 'wp-seo-pilot' );
+		return $texts[ $level ] ?? __( 'Unknown', 'saman-labs-seo' );
 	}
 
 	/**

@@ -616,7 +616,7 @@ class Sitemap_Enhancer {
 		if ( isset( $providers['users'] ) && '1' === $include_author ) {
 			$map[] = [
 				'slug'     => 'author',
-				'label'    => __( 'Authors', 'wp-seo-pilot' ),
+				'label'    => __( 'Authors', 'saman-labs-seo' ),
 				'provider' => 'users',
 				'subtype'  => '',
 			];

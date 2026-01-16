@@ -276,11 +276,11 @@ class Repository {
 		$rule = $this->get_rule( $rule_id );
 
 		if ( ! $rule ) {
-			return new WP_Error( 'wpseopilot_rule_missing', __( 'Rule not found.', 'wp-seo-pilot' ) );
+			return new WP_Error( 'wpseopilot_rule_missing', __( 'Rule not found.', 'saman-labs-seo' ) );
 		}
 
 		unset( $rule['id'] );
-		$rule['title']      = sprintf( '%s %s', $rule['title'], __( '(Copy)', 'wp-seo-pilot' ) );
+		$rule['title']      = sprintf( '%s %s', $rule['title'], __( '(Copy)', 'saman-labs-seo' ) );
 		$rule['created_at'] = time();
 		$rule['status']     = 'inactive';
 
@@ -357,7 +357,7 @@ class Repository {
 		$categories = $this->get_option_array( self::OPTION_CATEGORIES );
 
 		if ( ! isset( $categories[ $category_id ] ) ) {
-			return new WP_Error( 'wpseopilot_category_missing', __( 'Category not found.', 'wp-seo-pilot' ) );
+			return new WP_Error( 'wpseopilot_category_missing', __( 'Category not found.', 'saman-labs-seo' ) );
 		}
 
 		$rules  = $this->get_option_array( self::OPTION_RULES );
@@ -370,11 +370,11 @@ class Repository {
 
 		if ( ! empty( $in_use ) ) {
 			if ( empty( $reassign ) ) {
-				return new WP_Error( 'wpseopilot_category_in_use', __( 'Category still assigned to rules.', 'wp-seo-pilot' ) );
+				return new WP_Error( 'wpseopilot_category_in_use', __( 'Category still assigned to rules.', 'saman-labs-seo' ) );
 			}
 
 			if ( '__none__' !== $reassign && ! isset( $categories[ $reassign ] ) ) {
-				return new WP_Error( 'wpseopilot_category_reassign', __( 'Reassignment category not found.', 'wp-seo-pilot' ) );
+				return new WP_Error( 'wpseopilot_category_reassign', __( 'Reassignment category not found.', 'saman-labs-seo' ) );
 			}
 
 			foreach ( $rules as $rule_id => $rule ) {
@@ -718,11 +718,11 @@ class Repository {
 		$keywords = $this->sanitize_keywords( $data['keywords'] ?? [] );
 
 		if ( empty( $title ) ) {
-			return new WP_Error( 'wpseopilot_rule_title', __( 'Internal Title is required.', 'wp-seo-pilot' ) );
+			return new WP_Error( 'wpseopilot_rule_title', __( 'Internal Title is required.', 'saman-labs-seo' ) );
 		}
 
 		if ( empty( $keywords ) ) {
-			return new WP_Error( 'wpseopilot_rule_keywords', __( 'Add at least one keyword.', 'wp-seo-pilot' ) );
+			return new WP_Error( 'wpseopilot_rule_keywords', __( 'Add at least one keyword.', 'saman-labs-seo' ) );
 		}
 
 		$destination_type = ( isset( $data['destination']['type'] ) && 'url' === $data['destination']['type'] ) ? 'url' : 'post';
@@ -731,15 +731,15 @@ class Repository {
 
 		if ( 'post' === $destination_type ) {
 			if ( ! $destination_post ) {
-				return new WP_Error( 'wpseopilot_rule_destination', __( 'Select a destination post.', 'wp-seo-pilot' ) );
+				return new WP_Error( 'wpseopilot_rule_destination', __( 'Select a destination post.', 'saman-labs-seo' ) );
 			}
 
 			if ( ! get_post( $destination_post ) ) {
-				return new WP_Error( 'wpseopilot_rule_destination', __( 'Destination post not found.', 'wp-seo-pilot' ) );
+				return new WP_Error( 'wpseopilot_rule_destination', __( 'Destination post not found.', 'saman-labs-seo' ) );
 			}
 		} else {
 			if ( empty( $destination_url ) ) {
-				return new WP_Error( 'wpseopilot_rule_destination', __( 'Enter a destination URL.', 'wp-seo-pilot' ) );
+				return new WP_Error( 'wpseopilot_rule_destination', __( 'Enter a destination URL.', 'saman-labs-seo' ) );
 			}
 		}
 
@@ -863,7 +863,7 @@ class Repository {
 		$cap         = isset( $data['category_cap'] ) ? absint( $data['category_cap'] ) : 0;
 
 		if ( empty( $name ) ) {
-			return new WP_Error( 'wpseopilot_category_name', __( 'Name is required.', 'wp-seo-pilot' ) );
+			return new WP_Error( 'wpseopilot_category_name', __( 'Name is required.', 'saman-labs-seo' ) );
 		}
 
 		return [
@@ -893,7 +893,7 @@ class Repository {
 		$name        = isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '';
 
 		if ( empty( $name ) ) {
-			return new WP_Error( 'wpseopilot_template_name', __( 'Template name is required.', 'wp-seo-pilot' ) );
+			return new WP_Error( 'wpseopilot_template_name', __( 'Template name is required.', 'saman-labs-seo' ) );
 		}
 
 		$apply_to    = isset( $data['apply_to'] ) ? sanitize_key( $data['apply_to'] ) : 'both';

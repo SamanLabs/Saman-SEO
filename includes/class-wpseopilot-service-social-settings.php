@@ -44,12 +44,12 @@ class Social_Settings {
 		\SamanLabs\SEO\Admin_Topbar::render( 'social' );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Social Settings Moved', 'wp-seo-pilot' ); ?></h1>
+			<h1><?php esc_html_e( 'Social Settings Moved', 'saman-labs-seo' ); ?></h1>
 			<div class="notice notice-info">
-				<p><?php esc_html_e( 'Social Settings have been moved to Search Appearance for better organization.', 'wp-seo-pilot' ); ?></p>
+				<p><?php esc_html_e( 'Social Settings have been moved to Search Appearance for better organization.', 'saman-labs-seo' ); ?></p>
 				<p>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-types#social' ) ); ?>" class="button button-primary">
-						<?php esc_html_e( 'Go to Social Settings →', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Go to Social Settings →', 'saman-labs-seo' ); ?>
 					</a>
 				</p>
 			</div>

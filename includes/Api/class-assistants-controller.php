@@ -123,14 +123,14 @@ class Assistants_Controller extends REST_Controller {
 		// Add built-in SEO assistants (registered with WP AI Pilot).
 		$assistants[] = [
 			'id'                => 'seo-general',
-			'name'              => __( 'SEO Assistant', 'wp-seo-pilot' ),
-			'description'       => __( 'Your helpful SEO buddy for all things search optimization.', 'wp-seo-pilot' ),
-			'initial_message'   => __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'wp-seo-pilot' ),
+			'name'              => __( 'SEO Assistant', 'saman-labs-seo' ),
+			'description'       => __( 'Your helpful SEO buddy for all things search optimization.', 'saman-labs-seo' ),
+			'initial_message'   => __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'saman-labs-seo' ),
 			'suggested_prompts' => [
-				__( 'How do I write a good meta description?', 'wp-seo-pilot' ),
-				__( 'What makes a title tag effective?', 'wp-seo-pilot' ),
-				__( 'Help me find keywords for my blog post', 'wp-seo-pilot' ),
-				__( 'What are internal links and why do they matter?', 'wp-seo-pilot' ),
+				__( 'How do I write a good meta description?', 'saman-labs-seo' ),
+				__( 'What makes a title tag effective?', 'saman-labs-seo' ),
+				__( 'Help me find keywords for my blog post', 'saman-labs-seo' ),
+				__( 'What are internal links and why do they matter?', 'saman-labs-seo' ),
 			],
 			'is_builtin'        => true,
 			'color'             => '#3b82f6',
@@ -139,14 +139,14 @@ class Assistants_Controller extends REST_Controller {
 
 		$assistants[] = [
 			'id'                => 'seo-reporter',
-			'name'              => __( 'SEO Reporter', 'wp-seo-pilot' ),
-			'description'       => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'wp-seo-pilot' ),
-			'initial_message'   => __( "Hey! I can give you a quick rundown of your site's SEO health. Want me to take a look?", 'wp-seo-pilot' ),
+			'name'              => __( 'SEO Reporter', 'saman-labs-seo' ),
+			'description'       => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'saman-labs-seo' ),
+			'initial_message'   => __( "Hey! I can give you a quick rundown of your site's SEO health. Want me to take a look?", 'saman-labs-seo' ),
 			'suggested_prompts' => [
-				__( 'Give me a quick SEO report', 'wp-seo-pilot' ),
-				__( 'What SEO issues should I fix first?', 'wp-seo-pilot' ),
-				__( 'Check my meta titles and descriptions', 'wp-seo-pilot' ),
-				__( 'Find posts missing SEO data', 'wp-seo-pilot' ),
+				__( 'Give me a quick SEO report', 'saman-labs-seo' ),
+				__( 'What SEO issues should I fix first?', 'saman-labs-seo' ),
+				__( 'Check my meta titles and descriptions', 'saman-labs-seo' ),
+				__( 'Find posts missing SEO data', 'saman-labs-seo' ),
 			],
 			'is_builtin'        => true,
 			'color'             => '#8b5cf6',
@@ -193,11 +193,11 @@ class Assistants_Controller extends REST_Controller {
 		$context      = isset( $params['context'] ) ? $params['context'] : [];
 
 		if ( empty( $assistant_id ) ) {
-			return $this->error( __( 'Assistant ID is required.', 'wp-seo-pilot' ), 'missing_assistant', 400 );
+			return $this->error( __( 'Assistant ID is required.', 'saman-labs-seo' ), 'missing_assistant', 400 );
 		}
 
 		if ( empty( $message ) ) {
-			return $this->error( __( 'Message is required.', 'wp-seo-pilot' ), 'missing_message', 400 );
+			return $this->error( __( 'Message is required.', 'saman-labs-seo' ), 'missing_message', 400 );
 		}
 
 		// Check if WP AI Pilot is ready.
@@ -206,14 +206,14 @@ class Assistants_Controller extends REST_Controller {
 
 			if ( ! $status['installed'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is required for AI assistants. Please install it from the More page.', 'wp-seo-pilot' ),
+					__( 'WP AI Pilot is required for AI assistants. Please install it from the More page.', 'saman-labs-seo' ),
 					'ai_not_installed',
 					400
 				);
 			}
 
 			return $this->error(
-				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'wp-seo-pilot' ),
+				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'saman-labs-seo' ),
 				'ai_not_configured',
 				400
 			);
@@ -253,11 +253,11 @@ class Assistants_Controller extends REST_Controller {
 		$assistant = $this->get_custom_assistant_by_id( $custom_id );
 
 		if ( ! $assistant ) {
-			return $this->error( __( 'Custom assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Custom assistant not found.', 'saman-labs-seo' ), 'not_found', 404 );
 		}
 
 		if ( ! $assistant['is_active'] ) {
-			return $this->error( __( 'This assistant is not active.', 'wp-seo-pilot' ), 'inactive', 400 );
+			return $this->error( __( 'This assistant is not active.', 'saman-labs-seo' ), 'inactive', 400 );
 		}
 
 		// Build messages for chat.
@@ -320,7 +320,7 @@ class Assistants_Controller extends REST_Controller {
 		$assistant = $this->get_custom_assistant_by_id( $id );
 
 		if ( ! $assistant ) {
-			return $this->error( __( 'Assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Assistant not found.', 'saman-labs-seo' ), 'not_found', 404 );
 		}
 
 		$assistant['usage'] = $this->get_assistant_usage_count( 'custom_' . $id );
@@ -343,11 +343,11 @@ class Assistants_Controller extends REST_Controller {
 		}
 
 		if ( empty( $params['name'] ) ) {
-			return $this->error( __( 'Name is required.', 'wp-seo-pilot' ), 'missing_name', 400 );
+			return $this->error( __( 'Name is required.', 'saman-labs-seo' ), 'missing_name', 400 );
 		}
 
 		if ( empty( $params['system_prompt'] ) ) {
-			return $this->error( __( 'System prompt is required.', 'wp-seo-pilot' ), 'missing_prompt', 400 );
+			return $this->error( __( 'System prompt is required.', 'saman-labs-seo' ), 'missing_prompt', 400 );
 		}
 
 		$this->maybe_create_assistants_table();
@@ -369,10 +369,10 @@ class Assistants_Controller extends REST_Controller {
 		$result = $wpdb->insert( $this->custom_assistants_table, $data );
 
 		if ( false === $result ) {
-			return $this->error( __( 'Failed to create assistant.', 'wp-seo-pilot' ), 'db_error', 500 );
+			return $this->error( __( 'Failed to create assistant.', 'saman-labs-seo' ), 'db_error', 500 );
 		}
 
-		return $this->success( [ 'id' => $wpdb->insert_id ], __( 'Assistant created successfully.', 'wp-seo-pilot' ) );
+		return $this->success( [ 'id' => $wpdb->insert_id ], __( 'Assistant created successfully.', 'saman-labs-seo' ) );
 	}
 
 	/**
@@ -388,7 +388,7 @@ class Assistants_Controller extends REST_Controller {
 		$existing = $this->get_custom_assistant_by_id( $id );
 
 		if ( ! $existing ) {
-			return $this->error( __( 'Assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Assistant not found.', 'saman-labs-seo' ), 'not_found', 404 );
 		}
 
 		$params = $request->get_json_params();
@@ -428,7 +428,7 @@ class Assistants_Controller extends REST_Controller {
 
 		$wpdb->update( $this->custom_assistants_table, $data, [ 'id' => $id ] );
 
-		return $this->success( null, __( 'Assistant updated successfully.', 'wp-seo-pilot' ) );
+		return $this->success( null, __( 'Assistant updated successfully.', 'saman-labs-seo' ) );
 	}
 
 	/**
@@ -444,12 +444,12 @@ class Assistants_Controller extends REST_Controller {
 		$existing = $this->get_custom_assistant_by_id( $id );
 
 		if ( ! $existing ) {
-			return $this->error( __( 'Assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Assistant not found.', 'saman-labs-seo' ), 'not_found', 404 );
 		}
 
 		$wpdb->delete( $this->custom_assistants_table, [ 'id' => $id ] );
 
-		return $this->success( null, __( 'Assistant deleted successfully.', 'wp-seo-pilot' ) );
+		return $this->success( null, __( 'Assistant deleted successfully.', 'saman-labs-seo' ) );
 	}
 
 	// =========================================================================

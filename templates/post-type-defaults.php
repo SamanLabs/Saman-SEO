@@ -20,9 +20,9 @@ call_user_func(
 		$schema_pages    = $settings_instance->get_schema_page_options();
 		$schema_articles = $settings_instance->get_schema_article_options();
 		$archive_items   = [
-			'author' => __( 'Author archives', 'wp-seo-pilot' ),
-			'date'   => __( 'Date archives', 'wp-seo-pilot' ),
-			'search' => __( 'Search results', 'wp-seo-pilot' ),
+			'author' => __( 'Author archives', 'saman-labs-seo' ),
+			'date'   => __( 'Date archives', 'saman-labs-seo' ),
+			'search' => __( 'Search results', 'saman-labs-seo' ),
 		];
 
 		// Render top bar
@@ -33,23 +33,23 @@ call_user_func(
 		<?php settings_fields( 'wpseopilot_search_appearance' ); ?>
 
 		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Homepage Defaults', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'Set the title and description that appear when visitors find your homepage in search results.', 'wp-seo-pilot' ); ?></p>
+			<h2><?php esc_html_e( 'Homepage Defaults', 'saman-labs-seo' ); ?></h2>
+			<p><?php esc_html_e( 'Set the title and description that appear when visitors find your homepage in search results.', 'saman-labs-seo' ); ?></p>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row">
 						<div class="wpseopilot-flex-label">
-							<label for="wpseopilot_homepage_title"><?php esc_html_e( 'SEO title', 'wp-seo-pilot' ); ?></label>
+							<label for="wpseopilot_homepage_title"><?php esc_html_e( 'SEO title', 'saman-labs-seo' ); ?></label>
 						</div>
 					</th>
 					<td>
 						<div class="wpseopilot-flex-input">
 							<input type="text" class="regular-text" id="wpseopilot_homepage_title" name="wpseopilot_homepage_title" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_title' ) ); ?>" data-context="global" />
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_homepage_title">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_homepage_title">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<div class="wpseopilot-preview"></div>
@@ -58,17 +58,17 @@ call_user_func(
 				<tr>
 					<th scope="row">
 						<div class="wpseopilot-flex-label">
-							<label for="wpseopilot_homepage_description"><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></label>
+							<label for="wpseopilot_homepage_description"><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></label>
 						</div>
 					</th>
 					<td>
 						<div class="wpseopilot-flex-input">
 							<textarea class="large-text" rows="3" id="wpseopilot_homepage_description" name="wpseopilot_homepage_description" data-context="global"><?php echo esc_textarea( get_option( 'wpseopilot_homepage_description' ) ); ?></textarea>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_homepage_description">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_homepage_description">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<div class="wpseopilot-preview"></div>
@@ -76,19 +76,19 @@ call_user_func(
 				</tr>
 				<tr>
 					<th scope="row">
-						<label for="wpseopilot_homepage_keywords"><?php esc_html_e( 'Keywords', 'wp-seo-pilot' ); ?></label>
+						<label for="wpseopilot_homepage_keywords"><?php esc_html_e( 'Keywords', 'saman-labs-seo' ); ?></label>
 					</th>
 					<td>
 						<input type="text" class="regular-text" id="wpseopilot_homepage_keywords" name="wpseopilot_homepage_keywords" value="<?php echo esc_attr( get_option( 'wpseopilot_homepage_keywords' ) ); ?>" />
-						<p class="description"><?php esc_html_e( 'Optional comma-separated keywords for the homepage meta tag.', 'wp-seo-pilot' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Optional comma-separated keywords for the homepage meta tag.', 'saman-labs-seo' ); ?></p>
 					</td>
 				</tr>
 			</table>
 		</section>
 
 		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Content Types', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'Decide whether each post type should appear in search, expose SEO controls to editors, and define fallback metadata.', 'wp-seo-pilot' ); ?></p>
+			<h2><?php esc_html_e( 'Content Types', 'saman-labs-seo' ); ?></h2>
+			<p><?php esc_html_e( 'Decide whether each post type should appear in search, expose SEO controls to editors, and define fallback metadata.', 'saman-labs-seo' ); ?></p>
 			
 			<?php foreach ( $post_types as $slug => $object ) : ?>
 				<?php
@@ -117,38 +117,38 @@ call_user_func(
 					<div class="wpseopilot-accordion__body">
 						<div class="wpseopilot-flex">
 							<label>
-								<strong><?php esc_html_e( 'Show in search results?', 'wp-seo-pilot' ); ?></strong><br />
+								<strong><?php esc_html_e( 'Show in search results?', 'saman-labs-seo' ); ?></strong><br />
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][show_search]" value="1" <?php checked( $settings['show_search'], '1' ); ?> />
-									<span><?php esc_html_e( 'Yes', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'Yes', 'saman-labs-seo' ); ?></span>
 								</label>
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][show_search]" value="0" <?php checked( $settings['show_search'], '0' ); ?> />
-									<span><?php esc_html_e( 'No', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'No', 'saman-labs-seo' ); ?></span>
 								</label>
 							</label>
 							<label>
-								<strong><?php esc_html_e( 'Show SEO settings to editors?', 'wp-seo-pilot' ); ?></strong><br />
+								<strong><?php esc_html_e( 'Show SEO settings to editors?', 'saman-labs-seo' ); ?></strong><br />
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][show_seo]" value="1" <?php checked( $settings['show_seo'], '1' ); ?> />
-									<span><?php esc_html_e( 'Show', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'Show', 'saman-labs-seo' ); ?></span>
 								</label>
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][show_seo]" value="0" <?php checked( $settings['show_seo'], '0' ); ?> />
-									<span><?php esc_html_e( 'Hide', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'Hide', 'saman-labs-seo' ); ?></span>
 								</label>
 							</label>
 						</div>
 
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_template_<?php echo esc_attr( $slug ); ?>">
-								<strong><?php esc_html_e( 'SEO title template', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'SEO title template', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_template_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_template_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_template_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_title_templates[<?php echo esc_attr( $slug ); ?>]" value="<?php echo esc_attr( $template ); ?>" data-context="<?php echo esc_attr($context_key); ?>" />
@@ -156,13 +156,13 @@ call_user_func(
 						
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>">
-								<strong><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<textarea class="large-text" rows="3" id="wpseopilot_desc_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_meta_descriptions[<?php echo esc_attr( $slug ); ?>]" data-context="<?php echo esc_attr($context_key); ?>"><?php echo esc_textarea( $description ); ?></textarea>
@@ -170,14 +170,14 @@ call_user_func(
 
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_keywords_<?php echo esc_attr( $slug ); ?>">
-								<strong><?php esc_html_e( 'Default keywords (optional)', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Default keywords (optional)', 'saman-labs-seo' ); ?></strong>
 							</label>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_keywords_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_keywords[<?php echo esc_attr( $slug ); ?>]" value="<?php echo esc_attr( $keywords ); ?>" />
 
 						<div class="wpseopilot-flex">
 							<label>
-								<strong><?php esc_html_e( 'Default page schema type', 'wp-seo-pilot' ); ?></strong><br />
+								<strong><?php esc_html_e( 'Default page schema type', 'saman-labs-seo' ); ?></strong><br />
 								<select name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][schema_page]">
 									<?php foreach ( $schema_pages as $value => $text ) : ?>
 										<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $settings['schema_page'], $value ); ?>>
@@ -187,7 +187,7 @@ call_user_func(
 								</select>
 							</label>
 							<label>
-								<strong><?php esc_html_e( 'Default article type', 'wp-seo-pilot' ); ?></strong><br />
+								<strong><?php esc_html_e( 'Default article type', 'saman-labs-seo' ); ?></strong><br />
 								<select name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][schema_article]">
 									<?php foreach ( $schema_articles as $value => $text ) : ?>
 										<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $settings['schema_article'], $value ); ?>>
@@ -199,7 +199,7 @@ call_user_func(
 						</div>
 
 						<label for="wpseopilot_analysis_<?php echo esc_attr( $slug ); ?>">
-							<strong><?php esc_html_e( 'Custom fields to analyse (comma separated)', 'wp-seo-pilot' ); ?></strong>
+							<strong><?php esc_html_e( 'Custom fields to analyse (comma separated)', 'saman-labs-seo' ); ?></strong>
 						</label>
 						<input type="text" class="regular-text" id="wpseopilot_analysis_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_post_type_settings[<?php echo esc_attr( $slug ); ?>][analysis_fields]" value="<?php echo esc_attr( $settings['analysis_fields'] ); ?>" />
 					</div>
@@ -208,8 +208,8 @@ call_user_func(
 		</section>
 
 		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Taxonomies', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'Configure how category, tag, and custom taxonomy archives behave in search results.', 'wp-seo-pilot' ); ?></p>
+			<h2><?php esc_html_e( 'Taxonomies', 'saman-labs-seo' ); ?></h2>
+			<p><?php esc_html_e( 'Configure how category, tag, and custom taxonomy archives behave in search results.', 'saman-labs-seo' ); ?></p>
 			
 			<?php foreach ( $taxonomies as $slug => $taxonomy ) : ?>
 				<?php
@@ -233,38 +233,38 @@ call_user_func(
 					<div class="wpseopilot-accordion__body">
 						<div class="wpseopilot-flex">
 							<label>
-								<strong><?php esc_html_e( 'Show in search results?', 'wp-seo-pilot' ); ?></strong><br />
+								<strong><?php esc_html_e( 'Show in search results?', 'saman-labs-seo' ); ?></strong><br />
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][show_search]" value="1" <?php checked( $settings['show_search'], '1' ); ?> />
-									<span><?php esc_html_e( 'Yes', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'Yes', 'saman-labs-seo' ); ?></span>
 								</label>
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][show_search]" value="0" <?php checked( $settings['show_search'], '0' ); ?> />
-									<span><?php esc_html_e( 'No', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'No', 'saman-labs-seo' ); ?></span>
 								</label>
 							</label>
 							<label>
-								<strong><?php esc_html_e( 'Show SEO settings?', 'wp-seo-pilot' ); ?></strong><br />
+								<strong><?php esc_html_e( 'Show SEO settings?', 'saman-labs-seo' ); ?></strong><br />
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][show_seo]" value="1" <?php checked( $settings['show_seo'], '1' ); ?> />
-									<span><?php esc_html_e( 'Show', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'Show', 'saman-labs-seo' ); ?></span>
 								</label>
 								<label class="wpseopilot-toggle">
 									<input type="radio" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][show_seo]" value="0" <?php checked( $settings['show_seo'], '0' ); ?> />
-									<span><?php esc_html_e( 'Hide', 'wp-seo-pilot' ); ?></span>
+									<span><?php esc_html_e( 'Hide', 'saman-labs-seo' ); ?></span>
 								</label>
 							</label>
 						</div>
 
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>">
-								<strong><?php esc_html_e( 'SEO title', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'SEO title', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_tax_title_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][title]" value="<?php echo esc_attr( $settings['title'] ); ?>" data-context="<?php echo esc_attr($context_key); ?>" />
@@ -272,13 +272,13 @@ call_user_func(
 
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>">
-								<strong><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<textarea class="large-text" rows="3" id="wpseopilot_tax_desc_<?php echo esc_attr( $slug ); ?>" name="wpseopilot_taxonomy_settings[<?php echo esc_attr( $slug ); ?>][description]" data-context="<?php echo esc_attr($context_key); ?>"><?php echo esc_textarea( $settings['description'] ); ?></textarea>
@@ -289,8 +289,8 @@ call_user_func(
 		</section>
 
 		<section class="wpseopilot-card">
-			<h2><?php esc_html_e( 'Archives & Special Templates', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'Control author archives, date archives, and built-in search pages.', 'wp-seo-pilot' ); ?></p>
+			<h2><?php esc_html_e( 'Archives & Special Templates', 'saman-labs-seo' ); ?></h2>
+			<p><?php esc_html_e( 'Control author archives, date archives, and built-in search pages.', 'saman-labs-seo' ); ?></p>
 			
 			<?php foreach ( $archive_items as $key => $label ) : ?>
 				<?php
@@ -311,26 +311,26 @@ call_user_func(
 					</summary>
 					<div class="wpseopilot-accordion__body">
 						<label>
-							<strong><?php esc_html_e( 'Show in search results?', 'wp-seo-pilot' ); ?></strong><br />
+							<strong><?php esc_html_e( 'Show in search results?', 'saman-labs-seo' ); ?></strong><br />
 							<label class="wpseopilot-toggle">
 								<input type="radio" name="wpseopilot_archive_settings[<?php echo esc_attr( $key ); ?>][show]" value="1" <?php checked( $settings['show'], '1' ); ?> />
-								<span><?php esc_html_e( 'Yes', 'wp-seo-pilot' ); ?></span>
+								<span><?php esc_html_e( 'Yes', 'saman-labs-seo' ); ?></span>
 							</label>
 							<label class="wpseopilot-toggle">
 								<input type="radio" name="wpseopilot_archive_settings[<?php echo esc_attr( $key ); ?>][show]" value="0" <?php checked( $settings['show'], '0' ); ?> />
-								<span><?php esc_html_e( 'No', 'wp-seo-pilot' ); ?></span>
+								<span><?php esc_html_e( 'No', 'saman-labs-seo' ); ?></span>
 							</label>
 						</label>
 
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>">
-								<strong><?php esc_html_e( 'SEO title', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'SEO title', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<input type="text" class="regular-text" id="wpseopilot_archive_title_<?php echo esc_attr( $key ); ?>" name="wpseopilot_archive_settings[<?php echo esc_attr( $key ); ?>][title]" value="<?php echo esc_attr( $settings['title'] ); ?>" data-context="<?php echo esc_attr($context_key); ?>" />
@@ -338,13 +338,13 @@ call_user_func(
 
 						<div class="wpseopilot-flex-label">
 							<label for="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>">
-								<strong><?php esc_html_e( 'Meta description', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Meta description', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<button type="button" class="button button-small wpseopilot-trigger-vars" data-target="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>">
-								<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 							</button>
 							<button type="button" class="button button-small wpseopilot-trigger-preview" data-target="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>">
-								<?php esc_html_e( 'Preview', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Preview', 'saman-labs-seo' ); ?>
 							</button>
 						</div>
 						<textarea class="large-text" rows="3" id="wpseopilot_archive_desc_<?php echo esc_attr( $key ); ?>" name="wpseopilot_archive_settings[<?php echo esc_attr( $key ); ?>][description]" data-context="<?php echo esc_attr($context_key); ?>"><?php echo esc_textarea( $settings['description'] ); ?></textarea>
@@ -354,7 +354,7 @@ call_user_func(
 			<?php endforeach; ?>
 		</section>
 
-		<?php submit_button( __( 'Save Changes', 'wp-seo-pilot' ) ); ?>
+		<?php submit_button( __( 'Save Changes', 'saman-labs-seo' ) ); ?>
 	</form>
 </div>
 <?php

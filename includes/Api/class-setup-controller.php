@@ -103,7 +103,7 @@ class Setup_Controller extends REST_Controller {
         $model = isset( $params['model'] ) ? sanitize_text_field( $params['model'] ) : 'gpt-4o-mini';
 
         if ( empty( $api_key ) && $provider !== 'ollama' ) {
-            return $this->error( __( 'API key is required.', 'wp-seo-pilot' ), 'missing_key', 400 );
+            return $this->error( __( 'API key is required.', 'saman-labs-seo' ), 'missing_key', 400 );
         }
 
         $test_prompt = 'Say "Hello!" in one word.';
@@ -119,7 +119,7 @@ class Setup_Controller extends REST_Controller {
                 $result = $this->test_ollama( $test_prompt );
                 break;
             default:
-                return $this->error( __( 'Unsupported provider.', 'wp-seo-pilot' ), 'invalid_provider', 400 );
+                return $this->error( __( 'Unsupported provider.', 'saman-labs-seo' ), 'invalid_provider', 400 );
         }
 
         if ( is_wp_error( $result ) ) {
@@ -131,7 +131,7 @@ class Setup_Controller extends REST_Controller {
 
         return $this->success( [
             'success'  => true,
-            'message'  => __( 'Connection successful!', 'wp-seo-pilot' ),
+            'message'  => __( 'Connection successful!', 'saman-labs-seo' ),
             'response' => $result,
         ] );
     }
@@ -193,7 +193,7 @@ class Setup_Controller extends REST_Controller {
         update_option( 'wpseopilot_setup_completed', true );
         delete_option( 'wpseopilot_setup_skipped' );
 
-        return $this->success( null, __( 'Setup completed successfully!', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Setup completed successfully!', 'saman-labs-seo' ) );
     }
 
     /**
@@ -205,7 +205,7 @@ class Setup_Controller extends REST_Controller {
     public function skip_setup( $request ) {
         update_option( 'wpseopilot_setup_skipped', true );
 
-        return $this->success( null, __( 'Setup skipped.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Setup skipped.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -219,7 +219,7 @@ class Setup_Controller extends REST_Controller {
         delete_option( 'wpseopilot_setup_skipped' );
         delete_option( 'wpseopilot_setup_data' );
 
-        return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -252,7 +252,7 @@ class Setup_Controller extends REST_Controller {
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'OpenAI API error', 'wp-seo-pilot' );
+            $error_message = $body['error']['message'] ?? __( 'OpenAI API error', 'saman-labs-seo' );
             return new \WP_Error( 'api_error', $error_message );
         }
 
@@ -289,7 +289,7 @@ class Setup_Controller extends REST_Controller {
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'Anthropic API error', 'wp-seo-pilot' );
+            $error_message = $body['error']['message'] ?? __( 'Anthropic API error', 'saman-labs-seo' );
             return new \WP_Error( 'api_error', $error_message );
         }
 
@@ -314,14 +314,14 @@ class Setup_Controller extends REST_Controller {
         ] );
 
         if ( is_wp_error( $response ) ) {
-            return new \WP_Error( 'connection_error', __( 'Could not connect to Ollama. Make sure it\'s running on localhost:11434.', 'wp-seo-pilot' ) );
+            return new \WP_Error( 'connection_error', __( 'Could not connect to Ollama. Make sure it\'s running on localhost:11434.', 'saman-labs-seo' ) );
         }
 
         $status_code = wp_remote_retrieve_response_code( $response );
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( $status_code !== 200 ) {
-            return new \WP_Error( 'api_error', __( 'Ollama returned an error. Make sure a model is installed.', 'wp-seo-pilot' ) );
+            return new \WP_Error( 'api_error', __( 'Ollama returned an error. Make sure a model is installed.', 'saman-labs-seo' ) );
         }
 
         return trim( $body['message']['content'] ?? '' );

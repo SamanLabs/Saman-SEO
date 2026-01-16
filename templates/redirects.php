@@ -21,14 +21,14 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 	if ( ! empty( $suggestions ) ) :
 		?>
 		<div class="wpseopilot-card" style="margin-bottom: 20px; border-left: 4px solid #ffba00;">
-			<h2><?php esc_html_e( '⚠️ Detected Slug Changes', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'The following posts have changed their URL structure. You should probably create redirects to prevent 404 errors.', 'wp-seo-pilot' ); ?></p>
+			<h2><?php esc_html_e( '⚠️ Detected Slug Changes', 'saman-labs-seo' ); ?></h2>
+			<p><?php esc_html_e( 'The following posts have changed their URL structure. You should probably create redirects to prevent 404 errors.', 'saman-labs-seo' ); ?></p>
 			<table class="wp-list-table widefat striped" style="margin-top: 10px;">
 				<thead>
 					<tr>
-						<th><?php esc_html_e( 'Old Path', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'New Target', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'Actions', 'wp-seo-pilot' ); ?></th>
+						<th><?php esc_html_e( 'Old Path', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'New Target', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'Actions', 'saman-labs-seo' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -42,9 +42,9 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 									document.getElementById('source').value = '<?php echo esc_js( $suggestion['source'] ); ?>';
 									document.getElementById('target').value = '<?php echo esc_js( $suggestion['target'] ); ?>';
 									document.getElementById('source').focus();
-								"><?php esc_html_e( 'Use', 'wp-seo-pilot' ); ?></a>
+								"><?php esc_html_e( 'Use', 'saman-labs-seo' ); ?></a>
 								
-								<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_dismiss_slug', 'key' => $key ], admin_url( 'admin-post.php' ) ), 'wpseopilot_dismiss_slug' ) ); ?>" class="button button-small button-link-delete" style="color: #a00;"><?php esc_html_e( 'Dismiss', 'wp-seo-pilot' ); ?></a>
+								<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_dismiss_slug', 'key' => $key ], admin_url( 'admin-post.php' ) ), 'wpseopilot_dismiss_slug' ) ); ?>" class="button button-small button-link-delete" style="color: #a00;"><?php esc_html_e( 'Dismiss', 'saman-labs-seo' ); ?></a>
 							</td>
 						</tr>
 					<?php endforeach; ?>
@@ -58,37 +58,37 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 		<input type="hidden" name="action" value="wpseopilot_save_redirect" />
 		<table class="form-table">
 			<tr>
-				<th scope="row"><label for="source"><?php esc_html_e( 'Source path', 'wp-seo-pilot' ); ?></label></th>
+				<th scope="row"><label for="source"><?php esc_html_e( 'Source path', 'saman-labs-seo' ); ?></label></th>
 				<td><input type="text" name="source" id="source" class="regular-text" placeholder="/old-url" value="<?php echo esc_attr( $wpseopilot_prefill ); ?>" required /></td>
 			</tr>
 			<tr>
-				<th scope="row"><label for="target"><?php esc_html_e( 'Target URL', 'wp-seo-pilot' ); ?></label></th>
+				<th scope="row"><label for="target"><?php esc_html_e( 'Target URL', 'saman-labs-seo' ); ?></label></th>
 				<td><input type="url" name="target" id="target" class="regular-text" placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>" required /></td>
 			</tr>
 			<tr>
-				<th scope="row"><label for="status_code"><?php esc_html_e( 'Status', 'wp-seo-pilot' ); ?></label></th>
+				<th scope="row"><label for="status_code"><?php esc_html_e( 'Status', 'saman-labs-seo' ); ?></label></th>
 				<td>
 					<select name="status_code" id="status_code">
-						<option value="301">301 <?php esc_html_e( 'Permanent', 'wp-seo-pilot' ); ?></option>
-						<option value="302">302 <?php esc_html_e( 'Temporary', 'wp-seo-pilot' ); ?></option>
+						<option value="301">301 <?php esc_html_e( 'Permanent', 'saman-labs-seo' ); ?></option>
+						<option value="302">302 <?php esc_html_e( 'Temporary', 'saman-labs-seo' ); ?></option>
 						<option value="307">307</option>
-						<option value="410">410 <?php esc_html_e( 'Gone', 'wp-seo-pilot' ); ?></option>
+						<option value="410">410 <?php esc_html_e( 'Gone', 'saman-labs-seo' ); ?></option>
 					</select>
 				</td>
 			</tr>
 		</table>
-		<?php submit_button( __( 'Add redirect', 'wp-seo-pilot' ) ); ?>
+		<?php submit_button( __( 'Add redirect', 'saman-labs-seo' ) ); ?>
 	</form>
 
 	<table class="wp-list-table widefat striped">
 		<thead>
 			<tr>
-				<th><?php esc_html_e( 'Source', 'wp-seo-pilot' ); ?></th>
-				<th><?php esc_html_e( 'Target', 'wp-seo-pilot' ); ?></th>
-				<th><?php esc_html_e( 'Status', 'wp-seo-pilot' ); ?></th>
-				<th><?php esc_html_e( 'Hits', 'wp-seo-pilot' ); ?></th>
-				<th><?php esc_html_e( 'Last hit', 'wp-seo-pilot' ); ?></th>
-				<th><?php esc_html_e( 'Actions', 'wp-seo-pilot' ); ?></th>
+				<th><?php esc_html_e( 'Source', 'saman-labs-seo' ); ?></th>
+				<th><?php esc_html_e( 'Target', 'saman-labs-seo' ); ?></th>
+				<th><?php esc_html_e( 'Status', 'saman-labs-seo' ); ?></th>
+				<th><?php esc_html_e( 'Hits', 'saman-labs-seo' ); ?></th>
+				<th><?php esc_html_e( 'Last hit', 'saman-labs-seo' ); ?></th>
+				<th><?php esc_html_e( 'Actions', 'saman-labs-seo' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -101,13 +101,13 @@ $wpseopilot_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslas
 						<td><?php echo esc_html( $wpseopilot_redirect->hits ); ?></td>
 						<td><?php echo esc_html( $wpseopilot_redirect->last_hit ?: '—' ); ?></td>
 						<td>
-							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_redirect', 'id' => $wpseopilot_redirect->id ], admin_url( 'admin-post.php' ) ), 'wpseopilot_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'wp-seo-pilot' ); ?></a>
+							<a class="delete" href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_redirect', 'id' => $wpseopilot_redirect->id ], admin_url( 'admin-post.php' ) ), 'wpseopilot_redirect_delete' ) ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>
 			<?php else : ?>
 				<tr>
-					<td colspan="6"><?php esc_html_e( 'No redirects configured.', 'wp-seo-pilot' ); ?></td>
+					<td colspan="6"><?php esc_html_e( 'No redirects configured.', 'saman-labs-seo' ); ?></td>
 				</tr>
 			<?php endif; ?>
 		</tbody>

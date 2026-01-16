@@ -95,7 +95,7 @@ class Ai_Controller extends REST_Controller {
 
 		if ( empty( $content ) ) {
 			return $this->error(
-				__( 'Content is required for AI generation.', 'wp-seo-pilot' ),
+				__( 'Content is required for AI generation.', 'saman-labs-seo' ),
 				'missing_content',
 				400
 			);
@@ -107,7 +107,7 @@ class Ai_Controller extends REST_Controller {
 
 			if ( ! $status['installed'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is required for AI features. Please install it from the More page.', 'wp-seo-pilot' ),
+					__( 'WP AI Pilot is required for AI features. Please install it from the More page.', 'saman-labs-seo' ),
 					'ai_not_installed',
 					400
 				);
@@ -115,14 +115,14 @@ class Ai_Controller extends REST_Controller {
 
 			if ( ! $status['active'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is installed but not activated. Please activate it.', 'wp-seo-pilot' ),
+					__( 'WP AI Pilot is installed but not activated. Please activate it.', 'saman-labs-seo' ),
 					'ai_not_active',
 					400
 				);
 			}
 
 			return $this->error(
-				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'wp-seo-pilot' ),
+				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'saman-labs-seo' ),
 				'ai_not_configured',
 				400
 			);
@@ -159,7 +159,7 @@ class Ai_Controller extends REST_Controller {
 			$results['description'] = trim( $result );
 		}
 
-		return $this->success( $results, __( 'AI generation completed.', 'wp-seo-pilot' ), [
+		return $this->success( $results, __( 'AI generation completed.', 'saman-labs-seo' ), [
 			'provider' => 'wp-ai-pilot',
 		] );
 	}
@@ -189,14 +189,14 @@ class Ai_Controller extends REST_Controller {
 		];
 
 		if ( $ready ) {
-			$response['message']      = __( 'Connected to WP AI Pilot', 'wp-seo-pilot' );
+			$response['message']      = __( 'Connected to WP AI Pilot', 'saman-labs-seo' );
 			$response['models_count'] = count( AI_Pilot::get_models() );
 		} elseif ( $status['installed'] && ! $status['active'] ) {
-			$response['message'] = __( 'WP AI Pilot needs to be activated', 'wp-seo-pilot' );
+			$response['message'] = __( 'WP AI Pilot needs to be activated', 'saman-labs-seo' );
 		} elseif ( $status['installed'] && ! $status['ready'] ) {
-			$response['message'] = __( 'WP AI Pilot needs configuration', 'wp-seo-pilot' );
+			$response['message'] = __( 'WP AI Pilot needs configuration', 'saman-labs-seo' );
 		} else {
-			$response['message'] = __( 'Install WP AI Pilot to enable AI features', 'wp-seo-pilot' );
+			$response['message'] = __( 'Install WP AI Pilot to enable AI features', 'saman-labs-seo' );
 		}
 
 		return $this->success( $response );
@@ -273,7 +273,7 @@ class Ai_Controller extends REST_Controller {
 			'ai_prompt_system'      => get_option( 'wpseopilot_ai_prompt_system' ),
 			'ai_prompt_title'       => get_option( 'wpseopilot_ai_prompt_title' ),
 			'ai_prompt_description' => get_option( 'wpseopilot_ai_prompt_description' ),
-		], __( 'Settings saved.', 'wp-seo-pilot' ) );
+		], __( 'Settings saved.', 'saman-labs-seo' ) );
 	}
 
 	/**
@@ -293,6 +293,6 @@ class Ai_Controller extends REST_Controller {
 		update_option( 'wpseopilot_ai_prompt_title', $defaults['ai_prompt_title'] );
 		update_option( 'wpseopilot_ai_prompt_description', $defaults['ai_prompt_description'] );
 
-		return $this->success( $defaults, __( 'Settings reset to defaults.', 'wp-seo-pilot' ) );
+		return $this->success( $defaults, __( 'Settings reset to defaults.', 'saman-labs-seo' ) );
 	}
 }

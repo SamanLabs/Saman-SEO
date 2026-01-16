@@ -121,8 +121,8 @@ class Internal_Linking {
 	public function register_menu() {
 		$this->page_hook = add_submenu_page(
 			'wpseopilot',
-			__( 'Internal Linking', 'wp-seo-pilot' ),
-			__( 'Internal Linking', 'wp-seo-pilot' ),
+			__( 'Internal Linking', 'saman-labs-seo' ),
+			__( 'Internal Linking', 'saman-labs-seo' ),
 			self::CAPABILITY,
 			self::PAGE_SLUG,
 			[ $this, 'render_page' ],
@@ -178,17 +178,17 @@ class Internal_Linking {
 				'ajax'   => admin_url( 'admin-ajax.php' ),
 				'nonce'  => wp_create_nonce( 'wpseopilot_link_admin' ),
 				'labels' => [
-					'empty'           => __( 'No rules yet. Create your first internal link rule.', 'wp-seo-pilot' ),
-					'keyword_hint'    => __( 'Use Enter to add each keyword. Exact phrase match; word boundaries recommended.', 'wp-seo-pilot' ),
-					'preview_note'    => __( 'Preview simulates replacements without saving changes.', 'wp-seo-pilot' ),
-					'previewSelect'   => __( 'Select a post or enter a URL to preview.', 'wp-seo-pilot' ),
-					'previewRunning'  => __( 'Generating preview…', 'wp-seo-pilot' ),
-					'previewEmpty'    => __( 'No replacements found.', 'wp-seo-pilot' ),
-					'previewError'    => __( 'Unable to run preview.', 'wp-seo-pilot' ),
-					'previewSuccess'  => __( 'Preview complete: %d replacement(s).', 'wp-seo-pilot' ),
-					'save_success'    => __( 'Rule saved.', 'wp-seo-pilot' ),
-					'category_prompt' => __( 'Provide a category name to continue.', 'wp-seo-pilot' ),
-					'remove'          => __( 'Remove keyword', 'wp-seo-pilot' ),
+					'empty'           => __( 'No rules yet. Create your first internal link rule.', 'saman-labs-seo' ),
+					'keyword_hint'    => __( 'Use Enter to add each keyword. Exact phrase match; word boundaries recommended.', 'saman-labs-seo' ),
+					'preview_note'    => __( 'Preview simulates replacements without saving changes.', 'saman-labs-seo' ),
+					'previewSelect'   => __( 'Select a post or enter a URL to preview.', 'saman-labs-seo' ),
+					'previewRunning'  => __( 'Generating preview…', 'saman-labs-seo' ),
+					'previewEmpty'    => __( 'No replacements found.', 'saman-labs-seo' ),
+					'previewError'    => __( 'Unable to run preview.', 'saman-labs-seo' ),
+					'previewSuccess'  => __( 'Preview complete: %d replacement(s).', 'saman-labs-seo' ),
+					'save_success'    => __( 'Rule saved.', 'saman-labs-seo' ),
+					'category_prompt' => __( 'Provide a category name to continue.', 'saman-labs-seo' ),
+					'remove'          => __( 'Remove keyword', 'saman-labs-seo' ),
 				],
 			]
 		);
@@ -354,7 +354,7 @@ class Internal_Linking {
 			$this->redirect_back();
 		}
 
-		$this->flash_notice( __( 'Rule saved.', 'wp-seo-pilot' ) );
+		$this->flash_notice( __( 'Rule saved.', 'saman-labs-seo' ) );
 		$redirect = $this->get_admin_url(
 			[
 				'tab'  => 'edit',
@@ -377,7 +377,7 @@ class Internal_Linking {
 		$rule_id = isset( $_GET['rule'] ) ? sanitize_key( wp_unslash( $_GET['rule'] ) ) : '';
 		if ( $rule_id ) {
 			$this->repository->delete_rule( $rule_id );
-			$this->flash_notice( __( 'Rule deleted.', 'wp-seo-pilot' ) );
+			$this->flash_notice( __( 'Rule deleted.', 'saman-labs-seo' ) );
 		}
 
 		wp_safe_redirect( $this->get_admin_url() );
@@ -405,7 +405,7 @@ class Internal_Linking {
 		$affected = $this->repository->bulk_update_rules( $rule_ids, $action );
 
 		if ( $affected > 0 ) {
-			$message = sprintf( _n( '%d rule updated.', '%d rules updated.', $affected, 'wp-seo-pilot' ), $affected );
+			$message = sprintf( _n( '%d rule updated.', '%d rules updated.', $affected, 'saman-labs-seo' ), $affected );
 			$this->flash_notice( $message );
 		}
 
@@ -428,7 +428,7 @@ class Internal_Linking {
 			if ( is_wp_error( $result ) ) {
 				$this->flash_notice( $result->get_error_message(), 'error' );
 			} else {
-				$this->flash_notice( __( 'Rule duplicated. Remember to review before activating.', 'wp-seo-pilot' ) );
+				$this->flash_notice( __( 'Rule duplicated. Remember to review before activating.', 'saman-labs-seo' ) );
 			}
 		}
 
@@ -453,7 +453,7 @@ class Internal_Linking {
 			if ( $rule ) {
 				$rule['status'] = $status;
 				$this->repository->save_rule( $rule );
-				$message = 'active' === $status ? __( 'Rule activated.', 'wp-seo-pilot' ) : __( 'Rule deactivated.', 'wp-seo-pilot' );
+				$message = 'active' === $status ? __( 'Rule activated.', 'saman-labs-seo' ) : __( 'Rule deactivated.', 'saman-labs-seo' );
 				$this->flash_notice( $message );
 			}
 		}
@@ -477,7 +477,7 @@ class Internal_Linking {
 		if ( is_wp_error( $result ) ) {
 			$this->flash_notice( $result->get_error_message(), 'error' );
 		} else {
-			$this->flash_notice( __( 'Category saved.', 'wp-seo-pilot' ) );
+			$this->flash_notice( __( 'Category saved.', 'saman-labs-seo' ) );
 		}
 
 		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'categories' ] ) );
@@ -501,7 +501,7 @@ class Internal_Linking {
 			if ( is_wp_error( $result ) ) {
 				$this->flash_notice( $result->get_error_message(), 'error' );
 			} else {
-				$this->flash_notice( __( 'Category deleted.', 'wp-seo-pilot' ) );
+				$this->flash_notice( __( 'Category deleted.', 'saman-labs-seo' ) );
 			}
 		}
 
@@ -524,7 +524,7 @@ class Internal_Linking {
 		if ( is_wp_error( $result ) ) {
 			$this->flash_notice( $result->get_error_message(), 'error' );
 		} else {
-			$this->flash_notice( __( 'Template saved.', 'wp-seo-pilot' ) );
+			$this->flash_notice( __( 'Template saved.', 'saman-labs-seo' ) );
 		}
 
 		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'utms' ] ) );
@@ -543,7 +543,7 @@ class Internal_Linking {
 		$template_id = isset( $_GET['template'] ) ? sanitize_key( wp_unslash( $_GET['template'] ) ) : '';
 		if ( $template_id ) {
 			$this->repository->delete_template( $template_id );
-			$this->flash_notice( __( 'Template deleted.', 'wp-seo-pilot' ) );
+			$this->flash_notice( __( 'Template deleted.', 'saman-labs-seo' ) );
 		}
 
 		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'utms' ] ) );
@@ -562,7 +562,7 @@ class Internal_Linking {
 		$data = isset( $_POST['settings'] ) ? (array) wp_unslash( $_POST['settings'] ) : [];
 		$this->repository->save_settings( $data );
 
-		$this->flash_notice( __( 'Settings updated.', 'wp-seo-pilot' ) );
+		$this->flash_notice( __( 'Settings updated.', 'saman-labs-seo' ) );
 		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'settings' ] ) );
 		exit;
 	}
@@ -588,12 +588,12 @@ class Internal_Linking {
 		$preview_url = isset( $preview['url'] ) ? esc_url_raw( $preview['url'] ) : '';
 
 		if ( ! $post_id && '' === $preview_url ) {
-			wp_send_json_error( __( 'Select a post or enter a URL to preview.', 'wp-seo-pilot' ), 400 );
+			wp_send_json_error( __( 'Select a post or enter a URL to preview.', 'saman-labs-seo' ), 400 );
 		}
 
 		$post = $post_id ? get_post( $post_id ) : null;
 		if ( $post_id && ! $post instanceof WP_Post ) {
-			wp_send_json_error( __( 'Post not found.', 'wp-seo-pilot' ), 404 );
+			wp_send_json_error( __( 'Post not found.', 'saman-labs-seo' ), 404 );
 		}
 
 		if ( $preview_url && ! $post ) {
@@ -628,7 +628,7 @@ class Internal_Linking {
 	 */
 	public function ajax_destination_search() {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'wp-seo-pilot' ), 403 );
+			wp_send_json_error( __( 'Permission denied.', 'saman-labs-seo' ), 403 );
 		}
 
 		check_ajax_referer( 'wpseopilot_link_admin', 'nonce' );
@@ -709,14 +709,14 @@ class Internal_Linking {
 	 */
 	private function fetch_preview_body( $url ) {
 		if ( empty( $url ) ) {
-			return new \WP_Error( 'wpseopilot_preview_url', __( 'Enter a preview URL.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'wpseopilot_preview_url', __( 'Enter a preview URL.', 'saman-labs-seo' ) );
 		}
 
 		$site_host   = wp_parse_url( home_url(), PHP_URL_HOST );
 		$target_host = wp_parse_url( $url, PHP_URL_HOST );
 
 		if ( $target_host && $site_host && strtolower( $target_host ) !== strtolower( $site_host ) ) {
-			return new \WP_Error( 'wpseopilot_preview_host', __( 'Preview URLs must be on this site.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'wpseopilot_preview_host', __( 'Preview URLs must be on this site.', 'saman-labs-seo' ) );
 		}
 
 		$response = wp_remote_get( $url, [ 'timeout' => 10 ] );
@@ -726,7 +726,7 @@ class Internal_Linking {
 
 		$body = wp_remote_retrieve_body( $response );
 		if ( empty( $body ) ) {
-			return new \WP_Error( 'wpseopilot_preview_body', __( 'No content returned for preview URL.', 'wp-seo-pilot' ) );
+			return new \WP_Error( 'wpseopilot_preview_body', __( 'No content returned for preview URL.', 'saman-labs-seo' ) );
 		}
 
 		if ( strlen( $body ) > 200000 ) {
@@ -743,7 +743,7 @@ class Internal_Linking {
 	 */
 	private function guard_capability() {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 	}
 
@@ -854,7 +854,7 @@ class Internal_Linking {
 		$category_ids = array_column( $categories, 'name', 'id' );
 
 		if ( ! empty( $category ) && ! isset( $category_ids[ $category ] ) && '__none__' !== $category ) {
-			$this->flash_notice( __( 'Category not found.', 'wp-seo-pilot' ), 'error' );
+			$this->flash_notice( __( 'Category not found.', 'saman-labs-seo' ), 'error' );
 			wp_safe_redirect( $this->get_admin_url() );
 			exit;
 		}
@@ -871,7 +871,7 @@ class Internal_Linking {
 		}
 
 		if ( $updated > 0 ) {
-			$this->flash_notice( __( 'Categories updated.', 'wp-seo-pilot' ) );
+			$this->flash_notice( __( 'Categories updated.', 'saman-labs-seo' ) );
 		}
 
 		wp_safe_redirect( $this->get_admin_url() );

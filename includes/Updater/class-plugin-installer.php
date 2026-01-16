@@ -66,13 +66,13 @@ class Plugin_Installer {
             }
             return [
                 'success' => false,
-                'message' => __( 'Installation failed. Check file permissions.', 'wp-seo-pilot' ),
+                'message' => __( 'Installation failed. Check file permissions.', 'saman-labs-seo' ),
             ];
         }
 
         return [
             'success' => true,
-            'message' => __( 'Plugin installed successfully.', 'wp-seo-pilot' ),
+            'message' => __( 'Plugin installed successfully.', 'saman-labs-seo' ),
         ];
     }
 
@@ -107,13 +107,13 @@ class Plugin_Installer {
             }
             return [
                 'success' => false,
-                'message' => __( 'Update failed.', 'wp-seo-pilot' ),
+                'message' => __( 'Update failed.', 'saman-labs-seo' ),
             ];
         }
 
         return [
             'success' => true,
-            'message' => __( 'Plugin updated successfully.', 'wp-seo-pilot' ),
+            'message' => __( 'Plugin updated successfully.', 'saman-labs-seo' ),
         ];
     }
 
@@ -137,7 +137,7 @@ class Plugin_Installer {
 
         return [
             'success' => true,
-            'message' => __( 'Plugin activated successfully.', 'wp-seo-pilot' ),
+            'message' => __( 'Plugin activated successfully.', 'saman-labs-seo' ),
         ];
     }
 
@@ -154,7 +154,7 @@ class Plugin_Installer {
 
         return [
             'success' => true,
-            'message' => __( 'Plugin deactivated.', 'wp-seo-pilot' ),
+            'message' => __( 'Plugin deactivated.', 'saman-labs-seo' ),
         ];
     }
 
@@ -182,7 +182,7 @@ class Plugin_Installer {
 
         return [
             'success' => true,
-            'message' => __( 'Plugin deleted.', 'wp-seo-pilot' ),
+            'message' => __( 'Plugin deleted.', 'saman-labs-seo' ),
         ];
     }
 }

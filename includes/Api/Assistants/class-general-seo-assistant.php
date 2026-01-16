@@ -32,7 +32,7 @@ class General_SEO_Assistant extends Base_Assistant {
      * @return string
      */
     public function get_name() {
-        return __( 'SEO Assistant', 'wp-seo-pilot' );
+        return __( 'SEO Assistant', 'saman-labs-seo' );
     }
 
     /**
@@ -41,7 +41,7 @@ class General_SEO_Assistant extends Base_Assistant {
      * @return string
      */
     public function get_description() {
-        return __( 'Your helpful SEO buddy for all things search optimization.', 'wp-seo-pilot' );
+        return __( 'Your helpful SEO buddy for all things search optimization.', 'saman-labs-seo' );
     }
 
     /**
@@ -85,7 +85,7 @@ GOOD: 'Three things to fix: [specific list]'";
      * @return string
      */
     public function get_initial_message() {
-        return __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'wp-seo-pilot' );
+        return __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'saman-labs-seo' );
     }
 
     /**
@@ -95,10 +95,10 @@ GOOD: 'Three things to fix: [specific list]'";
      */
     public function get_suggested_prompts() {
         return [
-            __( 'How do I write a good meta description?', 'wp-seo-pilot' ),
-            __( 'What makes a title tag effective?', 'wp-seo-pilot' ),
-            __( 'Help me find keywords for my blog post', 'wp-seo-pilot' ),
-            __( 'What are internal links and why do they matter?', 'wp-seo-pilot' ),
+            __( 'How do I write a good meta description?', 'saman-labs-seo' ),
+            __( 'What makes a title tag effective?', 'saman-labs-seo' ),
+            __( 'Help me find keywords for my blog post', 'saman-labs-seo' ),
+            __( 'What are internal links and why do they matter?', 'saman-labs-seo' ),
         ];
     }
 

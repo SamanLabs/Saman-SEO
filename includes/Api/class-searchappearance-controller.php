@@ -287,7 +287,7 @@ class SearchAppearance_Controller extends REST_Controller {
             'meta_title'       => $meta_title,
             'meta_description' => $meta_description,
             'meta_keywords'    => $meta_keywords,
-        ], __( 'Homepage settings saved.', 'wp-seo-pilot' ) );
+        ], __( 'Homepage settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -324,7 +324,7 @@ class SearchAppearance_Controller extends REST_Controller {
 
         return $this->success( [
             'separator' => $separator,
-        ], __( 'Title separator saved.', 'wp-seo-pilot' ) );
+        ], __( 'Title separator saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -401,7 +401,7 @@ class SearchAppearance_Controller extends REST_Controller {
         $params = $request->get_json_params();
 
         if ( ! is_array( $params ) ) {
-            return $this->error( __( 'Invalid data.', 'wp-seo-pilot' ), 'invalid_data', 400 );
+            return $this->error( __( 'Invalid data.', 'saman-labs-seo' ), 'invalid_data', 400 );
         }
 
         $defaults = [];
@@ -432,7 +432,7 @@ class SearchAppearance_Controller extends REST_Controller {
         update_option( 'wpseopilot_post_type_defaults', $defaults );
         update_option( 'wpseopilot_post_type_settings', $settings );
 
-        return $this->success( $this->get_post_types_data(), __( 'Post type settings saved.', 'wp-seo-pilot' ) );
+        return $this->success( $this->get_post_types_data(), __( 'Post type settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -465,7 +465,7 @@ class SearchAppearance_Controller extends REST_Controller {
         update_option( 'wpseopilot_post_type_defaults', $defaults );
         update_option( 'wpseopilot_post_type_settings', $settings );
 
-        return $this->success( null, __( 'Post type settings saved.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Post type settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -534,7 +534,7 @@ class SearchAppearance_Controller extends REST_Controller {
         $params = $request->get_json_params();
 
         if ( ! is_array( $params ) ) {
-            return $this->error( __( 'Invalid data.', 'wp-seo-pilot' ), 'invalid_data', 400 );
+            return $this->error( __( 'Invalid data.', 'saman-labs-seo' ), 'invalid_data', 400 );
         }
 
         $defaults = [];
@@ -564,7 +564,7 @@ class SearchAppearance_Controller extends REST_Controller {
         update_option( 'wpseopilot_taxonomy_defaults', $defaults );
         update_option( 'wpseopilot_taxonomy_settings', $settings );
 
-        return $this->success( $this->get_taxonomies_data(), __( 'Taxonomy settings saved.', 'wp-seo-pilot' ) );
+        return $this->success( $this->get_taxonomies_data(), __( 'Taxonomy settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -596,7 +596,7 @@ class SearchAppearance_Controller extends REST_Controller {
         update_option( 'wpseopilot_taxonomy_defaults', $defaults );
         update_option( 'wpseopilot_taxonomy_settings', $settings );
 
-        return $this->success( null, __( 'Taxonomy settings saved.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Taxonomy settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -620,29 +620,29 @@ class SearchAppearance_Controller extends REST_Controller {
 
         $archive_types = [
             'author' => [
-                'name'                        => __( 'Author Archives', 'wp-seo-pilot' ),
-                'description'                 => __( 'Archive pages showing posts by a specific author.', 'wp-seo-pilot' ),
+                'name'                        => __( 'Author Archives', 'saman-labs-seo' ),
+                'description'                 => __( 'Archive pages showing posts by a specific author.', 'saman-labs-seo' ),
                 'default_title_template'      => '{{author}} {{separator}} {{site_title}}',
                 'default_description_template' => 'Articles written by {{author}}. {{author_bio}}',
                 'variables'                   => [ 'author', 'author_bio', 'separator', 'site_title' ],
             ],
             'date'   => [
-                'name'                        => __( 'Date Archives', 'wp-seo-pilot' ),
-                'description'                 => __( 'Archive pages showing posts from a specific date period.', 'wp-seo-pilot' ),
+                'name'                        => __( 'Date Archives', 'saman-labs-seo' ),
+                'description'                 => __( 'Archive pages showing posts from a specific date period.', 'saman-labs-seo' ),
                 'default_title_template'      => '{{date}} Archives {{separator}} {{site_title}}',
                 'default_description_template' => 'Browse our articles from {{date}}.',
                 'variables'                   => [ 'date', 'separator', 'site_title' ],
             ],
             'search' => [
-                'name'                        => __( 'Search Results', 'wp-seo-pilot' ),
-                'description'                 => __( 'Pages showing search results.', 'wp-seo-pilot' ),
+                'name'                        => __( 'Search Results', 'saman-labs-seo' ),
+                'description'                 => __( 'Pages showing search results.', 'saman-labs-seo' ),
                 'default_title_template'      => 'Search: {{search_term}} {{separator}} {{site_title}}',
                 'default_description_template' => 'Search results for "{{search_term}}" on {{site_title}}.',
                 'variables'                   => [ 'search_term', 'separator', 'site_title' ],
             ],
             '404'    => [
-                'name'                        => __( '404 Page', 'wp-seo-pilot' ),
-                'description'                 => __( 'The page shown when content is not found.', 'wp-seo-pilot' ),
+                'name'                        => __( '404 Page', 'saman-labs-seo' ),
+                'description'                 => __( 'The page shown when content is not found.', 'saman-labs-seo' ),
                 'default_title_template'      => 'Page Not Found {{separator}} {{site_title}}',
                 'default_description_template' => 'The page you are looking for could not be found.',
                 'variables'                   => [ 'request_url', 'separator', 'site_title' ],
@@ -697,7 +697,7 @@ class SearchAppearance_Controller extends REST_Controller {
         $params = $request->get_json_params();
 
         if ( ! is_array( $params ) ) {
-            return $this->error( __( 'Invalid data.', 'wp-seo-pilot' ), 'invalid_data', 400 );
+            return $this->error( __( 'Invalid data.', 'saman-labs-seo' ), 'invalid_data', 400 );
         }
 
         $allowed  = [ 'author', 'date', 'search', '404' ];
@@ -727,7 +727,7 @@ class SearchAppearance_Controller extends REST_Controller {
         update_option( 'wpseopilot_archive_defaults', $defaults );
         update_option( 'wpseopilot_archive_settings', $settings );
 
-        return $this->success( $this->get_archives_data(), __( 'Archive settings saved.', 'wp-seo-pilot' ) );
+        return $this->success( $this->get_archives_data(), __( 'Archive settings saved.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -774,128 +774,128 @@ class SearchAppearance_Controller extends REST_Controller {
 
         $variables = [
             'global' => [
-                'label' => __( 'General', 'wp-seo-pilot' ),
+                'label' => __( 'General', 'saman-labs-seo' ),
                 'vars'  => [
                     [
                         'tag'     => 'site_title',
-                        'label'   => __( 'Site Title', 'wp-seo-pilot' ),
-                        'desc'    => __( 'The main title of your site', 'wp-seo-pilot' ),
+                        'label'   => __( 'Site Title', 'saman-labs-seo' ),
+                        'desc'    => __( 'The main title of your site', 'saman-labs-seo' ),
                         'preview' => $site_name,
                     ],
                     [
                         'tag'     => 'tagline',
-                        'label'   => __( 'Tagline', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Site description / tagline', 'wp-seo-pilot' ),
+                        'label'   => __( 'Tagline', 'saman-labs-seo' ),
+                        'desc'    => __( 'Site description / tagline', 'saman-labs-seo' ),
                         'preview' => $tagline,
                     ],
                     [
                         'tag'     => 'separator',
-                        'label'   => __( 'Separator', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Character between title parts', 'wp-seo-pilot' ),
+                        'label'   => __( 'Separator', 'saman-labs-seo' ),
+                        'desc'    => __( 'Character between title parts', 'saman-labs-seo' ),
                         'preview' => $separator,
                     ],
                     [
                         'tag'     => 'current_year',
-                        'label'   => __( 'Current Year', 'wp-seo-pilot' ),
-                        'desc'    => __( 'The current year (4 digits)', 'wp-seo-pilot' ),
+                        'label'   => __( 'Current Year', 'saman-labs-seo' ),
+                        'desc'    => __( 'The current year (4 digits)', 'saman-labs-seo' ),
                         'preview' => date_i18n( 'Y' ),
                     ],
                 ],
             ],
             'post' => [
-                'label' => __( 'Post / Page', 'wp-seo-pilot' ),
+                'label' => __( 'Post / Page', 'saman-labs-seo' ),
                 'vars'  => [
                     [
                         'tag'     => 'post_title',
-                        'label'   => __( 'Post Title', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Title of the current post/page', 'wp-seo-pilot' ),
+                        'label'   => __( 'Post Title', 'saman-labs-seo' ),
+                        'desc'    => __( 'Title of the current post/page', 'saman-labs-seo' ),
                         'preview' => $post_title,
                     ],
                     [
                         'tag'     => 'post_excerpt',
-                        'label'   => __( 'Excerpt', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Post excerpt or snippet', 'wp-seo-pilot' ),
+                        'label'   => __( 'Excerpt', 'saman-labs-seo' ),
+                        'desc'    => __( 'Post excerpt or snippet', 'saman-labs-seo' ),
                         'preview' => $post_excerpt,
                     ],
                     [
                         'tag'     => 'post_date',
-                        'label'   => __( 'Publish Date', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Date the post was published', 'wp-seo-pilot' ),
+                        'label'   => __( 'Publish Date', 'saman-labs-seo' ),
+                        'desc'    => __( 'Date the post was published', 'saman-labs-seo' ),
                         'preview' => date_i18n( get_option( 'date_format' ) ),
                     ],
                     [
                         'tag'     => 'post_author',
-                        'label'   => __( 'Author', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Display name of the author', 'wp-seo-pilot' ),
+                        'label'   => __( 'Author', 'saman-labs-seo' ),
+                        'desc'    => __( 'Display name of the author', 'saman-labs-seo' ),
                         'preview' => $author_name,
                     ],
                     [
                         'tag'     => 'category',
-                        'label'   => __( 'Primary Category', 'wp-seo-pilot' ),
-                        'desc'    => __( 'The main category', 'wp-seo-pilot' ),
+                        'label'   => __( 'Primary Category', 'saman-labs-seo' ),
+                        'desc'    => __( 'The main category', 'saman-labs-seo' ),
                         'preview' => $category_name,
                     ],
                     [
                         'tag'     => 'id',
-                        'label'   => __( 'Post ID', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Numeric post ID', 'wp-seo-pilot' ),
+                        'label'   => __( 'Post ID', 'saman-labs-seo' ),
+                        'desc'    => __( 'Numeric post ID', 'saman-labs-seo' ),
                         'preview' => ! empty( $sample_post ) ? (string) $sample_post[0]->ID : '123',
                     ],
                 ],
             ],
             'taxonomy' => [
-                'label' => __( 'Taxonomy', 'wp-seo-pilot' ),
+                'label' => __( 'Taxonomy', 'saman-labs-seo' ),
                 'vars'  => [
                     [
                         'tag'     => 'term_title',
-                        'label'   => __( 'Term Name', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Name of the category/tag', 'wp-seo-pilot' ),
+                        'label'   => __( 'Term Name', 'saman-labs-seo' ),
+                        'desc'    => __( 'Name of the category/tag', 'saman-labs-seo' ),
                         'preview' => $category_name,
                     ],
                     [
                         'tag'     => 'term_description',
-                        'label'   => __( 'Term Description', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Description of the term', 'wp-seo-pilot' ),
+                        'label'   => __( 'Term Description', 'saman-labs-seo' ),
+                        'desc'    => __( 'Description of the term', 'saman-labs-seo' ),
                         'preview' => $category_desc,
                     ],
                 ],
             ],
             'author' => [
-                'label' => __( 'Author', 'wp-seo-pilot' ),
+                'label' => __( 'Author', 'saman-labs-seo' ),
                 'vars'  => [
                     [
                         'tag'     => 'author',
-                        'label'   => __( 'Author Name', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Name of the author', 'wp-seo-pilot' ),
+                        'label'   => __( 'Author Name', 'saman-labs-seo' ),
+                        'desc'    => __( 'Name of the author', 'saman-labs-seo' ),
                         'preview' => $author_name,
                     ],
                     [
                         'tag'     => 'author_bio',
-                        'label'   => __( 'Author Bio', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Biographical info', 'wp-seo-pilot' ),
+                        'label'   => __( 'Author Bio', 'saman-labs-seo' ),
+                        'desc'    => __( 'Biographical info', 'saman-labs-seo' ),
                         'preview' => wp_trim_words( $author_bio, 10 ),
                     ],
                 ],
             ],
             'archive' => [
-                'label' => __( 'Archive', 'wp-seo-pilot' ),
+                'label' => __( 'Archive', 'saman-labs-seo' ),
                 'vars'  => [
                     [
                         'tag'     => 'date',
-                        'label'   => __( 'Archive Date', 'wp-seo-pilot' ),
-                        'desc'    => __( 'Date for date archives', 'wp-seo-pilot' ),
+                        'label'   => __( 'Archive Date', 'saman-labs-seo' ),
+                        'desc'    => __( 'Date for date archives', 'saman-labs-seo' ),
                         'preview' => date_i18n( 'F Y' ),
                     ],
                     [
                         'tag'     => 'search_term',
-                        'label'   => __( 'Search Query', 'wp-seo-pilot' ),
-                        'desc'    => __( 'User search keywords', 'wp-seo-pilot' ),
+                        'label'   => __( 'Search Query', 'saman-labs-seo' ),
+                        'desc'    => __( 'User search keywords', 'saman-labs-seo' ),
                         'preview' => 'example search',
                     ],
                     [
                         'tag'     => 'request_url',
-                        'label'   => __( 'Requested URL', 'wp-seo-pilot' ),
-                        'desc'    => __( 'URL that was requested', 'wp-seo-pilot' ),
+                        'label'   => __( 'Requested URL', 'saman-labs-seo' ),
+                        'desc'    => __( 'URL that was requested', 'saman-labs-seo' ),
                         'preview' => '/example-page/',
                     ],
                 ],

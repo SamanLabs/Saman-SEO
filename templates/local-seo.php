@@ -40,7 +40,7 @@ if ( ! is_array( $social_profiles ) ) {
 <div class="wrap wpseopilot-page wpseopilot-local-seo-page">
 
 	<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">
-		<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'Local SEO sections', 'wp-seo-pilot' ); ?>">
+		<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'Local SEO sections', 'saman-labs-seo' ); ?>">
 			<button
 				type="button"
 				class="nav-tab nav-tab-active"
@@ -50,7 +50,7 @@ if ( ! is_array( $social_profiles ) ) {
 				aria-controls="wpseopilot-tab-business-info"
 				data-wpseopilot-tab="wpseopilot-tab-business-info"
 			>
-				<?php esc_html_e( 'Business Information', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Business Information', 'saman-labs-seo' ); ?>
 			</button>
 			<button
 				type="button"
@@ -61,7 +61,7 @@ if ( ! is_array( $social_profiles ) ) {
 				aria-controls="wpseopilot-tab-opening-hours"
 				data-wpseopilot-tab="wpseopilot-tab-opening-hours"
 			>
-				<?php esc_html_e( 'Opening Hours', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Opening Hours', 'saman-labs-seo' ); ?>
 			</button>
 			<button
 				type="button"
@@ -72,7 +72,7 @@ if ( ! is_array( $social_profiles ) ) {
 				aria-controls="wpseopilot-tab-schema-preview"
 				data-wpseopilot-tab="wpseopilot-tab-schema-preview"
 			>
-				<?php esc_html_e( 'Schema Preview', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Schema Preview', 'saman-labs-seo' ); ?>
 			</button>
 		</div>
 
@@ -89,15 +89,15 @@ if ( ! is_array( $social_profiles ) ) {
 				<!-- Business Details Card -->
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Business Details', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Basic information about your business that will appear in search results and knowledge panels.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Business Details', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Basic information about your business that will appear in search results and knowledge panels.', 'saman-labs-seo' ); ?></p>
 					</div>
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_business_name">
-								<strong><?php esc_html_e( 'Business Name', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Official name of your business (required)', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Business Name', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Official name of your business (required)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="text"
@@ -111,8 +111,8 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_business_type">
-								<strong><?php esc_html_e( 'Business Type', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Select the type that best describes your business', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Business Type', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Select the type that best describes your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<select id="wpseopilot_local_business_type" name="wpseopilot_local_business_type" class="regular-text">
 								<?php foreach ( $business_types as $value => $label ) : ?>
@@ -125,8 +125,8 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_description">
-								<strong><?php esc_html_e( 'Business Description', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Short, human-readable description of your business', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Business Description', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Short, human-readable description of your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<textarea
 								id="wpseopilot_local_description"
@@ -138,8 +138,8 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_logo">
-								<strong><?php esc_html_e( 'Business Logo', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Official logo of your business', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Business Logo', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Official logo of your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<div class="wpseopilot-media-field">
 								<input
@@ -149,14 +149,14 @@ if ( ! is_array( $social_profiles ) ) {
 									value="<?php echo esc_url( $logo ); ?>"
 									class="regular-text"
 								/>
-								<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'wp-seo-pilot' ); ?></button>
+								<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'saman-labs-seo' ); ?></button>
 							</div>
 						</div>
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_image">
-								<strong><?php esc_html_e( 'Cover Image', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Featured image representing your business', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Cover Image', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Featured image representing your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<div class="wpseopilot-media-field">
 								<input
@@ -166,14 +166,14 @@ if ( ! is_array( $social_profiles ) ) {
 									value="<?php echo esc_url( $image ); ?>"
 									class="regular-text"
 								/>
-								<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'wp-seo-pilot' ); ?></button>
+								<button type="button" class="button wpseopilot-media-trigger"><?php esc_html_e( 'Select image', 'saman-labs-seo' ); ?></button>
 							</div>
 						</div>
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_price_range">
-								<strong><?php esc_html_e( 'Price Range', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Use $ symbols (e.g., $, $$, $$$, $$$$)', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Price Range', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Use $ symbols (e.g., $, $$, $$$, $$$$)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="text"
@@ -191,15 +191,15 @@ if ( ! is_array( $social_profiles ) ) {
 				<!-- Contact Information Card -->
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Contact Information', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'How customers can reach your business.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Contact Information', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'How customers can reach your business.', 'saman-labs-seo' ); ?></p>
 					</div>
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_phone">
-								<strong><?php esc_html_e( 'Phone Number', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Include country code (e.g., +1-305-555-1234)', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Phone Number', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Include country code (e.g., +1-305-555-1234)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="tel"
@@ -213,8 +213,8 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_email">
-								<strong><?php esc_html_e( 'Email Address', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Public contact email for your business', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Email Address', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Public contact email for your business', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="email"
@@ -232,14 +232,14 @@ if ( ! is_array( $social_profiles ) ) {
 				<!-- Address Card -->
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Business Address', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Physical location of your business for local search results.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Business Address', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Physical location of your business for local search results.', 'saman-labs-seo' ); ?></p>
 					</div>
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_street">
-								<strong><?php esc_html_e( 'Street Address', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Street Address', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
@@ -253,7 +253,7 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_city">
-								<strong><?php esc_html_e( 'City', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'City', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
@@ -267,7 +267,7 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_state">
-								<strong><?php esc_html_e( 'State / Province', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'State / Province', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
@@ -281,7 +281,7 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_zip">
-								<strong><?php esc_html_e( 'Postal Code', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Postal Code', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
@@ -295,8 +295,8 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_country">
-								<strong><?php esc_html_e( 'Country', 'wp-seo-pilot' ); ?></strong>
-								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Two-letter country code (e.g., US, GB, CA)', 'wp-seo-pilot' ); ?></span>
+								<strong><?php esc_html_e( 'Country', 'saman-labs-seo' ); ?></strong>
+								<span class="wpseopilot-label-hint"><?php esc_html_e( 'Two-letter country code (e.g., US, GB, CA)', 'saman-labs-seo' ); ?></span>
 							</label>
 							<input
 								type="text"
@@ -315,14 +315,14 @@ if ( ! is_array( $social_profiles ) ) {
 				<!-- Geo Coordinates Card -->
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Geo Coordinates', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Precise location coordinates improve map accuracy and local search rankings.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Geo Coordinates', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Precise location coordinates improve map accuracy and local search rankings.', 'saman-labs-seo' ); ?></p>
 					</div>
 					<div class="wpseopilot-card-body">
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_latitude">
-								<strong><?php esc_html_e( 'Latitude', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Latitude', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
@@ -336,7 +336,7 @@ if ( ! is_array( $social_profiles ) ) {
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_local_longitude">
-								<strong><?php esc_html_e( 'Longitude', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Longitude', 'saman-labs-seo' ); ?></strong>
 							</label>
 							<input
 								type="text"
@@ -352,8 +352,8 @@ if ( ! is_array( $social_profiles ) ) {
 							<?php
 							printf(
 								/* translators: %s: Google Maps geocoding URL */
-								esc_html__( 'Find coordinates using %s', 'wp-seo-pilot' ),
-								'<a href="https://www.google.com/maps" target="_blank" rel="noopener">' . esc_html__( 'Google Maps', 'wp-seo-pilot' ) . '</a>'
+								esc_html__( 'Find coordinates using %s', 'saman-labs-seo' ),
+								'<a href="https://www.google.com/maps" target="_blank" rel="noopener">' . esc_html__( 'Google Maps', 'saman-labs-seo' ) . '</a>'
 							);
 							?>
 						</p>
@@ -364,8 +364,8 @@ if ( ! is_array( $social_profiles ) ) {
 				<!-- Social Profiles Card -->
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Social Profiles', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Links to your business social media profiles for brand verification.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Social Profiles', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Links to your business social media profiles for brand verification.', 'saman-labs-seo' ); ?></p>
 					</div>
 					<div class="wpseopilot-card-body">
 
@@ -376,7 +376,7 @@ if ( ! is_array( $social_profiles ) ) {
 							?>
 							<div class="wpseopilot-form-row">
 								<label for="wpseopilot_local_social_<?php echo esc_attr( $i ); ?>">
-									<strong><?php echo esc_html( sprintf( __( 'Social Profile %d', 'wp-seo-pilot' ), $i + 1 ) ); ?></strong>
+									<strong><?php echo esc_html( sprintf( __( 'Social Profile %d', 'saman-labs-seo' ), $i + 1 ) ); ?></strong>
 								</label>
 								<input
 									type="url"
@@ -390,13 +390,13 @@ if ( ! is_array( $social_profiles ) ) {
 						<?php endfor; ?>
 
 						<p class="description">
-							<?php esc_html_e( 'Add URLs to your official social media profiles (Facebook, Instagram, LinkedIn, Twitter, etc.). Only include profiles you actually maintain.', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Add URLs to your official social media profiles (Facebook, Instagram, LinkedIn, Twitter, etc.). Only include profiles you actually maintain.', 'saman-labs-seo' ); ?>
 						</p>
 
 					</div>
 				</div>
 
-				<?php submit_button( __( 'Save Business Information', 'wp-seo-pilot' ) ); ?>
+				<?php submit_button( __( 'Save Business Information', 'saman-labs-seo' ) ); ?>
 			</form>
 		</div>
 
@@ -412,20 +412,20 @@ if ( ! is_array( $social_profiles ) ) {
 
 				<div class="wpseopilot-card">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Opening Hours', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Configure your business hours for each day of the week. Leave days unchecked if closed.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Opening Hours', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Configure your business hours for each day of the week. Leave days unchecked if closed.', 'saman-labs-seo' ); ?></p>
 					</div>
 					<div class="wpseopilot-card-body">
 
 						<?php
 						$days = [
-							'monday'    => __( 'Monday', 'wp-seo-pilot' ),
-							'tuesday'   => __( 'Tuesday', 'wp-seo-pilot' ),
-							'wednesday' => __( 'Wednesday', 'wp-seo-pilot' ),
-							'thursday'  => __( 'Thursday', 'wp-seo-pilot' ),
-							'friday'    => __( 'Friday', 'wp-seo-pilot' ),
-							'saturday'  => __( 'Saturday', 'wp-seo-pilot' ),
-							'sunday'    => __( 'Sunday', 'wp-seo-pilot' ),
+							'monday'    => __( 'Monday', 'saman-labs-seo' ),
+							'tuesday'   => __( 'Tuesday', 'saman-labs-seo' ),
+							'wednesday' => __( 'Wednesday', 'saman-labs-seo' ),
+							'thursday'  => __( 'Thursday', 'saman-labs-seo' ),
+							'friday'    => __( 'Friday', 'saman-labs-seo' ),
+							'saturday'  => __( 'Saturday', 'saman-labs-seo' ),
+							'sunday'    => __( 'Sunday', 'saman-labs-seo' ),
 						];
 
 						foreach ( $days as $day => $label ) :
@@ -463,13 +463,13 @@ if ( ! is_array( $social_profiles ) ) {
 						<?php endforeach; ?>
 
 						<p class="description">
-							<?php esc_html_e( 'Use 24-hour format (HH:MM). Unchecked days will not appear in your opening hours schema.', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Use 24-hour format (HH:MM). Unchecked days will not appear in your opening hours schema.', 'saman-labs-seo' ); ?>
 						</p>
 
 					</div>
 				</div>
 
-				<?php submit_button( __( 'Save Opening Hours', 'wp-seo-pilot' ) ); ?>
+				<?php submit_button( __( 'Save Opening Hours', 'saman-labs-seo' ) ); ?>
 			</form>
 		</div>
 
@@ -482,8 +482,8 @@ if ( ! is_array( $social_profiles ) ) {
 		>
 			<div class="wpseopilot-card">
 				<div class="wpseopilot-card-header">
-					<h2><?php esc_html_e( 'Schema Markup Preview', 'wp-seo-pilot' ); ?></h2>
-					<p><?php esc_html_e( 'Preview of the LocalBusiness JSON-LD schema that will be output on your homepage.', 'wp-seo-pilot' ); ?></p>
+					<h2><?php esc_html_e( 'Schema Markup Preview', 'saman-labs-seo' ); ?></h2>
+					<p><?php esc_html_e( 'Preview of the LocalBusiness JSON-LD schema that will be output on your homepage.', 'saman-labs-seo' ); ?></p>
 				</div>
 				<div class="wpseopilot-card-body">
 
@@ -497,14 +497,14 @@ if ( ! is_array( $social_profiles ) ) {
 						?>
 						<pre class="wpseopilot-schema-preview"><code><?php echo esc_html( wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) ); ?></code></pre>
 						<p class="description">
-							<?php esc_html_e( 'This schema markup is automatically added to your homepage. Test it using Google\'s Rich Results Test.', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'This schema markup is automatically added to your homepage. Test it using Google\'s Rich Results Test.', 'saman-labs-seo' ); ?>
 						</p>
 						<a href="https://search.google.com/test/rich-results" class="button button-secondary" target="_blank" rel="noopener">
-							<?php esc_html_e( 'Test with Google', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Test with Google', 'saman-labs-seo' ); ?>
 						</a>
 					<?php else : ?>
 						<p class="description">
-							<?php esc_html_e( 'Complete the Business Information tab to see your schema preview. At minimum, a business name is required.', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Complete the Business Information tab to see your schema preview. At minimum, a business name is required.', 'saman-labs-seo' ); ?>
 						</p>
 					<?php endif; ?>
 

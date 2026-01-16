@@ -57,7 +57,7 @@ class Dashboard_Widget {
 
         wp_add_dashboard_widget(
             'wpseopilot_404_widget',
-            __( '404 Monitor - WP SEO Pilot', 'wp-seo-pilot' ),
+            __( '404 Monitor - WP SEO Pilot', 'saman-labs-seo' ),
             [ $this, 'render_widget' ]
         );
     }
@@ -74,43 +74,43 @@ class Dashboard_Widget {
             <div class="wpseopilot-widget-stats">
                 <div class="wpseopilot-widget-stat">
                     <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['total'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Total 404s', 'wp-seo-pilot' ); ?></span>
+                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Total 404s', 'saman-labs-seo' ); ?></span>
                 </div>
                 <div class="wpseopilot-widget-stat">
                     <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['need_redirect'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Need Redirect', 'wp-seo-pilot' ); ?></span>
+                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Need Redirect', 'saman-labs-seo' ); ?></span>
                 </div>
                 <div class="wpseopilot-widget-stat">
                     <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['last_24h'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Last 24h', 'wp-seo-pilot' ); ?></span>
+                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Last 24h', 'saman-labs-seo' ); ?></span>
                 </div>
                 <div class="wpseopilot-widget-stat">
                     <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['bots'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Bots', 'wp-seo-pilot' ); ?></span>
+                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Bots', 'saman-labs-seo' ); ?></span>
                 </div>
             </div>
 
             <?php if ( ! empty( $recent ) ) : ?>
                 <div class="wpseopilot-widget-recent">
-                    <h4><?php esc_html_e( 'Recent 404s', 'wp-seo-pilot' ); ?></h4>
+                    <h4><?php esc_html_e( 'Recent 404s', 'saman-labs-seo' ); ?></h4>
                     <ul>
                         <?php foreach ( $recent as $entry ) : ?>
                             <li>
                                 <code><?php echo esc_html( $this->truncate_url( $entry->request_uri, 40 ) ); ?></code>
-                                <span class="wpseopilot-widget-hits"><?php echo esc_html( number_format_i18n( $entry->hits ) ); ?> <?php esc_html_e( 'hits', 'wp-seo-pilot' ); ?></span>
+                                <span class="wpseopilot-widget-hits"><?php echo esc_html( number_format_i18n( $entry->hits ) ); ?> <?php esc_html_e( 'hits', 'saman-labs-seo' ); ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
             <?php elseif ( 0 === $stats['total'] ) : ?>
                 <div class="wpseopilot-widget-empty">
-                    <p><?php esc_html_e( 'No 404 errors recorded yet. Great!', 'wp-seo-pilot' ); ?></p>
+                    <p><?php esc_html_e( 'No 404 errors recorded yet. Great!', 'saman-labs-seo' ); ?></p>
                 </div>
             <?php endif; ?>
 
             <p class="wpseopilot-widget-footer">
                 <a href="<?php echo esc_url( $admin_url ); ?>" class="button button-primary">
-                    <?php esc_html_e( 'View All 404s', 'wp-seo-pilot' ); ?>
+                    <?php esc_html_e( 'View All 404s', 'saman-labs-seo' ); ?>
                 </a>
             </p>
         </div>

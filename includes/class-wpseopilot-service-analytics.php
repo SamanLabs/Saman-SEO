@@ -120,7 +120,7 @@ class Analytics {
 
 		$page = sanitize_text_field( $_GET['page'] );
 
-		if ( strpos( $page, 'wpseopilot' ) === false && $page !== 'wp-seo-pilot' ) {
+		if ( strpos( $page, 'wpseopilot' ) === false && $page !== 'saman-labs-seo' ) {
 			return;
 		}
 

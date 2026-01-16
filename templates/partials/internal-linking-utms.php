@@ -11,24 +11,24 @@ $editing     = $template_to_edit ?? null;
 ?>
 <div class="wpseopilot-links__split">
 	<div class="wpseopilot-card">
-		<h3><?php esc_html_e( 'UTM Templates', 'wp-seo-pilot' ); ?></h3>
-		<p><?php esc_html_e( 'Define reusable parameter sets so rules and categories can inherit consistent tracking.', 'wp-seo-pilot' ); ?></p>
+		<h3><?php esc_html_e( 'UTM Templates', 'saman-labs-seo' ); ?></h3>
+		<p><?php esc_html_e( 'Define reusable parameter sets so rules and categories can inherit consistent tracking.', 'saman-labs-seo' ); ?></p>
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Name', 'wp-seo-pilot' ); ?></th>
-					<th><?php esc_html_e( 'utm_source', 'wp-seo-pilot' ); ?></th>
-					<th><?php esc_html_e( 'utm_medium', 'wp-seo-pilot' ); ?></th>
-					<th><?php esc_html_e( 'utm_campaign', 'wp-seo-pilot' ); ?></th>
-					<th><?php esc_html_e( 'Apply to', 'wp-seo-pilot' ); ?></th>
-					<th><?php esc_html_e( 'Append mode', 'wp-seo-pilot' ); ?></th>
-					<th><?php esc_html_e( 'Actions', 'wp-seo-pilot' ); ?></th>
+					<th><?php esc_html_e( 'Name', 'saman-labs-seo' ); ?></th>
+					<th><?php esc_html_e( 'utm_source', 'saman-labs-seo' ); ?></th>
+					<th><?php esc_html_e( 'utm_medium', 'saman-labs-seo' ); ?></th>
+					<th><?php esc_html_e( 'utm_campaign', 'saman-labs-seo' ); ?></th>
+					<th><?php esc_html_e( 'Apply to', 'saman-labs-seo' ); ?></th>
+					<th><?php esc_html_e( 'Append mode', 'saman-labs-seo' ); ?></th>
+					<th><?php esc_html_e( 'Actions', 'saman-labs-seo' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php if ( empty( $utm_templates ) ) : ?>
 					<tr>
-						<td colspan="7"><?php esc_html_e( 'No UTM templates yet.', 'wp-seo-pilot' ); ?></td>
+						<td colspan="7"><?php esc_html_e( 'No UTM templates yet.', 'saman-labs-seo' ); ?></td>
 					</tr>
 				<?php else : ?>
 					<?php foreach ( $utm_templates as $template ) : ?>
@@ -42,21 +42,21 @@ $editing     = $template_to_edit ?? null;
 								<?php
 								switch ( $template['append_mode'] ) {
 									case 'always_overwrite':
-										esc_html_e( 'Always overwrite', 'wp-seo-pilot' );
+										esc_html_e( 'Always overwrite', 'saman-labs-seo' );
 										break;
 									case 'never':
-										esc_html_e( 'Never overwrite', 'wp-seo-pilot' );
+										esc_html_e( 'Never overwrite', 'saman-labs-seo' );
 										break;
 									default:
-										esc_html_e( 'Append if missing', 'wp-seo-pilot' );
+										esc_html_e( 'Append if missing', 'saman-labs-seo' );
 										break;
 								}
 								?>
 							</td>
 							<td>
-								<a href="<?php echo esc_url( add_query_arg( [ 'tab' => 'utms', 'template' => $template['id'] ], $page_url ) ); ?>"><?php esc_html_e( 'Edit', 'wp-seo-pilot' ); ?></a>
+								<a href="<?php echo esc_url( add_query_arg( [ 'tab' => 'utms', 'template' => $template['id'] ], $page_url ) ); ?>"><?php esc_html_e( 'Edit', 'saman-labs-seo' ); ?></a>
 								<?php $delete_url = wp_nonce_url( add_query_arg( [ 'action' => 'wpseopilot_delete_link_template', 'template' => $template['id'] ], admin_url( 'admin-post.php' ) ), 'wpseopilot_delete_link_template' ); ?>
-								| <a class="submitdelete" href="<?php echo esc_url( $delete_url ); ?>"><?php esc_html_e( 'Delete', 'wp-seo-pilot' ); ?></a>
+								| <a class="submitdelete" href="<?php echo esc_url( $delete_url ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a>
 							</td>
 						</tr>
 					<?php endforeach; ?>
@@ -66,7 +66,7 @@ $editing     = $template_to_edit ?? null;
 	</div>
 
 	<div class="wpseopilot-card">
-		<h3><?php echo esc_html( $editing ? __( 'Edit template', 'wp-seo-pilot' ) : __( 'Add template', 'wp-seo-pilot' ) ); ?></h3>
+		<h3><?php echo esc_html( $editing ? __( 'Edit template', 'saman-labs-seo' ) : __( 'Add template', 'saman-labs-seo' ) ); ?></h3>
 		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__utm-form">
 			<?php wp_nonce_field( 'wpseopilot_save_link_template' ); ?>
 			<input type="hidden" name="action" value="wpseopilot_save_link_template" />
@@ -76,70 +76,70 @@ $editing     = $template_to_edit ?? null;
 			<?php endif; ?>
 
 			<label>
-				<span><?php esc_html_e( 'Name', 'wp-seo-pilot' ); ?></span>
+				<span><?php esc_html_e( 'Name', 'saman-labs-seo' ); ?></span>
 				<input type="text" name="template[name]" value="<?php echo esc_attr( $editing['name'] ?? '' ); ?>" required />
 			</label>
 			<div class="wpseopilot-grid">
 				<label>
-					<span><?php esc_html_e( 'utm_source', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'utm_source', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_source]" value="<?php echo esc_attr( $editing['utm_source'] ?? '' ); ?>" />
 				</label>
 				<label>
-					<span><?php esc_html_e( 'utm_medium', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'utm_medium', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_medium]" value="<?php echo esc_attr( $editing['utm_medium'] ?? '' ); ?>" />
 				</label>
 				<label>
-					<span><?php esc_html_e( 'utm_campaign', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'utm_campaign', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_campaign]" value="<?php echo esc_attr( $editing['utm_campaign'] ?? '' ); ?>" />
 				</label>
 			</div>
 			<div class="wpseopilot-grid">
 				<label>
-					<span><?php esc_html_e( 'utm_term (optional)', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'utm_term (optional)', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_term]" value="<?php echo esc_attr( $editing['utm_term'] ?? '' ); ?>" />
 				</label>
 				<label>
-					<span><?php esc_html_e( 'utm_content (optional)', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'utm_content (optional)', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_content]" value="<?php echo esc_attr( $editing['utm_content'] ?? '' ); ?>" />
 				</label>
 			</div>
 			<fieldset>
-				<legend><?php esc_html_e( 'Apply to', 'wp-seo-pilot' ); ?></legend>
+				<legend><?php esc_html_e( 'Apply to', 'saman-labs-seo' ); ?></legend>
 				<label class="wpseopilot-links__choice">
 					<input type="radio" name="template[apply_to]" value="internal" <?php checked( 'internal', $editing['apply_to'] ?? 'both' ); ?> />
-					<span><?php esc_html_e( 'Internal links only', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'Internal links only', 'saman-labs-seo' ); ?></span>
 				</label>
 				<label class="wpseopilot-links__choice">
 					<input type="radio" name="template[apply_to]" value="external" <?php checked( 'external', $editing['apply_to'] ?? 'both' ); ?> />
-					<span><?php esc_html_e( 'External links only', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'External links only', 'saman-labs-seo' ); ?></span>
 				</label>
 				<label class="wpseopilot-links__choice">
 					<input type="radio" name="template[apply_to]" value="both" <?php checked( 'both', $editing['apply_to'] ?? 'both' ); ?> />
-					<span><?php esc_html_e( 'Both', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'Both', 'saman-labs-seo' ); ?></span>
 				</label>
 			</fieldset>
 			<fieldset>
-				<legend><?php esc_html_e( 'Append mode', 'wp-seo-pilot' ); ?></legend>
+				<legend><?php esc_html_e( 'Append mode', 'saman-labs-seo' ); ?></legend>
 				<label class="wpseopilot-links__choice">
 					<input type="radio" name="template[append_mode]" value="append_if_missing" <?php checked( 'append_if_missing', $editing['append_mode'] ?? 'append_if_missing' ); ?> />
-					<span><?php esc_html_e( 'Append if missing', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'Append if missing', 'saman-labs-seo' ); ?></span>
 				</label>
 				<label class="wpseopilot-links__choice">
 					<input type="radio" name="template[append_mode]" value="always_overwrite" <?php checked( 'always_overwrite', $editing['append_mode'] ?? '' ); ?> />
-					<span><?php esc_html_e( 'Always overwrite', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'Always overwrite', 'saman-labs-seo' ); ?></span>
 				</label>
 				<label class="wpseopilot-links__choice">
 					<input type="radio" name="template[append_mode]" value="never" <?php checked( 'never', $editing['append_mode'] ?? '' ); ?> />
-					<span><?php esc_html_e( 'Never overwrite existing params', 'wp-seo-pilot' ); ?></span>
+					<span><?php esc_html_e( 'Never overwrite existing params', 'saman-labs-seo' ); ?></span>
 				</label>
 			</fieldset>
 
 			<div class="wpseopilot-links__helper">
-				<strong><?php esc_html_e( 'Token helper', 'wp-seo-pilot' ); ?></strong>
-				<p><?php esc_html_e( 'Tokens: {post_id}, {post_slug}, {post_type}, {post_title}, {primary_category}, {keyword}, {rule_id}, {date:Ymd}, {author}, {site_name}.', 'wp-seo-pilot' ); ?></p>
+				<strong><?php esc_html_e( 'Token helper', 'saman-labs-seo' ); ?></strong>
+				<p><?php esc_html_e( 'Tokens: {post_id}, {post_slug}, {post_type}, {post_title}, {primary_category}, {keyword}, {rule_id}, {date:Ymd}, {author}, {site_name}.', 'saman-labs-seo' ); ?></p>
 			</div>
 
-			<?php submit_button( $editing ? __( 'Update template', 'wp-seo-pilot' ) : __( 'Save template', 'wp-seo-pilot' ) ); ?>
+			<?php submit_button( $editing ? __( 'Update template', 'saman-labs-seo' ) : __( 'Save template', 'saman-labs-seo' ) ); ?>
 		</form>
 	</div>
 </div>

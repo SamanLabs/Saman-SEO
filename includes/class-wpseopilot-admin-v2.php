@@ -175,8 +175,8 @@ class Admin_V2 {
     public function register_menu() {
         // Main menu
         add_menu_page(
-            __( 'WP SEO Pilot', 'wp-seo-pilot' ),
-            __( 'WP SEO Pilot', 'wp-seo-pilot' ),
+            __( 'WP SEO Pilot', 'saman-labs-seo' ),
+            __( 'WP SEO Pilot', 'saman-labs-seo' ),
             'manage_options',
             self::MENU_SLUG,
             [ $this, 'render_app' ],
@@ -186,12 +186,12 @@ class Admin_V2 {
 
         // Visible submenu items - matching Header.js navItems
         $visible_subpages = [
-            'dashboard'          => __( 'Dashboard', 'wp-seo-pilot' ),
-            'search-appearance'  => __( 'Search Appearance', 'wp-seo-pilot' ),
-            'sitemap'            => __( 'Sitemap', 'wp-seo-pilot' ),
-            'tools'              => __( 'Tools', 'wp-seo-pilot' ),
-            'settings'           => __( 'Settings', 'wp-seo-pilot' ),
-            'more'               => __( 'More', 'wp-seo-pilot' ),
+            'dashboard'          => __( 'Dashboard', 'saman-labs-seo' ),
+            'search-appearance'  => __( 'Search Appearance', 'saman-labs-seo' ),
+            'sitemap'            => __( 'Sitemap', 'saman-labs-seo' ),
+            'tools'              => __( 'Tools', 'saman-labs-seo' ),
+            'settings'           => __( 'Settings', 'saman-labs-seo' ),
+            'more'               => __( 'More', 'saman-labs-seo' ),
         ];
 
         foreach ( $visible_subpages as $slug => $title ) {
@@ -207,23 +207,23 @@ class Admin_V2 {
 
         // Hidden subpages - accessible via React navigation but not shown in WP menu
         $hidden_subpages = [
-            'redirects'        => __( 'Redirects', 'wp-seo-pilot' ),
-            '404-log'          => __( '404 Log', 'wp-seo-pilot' ),
-            'internal-linking' => __( 'Internal Linking', 'wp-seo-pilot' ),
-            'audit'            => __( 'Site Audit', 'wp-seo-pilot' ),
-            'ai-assistant'     => __( 'AI Assistant', 'wp-seo-pilot' ),
-            'assistants'       => __( 'AI Assistants', 'wp-seo-pilot' ),
-            'bulk-editor'      => __( 'Bulk Editor', 'wp-seo-pilot' ),
-            'content-gaps'     => __( 'Content Gaps', 'wp-seo-pilot' ),
-            'schema-builder'   => __( 'Schema Builder', 'wp-seo-pilot' ),
-            'link-health'      => __( 'Link Health', 'wp-seo-pilot' ),
-            'local-seo'        => __( 'Local SEO', 'wp-seo-pilot' ),
-            'robots-txt'        => __( 'robots.txt Editor', 'wp-seo-pilot' ),
-            'image-seo'         => __( 'Image SEO', 'wp-seo-pilot' ),
-            'instant-indexing'  => __( 'Instant Indexing', 'wp-seo-pilot' ),
-            'schema-validator'  => __( 'Schema Validator', 'wp-seo-pilot' ),
-            'htaccess-editor'   => __( '.htaccess Editor', 'wp-seo-pilot' ),
-            'mobile-friendly'   => __( 'Mobile Friendly Test', 'wp-seo-pilot' ),
+            'redirects'        => __( 'Redirects', 'saman-labs-seo' ),
+            '404-log'          => __( '404 Log', 'saman-labs-seo' ),
+            'internal-linking' => __( 'Internal Linking', 'saman-labs-seo' ),
+            'audit'            => __( 'Site Audit', 'saman-labs-seo' ),
+            'ai-assistant'     => __( 'AI Assistant', 'saman-labs-seo' ),
+            'assistants'       => __( 'AI Assistants', 'saman-labs-seo' ),
+            'bulk-editor'      => __( 'Bulk Editor', 'saman-labs-seo' ),
+            'content-gaps'     => __( 'Content Gaps', 'saman-labs-seo' ),
+            'schema-builder'   => __( 'Schema Builder', 'saman-labs-seo' ),
+            'link-health'      => __( 'Link Health', 'saman-labs-seo' ),
+            'local-seo'        => __( 'Local SEO', 'saman-labs-seo' ),
+            'robots-txt'        => __( 'robots.txt Editor', 'saman-labs-seo' ),
+            'image-seo'         => __( 'Image SEO', 'saman-labs-seo' ),
+            'instant-indexing'  => __( 'Instant Indexing', 'saman-labs-seo' ),
+            'schema-validator'  => __( 'Schema Validator', 'saman-labs-seo' ),
+            'htaccess-editor'   => __( '.htaccess Editor', 'saman-labs-seo' ),
+            'mobile-friendly'   => __( 'Mobile Friendly Test', 'saman-labs-seo' ),
         ];
 
         foreach ( $hidden_subpages as $slug => $title ) {

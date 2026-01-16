@@ -121,7 +121,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => __( 'Breadcrumbs service not available.', 'wp-seo-pilot' ),
+					'message' => __( 'Breadcrumbs service not available.', 'saman-labs-seo' ),
 				],
 				500
 			);
@@ -148,7 +148,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => __( 'Breadcrumbs service not available.', 'wp-seo-pilot' ),
+					'message' => __( 'Breadcrumbs service not available.', 'saman-labs-seo' ),
 				],
 				500
 			);
@@ -165,7 +165,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 		if ( $result ) {
 			return new WP_REST_Response( [
 				'success' => true,
-				'message' => __( 'Settings saved successfully.', 'wp-seo-pilot' ),
+				'message' => __( 'Settings saved successfully.', 'saman-labs-seo' ),
 				'data'    => $service->get_settings(),
 			] );
 		}
@@ -173,7 +173,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 		return new WP_REST_Response(
 			[
 				'success' => false,
-				'message' => __( 'Failed to save settings.', 'wp-seo-pilot' ),
+				'message' => __( 'Failed to save settings.', 'saman-labs-seo' ),
 			],
 			500
 		);
@@ -192,7 +192,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => __( 'Breadcrumbs service not available.', 'wp-seo-pilot' ),
+					'message' => __( 'Breadcrumbs service not available.', 'saman-labs-seo' ),
 				],
 				500
 			);
@@ -245,7 +245,7 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => __( 'Breadcrumbs service not available.', 'wp-seo-pilot' ),
+					'message' => __( 'Breadcrumbs service not available.', 'saman-labs-seo' ),
 				],
 				500
 			);
@@ -257,15 +257,15 @@ class Breadcrumbs_Controller extends WP_REST_Controller {
 		$sample_crumbs = [
 			[
 				'url'   => home_url( '/' ),
-				'title' => __( 'Home', 'wp-seo-pilot' ),
+				'title' => __( 'Home', 'saman-labs-seo' ),
 			],
 			[
 				'url'   => home_url( '/category/' ),
-				'title' => __( 'Category', 'wp-seo-pilot' ),
+				'title' => __( 'Category', 'saman-labs-seo' ),
 			],
 			[
 				'url'   => '',
-				'title' => __( 'Current Page', 'wp-seo-pilot' ),
+				'title' => __( 'Current Page', 'saman-labs-seo' ),
 			],
 		];
 

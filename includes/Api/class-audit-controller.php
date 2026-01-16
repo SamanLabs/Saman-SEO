@@ -150,7 +150,7 @@ class Audit_Controller extends REST_Controller {
         // Cache results
         set_transient( 'wpseopilot_audit_results', $results, HOUR_IN_SECONDS );
 
-        return $this->success( $results, __( 'Audit completed successfully.', 'wp-seo-pilot' ) );
+        return $this->success( $results, __( 'Audit completed successfully.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -167,7 +167,7 @@ class Audit_Controller extends REST_Controller {
         $post    = get_post( $post_id );
 
         if ( ! $post ) {
-            return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Post not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         // Use the enhanced scoring function.
@@ -209,10 +209,10 @@ class Audit_Controller extends REST_Controller {
      */
     private function group_metrics_by_category( $metrics ) {
         $groups = [
-            'basic'     => [ 'label' => __( 'Basic SEO', 'wp-seo-pilot' ), 'items' => [] ],
-            'keyword'   => [ 'label' => __( 'Keyword Optimization', 'wp-seo-pilot' ), 'items' => [] ],
-            'structure' => [ 'label' => __( 'Content Structure', 'wp-seo-pilot' ), 'items' => [] ],
-            'links'     => [ 'label' => __( 'Links & Media', 'wp-seo-pilot' ), 'items' => [] ],
+            'basic'     => [ 'label' => __( 'Basic SEO', 'saman-labs-seo' ), 'items' => [] ],
+            'keyword'   => [ 'label' => __( 'Keyword Optimization', 'saman-labs-seo' ), 'items' => [] ],
+            'structure' => [ 'label' => __( 'Content Structure', 'saman-labs-seo' ), 'items' => [] ],
+            'links'     => [ 'label' => __( 'Links & Media', 'saman-labs-seo' ), 'items' => [] ],
         ];
 
         foreach ( $metrics as $metric ) {
@@ -297,7 +297,7 @@ class Audit_Controller extends REST_Controller {
 
         $post = get_post( $post_id );
         if ( ! $post ) {
-            return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Post not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         // Get current meta
@@ -324,7 +324,7 @@ class Audit_Controller extends REST_Controller {
         return $this->success( [
             'post_id' => $post_id,
             'meta'    => $meta,
-        ], __( 'Recommendation applied successfully.', 'wp-seo-pilot' ) );
+        ], __( 'Recommendation applied successfully.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -416,8 +416,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'high',
-                    'message'  => __( 'Missing meta title.', 'wp-seo-pilot' ),
-                    'action'   => __( 'Add a descriptive SEO title.', 'wp-seo-pilot' ),
+                    'message'  => __( 'Missing meta title.', 'saman-labs-seo' ),
+                    'action'   => __( 'Add a descriptive SEO title.', 'saman-labs-seo' ),
                     'type'     => 'title_missing',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -428,8 +428,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'medium',
-                    'message'  => sprintf( __( 'Meta title too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['title'] ) ),
-                    'action'   => __( 'Shorten to under 65 characters.', 'wp-seo-pilot' ),
+                    'message'  => sprintf( __( 'Meta title too long (%d characters).', 'saman-labs-seo' ), strlen( $meta['title'] ) ),
+                    'action'   => __( 'Shorten to under 65 characters.', 'saman-labs-seo' ),
                     'type'     => 'title_length',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -442,8 +442,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'high',
-                    'message'  => __( 'Missing meta description.', 'wp-seo-pilot' ),
-                    'action'   => __( 'Add a keyword-rich summary.', 'wp-seo-pilot' ),
+                    'message'  => __( 'Missing meta description.', 'saman-labs-seo' ),
+                    'action'   => __( 'Add a keyword-rich summary.', 'saman-labs-seo' ),
                     'type'     => 'description_missing',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -454,8 +454,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
-                    'message'  => sprintf( __( 'Meta description too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['description'] ) ),
-                    'action'   => __( 'Shorten to under 160 characters.', 'wp-seo-pilot' ),
+                    'message'  => sprintf( __( 'Meta description too long (%d characters).', 'saman-labs-seo' ), strlen( $meta['description'] ) ),
+                    'action'   => __( 'Shorten to under 160 characters.', 'saman-labs-seo' ),
                     'type'     => 'description_length',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -471,8 +471,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'medium',
-                    'message'  => sprintf( _n( '%d image missing alt text.', '%d images missing alt text.', $missing, 'wp-seo-pilot' ), $missing ),
-                    'action'   => __( 'Add descriptive alt attributes.', 'wp-seo-pilot' ),
+                    'message'  => sprintf( _n( '%d image missing alt text.', '%d images missing alt text.', $missing, 'saman-labs-seo' ), $missing ),
+                    'action'   => __( 'Add descriptive alt attributes.', 'saman-labs-seo' ),
                     'type'     => 'missing_alt',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -486,8 +486,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
-                    'message'  => sprintf( __( 'Low word count (%d words).', 'wp-seo-pilot' ), $word_count ),
-                    'action'   => __( 'Consider adding more content (300+ words recommended).', 'wp-seo-pilot' ),
+                    'message'  => sprintf( __( 'Low word count (%d words).', 'saman-labs-seo' ), $word_count ),
+                    'action'   => __( 'Consider adding more content (300+ words recommended).', 'saman-labs-seo' ),
                     'type'     => 'low_word_count',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -500,8 +500,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
-                    'message'  => __( 'No H1 heading in content.', 'wp-seo-pilot' ),
-                    'action'   => __( 'Consider adding a main heading.', 'wp-seo-pilot' ),
+                    'message'  => __( 'No H1 heading in content.', 'saman-labs-seo' ),
+                    'action'   => __( 'Consider adding a main heading.', 'saman-labs-seo' ),
                     'type'     => 'missing_h1',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -537,13 +537,13 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'high',
                 'type'     => 'title_missing',
-                'message'  => __( 'Missing meta title.', 'wp-seo-pilot' ),
+                'message'  => __( 'Missing meta title.', 'saman-labs-seo' ),
             ];
         } elseif ( strlen( $meta['title'] ) > 65 ) {
             $issues[] = [
                 'severity' => 'medium',
                 'type'     => 'title_length',
-                'message'  => sprintf( __( 'Meta title too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['title'] ) ),
+                'message'  => sprintf( __( 'Meta title too long (%d characters).', 'saman-labs-seo' ), strlen( $meta['title'] ) ),
             ];
         }
 
@@ -552,13 +552,13 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'high',
                 'type'     => 'description_missing',
-                'message'  => __( 'Missing meta description.', 'wp-seo-pilot' ),
+                'message'  => __( 'Missing meta description.', 'saman-labs-seo' ),
             ];
         } elseif ( strlen( $meta['description'] ) > 160 ) {
             $issues[] = [
                 'severity' => 'low',
                 'type'     => 'description_length',
-                'message'  => sprintf( __( 'Meta description too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['description'] ) ),
+                'message'  => sprintf( __( 'Meta description too long (%d characters).', 'saman-labs-seo' ), strlen( $meta['description'] ) ),
             ];
         }
 
@@ -569,7 +569,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'medium',
                 'type'     => 'missing_alt',
-                'message'  => sprintf( __( '%d images missing alt text.', 'wp-seo-pilot' ), $img_count - $alt_count ),
+                'message'  => sprintf( __( '%d images missing alt text.', 'saman-labs-seo' ), $img_count - $alt_count ),
             ];
         }
 
@@ -579,7 +579,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'low',
                 'type'     => 'low_word_count',
-                'message'  => sprintf( __( 'Low word count (%d words).', 'wp-seo-pilot' ), $word_count ),
+                'message'  => sprintf( __( 'Low word count (%d words).', 'saman-labs-seo' ), $word_count ),
             ];
         }
 

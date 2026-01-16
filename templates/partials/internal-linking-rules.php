@@ -24,11 +24,11 @@ foreach ( $utm_templates as $template ) {
 }
 
 $bulk_actions = [
-	''              => __( 'Bulk actions', 'wp-seo-pilot' ),
-	'activate'      => __( 'Activate', 'wp-seo-pilot' ),
-	'deactivate'    => __( 'Deactivate', 'wp-seo-pilot' ),
-	'delete'        => __( 'Delete', 'wp-seo-pilot' ),
-	'change_category' => __( 'Change category', 'wp-seo-pilot' ),
+	''              => __( 'Bulk actions', 'saman-labs-seo' ),
+	'activate'      => __( 'Activate', 'saman-labs-seo' ),
+	'deactivate'    => __( 'Deactivate', 'saman-labs-seo' ),
+	'delete'        => __( 'Delete', 'saman-labs-seo' ),
+	'change_category' => __( 'Change category', 'saman-labs-seo' ),
 ];
 
 $rules_empty = empty( $rules );
@@ -37,12 +37,12 @@ $rules_empty = empty( $rules );
 <div class="wpseopilot-card wpseopilot-links__rules">
 	<div class="wpseopilot-links__panel-head">
 		<div>
-			<h2><?php esc_html_e( 'Rules', 'wp-seo-pilot' ); ?></h2>
-			<p><?php esc_html_e( 'Define how keywords become links, inherit settings from categories, and control limits + placements.', 'wp-seo-pilot' ); ?></p>
+			<h2><?php esc_html_e( 'Rules', 'saman-labs-seo' ); ?></h2>
+			<p><?php esc_html_e( 'Define how keywords become links, inherit settings from categories, and control limits + placements.', 'saman-labs-seo' ); ?></p>
 		</div>
 		<div>
 			<a class="button button-primary" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'new' ], $page_url ) ); ?>">
-				<?php esc_html_e( 'Add rule', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Add rule', 'saman-labs-seo' ); ?>
 			</a>
 		</div>
 	</div>
@@ -52,18 +52,18 @@ $rules_empty = empty( $rules );
 		<input type="hidden" name="tab" value="rules" />
 
 		<label>
-			<span><?php esc_html_e( 'Status', 'wp-seo-pilot' ); ?></span>
+			<span><?php esc_html_e( 'Status', 'saman-labs-seo' ); ?></span>
 			<select name="status">
-				<option value=""><?php esc_html_e( 'All statuses', 'wp-seo-pilot' ); ?></option>
-				<option value="active" <?php selected( 'active', $filter_status ); ?>><?php esc_html_e( 'Active', 'wp-seo-pilot' ); ?></option>
-				<option value="inactive" <?php selected( 'inactive', $filter_status ); ?>><?php esc_html_e( 'Inactive', 'wp-seo-pilot' ); ?></option>
+				<option value=""><?php esc_html_e( 'All statuses', 'saman-labs-seo' ); ?></option>
+				<option value="active" <?php selected( 'active', $filter_status ); ?>><?php esc_html_e( 'Active', 'saman-labs-seo' ); ?></option>
+				<option value="inactive" <?php selected( 'inactive', $filter_status ); ?>><?php esc_html_e( 'Inactive', 'saman-labs-seo' ); ?></option>
 			</select>
 		</label>
 
 		<label>
-			<span><?php esc_html_e( 'Category', 'wp-seo-pilot' ); ?></span>
+			<span><?php esc_html_e( 'Category', 'saman-labs-seo' ); ?></span>
 			<select name="category">
-				<option value=""><?php esc_html_e( 'All categories', 'wp-seo-pilot' ); ?></option>
+				<option value=""><?php esc_html_e( 'All categories', 'saman-labs-seo' ); ?></option>
 				<?php foreach ( $categories as $category ) : ?>
 					<option value="<?php echo esc_attr( $category['id'] ); ?>" <?php selected( $category['id'], $filter_category ); ?>>
 						<?php echo esc_html( $category['name'] ); ?>
@@ -73,9 +73,9 @@ $rules_empty = empty( $rules );
 		</label>
 
 		<label>
-			<span><?php esc_html_e( 'Post type', 'wp-seo-pilot' ); ?></span>
+			<span><?php esc_html_e( 'Post type', 'saman-labs-seo' ); ?></span>
 			<select name="post_type[]" multiple size="3">
-				<option value="__all__" <?php selected( in_array( '__all__', $filter_types, true ), true ); ?>><?php esc_html_e( 'All post types', 'wp-seo-pilot' ); ?></option>
+				<option value="__all__" <?php selected( in_array( '__all__', $filter_types, true ), true ); ?>><?php esc_html_e( 'All post types', 'saman-labs-seo' ); ?></option>
 				<?php foreach ( $post_types as $type => $label ) : ?>
 					<option value="<?php echo esc_attr( $type ); ?>" <?php selected( in_array( $type, $filter_types, true ), true ); ?>>
 						<?php echo esc_html( $label ); ?>
@@ -85,20 +85,20 @@ $rules_empty = empty( $rules );
 		</label>
 
 		<label class="wpseopilot-links__search">
-			<span><?php esc_html_e( 'Search', 'wp-seo-pilot' ); ?></span>
-			<input type="search" name="s" value="<?php echo esc_attr( $search_term ); ?>" placeholder="<?php esc_attr_e( 'Title or keyword', 'wp-seo-pilot' ); ?>" />
+			<span><?php esc_html_e( 'Search', 'saman-labs-seo' ); ?></span>
+			<input type="search" name="s" value="<?php echo esc_attr( $search_term ); ?>" placeholder="<?php esc_attr_e( 'Title or keyword', 'saman-labs-seo' ); ?>" />
 		</label>
 
 		<div class="wpseopilot-links__filter-actions">
-			<button type="submit" class="button"><?php esc_html_e( 'Filter', 'wp-seo-pilot' ); ?></button>
-			<a class="button button-link" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'rules' ], $page_url ) ); ?>"><?php esc_html_e( 'Reset', 'wp-seo-pilot' ); ?></a>
+			<button type="submit" class="button"><?php esc_html_e( 'Filter', 'saman-labs-seo' ); ?></button>
+			<a class="button button-link" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'rules' ], $page_url ) ); ?>"><?php esc_html_e( 'Reset', 'saman-labs-seo' ); ?></a>
 		</div>
 	</form>
 
 	<?php if ( $rules_empty ) : ?>
 		<div class="wpseopilot-links__empty">
-			<p><?php esc_html_e( 'No rules yet. Create your first internal link rule.', 'wp-seo-pilot' ); ?></p>
-			<a class="button button-primary" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'new' ], $page_url ) ); ?>"><?php esc_html_e( 'Create rule', 'wp-seo-pilot' ); ?></a>
+			<p><?php esc_html_e( 'No rules yet. Create your first internal link rule.', 'saman-labs-seo' ); ?></p>
+			<a class="button button-primary" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'new' ], $page_url ) ); ?>"><?php esc_html_e( 'Create rule', 'saman-labs-seo' ); ?></a>
 		</div>
 	<?php else : ?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-links__table-form" data-bulk-form>
@@ -111,13 +111,13 @@ $rules_empty = empty( $rules );
 						<td class="manage-column column-cb check-column">
 							<input type="checkbox" data-select-all />
 						</td>
-						<th><?php esc_html_e( 'Title', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'Category', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'Keywords', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'Destination', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'UTM Template', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'Limits', 'wp-seo-pilot' ); ?></th>
-						<th><?php esc_html_e( 'Status', 'wp-seo-pilot' ); ?></th>
+						<th><?php esc_html_e( 'Title', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'Category', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'Keywords', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'Destination', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'UTM Template', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'Limits', 'saman-labs-seo' ); ?></th>
+						<th><?php esc_html_e( 'Status', 'saman-labs-seo' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -144,7 +144,7 @@ $rules_empty = empty( $rules );
 									$post_obj->post_type
 								);
 							} else {
-								$destination_label = __( 'Post not found', 'wp-seo-pilot' );
+								$destination_label = __( 'Post not found', 'saman-labs-seo' );
 							}
 						} elseif ( ! empty( $destination['url'] ) ) {
 							$destination_label = $destination['url'];
@@ -191,10 +191,10 @@ $rules_empty = empty( $rules );
 						<td>
 							<strong><a href="<?php echo esc_url( $tab_url( 'edit', [ 'rule' => $rule['id'] ] ) ); ?>"><?php echo esc_html( $rule['title'] ); ?></a></strong>
 							<div class="row-actions">
-								<span class="edit"><a href="<?php echo esc_url( $tab_url( 'edit', [ 'rule' => $rule['id'] ] ) ); ?>"><?php esc_html_e( 'Edit', 'wp-seo-pilot' ); ?></a> | </span>
-								<span class="duplicate"><a href="<?php echo esc_url( $duplicate_url ); ?>"><?php esc_html_e( 'Duplicate', 'wp-seo-pilot' ); ?></a> | </span>
-								<span class="toggle"><a href="<?php echo esc_url( $toggle_url ); ?>"><?php echo ( 'active' === $status ) ? esc_html__( 'Deactivate', 'wp-seo-pilot' ) : esc_html__( 'Activate', 'wp-seo-pilot' ); ?></a> | </span>
-								<span class="delete"><a class="submitdelete" href="<?php echo esc_url( $delete_url ); ?>"><?php esc_html_e( 'Delete', 'wp-seo-pilot' ); ?></a></span>
+								<span class="edit"><a href="<?php echo esc_url( $tab_url( 'edit', [ 'rule' => $rule['id'] ] ) ); ?>"><?php esc_html_e( 'Edit', 'saman-labs-seo' ); ?></a> | </span>
+								<span class="duplicate"><a href="<?php echo esc_url( $duplicate_url ); ?>"><?php esc_html_e( 'Duplicate', 'saman-labs-seo' ); ?></a> | </span>
+								<span class="toggle"><a href="<?php echo esc_url( $toggle_url ); ?>"><?php echo ( 'active' === $status ) ? esc_html__( 'Deactivate', 'saman-labs-seo' ) : esc_html__( 'Activate', 'saman-labs-seo' ); ?></a> | </span>
+								<span class="delete"><a class="submitdelete" href="<?php echo esc_url( $delete_url ); ?>"><?php esc_html_e( 'Delete', 'saman-labs-seo' ); ?></a></span>
 							</div>
 						</td>
 						<td>
@@ -203,7 +203,7 @@ $rules_empty = empty( $rules );
 									<?php echo esc_html( $category['name'] ); ?>
 								</span>
 							<?php else : ?>
-								<?php esc_html_e( '—', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( '—', 'saman-labs-seo' ); ?>
 							<?php endif; ?>
 						</td>
 						<td><?php echo esc_html( $keywords ); ?></td>
@@ -215,17 +215,17 @@ $rules_empty = empty( $rules );
 									<?php echo esc_html( $destination_label ); ?>
 								</a>
 							<?php else : ?>
-								<?php esc_html_e( '—', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( '—', 'saman-labs-seo' ); ?>
 							<?php endif; ?>
 						</td>
 						<td>
 							<?php
 							if ( 'inherit' === $template_id ) {
-								echo esc_html__( 'Inherit', 'wp-seo-pilot' );
+								echo esc_html__( 'Inherit', 'saman-labs-seo' );
 							} elseif ( $template ) {
 								echo esc_html( $template['name'] );
 							} else {
-								echo esc_html__( 'Custom', 'wp-seo-pilot' );
+								echo esc_html__( 'Custom', 'saman-labs-seo' );
 							}
 							?>
 						</td>
@@ -234,7 +234,7 @@ $rules_empty = empty( $rules );
 						</td>
 						<td>
 							<span class="wpseopilot-status wpseopilot-status--<?php echo ( 'active' === $status ) ? 'success' : 'muted'; ?>">
-								<?php echo ( 'active' === $status ) ? esc_html__( 'Active', 'wp-seo-pilot' ) : esc_html__( 'Inactive', 'wp-seo-pilot' ); ?>
+								<?php echo ( 'active' === $status ) ? esc_html__( 'Active', 'saman-labs-seo' ) : esc_html__( 'Inactive', 'saman-labs-seo' ); ?>
 							</span>
 						</td>
 					</tr>
@@ -244,7 +244,7 @@ $rules_empty = empty( $rules );
 
 			<div class="wpseopilot-links__bulk">
 				<label>
-					<span class="screen-reader-text"><?php esc_html_e( 'Bulk actions', 'wp-seo-pilot' ); ?></span>
+					<span class="screen-reader-text"><?php esc_html_e( 'Bulk actions', 'saman-labs-seo' ); ?></span>
 					<select name="bulk_action" data-bulk-action>
 						<?php foreach ( $bulk_actions as $value => $label ) : ?>
 							<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
@@ -252,15 +252,15 @@ $rules_empty = empty( $rules );
 					</select>
 				</label>
 				<label class="wpseopilot-links__bulk-category" data-bulk-category hidden>
-					<span class="screen-reader-text"><?php esc_html_e( 'Select category', 'wp-seo-pilot' ); ?></span>
+					<span class="screen-reader-text"><?php esc_html_e( 'Select category', 'saman-labs-seo' ); ?></span>
 					<select name="bulk_category">
-						<option value="__none__"><?php esc_html_e( 'Remove category', 'wp-seo-pilot' ); ?></option>
+						<option value="__none__"><?php esc_html_e( 'Remove category', 'saman-labs-seo' ); ?></option>
 						<?php foreach ( $categories as $category ) : ?>
 							<option value="<?php echo esc_attr( $category['id'] ); ?>"><?php echo esc_html( $category['name'] ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</label>
-				<button type="submit" class="button button-secondary"><?php esc_html_e( 'Apply', 'wp-seo-pilot' ); ?></button>
+				<button type="submit" class="button button-secondary"><?php esc_html_e( 'Apply', 'saman-labs-seo' ); ?></button>
 			</div>
 		</form>
 	<?php endif; ?>

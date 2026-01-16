@@ -135,7 +135,7 @@ class Settings_Controller extends REST_Controller {
         // Sync IndexNow settings to consolidated option for the service.
         $this->sync_indexnow_settings( $settings );
 
-        return $this->success( null, __( 'Settings saved successfully.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Settings saved successfully.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -226,7 +226,7 @@ class Settings_Controller extends REST_Controller {
         return $this->success( [
             'key'   => $key,
             'value' => $value,
-        ], __( 'Setting saved.', 'wp-seo-pilot' ) );
+        ], __( 'Setting saved.', 'saman-labs-seo' ) );
     }
 
     // =========================================================================
@@ -265,7 +265,7 @@ class Settings_Controller extends REST_Controller {
         $category    = isset( $params['category'] ) ? sanitize_text_field( $params['category'] ) : 'custom';
 
         if ( empty( $name ) ) {
-            return $this->error( __( 'Template name is required.', 'wp-seo-pilot' ), 'missing_name', 400 );
+            return $this->error( __( 'Template name is required.', 'saman-labs-seo' ), 'missing_name', 400 );
         }
 
         $templates = get_option( 'wpseopilot_content_templates', [] );
@@ -284,7 +284,7 @@ class Settings_Controller extends REST_Controller {
 
         update_option( 'wpseopilot_content_templates', $templates );
 
-        return $this->success( $templates[ $id ], __( 'Template created.', 'wp-seo-pilot' ) );
+        return $this->success( $templates[ $id ], __( 'Template created.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -300,12 +300,12 @@ class Settings_Controller extends REST_Controller {
         $templates = get_option( 'wpseopilot_content_templates', [] );
 
         if ( ! isset( $templates[ $id ] ) ) {
-            return $this->error( __( 'Template not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Template not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         // Don't allow editing default templates.
         if ( ! empty( $templates[ $id ]['is_default'] ) ) {
-            return $this->error( __( 'Cannot edit default templates.', 'wp-seo-pilot' ), 'cannot_edit', 403 );
+            return $this->error( __( 'Cannot edit default templates.', 'saman-labs-seo' ), 'cannot_edit', 403 );
         }
 
         if ( isset( $params['name'] ) ) {
@@ -325,7 +325,7 @@ class Settings_Controller extends REST_Controller {
 
         update_option( 'wpseopilot_content_templates', $templates );
 
-        return $this->success( $templates[ $id ], __( 'Template updated.', 'wp-seo-pilot' ) );
+        return $this->success( $templates[ $id ], __( 'Template updated.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -340,18 +340,18 @@ class Settings_Controller extends REST_Controller {
         $templates = get_option( 'wpseopilot_content_templates', [] );
 
         if ( ! isset( $templates[ $id ] ) ) {
-            return $this->error( __( 'Template not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Template not found.', 'saman-labs-seo' ), 'not_found', 404 );
         }
 
         // Don't allow deleting default templates.
         if ( ! empty( $templates[ $id ]['is_default'] ) ) {
-            return $this->error( __( 'Cannot delete default templates.', 'wp-seo-pilot' ), 'cannot_delete', 403 );
+            return $this->error( __( 'Cannot delete default templates.', 'saman-labs-seo' ), 'cannot_delete', 403 );
         }
 
         unset( $templates[ $id ] );
         update_option( 'wpseopilot_content_templates', $templates );
 
-        return $this->success( null, __( 'Template deleted.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Template deleted.', 'saman-labs-seo' ) );
     }
 
     /**

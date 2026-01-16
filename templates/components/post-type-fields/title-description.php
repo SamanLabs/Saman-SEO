@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 <div class="wpseopilot-form-row">
 	<label>
-		<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
+		<strong><?php esc_html_e( 'Show in Search Results?', 'saman-labs-seo' ); ?></strong>
 	</label>
 	<label class="wpseopilot-toggle">
 		<input
@@ -24,19 +24,19 @@ defined( 'ABSPATH' ) || exit;
 			<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 		/>
 		<span class="wpseopilot-toggle-label">
-			<?php esc_html_e( 'Hide from search engines (noindex)', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-labs-seo' ); ?>
 		</span>
 	</label>
 	<p class="description">
-		<?php esc_html_e( 'When enabled, search engines will not index this content type in their results.', 'wp-seo-pilot' ); ?>
+		<?php esc_html_e( 'When enabled, search engines will not index this content type in their results.', 'saman-labs-seo' ); ?>
 	</p>
 </div>
 
 <div class="wpseopilot-form-row">
 	<label for="title_template_<?php echo esc_attr( $slug ); ?>">
-		<strong><?php esc_html_e( 'Title Template', 'wp-seo-pilot' ); ?></strong>
+		<strong><?php esc_html_e( 'Title Template', 'saman-labs-seo' ); ?></strong>
 		<span class="wpseopilot-label-hint">
-			<?php esc_html_e( 'Use variables like {{post_title}}, {{site_title}}, {{separator}}', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Use variables like {{post_title}}, {{site_title}}, {{separator}}', 'saman-labs-seo' ); ?>
 		</span>
 	</label>
 	<div class="wpseopilot-flex-input">
@@ -55,16 +55,16 @@ defined( 'ABSPATH' ) || exit;
 			data-target="title_template_<?php echo esc_attr( $slug ); ?>"
 		>
 			<span class="dashicons dashicons-editor-code"></span>
-			<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 		</button>
 	</div>
 </div>
 
 <div class="wpseopilot-form-row">
 	<label for="desc_template_<?php echo esc_attr( $slug ); ?>">
-		<strong><?php esc_html_e( 'Description Template', 'wp-seo-pilot' ); ?></strong>
+		<strong><?php esc_html_e( 'Description Template', 'saman-labs-seo' ); ?></strong>
 		<span class="wpseopilot-label-hint">
-			<?php esc_html_e( 'Use variables like {{post_excerpt}}, {{post_date}}, {{category}}', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Use variables like {{post_excerpt}}, {{post_date}}, {{category}}', 'saman-labs-seo' ); ?>
 		</span>
 	</label>
 	<div class="wpseopilot-flex-input">
@@ -82,7 +82,7 @@ defined( 'ABSPATH' ) || exit;
 			data-target="desc_template_<?php echo esc_attr( $slug ); ?>"
 		>
 			<span class="dashicons dashicons-editor-code"></span>
-			<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 		</button>
 	</div>
 </div>

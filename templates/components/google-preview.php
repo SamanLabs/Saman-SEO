@@ -17,20 +17,20 @@ $preview_domain = parse_url( home_url(), PHP_URL_HOST );
 	<div class="wpseopilot-google-preview__header">
 		<div style="display: flex; align-items: center; gap: 8px;">
 			<span class="dashicons dashicons-search"></span>
-			<span><?php esc_html_e( 'Google Search Preview', 'wp-seo-pilot' ); ?></span>
+			<span><?php esc_html_e( 'Google Search Preview', 'saman-labs-seo' ); ?></span>
 		</div>
 		<button type="button" class="button button-small wpseopilot-preview-source-toggle" style="margin-left: auto;">
-			<?php esc_html_e( 'Change Source', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Change Source', 'saman-labs-seo' ); ?>
 		</button>
 	</div>
 	
 	<!-- Preview Source Control -->
 	<div class="wpseopilot-preview-source-panel" style="display: none; padding: 10px 15px; background: #f0f0f1; border-bottom: 1px solid #dfe3ec;">
 		<div style="display: flex; gap: 8px; align-items: center;">
-			<label style="font-size: 12px; font-weight: 500;"><?php esc_html_e( 'Preview Data From:', 'wp-seo-pilot' ); ?></label>
+			<label style="font-size: 12px; font-weight: 500;"><?php esc_html_e( 'Preview Data From:', 'saman-labs-seo' ); ?></label>
 			<input type="number" class="small-text wpseopilot-preview-object-id-input" placeholder="Post ID" />
 			<button type="button" class="button button-small button-secondary wpseopilot-preview-apply-id">
-				<?php esc_html_e( 'Apply', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Apply', 'saman-labs-seo' ); ?>
 			</button>
 			<span class="wpseopilot-preview-source-status" style="font-size: 11px; color: #646970;"></span>
 		</div>
@@ -57,10 +57,10 @@ $preview_domain = parse_url( home_url(), PHP_URL_HOST );
 	</div>
 	<div class="wpseopilot-google-preview__footer">
 		<span class="wpseopilot-google-preview__chars">
-			<span class="wpseopilot-char-count" data-type="title">0</span> / 60 <?php esc_html_e( 'chars (title)', 'wp-seo-pilot' ); ?>
+			<span class="wpseopilot-char-count" data-type="title">0</span> / 60 <?php esc_html_e( 'chars (title)', 'saman-labs-seo' ); ?>
 		</span>
 		<span class="wpseopilot-google-preview__chars">
-			<span class="wpseopilot-char-count" data-type="description">0</span> / 155 <?php esc_html_e( 'chars (description)', 'wp-seo-pilot' ); ?>
+			<span class="wpseopilot-char-count" data-type="description">0</span> / 155 <?php esc_html_e( 'chars (description)', 'saman-labs-seo' ); ?>
 		</span>
 	</div>
 </div>

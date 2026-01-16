@@ -17,38 +17,38 @@ defined( 'ABSPATH' ) || exit;
 	$current_schema = $settings['schema_type'] ?? 'Article';
 	$schema_options = [
 		'None' => [
-			'label' => __( 'None', 'wp-seo-pilot' ),
-			'desc'  => __( 'Do not output schema markup.', 'wp-seo-pilot' ),
+			'label' => __( 'None', 'saman-labs-seo' ),
+			'desc'  => __( 'Do not output schema markup.', 'saman-labs-seo' ),
 			'icon'  => 'dashicons-hidden',
 			'val'   => '',
 		],
 		'Article' => [
-			'label' => __( 'Article', 'wp-seo-pilot' ),
-			'desc'  => __( 'News or blog post content.', 'wp-seo-pilot' ),
+			'label' => __( 'Article', 'saman-labs-seo' ),
+			'desc'  => __( 'News or blog post content.', 'saman-labs-seo' ),
 			'icon'  => 'dashicons-format-aside',
 			'val'   => 'Article',
 		],
 		'BlogPosting' => [
-			'label' => __( 'Blog Posting', 'wp-seo-pilot' ),
-			'desc'  => __( 'A post on a blog.', 'wp-seo-pilot' ),
+			'label' => __( 'Blog Posting', 'saman-labs-seo' ),
+			'desc'  => __( 'A post on a blog.', 'saman-labs-seo' ),
 			'icon'  => 'dashicons-welcome-write-blog',
 			'val'   => 'BlogPosting',
 		],
 		'NewsArticle' => [
-			'label' => __( 'News Article', 'wp-seo-pilot' ),
-			'desc'  => __( 'News story or report.', 'wp-seo-pilot' ),
+			'label' => __( 'News Article', 'saman-labs-seo' ),
+			'desc'  => __( 'News story or report.', 'saman-labs-seo' ),
 			'icon'  => 'dashicons-media-document',
 			'val'   => 'NewsArticle',
 		],
 		'WebPage' => [
-			'label' => __( 'Web Page', 'wp-seo-pilot' ),
-			'desc'  => __( 'Generic web page.', 'wp-seo-pilot' ),
+			'label' => __( 'Web Page', 'saman-labs-seo' ),
+			'desc'  => __( 'Generic web page.', 'saman-labs-seo' ),
 			'icon'  => 'dashicons-admin-page',
 			'val'   => 'WebPage',
 		],
 		'Product' => [
-			'label' => __( 'Product', 'wp-seo-pilot' ),
-			'desc'  => __( 'Item for sale.', 'wp-seo-pilot' ),
+			'label' => __( 'Product', 'saman-labs-seo' ),
+			'desc'  => __( 'Item for sale.', 'saman-labs-seo' ),
 			'icon'  => 'dashicons-cart',
 			'val'   => 'Product',
 		],
@@ -76,6 +76,6 @@ defined( 'ABSPATH' ) || exit;
 <div class="wpseopilot-form-row">
 	<p class="wpseopilot-info-notice">
 		<span class="dashicons dashicons-info"></span>
-		<?php esc_html_e( 'Additional schema configuration options will be available in future updates.', 'wp-seo-pilot' ); ?>
+		<?php esc_html_e( 'Additional schema configuration options will be available in future updates.', 'saman-labs-seo' ); ?>
 	</p>
 </div>

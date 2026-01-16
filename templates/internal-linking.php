@@ -25,11 +25,11 @@
  */
 
 $tabs = [
-	'rules'      => __( 'Rules', 'wp-seo-pilot' ),
-	'new'        => __( 'Add Rule', 'wp-seo-pilot' ),
-	'categories' => __( 'Categories', 'wp-seo-pilot' ),
-	'utms'       => __( 'UTM Templates', 'wp-seo-pilot' ),
-	'settings'   => __( 'Settings', 'wp-seo-pilot' ),
+	'rules'      => __( 'Rules', 'saman-labs-seo' ),
+	'new'        => __( 'Add Rule', 'saman-labs-seo' ),
+	'categories' => __( 'Categories', 'saman-labs-seo' ),
+	'utms'       => __( 'UTM Templates', 'saman-labs-seo' ),
+	'settings'   => __( 'Settings', 'saman-labs-seo' ),
 ];
 
 $tab_url = static function ( $tab, $extra = [] ) use ( $page_url ) {

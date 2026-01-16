@@ -158,7 +158,7 @@ class Breadcrumbs {
 
 		// Add home link.
 		if ( ! empty( $args['show_home'] ) ) {
-			$home_label = ! empty( $args['home_label'] ) ? $args['home_label'] : __( 'Home', 'wp-seo-pilot' );
+			$home_label = ! empty( $args['home_label'] ) ? $args['home_label'] : __( 'Home', 'saman-labs-seo' );
 			$crumbs[]   = [
 				'url'   => home_url( '/' ),
 				'title' => $home_label,
@@ -230,7 +230,7 @@ class Breadcrumbs {
 				'url'   => '',
 				'title' => sprintf(
 					/* translators: %s: search query */
-					__( 'Search: %s', 'wp-seo-pilot' ),
+					__( 'Search: %s', 'saman-labs-seo' ),
 					get_search_query()
 				),
 			];
@@ -240,7 +240,7 @@ class Breadcrumbs {
 		if ( is_404() ) {
 			$crumbs[] = [
 				'url'   => '',
-				'title' => __( 'Page Not Found', 'wp-seo-pilot' ),
+				'title' => __( 'Page Not Found', 'saman-labs-seo' ),
 			];
 		}
 
@@ -437,7 +437,7 @@ class Breadcrumbs {
 				'url'   => ! empty( $args['link_current'] ) ? get_term_link( $tag ) : '',
 				'title' => sprintf(
 					/* translators: %s: tag name */
-					__( 'Tag: %s', 'wp-seo-pilot' ),
+					__( 'Tag: %s', 'saman-labs-seo' ),
 					$tag->name
 				),
 			];
@@ -530,7 +530,7 @@ class Breadcrumbs {
 				'url'   => ! empty( $args['link_current'] ) ? get_author_posts_url( $author->ID ) : '',
 				'title' => sprintf(
 					/* translators: %s: author name */
-					__( 'Author: %s', 'wp-seo-pilot' ),
+					__( 'Author: %s', 'saman-labs-seo' ),
 					$author->display_name
 				),
 			];
@@ -649,7 +649,7 @@ class Breadcrumbs {
 
 		ob_start();
 		?>
-		<nav class="wpseopilot-breadcrumbs wpseopilot-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'wp-seo-pilot' ); ?>">
+		<nav class="wpseopilot-breadcrumbs wpseopilot-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'saman-labs-seo' ); ?>">
 			<ol class="wpseopilot-breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
 				<?php foreach ( $crumbs as $index => $crumb ) : ?>
 					<?php
@@ -896,13 +896,13 @@ class Breadcrumbs {
 	 */
 	public function get_separator_options() {
 		return [
-			'>'       => __( 'Angle bracket (>)', 'wp-seo-pilot' ),
-			'/'       => __( 'Slash (/)', 'wp-seo-pilot' ),
-			'|'       => __( 'Pipe (|)', 'wp-seo-pilot' ),
-			'-'       => __( 'Dash (-)', 'wp-seo-pilot' ),
-			'arrow'   => __( 'Arrow (→)', 'wp-seo-pilot' ),
-			'chevron' => __( 'Chevron (›)', 'wp-seo-pilot' ),
-			'custom'  => __( 'Custom', 'wp-seo-pilot' ),
+			'>'       => __( 'Angle bracket (>)', 'saman-labs-seo' ),
+			'/'       => __( 'Slash (/)', 'saman-labs-seo' ),
+			'|'       => __( 'Pipe (|)', 'saman-labs-seo' ),
+			'-'       => __( 'Dash (-)', 'saman-labs-seo' ),
+			'arrow'   => __( 'Arrow (→)', 'saman-labs-seo' ),
+			'chevron' => __( 'Chevron (›)', 'saman-labs-seo' ),
+			'custom'  => __( 'Custom', 'saman-labs-seo' ),
 		];
 	}
 
@@ -913,11 +913,11 @@ class Breadcrumbs {
 	 */
 	public function get_style_presets() {
 		return [
-			'default' => __( 'Default', 'wp-seo-pilot' ),
-			'minimal' => __( 'Minimal', 'wp-seo-pilot' ),
-			'rounded' => __( 'Rounded', 'wp-seo-pilot' ),
-			'pills'   => __( 'Pills', 'wp-seo-pilot' ),
-			'none'    => __( 'No styling', 'wp-seo-pilot' ),
+			'default' => __( 'Default', 'saman-labs-seo' ),
+			'minimal' => __( 'Minimal', 'saman-labs-seo' ),
+			'rounded' => __( 'Rounded', 'saman-labs-seo' ),
+			'pills'   => __( 'Pills', 'saman-labs-seo' ),
+			'none'    => __( 'No styling', 'saman-labs-seo' ),
 		];
 	}
 }

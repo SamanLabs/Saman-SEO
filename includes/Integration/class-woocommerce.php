@@ -294,29 +294,29 @@ class WooCommerce {
 	public static function get_meta_fields(): array {
 		return [
 			'_wpseopilot_brand'     => [
-				'label'       => __( 'Brand', 'wp-seo-pilot' ),
-				'description' => __( 'Product brand name for schema.', 'wp-seo-pilot' ),
+				'label'       => __( 'Brand', 'saman-labs-seo' ),
+				'description' => __( 'Product brand name for schema.', 'saman-labs-seo' ),
 				'type'        => 'text',
 			],
 			'_wpseopilot_gtin'      => [
-				'label'       => __( 'GTIN/UPC/EAN', 'wp-seo-pilot' ),
-				'description' => __( 'Global Trade Item Number (barcode).', 'wp-seo-pilot' ),
+				'label'       => __( 'GTIN/UPC/EAN', 'saman-labs-seo' ),
+				'description' => __( 'Global Trade Item Number (barcode).', 'saman-labs-seo' ),
 				'type'        => 'text',
 			],
 			'_wpseopilot_mpn'       => [
-				'label'       => __( 'MPN', 'wp-seo-pilot' ),
-				'description' => __( 'Manufacturer Part Number.', 'wp-seo-pilot' ),
+				'label'       => __( 'MPN', 'saman-labs-seo' ),
+				'description' => __( 'Manufacturer Part Number.', 'saman-labs-seo' ),
 				'type'        => 'text',
 			],
 			'_wpseopilot_condition' => [
-				'label'       => __( 'Condition', 'wp-seo-pilot' ),
-				'description' => __( 'Product condition for schema.', 'wp-seo-pilot' ),
+				'label'       => __( 'Condition', 'saman-labs-seo' ),
+				'description' => __( 'Product condition for schema.', 'saman-labs-seo' ),
 				'type'        => 'select',
 				'options'     => [
-					'NewCondition'         => __( 'New', 'wp-seo-pilot' ),
-					'UsedCondition'        => __( 'Used', 'wp-seo-pilot' ),
-					'RefurbishedCondition' => __( 'Refurbished', 'wp-seo-pilot' ),
-					'DamagedCondition'     => __( 'Damaged', 'wp-seo-pilot' ),
+					'NewCondition'         => __( 'New', 'saman-labs-seo' ),
+					'UsedCondition'        => __( 'Used', 'saman-labs-seo' ),
+					'RefurbishedCondition' => __( 'Refurbished', 'saman-labs-seo' ),
+					'DamagedCondition'     => __( 'Damaged', 'saman-labs-seo' ),
 				],
 			],
 		];

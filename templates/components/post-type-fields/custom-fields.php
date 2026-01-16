@@ -13,9 +13,9 @@ defined( 'ABSPATH' ) || exit;
 ?>
 
 <div class="wpseopilot-form-row">
-	<h4><?php esc_html_e( 'Custom Field Mapping', 'wp-seo-pilot' ); ?></h4>
+	<h4><?php esc_html_e( 'Custom Field Mapping', 'saman-labs-seo' ); ?></h4>
 	<p class="description">
-		<?php esc_html_e( 'Map custom fields to SEO variables for use in title and description templates.', 'wp-seo-pilot' ); ?>
+		<?php esc_html_e( 'Map custom fields to SEO variables for use in title and description templates.', 'saman-labs-seo' ); ?>
 	</p>
 </div>
 
@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) || exit;
 			?>
 			<div class="wpseopilot-tag-cloud-container">
 				<p class="description" style="margin-bottom: 12px;">
-					<?php esc_html_e( 'Click to copy these custom field variables found in your latest post:', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Click to copy these custom field variables found in your latest post:', 'saman-labs-seo' ); ?>
 				</p>
 				<div class="wpseopilot-tag-cloud">
 					<?php foreach ( $custom_fields as $field ) : ?>
@@ -47,10 +47,10 @@ defined( 'ABSPATH' ) || exit;
 			<div class="wpseopilot-placeholder-content">
 				<span class="dashicons dashicons-list-view" style="font-size: 48px; opacity: 0.3;"></span>
 				<p>
-					<?php esc_html_e( 'No custom fields detected for this post type yet.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'No custom fields detected for this post type yet.', 'saman-labs-seo' ); ?>
 				</p>
 				<p class="description">
-					<?php esc_html_e( 'Create a post with custom fields to see them listed here.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Create a post with custom fields to see them listed here.', 'saman-labs-seo' ); ?>
 				</p>
 			</div>
 			<?php

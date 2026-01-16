@@ -51,7 +51,7 @@ abstract class Base_Assistant {
      * @return string
      */
     public function get_initial_message() {
-        return __( 'Hello! How can I help you today?', 'wp-seo-pilot' );
+        return __( 'Hello! How can I help you today?', 'saman-labs-seo' );
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class Base_Assistant {
      */
     public function process_action( $action, $context = [] ) {
         return [
-            'message' => __( 'Action not implemented.', 'wp-seo-pilot' ),
+            'message' => __( 'Action not implemented.', 'saman-labs-seo' ),
             'actions' => [],
             'data'    => null,
         ];

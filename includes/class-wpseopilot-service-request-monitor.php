@@ -185,7 +185,7 @@ class Request_Monitor {
 
 		$subject = sprintf(
 			/* translators: %s: Site name */
-			__( '[%s] 404 Error Alert - URL Needs Attention', 'wp-seo-pilot' ),
+			__( '[%s] 404 Error Alert - URL Needs Attention', 'saman-labs-seo' ),
 			$site_name
 		);
 
@@ -199,7 +199,7 @@ class Request_Monitor {
 				"You may want to create a redirect for this URL to improve user experience and SEO.\n\n" .
 				"View and manage 404 errors:\n%4\$s\n\n" .
 				"--\nThis notification was sent by WP SEO Pilot.\nYou can disable these notifications in Settings > Advanced > 404 Monitor.",
-				'wp-seo-pilot'
+				'saman-labs-seo'
 			),
 			$request_uri,
 			$hits,
@@ -347,8 +347,8 @@ class Request_Monitor {
 	public function register_page() {
 		add_submenu_page(
 			'wpseopilot',
-			__( '404 Log', 'wp-seo-pilot' ),
-			__( '404 Log', 'wp-seo-pilot' ),
+			__( '404 Log', 'saman-labs-seo' ),
+			__( '404 Log', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot-404',
 			[ $this, 'render_page' ],
@@ -520,7 +520,7 @@ class Request_Monitor {
 	 */
 	private function describe_device_from_user_agent( $user_agent ) {
 		if ( empty( $user_agent ) ) {
-			return __( 'Unknown device', 'wp-seo-pilot' );
+			return __( 'Unknown device', 'saman-labs-seo' );
 		}
 
 		$browser_label  = $this->detect_browser_label( $user_agent );

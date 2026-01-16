@@ -19,12 +19,12 @@
 
 	<?php if ( isset( $_GET['wpseopilot_ai_reset'] ) ) : ?>
 		<div class="notice notice-success is-dismissible">
-			<p><?php esc_html_e( 'AI settings restored to defaults. Remember to save if you make further tweaks.', 'wp-seo-pilot' ); ?></p>
+			<p><?php esc_html_e( 'AI settings restored to defaults. Remember to save if you make further tweaks.', 'saman-labs-seo' ); ?></p>
 		</div>
 	<?php endif; ?>
 
 	<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">
-		<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'AI Assistant sections', 'wp-seo-pilot' ); ?>">
+		<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'AI Assistant sections', 'saman-labs-seo' ); ?>">
 			<button
 				type="button"
 				class="nav-tab nav-tab-active"
@@ -34,7 +34,7 @@
 				aria-controls="wpseopilot-tab-ai-settings"
 				data-wpseopilot-tab="wpseopilot-tab-ai-settings"
 			>
-				<?php esc_html_e( 'Settings', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Settings', 'saman-labs-seo' ); ?>
 			</button>
 			<button
 				type="button"
@@ -45,7 +45,7 @@
 				aria-controls="wpseopilot-tab-custom-models"
 				data-wpseopilot-tab="wpseopilot-tab-custom-models"
 			>
-				<?php esc_html_e( 'Custom Models', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Custom Models', 'saman-labs-seo' ); ?>
 			</button>
 		</div>
 
@@ -59,8 +59,8 @@
 			<!-- OpenAI Connection Card -->
 			<div class="wpseopilot-card">
 				<div class="wpseopilot-card-header">
-					<h2><?php esc_html_e( 'Connect OpenAI', 'wp-seo-pilot' ); ?></h2>
-					<p><?php esc_html_e( 'Your API key stays on this site and is only sent to OpenAI when you click an AI button inside the editor.', 'wp-seo-pilot' ); ?></p>
+					<h2><?php esc_html_e( 'Connect OpenAI', 'saman-labs-seo' ); ?></h2>
+					<p><?php esc_html_e( 'Your API key stays on this site and is only sent to OpenAI when you click an AI button inside the editor.', 'saman-labs-seo' ); ?></p>
 				</div>
 				<div class="wpseopilot-card-body">
 					<form action="options.php" method="post">
@@ -68,9 +68,9 @@
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_openai_api_key">
-								<strong><?php esc_html_e( 'OpenAI API Key', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'OpenAI API Key', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
-									<?php esc_html_e( 'Create a key on platform.openai.com, paste it here, and save.', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Create a key on platform.openai.com, paste it here, and save.', 'saman-labs-seo' ); ?>
 								</span>
 							</label>
 							<input
@@ -84,7 +84,7 @@
 							/>
 						</div>
 
-						<?php submit_button( __( 'Save API key', 'wp-seo-pilot' ), 'primary', 'submit', false ); ?>
+						<?php submit_button( __( 'Save API key', 'saman-labs-seo' ), 'primary', 'submit', false ); ?>
 					</form>
 				</div>
 			</div>
@@ -92,16 +92,16 @@
 			<!-- Model & Prompt Tuning Card -->
 			<div class="wpseopilot-card">
 				<div class="wpseopilot-card-header">
-					<h2><?php esc_html_e( 'Model & Prompt Tuning', 'wp-seo-pilot' ); ?></h2>
-					<p><?php esc_html_e( 'Choose your preferred OpenAI model and fine-tune the prompts used for titles and descriptions.', 'wp-seo-pilot' ); ?></p>
+					<h2><?php esc_html_e( 'Model & Prompt Tuning', 'saman-labs-seo' ); ?></h2>
+					<p><?php esc_html_e( 'Choose your preferred OpenAI model and fine-tune the prompts used for titles and descriptions.', 'saman-labs-seo' ); ?></p>
 				</div>
 				<div class="wpseopilot-card-body">
 					<div class="wpseopilot-card-toolbar">
-						<span><?php esc_html_e( 'Need a clean slate?', 'wp-seo-pilot' ); ?></span>
+						<span><?php esc_html_e( 'Need a clean slate?', 'saman-labs-seo' ); ?></span>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display: inline;">
 							<?php wp_nonce_field( 'wpseopilot_ai_reset' ); ?>
 							<input type="hidden" name="action" value="wpseopilot_ai_reset" />
-							<button type="submit" class="button button-link-delete"><?php esc_html_e( 'Reset to defaults', 'wp-seo-pilot' ); ?></button>
+							<button type="submit" class="button button-link-delete"><?php esc_html_e( 'Reset to defaults', 'saman-labs-seo' ); ?></button>
 						</form>
 					</div>
 
@@ -110,9 +110,9 @@
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_ai_model">
-								<strong><?php esc_html_e( 'Model', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Model', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
-									<?php esc_html_e( 'Pick the balance of quality, latency, and price that fits your workflow.', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Pick the balance of quality, latency, and price that fits your workflow.', 'saman-labs-seo' ); ?>
 								</span>
 							</label>
 							<select id="wpseopilot_ai_model" name="wpseopilot_ai_model" class="regular-text">
@@ -126,9 +126,9 @@
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_ai_prompt_system">
-								<strong><?php esc_html_e( 'System Prompt', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'System Prompt', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
-									<?php esc_html_e( 'Used for every request. Great place to enforce voice, POV, or formatting rules.', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Used for every request. Great place to enforce voice, POV, or formatting rules.', 'saman-labs-seo' ); ?>
 								</span>
 							</label>
 							<textarea
@@ -141,9 +141,9 @@
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_ai_prompt_title">
-								<strong><?php esc_html_e( 'Title Instructions', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Title Instructions', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
-									<?php esc_html_e( 'Customize how AI should craft titles — length, tone, keywords, emojis, etc.', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Customize how AI should craft titles — length, tone, keywords, emojis, etc.', 'saman-labs-seo' ); ?>
 								</span>
 							</label>
 							<textarea
@@ -156,9 +156,9 @@
 
 						<div class="wpseopilot-form-row">
 							<label for="wpseopilot_ai_prompt_description">
-								<strong><?php esc_html_e( 'Description Instructions', 'wp-seo-pilot' ); ?></strong>
+								<strong><?php esc_html_e( 'Description Instructions', 'saman-labs-seo' ); ?></strong>
 								<span class="wpseopilot-label-hint">
-									<?php esc_html_e( 'Control summary length, CTAs, tone, or localization hints for descriptions.', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Control summary length, CTAs, tone, or localization hints for descriptions.', 'saman-labs-seo' ); ?>
 								</span>
 							</label>
 							<textarea
@@ -169,7 +169,7 @@
 							><?php echo esc_textarea( $prompt_description ); ?></textarea>
 						</div>
 
-						<?php submit_button( __( 'Save AI settings', 'wp-seo-pilot' ), 'primary', 'submit', false ); ?>
+						<?php submit_button( __( 'Save AI settings', 'saman-labs-seo' ), 'primary', 'submit', false ); ?>
 					</form>
 				</div>
 			</div>
@@ -177,38 +177,38 @@
 			<!-- How it Works Card -->
 			<div class="wpseopilot-card">
 				<div class="wpseopilot-card-header">
-					<h2><?php esc_html_e( 'How It Works in the Editor', 'wp-seo-pilot' ); ?></h2>
+					<h2><?php esc_html_e( 'How It Works in the Editor', 'saman-labs-seo' ); ?></h2>
 				</div>
 				<div class="wpseopilot-card-body">
-					<p><?php esc_html_e( 'Once a key is saved, every post type using WP SEO Pilot shows "AI title" and "AI description" buttons in both the classic meta box and Gutenberg sidebar. Suggestions are inserted instantly and can be edited like normal text.', 'wp-seo-pilot' ); ?></p>
+					<p><?php esc_html_e( 'Once a key is saved, every post type using WP SEO Pilot shows "AI title" and "AI description" buttons in both the classic meta box and Gutenberg sidebar. Suggestions are inserted instantly and can be edited like normal text.', 'saman-labs-seo' ); ?></p>
 
 					<div class="wpseopilot-features-grid">
 						<div class="wpseopilot-feature">
-							<h3><?php esc_html_e( 'Clear Feedback in Real Time', 'wp-seo-pilot' ); ?></h3>
-							<p><?php esc_html_e( 'Easily create content that ranks and build lasting visibility through better organic performance.', 'wp-seo-pilot' ); ?></p>
+							<h3><?php esc_html_e( 'Clear Feedback in Real Time', 'saman-labs-seo' ); ?></h3>
+							<p><?php esc_html_e( 'Easily create content that ranks and build lasting visibility through better organic performance.', 'saman-labs-seo' ); ?></p>
 							<ul class="wpseopilot-feature-list">
-								<li><?php esc_html_e( 'See actionable SEO feedback instantly', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Improve readability and structure', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Spot issues before publishing', 'wp-seo-pilot' ); ?></li>
+								<li><?php esc_html_e( 'See actionable SEO feedback instantly', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Improve readability and structure', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Spot issues before publishing', 'saman-labs-seo' ); ?></li>
 							</ul>
 						</div>
 
 						<div class="wpseopilot-feature">
-							<h3><?php esc_html_e( 'Work Smarter with AI Guidance', 'wp-seo-pilot' ); ?></h3>
-							<p><?php esc_html_e( 'Spend less time writing boilerplate copy and more time growing your business.', 'wp-seo-pilot' ); ?></p>
+							<h3><?php esc_html_e( 'Work Smarter with AI Guidance', 'saman-labs-seo' ); ?></h3>
+							<p><?php esc_html_e( 'Spend less time writing boilerplate copy and more time growing your business.', 'saman-labs-seo' ); ?></p>
 							<ul class="wpseopilot-feature-list">
-								<li><?php esc_html_e( 'Use generative AI to create SEO titles & meta descriptions', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Get AI-powered suggestions tailored to your tone', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Summarize content quickly for clarity', 'wp-seo-pilot' ); ?></li>
+								<li><?php esc_html_e( 'Use generative AI to create SEO titles & meta descriptions', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Get AI-powered suggestions tailored to your tone', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Summarize content quickly for clarity', 'saman-labs-seo' ); ?></li>
 							</ul>
 						</div>
 
 						<div class="wpseopilot-feature">
-							<h3><?php esc_html_e( 'Privacy & Security', 'wp-seo-pilot' ); ?></h3>
+							<h3><?php esc_html_e( 'Privacy & Security', 'saman-labs-seo' ); ?></h3>
 							<ul class="wpseopilot-feature-list">
-								<li><?php esc_html_e( 'Buttons remain hidden if no API key is present', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Requests include the content summary, URL, and any prompt customizations', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Nothing is stored externally — responses update the field you are editing', 'wp-seo-pilot' ); ?></li>
+								<li><?php esc_html_e( 'Buttons remain hidden if no API key is present', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Requests include the content summary, URL, and any prompt customizations', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Nothing is stored externally — responses update the field you are editing', 'saman-labs-seo' ); ?></li>
 							</ul>
 						</div>
 					</div>
@@ -225,47 +225,47 @@
 		>
 			<div class="wpseopilot-card">
 				<div class="wpseopilot-card-header">
-					<h2><?php esc_html_e( 'Custom AI Models', 'wp-seo-pilot' ); ?></h2>
-					<p><?php esc_html_e( 'Connect and configure custom AI models with your own API endpoints.', 'wp-seo-pilot' ); ?></p>
+					<h2><?php esc_html_e( 'Custom AI Models', 'saman-labs-seo' ); ?></h2>
+					<p><?php esc_html_e( 'Connect and configure custom AI models with your own API endpoints.', 'saman-labs-seo' ); ?></p>
 				</div>
 				<div class="wpseopilot-card-body">
 					<div class="wpseopilot-coming-soon">
 						<div class="wpseopilot-coming-soon-icon">
 							<span class="dashicons dashicons-lightbulb"></span>
 						</div>
-						<h3><?php esc_html_e( 'Coming Soon', 'wp-seo-pilot' ); ?></h3>
-						<p><?php esc_html_e( 'This feature is currently in development and will be available in an upcoming release.', 'wp-seo-pilot' ); ?></p>
+						<h3><?php esc_html_e( 'Coming Soon', 'saman-labs-seo' ); ?></h3>
+						<p><?php esc_html_e( 'This feature is currently in development and will be available in an upcoming release.', 'saman-labs-seo' ); ?></p>
 
 						<div class="wpseopilot-coming-soon-features">
-							<h4><?php esc_html_e( 'What to expect:', 'wp-seo-pilot' ); ?></h4>
+							<h4><?php esc_html_e( 'What to expect:', 'saman-labs-seo' ); ?></h4>
 							<ul>
 								<li>
 									<span class="dashicons dashicons-yes"></span>
-									<?php esc_html_e( 'Add custom AI model endpoints (OpenAI-compatible APIs)', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Add custom AI model endpoints (OpenAI-compatible APIs)', 'saman-labs-seo' ); ?>
 								</li>
 								<li>
 									<span class="dashicons dashicons-yes"></span>
-									<?php esc_html_e( 'Configure API keys for different providers (Anthropic, Google, etc.)', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Configure API keys for different providers (Anthropic, Google, etc.)', 'saman-labs-seo' ); ?>
 								</li>
 								<li>
 									<span class="dashicons dashicons-yes"></span>
-									<?php esc_html_e( 'Set custom model parameters (temperature, max tokens, etc.)', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Set custom model parameters (temperature, max tokens, etc.)', 'saman-labs-seo' ); ?>
 								</li>
 								<li>
 									<span class="dashicons dashicons-yes"></span>
-									<?php esc_html_e( 'Use local AI models via Ollama or similar services', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Use local AI models via Ollama or similar services', 'saman-labs-seo' ); ?>
 								</li>
 								<li>
 									<span class="dashicons dashicons-yes"></span>
-									<?php esc_html_e( 'Choose different models for titles vs descriptions', 'wp-seo-pilot' ); ?>
+									<?php esc_html_e( 'Choose different models for titles vs descriptions', 'saman-labs-seo' ); ?>
 								</li>
 							</ul>
 						</div>
 
 						<div class="wpseopilot-coming-soon-cta">
-							<p><?php esc_html_e( 'Want to be notified when this feature launches?', 'wp-seo-pilot' ); ?></p>
+							<p><?php esc_html_e( 'Want to be notified when this feature launches?', 'saman-labs-seo' ); ?></p>
 							<a href="https://github.com/jhd3197/WP-SEO-Pilot" class="button button-primary" target="_blank" rel="noopener">
-								<?php esc_html_e( 'Follow on GitHub', 'wp-seo-pilot' ); ?>
+								<?php esc_html_e( 'Follow on GitHub', 'saman-labs-seo' ); ?>
 							</a>
 						</div>
 					</div>

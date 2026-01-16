@@ -14,8 +14,8 @@
 	const { __ } = i18n;
 
 	registerBlockType( 'wpseopilot/faq', {
-		title: __( 'FAQ', 'wp-seo-pilot' ),
-		description: __( 'Add frequently asked questions with automatic schema markup for rich results.', 'wp-seo-pilot' ),
+		title: __( 'FAQ', 'saman-labs-seo' ),
+		description: __( 'Add frequently asked questions with automatic schema markup for rich results.', 'saman-labs-seo' ),
 		category: 'widgets',
 		icon: 'editor-help',
 		keywords: [ 'faq', 'questions', 'answers', 'schema', 'seo' ],
@@ -80,10 +80,10 @@
 					null,
 					el(
 						PanelBody,
-						{ title: __( 'FAQ Settings', 'wp-seo-pilot' ), initialOpen: true },
+						{ title: __( 'FAQ Settings', 'saman-labs-seo' ), initialOpen: true },
 						el( ToggleControl, {
-							label: __( 'Include FAQPage Schema', 'wp-seo-pilot' ),
-							help: __( 'Add structured data for Google rich results.', 'wp-seo-pilot' ),
+							label: __( 'Include FAQPage Schema', 'saman-labs-seo' ),
+							help: __( 'Add structured data for Google rich results.', 'saman-labs-seo' ),
 							checked: showSchema,
 							onChange: function( value ) {
 								setAttributes( { showSchema: value } );
@@ -96,8 +96,8 @@
 					blockProps,
 					el( 'div', { className: 'wpseopilot-faq-header' },
 						el( 'span', { className: 'wpseopilot-faq-icon' }, '?'),
-						el( 'span', { className: 'wpseopilot-faq-label' }, __( 'FAQ Block', 'wp-seo-pilot' ) ),
-						showSchema && el( 'span', { className: 'wpseopilot-faq-badge' }, __( 'Schema Enabled', 'wp-seo-pilot' ) )
+						el( 'span', { className: 'wpseopilot-faq-label' }, __( 'FAQ Block', 'saman-labs-seo' ) ),
+						showSchema && el( 'span', { className: 'wpseopilot-faq-badge' }, __( 'Schema Enabled', 'saman-labs-seo' ) )
 					),
 					el(
 						'div',
@@ -115,21 +115,21 @@
 										{ className: 'wpseopilot-faq-controls' },
 										el( Button, {
 											icon: 'arrow-up-alt2',
-											label: __( 'Move up', 'wp-seo-pilot' ),
+											label: __( 'Move up', 'saman-labs-seo' ),
 											onClick: () => moveFaq( index, -1 ),
 											disabled: index === 0,
 											isSmall: true,
 										} ),
 										el( Button, {
 											icon: 'arrow-down-alt2',
-											label: __( 'Move down', 'wp-seo-pilot' ),
+											label: __( 'Move down', 'saman-labs-seo' ),
 											onClick: () => moveFaq( index, 1 ),
 											disabled: index === faqs.length - 1,
 											isSmall: true,
 										} ),
 										el( Button, {
 											icon: 'trash',
-											label: __( 'Remove', 'wp-seo-pilot' ),
+											label: __( 'Remove', 'saman-labs-seo' ),
 											onClick: () => removeFaq( index ),
 											isSmall: true,
 											isDestructive: true,
@@ -139,7 +139,7 @@
 								el( RichText, {
 									tagName: 'div',
 									className: 'wpseopilot-faq-question',
-									placeholder: __( 'Enter question...', 'wp-seo-pilot' ),
+									placeholder: __( 'Enter question...', 'saman-labs-seo' ),
 									value: faq.question,
 									onChange: ( value ) => updateFaq( index, 'question', value ),
 									allowedFormats: [],
@@ -147,7 +147,7 @@
 								el( RichText, {
 									tagName: 'div',
 									className: 'wpseopilot-faq-answer',
-									placeholder: __( 'Enter answer...', 'wp-seo-pilot' ),
+									placeholder: __( 'Enter answer...', 'saman-labs-seo' ),
 									value: faq.answer,
 									onChange: ( value ) => updateFaq( index, 'answer', value ),
 									allowedFormats: [ 'core/bold', 'core/italic', 'core/link' ],
@@ -162,7 +162,7 @@
 							icon: 'plus-alt2',
 							onClick: addFaq,
 						},
-						__( 'Add Question', 'wp-seo-pilot' )
+						__( 'Add Question', 'saman-labs-seo' )
 					)
 				)
 			);

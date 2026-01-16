@@ -149,7 +149,7 @@ class Updater_Controller extends REST_Controller {
     public function check_updates() {
         $updater = GitHub_Updater::get_instance();
         $results = $updater->force_check_updates();
-        return $this->success( $results, __( 'Update check complete.', 'wp-seo-pilot' ) );
+        return $this->success( $results, __( 'Update check complete.', 'saman-labs-seo' ) );
     }
 
     /**
@@ -165,7 +165,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! isset( $plugins[ $slug ] ) ) {
             return $this->error(
-                __( 'Plugin not found in managed plugins list.', 'wp-seo-pilot' ),
+                __( 'Plugin not found in managed plugins list.', 'saman-labs-seo' ),
                 'invalid_plugin',
                 404
             );
@@ -175,7 +175,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( $plugin['installed'] ) {
             return $this->error(
-                __( 'Plugin is already installed.', 'wp-seo-pilot' ),
+                __( 'Plugin is already installed.', 'saman-labs-seo' ),
                 'already_installed',
                 400
             );
@@ -183,7 +183,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( empty( $plugin['download_url'] ) ) {
             return $this->error(
-                __( 'No download URL available for this plugin.', 'wp-seo-pilot' ),
+                __( 'No download URL available for this plugin.', 'saman-labs-seo' ),
                 'no_download_url',
                 400
             );
@@ -214,7 +214,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! isset( $plugins[ $slug ] ) ) {
             return $this->error(
-                __( 'Plugin not found in managed plugins list.', 'wp-seo-pilot' ),
+                __( 'Plugin not found in managed plugins list.', 'saman-labs-seo' ),
                 'invalid_plugin',
                 404
             );
@@ -224,7 +224,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! $plugin['installed'] ) {
             return $this->error(
-                __( 'Plugin is not installed.', 'wp-seo-pilot' ),
+                __( 'Plugin is not installed.', 'saman-labs-seo' ),
                 'not_installed',
                 400
             );
@@ -232,7 +232,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! $plugin['update_available'] ) {
             return $this->error(
-                __( 'No update available for this plugin.', 'wp-seo-pilot' ),
+                __( 'No update available for this plugin.', 'saman-labs-seo' ),
                 'no_update',
                 400
             );
@@ -260,7 +260,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! isset( $plugins[ $slug ] ) ) {
             return $this->error(
-                __( 'Plugin not found in managed plugins list.', 'wp-seo-pilot' ),
+                __( 'Plugin not found in managed plugins list.', 'saman-labs-seo' ),
                 'invalid_plugin',
                 404
             );
@@ -270,7 +270,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! $plugin['installed'] ) {
             return $this->error(
-                __( 'Plugin is not installed.', 'wp-seo-pilot' ),
+                __( 'Plugin is not installed.', 'saman-labs-seo' ),
                 'not_installed',
                 400
             );
@@ -278,7 +278,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( $plugin['active'] ) {
             return $this->error(
-                __( 'Plugin is already active.', 'wp-seo-pilot' ),
+                __( 'Plugin is already active.', 'saman-labs-seo' ),
                 'already_active',
                 400
             );
@@ -306,7 +306,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! isset( $plugins[ $slug ] ) ) {
             return $this->error(
-                __( 'Plugin not found in managed plugins list.', 'wp-seo-pilot' ),
+                __( 'Plugin not found in managed plugins list.', 'saman-labs-seo' ),
                 'invalid_plugin',
                 404
             );
@@ -316,7 +316,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! $plugin['installed'] ) {
             return $this->error(
-                __( 'Plugin is not installed.', 'wp-seo-pilot' ),
+                __( 'Plugin is not installed.', 'saman-labs-seo' ),
                 'not_installed',
                 400
             );
@@ -324,7 +324,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! $plugin['active'] ) {
             return $this->error(
-                __( 'Plugin is not active.', 'wp-seo-pilot' ),
+                __( 'Plugin is not active.', 'saman-labs-seo' ),
                 'not_active',
                 400
             );
@@ -365,7 +365,7 @@ class Updater_Controller extends REST_Controller {
 
         if ( ! $found ) {
             return $this->error(
-                __( 'Plugin not found in managed plugins list.', 'wp-seo-pilot' ),
+                __( 'Plugin not found in managed plugins list.', 'saman-labs-seo' ),
                 'invalid_plugin',
                 404
             );
@@ -383,8 +383,8 @@ class Updater_Controller extends REST_Controller {
                 'beta_enabled' => $enabled,
             ],
             $enabled
-                ? __( 'Beta updates enabled. Checking for updates...', 'wp-seo-pilot' )
-                : __( 'Beta updates disabled.', 'wp-seo-pilot' )
+                ? __( 'Beta updates enabled. Checking for updates...', 'saman-labs-seo' )
+                : __( 'Beta updates disabled.', 'saman-labs-seo' )
         );
     }
 }

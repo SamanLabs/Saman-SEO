@@ -88,7 +88,7 @@ class Admin_UI {
 
 		add_meta_box(
 			'wpseopilot-meta',
-			__( 'WP SEO Pilot', 'wp-seo-pilot' ),
+			__( 'WP SEO Pilot', 'saman-labs-seo' ),
 			[ $this, 'render_meta_box' ],
 			[ 'post', 'page' ],
 			'side',
@@ -189,18 +189,18 @@ class Admin_UI {
 			'wpseopilot-admin',
 			'WPSEOPilotAdmin',
 			[
-				'mediaTitle'  => __( 'Select image', 'wp-seo-pilot' ),
-				'mediaButton' => __( 'Use image', 'wp-seo-pilot' ),
+				'mediaTitle'  => __( 'Select image', 'saman-labs-seo' ),
+				'mediaButton' => __( 'Use image', 'saman-labs-seo' ),
 				'variables'   => $settings_svc->get_context_variables(),
 				'ai'          => [
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'wpseopilot_ai_generate' ),
 					'strings' => [
-						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'wp-seo-pilot' ),
-						'running'  => __( 'Asking AI for ideas…', 'wp-seo-pilot' ),
-						'success'  => __( 'AI suggestion inserted.', 'wp-seo-pilot' ),
-						'error'    => __( 'Unable to fetch suggestion.', 'wp-seo-pilot' ),
+						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'saman-labs-seo' ),
+						'running'  => __( 'Asking AI for ideas…', 'saman-labs-seo' ),
+						'success'  => __( 'AI suggestion inserted.', 'saman-labs-seo' ),
+						'error'    => __( 'Unable to fetch suggestion.', 'saman-labs-seo' ),
 					],
 				],
 			]
@@ -348,10 +348,10 @@ class Admin_UI {
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'wpseopilot_ai_generate' ),
 					'strings' => [
-						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'wp-seo-pilot' ),
-						'running'  => __( 'Asking AI for ideas…', 'wp-seo-pilot' ),
-						'success'  => __( 'AI suggestion inserted.', 'wp-seo-pilot' ),
-						'error'    => __( 'Unable to fetch suggestion.', 'wp-seo-pilot' ),
+						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'saman-labs-seo' ),
+						'running'  => __( 'Asking AI for ideas…', 'saman-labs-seo' ),
+						'success'  => __( 'AI suggestion inserted.', 'saman-labs-seo' ),
+						'error'    => __( 'Unable to fetch suggestion.', 'saman-labs-seo' ),
 					],
 				],
 			]
@@ -366,7 +366,7 @@ class Admin_UI {
 	 * @return array
 	 */
 	public function add_posts_column( $columns ) {
-		$columns['wpseopilot'] = __( 'SEO', 'wp-seo-pilot' );
+		$columns['wpseopilot'] = __( 'SEO', 'saman-labs-seo' );
 		return $columns;
 	}
 
@@ -439,7 +439,7 @@ class Admin_UI {
 		$actions['wpseopilot_edit'] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( get_edit_post_link( $post->ID ) . '#wpseopilot' ),
-			esc_html__( 'Edit SEO', 'wp-seo-pilot' )
+			esc_html__( 'Edit SEO', 'saman-labs-seo' )
 		);
 
 		$actions['wpseopilot_noindex'] = sprintf(
@@ -456,7 +456,7 @@ class Admin_UI {
 					'wpseopilot_toggle_noindex'
 				)
 			),
-			esc_html__( 'Toggle noindex', 'wp-seo-pilot' )
+			esc_html__( 'Toggle noindex', 'saman-labs-seo' )
 		);
 		
 		if ( '1' === get_option( 'wpseopilot_enable_og_preview', '1' ) ) {
@@ -471,7 +471,7 @@ class Admin_UI {
 						home_url( '/' )
 					)
 				),
-				esc_html__( 'OG preview', 'wp-seo-pilot' )
+				esc_html__( 'OG preview', 'saman-labs-seo' )
 			);
 		}
 
@@ -486,10 +486,10 @@ class Admin_UI {
 	 * @return array
 	 */
 	public function bulk_actions( $actions ) {
-		$actions['wpseopilot_noindex'] = __( 'Mark as noindex', 'wp-seo-pilot' );
-		$actions['wpseopilot_index']   = __( 'Mark as index', 'wp-seo-pilot' );
-		$actions['wpseopilot_regen_canonical'] = __( 'Regenerate canonical', 'wp-seo-pilot' );
-		$actions['wpseopilot_apply_template']  = __( 'Apply title template', 'wp-seo-pilot' );
+		$actions['wpseopilot_noindex'] = __( 'Mark as noindex', 'saman-labs-seo' );
+		$actions['wpseopilot_index']   = __( 'Mark as index', 'saman-labs-seo' );
+		$actions['wpseopilot_regen_canonical'] = __( 'Regenerate canonical', 'saman-labs-seo' );
+		$actions['wpseopilot_apply_template']  = __( 'Apply title template', 'saman-labs-seo' );
 		return $actions;
 	}
 
@@ -537,7 +537,7 @@ class Admin_UI {
 	 */
 	public function handle_toggle_noindex() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		check_admin_referer( 'wpseopilot_toggle_noindex' );
@@ -571,7 +571,7 @@ class Admin_UI {
 		<script>
 			jQuery(function ($) {
 				$('#wpseopilot-meta .hndle').pointer({
-					content: '<h3><?php echo esc_js( __( 'SEO fields live here', 'wp-seo-pilot' ) ); ?></h3><p><?php echo esc_js( __( 'Update title, description, and previews without scrolling.', 'wp-seo-pilot' ) ); ?></p>',
+					content: '<h3><?php echo esc_js( __( 'SEO fields live here', 'saman-labs-seo' ) ); ?></h3><p><?php echo esc_js( __( 'Update title, description, and previews without scrolling.', 'saman-labs-seo' ) ); ?></p>',
 					position: { edge: 'left', align: 'center' },
 					close: function () {}
 				}).pointer('open');

@@ -36,9 +36,9 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 		<!-- Live Preview Card -->
 		<div class="wpseopilot-settings-card">
 			<div class="wpseopilot-settings-card__header">
-				<h2><?php esc_html_e( 'Live Preview', 'wp-seo-pilot' ); ?></h2>
+				<h2><?php esc_html_e( 'Live Preview', 'saman-labs-seo' ); ?></h2>
 				<p class="wpseopilot-settings-card__description">
-					<?php esc_html_e( 'Preview how your social cards will look when shared on social media.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Preview how your social cards will look when shared on social media.', 'saman-labs-seo' ); ?>
 				</p>
 			</div>
 			<div class="wpseopilot-settings-card__body">
@@ -47,18 +47,18 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 				<div class="wpseopilot-social-card-preview__controls">
 					<div class="wpseopilot-form-field">
 						<label for="wpseopilot-preview-title">
-							<?php esc_html_e( 'Sample Title', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Sample Title', 'saman-labs-seo' ); ?>
 						</label>
 						<input
 							type="text"
 							id="wpseopilot-preview-title"
 							class="regular-text"
-							value="<?php esc_attr_e( 'Sample Post Title - Understanding Core Web Vitals', 'wp-seo-pilot' ); ?>"
+							value="<?php esc_attr_e( 'Sample Post Title - Understanding Core Web Vitals', 'saman-labs-seo' ); ?>"
 						/>
 					</div>
 					<button type="button" id="wpseopilot-refresh-preview" class="button">
 						<span class="dashicons dashicons-update"></span>
-						<?php esc_html_e( 'Refresh Preview', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Refresh Preview', 'saman-labs-seo' ); ?>
 					</button>
 				</div>
 
@@ -70,7 +70,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 					<img
 						id="wpseopilot-social-card-preview-img"
 						src="<?php echo esc_url( home_url( '/?wpseopilot_social_card=1&title=' . urlencode( 'Sample Post Title - Understanding Core Web Vitals' ) ) ); ?>"
-						alt="<?php esc_attr_e( 'Social card preview', 'wp-seo-pilot' ); ?>"
+						alt="<?php esc_attr_e( 'Social card preview', 'saman-labs-seo' ); ?>"
 					/>
 				</div>
 
@@ -80,34 +80,34 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 		<!-- Design Customization Card -->
 		<div class="wpseopilot-settings-card">
 			<div class="wpseopilot-settings-card__header">
-				<h2><?php esc_html_e( 'Design Customization', 'wp-seo-pilot' ); ?></h2>
+				<h2><?php esc_html_e( 'Design Customization', 'saman-labs-seo' ); ?></h2>
 				<p class="wpseopilot-settings-card__description">
-					<?php esc_html_e( 'Customize the appearance of your social cards to match your brand.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Customize the appearance of your social cards to match your brand.', 'saman-labs-seo' ); ?>
 				</p>
 			</div>
 			<div class="wpseopilot-settings-card__body">
 
 				<!-- Layout Selection -->
 				<div class="wpseopilot-form-field">
-					<label><?php esc_html_e( 'Layout Style', 'wp-seo-pilot' ); ?></label>
+					<label><?php esc_html_e( 'Layout Style', 'saman-labs-seo' ); ?></label>
 					<div class="wpseopilot-layout-selector">
 						<?php
 						$layouts = [
 							'default'  => [
-								'label'       => __( 'Default', 'wp-seo-pilot' ),
-								'description' => __( 'Title with accent bar at bottom', 'wp-seo-pilot' ),
+								'label'       => __( 'Default', 'saman-labs-seo' ),
+								'description' => __( 'Title with accent bar at bottom', 'saman-labs-seo' ),
 							],
 							'centered' => [
-								'label'       => __( 'Centered', 'wp-seo-pilot' ),
-								'description' => __( 'Centered text layout', 'wp-seo-pilot' ),
+								'label'       => __( 'Centered', 'saman-labs-seo' ),
+								'description' => __( 'Centered text layout', 'saman-labs-seo' ),
 							],
 							'minimal'  => [
-								'label'       => __( 'Minimal', 'wp-seo-pilot' ),
-								'description' => __( 'Text only, no accent', 'wp-seo-pilot' ),
+								'label'       => __( 'Minimal', 'saman-labs-seo' ),
+								'description' => __( 'Text only, no accent', 'saman-labs-seo' ),
 							],
 							'bold'     => [
-								'label'       => __( 'Bold', 'wp-seo-pilot' ),
-								'description' => __( 'Large accent block', 'wp-seo-pilot' ),
+								'label'       => __( 'Bold', 'saman-labs-seo' ),
+								'description' => __( 'Large accent block', 'saman-labs-seo' ),
 							],
 						];
 
@@ -133,7 +133,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 				<!-- Color Settings -->
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-background-color">
-						<?php esc_html_e( 'Background Color', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Background Color', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="color"
@@ -152,7 +152,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-accent-color">
-						<?php esc_html_e( 'Accent Color', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Accent Color', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="color"
@@ -171,7 +171,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-text-color">
-						<?php esc_html_e( 'Text Color', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Text Color', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="color"
@@ -191,7 +191,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 				<!-- Font Sizes -->
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-title-font-size">
-						<?php esc_html_e( 'Title Font Size (px)', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Title Font Size (px)', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="number"
@@ -207,7 +207,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-site-font-size">
-						<?php esc_html_e( 'Site Name Font Size (px)', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Site Name Font Size (px)', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="number"
@@ -224,7 +224,7 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 				<!-- Logo Settings -->
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-logo-url">
-						<?php esc_html_e( 'Logo URL', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Logo URL', 'saman-labs-seo' ); ?>
 					</label>
 					<div class="wpseopilot-media-upload">
 						<input
@@ -235,33 +235,33 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 							value="<?php echo esc_attr( $design_settings['logo_url'] ); ?>"
 						/>
 						<button type="button" class="button wpseopilot-media-upload-btn" data-target="#wpseopilot-logo-url">
-							<?php esc_html_e( 'Choose Image', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Choose Image', 'saman-labs-seo' ); ?>
 						</button>
 					</div>
 					<p class="description">
-						<?php esc_html_e( 'Upload or select a logo to display on your social cards. Recommended size: 200x200px.', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Upload or select a logo to display on your social cards. Recommended size: 200x200px.', 'saman-labs-seo' ); ?>
 					</p>
 				</div>
 
 				<div class="wpseopilot-form-field">
 					<label for="wpseopilot-logo-position">
-						<?php esc_html_e( 'Logo Position', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Logo Position', 'saman-labs-seo' ); ?>
 					</label>
 					<select id="wpseopilot-logo-position" name="wpseopilot_social_card_design[logo_position]">
 						<option value="top-left" <?php selected( $design_settings['logo_position'], 'top-left' ); ?>>
-							<?php esc_html_e( 'Top Left', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Top Left', 'saman-labs-seo' ); ?>
 						</option>
 						<option value="top-right" <?php selected( $design_settings['logo_position'], 'top-right' ); ?>>
-							<?php esc_html_e( 'Top Right', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Top Right', 'saman-labs-seo' ); ?>
 						</option>
 						<option value="bottom-left" <?php selected( $design_settings['logo_position'], 'bottom-left' ); ?>>
-							<?php esc_html_e( 'Bottom Left', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Bottom Left', 'saman-labs-seo' ); ?>
 						</option>
 						<option value="bottom-right" <?php selected( $design_settings['logo_position'], 'bottom-right' ); ?>>
-							<?php esc_html_e( 'Bottom Right', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Bottom Right', 'saman-labs-seo' ); ?>
 						</option>
 						<option value="center" <?php selected( $design_settings['logo_position'], 'center' ); ?>>
-							<?php esc_html_e( 'Center', 'wp-seo-pilot' ); ?>
+							<?php esc_html_e( 'Center', 'saman-labs-seo' ); ?>
 						</option>
 					</select>
 				</div>
@@ -277,23 +277,23 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 		<!-- Module Status -->
 		<div class="wpseopilot-settings-card">
 			<div class="wpseopilot-settings-card__header">
-				<h3><?php esc_html_e( 'Module Status', 'wp-seo-pilot' ); ?></h3>
+				<h3><?php esc_html_e( 'Module Status', 'saman-labs-seo' ); ?></h3>
 			</div>
 			<div class="wpseopilot-settings-card__body">
 				<?php if ( $module_enabled ) : ?>
 					<div class="wpseopilot-status-badge wpseopilot-status-badge--success">
 						<span class="dashicons dashicons-yes-alt"></span>
-						<?php esc_html_e( 'Active', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Active', 'saman-labs-seo' ); ?>
 					</div>
-					<p><?php esc_html_e( 'Dynamic social card generator is enabled.', 'wp-seo-pilot' ); ?></p>
+					<p><?php esc_html_e( 'Dynamic social card generator is enabled.', 'saman-labs-seo' ); ?></p>
 				<?php else : ?>
 					<div class="wpseopilot-status-badge wpseopilot-status-badge--inactive">
 						<span class="dashicons dashicons-warning"></span>
-						<?php esc_html_e( 'Disabled', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Disabled', 'saman-labs-seo' ); ?>
 					</div>
-					<p><?php esc_html_e( 'Dynamic social card generator is currently disabled.', 'wp-seo-pilot' ); ?></p>
+					<p><?php esc_html_e( 'Dynamic social card generator is currently disabled.', 'saman-labs-seo' ); ?></p>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot#modules' ) ); ?>" class="button">
-						<?php esc_html_e( 'Enable in Modules', 'wp-seo-pilot' ); ?>
+						<?php esc_html_e( 'Enable in Modules', 'saman-labs-seo' ); ?>
 					</a>
 				<?php endif; ?>
 			</div>
@@ -302,14 +302,14 @@ $module_enabled = '1' === get_option( 'wpseopilot_enable_og_preview', '1' );
 		<!-- Info Card -->
 		<div class="wpseopilot-settings-card">
 			<div class="wpseopilot-settings-card__header">
-				<h3><?php esc_html_e( 'About Social Cards', 'wp-seo-pilot' ); ?></h3>
+				<h3><?php esc_html_e( 'About Social Cards', 'saman-labs-seo' ); ?></h3>
 			</div>
 			<div class="wpseopilot-settings-card__body">
 				<p>
-					<?php esc_html_e( 'Social cards are automatically generated images that appear when your content is shared on social media platforms like Facebook, Twitter, and LinkedIn.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Social cards are automatically generated images that appear when your content is shared on social media platforms like Facebook, Twitter, and LinkedIn.', 'saman-labs-seo' ); ?>
 				</p>
 				<p>
-					<?php esc_html_e( 'These customizations only affect the dynamically generated PNG images, not the Open Graph meta tags.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'These customizations only affect the dynamically generated PNG images, not the Open Graph meta tags.', 'saman-labs-seo' ); ?>
 				</p>
 			</div>
 		</div>

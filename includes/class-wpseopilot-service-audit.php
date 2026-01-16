@@ -36,8 +36,8 @@ class Audit {
 	public function register_page() {
 		add_submenu_page(
 			'wpseopilot',
-			__( 'Audit', 'wp-seo-pilot' ),
-			__( 'Audit', 'wp-seo-pilot' ),
+			__( 'Audit', 'saman-labs-seo' ),
+			__( 'Audit', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot-audit',
 			[ $this, 'render_page' ],
@@ -135,8 +135,8 @@ class Audit {
 						'post_id'  => $post_id,
 						'title'    => $title,
 						'severity' => empty( $meta['title'] ) ? 'high' : 'medium',
-						'message'  => empty( $meta['title'] ) ? __( 'Missing meta title.', 'wp-seo-pilot' ) : __( 'Meta title longer than 65 characters.', 'wp-seo-pilot' ),
-						'action'   => __( 'Edit SEO fields.', 'wp-seo-pilot' ),
+						'message'  => empty( $meta['title'] ) ? __( 'Missing meta title.', 'saman-labs-seo' ) : __( 'Meta title longer than 65 characters.', 'saman-labs-seo' ),
+						'action'   => __( 'Edit SEO fields.', 'saman-labs-seo' ),
 						'type'     => empty( $meta['title'] ) ? 'title_missing' : 'title_length',
 					]
 				);
@@ -153,8 +153,8 @@ class Audit {
 						'post_id'  => $post_id,
 						'title'    => $title,
 						'severity' => 'high',
-						'message'  => __( 'Missing meta description.', 'wp-seo-pilot' ),
-						'action'   => __( 'Add keyword-rich summary.', 'wp-seo-pilot' ),
+						'message'  => __( 'Missing meta description.', 'saman-labs-seo' ),
+						'action'   => __( 'Add keyword-rich summary.', 'saman-labs-seo' ),
 						'type'     => 'description_missing',
 					]
 				);
@@ -168,8 +168,8 @@ class Audit {
 						'post_id'  => $post_id,
 						'title'    => $title,
 						'severity' => 'medium',
-						'message'  => __( 'Images missing alt text.', 'wp-seo-pilot' ),
-						'action'   => __( 'Add descriptive alt attributes.', 'wp-seo-pilot' ),
+						'message'  => __( 'Images missing alt text.', 'saman-labs-seo' ),
+						'action'   => __( 'Add descriptive alt attributes.', 'saman-labs-seo' ),
 						'type'     => 'missing_alt',
 					]
 				);

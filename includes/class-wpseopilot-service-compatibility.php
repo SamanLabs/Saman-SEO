@@ -95,7 +95,7 @@ class Compatibility {
 			wp_kses_post(
 				sprintf(
 					/* translators: %s: plugin name. */
-					__( 'WP SEO Pilot detected another SEO plugin. Some overlapping features are disabled until you deactivate %s or run the migration.', 'wp-seo-pilot' ),
+					__( 'WP SEO Pilot detected another SEO plugin. Some overlapping features are disabled until you deactivate %s or run the migration.', 'saman-labs-seo' ),
 					esc_html( $this->active_conflict )
 				)
 			)

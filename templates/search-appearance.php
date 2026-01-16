@@ -39,22 +39,22 @@ $taxonomies = get_taxonomies(
 		<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">
 			<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist">
 				<a href="#global" class="nav-tab nav-tab-active" data-wpseopilot-tab="wpseopilot-tab-global">
-					<?php esc_html_e( 'Global Settings', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Global Settings', 'saman-labs-seo' ); ?>
 				</a>
 				<a href="#content-types" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-content-types">
-					<?php esc_html_e( 'Content Types', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Content Types', 'saman-labs-seo' ); ?>
 				</a>
 				<a href="#taxonomies" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-taxonomies">
-					<?php esc_html_e( 'Taxonomies', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Taxonomies', 'saman-labs-seo' ); ?>
 				</a>
 				<a href="#archives" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-archives">
-					<?php esc_html_e( 'Archives', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Archives', 'saman-labs-seo' ); ?>
 				</a>
 			<a href="#social" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-social">
-				<?php esc_html_e( 'Social Settings', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Social Settings', 'saman-labs-seo' ); ?>
 			</a>
 			<a href="#social-cards" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-social-cards">
-				<?php esc_html_e( 'Social Cards', 'wp-seo-pilot' ); ?>
+				<?php esc_html_e( 'Social Cards', 'saman-labs-seo' ); ?>
 			</a>
 			</div>
 			<!-- Global Settings Tab -->
@@ -65,8 +65,8 @@ $taxonomies = get_taxonomies(
 						<!-- Homepage Defaults Card -->
 						<div class="wpseopilot-card">
 							<div class="wpseopilot-card-header">
-								<h2><?php esc_html_e( 'Homepage Defaults', 'wp-seo-pilot' ); ?></h2>
-								<p><?php esc_html_e( 'Configure default SEO settings for your homepage.', 'wp-seo-pilot' ); ?></p>
+								<h2><?php esc_html_e( 'Homepage Defaults', 'saman-labs-seo' ); ?></h2>
+								<p><?php esc_html_e( 'Configure default SEO settings for your homepage.', 'saman-labs-seo' ); ?></p>
 							</div>
 							<div class="wpseopilot-card-body">
 
@@ -80,8 +80,8 @@ $taxonomies = get_taxonomies(
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label for="homepage_meta_title">
-										<strong><?php esc_html_e( 'Meta Title', 'wp-seo-pilot' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The title tag for your homepage', 'wp-seo-pilot' ); ?></span>
+										<strong><?php esc_html_e( 'Meta Title', 'saman-labs-seo' ); ?></strong>
+										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The title tag for your homepage', 'saman-labs-seo' ); ?></span>
 									</label>
 									<div class="wpseopilot-flex-input">
 										<input
@@ -95,15 +95,15 @@ $taxonomies = get_taxonomies(
 										/>
 										<button type="button" class="button wpseopilot-trigger-vars" data-target="homepage_meta_title">
 											<span class="dashicons dashicons-editor-code"></span>
-											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
 								<div class="wpseopilot-form-row">
 									<label for="homepage_meta_description">
-										<strong><?php esc_html_e( 'Meta Description', 'wp-seo-pilot' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The meta description for your homepage', 'wp-seo-pilot' ); ?></span>
+										<strong><?php esc_html_e( 'Meta Description', 'saman-labs-seo' ); ?></strong>
+										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The meta description for your homepage', 'saman-labs-seo' ); ?></span>
 									</label>
 									<div class="wpseopilot-flex-input">
 										<textarea
@@ -116,15 +116,15 @@ $taxonomies = get_taxonomies(
 										><?php echo esc_textarea( $homepage_defaults['meta_description'] ?? '' ); ?></textarea>
 										<button type="button" class="button wpseopilot-trigger-vars" data-target="homepage_meta_description">
 											<span class="dashicons dashicons-editor-code"></span>
-											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
 								<div class="wpseopilot-form-row">
 									<label for="homepage_meta_keywords">
-										<strong><?php esc_html_e( 'Meta Keywords', 'wp-seo-pilot' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Comma-separated keywords (optional)', 'wp-seo-pilot' ); ?></span>
+										<strong><?php esc_html_e( 'Meta Keywords', 'saman-labs-seo' ); ?></strong>
+										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Comma-separated keywords (optional)', 'saman-labs-seo' ); ?></span>
 									</label>
 									<input
 										type="text"
@@ -137,8 +137,8 @@ $taxonomies = get_taxonomies(
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label>
-										<strong><?php esc_html_e( 'Title Divider', 'wp-seo-pilot' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Choose the character that separates title parts', 'wp-seo-pilot' ); ?></span>
+										<strong><?php esc_html_e( 'Title Divider', 'saman-labs-seo' ); ?></strong>
+										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Choose the character that separates title parts', 'saman-labs-seo' ); ?></span>
 									</label>
 									<?php
 									$current_separator = get_option( 'wpseopilot_title_separator', '-' );
@@ -172,12 +172,12 @@ $taxonomies = get_taxonomies(
 												type="button"
 												class="wpseopilot-separator-option wpseopilot-separator-custom<?php echo ( ! isset( $separators[ $current_separator ] ) && ! empty( $current_separator ) ) ? ' is-active' : ''; ?>"
 												data-separator="custom"
-												title="<?php esc_attr_e( 'Custom', 'wp-seo-pilot' ); ?>"
+												title="<?php esc_attr_e( 'Custom', 'saman-labs-seo' ); ?>"
 											>
 												<span class="wpseopilot-separator-preview">
 													<?php echo isset( $separators[ $current_separator ] ) ? '?' : esc_html( $current_separator ); ?>
 												</span>
-												<span class="wpseopilot-separator-label"><?php esc_html_e( 'Custom', 'wp-seo-pilot' ); ?></span>
+												<span class="wpseopilot-separator-label"><?php esc_html_e( 'Custom', 'saman-labs-seo' ); ?></span>
 											</button>
 										</div>
 										<div class="wpseopilot-separator-custom-input" style="<?php echo isset( $separators[ $current_separator ] ) ? 'display: none;' : ''; ?>">
@@ -186,7 +186,7 @@ $taxonomies = get_taxonomies(
 												id="wpseopilot_custom_separator"
 												class="small-text"
 												maxlength="3"
-												placeholder="<?php esc_attr_e( 'Enter custom separator', 'wp-seo-pilot' ); ?>"
+												placeholder="<?php esc_attr_e( 'Enter custom separator', 'saman-labs-seo' ); ?>"
 												value="<?php echo isset( $separators[ $current_separator ] ) ? '' : esc_attr( $current_separator ); ?>"
 											/>
 										</div>
@@ -197,11 +197,11 @@ $taxonomies = get_taxonomies(
 											value="<?php echo esc_attr( $current_separator ); ?>"
 										/>
 										<p class="description">
-											<?php esc_html_e( 'This character appears in the {{separator}} variable used in title templates.', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'This character appears in the {{separator}} variable used in title templates.', 'saman-labs-seo' ); ?>
 											<?php
 											printf(
 												/* translators: %s: separator character */
-												esc_html__( 'Example: "My Page %s My Site"', 'wp-seo-pilot' ),
+												esc_html__( 'Example: "My Page %s My Site"', 'saman-labs-seo' ),
 												'<code>' . esc_html( $current_separator ) . '</code>'
 											);
 											?>
@@ -216,12 +216,12 @@ $taxonomies = get_taxonomies(
 
 					<div class="wpseopilot-settings-sidebar">
 						<div class="wpseopilot-info-card">
-							<h3><?php esc_html_e( 'Homepage SEO', 'wp-seo-pilot' ); ?></h3>
-							<p><?php esc_html_e( 'Your homepage is often the most important page for SEO. Make sure to craft compelling title and description tags.', 'wp-seo-pilot' ); ?></p>
+							<h3><?php esc_html_e( 'Homepage SEO', 'saman-labs-seo' ); ?></h3>
+							<p><?php esc_html_e( 'Your homepage is often the most important page for SEO. Make sure to craft compelling title and description tags.', 'saman-labs-seo' ); ?></p>
 							<ul class="wpseopilot-info-list">
-								<li><?php esc_html_e( 'Keep title under 60 characters', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Keep description under 155 characters', 'wp-seo-pilot' ); ?></li>
-								<li><?php esc_html_e( 'Include your primary keywords', 'wp-seo-pilot' ); ?></li>
+								<li><?php esc_html_e( 'Keep title under 60 characters', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Keep description under 155 characters', 'saman-labs-seo' ); ?></li>
+								<li><?php esc_html_e( 'Include your primary keywords', 'saman-labs-seo' ); ?></li>
 							</ul>
 						</div>
 					</div>
@@ -232,8 +232,8 @@ $taxonomies = get_taxonomies(
 			<div id="wpseopilot-tab-content-types" class="wpseopilot-tab-panel">
 				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Content Type Settings', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Configure SEO settings for each post type.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Content Type Settings', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Configure SEO settings for each post type.', 'saman-labs-seo' ); ?></p>
 					</div>
 
 					<?php foreach ( $post_types as $slug => $object ) : ?>
@@ -268,7 +268,7 @@ $taxonomies = get_taxonomies(
 											aria-selected="true"
 											role="tab"
 										>
-											<?php esc_html_e( 'Title & Description', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Title & Description', 'saman-labs-seo' ); ?>
 										</button>
 										<button
 											type="button"
@@ -277,7 +277,7 @@ $taxonomies = get_taxonomies(
 											aria-selected="false"
 											role="tab"
 										>
-											<?php esc_html_e( 'Schema Markup', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Schema Markup', 'saman-labs-seo' ); ?>
 										</button>
 										<button
 											type="button"
@@ -286,7 +286,7 @@ $taxonomies = get_taxonomies(
 											aria-selected="false"
 											role="tab"
 										>
-											<?php esc_html_e( 'Custom Fields', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Custom Fields', 'saman-labs-seo' ); ?>
 										</button>
 										<button
 											type="button"
@@ -295,7 +295,7 @@ $taxonomies = get_taxonomies(
 											aria-selected="false"
 											role="tab"
 										>
-											<?php esc_html_e( 'Advanced Settings', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Advanced Settings', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 
@@ -343,8 +343,8 @@ $taxonomies = get_taxonomies(
 			<div id="wpseopilot-tab-taxonomies" class="wpseopilot-tab-panel">
 				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Taxonomy Settings', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Configure SEO settings for category and tag archives.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Taxonomy Settings', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Configure SEO settings for category and tag archives.', 'saman-labs-seo' ); ?></p>
 					</div>
 
 					<?php foreach ( $taxonomies as $slug => $object ) : ?>
@@ -370,7 +370,7 @@ $taxonomies = get_taxonomies(
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label>
-										<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
+										<strong><?php esc_html_e( 'Show in Search Results?', 'saman-labs-seo' ); ?></strong>
 									</label>
 									<label class="wpseopilot-toggle">
 										<input
@@ -380,16 +380,16 @@ $taxonomies = get_taxonomies(
 											<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 										/>
 										<span class="wpseopilot-toggle-label">
-											<?php esc_html_e( 'Hide from search engines (noindex)', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
 								</div>
 
 								<div class="wpseopilot-form-row">
 									<label>
-										<strong><?php esc_html_e( 'Title Template', 'wp-seo-pilot' ); ?></strong>
+										<strong><?php esc_html_e( 'Title Template', 'saman-labs-seo' ); ?></strong>
 										<span class="wpseopilot-label-hint">
-											<?php esc_html_e( 'Use {{term}} for term name, {{sitename}} for site name', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Use {{term}} for term name, {{sitename}} for site name', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
 									<div class="wpseopilot-flex-input">
@@ -400,20 +400,20 @@ $taxonomies = get_taxonomies(
 											class="regular-text"
 											data-preview-field="title"
 											data-context="taxonomy:<?php echo esc_attr( $slug ); ?>"
-											placeholder="<?php echo esc_attr__( '{{term}} Archives {{separator}} {{sitename}}', 'wp-seo-pilot' ); ?>"
+											placeholder="<?php echo esc_attr__( '{{term}} Archives {{separator}} {{sitename}}', 'saman-labs-seo' ); ?>"
 										/>
 										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]">
 											<span class="dashicons dashicons-editor-code"></span>
-											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
 								<div class="wpseopilot-form-row">
 									<label>
-										<strong><?php esc_html_e( 'Description Template', 'wp-seo-pilot' ); ?></strong>
+										<strong><?php esc_html_e( 'Description Template', 'saman-labs-seo' ); ?></strong>
 										<span class="wpseopilot-label-hint">
-											<?php esc_html_e( 'Use {{term_description}} for term description', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Use {{term_description}} for term description', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
 									<div class="wpseopilot-flex-input">
@@ -423,11 +423,11 @@ $taxonomies = get_taxonomies(
 											class="large-text"
 											data-preview-field="description"
 											data-context="taxonomy:<?php echo esc_attr( $slug ); ?>"
-											placeholder="<?php echo esc_attr__( '{{term_description}}', 'wp-seo-pilot' ); ?>"
+											placeholder="<?php echo esc_attr__( '{{term_description}}', 'saman-labs-seo' ); ?>"
 										><?php echo esc_textarea( $settings['description_template'] ?? '{{term_description}}' ); ?></textarea>
 										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]">
 											<span class="dashicons dashicons-editor-code"></span>
-											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
@@ -442,16 +442,16 @@ $taxonomies = get_taxonomies(
 			<div id="wpseopilot-tab-archives" class="wpseopilot-tab-panel">
 				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
 					<div class="wpseopilot-card-header">
-						<h2><?php esc_html_e( 'Archive & Special Page Settings', 'wp-seo-pilot' ); ?></h2>
-						<p><?php esc_html_e( 'Configure SEO settings for author, date, search archives, and special pages like 404.', 'wp-seo-pilot' ); ?></p>
+						<h2><?php esc_html_e( 'Archive & Special Page Settings', 'saman-labs-seo' ); ?></h2>
+						<p><?php esc_html_e( 'Configure SEO settings for author, date, search archives, and special pages like 404.', 'saman-labs-seo' ); ?></p>
 					</div>
 
 					<?php
 					$archive_types = [
-						'author' => __( 'Author Archives', 'wp-seo-pilot' ),
-						'date'   => __( 'Date Archives', 'wp-seo-pilot' ),
-						'search' => __( 'Search Results', 'wp-seo-pilot' ),
-						'404'    => __( '404 Page', 'wp-seo-pilot' ),
+						'author' => __( 'Author Archives', 'saman-labs-seo' ),
+						'date'   => __( 'Date Archives', 'saman-labs-seo' ),
+						'search' => __( 'Search Results', 'saman-labs-seo' ),
+						'404'    => __( '404 Page', 'saman-labs-seo' ),
 					];
 					?>
 
@@ -475,7 +475,7 @@ $taxonomies = get_taxonomies(
 
 								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
 									<label>
-										<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
+										<strong><?php esc_html_e( 'Show in Search Results?', 'saman-labs-seo' ); ?></strong>
 									</label>
 									<label class="wpseopilot-toggle">
 										<input
@@ -485,24 +485,24 @@ $taxonomies = get_taxonomies(
 											<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 										/>
 										<span class="wpseopilot-toggle-label">
-											<?php esc_html_e( 'Hide from search engines (noindex)', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
 								</div>
 
 								<div class="wpseopilot-form-row">
 									<label>
-										<strong><?php esc_html_e( 'Title Template', 'wp-seo-pilot' ); ?></strong>
+										<strong><?php esc_html_e( 'Title Template', 'saman-labs-seo' ); ?></strong>
 										<span class="wpseopilot-label-hint">
 											<?php
 											if ( 'author' === $type ) {
-												esc_html_e( 'Use {{author}} for author name', 'wp-seo-pilot' );
+												esc_html_e( 'Use {{author}} for author name', 'saman-labs-seo' );
 											} elseif ( 'date' === $type ) {
-												esc_html_e( 'Use {{date}} for date', 'wp-seo-pilot' );
+												esc_html_e( 'Use {{date}} for date', 'saman-labs-seo' );
 											} elseif ( 'search' === $type ) {
-												esc_html_e( 'Use {{search_term}} for search query', 'wp-seo-pilot' );
+												esc_html_e( 'Use {{search_term}} for search query', 'saman-labs-seo' );
 											} elseif ( '404' === $type ) {
-												esc_html_e( 'Use {{request_url}} for requested URL, {{sitename}} for site name', 'wp-seo-pilot' );
+												esc_html_e( 'Use {{request_url}} for requested URL, {{sitename}} for site name', 'saman-labs-seo' );
 											}
 											?>
 										</span>
@@ -517,36 +517,36 @@ $taxonomies = get_taxonomies(
 											data-context="archive:<?php echo esc_attr( $type ); ?>"
 											placeholder="<?php
 											if ( 'author' === $type ) {
-												echo esc_attr__( '{{author}} {{separator}} {{sitename}}', 'wp-seo-pilot' );
+												echo esc_attr__( '{{author}} {{separator}} {{sitename}}', 'saman-labs-seo' );
 											} elseif ( 'date' === $type ) {
-												echo esc_attr__( '{{date}} Archives {{separator}} {{sitename}}', 'wp-seo-pilot' );
+												echo esc_attr__( '{{date}} Archives {{separator}} {{sitename}}', 'saman-labs-seo' );
 											} elseif ( 'search' === $type ) {
-												echo esc_attr__( 'Search: {{search_term}} {{separator}} {{sitename}}', 'wp-seo-pilot' );
+												echo esc_attr__( 'Search: {{search_term}} {{separator}} {{sitename}}', 'saman-labs-seo' );
 											} elseif ( '404' === $type ) {
-												echo esc_attr__( 'Page Not Found {{separator}} {{sitename}}', 'wp-seo-pilot' );
+												echo esc_attr__( 'Page Not Found {{separator}} {{sitename}}', 'saman-labs-seo' );
 											}
 											?>"
 										/>
 										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]">
 											<span class="dashicons dashicons-editor-code"></span>
-											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
 								<div class="wpseopilot-form-row">
 									<label>
-										<strong><?php esc_html_e( 'Meta Description', 'wp-seo-pilot' ); ?></strong>
+										<strong><?php esc_html_e( 'Meta Description', 'saman-labs-seo' ); ?></strong>
 										<span class="wpseopilot-label-hint">
 											<?php
 											if ( 'author' === $type ) {
-												esc_html_e( 'Description for author archive pages', 'wp-seo-pilot' );
+												esc_html_e( 'Description for author archive pages', 'saman-labs-seo' );
 											} elseif ( 'date' === $type ) {
-												esc_html_e( 'Description for date archive pages', 'wp-seo-pilot' );
+												esc_html_e( 'Description for date archive pages', 'saman-labs-seo' );
 											} elseif ( 'search' === $type ) {
-												esc_html_e( 'Description for search results pages', 'wp-seo-pilot' );
+												esc_html_e( 'Description for search results pages', 'saman-labs-seo' );
 											} elseif ( '404' === $type ) {
-												esc_html_e( 'Description shown in search results for 404 pages', 'wp-seo-pilot' );
+												esc_html_e( 'Description shown in search results for 404 pages', 'saman-labs-seo' );
 											}
 											?>
 										</span>
@@ -560,19 +560,19 @@ $taxonomies = get_taxonomies(
 											data-context="archive:<?php echo esc_attr( $type ); ?>"
 											placeholder="<?php
 											if ( 'author' === $type ) {
-												echo esc_attr__( 'Articles written by {{author}}. {{author_bio}}', 'wp-seo-pilot' );
+												echo esc_attr__( 'Articles written by {{author}}. {{author_bio}}', 'saman-labs-seo' );
 											} elseif ( 'date' === $type ) {
-												echo esc_attr__( 'Browse our articles from {{date}}.', 'wp-seo-pilot' );
+												echo esc_attr__( 'Browse our articles from {{date}}.', 'saman-labs-seo' );
 											} elseif ( 'search' === $type ) {
-												echo esc_attr__( 'Search results for "{{search_term}}" on {{sitename}}.', 'wp-seo-pilot' );
+												echo esc_attr__( 'Search results for "{{search_term}}" on {{sitename}}.', 'saman-labs-seo' );
 											} elseif ( '404' === $type ) {
-												echo esc_attr__( 'The page you are looking for could not be found.', 'wp-seo-pilot' );
+												echo esc_attr__( 'The page you are looking for could not be found.', 'saman-labs-seo' );
 											}
 											?>"
 										><?php echo esc_textarea( $settings['description_template'] ?? '' ); ?></textarea>
 										<button type="button" class="button wpseopilot-trigger-vars" data-target="wpseopilot_archive_defaults[<?php echo esc_attr( $type ); ?>][description_template]">
 											<span class="dashicons dashicons-editor-code"></span>
-											<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
@@ -594,7 +594,7 @@ $taxonomies = get_taxonomies(
 	</div>
 
 			<div class="wpseopilot-tabs__actions">
-				<?php submit_button( __( 'Save Search Appearance Settings', 'wp-seo-pilot' ), 'primary', 'submit', false ); ?>
+				<?php submit_button( __( 'Save Search Appearance Settings', 'saman-labs-seo' ), 'primary', 'submit', false ); ?>
 			</div>
 		</div>
 	</form>

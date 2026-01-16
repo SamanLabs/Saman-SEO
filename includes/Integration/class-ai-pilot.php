@@ -20,7 +20,7 @@ class AI_Pilot {
 	/**
 	 * Plugin source identifier for usage tracking.
 	 */
-	const SOURCE = 'wp-seo-pilot';
+	const SOURCE = 'saman-labs-seo';
 
 	/**
 	 * Initialize the integration.
@@ -151,7 +151,7 @@ class AI_Pilot {
 		}
 
 		wp_ai_pilot()->register_plugin( [
-			'slug'        => 'wp-seo-pilot',
+			'slug'        => 'saman-labs-seo',
 			'file'        => 'wp-seo-pilot/wp-seo-pilot.php',
 			'name'        => 'WP SEO Pilot',
 			'permissions' => [ 'generate', 'chat', 'assistants' ],
@@ -169,8 +169,8 @@ class AI_Pilot {
 		// General SEO Assistant
 		wp_ai_pilot()->register_assistant( [
 			'id'                 => 'seo-general',
-			'name'               => __( 'SEO Assistant', 'wp-seo-pilot' ),
-			'description'        => __( 'Your helpful SEO buddy for all things search optimization.', 'wp-seo-pilot' ),
+			'name'               => __( 'SEO Assistant', 'saman-labs-seo' ),
+			'description'        => __( 'Your helpful SEO buddy for all things search optimization.', 'saman-labs-seo' ),
 			'plugin'             => 'wp-seo-pilot/wp-seo-pilot.php',
 			'system_prompt'      => self::get_general_seo_prompt(),
 			'icon'               => 'dashicons-search',
@@ -180,18 +180,18 @@ class AI_Pilot {
 			'max_tokens'         => 1000,
 			'save_conversations' => true,
 			'suggested_prompts'  => [
-				__( 'How do I write a good meta description?', 'wp-seo-pilot' ),
-				__( 'What makes a title tag effective?', 'wp-seo-pilot' ),
-				__( 'Help me find keywords for my blog post', 'wp-seo-pilot' ),
-				__( 'What are internal links and why do they matter?', 'wp-seo-pilot' ),
+				__( 'How do I write a good meta description?', 'saman-labs-seo' ),
+				__( 'What makes a title tag effective?', 'saman-labs-seo' ),
+				__( 'Help me find keywords for my blog post', 'saman-labs-seo' ),
+				__( 'What are internal links and why do they matter?', 'saman-labs-seo' ),
 			],
 		] );
 
 		// SEO Reporter Assistant
 		wp_ai_pilot()->register_assistant( [
 			'id'                 => 'seo-reporter',
-			'name'               => __( 'SEO Reporter', 'wp-seo-pilot' ),
-			'description'        => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'wp-seo-pilot' ),
+			'name'               => __( 'SEO Reporter', 'saman-labs-seo' ),
+			'description'        => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'saman-labs-seo' ),
 			'plugin'             => 'wp-seo-pilot/wp-seo-pilot.php',
 			'system_prompt'      => self::get_reporter_prompt(),
 			'icon'               => 'dashicons-chart-bar',
@@ -201,10 +201,10 @@ class AI_Pilot {
 			'max_tokens'         => 1500,
 			'save_conversations' => true,
 			'suggested_prompts'  => [
-				__( 'Give me a quick SEO report', 'wp-seo-pilot' ),
-				__( 'What SEO issues should I fix first?', 'wp-seo-pilot' ),
-				__( 'Check my meta titles and descriptions', 'wp-seo-pilot' ),
-				__( 'Find posts missing SEO data', 'wp-seo-pilot' ),
+				__( 'Give me a quick SEO report', 'saman-labs-seo' ),
+				__( 'What SEO issues should I fix first?', 'saman-labs-seo' ),
+				__( 'Check my meta titles and descriptions', 'saman-labs-seo' ),
+				__( 'Find posts missing SEO data', 'saman-labs-seo' ),
 			],
 		] );
 	}
@@ -341,7 +341,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
-				__( 'WP AI Pilot is not configured. Please install and configure WP AI Pilot to use AI features.', 'wp-seo-pilot' )
+				__( 'WP AI Pilot is not configured. Please install and configure WP AI Pilot to use AI features.', 'saman-labs-seo' )
 			);
 		}
 
@@ -368,7 +368,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
-				__( 'WP AI Pilot is not configured.', 'wp-seo-pilot' )
+				__( 'WP AI Pilot is not configured.', 'saman-labs-seo' )
 			);
 		}
 
@@ -394,7 +394,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
-				__( 'WP AI Pilot is not configured.', 'wp-seo-pilot' )
+				__( 'WP AI Pilot is not configured.', 'saman-labs-seo' )
 			);
 		}
 

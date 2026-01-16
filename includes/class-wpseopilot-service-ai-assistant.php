@@ -39,8 +39,8 @@ class AI_Assistant {
 	public function register_page() {
 		add_submenu_page(
 			'wpseopilot',
-			__( 'AI', 'wp-seo-pilot' ),
-			__( 'AI', 'wp-seo-pilot' ),
+			__( 'AI', 'saman-labs-seo' ),
+			__( 'AI', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot-ai',
 			[ $this, 'render_page' ]
@@ -113,26 +113,26 @@ class AI_Assistant {
 		check_ajax_referer( 'wpseopilot_ai_generate', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'wp-seo-pilot' ), 403 );
+			wp_send_json_error( __( 'Permission denied.', 'saman-labs-seo' ), 403 );
 		}
 
 		$post_id = isset( $_POST['postId'] ) ? absint( $_POST['postId'] ) : 0;
 		$field   = isset( $_POST['field'] ) ? sanitize_key( wp_unslash( $_POST['field'] ) ) : '';
 
 		if ( ! in_array( $field, [ 'title', 'description' ], true ) ) {
-			wp_send_json_error( __( 'Unknown field requested.', 'wp-seo-pilot' ), 400 );
+			wp_send_json_error( __( 'Unknown field requested.', 'saman-labs-seo' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post instanceof WP_Post ) {
-			wp_send_json_error( __( 'Post not found.', 'wp-seo-pilot' ), 404 );
+			wp_send_json_error( __( 'Post not found.', 'saman-labs-seo' ), 404 );
 		}
 
 		$api_key = get_option( 'wpseopilot_openai_api_key', '' );
 
 		if ( empty( $api_key ) ) {
-			wp_send_json_error( __( 'Add your OpenAI API key first.', 'wp-seo-pilot' ), 400 );
+			wp_send_json_error( __( 'Add your OpenAI API key first.', 'saman-labs-seo' ), 400 );
 		}
 
 		$content_snippet = generate_content_snippet( $post, 80 );
@@ -142,9 +142,9 @@ class AI_Assistant {
 		$defaults = $settings->get_defaults();
 
 		$model           = get_option( 'wpseopilot_ai_model', $defaults['wpseopilot_ai_model'] ?? 'gpt-4o-mini' );
-		$system_prompt   = get_option( 'wpseopilot_ai_prompt_system', $defaults['wpseopilot_ai_prompt_system'] ?? __( 'You are an SEO assistant generating concise metadata. Respond with plain text only.', 'wp-seo-pilot' ) );
-		$title_prompt    = get_option( 'wpseopilot_ai_prompt_title', $defaults['wpseopilot_ai_prompt_title'] ?? __( 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.', 'wp-seo-pilot' ) );
-		$description_prompt = get_option( 'wpseopilot_ai_prompt_description', $defaults['wpseopilot_ai_prompt_description'] ?? __( 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.', 'wp-seo-pilot' ) );
+		$system_prompt   = get_option( 'wpseopilot_ai_prompt_system', $defaults['wpseopilot_ai_prompt_system'] ?? __( 'You are an SEO assistant generating concise metadata. Respond with plain text only.', 'saman-labs-seo' ) );
+		$title_prompt    = get_option( 'wpseopilot_ai_prompt_title', $defaults['wpseopilot_ai_prompt_title'] ?? __( 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.', 'saman-labs-seo' ) );
+		$description_prompt = get_option( 'wpseopilot_ai_prompt_description', $defaults['wpseopilot_ai_prompt_description'] ?? __( 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.', 'saman-labs-seo' ) );
 
 		$instructions = ( 'title' === $field ) ? $title_prompt : $description_prompt;
 
@@ -195,7 +195,7 @@ class AI_Assistant {
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code >= 300 || empty( $body['choices'][0]['message']['content'] ) ) {
-			$message = $body['error']['message'] ?? __( 'Unable to fetch AI suggestion.', 'wp-seo-pilot' );
+			$message = $body['error']['message'] ?? __( 'Unable to fetch AI suggestion.', 'saman-labs-seo' );
 			wp_send_json_error( $message, $code );
 		}
 
@@ -216,7 +216,7 @@ class AI_Assistant {
 	 */
 	public function handle_reset() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		check_admin_referer( 'wpseopilot_ai_reset' );

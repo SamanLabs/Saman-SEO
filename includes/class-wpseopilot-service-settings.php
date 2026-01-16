@@ -177,45 +177,45 @@ class Settings {
 	public function get_context_variables() {
 		$variables = [
 			'global' => [
-				'label' => __( 'General', 'wp-seo-pilot' ),
+				'label' => __( 'General', 'saman-labs-seo' ),
 				'vars'  => [
-					[ 'tag' => 'site_title', 'label' => __( 'Site Title', 'wp-seo-pilot' ), 'desc' => __( 'The main title of your site', 'wp-seo-pilot' ), 'preview' => get_bloginfo( 'name' ) ],
-					[ 'tag' => 'tagline', 'label' => __( 'Tagline', 'wp-seo-pilot' ), 'desc' => __( 'Site description / tagline', 'wp-seo-pilot' ), 'preview' => get_bloginfo( 'description' ) ],
-					[ 'tag' => 'separator', 'label' => __( 'Separator', 'wp-seo-pilot' ), 'desc' => __( 'Separator character (e.g. -)', 'wp-seo-pilot' ), 'preview' => $this->get( 'wpseopilot_title_separator' ) ],
-					[ 'tag' => 'current_year', 'label' => __( 'Current Year', 'wp-seo-pilot' ), 'desc' => __( 'The current year (4 digits)', 'wp-seo-pilot' ), 'preview' => date_i18n( 'Y' ) ],
+					[ 'tag' => 'site_title', 'label' => __( 'Site Title', 'saman-labs-seo' ), 'desc' => __( 'The main title of your site', 'saman-labs-seo' ), 'preview' => get_bloginfo( 'name' ) ],
+					[ 'tag' => 'tagline', 'label' => __( 'Tagline', 'saman-labs-seo' ), 'desc' => __( 'Site description / tagline', 'saman-labs-seo' ), 'preview' => get_bloginfo( 'description' ) ],
+					[ 'tag' => 'separator', 'label' => __( 'Separator', 'saman-labs-seo' ), 'desc' => __( 'Separator character (e.g. -)', 'saman-labs-seo' ), 'preview' => $this->get( 'wpseopilot_title_separator' ) ],
+					[ 'tag' => 'current_year', 'label' => __( 'Current Year', 'saman-labs-seo' ), 'desc' => __( 'The current year (4 digits)', 'saman-labs-seo' ), 'preview' => date_i18n( 'Y' ) ],
 				],
 			],
 			'post' => [
-				'label' => __( 'Post Variables', 'wp-seo-pilot' ),
+				'label' => __( 'Post Variables', 'saman-labs-seo' ),
 				'vars'  => [
-					[ 'tag' => 'post_title', 'label' => __( 'Post Title', 'wp-seo-pilot' ), 'desc' => __( 'Title of the current post/page', 'wp-seo-pilot' ), 'preview' => 'Hello World' ],
-					[ 'tag' => 'post_excerpt', 'label' => __( 'Excerpt', 'wp-seo-pilot' ), 'desc' => __( 'Post excerpt or auto-generated snippet', 'wp-seo-pilot' ), 'preview' => 'This is an example excerpt...' ],
-					[ 'tag' => 'post_date', 'label' => __( 'Date', 'wp-seo-pilot' ), 'desc' => __( 'Publish date', 'wp-seo-pilot' ), 'preview' => date_i18n( get_option( 'date_format' ) ) ],
-					[ 'tag' => 'post_author', 'label' => __( 'Author', 'wp-seo-pilot' ), 'desc' => __( 'Display name of the author', 'wp-seo-pilot' ), 'preview' => 'John Doe' ],
-					[ 'tag' => 'category', 'label' => __( 'Primary Category', 'wp-seo-pilot' ), 'desc' => __( 'The main category for this post', 'wp-seo-pilot' ), 'preview' => 'Technology' ],
-					[ 'tag' => 'modified', 'label' => __( 'Modified Date', 'wp-seo-pilot' ), 'desc' => __( 'Last modified date', 'wp-seo-pilot' ), 'preview' => date_i18n( get_option( 'date_format' ) ) ],
-					[ 'tag' => 'id', 'label' => __( 'ID', 'wp-seo-pilot' ), 'desc' => __( 'The numeric post ID', 'wp-seo-pilot' ), 'preview' => '123' ],
+					[ 'tag' => 'post_title', 'label' => __( 'Post Title', 'saman-labs-seo' ), 'desc' => __( 'Title of the current post/page', 'saman-labs-seo' ), 'preview' => 'Hello World' ],
+					[ 'tag' => 'post_excerpt', 'label' => __( 'Excerpt', 'saman-labs-seo' ), 'desc' => __( 'Post excerpt or auto-generated snippet', 'saman-labs-seo' ), 'preview' => 'This is an example excerpt...' ],
+					[ 'tag' => 'post_date', 'label' => __( 'Date', 'saman-labs-seo' ), 'desc' => __( 'Publish date', 'saman-labs-seo' ), 'preview' => date_i18n( get_option( 'date_format' ) ) ],
+					[ 'tag' => 'post_author', 'label' => __( 'Author', 'saman-labs-seo' ), 'desc' => __( 'Display name of the author', 'saman-labs-seo' ), 'preview' => 'John Doe' ],
+					[ 'tag' => 'category', 'label' => __( 'Primary Category', 'saman-labs-seo' ), 'desc' => __( 'The main category for this post', 'saman-labs-seo' ), 'preview' => 'Technology' ],
+					[ 'tag' => 'modified', 'label' => __( 'Modified Date', 'saman-labs-seo' ), 'desc' => __( 'Last modified date', 'saman-labs-seo' ), 'preview' => date_i18n( get_option( 'date_format' ) ) ],
+					[ 'tag' => 'id', 'label' => __( 'ID', 'saman-labs-seo' ), 'desc' => __( 'The numeric post ID', 'saman-labs-seo' ), 'preview' => '123' ],
 				],
 			],
 			'taxonomy' => [
-				'label' => __( 'Taxonomy Variables', 'wp-seo-pilot' ),
+				'label' => __( 'Taxonomy Variables', 'saman-labs-seo' ),
 				'vars'  => [
-					[ 'tag' => 'term_title', 'label' => __( 'Term Name', 'wp-seo-pilot' ), 'desc' => __( 'Name of the current category/tag', 'wp-seo-pilot' ), 'preview' => 'My Category' ],
-					[ 'tag' => 'term_description', 'label' => __( 'Term Description', 'wp-seo-pilot' ), 'desc' => __( 'Description of the term', 'wp-seo-pilot' ), 'preview' => 'A list of all posts about...' ],
+					[ 'tag' => 'term_title', 'label' => __( 'Term Name', 'saman-labs-seo' ), 'desc' => __( 'Name of the current category/tag', 'saman-labs-seo' ), 'preview' => 'My Category' ],
+					[ 'tag' => 'term_description', 'label' => __( 'Term Description', 'saman-labs-seo' ), 'desc' => __( 'Description of the term', 'saman-labs-seo' ), 'preview' => 'A list of all posts about...' ],
 				],
 			],
 			'archive' => [
-				'label' => __( 'Archive Variables', 'wp-seo-pilot' ),
+				'label' => __( 'Archive Variables', 'saman-labs-seo' ),
 				'vars'  => [
-					[ 'tag' => 'archive_title', 'label' => __( 'Archive Title', 'wp-seo-pilot' ), 'desc' => __( 'Title based on date or type', 'wp-seo-pilot' ), 'preview' => 'Archives for June 2025' ],
-					[ 'tag' => 'archive_date', 'label' => __( 'Archive Date', 'wp-seo-pilot' ), 'desc' => __( 'Date for daily/monthly archives', 'wp-seo-pilot' ), 'preview' => 'June 2025' ],
+					[ 'tag' => 'archive_title', 'label' => __( 'Archive Title', 'saman-labs-seo' ), 'desc' => __( 'Title based on date or type', 'saman-labs-seo' ), 'preview' => 'Archives for June 2025' ],
+					[ 'tag' => 'archive_date', 'label' => __( 'Archive Date', 'saman-labs-seo' ), 'desc' => __( 'Date for daily/monthly archives', 'saman-labs-seo' ), 'preview' => 'June 2025' ],
 				],
 			],
 			'author' => [
-				'label' => __( 'Author Variables', 'wp-seo-pilot' ),
+				'label' => __( 'Author Variables', 'saman-labs-seo' ),
 				'vars'  => [
-					[ 'tag' => 'author_name', 'label' => __( 'Author Name', 'wp-seo-pilot' ), 'desc' => __( 'Name of the author being viewed', 'wp-seo-pilot' ), 'preview' => 'Jane Smith' ],
-					[ 'tag' => 'author_bio', 'label' => __( 'Author Bio', 'wp-seo-pilot' ), 'desc' => __( 'Biographical info', 'wp-seo-pilot' ), 'preview' => 'Jane is a writer...' ],
+					[ 'tag' => 'author_name', 'label' => __( 'Author Name', 'saman-labs-seo' ), 'desc' => __( 'Name of the author being viewed', 'saman-labs-seo' ), 'preview' => 'Jane Smith' ],
+					[ 'tag' => 'author_bio', 'label' => __( 'Author Bio', 'saman-labs-seo' ), 'desc' => __( 'Biographical info', 'saman-labs-seo' ), 'preview' => 'Jane is a writer...' ],
 				],
 			],
 		];
@@ -247,7 +247,7 @@ class Settings {
 						$custom_vars[] = [
 							'tag'     => 'cf_' . $key,
 							'label'   => $key,
-							'desc'    => sprintf( __( 'Custom Field: %s', 'wp-seo-pilot' ), $key ),
+							'desc'    => sprintf( __( 'Custom Field: %s', 'saman-labs-seo' ), $key ),
 							'preview' => $preview,
 						];
 					}
@@ -257,7 +257,7 @@ class Settings {
 					// Use a key like "post_type:book" so frontend can match it
 					$context_key = 'post_type:' . $pt->name;
 					$variables[ $context_key ] = [
-						'label' => sprintf( __( '%s Custom Fields', 'wp-seo-pilot' ), $pt->label ),
+						'label' => sprintf( __( '%s Custom Fields', 'saman-labs-seo' ), $pt->label ),
 						'vars'  => $custom_vars,
 					];
 				}
@@ -274,8 +274,8 @@ class Settings {
 	 */
 	public function register_menu() {
 		add_menu_page(
-			__( 'WP SEO Pilot', 'wp-seo-pilot' ),
-			__( 'WP SEO Pilot', 'wp-seo-pilot' ),
+			__( 'WP SEO Pilot', 'saman-labs-seo' ),
+			__( 'WP SEO Pilot', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot',
 			[ $this, 'render_settings_page' ],
@@ -285,8 +285,8 @@ class Settings {
 
 		add_submenu_page(
 			'wpseopilot',
-			__( 'Defaults', 'wp-seo-pilot' ),
-			__( 'Defaults', 'wp-seo-pilot' ),
+			__( 'Defaults', 'saman-labs-seo' ),
+			__( 'Defaults', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot',
 			[ $this, 'render_settings_page' ]
@@ -294,8 +294,8 @@ class Settings {
 
 		add_submenu_page(
 			'wpseopilot',
-			__( 'Search Appearance', 'wp-seo-pilot' ),
-			__( 'Search Appearance', 'wp-seo-pilot' ),
+			__( 'Search Appearance', 'saman-labs-seo' ),
+			__( 'Search Appearance', 'saman-labs-seo' ),
 			'manage_options',
 			'wpseopilot-types',
 			[ $this, 'render_post_type_defaults_page' ]
@@ -831,11 +831,11 @@ class Settings {
 	 */
 	public function get_ai_models() {
 		return [
-			'gpt-4o-mini'          => __( 'GPT-4o mini (fast, affordable)', 'wp-seo-pilot' ),
-			'gpt-4o'               => __( 'GPT-4o (highest quality)', 'wp-seo-pilot' ),
-			'gpt-4.1-mini'         => __( 'GPT-4.1 mini', 'wp-seo-pilot' ),
-			'gpt-4.1'              => __( 'GPT-4.1', 'wp-seo-pilot' ),
-			'gpt-3.5-turbo'        => __( 'GPT-3.5 Turbo', 'wp-seo-pilot' ),
+			'gpt-4o-mini'          => __( 'GPT-4o mini (fast, affordable)', 'saman-labs-seo' ),
+			'gpt-4o'               => __( 'GPT-4o (highest quality)', 'saman-labs-seo' ),
+			'gpt-4.1-mini'         => __( 'GPT-4.1 mini', 'saman-labs-seo' ),
+			'gpt-4.1'              => __( 'GPT-4.1', 'saman-labs-seo' ),
+			'gpt-3.5-turbo'        => __( 'GPT-3.5 Turbo', 'saman-labs-seo' ),
 		];
 	}
 
@@ -846,11 +846,11 @@ class Settings {
 	 */
 	public function get_schema_page_options() {
 		return [
-			'WebPage'            => __( 'Web Page (default)', 'wp-seo-pilot' ),
-			'ItemPage'           => __( 'Item Page', 'wp-seo-pilot' ),
-			'ProfilePage'        => __( 'Profile Page', 'wp-seo-pilot' ),
-			'ContactPage'        => __( 'Contact Page', 'wp-seo-pilot' ),
-			'SearchResultsPage'  => __( 'Search Results Page', 'wp-seo-pilot' ),
+			'WebPage'            => __( 'Web Page (default)', 'saman-labs-seo' ),
+			'ItemPage'           => __( 'Item Page', 'saman-labs-seo' ),
+			'ProfilePage'        => __( 'Profile Page', 'saman-labs-seo' ),
+			'ContactPage'        => __( 'Contact Page', 'saman-labs-seo' ),
+			'SearchResultsPage'  => __( 'Search Results Page', 'saman-labs-seo' ),
 		];
 	}
 
@@ -861,11 +861,11 @@ class Settings {
 	 */
 	public function get_schema_article_options() {
 		return [
-			'Article'      => __( 'Article (default)', 'wp-seo-pilot' ),
-			'BlogPosting'  => __( 'Blog Posting', 'wp-seo-pilot' ),
-			'NewsArticle'  => __( 'News Article', 'wp-seo-pilot' ),
-			'TechArticle'  => __( 'Tech Article', 'wp-seo-pilot' ),
-			'ScholarlyArticle' => __( 'Scholarly Article', 'wp-seo-pilot' ),
+			'Article'      => __( 'Article (default)', 'saman-labs-seo' ),
+			'BlogPosting'  => __( 'Blog Posting', 'saman-labs-seo' ),
+			'NewsArticle'  => __( 'News Article', 'saman-labs-seo' ),
+			'TechArticle'  => __( 'Tech Article', 'saman-labs-seo' ),
+			'ScholarlyArticle' => __( 'Scholarly Article', 'saman-labs-seo' ),
 		];
 	}
 
@@ -912,8 +912,8 @@ class Settings {
 			'wpseopilot-admin',
 			'WPSEOPilotAdmin',
 			[
-				'mediaTitle'  => __( 'Select default image', 'wp-seo-pilot' ),
-				'mediaButton' => __( 'Use image', 'wp-seo-pilot' ),
+				'mediaTitle'  => __( 'Select default image', 'saman-labs-seo' ),
+				'mediaButton' => __( 'Use image', 'saman-labs-seo' ),
 			]
 		);
 

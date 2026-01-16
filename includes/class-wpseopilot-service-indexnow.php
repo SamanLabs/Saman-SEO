@@ -577,7 +577,7 @@ class IndexNow {
 		if ( empty( $settings['api_key'] ) ) {
 			return [
 				'valid'   => false,
-				'message' => __( 'No API key configured.', 'wp-seo-pilot' ),
+				'message' => __( 'No API key configured.', 'saman-labs-seo' ),
 				'url'     => '',
 			];
 		}
@@ -601,8 +601,8 @@ class IndexNow {
 		return [
 			'valid'   => $valid,
 			'message' => $valid
-				? __( 'Key file is accessible and valid.', 'wp-seo-pilot' )
-				: __( 'Key file not accessible or content mismatch.', 'wp-seo-pilot' ),
+				? __( 'Key file is accessible and valid.', 'saman-labs-seo' )
+				: __( 'Key file not accessible or content mismatch.', 'saman-labs-seo' ),
 			'url'     => $key_url,
 		];
 	}

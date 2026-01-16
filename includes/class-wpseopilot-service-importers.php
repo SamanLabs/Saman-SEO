@@ -30,7 +30,7 @@ class Importers {
 	 */
 	public function handle_export() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'wp-seo-pilot' ) );
+			wp_die( esc_html__( 'Permission denied.', 'saman-labs-seo' ) );
 		}
 
 		check_admin_referer( 'wpseopilot_export' );
