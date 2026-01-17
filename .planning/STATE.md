@@ -5,8 +5,8 @@
 ## Current Position
 
 **Milestone:** 1 — Full rebrand and architecture refactor
-**Phase:** 6 — Feature Toggle Fix
-**Status:** Planning Complete
+**Phase:** 7 — Final Testing & Cleanup
+**Status:** Pending
 
 ## Progress
 
@@ -17,11 +17,20 @@
 | 3 | Database & Options | ✅ Complete |
 | 4 | REST API & Frontend | ✅ Complete |
 | 5 | AI Integration Refactor | ✅ Complete |
-| 6 | Feature Toggle Fix | 📋 Planned |
+| 6 | Feature Toggle Fix | ✅ Complete |
 | 7 | Final Testing & Cleanup | ⏳ Pending |
 
 ## Recent Activity
 
+- 2026-01-16: Phase 6 complete (Feature Toggle Fix)
+  - Created module_enabled() helper function with legacy fallback
+  - Updated 10 services to use centralized toggle
+  - Added module toggles to Internal_Linking and AI_Assistant
+  - Set default module options on activation
+  - Deprecated legacy enable_* options
+  - Updated Admin_V2 to conditionally hide menus
+  - Pass module status to React UI
+  - 14 commits with clear messages
 - 2026-01-16: Phase 5 complete (AI Integration Refactor)
   - Renamed all WP AI Pilot references to Saman Labs AI
   - Removed direct OpenAI/Anthropic/Ollama API calls
@@ -57,6 +66,7 @@
 - Phase 3 Summary: `.planning/phases/03-database-options/SUMMARY.md`
 - Phase 4 Summary: `.planning/phases/04-rest-api-frontend/SUMMARY.md`
 - Phase 5 Summary: `.planning/phases/05-ai-integration-refactor/SUMMARY.md`
+- Phase 6 Summary: `.planning/phases/06-feature-toggle-fix/SUMMARY.md`
 
 ---
 *Last updated: 2026-01-16*
