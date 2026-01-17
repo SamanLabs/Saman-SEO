@@ -48,11 +48,7 @@ class Request_Monitor {
 	public function boot() {
 		$this->maybe_upgrade_schema();
 
-		if ( false === get_option( 'samanlabs_seo_enable_404_logging', false ) ) {
-			add_option( 'samanlabs_seo_enable_404_logging', '1' );
-		}
-
-		if ( '1' !== get_option( 'samanlabs_seo_enable_404_logging', '1' ) ) {
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( '404_log' ) ) {
 			return;
 		}
 
