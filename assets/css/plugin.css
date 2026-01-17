@@ -1,4 +1,4 @@
-.wpseopilot-topbar {
+.samanlabs-seo-topbar {
   background: #ffffff;
   border-bottom: 1px solid #f0f0f1;
   margin: 0 -20px 20px -20px;
@@ -6,7 +6,7 @@
   position: relative;
   z-index: 100;
 }
-.wpseopilot-topbar .wpseopilot-topbar-inner {
+.samanlabs-seo-topbar .samanlabs-seo-topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,48 +14,48 @@
   max-width: 1400px;
   margin: 0 auto;
 }
-.wpseopilot-topbar .wpseopilot-topbar-left {
+.samanlabs-seo-topbar .samanlabs-seo-topbar-left {
   display: flex;
   align-items: center;
   gap: 24px;
 }
-.wpseopilot-topbar .wpseopilot-branding {
+.samanlabs-seo-topbar .samanlabs-seo-branding {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.wpseopilot-topbar .wpseopilot-branding h1 {
+.samanlabs-seo-topbar .samanlabs-seo-branding h1 {
   font-size: 18px;
   font-weight: 600;
   color: #1d2327;
   margin: 0;
   line-height: 1;
 }
-.wpseopilot-topbar .wpseopilot-branding .dashicons {
+.samanlabs-seo-topbar .samanlabs-seo-branding .dashicons {
   font-size: 24px;
   color: #2271b1;
   width: 24px;
   height: 24px;
 }
-.wpseopilot-topbar .wpseopilot-section-label {
+.samanlabs-seo-topbar .samanlabs-seo-section-label {
   font-size: 12px;
   color: #646970;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 500;
 }
-.wpseopilot-topbar .wpseopilot-nav ul {
+.samanlabs-seo-topbar .samanlabs-seo-nav ul {
   display: flex;
   gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.wpseopilot-topbar .wpseopilot-nav li {
+.samanlabs-seo-topbar .samanlabs-seo-nav li {
   margin: 0;
   padding: 0;
 }
-.wpseopilot-topbar .wpseopilot-nav a {
+.samanlabs-seo-topbar .samanlabs-seo-nav a {
   display: block;
   padding: 20px 16px;
   font-size: 13px;
@@ -66,36 +66,36 @@
   position: relative;
   top: 1px;
 }
-.wpseopilot-topbar .wpseopilot-nav a:hover {
+.samanlabs-seo-topbar .samanlabs-seo-nav a:hover {
   color: #1d2327;
 }
-.wpseopilot-topbar .wpseopilot-nav a.active {
+.samanlabs-seo-topbar .samanlabs-seo-nav a.active {
   color: #2271b1;
   border-bottom-color: #135e96;
 }
-.wpseopilot-topbar .wpseopilot-topbar-actions {
+.samanlabs-seo-topbar .samanlabs-seo-topbar-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.wpseopilot-topbar .wpseopilot-topbar-actions .button {
+.samanlabs-seo-topbar .samanlabs-seo-topbar-actions .button {
   margin: 0;
 }
-.wpseopilot-page {
+.samanlabs-seo-page {
   max-width: 1400px;
   margin: 0 auto;
 }
-.wpseopilot-tabs__nav,
-.wpseopilot-links__tabs {
+.samanlabs-seo-tabs__nav,
+.samanlabs-seo-links__tabs {
   border-bottom: 1px solid #f0f0f1;
   margin: 0 0 20px 0;
   padding: 0;
   background: transparent;
 }
-.wpseopilot-tabs__nav .nav-tab,
-.wpseopilot-links__tabs .nav-tab,
-.wpseopilot-tabs__nav a.nav-tab,
-.wpseopilot-links__tabs a.nav-tab {
+.samanlabs-seo-tabs__nav .nav-tab,
+.samanlabs-seo-links__tabs .nav-tab,
+.samanlabs-seo-tabs__nav a.nav-tab,
+.samanlabs-seo-links__tabs a.nav-tab {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -110,127 +110,127 @@
   top: 1px;
   text-decoration: none;
 }
-.wpseopilot-tabs__nav .nav-tab:hover,
-.wpseopilot-links__tabs .nav-tab:hover,
-.wpseopilot-tabs__nav a.nav-tab:hover,
-.wpseopilot-links__tabs a.nav-tab:hover {
+.samanlabs-seo-tabs__nav .nav-tab:hover,
+.samanlabs-seo-links__tabs .nav-tab:hover,
+.samanlabs-seo-tabs__nav a.nav-tab:hover,
+.samanlabs-seo-links__tabs a.nav-tab:hover {
   background: transparent;
   color: #1d2327;
   border-bottom-color: #dcdcde;
 }
-.wpseopilot-tabs__nav .nav-tab.nav-tab-active,
-.wpseopilot-links__tabs .nav-tab.nav-tab-active,
-.wpseopilot-tabs__nav a.nav-tab.nav-tab-active,
-.wpseopilot-links__tabs a.nav-tab.nav-tab-active {
+.samanlabs-seo-tabs__nav .nav-tab.nav-tab-active,
+.samanlabs-seo-links__tabs .nav-tab.nav-tab-active,
+.samanlabs-seo-tabs__nav a.nav-tab.nav-tab-active,
+.samanlabs-seo-links__tabs a.nav-tab.nav-tab-active {
   background: transparent;
   color: #2271b1;
   border-bottom-color: #135e96;
   font-weight: 600;
 }
-.wpseopilot-tabs__nav .nav-tab:focus,
-.wpseopilot-links__tabs .nav-tab:focus,
-.wpseopilot-tabs__nav a.nav-tab:focus,
-.wpseopilot-links__tabs a.nav-tab:focus {
+.samanlabs-seo-tabs__nav .nav-tab:focus,
+.samanlabs-seo-links__tabs .nav-tab:focus,
+.samanlabs-seo-tabs__nav a.nav-tab:focus,
+.samanlabs-seo-links__tabs a.nav-tab:focus {
   outline: none;
   box-shadow: none;
 }
-.wpseopilot-tabs .wpseopilot-tab-panel {
+.samanlabs-seo-tabs .samanlabs-seo-tab-panel {
   display: none;
 }
-.wpseopilot-tabs .wpseopilot-tab-panel.is-active {
+.samanlabs-seo-tabs .samanlabs-seo-tab-panel.is-active {
   display: block;
 }
-.wpseopilot-tabs.wpseopilot-tabs--ready .wpseopilot-tab-panel {
+.samanlabs-seo-tabs.samanlabs-seo-tabs--ready .samanlabs-seo-tab-panel {
   display: none;
 }
-.wpseopilot-tabs.wpseopilot-tabs--ready .wpseopilot-tab-panel.is-active {
+.samanlabs-seo-tabs.samanlabs-seo-tabs--ready .samanlabs-seo-tab-panel.is-active {
   display: block;
 }
-.wpseopilot-card {
+.samanlabs-seo-card {
   background: #ffffff;
   border: 1px solid #f0f0f1;
   border-radius: 4px;
   padding: 20px;
   margin-bottom: 20px;
 }
-.wpseopilot-card .wpseopilot-card-header {
+.samanlabs-seo-card .samanlabs-seo-card-header {
   margin-bottom: 20px;
 }
-.wpseopilot-card .wpseopilot-card-header h2,
-.wpseopilot-card .wpseopilot-card-header h3 {
+.samanlabs-seo-card .samanlabs-seo-card-header h2,
+.samanlabs-seo-card .samanlabs-seo-card-header h3 {
   font-size: 14px;
   font-weight: 600;
   color: #1d2327;
   margin: 0 0 8px 0;
   line-height: 1.4;
 }
-.wpseopilot-card .wpseopilot-card-header p {
+.samanlabs-seo-card .samanlabs-seo-card-header p {
   font-size: 13px;
   color: #50575e;
   margin: 0 0 20px 0;
   line-height: 1.6;
 }
-.wpseopilot-card .wpseopilot-card-footer {
+.samanlabs-seo-card .samanlabs-seo-card-footer {
   margin-top: 20px;
   padding-top: 16px;
   border-top: 1px solid #f0f0f1;
 }
-.wpseopilot-card.compact {
+.samanlabs-seo-card.compact {
   padding: 16px;
 }
-.wpseopilot-card.no-padding {
+.samanlabs-seo-card.no-padding {
   padding: 0;
 }
-.wpseopilot-card.no-padding .wpseopilot-card-header {
+.samanlabs-seo-card.no-padding .samanlabs-seo-card-header {
   padding: 20px 20px 0;
 }
-.wpseopilot-card.no-padding .wpseopilot-card-body {
+.samanlabs-seo-card.no-padding .samanlabs-seo-card-body {
   padding: 0 20px 20px;
 }
-.wpseopilot-card-grid {
+.samanlabs-seo-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
   margin-bottom: 20px;
 }
-.wpseopilot-info-card {
+.samanlabs-seo-info-card {
   background: #f0f6fc;
   border: 1px solid #e8e8e9;
   border-radius: 4px;
   padding: 16px;
   margin: 16px 0;
 }
-.wpseopilot-info-card.success {
+.samanlabs-seo-info-card.success {
   background: #a3ffbb;
   border-color: #3dff6f;
 }
-.wpseopilot-info-card.warning {
+.samanlabs-seo-info-card.warning {
   background: #fefbf3;
   border-color: #f4db97;
 }
-.wpseopilot-info-card.error {
+.samanlabs-seo-info-card.error {
   background: #ffffff;
   border-color: #f0b5b6;
 }
-.wpseopilot-info-card p {
+.samanlabs-seo-info-card p {
   margin: 0;
   font-size: 13px;
   color: #1d2327;
 }
-.wpseopilot-form-row {
+.samanlabs-seo-form-row {
   display: flex;
   align-items: flex-start;
   padding: 16px 0;
   border-bottom: 1px solid #f0f0f1;
 }
-.wpseopilot-form-row:last-child {
+.samanlabs-seo-form-row:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
-.wpseopilot-form-row:first-child {
+.samanlabs-seo-form-row:first-child {
   padding-top: 0;
 }
-.wpseopilot-form-row .wpseopilot-form-label {
+.samanlabs-seo-form-row .samanlabs-seo-form-label {
   flex: 0 0 200px;
   padding-right: 20px;
   font-weight: 500;
@@ -238,39 +238,39 @@
   font-size: 13px;
   line-height: 2;
 }
-.wpseopilot-form-row .wpseopilot-form-control {
+.samanlabs-seo-form-row .samanlabs-seo-form-control {
   flex: 1;
 }
-.wpseopilot-form-row .wpseopilot-helper-text {
+.samanlabs-seo-form-row .samanlabs-seo-helper-text {
   display: block;
   margin-top: 8px;
   font-size: 12px;
   color: #646970;
   line-height: 1.6;
 }
-.wpseopilot-toggle {
+.samanlabs-seo-toggle {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.wpseopilot-toggle input[type="checkbox"] {
+.samanlabs-seo-toggle input[type="checkbox"] {
   margin: 0;
 }
-.wpseopilot-toggle label {
+.samanlabs-seo-toggle label {
   margin: 0;
   font-weight: 400;
   color: #1d2327;
   cursor: pointer;
 }
-.wpseopilot-toggle label strong {
+.samanlabs-seo-toggle label strong {
   font-weight: 500;
 }
-.wpseopilot-checkbox-list {
+.samanlabs-seo-checkbox-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.wpseopilot-checkbox-list label {
+.samanlabs-seo-checkbox-list label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -280,13 +280,13 @@
   color: #1d2327;
   transition: color 150ms ease;
 }
-.wpseopilot-checkbox-list label:hover {
+.samanlabs-seo-checkbox-list label:hover {
   color: #50575e;
 }
-.wpseopilot-checkbox-list label input[type="checkbox"] {
+.samanlabs-seo-checkbox-list label input[type="checkbox"] {
   margin: 0;
 }
-.wpseopilot-input {
+.samanlabs-seo-input {
   width: 100%;
   max-width: 400px;
   padding: 6px 12px;
@@ -298,18 +298,18 @@
   border-radius: 2px;
   transition: border-color 150ms ease;
 }
-.wpseopilot-input:focus {
+.samanlabs-seo-input:focus {
   border-color: #2271b1;
   outline: none;
   box-shadow: 0 0 0 1px #2271b1;
 }
-.wpseopilot-input.large {
+.samanlabs-seo-input.large {
   max-width: 600px;
 }
-.wpseopilot-input.small {
+.samanlabs-seo-input.small {
   max-width: 200px;
 }
-.wpseopilot-select {
+.samanlabs-seo-select {
   max-width: 300px;
   padding: 6px 12px;
   font-size: 13px;
@@ -320,12 +320,12 @@
   border-radius: 2px;
   cursor: pointer;
 }
-.wpseopilot-select:focus {
+.samanlabs-seo-select:focus {
   border-color: #2271b1;
   outline: none;
   box-shadow: 0 0 0 1px #2271b1;
 }
-.wpseopilot-textarea {
+.samanlabs-seo-textarea {
   width: 100%;
   max-width: 600px;
   min-height: 100px;
@@ -338,23 +338,23 @@
   border-radius: 2px;
   resize: vertical;
 }
-.wpseopilot-textarea:focus {
+.samanlabs-seo-textarea:focus {
   border-color: #2271b1;
   outline: none;
   box-shadow: 0 0 0 1px #2271b1;
 }
-.wpseopilot-field-group {
+.samanlabs-seo-field-group {
   display: flex;
   gap: 12px;
   align-items: center;
 }
-.wpseopilot-field-group .wpseopilot-input {
+.samanlabs-seo-field-group .samanlabs-seo-input {
   margin: 0;
 }
-.wpseopilot-field-group .button {
+.samanlabs-seo-field-group .button {
   margin: 0;
 }
-.wpseopilot-flex-input {
+.samanlabs-seo-flex-input {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -362,29 +362,29 @@
   min-width: 0;
   align-items: flex-start;
 }
-.wpseopilot-flex-input > .button {
+.samanlabs-seo-flex-input > .button {
   order: 0;
 }
-.wpseopilot-flex-input > .button:first-of-type {
+.samanlabs-seo-flex-input > .button:first-of-type {
   margin-left: auto;
 }
-.wpseopilot-flex-input > input,
-.wpseopilot-flex-input > textarea,
-.wpseopilot-flex-input > select,
-.wpseopilot-flex-input > .wpseopilot-rich-container {
+.samanlabs-seo-flex-input > input,
+.samanlabs-seo-flex-input > textarea,
+.samanlabs-seo-flex-input > select,
+.samanlabs-seo-flex-input > .samanlabs-seo-rich-container {
   order: 1;
   flex: 1 1 100%;
   width: 100%;
   max-width: 100%;
 }
-.wpseopilot-google-preview {
+.samanlabs-seo-google-preview {
   border: 1px solid #dfe3ec;
   border-radius: 8px;
   background: #fff;
   margin-bottom: 1.5rem;
   overflow: hidden;
 }
-.wpseopilot-google-preview__header {
+.samanlabs-seo-google-preview__header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -394,17 +394,17 @@
   font-weight: 600;
   font-size: 13px;
 }
-.wpseopilot-google-preview__header .dashicons {
+.samanlabs-seo-google-preview__header .dashicons {
   color: #555d66;
   font-size: 18px;
   width: 18px;
   height: 18px;
 }
-.wpseopilot-google-preview__body {
+.samanlabs-seo-google-preview__body {
   padding: 1.25rem;
   background: #fafbfc;
 }
-.wpseopilot-google-preview__url {
+.samanlabs-seo-google-preview__url {
   color: #0f9d58;
   font-size: 12px;
   line-height: 1.3;
@@ -414,20 +414,20 @@
   align-items: center;
   gap: 6px;
 }
-.wpseopilot-google-preview__favicon {
+.samanlabs-seo-google-preview__favicon {
   width: 16px;
   height: 16px;
   font-size: 16px;
   color: #5f6368;
 }
-.wpseopilot-google-preview__favicon-img {
+.samanlabs-seo-google-preview__favicon-img {
   width: 16px;
   height: 16px;
   object-fit: contain;
   border-radius: 50%;
   display: block;
 }
-.wpseopilot-google-preview__title {
+.samanlabs-seo-google-preview__title {
   color: #1a0dab;
   font-size: 18px;
   line-height: 1.2;
@@ -436,18 +436,18 @@
   font-family: Arial, sans-serif;
   word-wrap: break-word;
 }
-.wpseopilot-google-preview__title:hover {
+.samanlabs-seo-google-preview__title:hover {
   text-decoration: underline;
   cursor: pointer;
 }
-.wpseopilot-google-preview__description {
+.samanlabs-seo-google-preview__description {
   color: #4d5156;
   font-size: 13px;
   line-height: 1.4;
   font-family: Arial, sans-serif;
   word-wrap: break-word;
 }
-.wpseopilot-google-preview__footer {
+.samanlabs-seo-google-preview__footer {
   display: flex;
   gap: 1.5rem;
   padding: 0.75rem 1rem;
@@ -456,52 +456,52 @@
   font-size: 12px;
   color: #555d66;
 }
-.wpseopilot-google-preview__chars {
+.samanlabs-seo-google-preview__chars {
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
-.wpseopilot-google-preview__chars .wpseopilot-char-count {
+.samanlabs-seo-google-preview__chars .samanlabs-seo-char-count {
   font-weight: 600;
   color: #1d2327;
 }
-.wpseopilot-google-preview__chars.over-limit {
+.samanlabs-seo-google-preview__chars.over-limit {
   color: #b32d2e;
 }
-.wpseopilot-google-preview__chars.over-limit .wpseopilot-char-count {
+.samanlabs-seo-google-preview__chars.over-limit .samanlabs-seo-char-count {
   color: #b32d2e;
 }
-.wpseopilot-preview-source-toggle {
+.samanlabs-seo-preview-source-toggle {
   color: #2271b1 !important;
   border-color: #2271b1 !important;
   background: transparent !important;
 }
-.wpseopilot-preview-source-toggle:hover {
+.samanlabs-seo-preview-source-toggle:hover {
   background: #f0f6fc !important;
 }
-.wpseopilot-preview-source-panel {
+.samanlabs-seo-preview-source-panel {
   border-bottom: 1px solid #dfe3ec;
 }
-.wpseopilot-preview-source-panel input[type="number"] {
+.samanlabs-seo-preview-source-panel input[type="number"] {
   width: 100px;
 }
-.wpseopilot-sitemap-page .wpseopilot-settings-grid {
+.samanlabs-seo-sitemap-page .samanlabs-seo-settings-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
   margin-bottom: 20px;
 }
 @media (max-width: 1200px) {
-  .wpseopilot-sitemap-page .wpseopilot-settings-grid {
+  .samanlabs-seo-sitemap-page .samanlabs-seo-settings-grid {
     grid-template-columns: 1fr;
   }
 }
-.wpseopilot-sitemap-page .wpseopilot-sitemap-urls {
+.samanlabs-seo-sitemap-page .samanlabs-seo-sitemap-urls {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.wpseopilot-sitemap-page .wpseopilot-sitemap-urls .sitemap-url-item {
+.samanlabs-seo-sitemap-page .samanlabs-seo-sitemap-urls .sitemap-url-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -510,79 +510,79 @@
   border-radius: 2px;
   transition: background 150ms ease;
 }
-.wpseopilot-sitemap-page .wpseopilot-sitemap-urls .sitemap-url-item:hover {
+.samanlabs-seo-sitemap-page .samanlabs-seo-sitemap-urls .sitemap-url-item:hover {
   background: #eef0f0;
 }
-.wpseopilot-sitemap-page .wpseopilot-sitemap-urls .sitemap-url-item strong {
+.samanlabs-seo-sitemap-page .samanlabs-seo-sitemap-urls .sitemap-url-item strong {
   font-weight: 500;
   color: #1d2327;
   font-size: 12px;
   min-width: 140px;
 }
-.wpseopilot-sitemap-page .wpseopilot-sitemap-urls .sitemap-url-item a {
+.samanlabs-seo-sitemap-page .samanlabs-seo-sitemap-urls .sitemap-url-item a {
   color: #2271b1;
   text-decoration: none;
   font-size: 12px;
   word-break: break-all;
 }
-.wpseopilot-sitemap-page .wpseopilot-sitemap-urls .sitemap-url-item a:hover {
+.samanlabs-seo-sitemap-page .samanlabs-seo-sitemap-urls .sitemap-url-item a:hover {
   text-decoration: underline;
 }
-.wpseopilot-sitemap-page .wpseopilot-additional-pages .additional-page-row {
+.samanlabs-seo-sitemap-page .samanlabs-seo-additional-pages .additional-page-row {
   display: flex;
   gap: 12px;
   margin-bottom: 12px;
   align-items: center;
 }
-.wpseopilot-sitemap-page .wpseopilot-additional-pages .additional-page-row input[type="url"] {
+.samanlabs-seo-sitemap-page .samanlabs-seo-additional-pages .additional-page-row input[type="url"] {
   flex: 1;
 }
-.wpseopilot-sitemap-page .wpseopilot-additional-pages .additional-page-row input[type="text"] {
+.samanlabs-seo-sitemap-page .samanlabs-seo-additional-pages .additional-page-row input[type="text"] {
   width: 80px;
   flex-shrink: 0;
 }
-.wpseopilot-sitemap-page .wpseopilot-additional-pages .additional-page-row .button {
+.samanlabs-seo-sitemap-page .samanlabs-seo-additional-pages .additional-page-row .button {
   flex-shrink: 0;
 }
-.wpseopilot-sitemap-page .wpseopilot-type-grid {
+.samanlabs-seo-sitemap-page .samanlabs-seo-type-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 8px;
 }
-.wpseopilot-social-page .wpseopilot-settings-grid {
+.samanlabs-seo-social-page .samanlabs-seo-settings-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
   margin-bottom: 20px;
 }
 @media (max-width: 1200px) {
-  .wpseopilot-social-page .wpseopilot-settings-grid {
+  .samanlabs-seo-social-page .samanlabs-seo-settings-grid {
     grid-template-columns: 1fr;
   }
 }
-.wpseopilot-social-page .wpseopilot-form-section {
+.samanlabs-seo-social-page .samanlabs-seo-form-section {
   border-bottom: 1px solid #f0f0f1;
   padding-bottom: 20px;
   margin-bottom: 20px;
 }
-.wpseopilot-social-page .wpseopilot-form-section:last-child {
+.samanlabs-seo-social-page .samanlabs-seo-form-section:last-child {
   border-bottom: none;
   padding-bottom: 0;
   margin-bottom: 0;
 }
-.wpseopilot-social-page .wpseopilot-form-section h3 {
+.samanlabs-seo-social-page .samanlabs-seo-form-section h3 {
   font-size: 16px;
   font-weight: 600;
   color: #1d2327;
   margin: 0 0 16px 0;
 }
-.wpseopilot-social-page .wpseopilot-accordion {
+.samanlabs-seo-social-page .samanlabs-seo-accordion {
   border-bottom: 1px solid #f0f0f1;
 }
-.wpseopilot-social-page .wpseopilot-accordion:last-child {
+.samanlabs-seo-social-page .samanlabs-seo-accordion:last-child {
   border-bottom: none;
 }
-.wpseopilot-social-page .wpseopilot-accordion summary {
+.samanlabs-seo-social-page .samanlabs-seo-accordion summary {
   padding: 16px 20px;
   cursor: pointer;
   display: flex;
@@ -590,14 +590,14 @@
   justify-content: space-between;
   transition: background 150ms ease;
 }
-.wpseopilot-social-page .wpseopilot-accordion summary:hover {
+.samanlabs-seo-social-page .samanlabs-seo-accordion summary:hover {
   background: #f6f7f7;
 }
-.wpseopilot-social-page .wpseopilot-accordion summary .wpseopilot-accordion-title {
+.samanlabs-seo-social-page .samanlabs-seo-accordion summary .samanlabs-seo-accordion-title {
   font-weight: 500;
   color: #1d2327;
 }
-.wpseopilot-social-page .wpseopilot-accordion summary .wpseopilot-accordion-badge {
+.samanlabs-seo-social-page .samanlabs-seo-accordion summary .samanlabs-seo-accordion-badge {
   font-size: 12px;
   color: #646970;
   background: #f6f7f7;
@@ -605,51 +605,51 @@
   border-radius: 2px;
   font-family: monospace;
 }
-.wpseopilot-social-page .wpseopilot-accordion[open] summary {
+.samanlabs-seo-social-page .samanlabs-seo-accordion[open] summary {
   background: #f6f7f7;
 }
-.wpseopilot-social-page .wpseopilot-accordion .wpseopilot-accordion__body {
+.samanlabs-seo-social-page .samanlabs-seo-accordion .samanlabs-seo-accordion__body {
   padding: 20px;
   background: #ffffff;
 }
-.wpseopilot-social-page .wpseopilot-info-list {
+.samanlabs-seo-social-page .samanlabs-seo-info-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-.wpseopilot-social-page .wpseopilot-info-list li {
+.samanlabs-seo-social-page .samanlabs-seo-info-list li {
   padding: 8px 0;
   position: relative;
   padding-left: 16px;
 }
-.wpseopilot-social-page .wpseopilot-info-list li:before {
+.samanlabs-seo-social-page .samanlabs-seo-info-list li:before {
   content: "•";
   position: absolute;
   left: 0;
   color: #2271b1;
 }
-.wpseopilot-social-page .wpseopilot-settings-footer {
+.samanlabs-seo-social-page .samanlabs-seo-settings-footer {
   margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid #f0f0f1;
 }
-.wpseopilot-social-card-preview__controls {
+.samanlabs-seo-social-card-preview__controls {
   display: flex;
   align-items: flex-end;
   gap: 16px;
   margin-bottom: 20px;
 }
-.wpseopilot-social-card-preview__controls .wpseopilot-form-field {
+.samanlabs-seo-social-card-preview__controls .samanlabs-seo-form-field {
   flex: 1;
   margin-bottom: 0;
 }
-.wpseopilot-social-card-preview__controls .button {
+.samanlabs-seo-social-card-preview__controls .button {
   white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 4px;
 }
-.wpseopilot-social-card-preview__frame {
+.samanlabs-seo-social-card-preview__frame {
   position: relative;
   background: #f6f7f7;
   border: 1px solid #dcdcde;
@@ -657,18 +657,18 @@
   overflow: hidden;
   min-height: 330px;
 }
-.wpseopilot-social-card-preview__frame img {
+.samanlabs-seo-social-card-preview__frame img {
   display: block;
   width: 100%;
   height: auto;
 }
-.wpseopilot-social-card-preview__frame.is-loading img {
+.samanlabs-seo-social-card-preview__frame.is-loading img {
   opacity: 0.3;
 }
-.wpseopilot-social-card-preview__frame.is-loading .wpseopilot-social-card-preview__loading {
+.samanlabs-seo-social-card-preview__frame.is-loading .samanlabs-seo-social-card-preview__loading {
   display: flex;
 }
-.wpseopilot-social-card-preview__loading {
+.samanlabs-seo-social-card-preview__loading {
   display: none;
   position: absolute;
   top: 50%;
@@ -677,37 +677,37 @@
   align-items: center;
   justify-content: center;
 }
-.wpseopilot-social-card-preview__loading .spinner {
+.samanlabs-seo-social-card-preview__loading .spinner {
   float: none;
   margin: 0;
 }
-.wpseopilot-layout-selector {
+.samanlabs-seo-layout-selector {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   margin-top: 12px;
 }
 @media (max-width: 768px) {
-  .wpseopilot-layout-selector {
+  .samanlabs-seo-layout-selector {
     grid-template-columns: 1fr;
   }
 }
-.wpseopilot-layout-option {
+.samanlabs-seo-layout-option {
   display: block;
   position: relative;
   cursor: pointer;
 }
-.wpseopilot-layout-option input[type="radio"] {
+.samanlabs-seo-layout-option input[type="radio"] {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 }
-.wpseopilot-layout-option input[type="radio"]:checked + .wpseopilot-layout-option__content {
+.samanlabs-seo-layout-option input[type="radio"]:checked + .samanlabs-seo-layout-option__content {
   background: #c5dff4;
   border-color: #2271b1;
 }
-.wpseopilot-layout-option input[type="radio"]:checked + .wpseopilot-layout-option__content:before {
+.samanlabs-seo-layout-option input[type="radio"]:checked + .samanlabs-seo-layout-option__content:before {
   content: "✓";
   position: absolute;
   top: 8px;
@@ -723,10 +723,10 @@
   font-size: 12px;
   font-weight: bold;
 }
-.wpseopilot-layout-option input[type="radio"]:focus + .wpseopilot-layout-option__content {
+.samanlabs-seo-layout-option input[type="radio"]:focus + .samanlabs-seo-layout-option__content {
   box-shadow: 0 0 0 2px #2271b1;
 }
-.wpseopilot-layout-option__content {
+.samanlabs-seo-layout-option__content {
   position: relative;
   padding: 16px;
   border: 2px solid #dcdcde;
@@ -734,21 +734,21 @@
   background: #fff;
   transition: all 150ms ease;
 }
-.wpseopilot-layout-option__content:hover {
+.samanlabs-seo-layout-option__content:hover {
   border-color: #2271b1;
 }
-.wpseopilot-layout-option__content strong {
+.samanlabs-seo-layout-option__content strong {
   display: block;
   font-weight: 600;
   color: #1d2327;
   margin-bottom: 8px;
 }
-.wpseopilot-layout-option__content span {
+.samanlabs-seo-layout-option__content span {
   display: block;
   font-size: 12px;
   color: #646970;
 }
-.wpseopilot-color-picker {
+.samanlabs-seo-color-picker {
   width: 60px;
   height: 40px;
   padding: 4px;
@@ -757,32 +757,32 @@
   cursor: pointer;
   vertical-align: middle;
 }
-.wpseopilot-color-picker::-webkit-color-swatch-wrapper {
+.samanlabs-seo-color-picker::-webkit-color-swatch-wrapper {
   padding: 0;
 }
-.wpseopilot-color-picker::-webkit-color-swatch {
+.samanlabs-seo-color-picker::-webkit-color-swatch {
   border: none;
   border-radius: 2px;
 }
-.wpseopilot-color-picker::-moz-color-swatch {
+.samanlabs-seo-color-picker::-moz-color-swatch {
   border: none;
   border-radius: 2px;
 }
-.wpseopilot-color-text {
+.samanlabs-seo-color-text {
   vertical-align: middle;
   margin-left: 12px;
   max-width: 120px;
   font-family: monospace;
 }
-.wpseopilot-media-upload {
+.samanlabs-seo-media-upload {
   display: flex;
   gap: 12px;
   align-items: center;
 }
-.wpseopilot-media-upload input[type="url"] {
+.samanlabs-seo-media-upload input[type="url"] {
   flex: 1;
 }
-.wpseopilot-status-badge {
+.samanlabs-seo-status-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -792,25 +792,25 @@
   font-size: 12px;
   margin-bottom: 16px;
 }
-.wpseopilot-status-badge .dashicons {
+.samanlabs-seo-status-badge .dashicons {
   font-size: 18px;
   width: 18px;
   height: 18px;
 }
-.wpseopilot-status-badge.wpseopilot-status-badge--success {
+.samanlabs-seo-status-badge.samanlabs-seo-status-badge--success {
   background: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
-.wpseopilot-status-badge.wpseopilot-status-badge--inactive {
+.samanlabs-seo-status-badge.samanlabs-seo-status-badge--inactive {
   background: #f8f9fa;
   color: #6c757d;
   border: 1px solid #dee2e6;
 }
-.wpseopilot-accordion-tabs {
+.samanlabs-seo-accordion-tabs {
   margin-top: 20px;
 }
-.wpseopilot-accordion-tabs__nav {
+.samanlabs-seo-accordion-tabs__nav {
   display: flex;
   gap: 0;
   border-bottom: 1px solid #f0f0f1;
@@ -818,7 +818,7 @@
   padding: 0;
   background: transparent;
 }
-.wpseopilot-accordion-tab {
+.samanlabs-seo-accordion-tab {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -832,74 +832,74 @@
   top: 1px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
-.wpseopilot-accordion-tab:hover {
+.samanlabs-seo-accordion-tab:hover {
   background: transparent;
   color: #1d2327;
   border-bottom-color: #dcdcde;
 }
-.wpseopilot-accordion-tab.is-active {
+.samanlabs-seo-accordion-tab.is-active {
   background: transparent;
   color: #2271b1;
   border-bottom-color: #135e96;
   font-weight: 600;
 }
-.wpseopilot-accordion-tab:focus {
+.samanlabs-seo-accordion-tab:focus {
   outline: 2px solid #2271b1;
   outline-offset: -2px;
   box-shadow: none;
 }
-.wpseopilot-accordion-tab-panel {
+.samanlabs-seo-accordion-tab-panel {
   display: none;
   padding: 16px 0;
 }
-.wpseopilot-accordion-tab-panel.is-active {
+.samanlabs-seo-accordion-tab-panel.is-active {
   display: block;
 }
-.wpseopilot-accordion-tabs--ready .wpseopilot-accordion-tab-panel {
+.samanlabs-seo-accordion-tabs--ready .samanlabs-seo-accordion-tab-panel {
   display: none;
 }
-.wpseopilot-accordion-tabs--ready .wpseopilot-accordion-tab-panel.is-active {
+.samanlabs-seo-accordion-tabs--ready .samanlabs-seo-accordion-tab-panel.is-active {
   display: block;
 }
-.wpseopilot-accordion__preview {
+.samanlabs-seo-accordion__preview {
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid #f0f0f1;
 }
 @media (max-width: 782px) {
-  .wpseopilot-accordion-tabs__nav {
+  .samanlabs-seo-accordion-tabs__nav {
     flex-wrap: wrap;
   }
-  .wpseopilot-accordion-tab {
+  .samanlabs-seo-accordion-tab {
     flex: 1 1 auto;
     min-width: 120px;
     padding: 12px;
     font-size: 11px;
   }
 }
-.wpseopilot-search-appearance-page .wpseopilot-settings-grid {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-settings-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
 }
 @media (max-width: 960px) {
-  .wpseopilot-search-appearance-page .wpseopilot-settings-grid {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-settings-grid {
     grid-template-columns: 1fr;
   }
 }
-.wpseopilot-search-appearance-page .wpseopilot-settings-main {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-settings-main {
   min-width: 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-settings-sidebar {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-settings-sidebar {
   min-width: 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion {
   border-bottom: 1px solid #e2e8f0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion:last-child {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion:last-child {
   border-bottom: none;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion summary {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion summary {
   padding: 1rem 1.25rem;
   cursor: pointer;
   display: flex;
@@ -909,28 +909,28 @@
   transition: background-color 0.15s ease;
   user-select: none;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion summary::-webkit-details-marker {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion summary::-webkit-details-marker {
   display: none;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion summary:hover {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion summary:hover {
   background: #f6f7f7;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion summary::after {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion summary::after {
   content: '\f345';
   font-family: 'dashicons';
   font-size: 20px;
   color: #555d66;
   transition: transform 0.2s ease;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion[open] summary::after {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion[open] summary::after {
   transform: rotate(180deg);
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion-title {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion-title {
   font-weight: 600;
   color: #1d2327;
   font-size: 14px;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion-badge {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion-badge {
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   background: #f0f0f1;
   color: #50575e;
@@ -940,86 +940,86 @@
   font-weight: 500;
   letter-spacing: 0.01em;
 }
-.wpseopilot-search-appearance-page .wpseopilot-accordion__body {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-accordion__body {
   padding: 1.25rem;
   background: #fafbfc;
   border-top: 1px solid #f0f0f1;
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-card {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-card {
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1.25rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-card h3 {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-card h3 {
   margin-top: 0;
   margin-bottom: 0.75rem;
   font-size: 14px;
   font-weight: 600;
   color: #1d2327;
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-card p {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-card p {
   margin: 0 0 0.75rem;
   color: #555d66;
   font-size: 13px;
   line-height: 1.5;
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-card p:last-child {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-card p:last-child {
   margin-bottom: 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-list {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-list {
   margin: 0;
   padding-left: 1.25rem;
   color: #555d66;
   font-size: 13px;
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-list li {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-list li {
   margin-bottom: 0.5rem;
   line-height: 1.5;
 }
-.wpseopilot-search-appearance-page .wpseopilot-info-list li:last-child {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-info-list li:last-child {
   margin-bottom: 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-toggle {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-toggle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
 }
-.wpseopilot-search-appearance-page .wpseopilot-toggle input[type="checkbox"] {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-toggle input[type="checkbox"] {
   margin: 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-toggle-label {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-toggle-label {
   color: #1d2327;
   font-weight: 400;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-selector {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-selector {
   margin-top: 8px;
   flex: 1;
   min-width: 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-form-row--separator {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-form-row--separator {
   flex-wrap: wrap;
 }
-.wpseopilot-search-appearance-page .wpseopilot-form-row--separator > label {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-form-row--separator > label {
   flex: 0 0 200px;
   max-width: 200px;
 }
-.wpseopilot-search-appearance-page .wpseopilot-form-row--separator > .wpseopilot-separator-selector {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-form-row--separator > .samanlabs-seo-separator-selector {
   flex: 1 1 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-form-row--separator .wpseopilot-separator-selector .description {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-form-row--separator .samanlabs-seo-separator-selector .description {
   margin: 8px 0 0;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-grid {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(90px, 1fr));
   gap: 10px;
   margin-bottom: 12px;
   width: 100%;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-option {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1033,28 +1033,28 @@
   min-height: 70px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-option:hover {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option:hover {
   border-color: #2271b1;
   background: #f6f7f7;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-option.is-active {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option.is-active {
   border-color: #2271b1;
   background: #f0f6fc;
   box-shadow: 0 0 0 1px #2271b1;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-option.is-active .wpseopilot-separator-preview {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option.is-active .samanlabs-seo-separator-preview {
   color: #2271b1;
   font-weight: 600;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-option.is-active .wpseopilot-separator-label {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option.is-active .samanlabs-seo-separator-label {
   color: #2271b1;
   font-weight: 600;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-option:focus {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option:focus {
   outline: 2px solid #2271b1;
   outline-offset: 2px;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-preview {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-preview {
   font-size: 24px;
   font-weight: 500;
   color: #1d2327;
@@ -1065,53 +1065,53 @@
   align-items: center;
   justify-content: center;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-label {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-label {
   font-size: 11px;
   color: #646970;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-custom-input {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-custom-input {
   margin-top: 12px;
   padding: 12px;
   background: #f6f7f7;
   border-radius: 4px;
   border: 1px solid #dcdcde;
 }
-.wpseopilot-search-appearance-page .wpseopilot-separator-custom-input input {
+.samanlabs-seo-search-appearance-page .samanlabs-seo-separator-custom-input input {
   width: 100%;
 }
 @media (max-width: 782px) {
-  .wpseopilot-search-appearance-page .wpseopilot-separator-grid {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-separator-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  .wpseopilot-search-appearance-page .wpseopilot-separator-option {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-separator-option {
     padding: 10px 6px;
     min-height: 60px;
   }
-  .wpseopilot-search-appearance-page .wpseopilot-separator-preview {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-separator-preview {
     font-size: 20px;
   }
-  .wpseopilot-search-appearance-page .wpseopilot-separator-label {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-separator-label {
     font-size: 10px;
   }
-  .wpseopilot-search-appearance-page .wpseopilot-form-row--separator > label {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-form-row--separator > label {
     flex: 0 0 100%;
     max-width: 100%;
     margin-bottom: 8px;
   }
-  .wpseopilot-search-appearance-page .wpseopilot-form-row--separator .wpseopilot-separator-selector .description {
+  .samanlabs-seo-search-appearance-page .samanlabs-seo-form-row--separator .samanlabs-seo-separator-selector .description {
     margin-left: 0;
   }
 }
-.wp-plugin-sidebar__panel .wpseopilot-panel {
+.wp-plugin-sidebar__panel .samanlabs-seo-panel {
   padding: 16px;
 }
-.wpseopilot-panel .components-text-control__input {
+.samanlabs-seo-panel .components-text-control__input {
   width: 100%;
 }
-.wpseopilot-snippet {
+.samanlabs-seo-snippet {
   border: 1px solid #dfe3ec;
   border-radius: 6px;
   padding: 12px;
@@ -1119,114 +1119,114 @@
   margin-top: 12px;
   background: #fff;
 }
-.wpseopilot-snippet__title {
+.samanlabs-seo-snippet__title {
   color: #1a0dab;
   font-weight: 600;
   margin-bottom: 4px;
 }
-.wpseopilot-snippet__url {
+.samanlabs-seo-snippet__url {
   color: #0f9d58;
   font-size: 11px;
   margin-bottom: 4px;
 }
-.wpseopilot-snippet__desc {
+.samanlabs-seo-snippet__desc {
   color: #4d5156;
 }
-.wpseopilot-links__lede {
+.samanlabs-seo-links__lede {
   margin-top: 0.5rem;
   color: #555d66;
 }
-.wpseopilot-links__tabs {
+.samanlabs-seo-links__tabs {
   margin-top: 1.5rem;
 }
-.wpseopilot-links__panel {
+.samanlabs-seo-links__panel {
   margin-top: 1.5rem;
 }
-.wpseopilot-links__panel-head {
+.samanlabs-seo-links__panel-head {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
 }
-.wpseopilot-links__panel-head p {
+.samanlabs-seo-links__panel-head p {
   margin: 0.25rem 0 0;
   color: #555d66;
 }
-.wpseopilot-grid {
+.samanlabs-seo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
-.wpseopilot-links__filters {
+.samanlabs-seo-links__filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
-.wpseopilot-links__filters label span,
-.wpseopilot-links__rule-form label span,
-.wpseopilot-links__category-form label span,
-.wpseopilot-links__utm-form label span {
+.samanlabs-seo-links__filters label span,
+.samanlabs-seo-links__rule-form label span,
+.samanlabs-seo-links__category-form label span,
+.samanlabs-seo-links__utm-form label span {
   display: block;
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
-.wpseopilot-links__filters select,
-.wpseopilot-links__filters input[type="search"],
-.wpseopilot-links__rule-form input[type="text"],
-.wpseopilot-links__rule-form input[type="url"],
-.wpseopilot-links__rule-form input[type="number"],
-.wpseopilot-links__rule-form textarea,
-.wpseopilot-links__category-form input[type="text"],
-.wpseopilot-links__category-form input[type="color"],
-.wpseopilot-links__category-form textarea,
-.wpseopilot-links__category-form select,
-.wpseopilot-links__utm-form input[type="text"],
-.wpseopilot-links__utm-form textarea,
-.wpseopilot-links__utm-form select {
+.samanlabs-seo-links__filters select,
+.samanlabs-seo-links__filters input[type="search"],
+.samanlabs-seo-links__rule-form input[type="text"],
+.samanlabs-seo-links__rule-form input[type="url"],
+.samanlabs-seo-links__rule-form input[type="number"],
+.samanlabs-seo-links__rule-form textarea,
+.samanlabs-seo-links__category-form input[type="text"],
+.samanlabs-seo-links__category-form input[type="color"],
+.samanlabs-seo-links__category-form textarea,
+.samanlabs-seo-links__category-form select,
+.samanlabs-seo-links__utm-form input[type="text"],
+.samanlabs-seo-links__utm-form textarea,
+.samanlabs-seo-links__utm-form select {
   width: 100%;
 }
-.wpseopilot-links__filter-actions {
+.samanlabs-seo-links__filter-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-.wpseopilot-links__rules table th,
-.wpseopilot-links__rules table td {
+.samanlabs-seo-links__rules table th,
+.samanlabs-seo-links__rules table td {
   vertical-align: middle;
 }
-.wpseopilot-links__empty {
+.samanlabs-seo-links__empty {
   padding: 2rem;
   text-align: center;
   background: #f6f7f7;
   border: 1px dashed #ccd0d4;
 }
-.wpseopilot-links__table-form {
+.samanlabs-seo-links__table-form {
   margin-top: 1rem;
 }
-.wpseopilot-links__bulk {
+.samanlabs-seo-links__bulk {
   margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
 }
-.wpseopilot-links__bulk-category[hidden] {
+.samanlabs-seo-links__bulk-category[hidden] {
   display: none !important;
 }
-.wpseopilot-tag-input {
+.samanlabs-seo-tag-input {
   border: 1px solid #ccd0d4;
   border-radius: 4px;
   padding: 0.5rem;
 }
-.wpseopilot-tag-input__list {
+.samanlabs-seo-tag-input__list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
   margin-bottom: 0.5rem;
 }
-.wpseopilot-tag {
+.samanlabs-seo-tag {
   background: #e6f0ff;
   border-radius: 999px;
   padding: 0.15rem 0.5rem;
@@ -1235,23 +1235,23 @@
   align-items: center;
   gap: 0.35rem;
 }
-.wpseopilot-tag__remove {
+.samanlabs-seo-tag__remove {
   border: none;
   background: transparent;
   color: #1d2327;
   cursor: pointer;
   font-size: 12px;
 }
-.wpseopilot-links__choice {
+.samanlabs-seo-links__choice {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   margin-right: 1rem;
 }
-.wpseopilot-links__destination-field {
+.samanlabs-seo-links__destination-field {
   margin-top: 1rem;
 }
-.wpseopilot-links__suggestions {
+.samanlabs-seo-links__suggestions {
   margin-top: 0.25rem;
   border: 1px solid #ccd0d4;
   border-radius: 4px;
@@ -1259,7 +1259,7 @@
   max-height: 200px;
   overflow-y: auto;
 }
-.wpseopilot-links__suggestions button {
+.samanlabs-seo-links__suggestions button {
   width: 100%;
   text-align: left;
   padding: 0.4rem 0.6rem;
@@ -1267,45 +1267,45 @@
   background: transparent;
   cursor: pointer;
 }
-.wpseopilot-links__suggestions button:hover {
+.samanlabs-seo-links__suggestions button:hover {
   background: #f0f0f1;
 }
-.wpseopilot-links__new-category[hidden],
+.samanlabs-seo-links__new-category[hidden],
 [data-destination-field][hidden],
 [data-heading-levels][hidden],
 [data-settings-heading][hidden],
-.wpseopilot-links__preview[hidden],
-.wpseopilot-links__suggestions[hidden] {
+.samanlabs-seo-links__preview[hidden],
+.samanlabs-seo-links__suggestions[hidden] {
   display: none !important;
 }
-.wpseopilot-links__split {
+.samanlabs-seo-links__split {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
 }
-.wpseopilot-links__rule {
+.samanlabs-seo-links__rule {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 65%);
   border: 1px solid #e2e8f0;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
-.wpseopilot-links__rule-guide {
+.samanlabs-seo-links__rule-guide {
   margin-bottom: 1.5rem;
   padding: 1.25rem;
   border-radius: 14px;
   border: 1px dashed #c3d4ff;
   background: #eef2ff;
 }
-.wpseopilot-links__rule-steps {
+.samanlabs-seo-links__rule-steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
-.wpseopilot-links__rule-step {
+.samanlabs-seo-links__rule-step {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
 }
-.wpseopilot-links__rule-step-number {
+.samanlabs-seo-links__rule-step-number {
   flex: none;
   width: 34px;
   height: 34px;
@@ -1318,73 +1318,73 @@
   align-items: center;
   justify-content: center;
 }
-.wpseopilot-links__rule-step strong {
+.samanlabs-seo-links__rule-step strong {
   display: block;
   margin-bottom: 0.1rem;
 }
 @media (max-width: 960px) {
-  .wpseopilot-links__split {
+  .samanlabs-seo-links__split {
     grid-template-columns: 1fr;
   }
 }
-.wpseopilot-color-chip {
+.samanlabs-seo-color-chip {
   display: inline-block;
   width: 20px;
   height: 20px;
   border-radius: 4px;
   border: 1px solid #ccd0d4;
 }
-.wpseopilot-links__helper {
+.samanlabs-seo-links__helper {
   margin-top: 1rem;
   padding: 0.75rem;
   border: 1px solid #ccd0d4;
   background: #f6f7f7;
 }
-.wpseopilot-status {
+.samanlabs-seo-status {
   display: inline-flex;
   align-items: center;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   font-size: 12px;
 }
-.wpseopilot-status--success {
+.samanlabs-seo-status--success {
   background: #e6f7ef;
   color: #1f6f43;
 }
-.wpseopilot-status--muted {
+.samanlabs-seo-status--muted {
   background: #f0f0f1;
   color: #50575e;
 }
-.wpseopilot-pill {
+.samanlabs-seo-pill {
   display: inline-flex;
   align-items: center;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
   font-size: 12px;
-  background: var(--wpseopilot-pill-color, #e0e7ff);
+  background: var(--samanlabs-seo-pill-color, #e0e7ff);
   color: #1d2327;
 }
-.wpseopilot-links__category-form,
-.wpseopilot-links__utm-form,
-.wpseopilot-links__settings-form,
-.wpseopilot-links__rule-form {
+.samanlabs-seo-links__category-form,
+.samanlabs-seo-links__utm-form,
+.samanlabs-seo-links__settings-form,
+.samanlabs-seo-links__rule-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-.wpseopilot-links__delete-category {
+.samanlabs-seo-links__delete-category {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.35rem;
 }
-.wpseopilot-links__preview {
+.samanlabs-seo-links__preview {
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid #ccd0d4;
   background: #fff;
 }
-.wpseopilot-links__preview pre {
+.samanlabs-seo-links__preview pre {
   max-height: 280px;
   overflow: auto;
   background: #1e1e1e;
@@ -1392,25 +1392,25 @@
   padding: 0.75rem;
   border-radius: 4px;
 }
-.wpseopilot-links__preview-status {
+.samanlabs-seo-links__preview-status {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
-.wpseopilot-links__preview-status.is-error {
+.samanlabs-seo-links__preview-status.is-error {
   color: #b32d2e;
 }
-.wpseopilot-links__preview-status.is-success {
+.samanlabs-seo-links__preview-status.is-success {
   color: #1d6f42;
 }
-.wpseopilot-links__preview-status.is-loading {
+.samanlabs-seo-links__preview-status.is-loading {
   color: #555d66;
 }
-.wpseopilot-links__rule {
+.samanlabs-seo-links__rule {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 65%);
   border: 1px solid #e2e8f0;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
-.wpseopilot-links__rule-hero {
+.samanlabs-seo-links__rule-hero {
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
@@ -1420,23 +1420,23 @@
   background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.2), rgba(255, 255, 255, 0));
   margin-bottom: 1.5rem;
 }
-.wpseopilot-links__rule-hero h2 {
+.samanlabs-seo-links__rule-hero h2 {
   margin: 0.25rem 0;
 }
-.wpseopilot-links__rule-hero ul {
+.samanlabs-seo-links__rule-hero ul {
   margin: 0.75rem 0 0;
   padding-left: 0;
   color: #1e293b;
   list-style: none;
 }
-.wpseopilot-links__rule-hero ul li {
+.samanlabs-seo-links__rule-hero ul li {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-weight: 600;
   margin-bottom: 0.35rem;
 }
-.wpseopilot-links__rule-hero ul li::before {
+.samanlabs-seo-links__rule-hero ul li::before {
   content: '✔';
   font-size: 0.85em;
   color: #0ea5e9;
@@ -1444,7 +1444,7 @@
   border-radius: 50%;
   padding: 0.15rem 0.4rem;
 }
-.wpseopilot-links__rule-hero-meta {
+.samanlabs-seo-links__rule-hero-meta {
   flex: none;
   min-width: 240px;
   background: #ffffff;
@@ -1456,18 +1456,18 @@
   flex-direction: column;
   gap: 0.75rem;
 }
-.wpseopilot-links__rule-hero-meta div span {
+.samanlabs-seo-links__rule-hero-meta div span {
   display: block;
   font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #64748b;
 }
-.wpseopilot-links__rule-hero-meta strong {
+.samanlabs-seo-links__rule-hero-meta strong {
   font-size: 20px;
   color: #0f172a;
 }
-.wpseopilot-links__pill {
+.samanlabs-seo-links__pill {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -1478,24 +1478,24 @@
   font-weight: 600;
   font-size: 12px;
 }
-.wpseopilot-links__rule-guide {
+.samanlabs-seo-links__rule-guide {
   margin-bottom: 1.5rem;
   padding: 1.25rem;
   border-radius: 14px;
   border: 1px dashed #c3d4ff;
   background: #eef2ff;
 }
-.wpseopilot-links__rule-steps {
+.samanlabs-seo-links__rule-steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
-.wpseopilot-links__rule-step {
+.samanlabs-seo-links__rule-step {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
 }
-.wpseopilot-links__rule-step-number {
+.samanlabs-seo-links__rule-step-number {
   flex: none;
   width: 34px;
   height: 34px;
@@ -1508,11 +1508,11 @@
   align-items: center;
   justify-content: center;
 }
-.wpseopilot-links__rule-step strong {
+.samanlabs-seo-links__rule-step strong {
   display: block;
   margin-bottom: 0.1rem;
 }
-.wpseopilot-links__section {
+.samanlabs-seo-links__section {
   margin-bottom: 1.5rem;
   padding: 1.25rem;
   border-radius: 14px;
@@ -1520,12 +1520,12 @@
   background: #fff;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
-.wpseopilot-links__section h3 {
+.samanlabs-seo-links__section h3 {
   margin-top: 0;
   margin-bottom: 0.75rem;
 }
-.wpseopilot-links__destination,
-.wpseopilot-links__toggles {
+.samanlabs-seo-links__destination,
+.samanlabs-seo-links__toggles {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
