@@ -26,6 +26,46 @@ namespace SamanLabs\SEO\Helpers {
 	}
 
 	/**
+	 * Check if a module is enabled.
+	 *
+	 * Uses the new `samanlabs_seo_module_*` option keys that match the React UI.
+	 * Falls back to legacy `samanlabs_seo_enable_*` options for backward compatibility.
+	 *
+	 * @param string $module Module slug (e.g., 'sitemap', 'redirects', '404_log').
+	 *
+	 * @return bool True if the module is enabled, false otherwise.
+	 */
+	function module_enabled( string $module ): bool {
+		$value = \get_option( 'samanlabs_seo_module_' . $module );
+
+		// If the new option exists, use it.
+		if ( false !== $value ) {
+			return '1' === $value;
+		}
+
+		// Fall back to legacy option if new one doesn't exist.
+		$legacy_map = [
+			'sitemap'       => 'samanlabs_seo_enable_sitemap_enhancer',
+			'redirects'     => 'samanlabs_seo_enable_redirect_manager',
+			'404_log'       => 'samanlabs_seo_enable_404_logging',
+			'llm_txt'       => 'samanlabs_seo_enable_llm_txt',
+			'local_seo'     => 'samanlabs_seo_enable_local_seo',
+			'social_cards'  => 'samanlabs_seo_enable_og_preview',
+			'analytics'     => 'samanlabs_seo_enable_analytics',
+			'admin_bar'     => 'samanlabs_seo_enable_admin_bar',
+			'internal_links' => 'samanlabs_seo_enable_internal_linking',
+			'ai_assistant'  => 'samanlabs_seo_enable_ai_assistant',
+		];
+
+		if ( isset( $legacy_map[ $module ] ) ) {
+			return '1' === \get_option( $legacy_map[ $module ], '1' );
+		}
+
+		// Default enabled for new/unknown modules.
+		return true;
+	}
+
+	/**
 	 * Fetch SEO meta for a post with sane defaults.
 	 *
 	 * @param int|WP_Post $post Post or ID.
@@ -998,6 +1038,17 @@ namespace SamanLabs\SEO\Helpers {
 }
 
 namespace {
+	/**
+	 * Check if a module is enabled.
+	 *
+	 * @param string $module Module slug (e.g., 'sitemap', 'redirects', '404_log').
+	 *
+	 * @return bool True if the module is enabled, false otherwise.
+	 */
+	function samanlabs_seo_module_enabled( string $module ): bool {
+		return \SamanLabs\SEO\Helpers\module_enabled( $module );
+	}
+
 	/**
 	 * Render breadcrumbs in theme templates.
 	 *
