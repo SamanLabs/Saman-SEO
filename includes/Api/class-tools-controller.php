@@ -8,29 +8,18 @@
 
 namespace SamanLabs\SEO\Api;
 
+use SamanLabs\SEO\Integration\AI_Pilot;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
  * REST API controller for AI-powered tools.
+ *
+ * All AI operations are delegated to Saman Labs AI plugin via AI_Pilot.
  */
 class Tools_Controller extends REST_Controller {
-
-    /**
-     * Custom models table name.
-     *
-     * @var string
-     */
-    private $custom_models_table;
-
-    /**
-     * Constructor.
-     */
-    public function __construct() {
-        global $wpdb;
-        $this->custom_models_table = $wpdb->prefix . 'samanlabs_seo_custom_models';
-    }
 
     /**
      * Register routes.
@@ -1046,7 +1035,9 @@ class Tools_Controller extends REST_Controller {
     }
 
     /**
-     * Call AI API.
+     * Call AI API via Saman Labs AI integration.
+     *
+     * All AI operations are delegated to Saman Labs AI plugin.
      *
      * @param string $system     System prompt.
      * @param string $prompt     User prompt.
@@ -1054,207 +1045,40 @@ class Tools_Controller extends REST_Controller {
      * @return string|\WP_Error
      */
     private function call_ai( $system, $prompt, $max_tokens = 500 ) {
-        $model = get_option( 'samanlabs_seo_ai_model', 'gpt-4o-mini' );
-
-        // Check if using custom model
-        if ( strpos( $model, 'custom_' ) === 0 ) {
-            return $this->call_custom_model( $model, $system, $prompt, $max_tokens );
+        // Check if Saman Labs AI is ready
+        if ( ! AI_Pilot::is_ready() ) {
+            return new \WP_Error(
+                'ai_not_ready',
+                __( 'Saman Labs AI is not configured. Please install and configure Saman Labs AI to use AI features.', 'saman-labs-seo' )
+            );
         }
 
-        // Use OpenAI
-        $api_key = get_option( 'samanlabs_seo_openai_api_key', '' );
-        if ( empty( $api_key ) ) {
-            return new \WP_Error( 'no_api_key', __( 'OpenAI API key is not configured.', 'saman-labs-seo' ) );
-        }
+        // Build messages array for chat
+        $messages = [
+            [ 'role' => 'system', 'content' => $system ],
+            [ 'role' => 'user', 'content' => $prompt ],
+        ];
 
-        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', [
-            'headers' => [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $api_key,
-            ],
-            'body'    => wp_json_encode( [
-                'model'       => $model,
-                'messages'    => [
-                    [ 'role' => 'system', 'content' => $system ],
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-                'max_tokens'  => $max_tokens,
-                'temperature' => 0.3,
-            ] ),
-            'timeout' => 60,
+        // Delegate to Saman Labs AI
+        $result = AI_Pilot::chat( $messages, [
+            'max_tokens'  => $max_tokens,
+            'temperature' => 0.3,
         ] );
 
-        if ( is_wp_error( $response ) ) {
-            return $response;
+        if ( is_wp_error( $result ) ) {
+            return $result;
         }
 
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'API error', 'saman-labs-seo' );
-            return new \WP_Error( 'api_error', $error_message );
+        // Extract content from response
+        if ( is_array( $result ) && isset( $result['content'] ) ) {
+            return trim( $result['content'] );
         }
 
-        return trim( $body['choices'][0]['message']['content'] ?? '' );
-    }
-
-    /**
-     * Call custom model.
-     *
-     * @param string $model_id   Model ID (custom_123 format).
-     * @param string $system     System prompt.
-     * @param string $prompt     User prompt.
-     * @param int    $max_tokens Max tokens.
-     * @return string|\WP_Error
-     */
-    private function call_custom_model( $model_id, $system, $prompt, $max_tokens ) {
-        global $wpdb;
-
-        $id = intval( str_replace( 'custom_', '', $model_id ) );
-
-        $model = $wpdb->get_row(
-            $wpdb->prepare( "SELECT * FROM {$this->custom_models_table} WHERE id = %d", $id ),
-            ARRAY_A
-        );
-
-        if ( ! $model ) {
-            return new \WP_Error( 'model_not_found', __( 'Custom model not found.', 'saman-labs-seo' ) );
+        if ( is_string( $result ) ) {
+            return trim( $result );
         }
 
-        $provider = $model['provider'];
-        $api_url = $model['api_url'];
-        $api_key = $model['api_key'];
-        $model_name = $model['model_id'];
-        $temperature = floatval( $model['temperature'] ?? 0.3 );
-
-        // Call based on provider type
-        switch ( $provider ) {
-            case 'openai':
-            case 'openai_compatible':
-            case 'lmstudio':
-                return $this->call_openai_compatible( $api_url, $api_key, $model_name, $system, $prompt, $max_tokens, $temperature );
-
-            case 'anthropic':
-                return $this->call_anthropic( $api_url, $api_key, $model_name, $system, $prompt, $max_tokens, $temperature );
-
-            case 'ollama':
-                return $this->call_ollama( $api_url, $model_name, $system, $prompt, $max_tokens, $temperature );
-
-            default:
-                return new \WP_Error( 'unsupported_provider', __( 'Unsupported provider.', 'saman-labs-seo' ) );
-        }
-    }
-
-    /**
-     * Call OpenAI-compatible API.
-     */
-    private function call_openai_compatible( $api_url, $api_key, $model, $system, $prompt, $max_tokens, $temperature ) {
-        $headers = [ 'Content-Type' => 'application/json' ];
-
-        if ( ! empty( $api_key ) ) {
-            $headers['Authorization'] = 'Bearer ' . $api_key;
-        }
-
-        $response = wp_remote_post( $api_url, [
-            'headers' => $headers,
-            'body'    => wp_json_encode( [
-                'model'       => $model,
-                'messages'    => [
-                    [ 'role' => 'system', 'content' => $system ],
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-                'max_tokens'  => $max_tokens,
-                'temperature' => $temperature,
-            ] ),
-            'timeout' => 60,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'API error', 'saman-labs-seo' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['choices'][0]['message']['content'] ?? '' );
-    }
-
-    /**
-     * Call Anthropic API.
-     */
-    private function call_anthropic( $api_url, $api_key, $model, $system, $prompt, $max_tokens, $temperature ) {
-        $response = wp_remote_post( $api_url, [
-            'headers' => [
-                'Content-Type'      => 'application/json',
-                'x-api-key'         => $api_key,
-                'anthropic-version' => '2023-06-01',
-            ],
-            'body'    => wp_json_encode( [
-                'model'      => $model,
-                'max_tokens' => $max_tokens,
-                'system'     => $system,
-                'messages'   => [
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-            ] ),
-            'timeout' => 60,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'Anthropic API error', 'saman-labs-seo' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['content'][0]['text'] ?? '' );
-    }
-
-    /**
-     * Call Ollama API.
-     */
-    private function call_ollama( $api_url, $model, $system, $prompt, $max_tokens, $temperature ) {
-        $response = wp_remote_post( $api_url, [
-            'headers' => [ 'Content-Type' => 'application/json' ],
-            'body'    => wp_json_encode( [
-                'model'    => $model,
-                'messages' => [
-                    [ 'role' => 'system', 'content' => $system ],
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-                'stream'   => false,
-                'options'  => [
-                    'temperature' => $temperature,
-                    'num_predict' => $max_tokens,
-                ],
-            ] ),
-            'timeout' => 120,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error'] ?? __( 'Ollama API error', 'saman-labs-seo' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['message']['content'] ?? '' );
+        return new \WP_Error( 'ai_error', __( 'Unexpected AI response format.', 'saman-labs-seo' ) );
     }
 
     // =========================================================================
