@@ -1,4 +1,4 @@
-# WP SEO Pilot - Development Roadmap
+# Saman SEO - Development Roadmap
 
 > Last Updated: January 2025
 > Current Version: 0.2.0
@@ -105,7 +105,7 @@ What we NEVER track:
 
 **Implementation:**
 - [ ] Add Matomo tracking code (only when opted in)
-- [ ] Settings toggle: "Help improve WP SEO Pilot"
+- [ ] Settings toggle: "Help improve Saman SEO"
 - [ ] Privacy-first: disabled by default
 - [ ] Clear explanation of what's tracked
 - [ ] One-click disable anytime

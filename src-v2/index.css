@@ -26,21 +26,21 @@
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj4PVksj.ttf) format('truetype');
 }
-.wp-seo-pilot-admin button,
-.wp-seo-pilot-admin input {
+.saman-seo-admin button,
+.saman-seo-admin input {
   font-family: inherit;
 }
-body[class*="wpseopilot"] #wpcontent {
+body[class*="saman-seo"] #wpcontent {
   padding-left: 0;
   min-height: 0;
 }
-body[class*="wpseopilot"] #wpwrap {
+body[class*="saman-seo"] #wpwrap {
   background: #f0f0f1;
 }
-body[class*="wpseopilot"] #wpbody-content {
+body[class*="saman-seo"] #wpbody-content {
   padding-bottom: 0;
 }
-.wp-seo-pilot-admin {
+.saman-seo-admin {
   --color-primary: #2271b1;
   --color-primary-strong: #135e96;
   --color-surface: #ffffff;
@@ -59,21 +59,21 @@ body[class*="wpseopilot"] #wpbody-content {
   box-sizing: border-box;
   background: radial-gradient(circle at top left, rgba(34, 113, 177, 0.1), transparent 45%), radial-gradient(circle at top right, rgba(46, 125, 50, 0.06), transparent 40%), #f0f0f1;
 }
-body.admin-bar .wp-seo-pilot-admin {
+body.admin-bar .saman-seo-admin {
   min-height: calc(100vh - 32px);
 }
 @media (max-width: 782px) {
-  body.admin-bar .wp-seo-pilot-admin {
+  body.admin-bar .saman-seo-admin {
     min-height: calc(100vh - 46px);
   }
 }
-.wp-seo-pilot-shell {
+.saman-seo-shell {
   max-width: 1400px;
   margin: 0 auto;
 }
-.wp-seo-pilot-admin *,
-.wp-seo-pilot-admin *::before,
-.wp-seo-pilot-admin *::after {
+.saman-seo-admin *,
+.saman-seo-admin *::before,
+.saman-seo-admin *::after {
   box-sizing: border-box;
 }
 code {

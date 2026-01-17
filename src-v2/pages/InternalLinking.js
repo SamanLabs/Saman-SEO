@@ -46,11 +46,11 @@ const InternalLinking = () => {
         setRulesLoading(true);
         try {
             const [rulesRes, categoriesRes, templatesRes, settingsRes, statsRes] = await Promise.all([
-                apiFetch({ path: '/wpseopilot/v2/internal-links/rules' }),
-                apiFetch({ path: '/wpseopilot/v2/internal-links/categories' }),
-                apiFetch({ path: '/wpseopilot/v2/internal-links/templates' }),
-                apiFetch({ path: '/wpseopilot/v2/internal-links/settings' }),
-                apiFetch({ path: '/wpseopilot/v2/internal-links/stats' }),
+                apiFetch({ path: '/saman-seo/v1/internal-links/rules' }),
+                apiFetch({ path: '/saman-seo/v1/internal-links/categories' }),
+                apiFetch({ path: '/saman-seo/v1/internal-links/templates' }),
+                apiFetch({ path: '/saman-seo/v1/internal-links/settings' }),
+                apiFetch({ path: '/saman-seo/v1/internal-links/stats' }),
             ]);
 
             if (rulesRes.success) setRules(rulesRes.data);
@@ -90,7 +90,7 @@ const InternalLinking = () => {
     const handleDeleteRule = async (id) => {
         if (!window.confirm('Are you sure you want to delete this rule?')) return;
         try {
-            await apiFetch({ path: `/wpseopilot/v2/internal-links/rules/${id}`, method: 'DELETE' });
+            await apiFetch({ path: `/saman-seo/v1/internal-links/rules/${id}`, method: 'DELETE' });
             setRules(rules.filter(r => r.id !== id));
             setSelectedRules(selectedRules.filter(rid => rid !== id));
         } catch (error) {
@@ -100,7 +100,7 @@ const InternalLinking = () => {
 
     const handleToggleRule = async (id) => {
         try {
-            const res = await apiFetch({ path: `/wpseopilot/v2/internal-links/rules/${id}/toggle`, method: 'POST' });
+            const res = await apiFetch({ path: `/saman-seo/v1/internal-links/rules/${id}/toggle`, method: 'POST' });
             if (res.success) {
                 setRules(rules.map(r => r.id === id ? res.data : r));
             }
@@ -111,7 +111,7 @@ const InternalLinking = () => {
 
     const handleDuplicateRule = async (id) => {
         try {
-            const res = await apiFetch({ path: `/wpseopilot/v2/internal-links/rules/${id}/duplicate`, method: 'POST' });
+            const res = await apiFetch({ path: `/saman-seo/v1/internal-links/rules/${id}/duplicate`, method: 'POST' });
             if (res.success) {
                 setRules([res.data, ...rules]);
             }
@@ -130,7 +130,7 @@ const InternalLinking = () => {
             }
 
             await apiFetch({
-                path: '/wpseopilot/v2/internal-links/rules/bulk',
+                path: '/saman-seo/v1/internal-links/rules/bulk',
                 method: 'POST',
                 data: payload,
             });
@@ -178,7 +178,7 @@ const InternalLinking = () => {
 
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/internal-links/categories/${id}`,
+                path: `/saman-seo/v1/internal-links/categories/${id}`,
                 method: 'DELETE',
                 data: reassign ? { reassign } : undefined,
             });
@@ -195,7 +195,7 @@ const InternalLinking = () => {
     const handleDeleteTemplate = async (id) => {
         if (!window.confirm('Are you sure you want to delete this UTM template?')) return;
         try {
-            await apiFetch({ path: `/wpseopilot/v2/internal-links/templates/${id}`, method: 'DELETE' });
+            await apiFetch({ path: `/saman-seo/v1/internal-links/templates/${id}`, method: 'DELETE' });
             setTemplates(templates.filter(t => t.id !== id));
         } catch (error) {
             console.error('Failed to delete template:', error);
@@ -206,7 +206,7 @@ const InternalLinking = () => {
     const handleSaveSettings = async () => {
         try {
             const res = await apiFetch({
-                path: '/wpseopilot/v2/internal-links/settings',
+                path: '/saman-seo/v1/internal-links/settings',
                 method: 'POST',
                 data: settings,
             });
@@ -888,7 +888,7 @@ const RuleModal = ({ rule, categories, templates, onClose, onSave }) => {
         if (postSearchQuery.length < 2) { setPostSearchResults([]); return; }
         const timer = setTimeout(async () => {
             try {
-                const res = await apiFetch({ path: `/wpseopilot/v2/internal-links/search-posts?search=${encodeURIComponent(postSearchQuery)}` });
+                const res = await apiFetch({ path: `/saman-seo/v1/internal-links/search-posts?search=${encodeURIComponent(postSearchQuery)}` });
                 if (res.success) setPostSearchResults(res.data);
             } catch (err) { console.error('Post search failed:', err); }
         }, 300);
@@ -922,7 +922,7 @@ const RuleModal = ({ rule, categories, templates, onClose, onSave }) => {
         setError('');
         setSaving(true);
         try {
-            const path = isEdit ? `/wpseopilot/v2/internal-links/rules/${rule.id}` : '/wpseopilot/v2/internal-links/rules';
+            const path = isEdit ? `/saman-seo/v1/internal-links/rules/${rule.id}` : '/saman-seo/v1/internal-links/rules';
             const res = await apiFetch({ path, method: isEdit ? 'PUT' : 'POST', data: formData });
             if (res.success) { onSave(res.data); } else { setError(res.message || 'Failed to save rule'); }
         } catch (err) { setError(err.message || 'Failed to save rule'); }
@@ -1068,8 +1068,8 @@ const CategoryModal = ({ category, templates, onClose, onSave }) => {
 
         try {
             const path = isEdit
-                ? `/wpseopilot/v2/internal-links/categories/${category.id}`
-                : '/wpseopilot/v2/internal-links/categories';
+                ? `/saman-seo/v1/internal-links/categories/${category.id}`
+                : '/saman-seo/v1/internal-links/categories';
             const method = isEdit ? 'PUT' : 'POST';
 
             const res = await apiFetch({ path, method, data: formData });
@@ -1181,7 +1181,7 @@ const TemplateModal = ({ template, onClose, onSave }) => {
         setError('');
         setSaving(true);
         try {
-            const path = isEdit ? `/wpseopilot/v2/internal-links/templates/${template.id}` : '/wpseopilot/v2/internal-links/templates';
+            const path = isEdit ? `/saman-seo/v1/internal-links/templates/${template.id}` : '/saman-seo/v1/internal-links/templates';
             const res = await apiFetch({ path, method: isEdit ? 'PUT' : 'POST', data: formData });
             if (res.success) { onSave(res.data); } else { setError(res.message || 'Failed to save template'); }
         } catch (err) { setError(err.message || 'Failed to save template'); }

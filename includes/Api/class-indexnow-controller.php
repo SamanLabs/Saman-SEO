@@ -2,12 +2,12 @@
 /**
  * REST API Controller for IndexNow.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
-use WPSEOPilot\Plugin;
+use Saman\SEO\Plugin;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -268,7 +268,7 @@ class IndexNow_Controller extends REST_Controller {
 	/**
 	 * Get IndexNow service.
 	 *
-	 * @return \WPSEOPilot\Service\IndexNow|null
+	 * @return \Saman\SEO\Service\IndexNow|null
 	 */
 	private function get_service() {
 		return Plugin::instance()->get( 'indexnow' );
@@ -284,7 +284,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$settings = $service->get_settings();
@@ -308,7 +308,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$settings = $request->get_json_params();
@@ -322,11 +322,11 @@ class IndexNow_Controller extends REST_Controller {
 		if ( $result ) {
 			return $this->success(
 				$service->get_settings(),
-				__( 'IndexNow settings saved successfully.', 'wp-seo-pilot' )
+				__( 'IndexNow settings saved successfully.', 'saman-seo' )
 			);
 		}
 
-		return $this->error( __( 'Failed to save settings.', 'wp-seo-pilot' ) );
+		return $this->error( __( 'Failed to save settings.', 'saman-seo' ) );
 	}
 
 	/**
@@ -339,7 +339,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$settings            = $service->get_settings();
@@ -355,7 +355,7 @@ class IndexNow_Controller extends REST_Controller {
 				'api_key'     => $settings['api_key'],
 				'key_file_url' => home_url( $settings['api_key'] . '.txt' ),
 			],
-			__( 'New API key generated successfully.', 'wp-seo-pilot' )
+			__( 'New API key generated successfully.', 'saman-seo' )
 		);
 	}
 
@@ -369,7 +369,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$result = $service->verify_key_file();
@@ -387,13 +387,13 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$urls = $request->get_param( 'urls' );
 
 		if ( empty( $urls ) ) {
-			return $this->error( __( 'No URLs provided.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No URLs provided.', 'saman-seo' ) );
 		}
 
 		// Filter out invalid URLs.
@@ -402,13 +402,13 @@ class IndexNow_Controller extends REST_Controller {
 		} );
 
 		if ( empty( $urls ) ) {
-			return $this->error( __( 'No valid URLs provided.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No valid URLs provided.', 'saman-seo' ) );
 		}
 
 		$settings = $service->get_settings();
 
 		if ( empty( $settings['api_key'] ) ) {
-			return $this->error( __( 'No API key configured. Please generate an API key first.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No API key configured. Please generate an API key first.', 'saman-seo' ) );
 		}
 
 		$success = $service->submit_urls( $urls );
@@ -425,14 +425,14 @@ class IndexNow_Controller extends REST_Controller {
 						'%d URL submitted successfully.',
 						'%d URLs submitted successfully.',
 						count( $urls ),
-						'wp-seo-pilot'
+						'saman-seo'
 					),
 					count( $urls )
 				)
 			);
 		}
 
-		return $this->error( __( 'Failed to submit URLs. Check the submission logs for details.', 'wp-seo-pilot' ) );
+		return $this->error( __( 'Failed to submit URLs. Check the submission logs for details.', 'saman-seo' ) );
 	}
 
 	/**
@@ -445,7 +445,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$logs = $service->get_logs( [
@@ -468,7 +468,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$days    = $request->get_param( 'days' );
@@ -482,7 +482,7 @@ class IndexNow_Controller extends REST_Controller {
 					'%d log entry cleared.',
 					'%d log entries cleared.',
 					$deleted,
-					'wp-seo-pilot'
+					'saman-seo'
 				),
 				$deleted
 			)
@@ -499,7 +499,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		return $this->success( $service->get_stats() );
@@ -515,7 +515,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		// Get public post types.
@@ -547,28 +547,28 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$post_id = $request->get_param( 'id' );
 		$post    = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
 		if ( 'publish' !== $post->post_status ) {
-			return $this->error( __( 'Only published posts can be submitted.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'Only published posts can be submitted.', 'saman-seo' ) );
 		}
 
 		$settings = $service->get_settings();
 
 		if ( empty( $settings['enabled'] ) ) {
-			return $this->error( __( 'IndexNow is not enabled. Enable it in Settings first.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow is not enabled. Enable it in Settings first.', 'saman-seo' ) );
 		}
 
 		if ( empty( $settings['api_key'] ) ) {
-			return $this->error( __( 'No API key configured. Generate one in Settings first.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No API key configured. Generate one in Settings first.', 'saman-seo' ) );
 		}
 
 		$url     = get_permalink( $post_id );
@@ -581,11 +581,11 @@ class IndexNow_Controller extends REST_Controller {
 					'url'     => $url,
 					'status'  => 'submitted',
 				],
-				__( 'URL submitted for indexing successfully.', 'wp-seo-pilot' )
+				__( 'URL submitted for indexing successfully.', 'saman-seo' )
 			);
 		}
 
-		return $this->error( __( 'Failed to submit URL. Check the logs for details.', 'wp-seo-pilot' ) );
+		return $this->error( __( 'Failed to submit URL. Check the logs for details.', 'saman-seo' ) );
 	}
 
 	/**
@@ -600,17 +600,17 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$post_id = $request->get_param( 'id' );
 		$post    = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
-		$table = $wpdb->prefix . 'wpseopilot_indexnow_log';
+		$table = $wpdb->prefix . 'SAMAN_SEO_indexnow_log';
 
 		// Get the most recent submission for this post.
 		$latest = $wpdb->get_row( $wpdb->prepare(
@@ -653,23 +653,23 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$settings = $service->get_settings();
 
 		if ( empty( $settings['enabled'] ) ) {
-			return $this->error( __( 'IndexNow is not enabled. Enable it in Settings first.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow is not enabled. Enable it in Settings first.', 'saman-seo' ) );
 		}
 
 		if ( empty( $settings['api_key'] ) ) {
-			return $this->error( __( 'No API key configured. Generate one in Settings first.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No API key configured. Generate one in Settings first.', 'saman-seo' ) );
 		}
 
 		$post_ids = $request->get_param( 'post_ids' );
 
 		if ( empty( $post_ids ) ) {
-			return $this->error( __( 'No posts selected.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No posts selected.', 'saman-seo' ) );
 		}
 
 		// Limit to 100 posts at a time.
@@ -691,7 +691,7 @@ class IndexNow_Controller extends REST_Controller {
 		}
 
 		if ( empty( $urls ) ) {
-			return $this->error( __( 'No valid published posts to submit.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'No valid published posts to submit.', 'saman-seo' ) );
 		}
 
 		// Submit in batches (IndexNow accepts up to 10,000 but we'll batch for better UX).
@@ -716,7 +716,7 @@ class IndexNow_Controller extends REST_Controller {
 			],
 			sprintf(
 				/* translators: %d: number of URLs */
-				__( '%d URLs submitted for indexing.', 'wp-seo-pilot' ),
+				__( '%d URLs submitted for indexing.', 'saman-seo' ),
 				$success_count
 			)
 		);
@@ -734,7 +734,7 @@ class IndexNow_Controller extends REST_Controller {
 		$service = $this->get_service();
 
 		if ( ! $service ) {
-			return $this->error( __( 'IndexNow service not available.', 'wp-seo-pilot' ) );
+			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
 		$page          = $request->get_param( 'page' );
@@ -760,7 +760,7 @@ class IndexNow_Controller extends REST_Controller {
 		$query = new \WP_Query( $args );
 		$posts = [];
 
-		$log_table = $wpdb->prefix . 'wpseopilot_indexnow_log';
+		$log_table = $wpdb->prefix . 'SAMAN_SEO_indexnow_log';
 
 		foreach ( $query->posts as $post ) {
 			// Get latest submission for this post.

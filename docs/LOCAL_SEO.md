@@ -1,6 +1,6 @@
 # Local SEO Guide
 
-Complete guide to configuring local business SEO with WP SEO Pilot.
+Complete guide to configuring local business SEO with Saman SEO.
 
 ---
 
@@ -20,7 +20,7 @@ Complete guide to configuring local business SEO with WP SEO Pilot.
 
 ## Overview
 
-WP SEO Pilot's Local SEO module helps local businesses improve their visibility in local search results by:
+Saman SEO's Local SEO module helps local businesses improve their visibility in local search results by:
 
 - Generating LocalBusiness schema markup
 - Providing accurate NAP (Name, Address, Phone) data
@@ -29,7 +29,7 @@ WP SEO Pilot's Local SEO module helps local businesses improve their visibility 
 - Connecting social profiles
 - Supporting Google My Business integration
 
-**Location:** Navigate to **WP SEO Pilot → Local SEO**
+**Location:** Navigate to **Saman SEO → Local SEO**
 
 **File:** `includes/class-wpseopilot-service-local-seo.php`
 
@@ -39,7 +39,7 @@ WP SEO Pilot's Local SEO module helps local businesses improve their visibility 
 
 ### Step 1: Enable the Module
 
-Navigate to **WP SEO Pilot → General Settings**
+Navigate to **Saman SEO → General Settings**
 
 Find **Local SEO Settings** and check **Enable Local SEO**.
 
@@ -51,7 +51,7 @@ update_option( 'wpseopilot_enable_local_seo', '1' );
 
 ### Step 2: Configure Business Details
 
-Navigate to **WP SEO Pilot → Local SEO** to access the configuration panel.
+Navigate to **Saman SEO → Local SEO** to access the configuration panel.
 
 ---
 
@@ -408,7 +408,7 @@ update_option( 'wpseopilot_local_opening_hours', json_encode( $opening_hours ) )
 
 ### What Gets Generated
 
-WP SEO Pilot outputs JSON-LD structured data based on your configuration:
+Saman SEO outputs JSON-LD structured data based on your configuration:
 
 ```json
 {
@@ -690,7 +690,7 @@ To disable the Local SEO module:
 update_option( 'wpseopilot_enable_local_seo', '0' );
 ```
 
-Or via admin: **WP SEO Pilot → General Settings** → Uncheck **Enable Local SEO**
+Or via admin: **Saman SEO → General Settings** → Uncheck **Enable Local SEO**
 
 ---
 

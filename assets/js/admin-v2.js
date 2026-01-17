@@ -128,7 +128,7 @@ Object(function webpackMissingModule() { var e = new Error("Cannot find module '
 const initialView = window?.wpseopilotV2Settings?.initialView || 'dashboard';
 (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.render)((0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Object(function webpackMissingModule() { var e = new Error("Cannot find module './App'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()), {
   initialView: initialView
-}), document.getElementById('wpseopilot-v2-root'));
+}), document.getElementById('samanseo-v2-root'));
 })();
 
 /******/ })()

@@ -1,5 +1,5 @@
 /**
- * WP SEO Pilot V2 - Main LESS Entry Point
+ * Saman SEO V2 - Main LESS Entry Point
  *
  * Modern admin interface styles based on WP Security Pilot design system.
  *
@@ -52,7 +52,7 @@
 /**
  * Base Styles & Reset
  */
-.wpseopilot-app {
+.samanseo-app {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.5;
@@ -63,25 +63,25 @@
   margin-right: -20px;
   margin-top: -10px;
 }
-.wpseopilot-app *,
-.wpseopilot-app *::before,
-.wpseopilot-app *::after {
+.samanseo-app *,
+.samanseo-app *::before,
+.samanseo-app *::after {
   box-sizing: border-box;
 }
-.wpseopilot-app button:focus {
+.samanseo-app button:focus {
   outline: none;
   box-shadow: none;
 }
-.wpseopilot-app a {
+.samanseo-app a {
   text-decoration: none;
 }
-#wpseopilot-v2-root {
+#samanseo-v2-root {
   margin: 0;
   padding: 0;
 }
-.wpseopilot-app + .update-nag,
-.wpseopilot-app + .updated,
-.wpseopilot-app + .notice:not(.wpseopilot-notice) {
+.samanseo-app + .update-nag,
+.samanseo-app + .updated,
+.samanseo-app + .notice:not(.samanseo-notice) {
   display: none !important;
 }
 @keyframes fadeIn {

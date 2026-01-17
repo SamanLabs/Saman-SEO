@@ -1,5 +1,5 @@
 /**
- * WP SEO Pilot - Admin List SEO Badge
+ * Saman SEO - Admin List SEO Badge
  *
  * Hydrates SEO score badges in the WordPress admin post list.
  */
@@ -12,7 +12,7 @@ import './admin-list.css';
  * Initialize all SEO badge placeholders on the page.
  */
 const initBadges = () => {
-    const placeholders = document.querySelectorAll('.wpseopilot-badge-placeholder');
+    const placeholders = document.querySelectorAll('.saman-seo-badge-placeholder');
 
     placeholders.forEach((placeholder) => {
         const data = placeholder.dataset;
@@ -30,7 +30,7 @@ const initBadges = () => {
         root.render(<SEOScoreBadge {...props} />);
 
         // Mark as initialized
-        placeholder.classList.add('wpseopilot-badge-initialized');
+        placeholder.classList.add('saman-seo-badge-initialized');
     });
 };
 

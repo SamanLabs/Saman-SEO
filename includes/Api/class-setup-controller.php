@@ -2,11 +2,13 @@
 /**
  * Setup Wizard REST Controller
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
+
+use Saman\SEO\Integration\AI_Pilot;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -74,9 +76,9 @@ class Setup_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_status( $request ) {
-        $completed = get_option( 'wpseopilot_setup_completed', false );
-        $skipped = get_option( 'wpseopilot_setup_skipped', false );
-        $setup_data = get_option( 'wpseopilot_setup_data', [] );
+        $completed = get_option( 'SAMAN_SEO_setup_completed', false );
+        $skipped = get_option( 'SAMAN_SEO_setup_skipped', false );
+        $setup_data = get_option( 'SAMAN_SEO_setup_data', [] );
 
         return $this->success( [
             'completed'   => (bool) $completed,
@@ -87,52 +89,54 @@ class Setup_Controller extends REST_Controller {
     }
 
     /**
-     * Test API connection.
+     * Test API connection via Saman Labs AI.
+     *
+     * All AI operations are now delegated to the Saman Labs AI plugin.
+     * This endpoint checks the status of that integration.
      *
      * @param \WP_REST_Request $request Request object.
      * @return \WP_REST_Response
      */
     public function test_api( $request ) {
-        $params = $request->get_json_params();
-        if ( empty( $params ) ) {
-            $params = $request->get_params();
-        }
+        $status = AI_Pilot::get_status();
 
-        $provider = isset( $params['provider'] ) ? sanitize_text_field( $params['provider'] ) : 'openai';
-        $api_key = isset( $params['api_key'] ) ? sanitize_text_field( $params['api_key'] ) : '';
-        $model = isset( $params['model'] ) ? sanitize_text_field( $params['model'] ) : 'gpt-4o-mini';
-
-        if ( empty( $api_key ) && $provider !== 'ollama' ) {
-            return $this->error( __( 'API key is required.', 'wp-seo-pilot' ), 'missing_key', 400 );
-        }
-
-        $test_prompt = 'Say "Hello!" in one word.';
-
-        switch ( $provider ) {
-            case 'openai':
-                $result = $this->test_openai( $api_key, $model, $test_prompt );
-                break;
-            case 'anthropic':
-                $result = $this->test_anthropic( $api_key, $test_prompt );
-                break;
-            case 'ollama':
-                $result = $this->test_ollama( $test_prompt );
-                break;
-            default:
-                return $this->error( __( 'Unsupported provider.', 'wp-seo-pilot' ), 'invalid_provider', 400 );
-        }
-
-        if ( is_wp_error( $result ) ) {
+        // Check if Saman Labs AI is installed
+        if ( ! AI_Pilot::is_installed() ) {
             return $this->success( [
-                'success' => false,
-                'message' => $result->get_error_message(),
+                'success'      => false,
+                'message'      => __( 'Saman Labs AI is not installed. Please install Saman Labs AI to use AI features.', 'saman-seo' ),
+                'install_url'  => admin_url( 'plugin-install.php?s=saman-ai&tab=search&type=term' ),
+                'status'       => 'not_installed',
             ] );
         }
 
+        // Check if Saman Labs AI is active
+        if ( ! AI_Pilot::is_active() ) {
+            return $this->success( [
+                'success'      => false,
+                'message'      => __( 'Saman Labs AI is installed but not activated. Please activate it in your plugins.', 'saman-seo' ),
+                'plugins_url'  => admin_url( 'plugins.php' ),
+                'status'       => 'not_active',
+            ] );
+        }
+
+        // Check if Saman Labs AI is configured
+        if ( ! AI_Pilot::is_ready() ) {
+            return $this->success( [
+                'success'      => false,
+                'message'      => __( 'Saman Labs AI is active but not configured. Please configure your AI provider in Saman Labs AI settings.', 'saman-seo' ),
+                'settings_url' => admin_url( 'admin.php?page=Saman-ai' ),
+                'status'       => 'not_configured',
+            ] );
+        }
+
+        // All good - Saman Labs AI is ready
         return $this->success( [
-            'success'  => true,
-            'message'  => __( 'Connection successful!', 'wp-seo-pilot' ),
-            'response' => $result,
+            'success'   => true,
+            'message'   => __( 'Saman Labs AI is ready! AI features are available.', 'saman-seo' ),
+            'status'    => 'ready',
+            'providers' => $status['providers'] ?? [],
+            'models'    => $status['models'] ?? [],
         ] );
     }
 
@@ -156,26 +160,19 @@ class Setup_Controller extends REST_Controller {
             'completed_at'  => current_time( 'mysql' ),
         ];
 
-        update_option( 'wpseopilot_setup_data', $setup_data );
+        update_option( 'SAMAN_SEO_setup_data', $setup_data );
 
-        // Save AI settings
+        // AI settings are now managed by Saman Labs AI plugin
+        // Only save provider preference for compatibility
         if ( ! empty( $params['ai_provider'] ) ) {
-            update_option( 'wpseopilot_ai_active_provider', sanitize_text_field( $params['ai_provider'] ) );
-        }
-
-        if ( ! empty( $params['ai_api_key'] ) ) {
-            update_option( 'wpseopilot_openai_api_key', sanitize_text_field( $params['ai_api_key'] ) );
-        }
-
-        if ( ! empty( $params['ai_model'] ) ) {
-            update_option( 'wpseopilot_ai_model', sanitize_text_field( $params['ai_model'] ) );
+            update_option( 'SAMAN_SEO_ai_active_provider', sanitize_text_field( $params['ai_provider'] ) );
         }
 
         // Save module settings
         $modules_to_toggle = [
-            'enable_sitemap'   => 'wpseopilot_module_sitemap',
-            'enable_404_log'   => 'wpseopilot_module_404_log',
-            'enable_redirects' => 'wpseopilot_module_redirects',
+            'enable_sitemap'   => 'SAMAN_SEO_module_sitemap',
+            'enable_404_log'   => 'SAMAN_SEO_module_404_log',
+            'enable_redirects' => 'SAMAN_SEO_module_redirects',
         ];
 
         foreach ( $modules_to_toggle as $param_key => $option_key ) {
@@ -186,14 +183,14 @@ class Setup_Controller extends REST_Controller {
 
         // Save title template
         if ( ! empty( $params['title_template'] ) ) {
-            update_option( 'wpseopilot_title_template', sanitize_text_field( $params['title_template'] ) );
+            update_option( 'SAMAN_SEO_title_template', sanitize_text_field( $params['title_template'] ) );
         }
 
         // Mark setup as completed
-        update_option( 'wpseopilot_setup_completed', true );
-        delete_option( 'wpseopilot_setup_skipped' );
+        update_option( 'SAMAN_SEO_setup_completed', true );
+        delete_option( 'SAMAN_SEO_setup_skipped' );
 
-        return $this->success( null, __( 'Setup completed successfully!', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Setup completed successfully!', 'saman-seo' ) );
     }
 
     /**
@@ -203,9 +200,9 @@ class Setup_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function skip_setup( $request ) {
-        update_option( 'wpseopilot_setup_skipped', true );
+        update_option( 'SAMAN_SEO_setup_skipped', true );
 
-        return $this->success( null, __( 'Setup skipped.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Setup skipped.', 'saman-seo' ) );
     }
 
     /**
@@ -215,115 +212,10 @@ class Setup_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function reset_setup( $request ) {
-        delete_option( 'wpseopilot_setup_completed' );
-        delete_option( 'wpseopilot_setup_skipped' );
-        delete_option( 'wpseopilot_setup_data' );
+        delete_option( 'SAMAN_SEO_setup_completed' );
+        delete_option( 'SAMAN_SEO_setup_skipped' );
+        delete_option( 'SAMAN_SEO_setup_data' );
 
-        return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'wp-seo-pilot' ) );
-    }
-
-    /**
-     * Test OpenAI connection.
-     *
-     * @param string $api_key API key.
-     * @param string $model   Model ID.
-     * @param string $prompt  Test prompt.
-     * @return string|\WP_Error
-     */
-    private function test_openai( $api_key, $model, $prompt ) {
-        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', [
-            'headers' => [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $api_key,
-            ],
-            'body'    => wp_json_encode( [
-                'model'      => $model,
-                'messages'   => [ [ 'role' => 'user', 'content' => $prompt ] ],
-                'max_tokens' => 10,
-            ] ),
-            'timeout' => 30,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'OpenAI API error', 'wp-seo-pilot' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['choices'][0]['message']['content'] ?? '' );
-    }
-
-    /**
-     * Test Anthropic connection.
-     *
-     * @param string $api_key API key.
-     * @param string $prompt  Test prompt.
-     * @return string|\WP_Error
-     */
-    private function test_anthropic( $api_key, $prompt ) {
-        $response = wp_remote_post( 'https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'Content-Type'      => 'application/json',
-                'x-api-key'         => $api_key,
-                'anthropic-version' => '2023-06-01',
-            ],
-            'body'    => wp_json_encode( [
-                'model'      => 'claude-3-haiku-20240307',
-                'max_tokens' => 10,
-                'messages'   => [ [ 'role' => 'user', 'content' => $prompt ] ],
-            ] ),
-            'timeout' => 30,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'Anthropic API error', 'wp-seo-pilot' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['content'][0]['text'] ?? '' );
-    }
-
-    /**
-     * Test Ollama connection.
-     *
-     * @param string $prompt Test prompt.
-     * @return string|\WP_Error
-     */
-    private function test_ollama( $prompt ) {
-        $response = wp_remote_post( 'http://localhost:11434/api/chat', [
-            'headers' => [ 'Content-Type' => 'application/json' ],
-            'body'    => wp_json_encode( [
-                'model'    => 'llama2',
-                'messages' => [ [ 'role' => 'user', 'content' => $prompt ] ],
-                'stream'   => false,
-            ] ),
-            'timeout' => 60,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return new \WP_Error( 'connection_error', __( 'Could not connect to Ollama. Make sure it\'s running on localhost:11434.', 'wp-seo-pilot' ) );
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            return new \WP_Error( 'api_error', __( 'Ollama returned an error. Make sure a model is installed.', 'wp-seo-pilot' ) );
-        }
-
-        return trim( $body['message']['content'] ?? '' );
+        return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'saman-seo' ) );
     }
 }

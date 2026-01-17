@@ -16,7 +16,7 @@ const Header = ({ currentView, onNavigate }) => {
                         <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
                     </svg>
                 </span>
-                <span className="brand-name">WP SEO Pilot</span>
+                <span className="brand-name">Saman SEO</span>
             </div>
             <nav className="main-nav" aria-label="Primary">
                 {navItems.map((item) => (
@@ -34,7 +34,7 @@ const Header = ({ currentView, onNavigate }) => {
             <div className="nav-actions">
                 <a
                     className="icon-button"
-                    href="https://github.com/jhd3197/WP-SEO-Pilot"
+                    href="https://github.com/Saman/Saman-SEO"
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Open GitHub repository"

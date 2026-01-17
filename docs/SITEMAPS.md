@@ -1,6 +1,6 @@
 # Sitemap Configuration
 
-Complete guide to configuring and customizing XML sitemaps in WP SEO Pilot.
+Complete guide to configuring and customizing XML sitemaps in Saman SEO.
 
 ---
 
@@ -18,7 +18,7 @@ Complete guide to configuring and customizing XML sitemaps in WP SEO Pilot.
 
 ## Overview
 
-WP SEO Pilot provides comprehensive XML sitemap functionality that:
+Saman SEO provides comprehensive XML sitemap functionality that:
 
 - Enhances WordPress core sitemaps with advanced features
 - Includes images, taxonomies, and custom post types
@@ -36,7 +36,7 @@ WP SEO Pilot provides comprehensive XML sitemap functionality that:
 
 ### Accessing Settings
 
-Navigate to **WP SEO Pilot → Sitemaps** in your WordPress admin.
+Navigate to **Saman SEO → Sitemaps** in your WordPress admin.
 
 ---
 
@@ -442,7 +442,7 @@ add_filter( 'wpseopilot_sitemap_lastmod', function( $lastmod, $group, $page ) {
 **Filter:** `wpseopilot_disable_core_sitemaps`
 
 ```php
-// Keep core sitemaps enabled alongside WP SEO Pilot
+// Keep core sitemaps enabled alongside Saman SEO
 add_filter( 'wpseopilot_disable_core_sitemaps', '__return_false' );
 ```
 
@@ -524,7 +524,7 @@ update_option( 'wpseopilot_sitemap_schedule_updates', 'hourly' );
 
 ### Via Admin UI
 
-Navigate to **WP SEO Pilot → Sitemaps** and click **Regenerate Sitemap**.
+Navigate to **Saman SEO → Sitemaps** and click **Regenerate Sitemap**.
 
 ---
 

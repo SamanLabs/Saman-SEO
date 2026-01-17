@@ -1,12 +1,12 @@
-# Contributing to WP SEO Pilot
+# Contributing to Saman SEO
 
-Thank you for your interest in contributing to WP SEO Pilot! This project exists to establish an open standard for WordPress SEO, and community contributions are essential to that mission.
+Thank you for your interest in contributing to Saman SEO! This project exists to establish an open standard for WordPress SEO, and community contributions are essential to that mission.
 
 ---
 
 ## Why Contribute?
 
-WP SEO Pilot is more than just another plugin—it's a movement toward transparency in SEO tooling. By contributing, you're:
+Saman SEO is more than just another plugin—it's a movement toward transparency in SEO tooling. By contributing, you're:
 
 - **Establishing Standards**: Helping define best practices for WordPress SEO
 - **Improving Quality**: Making SEO more accessible and effective for everyone
@@ -382,7 +382,7 @@ Significant contributors may be invited to join the core team.
 
 ## License
 
-By contributing to WP SEO Pilot, you agree that your contributions will be licensed under the same license as the project (see LICENSE).
+By contributing to Saman SEO, you agree that your contributions will be licensed under the same license as the project (see LICENSE).
 
 ---
 

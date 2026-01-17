@@ -1,12 +1,12 @@
 # Sitemap Configuration Guide
 
-Complete guide to configuring and customizing XML sitemaps in WP SEO Pilot.
+Complete guide to configuring and customizing XML sitemaps in Saman SEO.
 
 ---
 
 ## Overview
 
-WP SEO Pilot replaces WordPress core sitemaps with a comprehensive sitemap system that includes:
+Saman SEO replaces WordPress core sitemaps with a comprehensive sitemap system that includes:
 
 - **Sitemap Index**: Main `/sitemap_index.xml` listing all sub-sitemaps
 - **Post Type Sitemaps**: Individual sitemaps for each content type
@@ -26,7 +26,7 @@ Each entry is enriched with:
 
 ## Admin Configuration
 
-Navigate to **WP SEO Pilot → Sitemap** to access all sitemap settings.
+Navigate to **Saman SEO → Sitemap** to access all sitemap settings.
 
 ### Basic Settings
 
@@ -469,4 +469,4 @@ Sitemap: https://yoursite.com/sitemap_index.xml
 Sitemap: https://yoursite.com/sitemap-news.xml
 ```
 
-Edit via **WP SEO Pilot → robots.txt Editor**.
+Edit via **Saman SEO → robots.txt Editor**.

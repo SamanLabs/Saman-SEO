@@ -1,41 +1,45 @@
 <?php
 /**
- * WP AI Pilot Integration
+ * Saman Labs AI Integration
  *
- * Central integration layer for WP AI Pilot.
- * All AI functionality is delegated to WP AI Pilot.
+ * Central integration layer for Saman Labs AI (formerly WP AI Pilot).
+ * All AI functionality is delegated to the Saman Labs AI plugin.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  */
 
-namespace WPSEOPilot\Integration;
+namespace Saman\SEO\Integration;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Handles integration with WP AI Pilot plugin.
+ * Handles integration with Saman Labs AI plugin.
+ *
+ * Note: The underlying function names (wp_ai_pilot_*) will be updated
+ * when the Saman Labs AI plugin is fully renamed. This class abstracts
+ * the integration to minimize future changes.
  */
 class AI_Pilot {
 
 	/**
 	 * Plugin source identifier for usage tracking.
 	 */
-	const SOURCE = 'wp-seo-pilot';
+	const SOURCE = 'saman-seo';
 
 	/**
 	 * Initialize the integration.
 	 * Called during plugin initialization.
 	 */
 	public static function init(): void {
-		// Register with WP AI Pilot when it loads.
+		// Register with Saman Labs AI when it loads.
 		add_action( 'wp_ai_pilot_loaded', [ __CLASS__, 'register_with_ai_pilot' ], 10 );
 
-		// Also try on init in case WP AI Pilot loaded first.
+		// Also try on init in case Saman Labs AI loaded first.
 		add_action( 'init', [ __CLASS__, 'maybe_register' ], 20 );
 	}
 
 	/**
-	 * Check if WP AI Pilot function exists and register.
+	 * Check if Saman Labs AI function exists and register.
 	 */
 	public static function maybe_register(): void {
 		if ( function_exists( 'wp_ai_pilot' ) ) {
@@ -44,7 +48,7 @@ class AI_Pilot {
 	}
 
 	/**
-	 * Register plugin and assistants with WP AI Pilot.
+	 * Register plugin and assistants with Saman Labs AI.
 	 */
 	public static function register_with_ai_pilot(): void {
 		static $registered = false;
@@ -71,7 +75,7 @@ class AI_Pilot {
 	// =========================================================================
 
 	/**
-	 * Check if WP AI Pilot is installed.
+	 * Check if Saman Labs AI is installed.
 	 *
 	 * @return bool
 	 */
@@ -81,7 +85,7 @@ class AI_Pilot {
 	}
 
 	/**
-	 * Check if WP AI Pilot is active.
+	 * Check if Saman Labs AI is active.
 	 *
 	 * @return bool
 	 */
@@ -91,7 +95,7 @@ class AI_Pilot {
 	}
 
 	/**
-	 * Check if WP AI Pilot is ready (active + configured).
+	 * Check if Saman Labs AI is ready (active + configured).
 	 *
 	 * @return bool
 	 */
@@ -132,10 +136,10 @@ class AI_Pilot {
 	/**
 	 * Get the AI provider being used.
 	 *
-	 * @return string 'wp-ai-pilot' or 'none'.
+	 * @return string 'Saman-ai' or 'none'.
 	 */
 	public static function get_provider(): string {
-		return self::is_ready() ? 'wp-ai-pilot' : 'none';
+		return self::is_ready() ? 'Saman-ai' : 'none';
 	}
 
 	// =========================================================================
@@ -143,7 +147,7 @@ class AI_Pilot {
 	// =========================================================================
 
 	/**
-	 * Register WP SEO Pilot with WP AI Pilot.
+	 * Register Saman SEO with Saman Labs AI.
 	 */
 	public static function register_plugin(): void {
 		if ( ! function_exists( 'wp_ai_pilot' ) ) {
@@ -151,15 +155,15 @@ class AI_Pilot {
 		}
 
 		wp_ai_pilot()->register_plugin( [
-			'slug'        => 'wp-seo-pilot',
-			'file'        => 'wp-seo-pilot/wp-seo-pilot.php',
-			'name'        => 'WP SEO Pilot',
+			'slug'        => 'saman-seo',
+			'file'        => 'saman-seo/saman-seo.php',
+			'name'        => 'Saman SEO',
 			'permissions' => [ 'generate', 'chat', 'assistants' ],
 		] );
 	}
 
 	/**
-	 * Register SEO Assistants with WP AI Pilot.
+	 * Register SEO Assistants with Saman Labs AI.
 	 */
 	public static function register_seo_assistants(): void {
 		if ( ! function_exists( 'wp_ai_pilot' ) ) {
@@ -169,9 +173,9 @@ class AI_Pilot {
 		// General SEO Assistant
 		wp_ai_pilot()->register_assistant( [
 			'id'                 => 'seo-general',
-			'name'               => __( 'SEO Assistant', 'wp-seo-pilot' ),
-			'description'        => __( 'Your helpful SEO buddy for all things search optimization.', 'wp-seo-pilot' ),
-			'plugin'             => 'wp-seo-pilot/wp-seo-pilot.php',
+			'name'               => __( 'SEO Assistant', 'saman-seo' ),
+			'description'        => __( 'Your helpful SEO buddy for all things search optimization.', 'saman-seo' ),
+			'plugin'             => 'saman-seo/saman-seo.php',
 			'system_prompt'      => self::get_general_seo_prompt(),
 			'icon'               => 'dashicons-search',
 			'color'              => '#3b82f6',
@@ -180,19 +184,19 @@ class AI_Pilot {
 			'max_tokens'         => 1000,
 			'save_conversations' => true,
 			'suggested_prompts'  => [
-				__( 'How do I write a good meta description?', 'wp-seo-pilot' ),
-				__( 'What makes a title tag effective?', 'wp-seo-pilot' ),
-				__( 'Help me find keywords for my blog post', 'wp-seo-pilot' ),
-				__( 'What are internal links and why do they matter?', 'wp-seo-pilot' ),
+				__( 'How do I write a good meta description?', 'saman-seo' ),
+				__( 'What makes a title tag effective?', 'saman-seo' ),
+				__( 'Help me find keywords for my blog post', 'saman-seo' ),
+				__( 'What are internal links and why do they matter?', 'saman-seo' ),
 			],
 		] );
 
 		// SEO Reporter Assistant
 		wp_ai_pilot()->register_assistant( [
 			'id'                 => 'seo-reporter',
-			'name'               => __( 'SEO Reporter', 'wp-seo-pilot' ),
-			'description'        => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'wp-seo-pilot' ),
-			'plugin'             => 'wp-seo-pilot/wp-seo-pilot.php',
+			'name'               => __( 'SEO Reporter', 'saman-seo' ),
+			'description'        => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'saman-seo' ),
+			'plugin'             => 'saman-seo/saman-seo.php',
 			'system_prompt'      => self::get_reporter_prompt(),
 			'icon'               => 'dashicons-chart-bar',
 			'color'              => '#8b5cf6',
@@ -201,10 +205,10 @@ class AI_Pilot {
 			'max_tokens'         => 1500,
 			'save_conversations' => true,
 			'suggested_prompts'  => [
-				__( 'Give me a quick SEO report', 'wp-seo-pilot' ),
-				__( 'What SEO issues should I fix first?', 'wp-seo-pilot' ),
-				__( 'Check my meta titles and descriptions', 'wp-seo-pilot' ),
-				__( 'Find posts missing SEO data', 'wp-seo-pilot' ),
+				__( 'Give me a quick SEO report', 'saman-seo' ),
+				__( 'What SEO issues should I fix first?', 'saman-seo' ),
+				__( 'Check my meta titles and descriptions', 'saman-seo' ),
+				__( 'Find posts missing SEO data', 'saman-seo' ),
 			],
 		] );
 	}
@@ -316,7 +320,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	// =========================================================================
 
 	/**
-	 * Get available models from WP AI Pilot.
+	 * Get available models from Saman Labs AI.
 	 *
 	 * @return array Array of model configurations.
 	 */
@@ -329,7 +333,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	}
 
 	/**
-	 * Generate text using WP AI Pilot.
+	 * Generate text using Saman Labs AI.
 	 *
 	 * @param string $content The content to analyze.
 	 * @param string $type    'title' or 'description'.
@@ -341,7 +345,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
-				__( 'WP AI Pilot is not configured. Please install and configure WP AI Pilot to use AI features.', 'wp-seo-pilot' )
+				__( 'Saman Labs AI is not configured. Please install and configure Saman Labs AI to use AI features.', 'saman-seo' )
 			);
 		}
 
@@ -357,7 +361,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	}
 
 	/**
-	 * Chat with message history using WP AI Pilot.
+	 * Chat with message history using Saman Labs AI.
 	 *
 	 * @param array $messages Message array with role/content.
 	 * @param array $options  Optional settings.
@@ -368,7 +372,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
-				__( 'WP AI Pilot is not configured.', 'wp-seo-pilot' )
+				__( 'Saman Labs AI is not configured.', 'saman-seo' )
 			);
 		}
 
@@ -394,7 +398,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
-				__( 'WP AI Pilot is not configured.', 'wp-seo-pilot' )
+				__( 'Saman Labs AI is not configured.', 'saman-seo' )
 			);
 		}
 
@@ -492,8 +496,8 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 				$parts[] = '- Type: ' . $post->post_type;
 				$parts[] = '- Status: ' . $post->post_status;
 
-				$meta_title = get_post_meta( $post->ID, '_wpseopilot_title', true );
-				$meta_desc  = get_post_meta( $post->ID, '_wpseopilot_description', true );
+				$meta_title = get_post_meta( $post->ID, '_SAMAN_SEO_title', true );
+				$meta_desc  = get_post_meta( $post->ID, '_SAMAN_SEO_description', true );
 
 				if ( $meta_title ) {
 					$parts[] = '- SEO Title: ' . $meta_title;
@@ -519,7 +523,7 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 	// =========================================================================
 
 	/**
-	 * Get usage statistics for WP SEO Pilot.
+	 * Get usage statistics for Saman SEO.
 	 *
 	 * @param string $period '24hours', '7days', '30days', '90days', 'all'.
 	 *
@@ -534,7 +538,7 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 	}
 
 	/**
-	 * Get registered assistants from WP AI Pilot that belong to SEO Pilot.
+	 * Get registered assistants from Saman Labs AI that belong to Saman SEO.
 	 *
 	 * @return array Array of assistants.
 	 */
@@ -545,10 +549,10 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 
 		$all = wp_ai_pilot()->get_assistants( true );
 
-		// Filter to SEO Pilot assistants.
+		// Filter to Saman SEO assistants.
 		return array_filter( $all, function ( $assistant ) {
 			return isset( $assistant['plugin'] ) &&
-			       $assistant['plugin'] === 'wp-seo-pilot/wp-seo-pilot.php';
+			       $assistant['plugin'] === 'saman-seo/saman-seo.php';
 		} );
 	}
 }

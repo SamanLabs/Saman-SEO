@@ -2,7 +2,7 @@
 /**
  * Custom Fields Sub-Tab Content
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  *
  * Variables expected:
  * - $slug (string): Post type slug
@@ -12,15 +12,15 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 
-<div class="wpseopilot-form-row">
-	<h4><?php esc_html_e( 'Custom Field Mapping', 'wp-seo-pilot' ); ?></h4>
+<div class="saman-seo-form-row">
+	<h4><?php esc_html_e( 'Custom Field Mapping', 'saman-seo' ); ?></h4>
 	<p class="description">
-		<?php esc_html_e( 'Map custom fields to SEO variables for use in title and description templates.', 'wp-seo-pilot' ); ?>
+		<?php esc_html_e( 'Map custom fields to SEO variables for use in title and description templates.', 'saman-seo' ); ?>
 	</p>
 </div>
 
-<div class="wpseopilot-form-row">
-	<div class="wpseopilot-custom-fields-list">
+<div class="saman-seo-form-row">
+	<div class="saman-seo-custom-fields-list">
 		<?php
 		// $this refers to Settings class instance
 		$all_vars = $this->get_context_variables();
@@ -29,13 +29,13 @@ defined( 'ABSPATH' ) || exit;
 
 		if ( ! empty( $custom_fields ) ) :
 			?>
-			<div class="wpseopilot-tag-cloud-container">
+			<div class="saman-seo-tag-cloud-container">
 				<p class="description" style="margin-bottom: 12px;">
-					<?php esc_html_e( 'Click to copy these custom field variables found in your latest post:', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Click to copy these custom field variables found in your latest post:', 'saman-seo' ); ?>
 				</p>
-				<div class="wpseopilot-tag-cloud">
+				<div class="saman-seo-tag-cloud">
 					<?php foreach ( $custom_fields as $field ) : ?>
-						<button type="button" class="wpseopilot-tag-chip wpseopilot-copy-var" data-var="<?php echo esc_attr( $field['tag'] ); ?>" title="<?php echo esc_attr( $field['desc'] ); ?> | Preview: <?php echo esc_attr( $field['preview'] ); ?>">
+						<button type="button" class="saman-seo-tag-chip saman-seo-copy-var" data-var="<?php echo esc_attr( $field['tag'] ); ?>" title="<?php echo esc_attr( $field['desc'] ); ?> | Preview: <?php echo esc_attr( $field['preview'] ); ?>">
 							<code>{{<?php echo esc_html( $field['tag'] ); ?>}}</code>
 						</button>
 					<?php endforeach; ?>
@@ -44,13 +44,13 @@ defined( 'ABSPATH' ) || exit;
 			<?php
 		else :
 			?>
-			<div class="wpseopilot-placeholder-content">
+			<div class="saman-seo-placeholder-content">
 				<span class="dashicons dashicons-list-view" style="font-size: 48px; opacity: 0.3;"></span>
 				<p>
-					<?php esc_html_e( 'No custom fields detected for this post type yet.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'No custom fields detected for this post type yet.', 'saman-seo' ); ?>
 				</p>
 				<p class="description">
-					<?php esc_html_e( 'Create a post with custom fields to see them listed here.', 'wp-seo-pilot' ); ?>
+					<?php esc_html_e( 'Create a post with custom fields to see them listed here.', 'saman-seo' ); ?>
 				</p>
 			</div>
 			<?php

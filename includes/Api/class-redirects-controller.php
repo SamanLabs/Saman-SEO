@@ -2,11 +2,11 @@
 /**
  * Redirects REST Controller
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -36,8 +36,8 @@ class Redirects_Controller extends REST_Controller {
      */
     public function __construct() {
         global $wpdb;
-        $this->redirects_table = $wpdb->prefix . 'wpseopilot_redirects';
-        $this->log_table       = $wpdb->prefix . 'wpseopilot_404_log';
+        $this->redirects_table = $wpdb->prefix . 'SAMAN_SEO_redirects';
+        $this->log_table       = $wpdb->prefix . 'SAMAN_SEO_404_log';
     }
 
     /**
@@ -681,7 +681,7 @@ class Redirects_Controller extends REST_Controller {
         ) );
 
         if ( ! $redirect ) {
-            return $this->error( __( 'Redirect not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Redirect not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         return $this->success( $this->format_redirect( $redirect ) );
@@ -738,7 +738,7 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function create_redirect( $request ) {
-        $manager = new \WPSEOPilot\Service\Redirect_Manager();
+        $manager = new \Saman\SEO\Service\Redirect_Manager();
 
         $source      = $request->get_param( 'source' );
         $target      = $request->get_param( 'target' );
@@ -760,7 +760,7 @@ class Redirects_Controller extends REST_Controller {
 
         $redirect = $manager->get_redirect( $result );
 
-        return $this->success( $this->format_redirect( $redirect ), __( 'Redirect created successfully.', 'wp-seo-pilot' ) );
+        return $this->success( $this->format_redirect( $redirect ), __( 'Redirect created successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -770,7 +770,7 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function update_redirect( $request ) {
-        $manager = new \WPSEOPilot\Service\Redirect_Manager();
+        $manager = new \Saman\SEO\Service\Redirect_Manager();
 
         $id   = $request->get_param( 'id' );
         $data = [];
@@ -793,7 +793,7 @@ class Redirects_Controller extends REST_Controller {
 
         $redirect = $manager->get_redirect( $id );
 
-        return $this->success( $this->format_redirect( $redirect ), __( 'Redirect updated successfully.', 'wp-seo-pilot' ) );
+        return $this->success( $this->format_redirect( $redirect ), __( 'Redirect updated successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -803,7 +803,7 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function delete_redirect( $request ) {
-        $manager = new \WPSEOPilot\Service\Redirect_Manager();
+        $manager = new \Saman\SEO\Service\Redirect_Manager();
 
         $id     = $request->get_param( 'id' );
         $result = $manager->delete_redirect( $id );
@@ -812,7 +812,7 @@ class Redirects_Controller extends REST_Controller {
             return $this->error( $result->get_error_message(), $result->get_error_code(), 404 );
         }
 
-        return $this->success( null, __( 'Redirect deleted.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Redirect deleted.', 'saman-seo' ) );
     }
 
     /**
@@ -827,7 +827,7 @@ class Redirects_Controller extends REST_Controller {
         $ids = $request->get_param( 'ids' );
 
         if ( empty( $ids ) || ! is_array( $ids ) ) {
-            return $this->error( __( 'No IDs provided.', 'wp-seo-pilot' ), 'missing_ids', 400 );
+            return $this->error( __( 'No IDs provided.', 'saman-seo' ), 'missing_ids', 400 );
         }
 
         $ids          = array_map( 'absint', $ids );
@@ -840,11 +840,11 @@ class Redirects_Controller extends REST_Controller {
             $ids
         ) );
 
-        if ( class_exists( '\WPSEOPilot\Service\Redirect_Manager' ) ) {
-            \WPSEOPilot\Service\Redirect_Manager::flush_cache();
+        if ( class_exists( '\Saman\SEO\Service\Redirect_Manager' ) ) {
+            \Saman\SEO\Service\Redirect_Manager::flush_cache();
         }
 
-        return $this->success( [ 'deleted' => $deleted ], sprintf( __( '%d redirects deleted.', 'wp-seo-pilot' ), $deleted ) );
+        return $this->success( [ 'deleted' => $deleted ], sprintf( __( '%d redirects deleted.', 'saman-seo' ), $deleted ) );
     }
 
     /**
@@ -899,15 +899,15 @@ class Redirects_Controller extends REST_Controller {
 
         $warnings = [];
 
-        // Check for direct loop (A → A)
+        // Check for direct loop (A ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ A)
         if ( $source === $target_path ) {
             $warnings[] = [
                 'type'    => 'loop',
-                'message' => __( 'Source and target are the same URL. This will create an infinite loop.', 'wp-seo-pilot' ),
+                'message' => __( 'Source and target are the same URL. This will create an infinite loop.', 'saman-seo' ),
             ];
         }
 
-        // Check for reverse redirect (B → A when creating A → B)
+        // Check for reverse redirect (B ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ A when creating A ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ B)
         if ( $target_path ) {
             $exclude_sql = $exclude_id ? $wpdb->prepare( ' AND id != %d', $exclude_id ) : '';
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -927,7 +927,7 @@ class Redirects_Controller extends REST_Controller {
                     $warnings[] = [
                         'type'    => 'loop',
                         'message' => sprintf(
-                            __( 'This will create a redirect loop: %1$s → %2$s → %1$s', 'wp-seo-pilot' ),
+                            __( 'This will create a redirect loop: %1$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %2$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %1$s', 'saman-seo' ),
                             $source,
                             $target_path
                         ),
@@ -937,7 +937,7 @@ class Redirects_Controller extends REST_Controller {
                     $warnings[] = [
                         'type'    => 'chain',
                         'message' => sprintf(
-                            __( 'This creates a redirect chain: %1$s → %2$s → %3$s. Consider redirecting directly to the final destination.', 'wp-seo-pilot' ),
+                            __( 'This creates a redirect chain: %1$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %2$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %3$s. Consider redirecting directly to the final destination.', 'saman-seo' ),
                             $source,
                             $target_path,
                             $reverse->target
@@ -959,7 +959,7 @@ class Redirects_Controller extends REST_Controller {
                 $warnings[] = [
                     'type'    => 'chain',
                     'message' => sprintf(
-                        __( 'Note: %s already redirects to this source. After adding this redirect, it will become a chain.', 'wp-seo-pilot' ),
+                        __( 'Note: %s already redirects to this source. After adding this redirect, it will become a chain.', 'saman-seo' ),
                         $redirect->source
                     ),
                 ];
@@ -1033,7 +1033,7 @@ class Redirects_Controller extends REST_Controller {
         $data      = $request->get_param( 'data' );
         $overwrite = $request->get_param( 'overwrite' );
 
-        $manager = new \WPSEOPilot\Service\Redirect_Manager();
+        $manager = new \Saman\SEO\Service\Redirect_Manager();
 
         $imported = 0;
         $skipped  = 0;
@@ -1083,7 +1083,7 @@ class Redirects_Controller extends REST_Controller {
             $json_data = json_decode( $data, true );
 
             if ( ! is_array( $json_data ) ) {
-                return $this->error( __( 'Invalid JSON data.', 'wp-seo-pilot' ), 'invalid_json', 400 );
+                return $this->error( __( 'Invalid JSON data.', 'saman-seo' ), 'invalid_json', 400 );
             }
 
             foreach ( $json_data as $i => $redirect_data ) {
@@ -1102,14 +1102,14 @@ class Redirects_Controller extends REST_Controller {
             'imported' => $imported,
             'skipped'  => $skipped,
             'errors'   => $errors,
-        ], sprintf( __( 'Imported %d redirects, skipped %d.', 'wp-seo-pilot' ), $imported, $skipped ) );
+        ], sprintf( __( 'Imported %d redirects, skipped %d.', 'saman-seo' ), $imported, $skipped ) );
     }
 
     /**
      * Import a single redirect.
      *
      * @param array                                $data      Redirect data.
-     * @param \WPSEOPilot\Service\Redirect_Manager $manager   Redirect manager instance.
+     * @param \Saman\SEO\Service\Redirect_Manager $manager   Redirect manager instance.
      * @param bool                                 $overwrite Whether to overwrite existing.
      * @return bool|string True on success, 'skipped' if skipped, error message on failure.
      */
@@ -1118,7 +1118,7 @@ class Redirects_Controller extends REST_Controller {
         $target = isset( $data['target'] ) ? $data['target'] : '';
 
         if ( empty( $source ) || empty( $target ) ) {
-            return __( 'Missing source or target.', 'wp-seo-pilot' );
+            return __( 'Missing source or target.', 'saman-seo' );
         }
 
         $status_code = isset( $data['status_code'] ) ? (int) $data['status_code'] : 301;
@@ -1278,7 +1278,7 @@ class Redirects_Controller extends REST_Controller {
                 'hits'            => (int) $row->hits,
                 'last_seen'       => $row->last_seen,
                 'first_seen'      => isset( $row->first_seen ) ? $row->first_seen : null,
-                'device_label'    => ! empty( $row->device_label ) ? $row->device_label : __( 'Unknown device', 'wp-seo-pilot' ),
+                'device_label'    => ! empty( $row->device_label ) ? $row->device_label : __( 'Unknown device', 'saman-seo' ),
                 'redirect_exists' => ! empty( $row->redirect_exists ),
                 'is_bot'          => isset( $row->is_bot ) ? (bool) $row->is_bot : false,
                 'is_ignored'      => isset( $row->is_ignored ) ? (bool) $row->is_ignored : false,
@@ -1330,7 +1330,7 @@ class Redirects_Controller extends REST_Controller {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         $wpdb->query( "TRUNCATE TABLE {$this->log_table}" );
 
-        return $this->success( null, __( '404 log cleared.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( '404 log cleared.', 'saman-seo' ) );
     }
 
     /**
@@ -1352,10 +1352,10 @@ class Redirects_Controller extends REST_Controller {
         );
 
         if ( ! $deleted ) {
-            return $this->error( __( 'Entry not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Entry not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
-        return $this->success( null, __( 'Entry deleted.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Entry deleted.', 'saman-seo' ) );
     }
 
     /**
@@ -1377,7 +1377,7 @@ class Redirects_Controller extends REST_Controller {
         ) );
 
         if ( ! $entry ) {
-            return $this->error( __( 'Entry not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Entry not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         $request_uri = $entry->request_uri;
@@ -1480,13 +1480,13 @@ class Redirects_Controller extends REST_Controller {
         ) );
 
         if ( ! $entry ) {
-            return $this->error( __( '404 entry not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( '404 entry not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         $source = $entry->request_uri;
 
         // Create the redirect
-        $manager = new \WPSEOPilot\Service\Redirect_Manager();
+        $manager = new \Saman\SEO\Service\Redirect_Manager();
         $result  = $manager->create_redirect( $source, $target, $status_code );
 
         if ( is_wp_error( $result ) ) {
@@ -1515,7 +1515,7 @@ class Redirects_Controller extends REST_Controller {
                 ],
                 'entry_deleted' => $delete_entry,
             ],
-            __( 'Redirect created successfully.', 'wp-seo-pilot' )
+            __( 'Redirect created successfully.', 'saman-seo' )
         );
     }
 
@@ -1605,13 +1605,13 @@ class Redirects_Controller extends REST_Controller {
      */
     public function ignore_404_entry( $request ) {
         $id      = $request->get_param( 'id' );
-        $monitor = new \WPSEOPilot\Service\Request_Monitor();
+        $monitor = new \Saman\SEO\Service\Request_Monitor();
 
         if ( $monitor->ignore_entry( $id ) ) {
-            return $this->success( null, __( 'Entry ignored.', 'wp-seo-pilot' ) );
+            return $this->success( null, __( 'Entry ignored.', 'saman-seo' ) );
         }
 
-        return $this->error( __( 'Failed to ignore entry.', 'wp-seo-pilot' ), 'ignore_failed', 400 );
+        return $this->error( __( 'Failed to ignore entry.', 'saman-seo' ), 'ignore_failed', 400 );
     }
 
     /**
@@ -1622,13 +1622,13 @@ class Redirects_Controller extends REST_Controller {
      */
     public function unignore_404_entry( $request ) {
         $id      = $request->get_param( 'id' );
-        $monitor = new \WPSEOPilot\Service\Request_Monitor();
+        $monitor = new \Saman\SEO\Service\Request_Monitor();
 
         if ( $monitor->unignore_entry( $id ) ) {
-            return $this->success( null, __( 'Entry unignored.', 'wp-seo-pilot' ) );
+            return $this->success( null, __( 'Entry unignored.', 'saman-seo' ) );
         }
 
-        return $this->error( __( 'Failed to unignore entry.', 'wp-seo-pilot' ), 'unignore_failed', 400 );
+        return $this->error( __( 'Failed to unignore entry.', 'saman-seo' ), 'unignore_failed', 400 );
     }
 
     /**
@@ -1638,7 +1638,7 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function get_ignore_patterns( $request ) {
-        $monitor  = new \WPSEOPilot\Service\Request_Monitor();
+        $monitor  = new \Saman\SEO\Service\Request_Monitor();
         $patterns = $monitor->get_ignore_patterns();
 
         $data = [];
@@ -1666,11 +1666,11 @@ class Redirects_Controller extends REST_Controller {
         $is_regex = $request->get_param( 'is_regex' );
         $reason   = $request->get_param( 'reason' );
 
-        $monitor = new \WPSEOPilot\Service\Request_Monitor();
+        $monitor = new \Saman\SEO\Service\Request_Monitor();
         $id      = $monitor->add_ignore_pattern( $pattern, $is_regex, $reason );
 
         if ( false === $id ) {
-            return $this->error( __( 'Failed to create pattern.', 'wp-seo-pilot' ), 'create_failed', 400 );
+            return $this->error( __( 'Failed to create pattern.', 'saman-seo' ), 'create_failed', 400 );
         }
 
         return $this->success(
@@ -1680,7 +1680,7 @@ class Redirects_Controller extends REST_Controller {
                 'is_regex'   => $is_regex,
                 'reason'     => $reason,
             ],
-            __( 'Pattern created successfully.', 'wp-seo-pilot' )
+            __( 'Pattern created successfully.', 'saman-seo' )
         );
     }
 
@@ -1692,13 +1692,13 @@ class Redirects_Controller extends REST_Controller {
      */
     public function delete_ignore_pattern( $request ) {
         $id      = $request->get_param( 'id' );
-        $monitor = new \WPSEOPilot\Service\Request_Monitor();
+        $monitor = new \Saman\SEO\Service\Request_Monitor();
 
         if ( $monitor->delete_ignore_pattern( $id ) ) {
-            return $this->success( null, __( 'Pattern deleted.', 'wp-seo-pilot' ) );
+            return $this->success( null, __( 'Pattern deleted.', 'saman-seo' ) );
         }
 
-        return $this->error( __( 'Failed to delete pattern.', 'wp-seo-pilot' ), 'delete_failed', 400 );
+        return $this->error( __( 'Failed to delete pattern.', 'saman-seo' ), 'delete_failed', 400 );
     }
 
     /**
@@ -1708,7 +1708,7 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function get_slug_suggestions( $request ) {
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
 
         $data = [];
         foreach ( $suggestions as $key => $suggestion ) {
@@ -1733,16 +1733,16 @@ class Redirects_Controller extends REST_Controller {
     public function dismiss_slug_suggestion( $request ) {
         $key = $request->get_param( 'key' );
 
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
 
         if ( ! isset( $suggestions[ $key ] ) ) {
-            return $this->error( __( 'Suggestion not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Suggestion not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         unset( $suggestions[ $key ] );
-        update_option( 'wpseopilot_monitor_slugs', $suggestions );
+        update_option( 'SAMAN_SEO_monitor_slugs', $suggestions );
 
-        return $this->success( null, __( 'Suggestion dismissed.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Suggestion dismissed.', 'saman-seo' ) );
     }
 
     /**
@@ -1754,10 +1754,10 @@ class Redirects_Controller extends REST_Controller {
     public function apply_slug_suggestion( $request ) {
         $key = $request->get_param( 'key' );
 
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
 
         if ( ! isset( $suggestions[ $key ] ) ) {
-            return $this->error( __( 'Suggestion not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Suggestion not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         $suggestion = $suggestions[ $key ];
@@ -1775,7 +1775,7 @@ class Redirects_Controller extends REST_Controller {
         }
 
         // Remove from suggestions (already handled in create_redirect)
-        return $this->success( $result->get_data()['data'], __( 'Redirect created from suggestion.', 'wp-seo-pilot' ) );
+        return $this->success( $result->get_data()['data'], __( 'Redirect created from suggestion.', 'saman-seo' ) );
     }
 
     /**

@@ -31,7 +31,7 @@ const Audit = () => {
     const fetchAudit = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await apiFetch({ path: '/wpseopilot/v2/audit' });
+            const res = await apiFetch({ path: '/saman-seo/v1/audit' });
             if (res.success) {
                 setAuditData(res.data);
             }
@@ -53,7 +53,7 @@ const Audit = () => {
         setMessage({ type: '', text: '' });
         try {
             const res = await apiFetch({
-                path: '/wpseopilot/v2/audit/run',
+                path: '/saman-seo/v1/audit/run',
                 method: 'POST',
                 data: { post_type: 'any', limit: 100 },
             });
@@ -74,7 +74,7 @@ const Audit = () => {
         setApplyingRecommendation(rec.post_id);
         try {
             const res = await apiFetch({
-                path: `/wpseopilot/v2/audit/apply/${rec.post_id}`,
+                path: `/saman-seo/v1/audit/apply/${rec.post_id}`,
                 method: 'POST',
                 data: {
                     title: rec.suggested_title,

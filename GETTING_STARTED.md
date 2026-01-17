@@ -1,6 +1,6 @@
-# Getting Started with WP SEO Pilot
+# Getting Started with Saman SEO
 
-This guide will help you install and configure WP SEO Pilot for your WordPress site.
+This guide will help you install and configure Saman SEO for your WordPress site.
 
 ---
 
@@ -20,7 +20,7 @@ This guide will help you install and configure WP SEO Pilot for your WordPress s
 1. Download and extract the plugin ZIP file
 2. Upload the `wp-seo-pilot` folder to `/wp-content/plugins/` via FTP/SFTP
 3. Navigate to **Plugins** in WordPress admin
-4. Activate **WP SEO Pilot**
+4. Activate **Saman SEO**
 
 ### Method 3: WP-CLI
 
@@ -34,7 +34,7 @@ wp plugin install wp-seo-pilot --activate
 
 ### Step 1: Configure Global Settings
 
-Navigate to **WP SEO Pilot → Defaults** in your WordPress admin.
+Navigate to **Saman SEO → Defaults** in your WordPress admin.
 
 #### Site-Wide Defaults
 
@@ -79,7 +79,7 @@ Configure default behavior for each post type:
 
 ### Step 2: Configure Sitemaps
 
-Navigate to **WP SEO Pilot → Sitemap**.
+Navigate to **Saman SEO → Sitemap**.
 
 #### Basic Sitemap Settings
 
@@ -116,7 +116,7 @@ Navigate to **WP SEO Pilot → Sitemap**.
 
 ### Step 3: Configure Per-Post Defaults
 
-Navigate to **WP SEO Pilot → Post Type Defaults**.
+Navigate to **Saman SEO → Post Type Defaults**.
 
 For each post type, configure:
 
@@ -145,7 +145,7 @@ Products: {{excerpt}} | Shop at {{site_name}}
 ### Gutenberg Editor
 
 1. Open any post or page
-2. Look for the **WP SEO Pilot** panel in the right sidebar
+2. Look for the **Saman SEO** panel in the right sidebar
 3. Configure:
    - SEO Title (overrides template)
    - Meta Description
@@ -160,7 +160,7 @@ Products: {{excerpt}} | Shop at {{site_name}}
 ### Classic Editor
 
 1. Open any post or page
-2. Scroll to the **WP SEO Pilot** meta box below the editor
+2. Scroll to the **Saman SEO** meta box below the editor
 3. Configure the same fields as Gutenberg
 4. Click **Update** to save
 
@@ -170,7 +170,7 @@ Products: {{excerpt}} | Shop at {{site_name}}
 
 ### Internal Linking
 
-Navigate to **WP SEO Pilot → Internal Links**.
+Navigate to **Saman SEO → Internal Links**.
 
 1. **Create Linking Rule:**
    - Keyword: `WordPress`
@@ -189,7 +189,7 @@ Navigate to **WP SEO Pilot → Internal Links**.
 
 ### AI-Powered Suggestions
 
-Navigate to **WP SEO Pilot → AI Settings**.
+Navigate to **Saman SEO → AI Settings**.
 
 1. **Enable AI:** ✓
 2. **API Provider:** OpenAI
@@ -199,13 +199,13 @@ Navigate to **WP SEO Pilot → AI Settings**.
 
 **Using AI:**
 1. Open any post
-2. In the WP SEO Pilot panel, click **Generate Title** or **Generate Description**
+2. In the Saman SEO panel, click **Generate Title** or **Generate Description**
 3. Review the AI suggestion
 4. Accept or edit as needed
 
 ### SEO Audit
 
-Navigate to **WP SEO Pilot → Audit**.
+Navigate to **Saman SEO → Audit**.
 
 **Run Your First Audit:**
 1. Click **Run Audit**
@@ -228,7 +228,7 @@ Click **Auto-Fix** to automatically generate missing titles and descriptions bas
 
 ### Redirects
 
-Navigate to **WP SEO Pilot → Redirects**.
+Navigate to **Saman SEO → Redirects**.
 
 **Add a Redirect:**
 1. Enter **Source Path:** `/old-page`
@@ -257,7 +257,7 @@ Navigate to **WP SEO Pilot → Redirects**.
 
 ### WooCommerce
 
-WP SEO Pilot automatically detects WooCommerce and provides:
+Saman SEO automatically detects WooCommerce and provides:
 - Product-specific templates
 - Product schema markup
 - Product image inclusion in sitemaps
@@ -270,7 +270,7 @@ Description: Buy {{post_title}} at {{site_name}}. {{excerpt}}
 
 ### Multilingual Plugins (Polylang, WPML)
 
-WP SEO Pilot works with multilingual plugins. For best results:
+Saman SEO works with multilingual plugins. For best results:
 
 1. Set different defaults per language (if supported)
 2. Configure hreflang tags in global settings
@@ -293,7 +293,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 
 ### Page Builders (Elementor, Divi, Beaver Builder)
 
-WP SEO Pilot integrates seamlessly with page builders:
+Saman SEO integrates seamlessly with page builders:
 
 1. SEO fields appear in page builder sidebars
 2. Content is analyzed from builder output
@@ -308,13 +308,13 @@ WP SEO Pilot integrates seamlessly with page builders:
 **Check Frontend Output:**
 1. Visit any page on your site
 2. View page source (right-click → View Page Source)
-3. Look for WP SEO Pilot meta tags:
+3. Look for Saman SEO meta tags:
    ```html
-   <!-- WP SEO Pilot -->
+   <!-- Saman SEO -->
    <title>Your Page Title | Site Name</title>
    <meta name="description" content="...">
    <meta property="og:title" content="...">
-   <!-- /WP SEO Pilot -->
+   <!-- /Saman SEO -->
    ```
 
 **Check Sitemaps:**
@@ -412,10 +412,10 @@ AI Suggestions: Enabled
 
 ### Meta Tags Not Appearing
 
-**Problem:** WP SEO Pilot tags not in page source
+**Problem:** Saman SEO tags not in page source
 
 **Solution:**
-1. Check **WP SEO Pilot → Defaults** → ensure enabled
+1. Check **Saman SEO → Defaults** → ensure enabled
 2. Disable other SEO plugins temporarily
 3. Check theme's `wp_head()` function is present
 4. Clear caching plugins

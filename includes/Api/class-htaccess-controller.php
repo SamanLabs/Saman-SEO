@@ -4,11 +4,11 @@
  *
  * Provides endpoints for editing the .htaccess file.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -37,10 +37,10 @@ class Htaccess_Controller extends REST_Controller {
      * Constructor.
      */
     public function __construct() {
-        $this->namespace     = 'wpseopilot/v2';
+        $this->namespace     = 'saman-seo/v1';
         $this->rest_base     = 'htaccess';
         $this->htaccess_path = ABSPATH . '.htaccess';
-        $this->backup_dir    = WP_CONTENT_DIR . '/wpseopilot-backups/htaccess/';
+        $this->backup_dir    = WP_CONTENT_DIR . '/saman-seo-backups/htaccess/';
     }
 
     /**

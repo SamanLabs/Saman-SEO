@@ -92,7 +92,7 @@ RewriteRule .* - [F,L]`,
     useEffect(() => {
         const fetchContent = async () => {
             try {
-                const response = await apiFetch({ path: '/wpseopilot/v2/htaccess' });
+                const response = await apiFetch({ path: '/saman-seo/v1/htaccess' });
                 if (response.success) {
                     setContent(response.data.content || '');
                     setOriginalContent(response.data.content || '');
@@ -121,7 +121,7 @@ RewriteRule .* - [F,L]`,
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/htaccess',
+                path: '/saman-seo/v1/htaccess',
                 method: 'POST',
                 data: { content },
             });
@@ -153,7 +153,7 @@ RewriteRule .* - [F,L]`,
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/htaccess/restore',
+                path: '/saman-seo/v1/htaccess/restore',
                 method: 'POST',
                 data: { backup: backup.file },
             });

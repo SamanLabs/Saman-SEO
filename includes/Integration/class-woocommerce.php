@@ -4,10 +4,10 @@
  *
  * Adds Product schema support for WooCommerce products.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  */
 
-namespace WPSEOPilot\Integration;
+namespace Saman\SEO\Integration;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -33,7 +33,7 @@ class WooCommerce {
 			return;
 		}
 
-		add_filter( 'wpseopilot_jsonld_graph', [ $this, 'add_product_schema' ], 25, 1 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_product_schema' ], 25, 1 );
 	}
 
 	/**
@@ -108,12 +108,12 @@ class WooCommerce {
 		}
 
 		// GTIN/MPN/ISBN.
-		$gtin = get_post_meta( $product->get_id(), '_wpseopilot_gtin', true );
+		$gtin = get_post_meta( $product->get_id(), '_SAMAN_SEO_gtin', true );
 		if ( $gtin ) {
 			$schema['gtin'] = $gtin;
 		}
 
-		$mpn = get_post_meta( $product->get_id(), '_wpseopilot_mpn', true );
+		$mpn = get_post_meta( $product->get_id(), '_SAMAN_SEO_mpn', true );
 		if ( $mpn ) {
 			$schema['mpn'] = $mpn;
 		}
@@ -144,7 +144,7 @@ class WooCommerce {
 	 */
 	private function get_product_brand( $product ): ?string {
 		// Check custom field first.
-		$brand = get_post_meta( $product->get_id(), '_wpseopilot_brand', true );
+		$brand = get_post_meta( $product->get_id(), '_SAMAN_SEO_brand', true );
 		if ( $brand ) {
 			return $brand;
 		}
@@ -186,7 +186,7 @@ class WooCommerce {
 		}
 
 		// Item condition.
-		$condition = get_post_meta( $product->get_id(), '_wpseopilot_condition', true );
+		$condition = get_post_meta( $product->get_id(), '_SAMAN_SEO_condition', true );
 		if ( $condition ) {
 			$offer['itemCondition'] = 'https://schema.org/' . $condition;
 		} else {
@@ -293,30 +293,30 @@ class WooCommerce {
 	 */
 	public static function get_meta_fields(): array {
 		return [
-			'_wpseopilot_brand'     => [
-				'label'       => __( 'Brand', 'wp-seo-pilot' ),
-				'description' => __( 'Product brand name for schema.', 'wp-seo-pilot' ),
+			'_SAMAN_SEO_brand'     => [
+				'label'       => __( 'Brand', 'saman-seo' ),
+				'description' => __( 'Product brand name for schema.', 'saman-seo' ),
 				'type'        => 'text',
 			],
-			'_wpseopilot_gtin'      => [
-				'label'       => __( 'GTIN/UPC/EAN', 'wp-seo-pilot' ),
-				'description' => __( 'Global Trade Item Number (barcode).', 'wp-seo-pilot' ),
+			'_SAMAN_SEO_gtin'      => [
+				'label'       => __( 'GTIN/UPC/EAN', 'saman-seo' ),
+				'description' => __( 'Global Trade Item Number (barcode).', 'saman-seo' ),
 				'type'        => 'text',
 			],
-			'_wpseopilot_mpn'       => [
-				'label'       => __( 'MPN', 'wp-seo-pilot' ),
-				'description' => __( 'Manufacturer Part Number.', 'wp-seo-pilot' ),
+			'_SAMAN_SEO_mpn'       => [
+				'label'       => __( 'MPN', 'saman-seo' ),
+				'description' => __( 'Manufacturer Part Number.', 'saman-seo' ),
 				'type'        => 'text',
 			],
-			'_wpseopilot_condition' => [
-				'label'       => __( 'Condition', 'wp-seo-pilot' ),
-				'description' => __( 'Product condition for schema.', 'wp-seo-pilot' ),
+			'_SAMAN_SEO_condition' => [
+				'label'       => __( 'Condition', 'saman-seo' ),
+				'description' => __( 'Product condition for schema.', 'saman-seo' ),
 				'type'        => 'select',
 				'options'     => [
-					'NewCondition'         => __( 'New', 'wp-seo-pilot' ),
-					'UsedCondition'        => __( 'Used', 'wp-seo-pilot' ),
-					'RefurbishedCondition' => __( 'Refurbished', 'wp-seo-pilot' ),
-					'DamagedCondition'     => __( 'Damaged', 'wp-seo-pilot' ),
+					'NewCondition'         => __( 'New', 'saman-seo' ),
+					'UsedCondition'        => __( 'Used', 'saman-seo' ),
+					'RefurbishedCondition' => __( 'Refurbished', 'saman-seo' ),
+					'DamagedCondition'     => __( 'Damaged', 'saman-seo' ),
 				],
 			],
 		];

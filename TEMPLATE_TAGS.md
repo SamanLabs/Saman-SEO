@@ -1,6 +1,6 @@
 # Template Tags & Shortcodes
 
-Reference for theme integration with WP SEO Pilot template tags and shortcodes.
+Reference for theme integration with Saman SEO template tags and shortcodes.
 
 ---
 

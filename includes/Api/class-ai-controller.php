@@ -2,15 +2,15 @@
 /**
  * AI REST Controller
  *
- * Simplified controller that delegates all AI operations to WP AI Pilot.
+ * Simplified controller that delegates all AI operations to Saman Labs AI.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
-use WPSEOPilot\Integration\AI_Pilot;
+use Saman\SEO\Integration\AI_Pilot;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * REST API controller for AI generation.
- * All AI operations are handled by WP AI Pilot.
+ * All AI operations are handled by Saman Labs AI.
  */
 class Ai_Controller extends REST_Controller {
 
@@ -95,19 +95,19 @@ class Ai_Controller extends REST_Controller {
 
 		if ( empty( $content ) ) {
 			return $this->error(
-				__( 'Content is required for AI generation.', 'wp-seo-pilot' ),
+				__( 'Content is required for AI generation.', 'saman-seo' ),
 				'missing_content',
 				400
 			);
 		}
 
-		// Check if WP AI Pilot is ready.
+		// Check if Saman Labs AI is ready.
 		if ( ! AI_Pilot::is_ready() ) {
 			$status = AI_Pilot::get_status();
 
 			if ( ! $status['installed'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is required for AI features. Please install it from the More page.', 'wp-seo-pilot' ),
+					__( 'Saman Labs AI is required for AI features. Please install it from the More page.', 'saman-seo' ),
 					'ai_not_installed',
 					400
 				);
@@ -115,14 +115,14 @@ class Ai_Controller extends REST_Controller {
 
 			if ( ! $status['active'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is installed but not activated. Please activate it.', 'wp-seo-pilot' ),
+					__( 'Saman Labs AI is installed but not activated. Please activate it.', 'saman-seo' ),
 					'ai_not_active',
 					400
 				);
 			}
 
 			return $this->error(
-				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'wp-seo-pilot' ),
+				__( 'Saman Labs AI needs configuration. Please add an API key in Saman Labs AI settings.', 'saman-seo' ),
 				'ai_not_configured',
 				400
 			);
@@ -159,8 +159,8 @@ class Ai_Controller extends REST_Controller {
 			$results['description'] = trim( $result );
 		}
 
-		return $this->success( $results, __( 'AI generation completed.', 'wp-seo-pilot' ), [
-			'provider' => 'wp-ai-pilot',
+		return $this->success( $results, __( 'AI generation completed.', 'saman-seo' ), [
+			'provider' => 'Saman-ai',
 		] );
 	}
 
@@ -184,19 +184,19 @@ class Ai_Controller extends REST_Controller {
 				'active'       => $status['active'],
 				'ready'        => $status['ready'],
 				'version'      => $status['version'] ?? null,
-				'settings_url' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+				'settings_url' => admin_url( 'admin.php?page=Saman-ai' ),
 			],
 		];
 
 		if ( $ready ) {
-			$response['message']      = __( 'Connected to WP AI Pilot', 'wp-seo-pilot' );
+			$response['message']      = __( 'Connected to Saman Labs AI', 'saman-seo' );
 			$response['models_count'] = count( AI_Pilot::get_models() );
 		} elseif ( $status['installed'] && ! $status['active'] ) {
-			$response['message'] = __( 'WP AI Pilot needs to be activated', 'wp-seo-pilot' );
+			$response['message'] = __( 'Saman Labs AI needs to be activated', 'saman-seo' );
 		} elseif ( $status['installed'] && ! $status['ready'] ) {
-			$response['message'] = __( 'WP AI Pilot needs configuration', 'wp-seo-pilot' );
+			$response['message'] = __( 'Saman Labs AI needs configuration', 'saman-seo' );
 		} else {
-			$response['message'] = __( 'Install WP AI Pilot to enable AI features', 'wp-seo-pilot' );
+			$response['message'] = __( 'Install Saman Labs AI to enable AI features', 'saman-seo' );
 		}
 
 		return $this->success( $response );
@@ -236,9 +236,9 @@ class Ai_Controller extends REST_Controller {
 	 */
 	public function get_settings( $request ) {
 		$settings = [
-			'ai_prompt_system'      => get_option( 'wpseopilot_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' ),
-			'ai_prompt_title'       => get_option( 'wpseopilot_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' ),
-			'ai_prompt_description' => get_option( 'wpseopilot_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' ),
+			'ai_prompt_system'      => get_option( 'SAMAN_SEO_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' ),
+			'ai_prompt_title'       => get_option( 'SAMAN_SEO_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' ),
+			'ai_prompt_description' => get_option( 'SAMAN_SEO_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' ),
 		];
 
 		return $this->success( $settings );
@@ -258,22 +258,22 @@ class Ai_Controller extends REST_Controller {
 		}
 
 		if ( isset( $params['ai_prompt_system'] ) ) {
-			update_option( 'wpseopilot_ai_prompt_system', sanitize_textarea_field( $params['ai_prompt_system'] ) );
+			update_option( 'SAMAN_SEO_ai_prompt_system', sanitize_textarea_field( $params['ai_prompt_system'] ) );
 		}
 
 		if ( isset( $params['ai_prompt_title'] ) ) {
-			update_option( 'wpseopilot_ai_prompt_title', sanitize_textarea_field( $params['ai_prompt_title'] ) );
+			update_option( 'SAMAN_SEO_ai_prompt_title', sanitize_textarea_field( $params['ai_prompt_title'] ) );
 		}
 
 		if ( isset( $params['ai_prompt_description'] ) ) {
-			update_option( 'wpseopilot_ai_prompt_description', sanitize_textarea_field( $params['ai_prompt_description'] ) );
+			update_option( 'SAMAN_SEO_ai_prompt_description', sanitize_textarea_field( $params['ai_prompt_description'] ) );
 		}
 
 		return $this->success( [
-			'ai_prompt_system'      => get_option( 'wpseopilot_ai_prompt_system' ),
-			'ai_prompt_title'       => get_option( 'wpseopilot_ai_prompt_title' ),
-			'ai_prompt_description' => get_option( 'wpseopilot_ai_prompt_description' ),
-		], __( 'Settings saved.', 'wp-seo-pilot' ) );
+			'ai_prompt_system'      => get_option( 'SAMAN_SEO_ai_prompt_system' ),
+			'ai_prompt_title'       => get_option( 'SAMAN_SEO_ai_prompt_title' ),
+			'ai_prompt_description' => get_option( 'SAMAN_SEO_ai_prompt_description' ),
+		], __( 'Settings saved.', 'saman-seo' ) );
 	}
 
 	/**
@@ -289,10 +289,10 @@ class Ai_Controller extends REST_Controller {
 			'ai_prompt_description' => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
 		];
 
-		update_option( 'wpseopilot_ai_prompt_system', $defaults['ai_prompt_system'] );
-		update_option( 'wpseopilot_ai_prompt_title', $defaults['ai_prompt_title'] );
-		update_option( 'wpseopilot_ai_prompt_description', $defaults['ai_prompt_description'] );
+		update_option( 'SAMAN_SEO_ai_prompt_system', $defaults['ai_prompt_system'] );
+		update_option( 'SAMAN_SEO_ai_prompt_title', $defaults['ai_prompt_title'] );
+		update_option( 'SAMAN_SEO_ai_prompt_description', $defaults['ai_prompt_description'] );
 
-		return $this->success( $defaults, __( 'Settings reset to defaults.', 'wp-seo-pilot' ) );
+		return $this->success( $defaults, __( 'Settings reset to defaults.', 'saman-seo' ) );
 	}
 }

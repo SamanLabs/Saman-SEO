@@ -71,11 +71,11 @@ const Sitemap = () => {
         setLoading(true);
         try {
             const [settingsRes, llmRes, postTypesRes, taxonomiesRes, statsRes] = await Promise.all([
-                apiFetch({ path: '/wpseopilot/v2/sitemap/settings' }),
-                apiFetch({ path: '/wpseopilot/v2/sitemap/llm-settings' }),
-                apiFetch({ path: '/wpseopilot/v2/sitemap/post-types' }),
-                apiFetch({ path: '/wpseopilot/v2/sitemap/taxonomies' }),
-                apiFetch({ path: '/wpseopilot/v2/sitemap/stats' }),
+                apiFetch({ path: '/saman-seo/v1/sitemap/settings' }),
+                apiFetch({ path: '/saman-seo/v1/sitemap/llm-settings' }),
+                apiFetch({ path: '/saman-seo/v1/sitemap/post-types' }),
+                apiFetch({ path: '/saman-seo/v1/sitemap/taxonomies' }),
+                apiFetch({ path: '/saman-seo/v1/sitemap/stats' }),
             ]);
 
             if (settingsRes.success) setSettings(settingsRes.data);
@@ -99,12 +99,12 @@ const Sitemap = () => {
         setSaving(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/sitemap/settings',
+                path: '/saman-seo/v1/sitemap/settings',
                 method: 'POST',
                 data: settings,
             });
             // Refetch stats after saving
-            const statsRes = await apiFetch({ path: '/wpseopilot/v2/sitemap/stats' });
+            const statsRes = await apiFetch({ path: '/saman-seo/v1/sitemap/stats' });
             if (statsRes.success) setStats(statsRes.data);
         } catch (error) {
             console.error('Failed to save settings:', error);
@@ -118,7 +118,7 @@ const Sitemap = () => {
         setSaving(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/sitemap/llm-settings',
+                path: '/saman-seo/v1/sitemap/llm-settings',
                 method: 'POST',
                 data: llmSettings,
             });
@@ -134,7 +134,7 @@ const Sitemap = () => {
         setRegenerating(true);
         try {
             const res = await apiFetch({
-                path: '/wpseopilot/v2/sitemap/regenerate',
+                path: '/saman-seo/v1/sitemap/regenerate',
                 method: 'POST',
             });
             if (res.success) {

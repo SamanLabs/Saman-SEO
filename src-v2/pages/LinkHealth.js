@@ -21,7 +21,7 @@ const LinkHealth = () => {
     // Fetch summary
     const fetchSummary = useCallback(async () => {
         try {
-            const res = await apiFetch({ path: '/wpseopilot/v2/link-health/summary' });
+            const res = await apiFetch({ path: '/saman-seo/v1/link-health/summary' });
             if (res.success) {
                 setSummary(res.data);
             }
@@ -35,7 +35,7 @@ const LinkHealth = () => {
         setLoading(true);
         try {
             const params = new URLSearchParams({ page, per_page: 50, type: linkTypeFilter });
-            const res = await apiFetch({ path: `/wpseopilot/v2/link-health/broken?${params}` });
+            const res = await apiFetch({ path: `/saman-seo/v1/link-health/broken?${params}` });
             if (res.success) {
                 setBrokenLinks(res.data);
             }
@@ -51,7 +51,7 @@ const LinkHealth = () => {
         setLoading(true);
         try {
             const params = new URLSearchParams({ page, per_page: 50 });
-            const res = await apiFetch({ path: `/wpseopilot/v2/link-health/orphans?${params}` });
+            const res = await apiFetch({ path: `/saman-seo/v1/link-health/orphans?${params}` });
             if (res.success) {
                 setOrphanPages(res.data);
             }
@@ -65,7 +65,7 @@ const LinkHealth = () => {
     // Check scan status
     const checkScanStatus = useCallback(async () => {
         try {
-            const res = await apiFetch({ path: '/wpseopilot/v2/link-health/scan/status' });
+            const res = await apiFetch({ path: '/saman-seo/v1/link-health/scan/status' });
             if (res.success && res.data) {
                 setScanStatus(res.data);
                 if (res.data.status === 'running') {
@@ -112,7 +112,7 @@ const LinkHealth = () => {
         setScanning(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/link-health/scan',
+                path: '/saman-seo/v1/link-health/scan',
                 method: 'POST',
                 data: { type: 'full' },
             });
@@ -128,7 +128,7 @@ const LinkHealth = () => {
         setRecheckingId(linkId);
         try {
             const res = await apiFetch({
-                path: `/wpseopilot/v2/link-health/link/${linkId}/recheck`,
+                path: `/saman-seo/v1/link-health/link/${linkId}/recheck`,
                 method: 'POST',
             });
             if (res.success) {
@@ -150,7 +150,7 @@ const LinkHealth = () => {
         }
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/link-health/link/${linkId}`,
+                path: `/saman-seo/v1/link-health/link/${linkId}`,
                 method: 'DELETE',
             });
             fetchBrokenLinks(brokenLinks.page);

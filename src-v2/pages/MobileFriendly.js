@@ -18,7 +18,7 @@ const MobileFriendly = ({ onNavigate }) => {
     useEffect(() => {
         const fetchRecent = async () => {
             try {
-                const response = await apiFetch({ path: '/wpseopilot/v2/mobile-test/recent' });
+                const response = await apiFetch({ path: '/saman-seo/v1/mobile-test/recent' });
                 if (response.success) {
                     setRecentTests(response.data || []);
                 }
@@ -42,7 +42,7 @@ const MobileFriendly = ({ onNavigate }) => {
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/mobile-test/analyze',
+                path: '/saman-seo/v1/mobile-test/analyze',
                 method: 'POST',
                 data: { url: url.trim() },
             });
@@ -64,7 +64,7 @@ const MobileFriendly = ({ onNavigate }) => {
 
     // Test homepage
     const handleTestHomepage = useCallback(() => {
-        const siteUrl = window.wpseopilotV2Settings?.adminUrl?.replace('/wp-admin/', '') || '';
+        const siteUrl = window.SamanSEOSettings?.adminUrl?.replace('/wp-admin/', '') || '';
         if (siteUrl) {
             setUrl(siteUrl);
             setTimeout(() => {

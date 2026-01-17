@@ -23,7 +23,7 @@ export function useSettings() {
         try {
             setLoading(true);
             const response = await apiFetch({
-                path: '/wpseopilot/v2/settings',
+                path: '/saman-seo/v1/settings',
             });
             setSettings(response.data || {});
             setError(null);
@@ -45,7 +45,7 @@ export function useSettings() {
         try {
             setSaving(true);
             await apiFetch({
-                path: '/wpseopilot/v2/settings',
+                path: '/saman-seo/v1/settings',
                 method: 'POST',
                 data: newSettings,
             });
@@ -72,7 +72,7 @@ export function useSettings() {
         try {
             setSaving(true);
             await apiFetch({
-                path: `/wpseopilot/v2/settings/${key}`,
+                path: `/saman-seo/v1/settings/${key}`,
                 method: 'PUT',
                 data: { value },
             });

@@ -7,7 +7,7 @@ import AiGenerateModal from '../components/AiGenerateModal';
 import useUrlTab from '../hooks/useUrlTab';
 
 // Get AI status from global settings
-const globalSettings = window?.wpseopilotV2Settings || {};
+const globalSettings = window?.SamanSEOSettings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
 const aiProvider = globalSettings.aiProvider || 'none';
 const aiPilot = globalSettings.aiPilot || null;
@@ -156,7 +156,7 @@ const SearchAppearance = () => {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await apiFetch({ path: '/wpseopilot/v2/search-appearance' });
+            const response = await apiFetch({ path: '/saman-seo/v1/search-appearance' });
             if (response.success) {
                 const data = response.data;
                 setHomepage(data.homepage || {});
@@ -275,7 +275,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/search-appearance/homepage',
+                path: '/saman-seo/v1/search-appearance/homepage',
                 method: 'POST',
                 data: homepage,
             });
@@ -295,7 +295,7 @@ const SearchAppearance = () => {
         setSeparator(newSeparator);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/search-appearance/separator',
+                path: '/saman-seo/v1/search-appearance/separator',
                 method: 'POST',
                 data: { separator: newSeparator },
             });
@@ -309,7 +309,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/search-appearance/post-types/${postType.slug}`,
+                path: `/saman-seo/v1/search-appearance/post-types/${postType.slug}`,
                 method: 'POST',
                 data: postType,
             });
@@ -332,7 +332,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/search-appearance/taxonomies/${taxonomy.slug}`,
+                path: `/saman-seo/v1/search-appearance/taxonomies/${taxonomy.slug}`,
                 method: 'POST',
                 data: taxonomy,
             });
@@ -355,7 +355,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/search-appearance/archives',
+                path: '/saman-seo/v1/search-appearance/archives',
                 method: 'POST',
                 data: archives,
             });
@@ -376,7 +376,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/search-appearance/social-defaults',
+                path: '/saman-seo/v1/search-appearance/social-defaults',
                 method: 'POST',
                 data: socialDefaults,
             });
@@ -395,7 +395,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/search-appearance/social-defaults/${slug}`,
+                path: `/saman-seo/v1/search-appearance/social-defaults/${slug}`,
                 method: 'POST',
                 data: settings,
             });
@@ -419,7 +419,7 @@ const SearchAppearance = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/search-appearance/card-design',
+                path: '/saman-seo/v1/search-appearance/card-design',
                 method: 'POST',
                 data: cardDesign,
             });

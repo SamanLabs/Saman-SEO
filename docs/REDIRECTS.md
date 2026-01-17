@@ -1,6 +1,6 @@
 # Redirect Manager Guide
 
-Complete guide to managing 301 redirects and monitoring 404 errors with WP SEO Pilot.
+Complete guide to managing 301 redirects and monitoring 404 errors with Saman SEO.
 
 ---
 
@@ -20,7 +20,7 @@ Complete guide to managing 301 redirects and monitoring 404 errors with WP SEO P
 
 ## Overview
 
-WP SEO Pilot includes a powerful redirect manager that:
+Saman SEO includes a powerful redirect manager that:
 
 - Creates and manages 301, 302, 307, and 308 redirects
 - Automatically suggests redirects when post slugs change
@@ -29,7 +29,7 @@ WP SEO Pilot includes a powerful redirect manager that:
 - Exports/imports redirects via WP-CLI
 - Stores redirects in a dedicated database table
 
-**Location:** Navigate to **WP SEO Pilot → Redirects**
+**Location:** Navigate to **Saman SEO → Redirects**
 
 **File:** `includes/class-wpseopilot-service-redirect-manager.php`
 
@@ -41,7 +41,7 @@ WP SEO Pilot includes a powerful redirect manager that:
 
 ### Via Admin UI
 
-1. Navigate to **WP SEO Pilot → Redirects**
+1. Navigate to **Saman SEO → Redirects**
 2. Click **Add New Redirect**
 3. Fill in the form:
    - **Source Path**: The URL to redirect from (e.g., `/old-page`)
@@ -103,7 +103,7 @@ https://example.com/external-resource
 
 ### Viewing All Redirects
 
-Navigate to **WP SEO Pilot → Redirects** to see:
+Navigate to **Saman SEO → Redirects** to see:
 
 - Source path
 - Target URL
@@ -160,20 +160,20 @@ Click column headers to sort by:
 
 ## Automatic Redirect Suggestions
 
-WP SEO Pilot automatically detects when you change a post's slug and suggests creating a redirect.
+Saman SEO automatically detects when you change a post's slug and suggests creating a redirect.
 
 ### How It Works
 
 1. You edit a post and change the permalink/slug
 2. Post is updated
-3. WP SEO Pilot detects the slug change
-4. A redirect suggestion appears in **WP SEO Pilot → Redirects**
+3. Saman SEO detects the slug change
+4. A redirect suggestion appears in **Saman SEO → Redirects**
 
 ---
 
 ### Accepting Redirect Suggestions
 
-1. Navigate to **WP SEO Pilot → Redirects**
+1. Navigate to **Saman SEO → Redirects**
 2. Look for the **Pending Suggestions** section
 3. Review the suggested redirect:
    - Old slug → New slug
@@ -205,7 +205,7 @@ Click **Create Redirect** to implement.
 
 Track 404 errors (page not found) to identify broken links and redirect opportunities.
 
-**Location:** Navigate to **WP SEO Pilot → 404 Monitor**
+**Location:** Navigate to **Saman SEO → 404 Monitor**
 
 **File:** `includes/class-wpseopilot-service-request-monitor.php`
 
@@ -269,7 +269,7 @@ Look for common typos in URLs:
 
 ### Creating Redirects from 404 Log
 
-1. Navigate to **WP SEO Pilot → 404 Monitor**
+1. Navigate to **Saman SEO → 404 Monitor**
 2. Find a 404 error worth redirecting
 3. Click **Create Redirect**
 4. Enter target URL

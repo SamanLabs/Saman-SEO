@@ -1,6 +1,6 @@
 # Developer Guide
 
-Comprehensive guide for developers integrating and extending WP SEO Pilot.
+Comprehensive guide for developers integrating and extending Saman SEO.
 
 ---
 
@@ -18,7 +18,7 @@ Comprehensive guide for developers integrating and extending WP SEO Pilot.
 
 ## Architecture Overview
 
-WP SEO Pilot follows WordPress coding standards and uses a modular architecture:
+Saman SEO follows WordPress coding standards and uses a modular architecture:
 
 ```
 wp-seo-pilot/
@@ -224,7 +224,7 @@ if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
 
 #### `wpseopilot_before_head_output`
 
-Fires before WP SEO Pilot outputs any `<head>` tags.
+Fires before Saman SEO outputs any `<head>` tags.
 
 ```php
 add_action( 'wpseopilot_before_head_output', function() {
@@ -235,7 +235,7 @@ add_action( 'wpseopilot_before_head_output', function() {
 
 #### `wpseopilot_after_head_output`
 
-Fires after WP SEO Pilot outputs all `<head>` tags.
+Fires after Saman SEO outputs all `<head>` tags.
 
 ```php
 add_action( 'wpseopilot_after_head_output', function() {
@@ -599,7 +599,7 @@ add_action( 'admin_init', function() {
 <?php
 /**
  * Plugin Name: My Site SEO Customizations
- * Description: Custom SEO modifications for WP SEO Pilot
+ * Description: Custom SEO modifications for Saman SEO
  * Version: 1.0.0
  */
 

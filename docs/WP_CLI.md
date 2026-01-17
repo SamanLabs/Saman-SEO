@@ -1,6 +1,6 @@
 # WP-CLI Commands
 
-Complete documentation for managing WP SEO Pilot via WP-CLI.
+Complete documentation for managing Saman SEO via WP-CLI.
 
 ---
 
@@ -21,7 +21,7 @@ Complete documentation for managing WP SEO Pilot via WP-CLI.
 ### Requirements
 
 - WP-CLI 2.0 or higher
-- WP SEO Pilot activated
+- Saman SEO activated
 - SSH/terminal access to your server
 
 ### Verify WP-CLI Installation

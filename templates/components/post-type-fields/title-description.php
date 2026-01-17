@@ -2,7 +2,7 @@
 /**
  * Title & Description Sub-Tab Content
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  *
  * Variables expected:
  * - $slug (string): Post type slug
@@ -12,38 +12,38 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 
-<div class="wpseopilot-form-row">
+<div class="saman-seo-form-row">
 	<label>
-		<strong><?php esc_html_e( 'Show in Search Results?', 'wp-seo-pilot' ); ?></strong>
+		<strong><?php esc_html_e( 'Show in Search Results?', 'saman-seo' ); ?></strong>
 	</label>
-	<label class="wpseopilot-toggle">
+	<label class="saman-seo-toggle">
 		<input
 			type="checkbox"
-			name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][noindex]"
+			name="SAMAN_SEO_post_type_defaults[<?php echo esc_attr( $slug ); ?>][noindex]"
 			value="1"
 			<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 		/>
-		<span class="wpseopilot-toggle-label">
-			<?php esc_html_e( 'Hide from search engines (noindex)', 'wp-seo-pilot' ); ?>
+		<span class="saman-seo-toggle-label">
+			<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-seo' ); ?>
 		</span>
 	</label>
 	<p class="description">
-		<?php esc_html_e( 'When enabled, search engines will not index this content type in their results.', 'wp-seo-pilot' ); ?>
+		<?php esc_html_e( 'When enabled, search engines will not index this content type in their results.', 'saman-seo' ); ?>
 	</p>
 </div>
 
-<div class="wpseopilot-form-row">
+<div class="saman-seo-form-row">
 	<label for="title_template_<?php echo esc_attr( $slug ); ?>">
-		<strong><?php esc_html_e( 'Title Template', 'wp-seo-pilot' ); ?></strong>
-		<span class="wpseopilot-label-hint">
-			<?php esc_html_e( 'Use variables like {{post_title}}, {{site_title}}, {{separator}}', 'wp-seo-pilot' ); ?>
+		<strong><?php esc_html_e( 'Title Template', 'saman-seo' ); ?></strong>
+		<span class="saman-seo-label-hint">
+			<?php esc_html_e( 'Use variables like {{post_title}}, {{site_title}}, {{separator}}', 'saman-seo' ); ?>
 		</span>
 	</label>
-	<div class="wpseopilot-flex-input">
+	<div class="saman-seo-flex-input">
 		<input
 			type="text"
 			id="title_template_<?php echo esc_attr( $slug ); ?>"
-			name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][title_template]"
+			name="SAMAN_SEO_post_type_defaults[<?php echo esc_attr( $slug ); ?>][title_template]"
 			value="<?php echo esc_attr( $settings['title_template'] ?? '{{post_title}} {{separator}} {{site_title}}' ); ?>"
 			class="regular-text"
 			data-preview-field="title"
@@ -51,26 +51,26 @@ defined( 'ABSPATH' ) || exit;
 		/>
 		<button
 			type="button"
-			class="button wpseopilot-trigger-vars"
+			class="button saman-seo-trigger-vars"
 			data-target="title_template_<?php echo esc_attr( $slug ); ?>"
 		>
 			<span class="dashicons dashicons-editor-code"></span>
-			<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Variables', 'saman-seo' ); ?>
 		</button>
 	</div>
 </div>
 
-<div class="wpseopilot-form-row">
+<div class="saman-seo-form-row">
 	<label for="desc_template_<?php echo esc_attr( $slug ); ?>">
-		<strong><?php esc_html_e( 'Description Template', 'wp-seo-pilot' ); ?></strong>
-		<span class="wpseopilot-label-hint">
-			<?php esc_html_e( 'Use variables like {{post_excerpt}}, {{post_date}}, {{category}}', 'wp-seo-pilot' ); ?>
+		<strong><?php esc_html_e( 'Description Template', 'saman-seo' ); ?></strong>
+		<span class="saman-seo-label-hint">
+			<?php esc_html_e( 'Use variables like {{post_excerpt}}, {{post_date}}, {{category}}', 'saman-seo' ); ?>
 		</span>
 	</label>
-	<div class="wpseopilot-flex-input">
+	<div class="saman-seo-flex-input">
 		<textarea
 			id="desc_template_<?php echo esc_attr( $slug ); ?>"
-			name="wpseopilot_post_type_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
+			name="SAMAN_SEO_post_type_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
 			rows="2"
 			class="large-text"
 			data-preview-field="description"
@@ -78,11 +78,11 @@ defined( 'ABSPATH' ) || exit;
 		><?php echo esc_textarea( $settings['description_template'] ?? '{{post_excerpt}}' ); ?></textarea>
 		<button
 			type="button"
-			class="button wpseopilot-trigger-vars"
+			class="button saman-seo-trigger-vars"
 			data-target="desc_template_<?php echo esc_attr( $slug ); ?>"
 		>
 			<span class="dashicons dashicons-editor-code"></span>
-			<?php esc_html_e( 'Variables', 'wp-seo-pilot' ); ?>
+			<?php esc_html_e( 'Variables', 'saman-seo' ); ?>
 		</button>
 	</div>
 </div>

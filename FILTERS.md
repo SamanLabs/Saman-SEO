@@ -1,6 +1,6 @@
 # Filter Reference
 
-Complete reference for all WP SEO Pilot filters with practical examples.
+Complete reference for all Saman SEO filters with practical examples.
 
 ---
 

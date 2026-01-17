@@ -4,11 +4,11 @@
  *
  * Validates JSON-LD structured data from URLs.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -23,7 +23,7 @@ class Schema_Validator_Controller extends REST_Controller {
      * Constructor.
      */
     public function __construct() {
-        $this->namespace = 'wpseopilot/v2';
+        $this->namespace = 'saman-seo/v1';
         $this->rest_base = 'schema-validator';
     }
 
@@ -65,7 +65,7 @@ class Schema_Validator_Controller extends REST_Controller {
         // Fetch the page content
         $response = wp_remote_get( $url, [
             'timeout'    => 15,
-            'user-agent' => 'WP SEO Pilot Schema Validator/1.0',
+            'user-agent' => 'Saman SEO Schema Validator/1.0',
             'sslverify'  => false,
         ] );
 

@@ -48,7 +48,7 @@ const Setup = ({ onComplete, onSkip }) => {
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/setup/test-api',
+                path: '/saman-seo/v1/setup/test-api',
                 method: 'POST',
                 data: {
                     provider: data.ai_provider,
@@ -70,7 +70,7 @@ const Setup = ({ onComplete, onSkip }) => {
 
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/setup/complete',
+                path: '/saman-seo/v1/setup/complete',
                 method: 'POST',
                 data,
             });
@@ -86,7 +86,7 @@ const Setup = ({ onComplete, onSkip }) => {
     const handleSkip = async () => {
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/setup/skip',
+                path: '/saman-seo/v1/setup/skip',
                 method: 'POST',
             });
         } catch (err) {
@@ -134,7 +134,7 @@ const Setup = ({ onComplete, onSkip }) => {
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <h1>Welcome to WP SEO Pilot</h1>
+                        <h1>Welcome to Saman SEO</h1>
                         <p className="setup-step__subtitle">
                             Let's get your site ready for search engines. This will only take a minute.
                         </p>
@@ -417,7 +417,7 @@ const Setup = ({ onComplete, onSkip }) => {
                         </div>
                         <h1>You're All Set!</h1>
                         <p className="setup-step__subtitle">
-                            WP SEO Pilot is configured and ready to help you rank higher.
+                            Saman SEO is configured and ready to help you rank higher.
                         </p>
 
                         <div className="setup-summary">

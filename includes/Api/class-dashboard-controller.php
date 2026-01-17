@@ -2,14 +2,14 @@
 /**
  * Dashboard REST Controller
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
-use WPSEOPilot\Service\Post_Meta;
-use function WPSEOPilot\Helpers\calculate_seo_score;
+use Saman\SEO\Service\Post_Meta;
+use function Saman\SEO\Helpers\calculate_seo_score;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -39,8 +39,8 @@ class Dashboard_Controller extends REST_Controller {
      */
     public function __construct() {
         global $wpdb;
-        $this->redirects_table = $wpdb->prefix . 'wpseopilot_redirects';
-        $this->log_table       = $wpdb->prefix . 'wpseopilot_404_log';
+        $this->redirects_table = $wpdb->prefix . 'SAMAN_SEO_redirects';
+        $this->log_table       = $wpdb->prefix . 'SAMAN_SEO_404_log';
     }
 
     /**
@@ -101,7 +101,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     public function get_dashboard( $request ) {
         // Check cache first (2 minute cache for dashboard overview)
-        $cached = get_transient( 'wpseopilot_dashboard_data' );
+        $cached = get_transient( 'SAMAN_SEO_dashboard_data' );
         if ( $cached !== false ) {
             return $this->success( $cached );
         }
@@ -117,7 +117,7 @@ class Dashboard_Controller extends REST_Controller {
         ];
 
         // Cache for 2 minutes
-        set_transient( 'wpseopilot_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
+        set_transient( 'SAMAN_SEO_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
 
         return $this->success( $data );
     }
@@ -151,15 +151,15 @@ class Dashboard_Controller extends REST_Controller {
     public function dismiss_notification( $request ) {
         $id = $request->get_param( 'id' );
 
-        $dismissed = get_option( 'wpseopilot_dismissed_notifications', [] );
+        $dismissed = get_option( 'SAMAN_SEO_dismissed_notifications', [] );
         if ( ! is_array( $dismissed ) ) {
             $dismissed = [];
         }
 
         $dismissed[ $id ] = time();
-        update_option( 'wpseopilot_dismissed_notifications', $dismissed );
+        update_option( 'SAMAN_SEO_dismissed_notifications', $dismissed );
 
-        return $this->success( null, __( 'Notification dismissed.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Notification dismissed.', 'saman-seo' ) );
     }
 
     /**
@@ -179,7 +179,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     private function calculate_overall_seo_score() {
         // Check cache first
-        $cached = get_transient( 'wpseopilot_dashboard_seo_score' );
+        $cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
         if ( $cached ) {
             return $cached;
         }
@@ -199,7 +199,7 @@ class Dashboard_Controller extends REST_Controller {
 
         foreach ( $posts as $post ) {
             $score_data = null;
-            if ( function_exists( 'WPSEOPilot\Helpers\calculate_seo_score' ) ) {
+            if ( function_exists( 'Saman\SEO\Helpers\calculate_seo_score' ) ) {
                 $score_data = calculate_seo_score( $post );
             }
 
@@ -251,7 +251,7 @@ class Dashboard_Controller extends REST_Controller {
         ];
 
         // Cache for 30 minutes
-        set_transient( 'wpseopilot_dashboard_seo_score', $result, 30 * MINUTE_IN_SECONDS );
+        set_transient( 'SAMAN_SEO_dashboard_seo_score', $result, 30 * MINUTE_IN_SECONDS );
 
         return $result;
     }
@@ -262,7 +262,7 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_score_trend() {
-        $history = get_option( 'wpseopilot_score_history', [] );
+        $history = get_option( 'SAMAN_SEO_score_history', [] );
         if ( ! is_array( $history ) ) {
             $history = [];
         }
@@ -281,7 +281,7 @@ class Dashboard_Controller extends REST_Controller {
                 unset( $history[ $date ] );
             }
         }
-        update_option( 'wpseopilot_score_history', $history );
+        update_option( 'SAMAN_SEO_score_history', $history );
 
         // Calculate trend
         $last_week = array_filter( $history, function( $date ) {
@@ -304,7 +304,7 @@ class Dashboard_Controller extends REST_Controller {
      * @return int
      */
     private function get_current_week_score() {
-        $cached = get_transient( 'wpseopilot_dashboard_seo_score' );
+        $cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
         return $cached['score'] ?? 0;
     }
 
@@ -315,7 +315,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     private function get_content_coverage_data() {
         // Check cache first (5 minute cache for coverage data)
-        $cached = get_transient( 'wpseopilot_content_coverage' );
+        $cached = get_transient( 'SAMAN_SEO_content_coverage' );
         if ( $cached !== false ) {
             return $cached;
         }
@@ -330,7 +330,7 @@ class Dashboard_Controller extends REST_Controller {
             "SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-             WHERE pm.meta_key = '_wpseopilot_meta'
+             WHERE pm.meta_key = '_SAMAN_SEO_meta'
              AND p.post_status = 'publish'
              AND pm.meta_value LIKE '%\"title\"%'
              AND pm.meta_value NOT LIKE '%\"title\":\"\"%'"
@@ -341,7 +341,7 @@ class Dashboard_Controller extends REST_Controller {
             "SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-             WHERE pm.meta_key = '_wpseopilot_meta'
+             WHERE pm.meta_key = '_SAMAN_SEO_meta'
              AND p.post_status = 'publish'
              AND pm.meta_value LIKE '%\"description\"%'
              AND pm.meta_value NOT LIKE '%\"description\":\"\"%'"
@@ -357,7 +357,7 @@ class Dashboard_Controller extends REST_Controller {
                 "SELECT COUNT(DISTINCT pm.post_id)
                  FROM {$wpdb->postmeta} pm
                  JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-                 WHERE pm.meta_key = '_wpseopilot_meta'
+                 WHERE pm.meta_key = '_SAMAN_SEO_meta'
                  AND p.post_status = 'publish'
                  AND DATE(p.post_date) <= %s
                  AND pm.meta_value LIKE '%\"title\"%'
@@ -384,7 +384,7 @@ class Dashboard_Controller extends REST_Controller {
         ];
 
         // Cache for 5 minutes
-        set_transient( 'wpseopilot_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
+        set_transient( 'SAMAN_SEO_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
 
         return $result;
     }
@@ -395,11 +395,11 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_sitemap_data() {
-        $enabled = get_option( 'wpseopilot_sitemap_enabled', '1' ) === '1';
-        $last_regen = get_option( 'wpseopilot_sitemap_last_regenerated', 0 );
+        $enabled = get_option( 'SAMAN_SEO_sitemap_enabled', '1' ) === '1';
+        $last_regen = get_option( 'SAMAN_SEO_sitemap_last_regenerated', 0 );
 
         // Count URLs
-        $post_types = get_option( 'wpseopilot_sitemap_post_types', [ 'post', 'page' ] );
+        $post_types = get_option( 'SAMAN_SEO_sitemap_post_types', [ 'post', 'page' ] );
         if ( ! is_array( $post_types ) ) {
             $post_types = [ 'post', 'page' ];
         }
@@ -413,7 +413,7 @@ class Dashboard_Controller extends REST_Controller {
         }
 
         // Add taxonomy URLs
-        $taxonomies = get_option( 'wpseopilot_sitemap_taxonomies', [ 'category' ] );
+        $taxonomies = get_option( 'SAMAN_SEO_sitemap_taxonomies', [ 'category' ] );
         if ( is_array( $taxonomies ) ) {
             foreach ( $taxonomies as $tax ) {
                 $terms = wp_count_terms( [ 'taxonomy' => $tax, 'hide_empty' => true ] );
@@ -436,9 +436,9 @@ class Dashboard_Controller extends REST_Controller {
             'errors'         => $errors,
             'types_enabled'  => [
                 'main'   => $enabled,
-                'rss'    => get_option( 'wpseopilot_sitemap_enable_rss', '0' ) === '1',
-                'news'   => get_option( 'wpseopilot_sitemap_enable_google_news', '0' ) === '1',
-                'llm'    => get_option( 'wpseopilot_enable_llm_txt', '0' ) === '1',
+                'rss'    => get_option( 'SAMAN_SEO_sitemap_enable_rss', '0' ) === '1',
+                'news'   => get_option( 'SAMAN_SEO_sitemap_enable_google_news', '0' ) === '1',
+                'llm'    => \Saman\SEO\Helpers\module_enabled( 'llm_txt' ),
             ],
         ];
     }
@@ -488,7 +488,7 @@ class Dashboard_Controller extends REST_Controller {
         ) );
 
         // Get pending suggestions
-        $suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
         $suggestions_count = is_array( $suggestions ) ? count( $suggestions ) : 0;
 
         // Top redirects by hits
@@ -520,7 +520,7 @@ class Dashboard_Controller extends REST_Controller {
     private function get_404_data() {
         global $wpdb;
 
-        $logging_enabled = get_option( 'wpseopilot_enable_404_logging', '1' ) === '1';
+        $logging_enabled = \Saman\SEO\Helpers\module_enabled( '404_log' );
 
         // Check if table exists
         $table_exists = $wpdb->get_var( $wpdb->prepare(
@@ -580,8 +580,8 @@ class Dashboard_Controller extends REST_Controller {
      * @return array
      */
     private function get_schema_data() {
-        $org_name = get_option( 'wpseopilot_homepage_organization_name', '' );
-        $local_enabled = get_option( 'wpseopilot_enable_local_seo', '0' ) === '1';
+        $org_name = get_option( 'SAMAN_SEO_homepage_organization_name', '' );
+        $local_enabled = \Saman\SEO\Helpers\module_enabled( 'local_seo' );
 
         $schema_types = [ 'Website', 'WebPage' ];
         if ( ! empty( $org_name ) ) {
@@ -615,7 +615,7 @@ class Dashboard_Controller extends REST_Controller {
      */
     private function get_notifications_data() {
         $notifications = [];
-        $dismissed = get_option( 'wpseopilot_dismissed_notifications', [] );
+        $dismissed = get_option( 'SAMAN_SEO_dismissed_notifications', [] );
         if ( ! is_array( $dismissed ) ) {
             $dismissed = [];
         }
@@ -625,10 +625,10 @@ class Dashboard_Controller extends REST_Controller {
         $dismissed = array_filter( $dismissed, function( $timestamp ) use ( $cutoff ) {
             return $timestamp > $cutoff;
         } );
-        update_option( 'wpseopilot_dismissed_notifications', $dismissed );
+        update_option( 'SAMAN_SEO_dismissed_notifications', $dismissed );
 
         // Priority 1: Check for slug change suggestions (redirects needed)
-        $slug_suggestions = get_option( 'wpseopilot_monitor_slugs', [] );
+        $slug_suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
         if ( is_array( $slug_suggestions ) && count( $slug_suggestions ) > 0 ) {
             // Only show one notification for multiple slug changes
             $count = count( $slug_suggestions );
@@ -640,18 +640,18 @@ class Dashboard_Controller extends REST_Controller {
                     'type'     => 'warning',
                     'priority' => 1,
                     'category' => 'redirects',
-                    'title'    => __( 'URL Changes Detected', 'wp-seo-pilot' ),
+                    'title'    => __( 'URL Changes Detected', 'saman-seo' ),
                     'message'  => $count === 1
                         ? sprintf(
-                            __( '"%s" has a new URL. Create a redirect to avoid broken links.', 'wp-seo-pilot' ),
+                            __( '"%s" has a new URL. Create a redirect to avoid broken links.', 'saman-seo' ),
                             get_the_title( $first_suggestion['post_id'] ?? 0 )
                         )
                         : sprintf(
-                            __( '%d pages have new URLs. Create redirects to avoid broken links.', 'wp-seo-pilot' ),
+                            __( '%d pages have new URLs. Create redirects to avoid broken links.', 'saman-seo' ),
                             $count
                         ),
                     'action'   => [
-                        'label' => __( 'Review Changes', 'wp-seo-pilot' ),
+                        'label' => __( 'Review Changes', 'saman-seo' ),
                     ],
                 ];
             }
@@ -665,13 +665,13 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => $errors_404['last_7_days'] >= 20 ? 'error' : 'warning',
                 'priority' => $errors_404['last_7_days'] >= 20 ? 1 : 2,
                 'category' => '404',
-                'title'    => __( '404 Errors Detected', 'wp-seo-pilot' ),
+                'title'    => __( '404 Errors Detected', 'saman-seo' ),
                 'message'  => sprintf(
-                    __( '%d broken links found this week. Fix them to improve user experience.', 'wp-seo-pilot' ),
+                    __( '%d broken links found this week. Fix them to improve user experience.', 'saman-seo' ),
                     $errors_404['last_7_days']
                 ),
                 'action'   => [
-                    'label' => __( 'View Errors', 'wp-seo-pilot' ),
+                    'label' => __( 'View Errors', 'saman-seo' ),
                 ],
             ];
         }
@@ -684,13 +684,13 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => 'error',
                 'priority' => 1,
                 'category' => 'seo',
-                'title'    => __( 'Low SEO Score', 'wp-seo-pilot' ),
+                'title'    => __( 'Low SEO Score', 'saman-seo' ),
                 'message'  => sprintf(
-                    __( 'Average score is %d%%. Run an audit to find quick wins.', 'wp-seo-pilot' ),
+                    __( 'Average score is %d%%. Run an audit to find quick wins.', 'saman-seo' ),
                     $seo_score['score']
                 ),
                 'action'   => [
-                    'label' => __( 'Run Audit', 'wp-seo-pilot' ),
+                    'label' => __( 'Run Audit', 'saman-seo' ),
                 ],
             ];
         }
@@ -703,10 +703,10 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => 'info',
                 'priority' => 3,
                 'category' => 'sitemap',
-                'title'    => __( 'Sitemap Not Active', 'wp-seo-pilot' ),
-                'message'  => __( 'Enable your XML sitemap to help search engines discover content.', 'wp-seo-pilot' ),
+                'title'    => __( 'Sitemap Not Active', 'saman-seo' ),
+                'message'  => __( 'Enable your XML sitemap to help search engines discover content.', 'saman-seo' ),
                 'action'   => [
-                    'label' => __( 'Enable', 'wp-seo-pilot' ),
+                    'label' => __( 'Enable', 'saman-seo' ),
                 ],
             ];
         }
@@ -720,14 +720,14 @@ class Dashboard_Controller extends REST_Controller {
                 'type'     => 'warning',
                 'priority' => 2,
                 'category' => 'content',
-                'title'    => __( 'Missing SEO Data', 'wp-seo-pilot' ),
+                'title'    => __( 'Missing SEO Data', 'saman-seo' ),
                 'message'  => sprintf(
-                    __( '%d of %d pages need SEO optimization.', 'wp-seo-pilot' ),
+                    __( '%d of %d pages need SEO optimization.', 'saman-seo' ),
                     $coverage['pending'],
                     $coverage['total']
                 ),
                 'action'   => [
-                    'label' => __( 'View Audit', 'wp-seo-pilot' ),
+                    'label' => __( 'View Audit', 'saman-seo' ),
                 ],
             ];
         }

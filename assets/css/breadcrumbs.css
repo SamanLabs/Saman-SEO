@@ -1,18 +1,18 @@
 /**
- * WP SEO Pilot Breadcrumbs Styles
+ * Saman SEO Breadcrumbs Styles
  *
  * Style presets: default, minimal, rounded, pills, none
  */
 
 /* Base styles */
-.wpseopilot-breadcrumbs {
+.samanseo-breadcrumbs {
 	margin: 0 0 20px;
 	padding: 0;
 	font-size: 14px;
 	line-height: 1.5;
 }
 
-.wpseopilot-breadcrumbs__list {
+.samanseo-breadcrumbs__list {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -22,209 +22,209 @@
 	gap: 0;
 }
 
-.wpseopilot-breadcrumbs__item {
+.samanseo-breadcrumbs__item {
 	display: flex;
 	align-items: center;
 	margin: 0;
 	padding: 0;
 }
 
-.wpseopilot-breadcrumbs__link {
+.samanseo-breadcrumbs__link {
 	color: inherit;
 	text-decoration: none;
 	transition: color 0.15s ease;
 }
 
-.wpseopilot-breadcrumbs__link:hover {
+.samanseo-breadcrumbs__link:hover {
 	text-decoration: underline;
 }
 
-.wpseopilot-breadcrumbs__current {
+.samanseo-breadcrumbs__current {
 	color: inherit;
 	opacity: 0.7;
 }
 
-.wpseopilot-breadcrumbs__separator {
+.samanseo-breadcrumbs__separator {
 	margin: 0 8px;
 	opacity: 0.5;
 }
 
 /* Default preset */
-.wpseopilot-breadcrumbs--default {
+.samanseo-breadcrumbs--default {
 	background: #f7f7f7;
 	padding: 12px 16px;
 	border-radius: 6px;
 }
 
-.wpseopilot-breadcrumbs--default .wpseopilot-breadcrumbs__link {
+.samanseo-breadcrumbs--default .samanseo-breadcrumbs__link {
 	color: #2271b1;
 }
 
-.wpseopilot-breadcrumbs--default .wpseopilot-breadcrumbs__link:hover {
+.samanseo-breadcrumbs--default .samanseo-breadcrumbs__link:hover {
 	color: #135e96;
 }
 
-.wpseopilot-breadcrumbs--default .wpseopilot-breadcrumbs__current {
+.samanseo-breadcrumbs--default .samanseo-breadcrumbs__current {
 	color: #1e1e1e;
 	font-weight: 500;
 }
 
 /* Minimal preset */
-.wpseopilot-breadcrumbs--minimal {
+.samanseo-breadcrumbs--minimal {
 	padding: 0;
 	background: transparent;
 }
 
-.wpseopilot-breadcrumbs--minimal .wpseopilot-breadcrumbs__link {
+.samanseo-breadcrumbs--minimal .samanseo-breadcrumbs__link {
 	color: #666;
 }
 
-.wpseopilot-breadcrumbs--minimal .wpseopilot-breadcrumbs__link:hover {
+.samanseo-breadcrumbs--minimal .samanseo-breadcrumbs__link:hover {
 	color: #333;
 }
 
-.wpseopilot-breadcrumbs--minimal .wpseopilot-breadcrumbs__current {
+.samanseo-breadcrumbs--minimal .samanseo-breadcrumbs__current {
 	color: #333;
 }
 
-.wpseopilot-breadcrumbs--minimal .wpseopilot-breadcrumbs__separator {
+.samanseo-breadcrumbs--minimal .samanseo-breadcrumbs__separator {
 	margin: 0 6px;
 }
 
 /* Rounded preset */
-.wpseopilot-breadcrumbs--rounded {
+.samanseo-breadcrumbs--rounded {
 	padding: 0;
 	background: transparent;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__list {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__list {
 	gap: 8px;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__item {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__item {
 	background: #f0f0f0;
 	border-radius: 20px;
 	padding: 6px 14px;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__item--current {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__item--current {
 	background: #2271b1;
 	color: #fff;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__link {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__link {
 	color: #333;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__link:hover {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__link:hover {
 	text-decoration: none;
 	color: #2271b1;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__current {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__current {
 	opacity: 1;
 	color: inherit;
 }
 
-.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__separator {
+.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__separator {
 	display: none;
 }
 
 /* Pills preset */
-.wpseopilot-breadcrumbs--pills {
+.samanseo-breadcrumbs--pills {
 	padding: 0;
 	background: transparent;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__list {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__list {
 	gap: 4px;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__item {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item {
 	position: relative;
 	background: #e9ecef;
 	padding: 8px 16px 8px 24px;
 	clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%);
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__item:first-child {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item:first-child {
 	padding-left: 16px;
 	clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
 	border-radius: 4px 0 0 4px;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__item--current {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item--current {
 	background: #2271b1;
 	color: #fff;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__link {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__link {
 	color: #495057;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__link:hover {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__link:hover {
 	text-decoration: none;
 	color: #212529;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__current {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__current {
 	opacity: 1;
 	color: inherit;
 }
 
-.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__separator {
+.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__separator {
 	display: none;
 }
 
 /* No styling preset */
-.wpseopilot-breadcrumbs--none {
+.samanseo-breadcrumbs--none {
 	padding: 0;
 	background: transparent;
 }
 
-.wpseopilot-breadcrumbs--none .wpseopilot-breadcrumbs__link {
+.samanseo-breadcrumbs--none .samanseo-breadcrumbs__link {
 	color: inherit;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-	.wpseopilot-breadcrumbs {
+	.samanseo-breadcrumbs {
 		font-size: 13px;
 	}
 
-	.wpseopilot-breadcrumbs--default {
+	.samanseo-breadcrumbs--default {
 		padding: 10px 12px;
 	}
 
-	.wpseopilot-breadcrumbs__separator {
+	.samanseo-breadcrumbs__separator {
 		margin: 0 6px;
 	}
 
-	.wpseopilot-breadcrumbs--rounded .wpseopilot-breadcrumbs__item,
-	.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__item {
+	.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__item,
+	.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item {
 		padding: 5px 10px;
 	}
 
-	.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__item {
+	.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item {
 		padding-left: 18px;
 	}
 
-	.wpseopilot-breadcrumbs--pills .wpseopilot-breadcrumbs__item:first-child {
+	.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item:first-child {
 		padding-left: 12px;
 	}
 }
 
 /* Accessibility */
-.wpseopilot-breadcrumbs__link:focus {
+.samanseo-breadcrumbs__link:focus {
 	outline: 2px solid #2271b1;
 	outline-offset: 2px;
 }
 
-.wpseopilot-breadcrumbs__link:focus:not(:focus-visible) {
+.samanseo-breadcrumbs__link:focus:not(:focus-visible) {
 	outline: none;
 }
 
-.wpseopilot-breadcrumbs__link:focus-visible {
+.samanseo-breadcrumbs__link:focus-visible {
 	outline: 2px solid #2271b1;
 	outline-offset: 2px;
 }

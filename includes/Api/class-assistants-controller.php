@@ -2,16 +2,16 @@
 /**
  * Assistants REST Controller
  *
- * Simplified controller that delegates AI chat to WP AI Pilot.
+ * Simplified controller that delegates AI chat to Saman Labs AI.
  * Keeps custom assistants CRUD and usage tracking local.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
-use WPSEOPilot\Integration\AI_Pilot;
+use Saman\SEO\Integration\AI_Pilot;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * REST API controller for AI assistants.
- * Chat is handled by WP AI Pilot. Custom assistants CRUD remains local.
+ * Chat is handled by Saman Labs AI. Custom assistants CRUD remains local.
  */
 class Assistants_Controller extends REST_Controller {
 
@@ -42,8 +42,8 @@ class Assistants_Controller extends REST_Controller {
 	 */
 	public function __construct() {
 		global $wpdb;
-		$this->custom_assistants_table = $wpdb->prefix . 'wpseopilot_custom_assistants';
-		$this->usage_table             = $wpdb->prefix . 'wpseopilot_assistant_usage';
+		$this->custom_assistants_table = $wpdb->prefix . 'SAMAN_SEO_custom_assistants';
+		$this->usage_table             = $wpdb->prefix . 'SAMAN_SEO_assistant_usage';
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Assistants_Controller extends REST_Controller {
 			],
 		] );
 
-		// Chat with assistant (delegates to WP AI Pilot).
+		// Chat with assistant (delegates to Saman Labs AI).
 		register_rest_route( $this->namespace, '/assistants/chat', [
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
@@ -112,7 +112,7 @@ class Assistants_Controller extends REST_Controller {
 
 	/**
 	 * Get all available assistants.
-	 * Returns built-in SEO assistants registered with WP AI Pilot + custom assistants.
+	 * Returns built-in SEO assistants registered with Saman Labs AI + custom assistants.
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return \WP_REST_Response
@@ -120,37 +120,37 @@ class Assistants_Controller extends REST_Controller {
 	public function get_assistants( $request ) {
 		$assistants = [];
 
-		// Add built-in SEO assistants (registered with WP AI Pilot).
+		// Add built-in SEO assistants (registered with Saman Labs AI).
 		$assistants[] = [
 			'id'                => 'seo-general',
-			'name'              => __( 'SEO Assistant', 'wp-seo-pilot' ),
-			'description'       => __( 'Your helpful SEO buddy for all things search optimization.', 'wp-seo-pilot' ),
-			'initial_message'   => __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'wp-seo-pilot' ),
+			'name'              => __( 'SEO Assistant', 'saman-seo' ),
+			'description'       => __( 'Your helpful SEO buddy for all things search optimization.', 'saman-seo' ),
+			'initial_message'   => __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'saman-seo' ),
 			'suggested_prompts' => [
-				__( 'How do I write a good meta description?', 'wp-seo-pilot' ),
-				__( 'What makes a title tag effective?', 'wp-seo-pilot' ),
-				__( 'Help me find keywords for my blog post', 'wp-seo-pilot' ),
-				__( 'What are internal links and why do they matter?', 'wp-seo-pilot' ),
+				__( 'How do I write a good meta description?', 'saman-seo' ),
+				__( 'What makes a title tag effective?', 'saman-seo' ),
+				__( 'Help me find keywords for my blog post', 'saman-seo' ),
+				__( 'What are internal links and why do they matter?', 'saman-seo' ),
 			],
 			'is_builtin'        => true,
 			'color'             => '#3b82f6',
-			'icon'              => '💬',
+			'icon'              => 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢Ãƒâ€šÃ‚Â¬',
 		];
 
 		$assistants[] = [
 			'id'                => 'seo-reporter',
-			'name'              => __( 'SEO Reporter', 'wp-seo-pilot' ),
-			'description'       => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'wp-seo-pilot' ),
-			'initial_message'   => __( "Hey! I can give you a quick rundown of your site's SEO health. Want me to take a look?", 'wp-seo-pilot' ),
+			'name'              => __( 'SEO Reporter', 'saman-seo' ),
+			'description'       => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'saman-seo' ),
+			'initial_message'   => __( "Hey! I can give you a quick rundown of your site's SEO health. Want me to take a look?", 'saman-seo' ),
 			'suggested_prompts' => [
-				__( 'Give me a quick SEO report', 'wp-seo-pilot' ),
-				__( 'What SEO issues should I fix first?', 'wp-seo-pilot' ),
-				__( 'Check my meta titles and descriptions', 'wp-seo-pilot' ),
-				__( 'Find posts missing SEO data', 'wp-seo-pilot' ),
+				__( 'Give me a quick SEO report', 'saman-seo' ),
+				__( 'What SEO issues should I fix first?', 'saman-seo' ),
+				__( 'Check my meta titles and descriptions', 'saman-seo' ),
+				__( 'Find posts missing SEO data', 'saman-seo' ),
 			],
 			'is_builtin'        => true,
 			'color'             => '#8b5cf6',
-			'icon'              => '📊',
+			'icon'              => 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â ',
 		];
 
 		// Add custom assistants.
@@ -167,7 +167,7 @@ class Assistants_Controller extends REST_Controller {
 					'is_custom'         => true,
 					'custom_id'         => $ca['id'],
 					'color'             => $ca['color'] ?? '#6366f1',
-					'icon'              => $ca['icon'] ?? '🤖',
+					'icon'              => $ca['icon'] ?? 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“',
 				];
 			}
 		}
@@ -177,7 +177,7 @@ class Assistants_Controller extends REST_Controller {
 
 	/**
 	 * Chat with an assistant.
-	 * Delegates to WP AI Pilot for AI processing.
+	 * Delegates to Saman Labs AI for AI processing.
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return \WP_REST_Response
@@ -193,27 +193,27 @@ class Assistants_Controller extends REST_Controller {
 		$context      = isset( $params['context'] ) ? $params['context'] : [];
 
 		if ( empty( $assistant_id ) ) {
-			return $this->error( __( 'Assistant ID is required.', 'wp-seo-pilot' ), 'missing_assistant', 400 );
+			return $this->error( __( 'Assistant ID is required.', 'saman-seo' ), 'missing_assistant', 400 );
 		}
 
 		if ( empty( $message ) ) {
-			return $this->error( __( 'Message is required.', 'wp-seo-pilot' ), 'missing_message', 400 );
+			return $this->error( __( 'Message is required.', 'saman-seo' ), 'missing_message', 400 );
 		}
 
-		// Check if WP AI Pilot is ready.
+		// Check if Saman Labs AI is ready.
 		if ( ! AI_Pilot::is_ready() ) {
 			$status = AI_Pilot::get_status();
 
 			if ( ! $status['installed'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is required for AI assistants. Please install it from the More page.', 'wp-seo-pilot' ),
+					__( 'Saman Labs AI is required for AI assistants. Please install it from the More page.', 'saman-seo' ),
 					'ai_not_installed',
 					400
 				);
 			}
 
 			return $this->error(
-				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'wp-seo-pilot' ),
+				__( 'Saman Labs AI needs configuration. Please add an API key in Saman Labs AI settings.', 'saman-seo' ),
 				'ai_not_configured',
 				400
 			);
@@ -224,7 +224,7 @@ class Assistants_Controller extends REST_Controller {
 			return $this->chat_with_custom_assistant( $assistant_id, $message, $context );
 		}
 
-		// Use WP AI Pilot for built-in assistants.
+		// Use Saman Labs AI for built-in assistants.
 		$response = AI_Pilot::assistant_chat( $assistant_id, $message, $context );
 
 		if ( is_wp_error( $response ) ) {
@@ -253,11 +253,11 @@ class Assistants_Controller extends REST_Controller {
 		$assistant = $this->get_custom_assistant_by_id( $custom_id );
 
 		if ( ! $assistant ) {
-			return $this->error( __( 'Custom assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Custom assistant not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
 		if ( ! $assistant['is_active'] ) {
-			return $this->error( __( 'This assistant is not active.', 'wp-seo-pilot' ), 'inactive', 400 );
+			return $this->error( __( 'This assistant is not active.', 'saman-seo' ), 'inactive', 400 );
 		}
 
 		// Build messages for chat.
@@ -272,7 +272,7 @@ class Assistants_Controller extends REST_Controller {
 			],
 		];
 
-		// Use WP AI Pilot for the actual chat.
+		// Use Saman Labs AI for the actual chat.
 		$response = AI_Pilot::chat( $messages );
 
 		if ( is_wp_error( $response ) ) {
@@ -320,7 +320,7 @@ class Assistants_Controller extends REST_Controller {
 		$assistant = $this->get_custom_assistant_by_id( $id );
 
 		if ( ! $assistant ) {
-			return $this->error( __( 'Assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Assistant not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
 		$assistant['usage'] = $this->get_assistant_usage_count( 'custom_' . $id );
@@ -343,11 +343,11 @@ class Assistants_Controller extends REST_Controller {
 		}
 
 		if ( empty( $params['name'] ) ) {
-			return $this->error( __( 'Name is required.', 'wp-seo-pilot' ), 'missing_name', 400 );
+			return $this->error( __( 'Name is required.', 'saman-seo' ), 'missing_name', 400 );
 		}
 
 		if ( empty( $params['system_prompt'] ) ) {
-			return $this->error( __( 'System prompt is required.', 'wp-seo-pilot' ), 'missing_prompt', 400 );
+			return $this->error( __( 'System prompt is required.', 'saman-seo' ), 'missing_prompt', 400 );
 		}
 
 		$this->maybe_create_assistants_table();
@@ -358,7 +358,7 @@ class Assistants_Controller extends REST_Controller {
 			'system_prompt'     => sanitize_textarea_field( $params['system_prompt'] ),
 			'initial_message'   => sanitize_textarea_field( $params['initial_message'] ?? '' ),
 			'suggested_prompts' => wp_json_encode( $params['suggested_prompts'] ?? [] ),
-			'icon'              => sanitize_text_field( $params['icon'] ?? '🤖' ),
+			'icon'              => sanitize_text_field( $params['icon'] ?? 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“' ),
 			'color'             => sanitize_hex_color( $params['color'] ?? '#6366f1' ) ?: '#6366f1',
 			'model_id'          => sanitize_text_field( $params['model_id'] ?? '' ),
 			'is_active'         => isset( $params['is_active'] ) ? ( $params['is_active'] ? 1 : 0 ) : 1,
@@ -369,10 +369,10 @@ class Assistants_Controller extends REST_Controller {
 		$result = $wpdb->insert( $this->custom_assistants_table, $data );
 
 		if ( false === $result ) {
-			return $this->error( __( 'Failed to create assistant.', 'wp-seo-pilot' ), 'db_error', 500 );
+			return $this->error( __( 'Failed to create assistant.', 'saman-seo' ), 'db_error', 500 );
 		}
 
-		return $this->success( [ 'id' => $wpdb->insert_id ], __( 'Assistant created successfully.', 'wp-seo-pilot' ) );
+		return $this->success( [ 'id' => $wpdb->insert_id ], __( 'Assistant created successfully.', 'saman-seo' ) );
 	}
 
 	/**
@@ -388,7 +388,7 @@ class Assistants_Controller extends REST_Controller {
 		$existing = $this->get_custom_assistant_by_id( $id );
 
 		if ( ! $existing ) {
-			return $this->error( __( 'Assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Assistant not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
 		$params = $request->get_json_params();
@@ -428,7 +428,7 @@ class Assistants_Controller extends REST_Controller {
 
 		$wpdb->update( $this->custom_assistants_table, $data, [ 'id' => $id ] );
 
-		return $this->success( null, __( 'Assistant updated successfully.', 'wp-seo-pilot' ) );
+		return $this->success( null, __( 'Assistant updated successfully.', 'saman-seo' ) );
 	}
 
 	/**
@@ -444,12 +444,12 @@ class Assistants_Controller extends REST_Controller {
 		$existing = $this->get_custom_assistant_by_id( $id );
 
 		if ( ! $existing ) {
-			return $this->error( __( 'Assistant not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+			return $this->error( __( 'Assistant not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
 		$wpdb->delete( $this->custom_assistants_table, [ 'id' => $id ] );
 
-		return $this->success( null, __( 'Assistant deleted successfully.', 'wp-seo-pilot' ) );
+		return $this->success( null, __( 'Assistant deleted successfully.', 'saman-seo' ) );
 	}
 
 	// =========================================================================
@@ -628,7 +628,7 @@ class Assistants_Controller extends REST_Controller {
             system_prompt longtext NOT NULL,
             initial_message text,
             suggested_prompts longtext,
-            icon varchar(50) DEFAULT '🤖',
+            icon varchar(50) DEFAULT 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“',
             color varchar(20) DEFAULT '#6366f1',
             model_id varchar(255) DEFAULT '',
             is_active tinyint(1) NOT NULL DEFAULT 1,

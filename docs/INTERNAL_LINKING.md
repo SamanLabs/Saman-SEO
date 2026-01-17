@@ -1,6 +1,6 @@
 # Internal Linking Guide
 
-Complete guide to automating and managing internal links with WP SEO Pilot.
+Complete guide to automating and managing internal links with Saman SEO.
 
 ---
 
@@ -20,7 +20,7 @@ Complete guide to automating and managing internal links with WP SEO Pilot.
 
 ## Overview
 
-WP SEO Pilot's Internal Linking Engine automatically inserts contextual internal links into your content based on customizable rules.
+Saman SEO's Internal Linking Engine automatically inserts contextual internal links into your content based on customizable rules.
 
 **Benefits:**
 - Improved site architecture
@@ -29,7 +29,7 @@ WP SEO Pilot's Internal Linking Engine automatically inserts contextual internal
 - Increased page views
 - Automated link building
 
-**Location:** Navigate to **WP SEO Pilot → Internal Linking**
+**Location:** Navigate to **Saman SEO → Internal Linking**
 
 **Files:**
 - `includes/class-wpseopilot-service-internal-linking.php`
@@ -61,7 +61,7 @@ Post Content → Scan for Keywords → Match Rules → Insert Links → Display
 
 ### Step 1: Enable Internal Linking
 
-Navigate to **WP SEO Pilot → Internal Linking**
+Navigate to **Saman SEO → Internal Linking**
 
 The feature is enabled by default once the plugin is activated.
 
@@ -101,7 +101,7 @@ Click **Add New Rule** to create a keyword → URL mapping.
 
 ### Adding a Link Rule
 
-1. Navigate to **WP SEO Pilot → Internal Linking → Rules**
+1. Navigate to **Saman SEO → Internal Linking → Rules**
 2. Click **Add New Rule**
 3. Fill in the form:
    - **Keyword**: Enter the word/phrase to match
@@ -387,7 +387,7 @@ Higher priority for:
 - Branded terms
 
 **Example:**
-- Priority 20: "WP SEO Pilot tutorial"
+- Priority 20: "Saman SEO tutorial"
 - Priority 15: "WordPress SEO plugin"
 - Priority 10: "SEO plugin"
 

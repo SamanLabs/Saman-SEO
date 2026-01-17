@@ -1,12 +1,12 @@
-# WP SEO Pilot - React Migration Plan (V2)
+# Saman SEO - React Migration Plan (V2)
 
 ## Executive Summary
 
-This document outlines the complete migration strategy for WP SEO Pilot from the current jQuery/PHP-based admin interface to a modern React-based Single Page Application (SPA), following the architecture established in WP-Security-Pilot.
+This document outlines the complete migration strategy for Saman SEO from the current jQuery/PHP-based admin interface to a modern React-based Single Page Application (SPA), following the architecture established in WP-Security-Pilot.
 
 **Migration Approach:** Gradual transition with dual-tab system
-- **Tab 1:** "WP SEO Pilot" - Current V1 (legacy, maintained during transition)
-- **Tab 2:** "WP SEO Pilot V2" - New React-based interface
+- **Tab 1:** "Saman SEO" - Current V1 (legacy, maintained during transition)
+- **Tab 2:** "Saman SEO V2" - New React-based interface
 
 ---
 
@@ -81,7 +81,7 @@ This document outlines the complete migration strategy for WP SEO Pilot from the
 ### Dual-Tab System During Migration
 ```
 WordPress Admin Menu:
-├── WP SEO Pilot (V1)          ← Current legacy interface
+├── Saman SEO (V1)          ← Current legacy interface
 │   ├── SEO Defaults
 │   ├── Search Appearance
 │   ├── Sitemap
@@ -92,7 +92,7 @@ WordPress Admin Menu:
 │   ├── AI Tuning
 │   └── Local SEO
 │
-└── WP SEO Pilot V2            ← New React interface
+└── Saman SEO V2            ← New React interface
     ├── Dashboard
     ├── SEO Defaults
     ├── Search Appearance
@@ -235,8 +235,8 @@ class Admin_V2 {
     public function register_menu() {
         // Main V2 menu
         add_menu_page(
-            __('WP SEO Pilot V2', 'wp-seo-pilot'),
-            __('WP SEO Pilot V2', 'wp-seo-pilot'),
+            __('Saman SEO V2', 'wp-seo-pilot'),
+            __('Saman SEO V2', 'wp-seo-pilot'),
             'manage_options',
             'wpseopilot-v2',
             [$this, 'render_app'],
@@ -471,7 +471,7 @@ export default function Header({ currentView, onNavigate }) {
         <header className="top-bar">
             <div className="brand">
                 <span className="brand-icon">🚀</span>
-                <span className="brand-text">WP SEO Pilot <span className="version-badge">V2</span></span>
+                <span className="brand-text">Saman SEO <span className="version-badge">V2</span></span>
             </div>
             <nav className="main-nav">
                 {navItems.map(item => (
@@ -506,7 +506,7 @@ export default function Header({ currentView, onNavigate }) {
 
 ```css
 /* ==========================================================================
-   WP SEO Pilot V2 - Global Styles
+   Saman SEO V2 - Global Styles
    Based on WP Security Pilot design system
    ========================================================================== */
 
@@ -2047,7 +2047,7 @@ npm run build
 
 ## Author & Credits
 
-**WP SEO Pilot V2 Migration**
+**Saman SEO V2 Migration**
 - Based on WP Security Pilot architecture
 - Developed by Juan
 - React + WordPress integration pattern

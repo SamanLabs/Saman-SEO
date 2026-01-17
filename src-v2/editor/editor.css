@@ -1,15 +1,15 @@
 /**
- * WP SEO Pilot V2 - Editor Sidebar Styles
+ * Saman SEO V2 - Editor Sidebar Styles
  */
 
 /* Panel Container */
-.wpseopilot-editor-panel {
+.samanseo-editor-panel {
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Score Header */
-.wpseopilot-score-header {
+.samanseo-score-header {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -18,45 +18,45 @@
     border-bottom: 1px solid #e0e0e0;
 }
 
-.wpseopilot-score-info {
+.samanseo-score-info {
     flex: 1;
 }
 
-.wpseopilot-score-label {
+.samanseo-score-label {
     font-size: 13px;
     font-weight: 600;
     color: #1e1e1e;
 }
 
-.wpseopilot-score-status {
+.samanseo-score-status {
     font-size: 12px;
     color: #757575;
     margin-top: 2px;
 }
 
 /* Score Gauge */
-.wpseopilot-gauge {
+.samanseo-gauge {
     position: relative;
     width: 48px;
     height: 48px;
     flex-shrink: 0;
 }
 
-.wpseopilot-gauge__svg {
+.samanseo-gauge__svg {
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
 }
 
-.wpseopilot-gauge__bg {
+.samanseo-gauge__bg {
     stroke: #e0e0e0;
 }
 
-.wpseopilot-gauge__progress {
+.samanseo-gauge__progress {
     transition: stroke-dashoffset 0.3s ease;
 }
 
-.wpseopilot-gauge__value {
+.samanseo-gauge__value {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -66,13 +66,13 @@
 }
 
 /* Tabs */
-.wpseopilot-tabs {
+.samanseo-tabs {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
     background: #fff;
 }
 
-.wpseopilot-tab {
+.samanseo-tab {
     flex: 1;
     padding: 10px 12px;
     font-size: 12px;
@@ -85,23 +85,23 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-tab:hover {
+.samanseo-tab:hover {
     color: #1e1e1e;
     background: #f6f7f7;
 }
 
-.wpseopilot-tab.active {
+.samanseo-tab.active {
     color: #2271b1;
     border-bottom-color: #2271b1;
 }
 
 /* Tab Content */
-.wpseopilot-tab-content {
+.samanseo-tab-content {
     padding: 16px;
 }
 
 /* Section Label */
-.wpseopilot-section-label {
+.samanseo-section-label {
     display: block;
     font-size: 11px;
     font-weight: 600;
@@ -112,11 +112,11 @@
 }
 
 /* Search Preview */
-.wpseopilot-preview-section {
+.samanseo-preview-section {
     margin-bottom: 20px;
 }
 
-.wpseopilot-search-preview {
+.samanseo-search-preview {
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -124,14 +124,14 @@
     font-family: Arial, sans-serif;
 }
 
-.wpseopilot-search-preview__breadcrumb {
+.samanseo-search-preview__breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 6px;
 }
 
-.wpseopilot-search-preview__favicon {
+.samanseo-search-preview__favicon {
     width: 26px;
     height: 26px;
     background: #f1f3f4;
@@ -142,12 +142,12 @@
     color: #70757a;
 }
 
-.wpseopilot-search-preview__favicon svg {
+.samanseo-search-preview__favicon svg {
     width: 14px;
     height: 14px;
 }
 
-.wpseopilot-search-preview__url-container {
+.samanseo-search-preview__url-container {
     flex: 1;
     min-width: 0;
     display: flex;
@@ -155,14 +155,14 @@
     gap: 1px;
 }
 
-.wpseopilot-search-preview__site-name {
+.samanseo-search-preview__site-name {
     font-size: 12px;
     color: #202124;
     font-weight: 400;
     line-height: 1.3;
 }
 
-.wpseopilot-search-preview__url {
+.samanseo-search-preview__url {
     font-size: 11px;
     color: #70757a;
     line-height: 1.3;
@@ -171,7 +171,7 @@
     text-overflow: ellipsis;
 }
 
-.wpseopilot-search-preview__menu {
+.samanseo-search-preview__menu {
     padding: 4px;
     background: none;
     border: none;
@@ -180,11 +180,11 @@
     border-radius: 4px;
 }
 
-.wpseopilot-search-preview__menu:hover {
+.samanseo-search-preview__menu:hover {
     background: #f1f3f4;
 }
 
-.wpseopilot-search-preview__title {
+.samanseo-search-preview__title {
     font-size: 18px;
     font-weight: 400;
     color: #1a0dab;
@@ -193,11 +193,11 @@
     cursor: pointer;
 }
 
-.wpseopilot-search-preview__title:hover {
+.samanseo-search-preview__title:hover {
     text-decoration: underline;
 }
 
-.wpseopilot-search-preview__description {
+.samanseo-search-preview__description {
     font-size: 13px;
     color: #4d5156;
     line-height: 1.58;
@@ -206,48 +206,48 @@
 }
 
 /* Fields */
-.wpseopilot-field {
+.samanseo-field {
     margin-bottom: 16px;
 }
 
-.wpseopilot-field-header {
+.samanseo-field-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 6px;
 }
 
-.wpseopilot-field-header label {
+.samanseo-field-header label {
     font-size: 12px;
     font-weight: 500;
     color: #1e1e1e;
 }
 
-.wpseopilot-char-count {
+.samanseo-char-count {
     font-size: 11px;
     font-weight: 500;
     padding: 2px 6px;
     border-radius: 4px;
 }
 
-.wpseopilot-char-count.good {
+.samanseo-char-count.good {
     background: #edfaef;
     color: #00a32a;
 }
 
-.wpseopilot-char-count.short,
-.wpseopilot-char-count.empty {
+.samanseo-char-count.short,
+.samanseo-char-count.empty {
     background: #fcf9e8;
     color: #996800;
 }
 
-.wpseopilot-char-count.long {
+.samanseo-char-count.long {
     background: #fcf0f1;
     color: #d63638;
 }
 
 /* Progress Bar */
-.wpseopilot-progress-bar {
+.samanseo-progress-bar {
     height: 3px;
     background: #e0e0e0;
     border-radius: 2px;
@@ -255,39 +255,39 @@
     overflow: hidden;
 }
 
-.wpseopilot-progress-fill {
+.samanseo-progress-fill {
     height: 100%;
     border-radius: 2px;
     transition: width 0.2s ease, background 0.2s ease;
 }
 
-.wpseopilot-progress-fill.good {
+.samanseo-progress-fill.good {
     background: #00a32a;
 }
 
-.wpseopilot-progress-fill.short,
-.wpseopilot-progress-fill.empty {
+.samanseo-progress-fill.short,
+.samanseo-progress-fill.empty {
     background: #dba617;
 }
 
-.wpseopilot-progress-fill.long {
+.samanseo-progress-fill.long {
     background: #d63638;
 }
 
 /* Issues List */
-.wpseopilot-issues {
+.samanseo-issues {
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
 }
 
-.wpseopilot-issues-list {
+.samanseo-issues-list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.wpseopilot-issue {
+.samanseo-issue {
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -299,15 +299,15 @@
     line-height: 1.4;
 }
 
-.wpseopilot-issue--error {
+.samanseo-issue--error {
     background: #fcf0f1;
 }
 
-.wpseopilot-issue--warning {
+.samanseo-issue--warning {
     background: #fcf9e8;
 }
 
-.wpseopilot-issue-icon {
+.samanseo-issue-icon {
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -319,36 +319,36 @@
     flex-shrink: 0;
 }
 
-.wpseopilot-issue--error .wpseopilot-issue-icon {
+.samanseo-issue--error .samanseo-issue-icon {
     background: #d63638;
     color: #fff;
 }
 
-.wpseopilot-issue--warning .wpseopilot-issue-icon {
+.samanseo-issue--warning .samanseo-issue-icon {
     background: #dba617;
     color: #fff;
 }
 
-.wpseopilot-issue-text {
+.samanseo-issue-text {
     color: #1e1e1e;
 }
 
 /* Robots Section */
-.wpseopilot-robots-section {
+.samanseo-robots-section {
     margin-bottom: 20px;
 }
 
-.wpseopilot-robots-section .components-toggle-control {
+.samanseo-robots-section .components-toggle-control {
     margin-bottom: 12px;
 }
 
-.wpseopilot-robots-preview {
+.samanseo-robots-preview {
     padding: 12px;
     background: #f6f7f7;
     border-radius: 6px;
 }
 
-.wpseopilot-robots-code {
+.samanseo-robots-code {
     display: block;
     padding: 8px 10px;
     background: #fff;
@@ -360,18 +360,18 @@
 }
 
 /* Social Preview */
-.wpseopilot-social-preview {
+.samanseo-social-preview {
     margin-bottom: 20px;
 }
 
-.wpseopilot-social-card {
+.samanseo-social-card {
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
 }
 
-.wpseopilot-social-image {
+.samanseo-social-image {
     width: 100%;
     aspect-ratio: 1.91 / 1;
     background: #f6f7f7;
@@ -380,13 +380,13 @@
     justify-content: center;
 }
 
-.wpseopilot-social-image img {
+.samanseo-social-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.wpseopilot-social-placeholder {
+.samanseo-social-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -394,26 +394,26 @@
     color: #757575;
 }
 
-.wpseopilot-social-placeholder svg {
+.samanseo-social-placeholder svg {
     opacity: 0.5;
 }
 
-.wpseopilot-social-placeholder span {
+.samanseo-social-placeholder span {
     font-size: 12px;
 }
 
-.wpseopilot-social-content {
+.samanseo-social-content {
     padding: 12px;
 }
 
-.wpseopilot-social-url {
+.samanseo-social-url {
     font-size: 11px;
     color: #65676b;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
 
-.wpseopilot-social-title {
+.samanseo-social-title {
     font-size: 14px;
     font-weight: 600;
     color: #1c1e21;
@@ -421,7 +421,7 @@
     margin-bottom: 4px;
 }
 
-.wpseopilot-social-desc {
+.samanseo-social-desc {
     font-size: 13px;
     color: #65676b;
     line-height: 1.4;
@@ -432,7 +432,7 @@
 }
 
 /* Media Button */
-.wpseopilot-media-button {
+.samanseo-media-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -440,7 +440,7 @@
 }
 
 /* Field Note */
-.wpseopilot-field-note {
+.samanseo-field-note {
     font-size: 11px;
     color: #757575;
     margin-top: 4px;
@@ -448,19 +448,19 @@
 }
 
 /* WordPress Component Overrides */
-.wpseopilot-editor-panel .components-text-control__input,
-.wpseopilot-editor-panel .components-textarea-control__input {
+.samanseo-editor-panel .components-text-control__input,
+.samanseo-editor-panel .components-textarea-control__input {
     font-size: 13px;
     border-radius: 4px;
 }
 
-.wpseopilot-editor-panel .components-base-control__help {
+.samanseo-editor-panel .components-base-control__help {
     font-size: 11px;
     color: #757575;
     margin-top: 4px;
 }
 
-.wpseopilot-editor-panel .components-toggle-control__label {
+.samanseo-editor-panel .components-toggle-control__label {
     font-size: 13px;
 }
 
@@ -468,24 +468,24 @@
    Template Input Component
    ======================================== */
 
-.wpseopilot-template-input {
+.samanseo-template-input {
     margin-bottom: 16px;
 }
 
-.wpseopilot-template-input__header {
+.samanseo-template-input__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 6px;
 }
 
-.wpseopilot-template-input__label {
+.samanseo-template-input__label {
     font-size: 12px;
     font-weight: 500;
     color: #1e1e1e;
 }
 
-.wpseopilot-template-input__counter {
+.samanseo-template-input__counter {
     font-size: 11px;
     font-weight: 500;
     padding: 2px 6px;
@@ -494,17 +494,17 @@
     color: #757575;
 }
 
-.wpseopilot-template-input__counter.has-value {
+.samanseo-template-input__counter.has-value {
     background: #edfaef;
     color: #00a32a;
 }
 
-.wpseopilot-template-input__counter.over-limit {
+.samanseo-template-input__counter.over-limit {
     background: #fcf0f1;
     color: #d63638;
 }
 
-.wpseopilot-template-input__container {
+.samanseo-template-input__container {
     position: relative;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
@@ -512,12 +512,12 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.wpseopilot-template-input.is-focused .wpseopilot-template-input__container {
+.samanseo-template-input.is-focused .samanseo-template-input__container {
     border-color: #2271b1;
     box-shadow: 0 0 0 1px #2271b1;
 }
 
-.wpseopilot-template-input__highlight {
+.samanseo-template-input__highlight {
     position: absolute;
     top: 0;
     left: 0;
@@ -533,12 +533,12 @@
     color: #1e1e1e;
 }
 
-.wpseopilot-template-input__highlight.multiline {
+.samanseo-template-input__highlight.multiline {
     padding-right: 10px;
     padding-top: 8px;
 }
 
-.wpseopilot-template-input__field {
+.samanseo-template-input__field {
     position: relative;
     width: 100%;
     padding: 8px 70px 8px 10px;
@@ -553,56 +553,56 @@
     font-family: inherit;
 }
 
-.wpseopilot-template-input__field.multiline {
+.samanseo-template-input__field.multiline {
     min-height: 72px;
     padding-right: 10px;
 }
 
-.wpseopilot-template-input__placeholder {
+.samanseo-template-input__placeholder {
     color: #9ca3af;
 }
 
 /* Variable syntax highlighting */
-.wpseopilot-template-input__var {
+.samanseo-template-input__var {
     position: relative;
     display: inline;
     pointer-events: auto;
 }
 
-.wpseopilot-template-input__bracket {
+.samanseo-template-input__bracket {
     opacity: 0.5;
 }
 
-.wpseopilot-template-input__tag {
+.samanseo-template-input__tag {
     font-weight: 500;
 }
 
-.wpseopilot-template-input__var--global {
+.samanseo-template-input__var--global {
     color: #2271b1;
 }
 
-.wpseopilot-template-input__var--post {
+.samanseo-template-input__var--post {
     color: #7c3aed;
 }
 
-.wpseopilot-template-input__var--taxonomy {
+.samanseo-template-input__var--taxonomy {
     color: #059669;
 }
 
-.wpseopilot-template-input__var--author {
+.samanseo-template-input__var--author {
     color: #ea580c;
 }
 
-.wpseopilot-template-input__var--archive {
+.samanseo-template-input__var--archive {
     color: #0891b2;
 }
 
-.wpseopilot-template-input__var--separator {
+.samanseo-template-input__var--separator {
     color: #6b7280;
 }
 
 /* Tooltip */
-.wpseopilot-template-input__tooltip {
+.samanseo-template-input__tooltip {
     position: absolute;
     bottom: calc(100% + 6px);
     left: 50%;
@@ -618,7 +618,7 @@
     pointer-events: none;
 }
 
-.wpseopilot-template-input__tooltip::after {
+.samanseo-template-input__tooltip::after {
     content: '';
     position: absolute;
     top: 100%;
@@ -629,7 +629,7 @@
 }
 
 /* Action buttons */
-.wpseopilot-template-input__actions {
+.samanseo-template-input__actions {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -638,7 +638,7 @@
     z-index: 10;
 }
 
-.wpseopilot-template-input__action-btn {
+.samanseo-template-input__action-btn {
     width: 26px;
     height: 26px;
     padding: 0;
@@ -653,38 +653,38 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-template-input__action-btn:hover {
+.samanseo-template-input__action-btn:hover {
     background: #fff;
     border-color: #2271b1;
     color: #2271b1;
 }
 
-.wpseopilot-template-input__action-btn:disabled {
+.samanseo-template-input__action-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.wpseopilot-template-input__action-btn--ai:hover {
+.samanseo-template-input__action-btn--ai:hover {
     border-color: #7c3aed;
     color: #7c3aed;
 }
 
-.wpseopilot-template-input__action-btn--ai.is-disabled {
+.samanseo-template-input__action-btn--ai.is-disabled {
     opacity: 0.5;
     cursor: pointer;
 }
 
-.wpseopilot-template-input__action-btn--ai.is-disabled:hover {
+.samanseo-template-input__action-btn--ai.is-disabled:hover {
     border-color: #ddd;
     color: #757575;
     background: #f6f7f7;
 }
 
-.wpseopilot-template-input__footer {
+.samanseo-template-input__footer {
     margin-top: 4px;
 }
 
-.wpseopilot-template-input__help {
+.samanseo-template-input__help {
     font-size: 11px;
     color: #757575;
 }
@@ -693,15 +693,15 @@
    Variable Picker Component
    ======================================== */
 
-.wpseopilot-variable-picker {
+.samanseo-variable-picker {
     position: relative;
 }
 
-.wpseopilot-variable-picker--compact {
+.samanseo-variable-picker--compact {
     display: inline-block;
 }
 
-.wpseopilot-variable-picker__dropdown {
+.samanseo-variable-picker__dropdown {
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
@@ -717,12 +717,12 @@
     flex-direction: column;
 }
 
-.wpseopilot-variable-picker__search {
+.samanseo-variable-picker__search {
     padding: 8px;
     border-bottom: 1px solid #e0e0e0;
 }
 
-.wpseopilot-variable-picker__search input {
+.samanseo-variable-picker__search input {
     width: 100%;
     padding: 6px 10px;
     font-size: 12px;
@@ -731,21 +731,21 @@
     outline: none;
 }
 
-.wpseopilot-variable-picker__search input:focus {
+.samanseo-variable-picker__search input:focus {
     border-color: #2271b1;
 }
 
-.wpseopilot-variable-picker__groups {
+.samanseo-variable-picker__groups {
     flex: 1;
     overflow-y: auto;
     padding: 4px 0;
 }
 
-.wpseopilot-variable-picker__group {
+.samanseo-variable-picker__group {
     padding: 4px 0;
 }
 
-.wpseopilot-variable-picker__group-label {
+.samanseo-variable-picker__group-label {
     padding: 4px 12px;
     font-size: 10px;
     font-weight: 600;
@@ -754,17 +754,17 @@
     color: #757575;
 }
 
-.wpseopilot-variable-picker__group-label--global { color: #2271b1; }
-.wpseopilot-variable-picker__group-label--post { color: #7c3aed; }
-.wpseopilot-variable-picker__group-label--taxonomy { color: #059669; }
-.wpseopilot-variable-picker__group-label--author { color: #ea580c; }
-.wpseopilot-variable-picker__group-label--archive { color: #0891b2; }
+.samanseo-variable-picker__group-label--global { color: #2271b1; }
+.samanseo-variable-picker__group-label--post { color: #7c3aed; }
+.samanseo-variable-picker__group-label--taxonomy { color: #059669; }
+.samanseo-variable-picker__group-label--author { color: #ea580c; }
+.samanseo-variable-picker__group-label--archive { color: #0891b2; }
 
-.wpseopilot-variable-picker__items {
+.samanseo-variable-picker__items {
     padding: 0 4px;
 }
 
-.wpseopilot-variable-picker__item {
+.samanseo-variable-picker__item {
     width: 100%;
     padding: 6px 8px;
     text-align: left;
@@ -775,17 +775,17 @@
     transition: background 0.15s ease;
 }
 
-.wpseopilot-variable-picker__item:hover {
+.samanseo-variable-picker__item:hover {
     background: #f6f7f7;
 }
 
-.wpseopilot-variable-picker__item-header {
+.samanseo-variable-picker__item-header {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.wpseopilot-variable-picker__tag {
+.samanseo-variable-picker__tag {
     font-size: 11px;
     font-family: monospace;
     padding: 2px 4px;
@@ -793,18 +793,18 @@
     border-radius: 3px;
 }
 
-.wpseopilot-variable-picker__tag--global { background: #e7f3ff; color: #2271b1; }
-.wpseopilot-variable-picker__tag--post { background: #f3e8ff; color: #7c3aed; }
-.wpseopilot-variable-picker__tag--taxonomy { background: #ecfdf5; color: #059669; }
-.wpseopilot-variable-picker__tag--author { background: #fff7ed; color: #ea580c; }
-.wpseopilot-variable-picker__tag--archive { background: #ecfeff; color: #0891b2; }
+.samanseo-variable-picker__tag--global { background: #e7f3ff; color: #2271b1; }
+.samanseo-variable-picker__tag--post { background: #f3e8ff; color: #7c3aed; }
+.samanseo-variable-picker__tag--taxonomy { background: #ecfdf5; color: #059669; }
+.samanseo-variable-picker__tag--author { background: #fff7ed; color: #ea580c; }
+.samanseo-variable-picker__tag--archive { background: #ecfeff; color: #0891b2; }
 
-.wpseopilot-variable-picker__label {
+.samanseo-variable-picker__label {
     font-size: 12px;
     color: #1e1e1e;
 }
 
-.wpseopilot-variable-picker__preview {
+.samanseo-variable-picker__preview {
     font-size: 11px;
     color: #757575;
     margin-top: 2px;
@@ -813,7 +813,7 @@
     white-space: nowrap;
 }
 
-.wpseopilot-variable-picker__empty {
+.samanseo-variable-picker__empty {
     padding: 20px;
     text-align: center;
     font-size: 12px;
@@ -824,7 +824,7 @@
    AI Generate Modal
    ======================================== */
 
-.wpseopilot-ai-modal-overlay {
+.samanseo-ai-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -838,16 +838,16 @@
     padding: 20px;
 }
 
-.wpseopilot-ai-modal {
+.samanseo-ai-modal {
     width: 100%;
     max-width: 420px;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    animation: wpseopilot-modal-appear 0.2s ease;
+    animation: samanseo-modal-appear 0.2s ease;
 }
 
-@keyframes wpseopilot-modal-appear {
+@keyframes samanseo-modal-appear {
     from {
         opacity: 0;
         transform: scale(0.95);
@@ -858,7 +858,7 @@
     }
 }
 
-.wpseopilot-ai-modal__header {
+.samanseo-ai-modal__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -866,7 +866,7 @@
     border-bottom: 1px solid #e0e0e0;
 }
 
-.wpseopilot-ai-modal__header h3 {
+.samanseo-ai-modal__header h3 {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -876,11 +876,11 @@
     color: #1e1e1e;
 }
 
-.wpseopilot-ai-modal__header h3 svg {
+.samanseo-ai-modal__header h3 svg {
     color: #7c3aed;
 }
 
-.wpseopilot-ai-modal__close {
+.samanseo-ai-modal__close {
     width: 28px;
     height: 28px;
     padding: 0;
@@ -895,69 +895,69 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-ai-modal__close:hover {
+.samanseo-ai-modal__close:hover {
     background: #f6f7f7;
     color: #1e1e1e;
 }
 
-.wpseopilot-ai-modal__body {
+.samanseo-ai-modal__body {
     padding: 20px;
 }
 
-.wpseopilot-ai-modal__option {
+.samanseo-ai-modal__option {
     margin-bottom: 16px;
 }
 
-.wpseopilot-ai-modal__checkbox {
+.samanseo-ai-modal__checkbox {
     display: flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
 }
 
-.wpseopilot-ai-modal__checkbox input {
+.samanseo-ai-modal__checkbox input {
     width: 16px;
     height: 16px;
     margin: 0;
     cursor: pointer;
 }
 
-.wpseopilot-ai-modal__checkbox-label {
+.samanseo-ai-modal__checkbox-label {
     font-size: 13px;
     color: #1e1e1e;
 }
 
-.wpseopilot-ai-modal__context-preview {
+.samanseo-ai-modal__context-preview {
     margin-bottom: 16px;
     padding: 10px;
     background: #f6f7f7;
     border-radius: 6px;
 }
 
-.wpseopilot-ai-modal__context-item {
+.samanseo-ai-modal__context-item {
     display: flex;
     gap: 8px;
     font-size: 12px;
     line-height: 1.4;
 }
 
-.wpseopilot-ai-modal__context-key {
+.samanseo-ai-modal__context-key {
     color: #757575;
     flex-shrink: 0;
 }
 
-.wpseopilot-ai-modal__context-value {
+.samanseo-ai-modal__context-value {
     color: #1e1e1e;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.wpseopilot-ai-modal__field {
+.samanseo-ai-modal__field {
     margin-bottom: 16px;
 }
 
-.wpseopilot-ai-modal__field label {
+.samanseo-ai-modal__field label {
     display: block;
     font-size: 12px;
     font-weight: 500;
@@ -965,7 +965,7 @@
     margin-bottom: 6px;
 }
 
-.wpseopilot-ai-modal__field textarea {
+.samanseo-ai-modal__field textarea {
     width: 100%;
     padding: 8px 10px;
     font-size: 13px;
@@ -975,12 +975,12 @@
     font-family: inherit;
 }
 
-.wpseopilot-ai-modal__field textarea:focus {
+.samanseo-ai-modal__field textarea:focus {
     border-color: #2271b1;
     outline: none;
 }
 
-.wpseopilot-ai-modal__error {
+.samanseo-ai-modal__error {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -992,11 +992,11 @@
     margin-bottom: 16px;
 }
 
-.wpseopilot-ai-modal__result {
+.samanseo-ai-modal__result {
     margin-bottom: 16px;
 }
 
-.wpseopilot-ai-modal__result label {
+.samanseo-ai-modal__result label {
     display: block;
     font-size: 12px;
     font-weight: 500;
@@ -1004,26 +1004,26 @@
     margin-bottom: 6px;
 }
 
-.wpseopilot-ai-modal__result-box {
+.samanseo-ai-modal__result-box {
     padding: 12px;
     background: #edfaef;
     border-radius: 6px;
     border: 1px solid #c3e6cb;
 }
 
-.wpseopilot-ai-modal__result-box p {
+.samanseo-ai-modal__result-box p {
     margin: 0 0 8px;
     font-size: 13px;
     color: #1e1e1e;
     line-height: 1.5;
 }
 
-.wpseopilot-ai-modal__char-count {
+.samanseo-ai-modal__char-count {
     font-size: 11px;
     color: #166534;
 }
 
-.wpseopilot-ai-modal__footer {
+.samanseo-ai-modal__footer {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -1031,7 +1031,7 @@
     border-top: 1px solid #e0e0e0;
 }
 
-.wpseopilot-ai-modal__btn {
+.samanseo-ai-modal__btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1046,46 +1046,46 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-ai-modal__btn:hover {
+.samanseo-ai-modal__btn:hover {
     background: #f6f7f7;
     border-color: #c5c5c5;
 }
 
-.wpseopilot-ai-modal__btn--secondary {
+.samanseo-ai-modal__btn--secondary {
     background: transparent;
     border-color: transparent;
 }
 
-.wpseopilot-ai-modal__btn--secondary:hover {
+.samanseo-ai-modal__btn--secondary:hover {
     background: #f6f7f7;
 }
 
-.wpseopilot-ai-modal__btn--primary {
+.samanseo-ai-modal__btn--primary {
     background: #2271b1;
     border-color: #2271b1;
     color: #fff;
 }
 
-.wpseopilot-ai-modal__btn--primary:hover {
+.samanseo-ai-modal__btn--primary:hover {
     background: #135e96;
     border-color: #135e96;
 }
 
-.wpseopilot-ai-modal__btn:disabled {
+.samanseo-ai-modal__btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.wpseopilot-ai-modal__spinner {
+.samanseo-ai-modal__spinner {
     width: 14px;
     height: 14px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #fff;
     border-radius: 50%;
-    animation: wpseopilot-spin 0.8s linear infinite;
+    animation: samanseo-spin 0.8s linear infinite;
 }
 
-@keyframes wpseopilot-spin {
+@keyframes samanseo-spin {
     to {
         transform: rotate(360deg);
     }
@@ -1095,7 +1095,7 @@
    Additional Field Styles
    ======================================== */
 
-.wpseopilot-field-input {
+.samanseo-field-input {
     width: 100%;
     padding: 8px 10px;
     font-size: 13px;
@@ -1104,20 +1104,20 @@
     transition: border-color 0.15s ease;
 }
 
-.wpseopilot-field-input:focus {
+.samanseo-field-input:focus {
     border-color: #2271b1;
     outline: none;
     box-shadow: 0 0 0 1px #2271b1;
 }
 
-.wpseopilot-field-help {
+.samanseo-field-help {
     font-size: 11px;
     color: #757575;
     margin: 4px 0 0;
 }
 
 /* Toggle switches */
-.wpseopilot-toggle {
+.samanseo-toggle {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -1125,13 +1125,13 @@
     cursor: pointer;
 }
 
-.wpseopilot-toggle input {
+.samanseo-toggle input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-.wpseopilot-toggle-slider {
+.samanseo-toggle-slider {
     position: relative;
     width: 36px;
     height: 20px;
@@ -1141,7 +1141,7 @@
     transition: background 0.2s ease;
 }
 
-.wpseopilot-toggle-slider::after {
+.samanseo-toggle-slider::after {
     content: '';
     position: absolute;
     top: 2px;
@@ -1154,21 +1154,21 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.wpseopilot-toggle input:checked + .wpseopilot-toggle-slider {
+.samanseo-toggle input:checked + .samanseo-toggle-slider {
     background: #2271b1;
 }
 
-.wpseopilot-toggle input:checked + .wpseopilot-toggle-slider::after {
+.samanseo-toggle input:checked + .samanseo-toggle-slider::after {
     transform: translateX(16px);
 }
 
-.wpseopilot-toggle-label {
+.samanseo-toggle-label {
     font-size: 13px;
     color: #1e1e1e;
     line-height: 1.4;
 }
 
-.wpseopilot-toggle-label small {
+.samanseo-toggle-label small {
     display: block;
     font-size: 11px;
     color: #757575;
@@ -1179,7 +1179,7 @@
    AI Provider Badge
    ======================================== */
 
-.wpseopilot-ai-badge {
+.samanseo-ai-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -1195,7 +1195,7 @@
     margin-right: 8px;
 }
 
-.wpseopilot-ai-badge svg {
+.samanseo-ai-badge svg {
     color: rgba(255, 255, 255, 0.9);
 }
 
@@ -1203,33 +1203,33 @@
    AI Notice Styles
    ======================================== */
 
-.wpseopilot-ai-modal--notice {
+.samanseo-ai-modal--notice {
     max-width: 380px;
 }
 
-.wpseopilot-ai-notice {
+.samanseo-ai-notice {
     display: flex;
     gap: 14px;
     padding: 16px;
     border-radius: 8px;
 }
 
-.wpseopilot-ai-notice--info {
+.samanseo-ai-notice--info {
     background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
     border: 1px solid #bfdbfe;
 }
 
-.wpseopilot-ai-notice--warning {
+.samanseo-ai-notice--warning {
     background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
     border: 1px solid #fcd34d;
 }
 
-.wpseopilot-ai-notice--success {
+.samanseo-ai-notice--success {
     background: linear-gradient(135deg, #ecfdf5 0%, #dcfce7 100%);
     border: 1px solid #86efac;
 }
 
-.wpseopilot-ai-notice__icon {
+.samanseo-ai-notice__icon {
     flex-shrink: 0;
     width: 40px;
     height: 40px;
@@ -1239,45 +1239,45 @@
     border-radius: 8px;
 }
 
-.wpseopilot-ai-notice--info .wpseopilot-ai-notice__icon {
+.samanseo-ai-notice--info .samanseo-ai-notice__icon {
     background: #3b82f6;
     color: #fff;
 }
 
-.wpseopilot-ai-notice--warning .wpseopilot-ai-notice__icon {
+.samanseo-ai-notice--warning .samanseo-ai-notice__icon {
     background: #f59e0b;
     color: #fff;
 }
 
-.wpseopilot-ai-notice--success .wpseopilot-ai-notice__icon {
+.samanseo-ai-notice--success .samanseo-ai-notice__icon {
     background: #10b981;
     color: #fff;
 }
 
-.wpseopilot-ai-notice__content {
+.samanseo-ai-notice__content {
     flex: 1;
 }
 
-.wpseopilot-ai-notice__content h4 {
+.samanseo-ai-notice__content h4 {
     margin: 0 0 4px;
     font-size: 14px;
     font-weight: 600;
     color: #1e1e1e;
 }
 
-.wpseopilot-ai-notice__content p {
+.samanseo-ai-notice__content p {
     margin: 0;
     font-size: 13px;
     line-height: 1.5;
     color: #4b5563;
 }
 
-.wpseopilot-ai-notice__content a {
+.samanseo-ai-notice__content a {
     color: #2563eb;
     text-decoration: none;
 }
 
-.wpseopilot-ai-notice__content a:hover {
+.samanseo-ai-notice__content a:hover {
     text-decoration: underline;
 }
 
@@ -1285,7 +1285,7 @@
    Keyphrase Hint
    ======================================== */
 
-.wpseopilot-keyphrase-hint {
+.samanseo-keyphrase-hint {
     font-size: 10px;
     color: #7c3aed;
     margin-top: 4px;
@@ -1293,7 +1293,7 @@
 }
 
 /* View All Link */
-.wpseopilot-view-all-link {
+.samanseo-view-all-link {
     display: block;
     width: 100%;
     padding: 8px 12px;
@@ -1309,7 +1309,7 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-view-all-link:hover {
+.samanseo-view-all-link:hover {
     background: #e5f0fa;
     color: #135e96;
 }
@@ -1318,15 +1318,15 @@
    Metrics Breakdown Component
    ======================================== */
 
-.wpseopilot-metrics-breakdown {
+.samanseo-metrics-breakdown {
     padding: 0;
 }
 
-.wpseopilot-metric-group {
+.samanseo-metric-group {
     margin-bottom: 16px;
 }
 
-.wpseopilot-metric-group__header {
+.samanseo-metric-group__header {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1337,19 +1337,19 @@
     margin-bottom: 8px;
 }
 
-.wpseopilot-metric-group__icon {
+.samanseo-metric-group__icon {
     font-size: 14px;
     line-height: 1;
 }
 
-.wpseopilot-metric-group__label {
+.samanseo-metric-group__label {
     flex: 1;
     font-size: 12px;
     font-weight: 600;
     color: #1e1e1e;
 }
 
-.wpseopilot-metric-group__score {
+.samanseo-metric-group__score {
     font-size: 11px;
     font-weight: 500;
     padding: 2px 6px;
@@ -1358,28 +1358,28 @@
     color: #757575;
 }
 
-.wpseopilot-metric-group__score--good {
+.samanseo-metric-group__score--good {
     background: #edfaef;
     color: #00a32a;
 }
 
-.wpseopilot-metric-group__score--fair {
+.samanseo-metric-group__score--fair {
     background: #fcf9e8;
     color: #b26200;
 }
 
-.wpseopilot-metric-group__score--poor {
+.samanseo-metric-group__score--poor {
     background: #fcf0f1;
     color: #d63638;
 }
 
-.wpseopilot-metric-list {
+.samanseo-metric-list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.wpseopilot-metric-item {
+.samanseo-metric-item {
     padding: 10px 12px;
     border-radius: 6px;
     margin-bottom: 6px;
@@ -1388,94 +1388,94 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-metric-item--fail {
+.samanseo-metric-item--fail {
     background: #fcf0f1;
     border-color: #f1b3b6;
 }
 
-.wpseopilot-metric-item--partial {
+.samanseo-metric-item--partial {
     background: #fcf9e8;
     border-color: #f0d88c;
 }
 
-.wpseopilot-metric-item--pass {
+.samanseo-metric-item--pass {
     background: #edfaef;
     border-color: #a8e6b0;
 }
 
-.wpseopilot-metric-item__header {
+.samanseo-metric-item__header {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 4px;
 }
 
-.wpseopilot-metric-item__indicator {
+.samanseo-metric-item__indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
-.wpseopilot-metric-item__indicator--pass {
+.samanseo-metric-item__indicator--pass {
     background: #00a32a;
 }
 
-.wpseopilot-metric-item__indicator--partial {
+.samanseo-metric-item__indicator--partial {
     background: #dba617;
 }
 
-.wpseopilot-metric-item__indicator--fail {
+.samanseo-metric-item__indicator--fail {
     background: #d63638;
 }
 
-.wpseopilot-metric-item__label {
+.samanseo-metric-item__label {
     flex: 1;
     font-size: 12px;
     font-weight: 500;
     color: #1e1e1e;
 }
 
-.wpseopilot-metric-item__score {
+.samanseo-metric-item__score {
     font-size: 11px;
     font-weight: 600;
     color: #757575;
 }
 
-.wpseopilot-metric-item__status {
+.samanseo-metric-item__status {
     font-size: 11px;
     color: #555;
     margin-bottom: 6px;
     line-height: 1.4;
 }
 
-.wpseopilot-metric-item__bar {
+.samanseo-metric-item__bar {
     height: 4px;
     background: #e0e0e0;
     border-radius: 2px;
     overflow: hidden;
 }
 
-.wpseopilot-metric-item__fill {
+.samanseo-metric-item__fill {
     height: 100%;
     border-radius: 2px;
     transition: width 0.3s ease;
 }
 
-.wpseopilot-metric-item__fill--pass {
+.samanseo-metric-item__fill--pass {
     background: #00a32a;
 }
 
-.wpseopilot-metric-item__fill--partial {
+.samanseo-metric-item__fill--partial {
     background: #dba617;
 }
 
-.wpseopilot-metric-item__fill--fail {
+.samanseo-metric-item__fill--fail {
     background: #d63638;
 }
 
 /* Keyphrase Notice */
-.wpseopilot-keyphrase-notice {
+.samanseo-keyphrase-notice {
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -1486,17 +1486,17 @@
     margin-top: 8px;
 }
 
-.wpseopilot-keyphrase-notice__icon {
+.samanseo-keyphrase-notice__icon {
     flex-shrink: 0;
     font-size: 20px;
     line-height: 1;
 }
 
-.wpseopilot-keyphrase-notice__content {
+.samanseo-keyphrase-notice__content {
     flex: 1;
 }
 
-.wpseopilot-keyphrase-notice__content strong {
+.samanseo-keyphrase-notice__content strong {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -1504,7 +1504,7 @@
     margin-bottom: 4px;
 }
 
-.wpseopilot-keyphrase-notice__content p {
+.samanseo-keyphrase-notice__content p {
     margin: 0;
     font-size: 12px;
     line-height: 1.4;
@@ -1515,18 +1515,18 @@
    Multi-Keyphrase Component
    ======================================== */
 
-.wpseopilot-field--keyphrases {
+.samanseo-field--keyphrases {
     margin-bottom: 20px;
 }
 
-.wpseopilot-field--keyphrases .wpseopilot-field-header {
+.samanseo-field--keyphrases .samanseo-field-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
 
-.wpseopilot-field-count {
+.samanseo-field-count {
     font-size: 11px;
     font-weight: 500;
     padding: 2px 8px;
@@ -1535,7 +1535,7 @@
     border-radius: 10px;
 }
 
-.wpseopilot-keyphrase-item {
+.samanseo-keyphrase-item {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1543,7 +1543,7 @@
     position: relative;
 }
 
-.wpseopilot-keyphrase-badge {
+.samanseo-keyphrase-badge {
     flex-shrink: 0;
     font-size: 10px;
     font-weight: 600;
@@ -1555,21 +1555,21 @@
     text-align: center;
 }
 
-.wpseopilot-keyphrase-primary .wpseopilot-keyphrase-badge {
+.samanseo-keyphrase-primary .samanseo-keyphrase-badge {
     background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
     color: #fff;
 }
 
-.wpseopilot-keyphrase-secondary .wpseopilot-keyphrase-badge {
+.samanseo-keyphrase-secondary .samanseo-keyphrase-badge {
     background: #f0f0f1;
     color: #757575;
 }
 
-.wpseopilot-keyphrase-item .wpseopilot-field-input {
+.samanseo-keyphrase-item .samanseo-field-input {
     flex: 1;
 }
 
-.wpseopilot-keyphrase-remove {
+.samanseo-keyphrase-remove {
     flex-shrink: 0;
     width: 24px;
     height: 24px;
@@ -1586,13 +1586,13 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-keyphrase-remove:hover {
+.samanseo-keyphrase-remove:hover {
     background: #fcf0f1;
     border-color: #f1b3b6;
     color: #d63638;
 }
 
-.wpseopilot-keyphrase-add {
+.samanseo-keyphrase-add {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1610,12 +1610,12 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-keyphrase-add:hover {
+.samanseo-keyphrase-add:hover {
     background: #e5f0fa;
     border-style: solid;
 }
 
-.wpseopilot-keyphrase-add svg {
+.samanseo-keyphrase-add svg {
     flex-shrink: 0;
 }
 
@@ -1623,15 +1623,15 @@
    Quick Templates Component
    ======================================== */
 
-.wpseopilot-field--templates {
+.samanseo-field--templates {
     margin-bottom: 16px;
 }
 
-.wpseopilot-templates-header {
+.samanseo-templates-header {
     margin-bottom: 0;
 }
 
-.wpseopilot-templates-toggle {
+.samanseo-templates-toggle {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1647,23 +1647,23 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-templates-toggle:hover {
+.samanseo-templates-toggle:hover {
     background: #f0f0f1;
     border-color: #c3c4c7;
 }
 
-.wpseopilot-templates-toggle.active {
+.samanseo-templates-toggle.active {
     background: #f0f6fc;
     border-color: #2271b1;
     color: #2271b1;
     border-radius: 4px 4px 0 0;
 }
 
-.wpseopilot-templates-toggle svg:last-child {
+.samanseo-templates-toggle svg:last-child {
     margin-left: auto;
 }
 
-.wpseopilot-templates-list {
+.samanseo-templates-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1674,7 +1674,7 @@
     border-radius: 0 0 4px 4px;
 }
 
-.wpseopilot-template-item {
+.samanseo-template-item {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1688,18 +1688,18 @@
     transition: all 0.15s ease;
 }
 
-.wpseopilot-template-item:hover {
+.samanseo-template-item:hover {
     background: #f0f6fc;
     border-color: #2271b1;
 }
 
-.wpseopilot-template-name {
+.samanseo-template-name {
     font-size: 12px;
     font-weight: 600;
     color: #1d2327;
 }
 
-.wpseopilot-template-preview {
+.samanseo-template-preview {
     font-size: 11px;
     color: #757575;
     font-family: monospace;
@@ -1709,13 +1709,13 @@
    Instant Indexing Section
    ========================================================================== */
 
-.wpseopilot-indexing-section {
+.samanseo-indexing-section {
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
 }
 
-.wpseopilot-indexing-notice {
+.samanseo-indexing-notice {
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -1726,22 +1726,22 @@
     margin-bottom: 12px;
 }
 
-.wpseopilot-indexing-notice svg {
+.samanseo-indexing-notice svg {
     flex-shrink: 0;
     margin-top: 1px;
 }
 
-.wpseopilot-indexing-notice--info {
+.samanseo-indexing-notice--info {
     background: #f0f6fc;
     color: #135e96;
 }
 
-.wpseopilot-indexing-notice--error {
+.samanseo-indexing-notice--error {
     background: #fcf0f1;
     color: #d63638;
 }
 
-.wpseopilot-indexing-status {
+.samanseo-indexing-status {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1751,31 +1751,31 @@
     margin-bottom: 12px;
 }
 
-.wpseopilot-indexing-status--success {
+.samanseo-indexing-status--success {
     background: #edfaef;
 }
 
-.wpseopilot-indexing-status--success .wpseopilot-indexing-status-icon {
+.samanseo-indexing-status--success .samanseo-indexing-status-icon {
     color: #00a32a;
 }
 
-.wpseopilot-indexing-status--failed {
+.samanseo-indexing-status--failed {
     background: #fcf0f1;
 }
 
-.wpseopilot-indexing-status--failed .wpseopilot-indexing-status-icon {
+.samanseo-indexing-status--failed .samanseo-indexing-status-icon {
     color: #d63638;
 }
 
-.wpseopilot-indexing-status--never {
+.samanseo-indexing-status--never {
     background: #f0f0f1;
 }
 
-.wpseopilot-indexing-status--never .wpseopilot-indexing-status-icon {
+.samanseo-indexing-status--never .samanseo-indexing-status-icon {
     color: #757575;
 }
 
-.wpseopilot-indexing-status-icon {
+.samanseo-indexing-status-icon {
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -1786,24 +1786,24 @@
     border-radius: 50%;
 }
 
-.wpseopilot-indexing-status-text {
+.samanseo-indexing-status-text {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.wpseopilot-indexing-status-text strong {
+.samanseo-indexing-status-text strong {
     font-size: 12px;
     font-weight: 600;
     color: #1d2327;
 }
 
-.wpseopilot-indexing-status-text span {
+.samanseo-indexing-status-text span {
     font-size: 11px;
     color: #757575;
 }
 
-.wpseopilot-indexing-button {
+.samanseo-indexing-button {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -1813,20 +1813,20 @@
     font-size: 12px !important;
 }
 
-.wpseopilot-indexing-button svg {
+.samanseo-indexing-button svg {
     flex-shrink: 0;
 }
 
-.wpseopilot-indexing-spinner {
+.samanseo-indexing-spinner {
     display: inline-block;
     width: 14px;
     height: 14px;
     border: 2px solid #e0e0e0;
     border-top-color: #2271b1;
     border-radius: 50%;
-    animation: wpseopilot-spin 0.8s linear infinite;
+    animation: samanseo-spin 0.8s linear infinite;
 }
 
-@keyframes wpseopilot-spin {
+@keyframes samanseo-spin {
     to { transform: rotate(360deg); }
 }

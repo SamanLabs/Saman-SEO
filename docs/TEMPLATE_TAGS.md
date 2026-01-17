@@ -1,6 +1,6 @@
 # Template Tags & Shortcodes
 
-This guide covers all public functions, template tags, and shortcodes available for theme integration with WP SEO Pilot.
+This guide covers all public functions, template tags, and shortcodes available for theme integration with Saman SEO.
 
 ---
 
@@ -185,7 +185,7 @@ See **[Filter Reference](FILTERS.md#wpseopilot_breadcrumb_links)** for more exam
 
 ## Helper Functions
 
-WP SEO Pilot provides namespaced helper functions for accessing SEO data programmatically.
+Saman SEO provides namespaced helper functions for accessing SEO data programmatically.
 
 **Namespace:** `WPSEOPilot\Helpers`
 

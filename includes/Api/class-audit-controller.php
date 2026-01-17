@@ -2,15 +2,15 @@
 /**
  * Audit REST Controller
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
-use WPSEOPilot\Service\Post_Meta;
-use function WPSEOPilot\Helpers\generate_title_from_template;
-use function WPSEOPilot\Helpers\calculate_seo_score;
+use Saman\SEO\Service\Post_Meta;
+use function Saman\SEO\Helpers\generate_title_from_template;
+use function Saman\SEO\Helpers\calculate_seo_score;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -113,7 +113,7 @@ class Audit_Controller extends REST_Controller {
      */
     public function get_audit( $request ) {
         // Check for cached results (valid for 1 hour)
-        $cached = get_transient( 'wpseopilot_audit_results' );
+        $cached = get_transient( 'SAMAN_SEO_audit_results' );
 
         if ( $cached ) {
             $cached['from_cache'] = true;
@@ -125,7 +125,7 @@ class Audit_Controller extends REST_Controller {
         $results['from_cache'] = false;
 
         // Cache for 1 hour
-        set_transient( 'wpseopilot_audit_results', $results, HOUR_IN_SECONDS );
+        set_transient( 'SAMAN_SEO_audit_results', $results, HOUR_IN_SECONDS );
 
         return $this->success( $results );
     }
@@ -141,16 +141,16 @@ class Audit_Controller extends REST_Controller {
         $limit     = min( absint( $request->get_param( 'limit' ) ), 500 ); // Max 500 posts
 
         // Clear old cache
-        delete_transient( 'wpseopilot_audit_results' );
+        delete_transient( 'SAMAN_SEO_audit_results' );
 
         $results = $this->collect_issues( $post_type, $limit );
         $results['from_cache'] = false;
         $results['ran_at'] = current_time( 'mysql' );
 
         // Cache results
-        set_transient( 'wpseopilot_audit_results', $results, HOUR_IN_SECONDS );
+        set_transient( 'SAMAN_SEO_audit_results', $results, HOUR_IN_SECONDS );
 
-        return $this->success( $results, __( 'Audit completed successfully.', 'wp-seo-pilot' ) );
+        return $this->success( $results, __( 'Audit completed successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -167,7 +167,7 @@ class Audit_Controller extends REST_Controller {
         $post    = get_post( $post_id );
 
         if ( ! $post ) {
-            return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         // Use the enhanced scoring function.
@@ -209,10 +209,10 @@ class Audit_Controller extends REST_Controller {
      */
     private function group_metrics_by_category( $metrics ) {
         $groups = [
-            'basic'     => [ 'label' => __( 'Basic SEO', 'wp-seo-pilot' ), 'items' => [] ],
-            'keyword'   => [ 'label' => __( 'Keyword Optimization', 'wp-seo-pilot' ), 'items' => [] ],
-            'structure' => [ 'label' => __( 'Content Structure', 'wp-seo-pilot' ), 'items' => [] ],
-            'links'     => [ 'label' => __( 'Links & Media', 'wp-seo-pilot' ), 'items' => [] ],
+            'basic'     => [ 'label' => __( 'Basic SEO', 'saman-seo' ), 'items' => [] ],
+            'keyword'   => [ 'label' => __( 'Keyword Optimization', 'saman-seo' ), 'items' => [] ],
+            'structure' => [ 'label' => __( 'Content Structure', 'saman-seo' ), 'items' => [] ],
+            'links'     => [ 'label' => __( 'Links & Media', 'saman-seo' ), 'items' => [] ],
         ];
 
         foreach ( $metrics as $metric ) {
@@ -263,10 +263,10 @@ class Audit_Controller extends REST_Controller {
             return null;
         }
 
-        $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+        $post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
 
         $title_suggestion = '';
-        if ( function_exists( 'WPSEOPilot\Helpers\generate_title_from_template' ) ) {
+        if ( function_exists( 'Saman\SEO\Helpers\generate_title_from_template' ) ) {
             $title_suggestion = generate_title_from_template( $post );
         }
         if ( empty( $title_suggestion ) ) {
@@ -297,7 +297,7 @@ class Audit_Controller extends REST_Controller {
 
         $post = get_post( $post_id );
         if ( ! $post ) {
-            return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         // Get current meta
@@ -318,13 +318,13 @@ class Audit_Controller extends REST_Controller {
             update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
 
             // Clear audit cache
-            delete_transient( 'wpseopilot_audit_results' );
+            delete_transient( 'SAMAN_SEO_audit_results' );
         }
 
         return $this->success( [
             'post_id' => $post_id,
             'meta'    => $meta,
-        ], __( 'Recommendation applied successfully.', 'wp-seo-pilot' ) );
+        ], __( 'Recommendation applied successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -334,7 +334,7 @@ class Audit_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_summary( $request ) {
-        $cached = get_transient( 'wpseopilot_audit_results' );
+        $cached = get_transient( 'SAMAN_SEO_audit_results' );
 
         if ( $cached ) {
             return $this->success( [
@@ -385,7 +385,7 @@ class Audit_Controller extends REST_Controller {
             'no_found_rows'  => true,
         ] );
 
-        $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+        $post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
         if ( ! is_array( $post_type_descriptions ) ) {
             $post_type_descriptions = [];
         }
@@ -416,8 +416,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'high',
-                    'message'  => __( 'Missing meta title.', 'wp-seo-pilot' ),
-                    'action'   => __( 'Add a descriptive SEO title.', 'wp-seo-pilot' ),
+                    'message'  => __( 'Missing meta title.', 'saman-seo' ),
+                    'action'   => __( 'Add a descriptive SEO title.', 'saman-seo' ),
                     'type'     => 'title_missing',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -428,8 +428,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'medium',
-                    'message'  => sprintf( __( 'Meta title too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['title'] ) ),
-                    'action'   => __( 'Shorten to under 65 characters.', 'wp-seo-pilot' ),
+                    'message'  => sprintf( __( 'Meta title too long (%d characters).', 'saman-seo' ), strlen( $meta['title'] ) ),
+                    'action'   => __( 'Shorten to under 65 characters.', 'saman-seo' ),
                     'type'     => 'title_length',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -442,8 +442,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'high',
-                    'message'  => __( 'Missing meta description.', 'wp-seo-pilot' ),
-                    'action'   => __( 'Add a keyword-rich summary.', 'wp-seo-pilot' ),
+                    'message'  => __( 'Missing meta description.', 'saman-seo' ),
+                    'action'   => __( 'Add a keyword-rich summary.', 'saman-seo' ),
                     'type'     => 'description_missing',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -454,8 +454,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
-                    'message'  => sprintf( __( 'Meta description too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['description'] ) ),
-                    'action'   => __( 'Shorten to under 160 characters.', 'wp-seo-pilot' ),
+                    'message'  => sprintf( __( 'Meta description too long (%d characters).', 'saman-seo' ), strlen( $meta['description'] ) ),
+                    'action'   => __( 'Shorten to under 160 characters.', 'saman-seo' ),
                     'type'     => 'description_length',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -471,8 +471,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'medium',
-                    'message'  => sprintf( _n( '%d image missing alt text.', '%d images missing alt text.', $missing, 'wp-seo-pilot' ), $missing ),
-                    'action'   => __( 'Add descriptive alt attributes.', 'wp-seo-pilot' ),
+                    'message'  => sprintf( _n( '%d image missing alt text.', '%d images missing alt text.', $missing, 'saman-seo' ), $missing ),
+                    'action'   => __( 'Add descriptive alt attributes.', 'saman-seo' ),
                     'type'     => 'missing_alt',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -486,8 +486,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
-                    'message'  => sprintf( __( 'Low word count (%d words).', 'wp-seo-pilot' ), $word_count ),
-                    'action'   => __( 'Consider adding more content (300+ words recommended).', 'wp-seo-pilot' ),
+                    'message'  => sprintf( __( 'Low word count (%d words).', 'saman-seo' ), $word_count ),
+                    'action'   => __( 'Consider adding more content (300+ words recommended).', 'saman-seo' ),
                     'type'     => 'low_word_count',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -500,8 +500,8 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
-                    'message'  => __( 'No H1 heading in content.', 'wp-seo-pilot' ),
-                    'action'   => __( 'Consider adding a main heading.', 'wp-seo-pilot' ),
+                    'message'  => __( 'No H1 heading in content.', 'saman-seo' ),
+                    'action'   => __( 'Consider adding a main heading.', 'saman-seo' ),
                     'type'     => 'missing_h1',
                 ] );
                 $posts_with_issues[ $post_id ] = true;
@@ -537,13 +537,13 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'high',
                 'type'     => 'title_missing',
-                'message'  => __( 'Missing meta title.', 'wp-seo-pilot' ),
+                'message'  => __( 'Missing meta title.', 'saman-seo' ),
             ];
         } elseif ( strlen( $meta['title'] ) > 65 ) {
             $issues[] = [
                 'severity' => 'medium',
                 'type'     => 'title_length',
-                'message'  => sprintf( __( 'Meta title too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['title'] ) ),
+                'message'  => sprintf( __( 'Meta title too long (%d characters).', 'saman-seo' ), strlen( $meta['title'] ) ),
             ];
         }
 
@@ -552,13 +552,13 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'high',
                 'type'     => 'description_missing',
-                'message'  => __( 'Missing meta description.', 'wp-seo-pilot' ),
+                'message'  => __( 'Missing meta description.', 'saman-seo' ),
             ];
         } elseif ( strlen( $meta['description'] ) > 160 ) {
             $issues[] = [
                 'severity' => 'low',
                 'type'     => 'description_length',
-                'message'  => sprintf( __( 'Meta description too long (%d characters).', 'wp-seo-pilot' ), strlen( $meta['description'] ) ),
+                'message'  => sprintf( __( 'Meta description too long (%d characters).', 'saman-seo' ), strlen( $meta['description'] ) ),
             ];
         }
 
@@ -569,7 +569,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'medium',
                 'type'     => 'missing_alt',
-                'message'  => sprintf( __( '%d images missing alt text.', 'wp-seo-pilot' ), $img_count - $alt_count ),
+                'message'  => sprintf( __( '%d images missing alt text.', 'saman-seo' ), $img_count - $alt_count ),
             ];
         }
 
@@ -579,7 +579,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'low',
                 'type'     => 'low_word_count',
-                'message'  => sprintf( __( 'Low word count (%d words).', 'wp-seo-pilot' ), $word_count ),
+                'message'  => sprintf( __( 'Low word count (%d words).', 'saman-seo' ), $word_count ),
             ];
         }
 
@@ -603,10 +603,10 @@ class Audit_Controller extends REST_Controller {
         // Build recommendation
         $recommendation = null;
         if ( empty( $meta['title'] ) || empty( $meta['description'] ) ) {
-            $post_type_descriptions = get_option( 'wpseopilot_post_type_meta_descriptions', [] );
+            $post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
 
             $title_suggestion = '';
-            if ( function_exists( 'WPSEOPilot\Helpers\generate_title_from_template' ) ) {
+            if ( function_exists( 'Saman\SEO\Helpers\generate_title_from_template' ) ) {
                 $title_suggestion = generate_title_from_template( $post );
             }
             if ( empty( $title_suggestion ) ) {
@@ -670,7 +670,7 @@ class Audit_Controller extends REST_Controller {
         }
 
         $title_suggestion = '';
-        if ( function_exists( 'WPSEOPilot\Helpers\generate_title_from_template' ) ) {
+        if ( function_exists( 'Saman\SEO\Helpers\generate_title_from_template' ) ) {
             $title_suggestion = generate_title_from_template( $post );
         }
         if ( empty( $title_suggestion ) ) {

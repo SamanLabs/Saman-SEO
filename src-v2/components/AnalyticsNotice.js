@@ -20,7 +20,7 @@ const AnalyticsNotice = ({ isEnabled, onToggle }) => {
                     </svg>
                 </div>
                 <div className="analytics-notice__content">
-                    <h4>Help Improve WP SEO Pilot</h4>
+                    <h4>Help Improve Saman SEO</h4>
                     <p>
                         Share anonymous usage data to help us understand which features are most valuable
                         and improve the plugin for everyone.

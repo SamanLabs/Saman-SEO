@@ -5,27 +5,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 // Font inheritance fix
-.wp-seo-pilot-admin button,
-.wp-seo-pilot-admin input {
+.saman-seo-admin button,
+.saman-seo-admin input {
     font-family: inherit;
 }
 
 // WordPress body overrides
-body[class*="wpseopilot"] #wpcontent {
+body[class*="saman-seo"] #wpcontent {
     padding-left: 0;
     min-height: 0;
 }
 
-body[class*="wpseopilot"] #wpwrap {
+body[class*="saman-seo"] #wpwrap {
     background: @color-background;
 }
 
-body[class*="wpseopilot"] #wpbody-content {
+body[class*="saman-seo"] #wpbody-content {
     padding-bottom: 0;
 }
 
 // Main admin container
-.wp-seo-pilot-admin {
+.saman-seo-admin {
     // CSS Custom Properties (for runtime theming if needed)
     --color-primary: @color-primary;
     --color-primary-strong: @color-primary-hover;
@@ -50,26 +50,26 @@ body[class*="wpseopilot"] #wpbody-content {
         @color-background;
 }
 
-body.admin-bar .wp-seo-pilot-admin {
+body.admin-bar .saman-seo-admin {
     min-height: calc(100vh - 32px);
 }
 
 @media (max-width: @breakpoint-md) {
-    body.admin-bar .wp-seo-pilot-admin {
+    body.admin-bar .saman-seo-admin {
         min-height: calc(100vh - 46px);
     }
 }
 
 // Shell container
-.wp-seo-pilot-shell {
+.saman-seo-shell {
     max-width: 1400px;
     margin: 0 auto;
 }
 
 // Box sizing reset
-.wp-seo-pilot-admin *,
-.wp-seo-pilot-admin *::before,
-.wp-seo-pilot-admin *::after {
+.saman-seo-admin *,
+.saman-seo-admin *::before,
+.saman-seo-admin *::after {
     box-sizing: border-box;
 }
 

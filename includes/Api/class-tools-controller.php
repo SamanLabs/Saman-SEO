@@ -2,11 +2,13 @@
 /**
  * AI-Powered Tools REST Controller
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
+
+use Saman\SEO\Integration\AI_Pilot;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -14,23 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * REST API controller for AI-powered tools.
+ *
+ * All AI operations are delegated to Saman Labs AI plugin via AI_Pilot.
  */
 class Tools_Controller extends REST_Controller {
-
-    /**
-     * Custom models table name.
-     *
-     * @var string
-     */
-    private $custom_models_table;
-
-    /**
-     * Constructor.
-     */
-    public function __construct() {
-        global $wpdb;
-        $this->custom_models_table = $wpdb->prefix . 'wpseopilot_custom_models';
-    }
 
     /**
      * Register routes.
@@ -208,7 +197,7 @@ class Tools_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function get_schema_templates( $request ) {
-		$templates = get_option( 'wpseopilot_schema_templates', [] );
+		$templates = get_option( 'SAMAN_SEO_schema_templates', [] );
 		return $this->success( $templates );
 	}
 
@@ -220,9 +209,9 @@ class Tools_Controller extends REST_Controller {
 	 */
 	public function save_schema_template( $request ) {
 		$params = $request->get_json_params();
-		$templates = get_option( 'wpseopilot_schema_templates', [] );
+		$templates = get_option( 'SAMAN_SEO_schema_templates', [] );
 		$templates[] = $params;
-		update_option( 'wpseopilot_schema_templates', $templates );
+		update_option( 'SAMAN_SEO_schema_templates', $templates );
 		return $this->success( $templates );
 	}
 
@@ -237,7 +226,7 @@ class Tools_Controller extends REST_Controller {
 		$url = isset( $params['url'] ) ? esc_url_raw( $params['url'] ) : '';
 
 		if ( empty( $url ) ) {
-			return $this->error( __( 'URL is required.', 'wp-seo-pilot' ), 'missing_url', 400 );
+			return $this->error( __( 'URL is required.', 'saman-seo' ), 'missing_url', 400 );
 		}
 
 		$response = wp_remote_get( $url );
@@ -254,13 +243,13 @@ class Tools_Controller extends REST_Controller {
 		$scripts = $xpath->query( '//script[@type="application/ld+json"]' );
 
 		if ( $scripts->length === 0 ) {
-			return $this->error( __( 'No schema found at the specified URL.', 'wp-seo-pilot' ), 'no_schema_found', 404 );
+			return $this->error( __( 'No schema found at the specified URL.', 'saman-seo' ), 'no_schema_found', 404 );
 		}
 
 		$schema_data = json_decode( $scripts[0]->nodeValue, true );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			return $this->error( __( 'Invalid JSON format in schema.', 'wp-seo-pilot' ), 'invalid_json', 400 );
+			return $this->error( __( 'Invalid JSON format in schema.', 'saman-seo' ), 'invalid_json', 400 );
 		}
 
 		return $this->success( [
@@ -304,11 +293,11 @@ class Tools_Controller extends REST_Controller {
             $args['meta_query'] = [
                 'relation' => 'OR',
                 [
-                    'key'     => '_wpseopilot_title',
+                    'key'     => '_SAMAN_SEO_title',
                     'compare' => 'NOT EXISTS',
                 ],
                 [
-                    'key'     => '_wpseopilot_title',
+                    'key'     => '_SAMAN_SEO_title',
                     'value'   => '',
                     'compare' => '=',
                 ],
@@ -317,11 +306,11 @@ class Tools_Controller extends REST_Controller {
             $args['meta_query'] = [
                 'relation' => 'OR',
                 [
-                    'key'     => '_wpseopilot_description',
+                    'key'     => '_SAMAN_SEO_description',
                     'compare' => 'NOT EXISTS',
                 ],
                 [
-                    'key'     => '_wpseopilot_description',
+                    'key'     => '_SAMAN_SEO_description',
                     'value'   => '',
                     'compare' => '=',
                 ],
@@ -332,8 +321,8 @@ class Tools_Controller extends REST_Controller {
         $posts = [];
 
         foreach ( $query->posts as $post ) {
-            $seo_title = get_post_meta( $post->ID, '_wpseopilot_title', true );
-            $seo_desc = get_post_meta( $post->ID, '_wpseopilot_description', true );
+            $seo_title = get_post_meta( $post->ID, '_SAMAN_SEO_title', true );
+            $seo_desc = get_post_meta( $post->ID, '_SAMAN_SEO_description', true );
 
             $posts[] = [
                 'id'               => $post->ID,
@@ -375,7 +364,7 @@ class Tools_Controller extends REST_Controller {
         $type = isset( $params['type'] ) ? sanitize_text_field( $params['type'] ) : 'both';
 
         if ( empty( $post_ids ) ) {
-            return $this->error( __( 'No posts selected.', 'wp-seo-pilot' ), 'no_posts', 400 );
+            return $this->error( __( 'No posts selected.', 'saman-seo' ), 'no_posts', 400 );
         }
 
         $suggestions = [];
@@ -425,7 +414,7 @@ class Tools_Controller extends REST_Controller {
         $changes = isset( $params['changes'] ) ? $params['changes'] : [];
 
         if ( empty( $changes ) ) {
-            return $this->error( __( 'No changes to save.', 'wp-seo-pilot' ), 'no_changes', 400 );
+            return $this->error( __( 'No changes to save.', 'saman-seo' ), 'no_changes', 400 );
         }
 
         $saved = 0;
@@ -437,17 +426,17 @@ class Tools_Controller extends REST_Controller {
             }
 
             if ( isset( $change['seo_title'] ) ) {
-                update_post_meta( $post_id, '_wpseopilot_title', sanitize_text_field( $change['seo_title'] ) );
+                update_post_meta( $post_id, '_SAMAN_SEO_title', sanitize_text_field( $change['seo_title'] ) );
             }
 
             if ( isset( $change['seo_description'] ) ) {
-                update_post_meta( $post_id, '_wpseopilot_description', sanitize_textarea_field( $change['seo_description'] ) );
+                update_post_meta( $post_id, '_SAMAN_SEO_description', sanitize_textarea_field( $change['seo_description'] ) );
             }
 
             $saved++;
         }
 
-        return $this->success( [ 'saved' => $saved ], sprintf( __( '%d posts updated.', 'wp-seo-pilot' ), $saved ) );
+        return $this->success( [ 'saved' => $saved ], sprintf( __( '%d posts updated.', 'saman-seo' ), $saved ) );
     }
 
     // =========================================================================
@@ -551,7 +540,7 @@ class Tools_Controller extends REST_Controller {
         $keywords = isset( $params['keywords'] ) ? array_map( 'sanitize_text_field', $params['keywords'] ) : [];
 
         if ( empty( $title ) ) {
-            return $this->error( __( 'Title is required.', 'wp-seo-pilot' ), 'missing_title', 400 );
+            return $this->error( __( 'Title is required.', 'saman-seo' ), 'missing_title', 400 );
         }
 
         $keywords_str = ! empty( $keywords ) ? implode( ', ', $keywords ) : '';
@@ -605,12 +594,12 @@ class Tools_Controller extends REST_Controller {
         $post_id = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
 
         if ( ! $post_id ) {
-            return $this->error( __( 'Post ID is required.', 'wp-seo-pilot' ), 'missing_post_id', 400 );
+            return $this->error( __( 'Post ID is required.', 'saman-seo' ), 'missing_post_id', 400 );
         }
 
         $post = get_post( $post_id );
         if ( ! $post ) {
-            return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         $content = wp_strip_all_tags( $post->post_content );
@@ -666,12 +655,12 @@ class Tools_Controller extends REST_Controller {
         $custom_data = isset( $params['custom_data'] ) ? $params['custom_data'] : [];
 
         if ( ! $post_id ) {
-            return $this->error( __( 'Post ID is required.', 'wp-seo-pilot' ), 'missing_post_id', 400 );
+            return $this->error( __( 'Post ID is required.', 'saman-seo' ), 'missing_post_id', 400 );
         }
 
         $post = get_post( $post_id );
         if ( ! $post ) {
-            return $this->error( __( 'Post not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         $content = wp_strip_all_tags( $post->post_content );
@@ -759,7 +748,7 @@ class Tools_Controller extends REST_Controller {
         $schema = isset( $params['schema'] ) ? $params['schema'] : '';
 
         if ( empty( $schema ) ) {
-            return $this->error( __( 'Schema is required.', 'wp-seo-pilot' ), 'missing_schema', 400 );
+            return $this->error( __( 'Schema is required.', 'saman-seo' ), 'missing_schema', 400 );
         }
 
         // Basic validation
@@ -769,7 +758,7 @@ class Tools_Controller extends REST_Controller {
         if ( is_string( $schema ) ) {
             $schema = json_decode( $schema, true );
             if ( json_last_error() !== JSON_ERROR_NONE ) {
-                $errors[] = __( 'Invalid JSON format.', 'wp-seo-pilot' );
+                $errors[] = __( 'Invalid JSON format.', 'saman-seo' );
                 return $this->success( [
                     'valid'    => false,
                     'errors'   => $errors,
@@ -780,11 +769,11 @@ class Tools_Controller extends REST_Controller {
 
         // Check required fields
         if ( ! isset( $schema['@context'] ) ) {
-            $errors[] = __( 'Missing @context (should be https://schema.org).', 'wp-seo-pilot' );
+            $errors[] = __( 'Missing @context (should be https://schema.org).', 'saman-seo' );
         }
 
         if ( ! isset( $schema['@type'] ) ) {
-            $errors[] = __( 'Missing @type.', 'wp-seo-pilot' );
+            $errors[] = __( 'Missing @type.', 'saman-seo' );
         }
 
         // Type-specific validation
@@ -792,34 +781,34 @@ class Tools_Controller extends REST_Controller {
 
         if ( $type === 'Article' || $type === 'BlogPosting' || $type === 'NewsArticle' ) {
             if ( empty( $schema['headline'] ) ) {
-                $errors[] = __( 'Missing headline (required for Article).', 'wp-seo-pilot' );
+                $errors[] = __( 'Missing headline (required for Article).', 'saman-seo' );
             }
             if ( empty( $schema['image'] ) ) {
-                $warnings[] = __( 'Missing image (recommended for Article).', 'wp-seo-pilot' );
+                $warnings[] = __( 'Missing image (recommended for Article).', 'saman-seo' );
             }
             if ( empty( $schema['author'] ) ) {
-                $warnings[] = __( 'Missing author (recommended for Article).', 'wp-seo-pilot' );
+                $warnings[] = __( 'Missing author (recommended for Article).', 'saman-seo' );
             }
             if ( empty( $schema['datePublished'] ) ) {
-                $warnings[] = __( 'Missing datePublished (recommended for Article).', 'wp-seo-pilot' );
+                $warnings[] = __( 'Missing datePublished (recommended for Article).', 'saman-seo' );
             }
         }
 
         if ( $type === 'Recipe' ) {
             if ( empty( $schema['name'] ) && empty( $schema['headline'] ) ) {
-                $errors[] = __( 'Missing name (required for Recipe).', 'wp-seo-pilot' );
+                $errors[] = __( 'Missing name (required for Recipe).', 'saman-seo' );
             }
             if ( empty( $schema['recipeIngredient'] ) ) {
-                $warnings[] = __( 'Missing recipeIngredient (recommended for Recipe).', 'wp-seo-pilot' );
+                $warnings[] = __( 'Missing recipeIngredient (recommended for Recipe).', 'saman-seo' );
             }
             if ( empty( $schema['recipeInstructions'] ) ) {
-                $warnings[] = __( 'Missing recipeInstructions (recommended for Recipe).', 'wp-seo-pilot' );
+                $warnings[] = __( 'Missing recipeInstructions (recommended for Recipe).', 'saman-seo' );
             }
         }
 
         if ( $type === 'FAQPage' ) {
             if ( empty( $schema['mainEntity'] ) ) {
-                $errors[] = __( 'Missing mainEntity (required for FAQPage).', 'wp-seo-pilot' );
+                $errors[] = __( 'Missing mainEntity (required for FAQPage).', 'saman-seo' );
             }
         }
 
@@ -846,11 +835,11 @@ class Tools_Controller extends REST_Controller {
         $schema = isset( $params['schema'] ) ? $params['schema'] : '';
 
         if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-            return $this->error( __( 'Invalid post or permission denied.', 'wp-seo-pilot' ), 'permission_denied', 403 );
+            return $this->error( __( 'Invalid post or permission denied.', 'saman-seo' ), 'permission_denied', 403 );
         }
 
         if ( empty( $schema ) ) {
-            return $this->error( __( 'Schema is required.', 'wp-seo-pilot' ), 'missing_schema', 400 );
+            return $this->error( __( 'Schema is required.', 'saman-seo' ), 'missing_schema', 400 );
         }
 
         // Store as JSON string
@@ -858,9 +847,9 @@ class Tools_Controller extends REST_Controller {
             $schema = wp_json_encode( $schema );
         }
 
-        update_post_meta( $post_id, '_wpseopilot_schema', $schema );
+        update_post_meta( $post_id, '_SAMAN_SEO_schema', $schema );
 
-        return $this->success( null, __( 'Schema saved successfully.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Schema saved successfully.', 'saman-seo' ) );
     }
 
     // =========================================================================
@@ -874,7 +863,7 @@ class Tools_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function get_robots_txt( $request ) {
-        $content = get_option( 'wpseopilot_robots_txt', '' );
+        $content = get_option( 'SAMAN_SEO_robots_txt', '' );
         $site_url = home_url();
         $sitemap_url = home_url( '/sitemap.xml' );
 
@@ -902,11 +891,11 @@ class Tools_Controller extends REST_Controller {
         // Sanitize - allow only safe characters
         $content = wp_kses( $content, [] );
 
-        update_option( 'wpseopilot_robots_txt', $content );
+        update_option( 'SAMAN_SEO_robots_txt', $content );
 
         return $this->success( [
             'content' => $content,
-        ], __( 'robots.txt saved successfully.', 'wp-seo-pilot' ) );
+        ], __( 'robots.txt saved successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -916,14 +905,14 @@ class Tools_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function reset_robots_txt( $request ) {
-        delete_option( 'wpseopilot_robots_txt' );
+        delete_option( 'SAMAN_SEO_robots_txt' );
 
         // Generate default content
         $default = "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: " . home_url( '/sitemap.xml' );
 
         return $this->success( [
             'content' => $default,
-        ], __( 'robots.txt reset to default.', 'wp-seo-pilot' ) );
+        ], __( 'robots.txt reset to default.', 'saman-seo' ) );
     }
 
     /**
@@ -1046,7 +1035,9 @@ class Tools_Controller extends REST_Controller {
     }
 
     /**
-     * Call AI API.
+     * Call AI API via Saman Labs AI integration.
+     *
+     * All AI operations are delegated to Saman Labs AI plugin.
      *
      * @param string $system     System prompt.
      * @param string $prompt     User prompt.
@@ -1054,207 +1045,40 @@ class Tools_Controller extends REST_Controller {
      * @return string|\WP_Error
      */
     private function call_ai( $system, $prompt, $max_tokens = 500 ) {
-        $model = get_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
-
-        // Check if using custom model
-        if ( strpos( $model, 'custom_' ) === 0 ) {
-            return $this->call_custom_model( $model, $system, $prompt, $max_tokens );
+        // Check if Saman Labs AI is ready
+        if ( ! AI_Pilot::is_ready() ) {
+            return new \WP_Error(
+                'ai_not_ready',
+                __( 'Saman Labs AI is not configured. Please install and configure Saman Labs AI to use AI features.', 'saman-seo' )
+            );
         }
 
-        // Use OpenAI
-        $api_key = get_option( 'wpseopilot_openai_api_key', '' );
-        if ( empty( $api_key ) ) {
-            return new \WP_Error( 'no_api_key', __( 'OpenAI API key is not configured.', 'wp-seo-pilot' ) );
-        }
+        // Build messages array for chat
+        $messages = [
+            [ 'role' => 'system', 'content' => $system ],
+            [ 'role' => 'user', 'content' => $prompt ],
+        ];
 
-        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', [
-            'headers' => [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $api_key,
-            ],
-            'body'    => wp_json_encode( [
-                'model'       => $model,
-                'messages'    => [
-                    [ 'role' => 'system', 'content' => $system ],
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-                'max_tokens'  => $max_tokens,
-                'temperature' => 0.3,
-            ] ),
-            'timeout' => 60,
+        // Delegate to Saman Labs AI
+        $result = AI_Pilot::chat( $messages, [
+            'max_tokens'  => $max_tokens,
+            'temperature' => 0.3,
         ] );
 
-        if ( is_wp_error( $response ) ) {
-            return $response;
+        if ( is_wp_error( $result ) ) {
+            return $result;
         }
 
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'API error', 'wp-seo-pilot' );
-            return new \WP_Error( 'api_error', $error_message );
+        // Extract content from response
+        if ( is_array( $result ) && isset( $result['content'] ) ) {
+            return trim( $result['content'] );
         }
 
-        return trim( $body['choices'][0]['message']['content'] ?? '' );
-    }
-
-    /**
-     * Call custom model.
-     *
-     * @param string $model_id   Model ID (custom_123 format).
-     * @param string $system     System prompt.
-     * @param string $prompt     User prompt.
-     * @param int    $max_tokens Max tokens.
-     * @return string|\WP_Error
-     */
-    private function call_custom_model( $model_id, $system, $prompt, $max_tokens ) {
-        global $wpdb;
-
-        $id = intval( str_replace( 'custom_', '', $model_id ) );
-
-        $model = $wpdb->get_row(
-            $wpdb->prepare( "SELECT * FROM {$this->custom_models_table} WHERE id = %d", $id ),
-            ARRAY_A
-        );
-
-        if ( ! $model ) {
-            return new \WP_Error( 'model_not_found', __( 'Custom model not found.', 'wp-seo-pilot' ) );
+        if ( is_string( $result ) ) {
+            return trim( $result );
         }
 
-        $provider = $model['provider'];
-        $api_url = $model['api_url'];
-        $api_key = $model['api_key'];
-        $model_name = $model['model_id'];
-        $temperature = floatval( $model['temperature'] ?? 0.3 );
-
-        // Call based on provider type
-        switch ( $provider ) {
-            case 'openai':
-            case 'openai_compatible':
-            case 'lmstudio':
-                return $this->call_openai_compatible( $api_url, $api_key, $model_name, $system, $prompt, $max_tokens, $temperature );
-
-            case 'anthropic':
-                return $this->call_anthropic( $api_url, $api_key, $model_name, $system, $prompt, $max_tokens, $temperature );
-
-            case 'ollama':
-                return $this->call_ollama( $api_url, $model_name, $system, $prompt, $max_tokens, $temperature );
-
-            default:
-                return new \WP_Error( 'unsupported_provider', __( 'Unsupported provider.', 'wp-seo-pilot' ) );
-        }
-    }
-
-    /**
-     * Call OpenAI-compatible API.
-     */
-    private function call_openai_compatible( $api_url, $api_key, $model, $system, $prompt, $max_tokens, $temperature ) {
-        $headers = [ 'Content-Type' => 'application/json' ];
-
-        if ( ! empty( $api_key ) ) {
-            $headers['Authorization'] = 'Bearer ' . $api_key;
-        }
-
-        $response = wp_remote_post( $api_url, [
-            'headers' => $headers,
-            'body'    => wp_json_encode( [
-                'model'       => $model,
-                'messages'    => [
-                    [ 'role' => 'system', 'content' => $system ],
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-                'max_tokens'  => $max_tokens,
-                'temperature' => $temperature,
-            ] ),
-            'timeout' => 60,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'API error', 'wp-seo-pilot' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['choices'][0]['message']['content'] ?? '' );
-    }
-
-    /**
-     * Call Anthropic API.
-     */
-    private function call_anthropic( $api_url, $api_key, $model, $system, $prompt, $max_tokens, $temperature ) {
-        $response = wp_remote_post( $api_url, [
-            'headers' => [
-                'Content-Type'      => 'application/json',
-                'x-api-key'         => $api_key,
-                'anthropic-version' => '2023-06-01',
-            ],
-            'body'    => wp_json_encode( [
-                'model'      => $model,
-                'max_tokens' => $max_tokens,
-                'system'     => $system,
-                'messages'   => [
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-            ] ),
-            'timeout' => 60,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error']['message'] ?? __( 'Anthropic API error', 'wp-seo-pilot' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['content'][0]['text'] ?? '' );
-    }
-
-    /**
-     * Call Ollama API.
-     */
-    private function call_ollama( $api_url, $model, $system, $prompt, $max_tokens, $temperature ) {
-        $response = wp_remote_post( $api_url, [
-            'headers' => [ 'Content-Type' => 'application/json' ],
-            'body'    => wp_json_encode( [
-                'model'    => $model,
-                'messages' => [
-                    [ 'role' => 'system', 'content' => $system ],
-                    [ 'role' => 'user', 'content' => $prompt ],
-                ],
-                'stream'   => false,
-                'options'  => [
-                    'temperature' => $temperature,
-                    'num_predict' => $max_tokens,
-                ],
-            ] ),
-            'timeout' => 120,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $status_code = wp_remote_retrieve_response_code( $response );
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( $status_code !== 200 ) {
-            $error_message = $body['error'] ?? __( 'Ollama API error', 'wp-seo-pilot' );
-            return new \WP_Error( 'api_error', $error_message );
-        }
-
-        return trim( $body['message']['content'] ?? '' );
+        return new \WP_Error( 'ai_error', __( 'Unexpected AI response format.', 'saman-seo' ) );
     }
 
     // =========================================================================
@@ -1390,16 +1214,16 @@ class Tools_Controller extends REST_Controller {
         $alt = sanitize_text_field( $request->get_param( 'alt' ) ?? '' );
 
         if ( ! $image_id ) {
-            return $this->error( __( 'Image ID is required.', 'wp-seo-pilot' ), 'missing_id', 400 );
+            return $this->error( __( 'Image ID is required.', 'saman-seo' ), 'missing_id', 400 );
         }
 
         $attachment = get_post( $image_id );
         if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
-            return $this->error( __( 'Image not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Image not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         if ( ! current_user_can( 'edit_post', $image_id ) ) {
-            return $this->error( __( 'Permission denied.', 'wp-seo-pilot' ), 'permission_denied', 403 );
+            return $this->error( __( 'Permission denied.', 'saman-seo' ), 'permission_denied', 403 );
         }
 
         update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
@@ -1407,7 +1231,7 @@ class Tools_Controller extends REST_Controller {
         return $this->success( [
             'id'  => $image_id,
             'alt' => $alt,
-        ], __( 'Alt text updated.', 'wp-seo-pilot' ) );
+        ], __( 'Alt text updated.', 'saman-seo' ) );
     }
 
     /**
@@ -1420,16 +1244,16 @@ class Tools_Controller extends REST_Controller {
         $image_id = intval( $request->get_param( 'id' ) );
 
         if ( ! $image_id ) {
-            return $this->error( __( 'Image ID is required.', 'wp-seo-pilot' ), 'missing_id', 400 );
+            return $this->error( __( 'Image ID is required.', 'saman-seo' ), 'missing_id', 400 );
         }
 
         $attachment = get_post( $image_id );
         if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
-            return $this->error( __( 'Image not found.', 'wp-seo-pilot' ), 'not_found', 404 );
+            return $this->error( __( 'Image not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
         if ( ! current_user_can( 'edit_post', $image_id ) ) {
-            return $this->error( __( 'Permission denied.', 'wp-seo-pilot' ), 'permission_denied', 403 );
+            return $this->error( __( 'Permission denied.', 'saman-seo' ), 'permission_denied', 403 );
         }
 
         // Generate alt text from filename.
@@ -1449,6 +1273,6 @@ class Tools_Controller extends REST_Controller {
         return $this->success( [
             'id'  => $image_id,
             'alt' => $alt,
-        ], __( 'Alt text generated from filename.', 'wp-seo-pilot' ) );
+        ], __( 'Alt text generated from filename.', 'saman-seo' ) );
     }
 }

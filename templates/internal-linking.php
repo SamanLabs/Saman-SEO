@@ -21,15 +21,15 @@
  * @var string $page_url
  * @var string $capability
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  */
 
 $tabs = [
-	'rules'      => __( 'Rules', 'wp-seo-pilot' ),
-	'new'        => __( 'Add Rule', 'wp-seo-pilot' ),
-	'categories' => __( 'Categories', 'wp-seo-pilot' ),
-	'utms'       => __( 'UTM Templates', 'wp-seo-pilot' ),
-	'settings'   => __( 'Settings', 'wp-seo-pilot' ),
+	'rules'      => __( 'Rules', 'saman-seo' ),
+	'new'        => __( 'Add Rule', 'saman-seo' ),
+	'categories' => __( 'Categories', 'saman-seo' ),
+	'utms'       => __( 'UTM Templates', 'saman-seo' ),
+	'settings'   => __( 'Settings', 'saman-seo' ),
 ];
 
 $tab_url = static function ( $tab, $extra = [] ) use ( $page_url ) {
@@ -39,13 +39,13 @@ $tab_url = static function ( $tab, $extra = [] ) use ( $page_url ) {
 $current_rule = $rule_to_edit ?: $rule_defaults;
 
 // Render top bar
-\WPSEOPilot\Admin_Topbar::render( 'internal-linking' );
+\Saman\SEO\Admin_Topbar::render( 'internal-linking' );
 ?>
-<div class="wrap wpseopilot-page wpseopilot-links">
+<div class="wrap saman-seo-page saman-seo-links">
 
-	<?php settings_errors( 'wpseopilot_links' ); ?>
+	<?php settings_errors( 'SAMAN_SEO_links' ); ?>
 
-	<h2 class="nav-tab-wrapper wpseopilot-links__tabs">
+	<h2 class="nav-tab-wrapper saman-seo-links__tabs">
 		<?php foreach ( $tabs as $tab => $label ) : ?>
 			<a href="<?php echo $tab_url( $tab ); ?>" class="nav-tab <?php echo ( $active_tab === $tab ) ? 'nav-tab-active' : ''; ?>">
 				<?php echo esc_html( $label ); ?>
@@ -53,7 +53,7 @@ $current_rule = $rule_to_edit ?: $rule_defaults;
 		<?php endforeach; ?>
 	</h2>
 
-	<div class="wpseopilot-links__panel">
+	<div class="saman-seo-links__panel">
 		<?php if ( 'rules' === $active_tab ) : ?>
 			<?php include __DIR__ . '/partials/internal-linking-rules.php'; ?>
 		<?php elseif ( in_array( $active_tab, [ 'new', 'edit' ], true ) ) : ?>

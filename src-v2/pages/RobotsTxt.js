@@ -112,7 +112,7 @@ const RobotsTxt = () => {
     const loadRobotsTxt = async () => {
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/robots-txt',
+                path: '/saman-seo/v1/tools/robots-txt',
             });
             setContent(response.content || '');
             setOriginalContent(response.content || '');
@@ -129,7 +129,7 @@ const RobotsTxt = () => {
         setSaving(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/tools/robots-txt',
+                path: '/saman-seo/v1/tools/robots-txt',
                 method: 'POST',
                 data: { content },
             });
@@ -145,7 +145,7 @@ const RobotsTxt = () => {
         setSaving(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/robots-txt/reset',
+                path: '/saman-seo/v1/tools/robots-txt/reset',
                 method: 'POST',
             });
             setContent(response.content || '');
@@ -173,7 +173,7 @@ const RobotsTxt = () => {
         setTestResult(null);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/robots-txt/test',
+                path: '/saman-seo/v1/tools/robots-txt/test',
                 method: 'POST',
                 data: { path: testUrl, content },
             });

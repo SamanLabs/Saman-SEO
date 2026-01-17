@@ -1,12 +1,12 @@
 # WP-CLI Commands
 
-Complete reference for WP SEO Pilot WP-CLI commands.
+Complete reference for Saman SEO WP-CLI commands.
 
 ---
 
 ## Installation
 
-WP-CLI commands are automatically available when WP SEO Pilot is active. No additional setup required.
+WP-CLI commands are automatically available when Saman SEO is active. No additional setup required.
 
 Verify installation:
 ```bash
@@ -448,7 +448,7 @@ wp wpseopilot import aioseo
 
 ### Clear SEO Cache
 
-Clear all WP SEO Pilot cached data.
+Clear all Saman SEO cached data.
 
 ```bash
 wp wpseopilot cache clear [--type=<cache-type>]
@@ -472,7 +472,7 @@ wp wpseopilot cache clear --type=sitemaps
 
 ### List Cron Jobs
 
-Show scheduled WP SEO Pilot tasks.
+Show scheduled Saman SEO tasks.
 
 ```bash
 wp wpseopilot cron list

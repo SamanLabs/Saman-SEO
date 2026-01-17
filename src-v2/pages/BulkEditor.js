@@ -20,7 +20,7 @@ const BulkEditor = ({ onNavigate }) => {
         setLoading(true);
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/tools/bulk-editor/posts?post_type=${postType}&page=${page}&per_page=${perPage}&filter=${filter}&search=${encodeURIComponent(searchQuery)}`,
+                path: `/saman-seo/v1/tools/bulk-editor/posts?post_type=${postType}&page=${page}&per_page=${perPage}&filter=${filter}&search=${encodeURIComponent(searchQuery)}`,
             });
             if (response.success) {
                 setPosts(response.data.posts);
@@ -67,7 +67,7 @@ const BulkEditor = ({ onNavigate }) => {
             }));
 
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/bulk-editor/save',
+                path: '/saman-seo/v1/tools/bulk-editor/save',
                 method: 'POST',
                 data: { changes: changesArray },
             });
@@ -90,7 +90,7 @@ const BulkEditor = ({ onNavigate }) => {
         setGenerating(idsToGenerate);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/bulk-editor/generate',
+                path: '/saman-seo/v1/tools/bulk-editor/generate',
                 method: 'POST',
                 data: { post_ids: idsToGenerate },
             });

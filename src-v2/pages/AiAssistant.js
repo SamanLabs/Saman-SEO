@@ -37,8 +37,8 @@ const AiAssistant = () => {
         setLoading(true);
         try {
             const [settingsRes, statusRes] = await Promise.all([
-                apiFetch({ path: '/wpseopilot/v2/ai/settings' }),
-                apiFetch({ path: '/wpseopilot/v2/ai/status' }),
+                apiFetch({ path: '/saman-seo/v1/ai/settings' }),
+                apiFetch({ path: '/saman-seo/v1/ai/status' }),
             ]);
 
             if (settingsRes.success) {
@@ -68,7 +68,7 @@ const AiAssistant = () => {
         setMessage({ type: '', text: '' });
         try {
             const res = await apiFetch({
-                path: '/wpseopilot/v2/ai/settings',
+                path: '/saman-seo/v1/ai/settings',
                 method: 'POST',
                 data: {
                     ai_prompt_system: settings.ai_prompt_system,
@@ -98,7 +98,7 @@ const AiAssistant = () => {
         setMessage({ type: '', text: '' });
         try {
             const res = await apiFetch({
-                path: '/wpseopilot/v2/ai/reset',
+                path: '/saman-seo/v1/ai/reset',
                 method: 'POST',
             });
 
@@ -138,7 +138,7 @@ const AiAssistant = () => {
 
         try {
             const res = await apiFetch({
-                path: '/wpseopilot/v2/ai/generate',
+                path: '/saman-seo/v1/ai/generate',
                 method: 'POST',
                 data: { content: testContent, type: 'both' },
             });
@@ -267,7 +267,7 @@ const AiAssistant = () => {
                                     </div>
                                     <div className="ai-provider-status__content">
                                         <h4>Install WP AI Pilot</h4>
-                                        <p>AI features in WP SEO Pilot are now powered by WP AI Pilot. Install it to enable AI-powered title and description generation.</p>
+                                        <p>AI features in Saman SEO are now powered by WP AI Pilot. Install it to enable AI-powered title and description generation.</p>
                                         <a
                                             href="plugin-install.php?s=wp+ai+pilot&tab=search"
                                             className="button primary"

@@ -1,7 +1,8 @@
-# WP SEO Pilot
+# Saman SEO
 
 <p align="center">
-  <img width="641" alt="WP SEO Pilot" src="https://github.com/user-attachments/assets/e1219160-3178-4eaf-a193-565d113e03bf" />
+  <img width="640" alt="Saman SEO" src="https://github.com/user-attachments/assets/5d0ac010-07d2-41bf-9793-321523a225f4" />
+
 </p>
 
 <p align="center">
@@ -9,20 +10,20 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/releases">
-    <img src="https://img.shields.io/github/v/release/jhd3197/WP-SEO-Pilot?style=flat-square&color=blue" alt="Latest Release">
+  <a href="https://github.com/SamanLabs/Saman-SEO/releases">
+    <img src="https://img.shields.io/github/v/release/SamanLabs/Saman-SEO?style=flat-square&color=blue" alt="Latest Release">
   </a>
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/jhd3197/WP-SEO-Pilot?style=flat-square&color=green" alt="License">
+  <a href="https://github.com/SamanLabs/Saman-SEO/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/SamanLabs/Saman-SEO?style=flat-square&color=green" alt="License">
   </a>
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/stargazers">
-    <img src="https://img.shields.io/github/stars/jhd3197/WP-SEO-Pilot?style=flat-square&color=yellow" alt="Stars">
+  <a href="https://github.com/SamanLabs/Saman-SEO/stargazers">
+    <img src="https://img.shields.io/github/stars/SamanLabs/Saman-SEO?style=flat-square&color=yellow" alt="Stars">
   </a>
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/network/members">
-    <img src="https://img.shields.io/github/forks/jhd3197/WP-SEO-Pilot?style=flat-square&color=orange" alt="Forks">
+  <a href="https://github.com/SamanLabs/Saman-SEO/network/members">
+    <img src="https://img.shields.io/github/forks/SamanLabs/Saman-SEO?style=flat-square&color=orange" alt="Forks">
   </a>
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/issues">
-    <img src="https://img.shields.io/github/issues/jhd3197/WP-SEO-Pilot?style=flat-square&color=red" alt="Issues">
+  <a href="https://github.com/SamanLabs/Saman-SEO/issues">
+    <img src="https://img.shields.io/github/issues/SamanLabs/Saman-SEO?style=flat-square&color=red" alt="Issues">
   </a>
 </p>
 
@@ -33,13 +34,13 @@
   <a href="https://php.net/">
     <img src="https://img.shields.io/badge/PHP-7.4%2B-777BB4?style=flat-square&logo=php" alt="PHP Version">
   </a>
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/jhd3197/WP-SEO-Pilot?style=flat-square&color=blueviolet" alt="Contributors">
+  <a href="https://github.com/SamanLabs/Saman-SEO/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/SamanLabs/Saman-SEO?style=flat-square&color=blueviolet" alt="Contributors">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/jhd3197/WP-SEO-Pilot/discussions">
+  <a href="https://github.com/SamanLabs/Saman-SEO/discussions">
     <img src="https://img.shields.io/badge/Discussions-Join%20Us-brightgreen?style=flat-square&logo=github" alt="Discussions">
   </a>
 </p>
@@ -54,7 +55,7 @@
 
 For too long, WordPress SEO has been dominated by proprietary solutions that operate as black boxes. Each plugin guards its methods as trade secrets, fragmenting the ecosystem and forcing developers to work around opaque systems.
 
-**WP SEO Pilot takes a different approach**: We believe the SEO industry benefits from transparency, shared standards, and collaborative improvement. By open-sourcing our complete SEO workflow, we're establishing a foundation that the entire WordPress community can build upon, inspect, and enhance.
+**Saman SEO takes a different approach**: We believe the SEO industry benefits from transparency, shared standards, and collaborative improvement. By open-sourcing our complete SEO workflow, we're establishing a foundation that the entire WordPress community can build upon, inspect, and enhance.
 
 This is SEO without secrets—because better SEO comes from better collaboration, not better secrecy.
 
@@ -111,12 +112,12 @@ This is SEO without secrets—because better SEO comes from better collaboration
 1. Download the latest release or clone this repository
 2. Upload to `/wp-content/plugins/wp-seo-pilot/`
 3. Activate through the WordPress admin interface
-4. Navigate to **WP SEO Pilot → Defaults** to configure site-wide settings
+4. Navigate to **Saman SEO → Defaults** to configure site-wide settings
 
 ### Basic Usage
 
 **Per-Post Configuration:**
-Edit any post or page and locate the "WP SEO Pilot" meta box or Gutenberg sidebar panel. Configure:
+Edit any post or page and locate the "Saman SEO" meta box or Gutenberg sidebar panel. Configure:
 - SEO Title
 - Meta Description  
 - Canonical URL
@@ -124,7 +125,7 @@ Edit any post or page and locate the "WP SEO Pilot" meta box or Gutenberg sideba
 - Open Graph Image
 
 **Site-Wide Defaults:**
-Navigate to **WP SEO Pilot → Defaults** to set template-driven defaults that apply when per-post values aren't specified.
+Navigate to **Saman SEO → Defaults** to set template-driven defaults that apply when per-post values aren't specified.
 
 ---
 
@@ -232,9 +233,9 @@ npm run watch
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/jhd3197/WP-SEO-Pilot/issues)
+- **Issues**: [GitHub Issues](https://github.com/SamanLabs/Saman-SEO/issues)
 - **Documentation**: [Full Documentation](docs/)
-- **Community**: [Discussions](https://github.com/jhd3197/WP-SEO-Pilot/discussions)
+- **Community**: [Discussions](https://github.com/SamanLabs/Saman-SEO/discussions)
 
 ---
 

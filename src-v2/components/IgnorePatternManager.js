@@ -19,7 +19,7 @@ const IgnorePatternManager = ({ onClose, onPatternChange }) => {
     const fetchPatterns = async () => {
         setLoading(true);
         try {
-            const response = await apiFetch({ path: '/wpseopilot/v2/404-ignore-patterns' });
+            const response = await apiFetch({ path: '/saman-seo/v1/404-ignore-patterns' });
             if (response.success) {
                 setPatterns(response.data);
             }
@@ -39,7 +39,7 @@ const IgnorePatternManager = ({ onClose, onPatternChange }) => {
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/404-ignore-patterns',
+                path: '/saman-seo/v1/404-ignore-patterns',
                 method: 'POST',
                 data: {
                     pattern: newPattern.trim(),
@@ -68,7 +68,7 @@ const IgnorePatternManager = ({ onClose, onPatternChange }) => {
         setDeletingId(id);
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/404-ignore-patterns/${id}`,
+                path: `/saman-seo/v1/404-ignore-patterns/${id}`,
                 method: 'DELETE',
             });
             setPatterns(prev => prev.filter(p => p.id !== id));

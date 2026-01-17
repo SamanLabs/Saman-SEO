@@ -32,7 +32,7 @@ const ContentGaps = ({ onNavigate }) => {
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/content-gaps/analyze',
+                path: '/saman-seo/v1/tools/content-gaps/analyze',
                 method: 'POST',
                 data: {
                     topic: topic || null,
@@ -55,7 +55,7 @@ const ContentGaps = ({ onNavigate }) => {
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/content-gaps/outline',
+                path: '/saman-seo/v1/tools/content-gaps/outline',
                 method: 'POST',
                 data: { topic: gapTopic },
             });

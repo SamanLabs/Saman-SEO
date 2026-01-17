@@ -1,6 +1,6 @@
 # AI Assistant Guide
 
-Complete guide to using AI-powered SEO features in WP SEO Pilot.
+Complete guide to using AI-powered SEO features in Saman SEO.
 
 ---
 
@@ -18,7 +18,7 @@ Complete guide to using AI-powered SEO features in WP SEO Pilot.
 
 ## Overview
 
-WP SEO Pilot integrates with OpenAI's GPT models to provide intelligent SEO suggestions:
+Saman SEO integrates with OpenAI's GPT models to provide intelligent SEO suggestions:
 
 - **AI-Generated Titles**: Create compelling, SEO-optimized titles
 - **AI-Generated Descriptions**: Write engaging meta descriptions
@@ -26,7 +26,7 @@ WP SEO Pilot integrates with OpenAI's GPT models to provide intelligent SEO sugg
 - **Customizable Prompts**: Tailor AI behavior to your needs
 - **Model Selection**: Choose the best model for your use case
 
-**Location:** Navigate to **WP SEO Pilot → AI Assistant**
+**Location:** Navigate to **Saman SEO → AI Assistant**
 
 **File:** `includes/class-wpseopilot-service-ai-assistant.php`
 
@@ -48,7 +48,7 @@ WP SEO Pilot integrates with OpenAI's GPT models to provide intelligent SEO sugg
 
 ### Step 2: Configure API Key in WordPress
 
-1. Navigate to **WP SEO Pilot → General Settings**
+1. Navigate to **Saman SEO → General Settings**
 2. Find the **OpenAI Settings** section
 3. Paste your API key in **OpenAI API Key** field
 4. Click **Save Changes**
@@ -94,7 +94,7 @@ update_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
 ### Generate Title for Single Post
 
 1. Edit any post or page
-2. Scroll to the **WP SEO Pilot** meta box
+2. Scroll to the **Saman SEO** meta box
 3. Click **Generate AI Title**
 4. Review the suggestion
 5. Click **Use This Title** or regenerate
@@ -106,7 +106,7 @@ update_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
 ### Generate Description for Single Post
 
 1. Edit any post or page
-2. In the **WP SEO Pilot** meta box
+2. In the **Saman SEO** meta box
 3. Click **Generate AI Description**
 4. Review the suggestion
 5. Click **Use This Description** or regenerate
@@ -115,7 +115,7 @@ update_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
 
 ### Batch Generation
 
-Navigate to **WP SEO Pilot → AI Assistant**:
+Navigate to **Saman SEO → AI Assistant**:
 
 #### Step 1: Select Posts
 
@@ -156,7 +156,7 @@ Suggested Description: "Discover expert-tested WordPress SEO techniques that del
 
 ## Customizing AI Prompts
 
-WP SEO Pilot allows complete customization of AI prompts to match your brand voice and SEO strategy.
+Saman SEO allows complete customization of AI prompts to match your brand voice and SEO strategy.
 
 ### System Prompt
 
@@ -496,7 +496,7 @@ Check usage in OpenAI Dashboard:
 **Solution:**
 1. Verify API key in [OpenAI Platform](https://platform.openai.com/api-keys)
 2. Generate new key if needed
-3. Update in **WP SEO Pilot → General Settings**
+3. Update in **Saman SEO → General Settings**
 
 ---
 
@@ -549,7 +549,7 @@ Check usage in OpenAI Dashboard:
 
 ## Reset AI Settings
 
-Navigate to **WP SEO Pilot → AI Assistant** and click **Reset to Defaults**.
+Navigate to **Saman SEO → AI Assistant** and click **Reset to Defaults**.
 
 Or programmatically:
 

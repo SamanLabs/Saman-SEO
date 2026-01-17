@@ -1,6 +1,6 @@
 # Developer Guide
 
-WP SEO Pilot is built with extensibility in mind. This guide covers how developers can extend, customize, and integrate with the plugin using hooks, filters, and programmatic controls.
+Saman SEO is built with extensibility in mind. This guide covers how developers can extend, customize, and integrate with the plugin using hooks, filters, and programmatic controls.
 
 ---
 
@@ -21,7 +21,7 @@ WP SEO Pilot is built with extensibility in mind. This guide covers how develope
 
 ## Plugin Architecture
 
-WP SEO Pilot follows a service-oriented architecture with clean separation of concerns.
+Saman SEO follows a service-oriented architecture with clean separation of concerns.
 
 ### Core Services
 
@@ -67,7 +67,7 @@ Fires when the plugin has fully initialized all services.
 ```php
 add_action( 'wpseopilot_booted', function( $plugin ) {
     // Plugin is fully loaded, all services available
-    error_log( 'WP SEO Pilot initialized!' );
+    error_log( 'Saman SEO initialized!' );
 }, 10, 1 );
 ```
 
@@ -709,7 +709,7 @@ $breadcrumbs_html = wpseopilot_breadcrumbs( null, false );
 
 ## Helper Functions
 
-WP SEO Pilot provides namespaced helper functions for common tasks.
+Saman SEO provides namespaced helper functions for common tasks.
 
 **Namespace:** `WPSEOPilot\Helpers`
 

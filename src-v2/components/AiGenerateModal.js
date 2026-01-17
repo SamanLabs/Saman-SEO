@@ -9,7 +9,7 @@ import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Get AI status from global settings
-const globalSettings = window?.wpseopilotV2Settings || {};
+const globalSettings = window?.SamanSEOSettings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
 const aiProvider = globalSettings.aiProvider || 'none';
 const aiPilot = globalSettings.aiPilot || null;
@@ -80,7 +80,7 @@ const AiGenerateModal = ({
             }
 
             const response = await apiFetch({
-                path: '/wpseopilot/v2/ai/generate',
+                path: '/saman-seo/v1/ai/generate',
                 method: 'POST',
                 data: {
                     content,

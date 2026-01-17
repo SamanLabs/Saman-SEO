@@ -33,7 +33,7 @@ const MetricsBreakdown = ({ metrics, metricsByCategory, hasKeyphrase }) => {
     };
 
     return (
-        <div className="wpseopilot-metrics-breakdown">
+        <div className="saman-seo-metrics-breakdown">
             {visibleCategories.map((category) => {
                 const group = metricsByCategory?.[category.key];
                 if (!group || group.items.length === 0) return null;
@@ -43,24 +43,24 @@ const MetricsBreakdown = ({ metrics, metricsByCategory, hasKeyphrase }) => {
                     percentage >= 80 ? 'good' : percentage >= 50 ? 'fair' : 'poor';
 
                 return (
-                    <div key={category.key} className="wpseopilot-metric-group">
+                    <div key={category.key} className="saman-seo-metric-group">
                         <div
-                            className="wpseopilot-metric-group__header"
+                            className="saman-seo-metric-group__header"
                             style={{ borderLeftColor: category.color }}
                         >
-                            <span className="wpseopilot-metric-group__icon">
+                            <span className="saman-seo-metric-group__icon">
                                 {category.icon}
                             </span>
-                            <span className="wpseopilot-metric-group__label">
+                            <span className="saman-seo-metric-group__label">
                                 {group.label || category.label}
                             </span>
                             <span
-                                className={`wpseopilot-metric-group__score wpseopilot-metric-group__score--${groupStatus}`}
+                                className={`saman-seo-metric-group__score saman-seo-metric-group__score--${groupStatus}`}
                             >
                                 {calculateGroupScore(group.items)}
                             </span>
                         </div>
-                        <ul className="wpseopilot-metric-list">
+                        <ul className="saman-seo-metric-list">
                             {group.items.map((metric) => (
                                 <MetricItem key={metric.key} metric={metric} />
                             ))}
@@ -70,9 +70,9 @@ const MetricsBreakdown = ({ metrics, metricsByCategory, hasKeyphrase }) => {
             })}
 
             {!hasKeyphrase && (
-                <div className="wpseopilot-keyphrase-notice">
-                    <span className="wpseopilot-keyphrase-notice__icon">💡</span>
-                    <div className="wpseopilot-keyphrase-notice__content">
+                <div className="saman-seo-keyphrase-notice">
+                    <span className="saman-seo-keyphrase-notice__icon">💡</span>
+                    <div className="saman-seo-keyphrase-notice__content">
                         <strong>Add a focus keyphrase</strong>
                         <p>
                             Set a target keyword to unlock 5 additional optimization
@@ -96,23 +96,23 @@ const MetricItem = ({ metric }) => {
 
     return (
         <li
-            className={`wpseopilot-metric-item wpseopilot-metric-item--${statusClass}`}
+            className={`saman-seo-metric-item saman-seo-metric-item--${statusClass}`}
         >
-            <div className="wpseopilot-metric-item__header">
+            <div className="saman-seo-metric-item__header">
                 <span
-                    className={`wpseopilot-metric-item__indicator wpseopilot-metric-item__indicator--${statusClass}`}
+                    className={`saman-seo-metric-item__indicator saman-seo-metric-item__indicator--${statusClass}`}
                 />
-                <span className="wpseopilot-metric-item__label">
+                <span className="saman-seo-metric-item__label">
                     {metric.label}
                 </span>
-                <span className="wpseopilot-metric-item__score">
+                <span className="saman-seo-metric-item__score">
                     {metric.score}/{metric.max}
                 </span>
             </div>
-            <div className="wpseopilot-metric-item__status">{metric.status}</div>
-            <div className="wpseopilot-metric-item__bar">
+            <div className="saman-seo-metric-item__status">{metric.status}</div>
+            <div className="saman-seo-metric-item__bar">
                 <div
-                    className={`wpseopilot-metric-item__fill wpseopilot-metric-item__fill--${statusClass}`}
+                    className={`saman-seo-metric-item__fill saman-seo-metric-item__fill--${statusClass}`}
                     style={{ width: `${scorePercent}%` }}
                 />
             </div>

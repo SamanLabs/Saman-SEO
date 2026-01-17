@@ -25,17 +25,17 @@ const SearchPreview = ({ title, description, url }) => {
     };
 
     return (
-        <div className="wpseopilot-search-preview">
+        <div className="saman-seo-search-preview">
             {/* Favicon and URL breadcrumb */}
-            <div className="wpseopilot-search-preview__breadcrumb">
-                <div className="wpseopilot-search-preview__favicon">
+            <div className="saman-seo-search-preview__breadcrumb">
+                <div className="saman-seo-search-preview__favicon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                         <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
                 </div>
-                <div className="wpseopilot-search-preview__url-container">
-                    <span className="wpseopilot-search-preview__site-name">
+                <div className="saman-seo-search-preview__url-container">
+                    <span className="saman-seo-search-preview__site-name">
                         {(() => {
                             try {
                                 return new URL(url).hostname.replace('www.', '');
@@ -44,9 +44,9 @@ const SearchPreview = ({ title, description, url }) => {
                             }
                         })()}
                     </span>
-                    <span className="wpseopilot-search-preview__url">{formatUrl(url)}</span>
+                    <span className="saman-seo-search-preview__url">{formatUrl(url)}</span>
                 </div>
-                <button type="button" className="wpseopilot-search-preview__menu" aria-label="More options">
+                <button type="button" className="saman-seo-search-preview__menu" aria-label="More options">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
                         <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
@@ -56,12 +56,12 @@ const SearchPreview = ({ title, description, url }) => {
             </div>
 
             {/* Title */}
-            <h3 className="wpseopilot-search-preview__title">
+            <h3 className="saman-seo-search-preview__title">
                 {displayTitle || 'Page Title'}
             </h3>
 
             {/* Description */}
-            <p className="wpseopilot-search-preview__description">
+            <p className="saman-seo-search-preview__description">
                 {displayDesc}
             </p>
         </div>

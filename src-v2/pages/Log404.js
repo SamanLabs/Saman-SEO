@@ -47,7 +47,7 @@ const Log404 = ({ onNavigate }) => {
                 hide_bots: hideBots ? '1' : '0',
                 hide_ignored: showIgnored ? '0' : '1',
             });
-            const response = await apiFetch({ path: `/wpseopilot/v2/404-log?${params}` });
+            const response = await apiFetch({ path: `/saman-seo/v1/404-log?${params}` });
             if (response.success) {
                 setLogEntries(response.data.items);
                 setLogTotal(response.data.total);
@@ -100,7 +100,7 @@ const Log404 = ({ onNavigate }) => {
         setClearingLog(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/404-log',
+                path: '/saman-seo/v1/404-log',
                 method: 'DELETE',
             });
             setLogEntries([]);
@@ -125,7 +125,7 @@ const Log404 = ({ onNavigate }) => {
                 hide_images: hideImages ? '1' : '0',
                 hide_bots: hideBots ? '1' : '0',
             });
-            const response = await apiFetch({ path: `/wpseopilot/v2/404-log/export?${params}` });
+            const response = await apiFetch({ path: `/saman-seo/v1/404-log/export?${params}` });
             if (response.success && response.data.content) {
                 // Trigger download
                 const blob = new Blob([response.data.content], {
@@ -152,7 +152,7 @@ const Log404 = ({ onNavigate }) => {
         setIgnoringEntry(entry.id);
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/404-log/${entry.id}/ignore`,
+                path: `/saman-seo/v1/404-log/${entry.id}/ignore`,
                 method: 'POST',
             });
             // Update the entry in the list
@@ -177,7 +177,7 @@ const Log404 = ({ onNavigate }) => {
         setIgnoringEntry(entry.id);
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/404-log/${entry.id}/ignore`,
+                path: `/saman-seo/v1/404-log/${entry.id}/ignore`,
                 method: 'DELETE',
             });
             // Update the entry in the list

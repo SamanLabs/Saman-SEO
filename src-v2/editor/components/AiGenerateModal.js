@@ -85,7 +85,7 @@ const AiGenerateModal = ({
             }
 
             const response = await apiFetch({
-                path: '/wpseopilot/v2/ai/generate',
+                path: '/saman-seo/v1/ai/generate',
                 method: 'POST',
                 data: {
                     content,
@@ -125,9 +125,9 @@ const AiGenerateModal = ({
     // Show configuration notice if AI is not configured
     if (aiProvider === 'none') {
         return (
-            <div className="wpseopilot-ai-modal-overlay" onClick={handleClose}>
-                <div className="wpseopilot-ai-modal wpseopilot-ai-modal--notice" onClick={(e) => e.stopPropagation()}>
-                    <div className="wpseopilot-ai-modal__header">
+            <div className="saman-seo-ai-modal-overlay" onClick={handleClose}>
+                <div className="saman-seo-ai-modal saman-seo-ai-modal--notice" onClick={(e) => e.stopPropagation()}>
+                    <div className="saman-seo-ai-modal__header">
                         <h3>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="10" />
@@ -137,7 +137,7 @@ const AiGenerateModal = ({
                         </h3>
                         <button
                             type="button"
-                            className="wpseopilot-ai-modal__close"
+                            className="saman-seo-ai-modal__close"
                             onClick={handleClose}
                             aria-label="Close"
                         >
@@ -147,27 +147,27 @@ const AiGenerateModal = ({
                         </button>
                     </div>
 
-                    <div className="wpseopilot-ai-modal__body">
+                    <div className="saman-seo-ai-modal__body">
                         {aiPilot?.installed ? (
-                            <div className="wpseopilot-ai-notice wpseopilot-ai-notice--warning">
-                                <div className="wpseopilot-ai-notice__icon">
+                            <div className="saman-seo-ai-notice saman-seo-ai-notice--warning">
+                                <div className="saman-seo-ai-notice__icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                                     </svg>
                                 </div>
-                                <div className="wpseopilot-ai-notice__content">
+                                <div className="saman-seo-ai-notice__content">
                                     <h4>WP AI Pilot Needs Configuration</h4>
                                     <p>WP AI Pilot is installed but not yet configured. Add an API key to enable AI-powered SEO suggestions.</p>
                                 </div>
                             </div>
                         ) : (
-                            <div className="wpseopilot-ai-notice wpseopilot-ai-notice--info">
-                                <div className="wpseopilot-ai-notice__icon">
+                            <div className="saman-seo-ai-notice saman-seo-ai-notice--info">
+                                <div className="saman-seo-ai-notice__icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                                     </svg>
                                 </div>
-                                <div className="wpseopilot-ai-notice__content">
+                                <div className="saman-seo-ai-notice__content">
                                     <h4>Enhance with WP AI Pilot</h4>
                                     <p>Install WP AI Pilot to unlock AI-powered title and meta description generation.</p>
                                 </div>
@@ -175,10 +175,10 @@ const AiGenerateModal = ({
                         )}
                     </div>
 
-                    <div className="wpseopilot-ai-modal__footer">
+                    <div className="saman-seo-ai-modal__footer">
                         <button
                             type="button"
-                            className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--secondary"
+                            className="saman-seo-ai-modal__btn saman-seo-ai-modal__btn--secondary"
                             onClick={handleClose}
                         >
                             Cancel
@@ -186,14 +186,14 @@ const AiGenerateModal = ({
                         {aiPilot?.installed ? (
                             <a
                                 href={aiPilot.settingsUrl}
-                                className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--primary"
+                                className="saman-seo-ai-modal__btn saman-seo-ai-modal__btn--primary"
                             >
                                 Configure WP AI Pilot
                             </a>
                         ) : (
                             <a
                                 href="/wp-admin/plugin-install.php?s=wp+ai+pilot&tab=search"
-                                className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--primary"
+                                className="saman-seo-ai-modal__btn saman-seo-ai-modal__btn--primary"
                             >
                                 Install WP AI Pilot
                             </a>
@@ -205,9 +205,9 @@ const AiGenerateModal = ({
     }
 
     return (
-        <div className="wpseopilot-ai-modal-overlay" onClick={handleClose}>
-            <div className="wpseopilot-ai-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="wpseopilot-ai-modal__header">
+        <div className="saman-seo-ai-modal-overlay" onClick={handleClose}>
+            <div className="saman-seo-ai-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="saman-seo-ai-modal__header">
                     <h3>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" />
@@ -216,7 +216,7 @@ const AiGenerateModal = ({
                         Generate {fieldType === 'title' ? 'Title' : 'Description'}
                     </h3>
                     {aiProvider === 'wp-ai-pilot' && (
-                        <span className="wpseopilot-ai-badge">
+                        <span className="saman-seo-ai-badge">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                             </svg>
@@ -225,7 +225,7 @@ const AiGenerateModal = ({
                     )}
                     <button
                         type="button"
-                        className="wpseopilot-ai-modal__close"
+                        className="saman-seo-ai-modal__close"
                         onClick={handleClose}
                         aria-label="Close"
                     >
@@ -235,16 +235,16 @@ const AiGenerateModal = ({
                     </button>
                 </div>
 
-                <div className="wpseopilot-ai-modal__body">
+                <div className="saman-seo-ai-modal__body">
                     {/* Context Toggle */}
-                    <div className="wpseopilot-ai-modal__option">
-                        <label className="wpseopilot-ai-modal__checkbox">
+                    <div className="saman-seo-ai-modal__option">
+                        <label className="saman-seo-ai-modal__checkbox">
                             <input
                                 type="checkbox"
                                 checked={includeContext}
                                 onChange={(e) => setIncludeContext(e.target.checked)}
                             />
-                            <span className="wpseopilot-ai-modal__checkbox-label">
+                            <span className="saman-seo-ai-modal__checkbox-label">
                                 Include post content as context
                             </span>
                         </label>
@@ -252,16 +252,16 @@ const AiGenerateModal = ({
 
                     {/* Context Preview */}
                     {includeContext && postTitle && (
-                        <div className="wpseopilot-ai-modal__context-preview">
-                            <div className="wpseopilot-ai-modal__context-item">
-                                <span className="wpseopilot-ai-modal__context-key">Post:</span>
-                                <span className="wpseopilot-ai-modal__context-value">{postTitle}</span>
+                        <div className="saman-seo-ai-modal__context-preview">
+                            <div className="saman-seo-ai-modal__context-item">
+                                <span className="saman-seo-ai-modal__context-key">Post:</span>
+                                <span className="saman-seo-ai-modal__context-value">{postTitle}</span>
                             </div>
                         </div>
                     )}
 
                     {/* Custom Prompt */}
-                    <div className="wpseopilot-ai-modal__field">
+                    <div className="saman-seo-ai-modal__field">
                         <label htmlFor="ai-custom-prompt">Custom instructions (optional)</label>
                         <textarea
                             id="ai-custom-prompt"
@@ -274,7 +274,7 @@ const AiGenerateModal = ({
 
                     {/* Error Message */}
                     {error && (
-                        <div className="wpseopilot-ai-modal__error">
+                        <div className="saman-seo-ai-modal__error">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="10" />
                                 <path d="M12 8v4m0 4h.01" />
@@ -285,11 +285,11 @@ const AiGenerateModal = ({
 
                     {/* Generated Result */}
                     {generatedResult && (
-                        <div className="wpseopilot-ai-modal__result">
+                        <div className="saman-seo-ai-modal__result">
                             <label>Generated {fieldType === 'title' ? 'title' : 'description'}:</label>
-                            <div className="wpseopilot-ai-modal__result-box">
+                            <div className="saman-seo-ai-modal__result-box">
                                 <p>{generatedResult}</p>
-                                <span className="wpseopilot-ai-modal__char-count">
+                                <span className="saman-seo-ai-modal__char-count">
                                     {generatedResult.length} characters
                                 </span>
                             </div>
@@ -297,10 +297,10 @@ const AiGenerateModal = ({
                     )}
                 </div>
 
-                <div className="wpseopilot-ai-modal__footer">
+                <div className="saman-seo-ai-modal__footer">
                     <button
                         type="button"
-                        className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--secondary"
+                        className="saman-seo-ai-modal__btn saman-seo-ai-modal__btn--secondary"
                         onClick={handleClose}
                     >
                         Cancel
@@ -310,7 +310,7 @@ const AiGenerateModal = ({
                         <>
                             <button
                                 type="button"
-                                className="wpseopilot-ai-modal__btn"
+                                className="saman-seo-ai-modal__btn"
                                 onClick={handleGenerate}
                                 disabled={isGenerating}
                             >
@@ -318,7 +318,7 @@ const AiGenerateModal = ({
                             </button>
                             <button
                                 type="button"
-                                className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--primary"
+                                className="saman-seo-ai-modal__btn saman-seo-ai-modal__btn--primary"
                                 onClick={handleApply}
                             >
                                 Apply
@@ -327,13 +327,13 @@ const AiGenerateModal = ({
                     ) : (
                         <button
                             type="button"
-                            className="wpseopilot-ai-modal__btn wpseopilot-ai-modal__btn--primary"
+                            className="saman-seo-ai-modal__btn saman-seo-ai-modal__btn--primary"
                             onClick={handleGenerate}
                             disabled={isGenerating}
                         >
                             {isGenerating ? (
                                 <>
-                                    <span className="wpseopilot-ai-modal__spinner"></span>
+                                    <span className="saman-seo-ai-modal__spinner"></span>
                                     Generating...
                                 </>
                             ) : (

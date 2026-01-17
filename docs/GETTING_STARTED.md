@@ -1,6 +1,6 @@
-# Getting Started with WP SEO Pilot
+# Getting Started with Saman SEO
 
-This guide will help you install, configure, and start using WP SEO Pilot for your WordPress site.
+This guide will help you install, configure, and start using Saman SEO for your WordPress site.
 
 ---
 
@@ -18,7 +18,7 @@ This guide will help you install, configure, and start using WP SEO Pilot for yo
 1. Download and extract the plugin ZIP file
 2. Upload the `wp-seo-pilot` folder to `/wp-content/plugins/`
 3. Navigate to **Plugins** in your WordPress admin
-4. Find **WP SEO Pilot** and click **Activate**
+4. Find **Saman SEO** and click **Activate**
 
 ### Via WP-CLI
 
@@ -30,7 +30,7 @@ wp plugin install wp-seo-pilot --activate
 
 ## Initial Configuration
 
-After activation, WP SEO Pilot will automatically:
+After activation, Saman SEO will automatically:
 - Create necessary database tables for redirects and 404 logging
 - Register default settings with sensible fallbacks
 - Set up sitemap functionality
@@ -38,7 +38,7 @@ After activation, WP SEO Pilot will automatically:
 
 ### Step 1: Configure Site-Wide Defaults
 
-Navigate to **WP SEO Pilot → General Settings** to configure:
+Navigate to **Saman SEO → General Settings** to configure:
 
 #### Title Templates
 
@@ -80,7 +80,7 @@ Your site tagline or a brief description of what your site offers.
 
 ### Step 2: Configure Search Appearance
 
-Navigate to **WP SEO Pilot → Search Appearance** to set:
+Navigate to **Saman SEO → Search Appearance** to set:
 
 #### Homepage SEO
 
@@ -107,7 +107,7 @@ For each post type (Posts, Pages, Custom Post Types), configure:
 
 ### Step 3: Configure Social Media
 
-Navigate to **WP SEO Pilot → Social Settings**:
+Navigate to **Saman SEO → Social Settings**:
 
 #### Open Graph Defaults
 
@@ -132,7 +132,7 @@ Navigate to **WP SEO Pilot → Social Settings**:
 
 ### Using the Classic Editor
 
-When editing any post or page, look for the **WP SEO Pilot** meta box in the sidebar:
+When editing any post or page, look for the **Saman SEO** meta box in the sidebar:
 
 #### Basic Fields
 
@@ -153,13 +153,13 @@ When editing any post or page, look for the **WP SEO Pilot** meta box in the sid
 ### Using the Block Editor (Gutenberg)
 
 1. Open any post or page in the block editor
-2. Look for the **WP SEO Pilot** panel in the right sidebar
+2. Look for the **Saman SEO** panel in the right sidebar
 3. Configure the same options as classic editor
 4. See live preview of how your content will appear in search results
 
 ### SEO Score
 
-WP SEO Pilot calculates an SEO score based on:
+Saman SEO calculates an SEO score based on:
 - Title length (optimal: 50-60 characters)
 - Description length (optimal: 150-160 characters)
 - Keyword usage
@@ -186,7 +186,7 @@ Every post and page gets granular control over:
 
 ### 2. XML Sitemaps
 
-Navigate to **WP SEO Pilot → Sitemaps**:
+Navigate to **Saman SEO → Sitemaps**:
 
 - **Enable/Disable Sitemaps**: Toggle sitemap generation
 - **Post Types**: Choose which content types to include
@@ -212,7 +212,7 @@ See **[Sitemap Configuration](SITEMAPS.md)** for advanced options.
 
 ### 3. Redirect Manager
 
-Navigate to **WP SEO Pilot → Redirects**:
+Navigate to **Saman SEO → Redirects**:
 
 - Create 301, 302, 307, or 308 redirects
 - Automatic redirect suggestions when you change post slugs
@@ -230,7 +230,7 @@ See **[Redirect Manager](REDIRECTS.md)** for programmatic usage.
 
 ### 4. 404 Monitoring
 
-Navigate to **WP SEO Pilot → 404 Monitor**:
+Navigate to **Saman SEO → 404 Monitor**:
 
 - View all 404 errors on your site
 - See hit counts and last occurrence
@@ -244,7 +244,7 @@ Navigate to **WP SEO Pilot → 404 Monitor**:
 
 ### 5. SEO Audit Dashboard
 
-Navigate to **WP SEO Pilot → Audit**:
+Navigate to **Saman SEO → Audit**:
 
 - Site-wide SEO analysis
 - Missing meta title/description detection
@@ -254,7 +254,7 @@ Navigate to **WP SEO Pilot → Audit**:
 
 ### 6. Internal Linking Engine
 
-Navigate to **WP SEO Pilot → Internal Linking**:
+Navigate to **Saman SEO → Internal Linking**:
 
 Automatically insert internal links based on rules:
 
@@ -267,7 +267,7 @@ See **[Internal Linking Guide](INTERNAL_LINKING.md)** for details.
 
 ### 7. AI-Powered Suggestions
 
-Navigate to **WP SEO Pilot → AI Assistant**:
+Navigate to **Saman SEO → AI Assistant**:
 
 **Requirements:**
 - OpenAI API key (configure in General Settings)
@@ -287,7 +287,7 @@ See **[AI Assistant Guide](AI_ASSISTANT.md)** for configuration.
 ### For New Posts
 
 1. Write your content in the WordPress editor
-2. Scroll to the **WP SEO Pilot** meta box
+2. Scroll to the **Saman SEO** meta box
 3. Review the auto-generated title (from template)
 4. Write a compelling meta description (150-160 chars)
 5. Add a focus keyword (optional)
@@ -297,7 +297,7 @@ See **[AI Assistant Guide](AI_ASSISTANT.md)** for configuration.
 
 ### For Existing Content
 
-1. Navigate to **WP SEO Pilot → Audit**
+1. Navigate to **Saman SEO → Audit**
 2. Review flagged issues (missing descriptions, etc.)
 3. Click through to edit posts with problems
 4. Fill in missing metadata
@@ -305,10 +305,10 @@ See **[AI Assistant Guide](AI_ASSISTANT.md)** for configuration.
 
 ### For Site-Wide Changes
 
-1. Navigate to **WP SEO Pilot → General Settings**
+1. Navigate to **Saman SEO → General Settings**
 2. Update title templates or defaults
 3. Changes apply immediately to all posts without custom values
-4. Use **WP SEO Pilot → Search Appearance** to configure post type defaults
+4. Use **Saman SEO → Search Appearance** to configure post type defaults
 
 ---
 
@@ -340,7 +340,7 @@ This format is:
 
 ### Other SEO Plugins
 
-WP SEO Pilot automatically detects and gracefully coexists with:
+Saman SEO automatically detects and gracefully coexists with:
 - Yoast SEO
 - Rank Math
 - All in One SEO Pack
@@ -352,7 +352,7 @@ WP SEO Pilot automatically detects and gracefully coexists with:
 
 ### Theme Compatibility
 
-WP SEO Pilot works with any WordPress theme because:
+Saman SEO works with any WordPress theme because:
 - Meta tags render via `wp_head` hook (standard)
 - No theme modifications required
 - Template tags available for breadcrumbs if desired
@@ -379,7 +379,7 @@ Works seamlessly with:
 
 ## Next Steps
 
-Now that you have WP SEO Pilot configured, explore these guides:
+Now that you have Saman SEO configured, explore these guides:
 
 - **[Developer Guide](DEVELOPER_GUIDE.md)** - Extend functionality with filters and hooks
 - **[Filter Reference](FILTERS.md)** - Complete filter documentation

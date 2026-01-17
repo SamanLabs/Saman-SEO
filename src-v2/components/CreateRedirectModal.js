@@ -24,7 +24,7 @@ const CreateRedirectModal = ({ entry, onClose, onSuccess }) => {
             setLoading(true);
             try {
                 const response = await apiFetch({
-                    path: `/wpseopilot/v2/404-log/${entry.id}/suggestions`,
+                    path: `/saman-seo/v1/404-log/${entry.id}/suggestions`,
                 });
                 if (response.success && response.data.suggestions) {
                     setSuggestions(response.data.suggestions);
@@ -56,7 +56,7 @@ const CreateRedirectModal = ({ entry, onClose, onSuccess }) => {
 
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/404-log/${entry.id}/create-redirect`,
+                path: `/saman-seo/v1/404-log/${entry.id}/create-redirect`,
                 method: 'POST',
                 data: {
                     target: targetUrl,

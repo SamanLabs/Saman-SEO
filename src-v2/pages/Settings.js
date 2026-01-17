@@ -109,7 +109,7 @@ const Settings = () => {
     const fetchSettings = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await apiFetch({ path: '/wpseopilot/v2/settings' });
+            const res = await apiFetch({ path: '/saman-seo/v1/settings' });
             if (res.success && res.data) {
                 setSettings(prev => ({ ...prev, ...res.data }));
             }
@@ -135,7 +135,7 @@ const Settings = () => {
         setSaving(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/settings',
+                path: '/saman-seo/v1/settings',
                 method: 'POST',
                 data: settings,
             });
@@ -155,7 +155,7 @@ const Settings = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `wpseopilot-settings-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `saman-seo-settings-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
     };
@@ -190,7 +190,7 @@ const Settings = () => {
         setResettingWizard(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/setup/reset',
+                path: '/saman-seo/v1/setup/reset',
                 method: 'POST',
             });
             alert('Setup wizard has been reset. It will appear on the next page load.');
@@ -215,7 +215,7 @@ const Settings = () => {
             <div className="page-header">
                 <div>
                     <h1>Settings</h1>
-                    <p>Configure WP SEO Pilot features, integrations, and preferences.</p>
+                    <p>Configure Saman SEO features, integrations, and preferences.</p>
                 </div>
                 <div className="page-header__actions">
                     {saved && <span className="save-indicator">Saved</span>}
@@ -750,14 +750,14 @@ const BreadcrumbsTab = ({ settings, updateSetting }) => {
                 <div className="side-card">
                     <h4>Usage</h4>
                     <p className="muted">Add breadcrumbs to your theme using:</p>
-                    <code className="code-block">[wpseopilot_breadcrumbs]</code>
+                    <code className="code-block">[Saman_seo_breadcrumbs]</code>
                     <p className="muted" style={{ marginTop: '8px' }}>Or in PHP:</p>
-                    <code className="code-block">wpseopilot_breadcrumbs();</code>
+                    <code className="code-block">Saman_seo_breadcrumbs();</code>
                 </div>
 
                 <div className="side-card">
                     <h4>Gutenberg Block</h4>
-                    <p className="muted">Search for "WP SEO Pilot Breadcrumbs" in the block inserter to add breadcrumbs to any page.</p>
+                    <p className="muted">Search for "Saman SEO Breadcrumbs" in the block inserter to add breadcrumbs to any page.</p>
                 </div>
 
                 <div className="side-card success">
@@ -932,7 +932,7 @@ const AdvancedTab = ({ settings, updateSetting }) => {
             <div className="settings-main">
                 <section className="panel">
                     <h3>User Interface</h3>
-                    <p className="panel-desc">Customize how WP SEO Pilot appears in your WordPress admin.</p>
+                    <p className="panel-desc">Customize how Saman SEO appears in your WordPress admin.</p>
 
                     <div className="settings-row compact">
                         <div className="settings-label">
@@ -1472,7 +1472,7 @@ const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resett
                 <div className="side-card">
                     <h4>Legacy Interface</h4>
                     <p className="muted">Access V1 for features not yet migrated.</p>
-                    <a href="admin.php?page=wpseopilot" className="button ghost">Open V1</a>
+                    <a href="admin.php?page=saman-seo" className="button ghost">Open V1</a>
                 </div>
             </aside>
         </div>

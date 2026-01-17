@@ -2,11 +2,11 @@
 /**
  * General SEO Assistant
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api\Assistants;
+namespace Saman\SEO\Api\Assistants;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -32,7 +32,7 @@ class General_SEO_Assistant extends Base_Assistant {
      * @return string
      */
     public function get_name() {
-        return __( 'SEO Assistant', 'wp-seo-pilot' );
+        return __( 'SEO Assistant', 'saman-seo' );
     }
 
     /**
@@ -41,7 +41,7 @@ class General_SEO_Assistant extends Base_Assistant {
      * @return string
      */
     public function get_description() {
-        return __( 'Your helpful SEO buddy for all things search optimization.', 'wp-seo-pilot' );
+        return __( 'Your helpful SEO buddy for all things search optimization.', 'saman-seo' );
     }
 
     /**
@@ -85,7 +85,7 @@ GOOD: 'Three things to fix: [specific list]'";
      * @return string
      */
     public function get_initial_message() {
-        return __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'wp-seo-pilot' );
+        return __( "Hey! I'm your SEO assistant. Ask me about meta tags, keywords, content optimization, or anything SEO-related.", 'saman-seo' );
     }
 
     /**
@@ -95,10 +95,10 @@ GOOD: 'Three things to fix: [specific list]'";
      */
     public function get_suggested_prompts() {
         return [
-            __( 'How do I write a good meta description?', 'wp-seo-pilot' ),
-            __( 'What makes a title tag effective?', 'wp-seo-pilot' ),
-            __( 'Help me find keywords for my blog post', 'wp-seo-pilot' ),
-            __( 'What are internal links and why do they matter?', 'wp-seo-pilot' ),
+            __( 'How do I write a good meta description?', 'saman-seo' ),
+            __( 'What makes a title tag effective?', 'saman-seo' ),
+            __( 'Help me find keywords for my blog post', 'saman-seo' ),
+            __( 'What are internal links and why do they matter?', 'saman-seo' ),
         ];
     }
 
@@ -125,8 +125,8 @@ GOOD: 'Three things to fix: [specific list]'";
                 $context_parts[] = '- Status: ' . $post->post_status;
 
                 // Get meta title/description if set
-                $meta_title = get_post_meta( $post->ID, '_wpseopilot_title', true );
-                $meta_desc = get_post_meta( $post->ID, '_wpseopilot_description', true );
+                $meta_title = get_post_meta( $post->ID, '_SAMAN_SEO_title', true );
+                $meta_desc = get_post_meta( $post->ID, '_SAMAN_SEO_description', true );
 
                 if ( $meta_title ) {
                     $context_parts[] = '- SEO Title: ' . $meta_title;

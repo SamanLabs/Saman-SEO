@@ -108,10 +108,10 @@ const VariablePicker = ({
     // Compact mode - just an icon button
     if (compact) {
         return (
-            <div className="wpseopilot-variable-picker wpseopilot-variable-picker--compact" ref={containerRef}>
+            <div className="saman-seo-variable-picker saman-seo-variable-picker--compact" ref={containerRef}>
                 <button
                     type="button"
-                    className="wpseopilot-template-input__action-btn wpseopilot-template-input__action-btn--vars"
+                    className="saman-seo-template-input__action-btn saman-seo-template-input__action-btn--vars"
                     onClick={handleToggle}
                     disabled={disabled}
                     title="Insert variable"
@@ -127,8 +127,8 @@ const VariablePicker = ({
                 </button>
 
                 {isOpen && (
-                    <div className="wpseopilot-variable-picker__dropdown">
-                        <div className="wpseopilot-variable-picker__search">
+                    <div className="saman-seo-variable-picker__dropdown">
+                        <div className="saman-seo-variable-picker__search">
                             <input
                                 type="text"
                                 placeholder="Search variables..."
@@ -138,30 +138,30 @@ const VariablePicker = ({
                             />
                         </div>
 
-                        <div className="wpseopilot-variable-picker__groups">
+                        <div className="saman-seo-variable-picker__groups">
                             {Object.entries(filteredVariables).map(([groupKey, group]) => (
-                                <div key={groupKey} className="wpseopilot-variable-picker__group">
-                                    <div className={`wpseopilot-variable-picker__group-label wpseopilot-variable-picker__group-label--${groupKey}`}>
+                                <div key={groupKey} className="saman-seo-variable-picker__group">
+                                    <div className={`saman-seo-variable-picker__group-label saman-seo-variable-picker__group-label--${groupKey}`}>
                                         {group.label}
                                     </div>
-                                    <div className="wpseopilot-variable-picker__items">
+                                    <div className="saman-seo-variable-picker__items">
                                         {group.vars.map((variable) => (
                                             <button
                                                 key={variable.tag}
                                                 type="button"
-                                                className="wpseopilot-variable-picker__item"
+                                                className="saman-seo-variable-picker__item"
                                                 onClick={() => handleSelect(variable)}
                                             >
-                                                <div className="wpseopilot-variable-picker__item-header">
-                                                    <code className={`wpseopilot-variable-picker__tag wpseopilot-variable-picker__tag--${groupKey}`}>
+                                                <div className="saman-seo-variable-picker__item-header">
+                                                    <code className={`saman-seo-variable-picker__tag saman-seo-variable-picker__tag--${groupKey}`}>
                                                         {variable.tag}
                                                     </code>
-                                                    <span className="wpseopilot-variable-picker__label">
+                                                    <span className="saman-seo-variable-picker__label">
                                                         {variable.label}
                                                     </span>
                                                 </div>
                                                 {variable.preview && (
-                                                    <div className="wpseopilot-variable-picker__preview">
+                                                    <div className="saman-seo-variable-picker__preview">
                                                         {variable.preview}
                                                     </div>
                                                 )}
@@ -172,7 +172,7 @@ const VariablePicker = ({
                             ))}
 
                             {Object.keys(filteredVariables).length === 0 && (
-                                <div className="wpseopilot-variable-picker__empty">
+                                <div className="saman-seo-variable-picker__empty">
                                     No variables found
                                 </div>
                             )}
@@ -185,10 +185,10 @@ const VariablePicker = ({
 
     // Full mode - button with text
     return (
-        <div className="wpseopilot-variable-picker" ref={containerRef}>
+        <div className="saman-seo-variable-picker" ref={containerRef}>
             <button
                 type="button"
-                className="wpseopilot-variable-picker__trigger"
+                className="saman-seo-variable-picker__trigger"
                 onClick={handleToggle}
                 disabled={disabled}
                 title="Insert variable"
@@ -200,8 +200,8 @@ const VariablePicker = ({
             </button>
 
             {isOpen && (
-                <div className="wpseopilot-variable-picker__dropdown">
-                    <div className="wpseopilot-variable-picker__search">
+                <div className="saman-seo-variable-picker__dropdown">
+                    <div className="saman-seo-variable-picker__search">
                         <input
                             type="text"
                             placeholder="Search variables..."
@@ -211,30 +211,30 @@ const VariablePicker = ({
                         />
                     </div>
 
-                    <div className="wpseopilot-variable-picker__groups">
+                    <div className="saman-seo-variable-picker__groups">
                         {Object.entries(filteredVariables).map(([groupKey, group]) => (
-                            <div key={groupKey} className="wpseopilot-variable-picker__group">
-                                <div className={`wpseopilot-variable-picker__group-label wpseopilot-variable-picker__group-label--${groupKey}`}>
+                            <div key={groupKey} className="saman-seo-variable-picker__group">
+                                <div className={`saman-seo-variable-picker__group-label saman-seo-variable-picker__group-label--${groupKey}`}>
                                     {group.label}
                                 </div>
-                                <div className="wpseopilot-variable-picker__items">
+                                <div className="saman-seo-variable-picker__items">
                                     {group.vars.map((variable) => (
                                         <button
                                             key={variable.tag}
                                             type="button"
-                                            className="wpseopilot-variable-picker__item"
+                                            className="saman-seo-variable-picker__item"
                                             onClick={() => handleSelect(variable)}
                                         >
-                                            <div className="wpseopilot-variable-picker__item-header">
-                                                <code className={`wpseopilot-variable-picker__tag wpseopilot-variable-picker__tag--${groupKey}`}>
+                                            <div className="saman-seo-variable-picker__item-header">
+                                                <code className={`saman-seo-variable-picker__tag saman-seo-variable-picker__tag--${groupKey}`}>
                                                     {variable.tag}
                                                 </code>
-                                                <span className="wpseopilot-variable-picker__label">
+                                                <span className="saman-seo-variable-picker__label">
                                                     {variable.label}
                                                 </span>
                                             </div>
                                             {variable.preview && (
-                                                <div className="wpseopilot-variable-picker__preview">
+                                                <div className="saman-seo-variable-picker__preview">
                                                     {variable.preview}
                                                 </div>
                                             )}
@@ -245,7 +245,7 @@ const VariablePicker = ({
                         ))}
 
                         {Object.keys(filteredVariables).length === 0 && (
-                            <div className="wpseopilot-variable-picker__empty">
+                            <div className="saman-seo-variable-picker__empty">
                                 No variables found
                             </div>
                         )}

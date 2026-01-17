@@ -33,9 +33,9 @@ const InstantIndexing = ({ onNavigate }) => {
         const fetchInitial = async () => {
             try {
                 const [settingsRes, optionsRes, statsRes] = await Promise.all([
-                    apiFetch({ path: '/wpseopilot/v2/indexnow/settings' }),
-                    apiFetch({ path: '/wpseopilot/v2/indexnow/options' }),
-                    apiFetch({ path: '/wpseopilot/v2/indexnow/stats' }),
+                    apiFetch({ path: '/saman-seo/v1/indexnow/settings' }),
+                    apiFetch({ path: '/saman-seo/v1/indexnow/options' }),
+                    apiFetch({ path: '/saman-seo/v1/indexnow/stats' }),
                 ]);
 
                 if (settingsRes.success) {
@@ -61,7 +61,7 @@ const InstantIndexing = ({ onNavigate }) => {
             setLoading(true);
             try {
                 const response = await apiFetch({
-                    path: `/wpseopilot/v2/indexnow/posts?post_type=${postType}&page=${page}&per_page=20&search=${search}&status_filter=${statusFilter}`,
+                    path: `/saman-seo/v1/indexnow/posts?post_type=${postType}&page=${page}&per_page=20&search=${search}&status_filter=${statusFilter}`,
                 });
 
                 if (response.success) {
@@ -88,7 +88,7 @@ const InstantIndexing = ({ onNavigate }) => {
         const fetchLogs = async () => {
             try {
                 const response = await apiFetch({
-                    path: '/wpseopilot/v2/indexnow/logs?per_page=50',
+                    path: '/saman-seo/v1/indexnow/logs?per_page=50',
                 });
                 if (response.success) {
                     setLogs(response.data.items || []);
@@ -127,7 +127,7 @@ const InstantIndexing = ({ onNavigate }) => {
         setSubmitting(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/indexnow/bulk-submit',
+                path: '/saman-seo/v1/indexnow/bulk-submit',
                 method: 'POST',
                 data: { post_ids: selectedPosts },
             });
@@ -136,9 +136,9 @@ const InstantIndexing = ({ onNavigate }) => {
                 // Refresh posts and stats
                 const [postsRes, statsRes] = await Promise.all([
                     apiFetch({
-                        path: `/wpseopilot/v2/indexnow/posts?post_type=${postType}&page=${page}&per_page=20`,
+                        path: `/saman-seo/v1/indexnow/posts?post_type=${postType}&page=${page}&per_page=20`,
                     }),
-                    apiFetch({ path: '/wpseopilot/v2/indexnow/stats' }),
+                    apiFetch({ path: '/saman-seo/v1/indexnow/stats' }),
                 ]);
 
                 if (postsRes.success) {
@@ -161,13 +161,13 @@ const InstantIndexing = ({ onNavigate }) => {
     const handleSubmitSingle = useCallback(async (postId) => {
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/indexnow/submit-post/${postId}`,
+                path: `/saman-seo/v1/indexnow/submit-post/${postId}`,
                 method: 'POST',
             });
 
             // Refresh posts
             const response = await apiFetch({
-                path: `/wpseopilot/v2/indexnow/posts?post_type=${postType}&page=${page}&per_page=20`,
+                path: `/saman-seo/v1/indexnow/posts?post_type=${postType}&page=${page}&per_page=20`,
             });
             if (response.success) {
                 setPosts(response.data.posts || []);

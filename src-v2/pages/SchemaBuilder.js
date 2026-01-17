@@ -182,7 +182,7 @@ const SchemaBuilder = ({ onNavigate }) => {
 
     useEffect(() => {
         // Fetch templates from server
-        apiFetch({ path: '/wpseopilot/v2/tools/schema/templates' })
+        apiFetch({ path: '/saman-seo/v1/tools/schema/templates' })
             .then(setTemplates)
             .catch(err => console.error('Failed to fetch templates:', err));
     }, []);
@@ -213,7 +213,7 @@ const SchemaBuilder = ({ onNavigate }) => {
         setDetecting(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/schema/detect',
+                path: '/saman-seo/v1/tools/schema/detect',
                 method: 'POST',
                 data: { url: postUrl },
             });
@@ -237,7 +237,7 @@ const SchemaBuilder = ({ onNavigate }) => {
         setGenerating(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/schema/generate',
+                path: '/saman-seo/v1/tools/schema/generate',
                 method: 'POST',
                 data: {
                     type: selectedType,
@@ -261,7 +261,7 @@ const SchemaBuilder = ({ onNavigate }) => {
         setValidating(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/schema/validate',
+                path: '/saman-seo/v1/tools/schema/validate',
                 method: 'POST',
                 data: { schema: generatedSchema },
             });
@@ -293,7 +293,7 @@ const SchemaBuilder = ({ onNavigate }) => {
             };
             
             apiFetch({
-                path: '/wpseopilot/v2/tools/schema/templates',
+                path: '/saman-seo/v1/tools/schema/templates',
                 method: 'POST',
                 data: newTemplate,
             })
@@ -316,7 +316,7 @@ const SchemaBuilder = ({ onNavigate }) => {
         setImporting(true);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/tools/schema/import',
+                path: '/saman-seo/v1/tools/schema/import',
                 method: 'POST',
                 data: { url: importUrl },
             });
@@ -340,7 +340,7 @@ const SchemaBuilder = ({ onNavigate }) => {
 		setSaving(true);
 		try {
 			const response = await apiFetch({
-				path: '/wpseopilot/v2/tools/schema/save',
+				path: '/saman-seo/v1/tools/schema/save',
 				method: 'POST',
 				data: {
 					schema: generatedSchema,

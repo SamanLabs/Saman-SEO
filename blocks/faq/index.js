@@ -1,5 +1,5 @@
 /**
- * WP SEO Pilot FAQ Block
+ * Saman SEO FAQ Block
  *
  * Creates an FAQ section with automatic FAQPage schema markup.
  *
@@ -13,9 +13,9 @@
 	const { PanelBody, ToggleControl, Button, TextControl } = components;
 	const { __ } = i18n;
 
-	registerBlockType( 'wpseopilot/faq', {
-		title: __( 'FAQ', 'wp-seo-pilot' ),
-		description: __( 'Add frequently asked questions with automatic schema markup for rich results.', 'wp-seo-pilot' ),
+	registerBlockType( 'samanseo/faq', {
+		title: __( 'FAQ', 'saman-seo' ),
+		description: __( 'Add frequently asked questions with automatic schema markup for rich results.', 'saman-seo' ),
 		category: 'widgets',
 		icon: 'editor-help',
 		keywords: [ 'faq', 'questions', 'answers', 'schema', 'seo' ],
@@ -42,7 +42,7 @@
 		edit: function( props ) {
 			const { attributes, setAttributes } = props;
 			const { faqs, showSchema, style } = attributes;
-			const blockProps = useBlockProps( { className: 'wpseopilot-faq-block' } );
+			const blockProps = useBlockProps( { className: 'samanseo-faq-block' } );
 
 			const updateFaq = ( index, field, value ) => {
 				const newFaqs = [ ...faqs ];
@@ -80,10 +80,10 @@
 					null,
 					el(
 						PanelBody,
-						{ title: __( 'FAQ Settings', 'wp-seo-pilot' ), initialOpen: true },
+						{ title: __( 'FAQ Settings', 'saman-seo' ), initialOpen: true },
 						el( ToggleControl, {
-							label: __( 'Include FAQPage Schema', 'wp-seo-pilot' ),
-							help: __( 'Add structured data for Google rich results.', 'wp-seo-pilot' ),
+							label: __( 'Include FAQPage Schema', 'saman-seo' ),
+							help: __( 'Add structured data for Google rich results.', 'saman-seo' ),
 							checked: showSchema,
 							onChange: function( value ) {
 								setAttributes( { showSchema: value } );
@@ -94,42 +94,42 @@
 				el(
 					'div',
 					blockProps,
-					el( 'div', { className: 'wpseopilot-faq-header' },
-						el( 'span', { className: 'wpseopilot-faq-icon' }, '?'),
-						el( 'span', { className: 'wpseopilot-faq-label' }, __( 'FAQ Block', 'wp-seo-pilot' ) ),
-						showSchema && el( 'span', { className: 'wpseopilot-faq-badge' }, __( 'Schema Enabled', 'wp-seo-pilot' ) )
+					el( 'div', { className: 'samanseo-faq-header' },
+						el( 'span', { className: 'samanseo-faq-icon' }, '?'),
+						el( 'span', { className: 'samanseo-faq-label' }, __( 'FAQ Block', 'saman-seo' ) ),
+						showSchema && el( 'span', { className: 'samanseo-faq-badge' }, __( 'Schema Enabled', 'saman-seo' ) )
 					),
 					el(
 						'div',
-						{ className: 'wpseopilot-faq-items' },
+						{ className: 'samanseo-faq-items' },
 						faqs.map( ( faq, index ) =>
 							el(
 								'div',
-								{ key: index, className: 'wpseopilot-faq-item' },
+								{ key: index, className: 'samanseo-faq-item' },
 								el(
 									'div',
-									{ className: 'wpseopilot-faq-item-header' },
-									el( 'span', { className: 'wpseopilot-faq-number' }, ( index + 1 ) + '.' ),
+									{ className: 'samanseo-faq-item-header' },
+									el( 'span', { className: 'samanseo-faq-number' }, ( index + 1 ) + '.' ),
 									el(
 										'div',
-										{ className: 'wpseopilot-faq-controls' },
+										{ className: 'samanseo-faq-controls' },
 										el( Button, {
 											icon: 'arrow-up-alt2',
-											label: __( 'Move up', 'wp-seo-pilot' ),
+											label: __( 'Move up', 'saman-seo' ),
 											onClick: () => moveFaq( index, -1 ),
 											disabled: index === 0,
 											isSmall: true,
 										} ),
 										el( Button, {
 											icon: 'arrow-down-alt2',
-											label: __( 'Move down', 'wp-seo-pilot' ),
+											label: __( 'Move down', 'saman-seo' ),
 											onClick: () => moveFaq( index, 1 ),
 											disabled: index === faqs.length - 1,
 											isSmall: true,
 										} ),
 										el( Button, {
 											icon: 'trash',
-											label: __( 'Remove', 'wp-seo-pilot' ),
+											label: __( 'Remove', 'saman-seo' ),
 											onClick: () => removeFaq( index ),
 											isSmall: true,
 											isDestructive: true,
@@ -138,16 +138,16 @@
 								),
 								el( RichText, {
 									tagName: 'div',
-									className: 'wpseopilot-faq-question',
-									placeholder: __( 'Enter question...', 'wp-seo-pilot' ),
+									className: 'samanseo-faq-question',
+									placeholder: __( 'Enter question...', 'saman-seo' ),
 									value: faq.question,
 									onChange: ( value ) => updateFaq( index, 'question', value ),
 									allowedFormats: [],
 								} ),
 								el( RichText, {
 									tagName: 'div',
-									className: 'wpseopilot-faq-answer',
-									placeholder: __( 'Enter answer...', 'wp-seo-pilot' ),
+									className: 'samanseo-faq-answer',
+									placeholder: __( 'Enter answer...', 'saman-seo' ),
 									value: faq.answer,
 									onChange: ( value ) => updateFaq( index, 'answer', value ),
 									allowedFormats: [ 'core/bold', 'core/italic', 'core/link' ],
@@ -158,11 +158,11 @@
 					el(
 						Button,
 						{
-							className: 'wpseopilot-faq-add',
+							className: 'samanseo-faq-add',
 							icon: 'plus-alt2',
 							onClick: addFaq,
 						},
-						__( 'Add Question', 'wp-seo-pilot' )
+						__( 'Add Question', 'saman-seo' )
 					)
 				)
 			);
@@ -170,7 +170,7 @@
 
 		save: function( { attributes } ) {
 			const { faqs, showSchema, style } = attributes;
-			const blockProps = useBlockProps.save( { className: 'wpseopilot-faq' } );
+			const blockProps = useBlockProps.save( { className: 'samanseo-faq' } );
 
 			// Filter out empty FAQs
 			const validFaqs = faqs.filter( faq => faq.question && faq.answer );
@@ -203,26 +203,26 @@
 				),
 				el(
 					'div',
-					{ className: 'wpseopilot-faq-list', itemScope: true, itemType: 'https://schema.org/FAQPage' },
+					{ className: 'samanseo-faq-list', itemScope: true, itemType: 'https://schema.org/FAQPage' },
 					validFaqs.map( ( faq, index ) =>
 						el(
 							'details',
 							{
 								key: index,
-								className: 'wpseopilot-faq-item',
+								className: 'samanseo-faq-item',
 								itemScope: true,
 								itemProp: 'mainEntity',
 								itemType: 'https://schema.org/Question',
 							},
 							el(
 								'summary',
-								{ className: 'wpseopilot-faq-question', itemProp: 'name' },
+								{ className: 'samanseo-faq-question', itemProp: 'name' },
 								el( RichText.Content, { value: faq.question } )
 							),
 							el(
 								'div',
 								{
-									className: 'wpseopilot-faq-answer',
+									className: 'samanseo-faq-answer',
 									itemScope: true,
 									itemProp: 'acceptedAnswer',
 									itemType: 'https://schema.org/Answer',

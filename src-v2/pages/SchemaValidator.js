@@ -27,7 +27,7 @@ const SchemaValidator = ({ onNavigate }) => {
 
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/schema-validator/validate',
+                path: '/saman-seo/v1/schema-validator/validate',
                 method: 'POST',
                 data: { url: url.trim() },
             });
@@ -46,7 +46,7 @@ const SchemaValidator = ({ onNavigate }) => {
 
     // Validate current site URL
     const handleValidateSite = useCallback(async () => {
-        const siteUrl = window.wpseopilotV2Settings?.adminUrl?.replace('/wp-admin/', '') || '';
+        const siteUrl = window.SamanSEOSettings?.adminUrl?.replace('/wp-admin/', '') || '';
         if (siteUrl) {
             setUrl(siteUrl);
             // Trigger validation after state update

@@ -1,5 +1,5 @@
 /**
- * WP SEO Pilot Analytics Utility
+ * Saman SEO Analytics Utility
  *
  * Tracks feature usage to help improve the plugin.
  * All tracking is anonymous and privacy-respecting:
@@ -33,8 +33,8 @@ export const trackEvent = (category, action, name = null, value = null) => {
         window._paq.push(eventData);
 
         // Debug log in development
-        if (window.wpseopilotDebug) {
-            console.log('WP SEO Pilot Analytics:', { category, action, name, value });
+        if (window.SamanSEODebug) {
+            console.log('Saman SEO Analytics:', { category, action, name, value });
         }
     } catch (e) {
         // Silently fail - analytics should never break functionality
@@ -54,7 +54,7 @@ export const trackPageView = (pageName, pageUrl = null) => {
         if (pageUrl) {
             window._paq.push(['setCustomUrl', pageUrl]);
         }
-        window._paq.push(['setDocumentTitle', `WP SEO Pilot - ${pageName}`]);
+        window._paq.push(['setDocumentTitle', `Saman SEO - ${pageName}`]);
         window._paq.push(['trackPageView']);
     } catch (e) {
         // Silently fail

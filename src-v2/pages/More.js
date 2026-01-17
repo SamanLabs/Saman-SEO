@@ -3,7 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Plugin icon configurations
 const PLUGIN_ICONS = {
-    'wp-seo-pilot': {
+    'saman-seo': {
         className: 'seo',
         svg: (
             <svg viewBox="0 0 24 24" role="img" focusable="false">
@@ -35,7 +35,7 @@ const PLUGIN_ICONS = {
 
 // Plugin taglines
 const PLUGIN_TAGLINES = {
-    'wp-seo-pilot': 'Performance-led SEO insights.',
+    'saman-seo': 'Performance-led SEO insights.',
     'wp-ai-pilot': 'Centralized AI management.',
     'wp-security-pilot': 'Open standard security.',
 };
@@ -52,7 +52,7 @@ const More = () => {
     const loadPlugins = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await apiFetch({ path: '/wpseopilot/v2/updater/plugins' });
+            const data = await apiFetch({ path: '/saman-seo/v1/updater/plugins' });
             setPlugins(data);
         } catch (error) {
             console.error('Failed to load plugins:', error);
@@ -79,7 +79,7 @@ const More = () => {
         setChecking(true);
         setNotice(null);
         try {
-            await apiFetch({ path: '/wpseopilot/v2/updater/check', method: 'POST' });
+            await apiFetch({ path: '/saman-seo/v1/updater/check', method: 'POST' });
             await loadPlugins();
             setNotice({ type: 'success', message: 'Update check complete.' });
         } catch (error) {
@@ -96,7 +96,7 @@ const More = () => {
         setNotice(null);
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/updater/${action}`,
+                path: `/saman-seo/v1/updater/${action}`,
                 method: 'POST',
                 data: { slug },
             });
@@ -116,7 +116,7 @@ const More = () => {
         setNotice(null);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/updater/beta',
+                path: '/saman-seo/v1/updater/beta',
                 method: 'POST',
                 data: { slug, enabled: !currentEnabled },
             });
@@ -131,7 +131,7 @@ const More = () => {
     };
 
     // Get icon config for a plugin
-    const getIconConfig = (slug) => PLUGIN_ICONS[slug] || PLUGIN_ICONS['wp-seo-pilot'];
+    const getIconConfig = (slug) => PLUGIN_ICONS[slug] || PLUGIN_ICONS['saman-seo'];
 
     // Get tagline for a plugin
     const getTagline = (slug) => PLUGIN_TAGLINES[slug] || '';

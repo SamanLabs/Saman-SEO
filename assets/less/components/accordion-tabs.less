@@ -1,7 +1,7 @@
 // Nested Accordion Tabs Component
 // Provides sub-tab navigation within accordion items
 
-.wpseopilot-accordion-tabs {
+.saman-seo-accordion-tabs {
 	margin-top: @spacing-lg;
 
 	&__nav {
@@ -14,7 +14,7 @@
 	}
 }
 
-.wpseopilot-accordion-tab {
+.saman-seo-accordion-tab {
 	background: transparent;
 	border: none;
 	border-bottom: 2px solid transparent;
@@ -48,7 +48,7 @@
 	}
 }
 
-.wpseopilot-accordion-tab-panel {
+.saman-seo-accordion-tab-panel {
 	display: none;
 	padding: @spacing-md 0;
 
@@ -58,8 +58,8 @@
 }
 
 // Fix FOUC for nested tabs
-.wpseopilot-accordion-tabs--ready {
-	.wpseopilot-accordion-tab-panel {
+.saman-seo-accordion-tabs--ready {
+	.saman-seo-accordion-tab-panel {
 		display: none;
 
 		&.is-active {
@@ -69,7 +69,7 @@
 }
 
 // Google Preview positioning within accordion
-.wpseopilot-accordion__preview {
+.saman-seo-accordion__preview {
 	margin-bottom: @spacing-lg;
 	padding-bottom: @spacing-lg;
 	border-bottom: 1px solid @color-border-light;
@@ -77,11 +77,11 @@
 
 // Responsive behavior for mobile
 @media (max-width: 782px) {
-	.wpseopilot-accordion-tabs__nav {
+	.saman-seo-accordion-tabs__nav {
 		flex-wrap: wrap;
 	}
 
-	.wpseopilot-accordion-tab {
+	.saman-seo-accordion-tab {
 		flex: 1 1 auto;
 		min-width: 120px;
 		padding: @spacing-sm;

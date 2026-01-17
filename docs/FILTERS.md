@@ -1,6 +1,6 @@
 # Filter Reference
 
-Complete documentation of all filter hooks available in WP SEO Pilot with practical examples.
+Complete documentation of all filter hooks available in Saman SEO with practical examples.
 
 ---
 
@@ -1175,7 +1175,7 @@ add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
 
 ### Default Priorities
 
-Most WP SEO Pilot filters use priority `10` by default.
+Most Saman SEO filters use priority `10` by default.
 
 ### Running Before Plugin Filters
 

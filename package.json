@@ -1,7 +1,7 @@
 {
-  "name": "wp-seo-pilot-assets",
-  "version": "0.2.0",
-  "description": "Asset build pipeline for the WP SEO Pilot plugin",
+  "name": "saman-seo",
+  "version": "2.0.0",
+  "description": "Asset build pipeline for the Saman SEO plugin",
   "private": true,
   "scripts": {
     "clean:css": "rimraf --glob \"assets/css/*.css\"",
@@ -30,7 +30,7 @@
     "plugin",
     "less",
     "react",
-    "wp-seo-pilot"
+    "saman-seo"
   ],
   "author": "Juan Denis",
   "license": "GPL-2.0-or-later",

@@ -2,11 +2,11 @@
 /**
  * Sitemap REST Controller
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -23,21 +23,21 @@ class Sitemap_Controller extends REST_Controller {
      * @var array
      */
     private $sitemap_settings = [
-        'wpseopilot_sitemap_enabled',
-        'wpseopilot_sitemap_max_urls',
-        'wpseopilot_sitemap_enable_index',
-        'wpseopilot_sitemap_dynamic_generation',
-        'wpseopilot_sitemap_schedule_updates',
-        'wpseopilot_sitemap_post_types',
-        'wpseopilot_sitemap_taxonomies',
-        'wpseopilot_sitemap_include_author_pages',
-        'wpseopilot_sitemap_include_date_archives',
-        'wpseopilot_sitemap_exclude_images',
-        'wpseopilot_sitemap_enable_rss',
-        'wpseopilot_sitemap_enable_google_news',
-        'wpseopilot_sitemap_google_news_name',
-        'wpseopilot_sitemap_google_news_post_types',
-        'wpseopilot_sitemap_additional_pages',
+        'SAMAN_SEO_sitemap_enabled',
+        'SAMAN_SEO_sitemap_max_urls',
+        'SAMAN_SEO_sitemap_enable_index',
+        'SAMAN_SEO_sitemap_dynamic_generation',
+        'SAMAN_SEO_sitemap_schedule_updates',
+        'SAMAN_SEO_sitemap_post_types',
+        'SAMAN_SEO_sitemap_taxonomies',
+        'SAMAN_SEO_sitemap_include_author_pages',
+        'SAMAN_SEO_sitemap_include_date_archives',
+        'SAMAN_SEO_sitemap_exclude_images',
+        'SAMAN_SEO_sitemap_enable_rss',
+        'SAMAN_SEO_sitemap_enable_google_news',
+        'SAMAN_SEO_sitemap_google_news_name',
+        'SAMAN_SEO_sitemap_google_news_post_types',
+        'SAMAN_SEO_sitemap_additional_pages',
     ];
 
     /**
@@ -46,11 +46,11 @@ class Sitemap_Controller extends REST_Controller {
      * @var array
      */
     private $llm_settings = [
-        'wpseopilot_enable_llm_txt',
-        'wpseopilot_llm_txt_title',
-        'wpseopilot_llm_txt_description',
-        'wpseopilot_llm_txt_posts_per_type',
-        'wpseopilot_llm_txt_include_excerpt',
+        'SAMAN_SEO_enable_llm_txt',
+        'SAMAN_SEO_llm_txt_title',
+        'SAMAN_SEO_llm_txt_description',
+        'SAMAN_SEO_llm_txt_posts_per_type',
+        'SAMAN_SEO_llm_txt_include_excerpt',
     ];
 
     /**
@@ -132,7 +132,7 @@ class Sitemap_Controller extends REST_Controller {
         $settings = [];
 
         foreach ( $this->sitemap_settings as $key ) {
-            $short_key = str_replace( 'wpseopilot_sitemap_', '', $key );
+            $short_key = str_replace( 'SAMAN_SEO_sitemap_', '', $key );
             $value = get_option( $key );
 
             // Handle defaults
@@ -166,7 +166,7 @@ class Sitemap_Controller extends REST_Controller {
         }
 
         foreach ( $params as $key => $value ) {
-            $option_key = 'wpseopilot_sitemap_' . $key;
+            $option_key = 'SAMAN_SEO_sitemap_' . $key;
 
             if ( in_array( $option_key, $this->sitemap_settings, true ) ) {
                 // Sanitize based on type
@@ -183,9 +183,9 @@ class Sitemap_Controller extends REST_Controller {
         }
 
         // Clear any sitemap caches
-        delete_transient( 'wpseopilot_sitemap_stats' );
+        delete_transient( 'SAMAN_SEO_sitemap_stats' );
 
-        return $this->success( null, __( 'Settings saved successfully.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'Settings saved successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -258,17 +258,17 @@ class Sitemap_Controller extends REST_Controller {
      */
     public function regenerate_sitemap( $request ) {
         // Clear sitemap caches
-        delete_transient( 'wpseopilot_sitemap_stats' );
+        delete_transient( 'SAMAN_SEO_sitemap_stats' );
 
         // Flush rewrite rules to ensure sitemap URLs work
         flush_rewrite_rules();
 
         // Update last regenerated timestamp
-        update_option( 'wpseopilot_sitemap_last_regenerated', current_time( 'mysql' ) );
+        update_option( 'SAMAN_SEO_sitemap_last_regenerated', current_time( 'mysql' ) );
 
         return $this->success( [
             'regenerated_at' => current_time( 'mysql' ),
-        ], __( 'Sitemap regenerated successfully.', 'wp-seo-pilot' ) );
+        ], __( 'Sitemap regenerated successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -279,14 +279,14 @@ class Sitemap_Controller extends REST_Controller {
      */
     public function get_stats( $request ) {
         // Try to get cached stats
-        $stats = get_transient( 'wpseopilot_sitemap_stats' );
+        $stats = get_transient( 'SAMAN_SEO_sitemap_stats' );
 
         if ( false === $stats ) {
             $stats = $this->calculate_sitemap_stats();
-            set_transient( 'wpseopilot_sitemap_stats', $stats, HOUR_IN_SECONDS );
+            set_transient( 'SAMAN_SEO_sitemap_stats', $stats, HOUR_IN_SECONDS );
         }
 
-        $last_regenerated = get_option( 'wpseopilot_sitemap_last_regenerated' );
+        $last_regenerated = get_option( 'SAMAN_SEO_sitemap_last_regenerated' );
 
         return $this->success( [
             'total_urls'       => $stats['total_urls'],
@@ -307,7 +307,7 @@ class Sitemap_Controller extends REST_Controller {
         $settings = [];
 
         foreach ( $this->llm_settings as $key ) {
-            $short_key = str_replace( 'wpseopilot_', '', $key );
+            $short_key = str_replace( 'SAMAN_SEO_', '', $key );
             $value = get_option( $key );
 
             // Handle defaults
@@ -338,7 +338,7 @@ class Sitemap_Controller extends REST_Controller {
         }
 
         foreach ( $params as $key => $value ) {
-            $option_key = 'wpseopilot_' . $key;
+            $option_key = 'SAMAN_SEO_' . $key;
 
             if ( in_array( $option_key, $this->llm_settings, true ) ) {
                 // Sanitize based on type
@@ -354,7 +354,7 @@ class Sitemap_Controller extends REST_Controller {
             }
         }
 
-        return $this->success( null, __( 'LLM.txt settings saved successfully.', 'wp-seo-pilot' ) );
+        return $this->success( null, __( 'LLM.txt settings saved successfully.', 'saman-seo' ) );
     }
 
     /**
@@ -363,8 +363,8 @@ class Sitemap_Controller extends REST_Controller {
      * @return array
      */
     private function calculate_sitemap_stats() {
-        $selected_post_types = get_option( 'wpseopilot_sitemap_post_types', [] );
-        $selected_taxonomies = get_option( 'wpseopilot_sitemap_taxonomies', [] );
+        $selected_post_types = get_option( 'SAMAN_SEO_sitemap_post_types', [] );
+        $selected_taxonomies = get_option( 'SAMAN_SEO_sitemap_taxonomies', [] );
 
         if ( ! is_array( $selected_post_types ) ) {
             $selected_post_types = [];
@@ -402,7 +402,7 @@ class Sitemap_Controller extends REST_Controller {
         }
 
         // Add author pages if enabled
-        if ( '1' === get_option( 'wpseopilot_sitemap_include_author_pages', '0' ) ) {
+        if ( '1' === get_option( 'SAMAN_SEO_sitemap_include_author_pages', '0' ) ) {
             $authors = count_users();
             $total_urls += isset( $authors['total_users'] ) ? $authors['total_users'] : 0;
         }
@@ -423,21 +423,21 @@ class Sitemap_Controller extends REST_Controller {
      */
     private function get_default_value( $key ) {
         $defaults = [
-            'wpseopilot_sitemap_enabled'                => '1',
-            'wpseopilot_sitemap_max_urls'               => 1000,
-            'wpseopilot_sitemap_enable_index'           => '1',
-            'wpseopilot_sitemap_dynamic_generation'     => '1',
-            'wpseopilot_sitemap_schedule_updates'       => '',
-            'wpseopilot_sitemap_post_types'             => [ 'post', 'page' ],
-            'wpseopilot_sitemap_taxonomies'             => [ 'category' ],
-            'wpseopilot_sitemap_include_author_pages'   => '0',
-            'wpseopilot_sitemap_include_date_archives'  => '0',
-            'wpseopilot_sitemap_exclude_images'         => '0',
-            'wpseopilot_sitemap_enable_rss'             => '0',
-            'wpseopilot_sitemap_enable_google_news'     => '0',
-            'wpseopilot_sitemap_google_news_name'       => get_bloginfo( 'name' ),
-            'wpseopilot_sitemap_google_news_post_types' => [],
-            'wpseopilot_sitemap_additional_pages'       => [],
+            'SAMAN_SEO_sitemap_enabled'                => '1',
+            'SAMAN_SEO_sitemap_max_urls'               => 1000,
+            'SAMAN_SEO_sitemap_enable_index'           => '1',
+            'SAMAN_SEO_sitemap_dynamic_generation'     => '1',
+            'SAMAN_SEO_sitemap_schedule_updates'       => '',
+            'SAMAN_SEO_sitemap_post_types'             => [ 'post', 'page' ],
+            'SAMAN_SEO_sitemap_taxonomies'             => [ 'category' ],
+            'SAMAN_SEO_sitemap_include_author_pages'   => '0',
+            'SAMAN_SEO_sitemap_include_date_archives'  => '0',
+            'SAMAN_SEO_sitemap_exclude_images'         => '0',
+            'SAMAN_SEO_sitemap_enable_rss'             => '0',
+            'SAMAN_SEO_sitemap_enable_google_news'     => '0',
+            'SAMAN_SEO_sitemap_google_news_name'       => get_bloginfo( 'name' ),
+            'SAMAN_SEO_sitemap_google_news_post_types' => [],
+            'SAMAN_SEO_sitemap_additional_pages'       => [],
         ];
 
         return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
@@ -451,11 +451,11 @@ class Sitemap_Controller extends REST_Controller {
      */
     private function get_llm_default_value( $key ) {
         $defaults = [
-            'wpseopilot_enable_llm_txt'           => '0',
-            'wpseopilot_llm_txt_title'            => get_bloginfo( 'name' ),
-            'wpseopilot_llm_txt_description'      => get_bloginfo( 'description' ),
-            'wpseopilot_llm_txt_posts_per_type'   => 50,
-            'wpseopilot_llm_txt_include_excerpt'  => '1',
+            'SAMAN_SEO_enable_llm_txt'           => '0',
+            'SAMAN_SEO_llm_txt_title'            => get_bloginfo( 'name' ),
+            'SAMAN_SEO_llm_txt_description'      => get_bloginfo( 'description' ),
+            'SAMAN_SEO_llm_txt_posts_per_type'   => 50,
+            'SAMAN_SEO_llm_txt_include_excerpt'  => '1',
         ];
 
         return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';

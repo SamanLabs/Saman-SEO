@@ -70,7 +70,7 @@ const Redirects = () => {
             if (filterGroup) params.append('group', filterGroup);
             if (filterStatus) params.append('status_code', filterStatus);
 
-            const response = await apiFetch({ path: `/wpseopilot/v2/redirects?${params}` });
+            const response = await apiFetch({ path: `/saman-seo/v1/redirects?${params}` });
             if (response.success) {
                 setRedirects(response.data.items || []);
                 setPagination(prev => ({
@@ -90,7 +90,7 @@ const Redirects = () => {
     // Fetch groups
     const fetchGroups = useCallback(async () => {
         try {
-            const response = await apiFetch({ path: '/wpseopilot/v2/redirects/groups' });
+            const response = await apiFetch({ path: '/saman-seo/v1/redirects/groups' });
             if (response.success) {
                 setGroups(response.data || []);
             }
@@ -103,7 +103,7 @@ const Redirects = () => {
     const fetchSuggestions = useCallback(async () => {
         setSuggestionsLoading(true);
         try {
-            const response = await apiFetch({ path: '/wpseopilot/v2/slug-suggestions' });
+            const response = await apiFetch({ path: '/saman-seo/v1/slug-suggestions' });
             if (response.success) {
                 setSuggestions(response.data);
             }
@@ -121,11 +121,11 @@ const Redirects = () => {
         fetchSuggestions();
 
         // Check if there's a redirect source from 404 Log page
-        const storedSource = sessionStorage.getItem('wpseopilot_redirect_source');
+        const storedSource = sessionStorage.getItem('Saman_seo_redirect_source');
         if (storedSource) {
             setFormData(prev => ({ ...prev, source: storedSource }));
             setShowModal(true);
-            sessionStorage.removeItem('wpseopilot_redirect_source');
+            sessionStorage.removeItem('Saman_seo_redirect_source');
         }
     }, []);
 
@@ -142,7 +142,7 @@ const Redirects = () => {
         if (!source || !target) return;
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/redirects/validate-chain',
+                path: '/saman-seo/v1/redirects/validate-chain',
                 method: 'POST',
                 data: { source, target, exclude_id: editingId || 0 },
             });
@@ -221,13 +221,13 @@ const Redirects = () => {
             let response;
             if (editingId) {
                 response = await apiFetch({
-                    path: `/wpseopilot/v2/redirects/${editingId}`,
+                    path: `/saman-seo/v1/redirects/${editingId}`,
                     method: 'PUT',
                     data,
                 });
             } else {
                 response = await apiFetch({
-                    path: '/wpseopilot/v2/redirects',
+                    path: '/saman-seo/v1/redirects',
                     method: 'POST',
                     data,
                 });
@@ -256,7 +256,7 @@ const Redirects = () => {
 
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/redirects/${id}`,
+                path: `/saman-seo/v1/redirects/${id}`,
                 method: 'DELETE',
             });
             fetchRedirects(pagination.page);
@@ -274,7 +274,7 @@ const Redirects = () => {
         setBulkLoading(true);
         try {
             await apiFetch({
-                path: '/wpseopilot/v2/redirects/bulk-delete',
+                path: '/saman-seo/v1/redirects/bulk-delete',
                 method: 'POST',
                 data: { ids: selectedIds },
             });
@@ -307,7 +307,7 @@ const Redirects = () => {
     // Export redirects
     const handleExport = async (format) => {
         try {
-            const response = await apiFetch({ path: `/wpseopilot/v2/redirects/export?format=${format}` });
+            const response = await apiFetch({ path: `/saman-seo/v1/redirects/export?format=${format}` });
             if (response.success) {
                 const blob = new Blob([response.data.content], { type: format === 'json' ? 'application/json' : 'text/csv' });
                 const url = URL.createObjectURL(blob);
@@ -330,7 +330,7 @@ const Redirects = () => {
         setImportResult(null);
         try {
             const response = await apiFetch({
-                path: '/wpseopilot/v2/redirects/import',
+                path: '/saman-seo/v1/redirects/import',
                 method: 'POST',
                 data: {
                     format: importFormat,
@@ -370,7 +370,7 @@ const Redirects = () => {
     const handleApplySuggestion = async (key) => {
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/slug-suggestions/${key}/apply`,
+                path: `/saman-seo/v1/slug-suggestions/${key}/apply`,
                 method: 'POST',
             });
             if (response.success) {
@@ -386,7 +386,7 @@ const Redirects = () => {
     const handleDismissSuggestion = async (key) => {
         try {
             await apiFetch({
-                path: `/wpseopilot/v2/slug-suggestions/${key}/dismiss`,
+                path: `/saman-seo/v1/slug-suggestions/${key}/dismiss`,
                 method: 'POST',
             });
             setSuggestions(suggestions.filter(s => s.key !== key));

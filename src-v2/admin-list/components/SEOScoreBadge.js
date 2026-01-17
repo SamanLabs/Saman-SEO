@@ -12,9 +12,9 @@ const SEOScoreBadge = ({ score, level, label, issues, flags }) => {
     };
 
     const getLevelClass = () => {
-        if (level === 'good') return 'wpseopilot-badge--good';
-        if (level === 'fair') return 'wpseopilot-badge--fair';
-        return 'wpseopilot-badge--poor';
+        if (level === 'good') return 'saman-seo-badge--good';
+        if (level === 'fair') return 'saman-seo-badge--fair';
+        return 'saman-seo-badge--poor';
     };
 
     // Calculate circle progress
@@ -24,8 +24,8 @@ const SEOScoreBadge = ({ score, level, label, issues, flags }) => {
     const dashOffset = circumference - progress;
 
     return (
-        <div className="wpseopilot-list-badge">
-            <div className={`wpseopilot-badge-ring ${getLevelClass()}`}>
+        <div className="saman-seo-list-badge">
+            <div className={`saman-seo-badge-ring ${getLevelClass()}`}>
                 <svg width="44" height="44" viewBox="0 0 44 44">
                     {/* Background circle */}
                     <circle
@@ -51,20 +51,20 @@ const SEOScoreBadge = ({ score, level, label, issues, flags }) => {
                         style={{ transition: 'stroke-dashoffset 0.3s ease' }}
                     />
                 </svg>
-                <span className="wpseopilot-badge-score">{score}</span>
+                <span className="saman-seo-badge-score">{score}</span>
             </div>
-            <div className="wpseopilot-badge-info">
-                <span className={`wpseopilot-badge-label ${getLevelClass()}`}>
+            <div className="saman-seo-badge-info">
+                <span className={`saman-seo-badge-label ${getLevelClass()}`}>
                     {label}
                 </span>
                 {issues && issues.length > 0 && (
-                    <span className="wpseopilot-badge-issues">
+                    <span className="saman-seo-badge-issues">
                         {issues.slice(0, 2).join(' • ')}
                         {issues.length > 2 && ` +${issues.length - 2}`}
                     </span>
                 )}
                 {flags && flags.length > 0 && (
-                    <span className="wpseopilot-badge-flags">
+                    <span className="saman-seo-badge-flags">
                         {flags.join(', ')}
                     </span>
                 )}

@@ -56,7 +56,7 @@ const SEOPanel = ({
     useEffect(() => {
         if (!postId) return;
 
-        apiFetch({ path: `/wpseopilot/v2/indexnow/post-status/${postId}` })
+        apiFetch({ path: `/saman-seo/v1/indexnow/post-status/${postId}` })
             .then((response) => {
                 if (response.success) {
                     setIndexingStatus(response.data);
@@ -76,14 +76,14 @@ const SEOPanel = ({
 
         try {
             const response = await apiFetch({
-                path: `/wpseopilot/v2/indexnow/submit-post/${postId}`,
+                path: `/saman-seo/v1/indexnow/submit-post/${postId}`,
                 method: 'POST',
             });
 
             if (response.success) {
                 // Refresh status after submission
                 const statusResponse = await apiFetch({
-                    path: `/wpseopilot/v2/indexnow/post-status/${postId}`,
+                    path: `/saman-seo/v1/indexnow/post-status/${postId}`,
                 });
                 if (statusResponse.success) {
                     setIndexingStatus(statusResponse.data);
@@ -151,24 +151,24 @@ const SEOPanel = ({
     }, [aiModal, closeAiModal]);
 
     return (
-        <div className="wpseopilot-editor-panel">
+        <div className="saman-seo-editor-panel">
             {/* Score Header */}
-            <div className="wpseopilot-score-header">
+            <div className="saman-seo-score-header">
                 <ScoreGauge score={seoScore?.score || 0} level={seoScore?.level || 'poor'} />
-                <div className="wpseopilot-score-info">
-                    <div className="wpseopilot-score-label">SEO Score</div>
-                    <div className="wpseopilot-score-status">
+                <div className="saman-seo-score-info">
+                    <div className="saman-seo-score-label">SEO Score</div>
+                    <div className="saman-seo-score-status">
                         {seoScore?.issues?.length > 0
                             ? `${seoScore.issues.length} issue${seoScore.issues.length !== 1 ? 's' : ''} found`
                             : 'Looking good!'}
                     </div>
                     {!seoMeta.focus_keyphrase && (
-                        <div className="wpseopilot-keyphrase-hint">
+                        <div className="saman-seo-keyphrase-hint">
                             Add keyphrases for full analysis
                         </div>
                     )}
                     {seoMeta.focus_keyphrase && (seoMeta.secondary_keyphrases?.length > 0) && (
-                        <div className="wpseopilot-keyphrase-hint" style={{ color: '#00a32a' }}>
+                        <div className="saman-seo-keyphrase-hint" style={{ color: '#00a32a' }}>
                             {1 + seoMeta.secondary_keyphrases.length} keywords tracked
                         </div>
                     )}
@@ -176,31 +176,31 @@ const SEOPanel = ({
             </div>
 
             {/* Tab Navigation */}
-            <div className="wpseopilot-tabs">
+            <div className="saman-seo-tabs">
                 <button
                     type="button"
-                    className={`wpseopilot-tab ${activeTab === 'general' ? 'active' : ''}`}
+                    className={`saman-seo-tab ${activeTab === 'general' ? 'active' : ''}`}
                     onClick={() => setActiveTab('general')}
                 >
                     General
                 </button>
                 <button
                     type="button"
-                    className={`wpseopilot-tab ${activeTab === 'analysis' ? 'active' : ''}`}
+                    className={`saman-seo-tab ${activeTab === 'analysis' ? 'active' : ''}`}
                     onClick={() => setActiveTab('analysis')}
                 >
                     Analysis
                 </button>
                 <button
                     type="button"
-                    className={`wpseopilot-tab ${activeTab === 'advanced' ? 'active' : ''}`}
+                    className={`saman-seo-tab ${activeTab === 'advanced' ? 'active' : ''}`}
                     onClick={() => setActiveTab('advanced')}
                 >
                     Advanced
                 </button>
                 <button
                     type="button"
-                    className={`wpseopilot-tab ${activeTab === 'social' ? 'active' : ''}`}
+                    className={`saman-seo-tab ${activeTab === 'social' ? 'active' : ''}`}
                     onClick={() => setActiveTab('social')}
                 >
                     Social
@@ -209,10 +209,10 @@ const SEOPanel = ({
 
             {/* General Tab */}
             {activeTab === 'general' && (
-                <div className="wpseopilot-tab-content">
+                <div className="saman-seo-tab-content">
                     {/* Search Preview */}
-                    <div className="wpseopilot-preview-section">
-                        <label className="wpseopilot-section-label">Search Preview</label>
+                    <div className="saman-seo-preview-section">
+                        <label className="saman-seo-section-label">Search Preview</label>
                         <SearchPreview
                             title={effectiveTitle}
                             description={effectiveDescription}
@@ -221,20 +221,20 @@ const SEOPanel = ({
                     </div>
 
                     {/* Focus Keyphrases - Multi-keyword support */}
-                    <div className="wpseopilot-field wpseopilot-field--keyphrases">
-                        <div className="wpseopilot-field-header">
+                    <div className="saman-seo-field saman-seo-field--keyphrases">
+                        <div className="saman-seo-field-header">
                             <label>Focus Keyphrases</label>
-                            <span className="wpseopilot-field-count">
+                            <span className="saman-seo-field-count">
                                 {1 + (seoMeta.secondary_keyphrases?.length || 0)}/5
                             </span>
                         </div>
 
                         {/* Primary Keyphrase */}
-                        <div className="wpseopilot-keyphrase-item wpseopilot-keyphrase-primary">
-                            <span className="wpseopilot-keyphrase-badge">Primary</span>
+                        <div className="saman-seo-keyphrase-item saman-seo-keyphrase-primary">
+                            <span className="saman-seo-keyphrase-badge">Primary</span>
                             <input
                                 type="text"
-                                className="wpseopilot-field-input"
+                                className="saman-seo-field-input"
                                 value={seoMeta.focus_keyphrase || ''}
                                 onChange={(e) => updateMeta('focus_keyphrase', e.target.value)}
                                 placeholder="Enter your main target keyword"
@@ -243,11 +243,11 @@ const SEOPanel = ({
 
                         {/* Secondary Keyphrases */}
                         {(seoMeta.secondary_keyphrases || []).map((keyphrase, index) => (
-                            <div key={index} className="wpseopilot-keyphrase-item wpseopilot-keyphrase-secondary">
-                                <span className="wpseopilot-keyphrase-badge">#{index + 2}</span>
+                            <div key={index} className="saman-seo-keyphrase-item saman-seo-keyphrase-secondary">
+                                <span className="saman-seo-keyphrase-badge">#{index + 2}</span>
                                 <input
                                     type="text"
-                                    className="wpseopilot-field-input"
+                                    className="saman-seo-field-input"
                                     value={keyphrase}
                                     onChange={(e) => {
                                         const updated = [...(seoMeta.secondary_keyphrases || [])];
@@ -258,7 +258,7 @@ const SEOPanel = ({
                                 />
                                 <button
                                     type="button"
-                                    className="wpseopilot-keyphrase-remove"
+                                    className="saman-seo-keyphrase-remove"
                                     onClick={() => {
                                         const updated = (seoMeta.secondary_keyphrases || []).filter((_, i) => i !== index);
                                         updateMeta('secondary_keyphrases', updated);
@@ -274,7 +274,7 @@ const SEOPanel = ({
                         {(seoMeta.secondary_keyphrases?.length || 0) < 4 && (
                             <button
                                 type="button"
-                                className="wpseopilot-keyphrase-add"
+                                className="saman-seo-keyphrase-add"
                                 onClick={() => {
                                     const current = seoMeta.secondary_keyphrases || [];
                                     updateMeta('secondary_keyphrases', [...current, '']);
@@ -288,17 +288,17 @@ const SEOPanel = ({
                             </button>
                         )}
 
-                        <p className="wpseopilot-field-help">
+                        <p className="saman-seo-field-help">
                             Add up to 5 keyphrases to optimize your content for multiple search terms
                         </p>
                     </div>
 
                     {/* Quick Templates */}
-                    <div className="wpseopilot-field wpseopilot-field--templates">
-                        <div className="wpseopilot-templates-header">
+                    <div className="saman-seo-field saman-seo-field--templates">
+                        <div className="saman-seo-templates-header">
                             <button
                                 type="button"
-                                className={`wpseopilot-templates-toggle ${showTemplates ? 'active' : ''}`}
+                                className={`saman-seo-templates-toggle ${showTemplates ? 'active' : ''}`}
                                 onClick={() => setShowTemplates(!showTemplates)}
                             >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -320,16 +320,16 @@ const SEOPanel = ({
                             </button>
                         </div>
                         {showTemplates && (
-                            <div className="wpseopilot-templates-list">
+                            <div className="saman-seo-templates-list">
                                 {quickTemplates.map((template) => (
                                     <button
                                         key={template.id}
                                         type="button"
-                                        className="wpseopilot-template-item"
+                                        className="saman-seo-template-item"
                                         onClick={() => applyTemplate(template)}
                                     >
-                                        <span className="wpseopilot-template-name">{template.name}</span>
-                                        <span className="wpseopilot-template-preview">{template.title}</span>
+                                        <span className="saman-seo-template-name">{template.name}</span>
+                                        <span className="saman-seo-template-preview">{template.title}</span>
                                     </button>
                                 ))}
                             </div>
@@ -339,7 +339,7 @@ const SEOPanel = ({
                     {/* SEO Title with AI and Variables */}
                     <TemplateInput
                         label="SEO Title"
-                        id="wpseopilot-seo-title"
+                        id="saman-seo-seo-title"
                         value={seoMeta.title || ''}
                         onChange={(value) => updateMeta('title', value)}
                         placeholder={postTitle || 'Enter SEO title'}
@@ -355,7 +355,7 @@ const SEOPanel = ({
                     {/* Meta Description with AI and Variables */}
                     <TemplateInput
                         label="Meta Description"
-                        id="wpseopilot-meta-desc"
+                        id="saman-seo-meta-desc"
                         value={seoMeta.description || ''}
                         onChange={(value) => updateMeta('description', value)}
                         placeholder="Enter meta description"
@@ -371,22 +371,22 @@ const SEOPanel = ({
 
                     {/* Quick Analysis */}
                     {seoScore?.issues?.length > 0 && (
-                        <div className="wpseopilot-issues">
-                            <label className="wpseopilot-section-label">Issues</label>
-                            <ul className="wpseopilot-issues-list">
+                        <div className="saman-seo-issues">
+                            <label className="saman-seo-section-label">Issues</label>
+                            <ul className="saman-seo-issues-list">
                                 {seoScore.issues.slice(0, 5).map((issue, idx) => (
-                                    <li key={idx} className={`wpseopilot-issue wpseopilot-issue--${issue.severity || 'warning'}`}>
-                                        <span className="wpseopilot-issue-icon">
+                                    <li key={idx} className={`saman-seo-issue saman-seo-issue--${issue.severity || 'warning'}`}>
+                                        <span className="saman-seo-issue-icon">
                                             {issue.severity === 'high' ? '!' : '?'}
                                         </span>
-                                        <span className="wpseopilot-issue-text">{issue.message}</span>
+                                        <span className="saman-seo-issue-text">{issue.message}</span>
                                     </li>
                                 ))}
                             </ul>
                             {seoScore.issues.length > 5 && (
                                 <button
                                     type="button"
-                                    className="wpseopilot-view-all-link"
+                                    className="saman-seo-view-all-link"
                                     onClick={() => setActiveTab('analysis')}
                                 >
                                     View all {seoScore.issues.length} issues →
@@ -399,7 +399,7 @@ const SEOPanel = ({
 
             {/* Analysis Tab */}
             {activeTab === 'analysis' && (
-                <div className="wpseopilot-tab-content">
+                <div className="saman-seo-tab-content">
                     <MetricsBreakdown
                         metrics={seoScore?.metrics || []}
                         metricsByCategory={seoScore?.metrics_by_category}
@@ -410,47 +410,47 @@ const SEOPanel = ({
 
             {/* Advanced Tab */}
             {activeTab === 'advanced' && (
-                <div className="wpseopilot-tab-content">
+                <div className="saman-seo-tab-content">
                     {/* Canonical URL */}
-                    <div className="wpseopilot-field">
-                        <div className="wpseopilot-field-header">
+                    <div className="saman-seo-field">
+                        <div className="saman-seo-field-header">
                             <label>Canonical URL</label>
                         </div>
                         <input
                             type="url"
-                            className="wpseopilot-field-input"
+                            className="saman-seo-field-input"
                             value={seoMeta.canonical || ''}
                             onChange={(e) => updateMeta('canonical', e.target.value)}
                             placeholder={postUrl}
                         />
-                        <p className="wpseopilot-field-help">Leave empty to use the default URL</p>
+                        <p className="saman-seo-field-help">Leave empty to use the default URL</p>
                     </div>
 
                     {/* Robots Settings */}
-                    <div className="wpseopilot-robots-section">
-                        <label className="wpseopilot-section-label">Search Engine Visibility</label>
+                    <div className="saman-seo-robots-section">
+                        <label className="saman-seo-section-label">Search Engine Visibility</label>
 
-                        <label className="wpseopilot-toggle">
+                        <label className="saman-seo-toggle">
                             <input
                                 type="checkbox"
                                 checked={seoMeta.noindex || false}
                                 onChange={(e) => updateMeta('noindex', e.target.checked)}
                             />
-                            <span className="wpseopilot-toggle-slider"></span>
-                            <span className="wpseopilot-toggle-label">
+                            <span className="saman-seo-toggle-slider"></span>
+                            <span className="saman-seo-toggle-label">
                                 Hide from search results
                                 <small>Add noindex meta tag</small>
                             </span>
                         </label>
 
-                        <label className="wpseopilot-toggle">
+                        <label className="saman-seo-toggle">
                             <input
                                 type="checkbox"
                                 checked={seoMeta.nofollow || false}
                                 onChange={(e) => updateMeta('nofollow', e.target.checked)}
                             />
-                            <span className="wpseopilot-toggle-slider"></span>
-                            <span className="wpseopilot-toggle-label">
+                            <span className="saman-seo-toggle-slider"></span>
+                            <span className="saman-seo-toggle-label">
                                 Don't follow links
                                 <small>Add nofollow meta tag</small>
                             </span>
@@ -458,9 +458,9 @@ const SEOPanel = ({
                     </div>
 
                     {/* Robots Preview */}
-                    <div className="wpseopilot-robots-preview">
-                        <label className="wpseopilot-section-label">Robots Meta</label>
-                        <code className="wpseopilot-robots-code">
+                    <div className="saman-seo-robots-preview">
+                        <label className="saman-seo-section-label">Robots Meta</label>
+                        <code className="saman-seo-robots-code">
                             {seoMeta.noindex || seoMeta.nofollow
                                 ? `${seoMeta.noindex ? 'noindex' : 'index'}, ${seoMeta.nofollow ? 'nofollow' : 'follow'}`
                                 : 'index, follow (default)'}
@@ -468,11 +468,11 @@ const SEOPanel = ({
                     </div>
 
                     {/* Instant Indexing Section */}
-                    <div className="wpseopilot-indexing-section">
-                        <label className="wpseopilot-section-label">Instant Indexing</label>
+                    <div className="saman-seo-indexing-section">
+                        <label className="saman-seo-section-label">Instant Indexing</label>
 
                         {indexingStatus && !indexingStatus.indexnow_enabled && (
-                            <div className="wpseopilot-indexing-notice wpseopilot-indexing-notice--info">
+                            <div className="saman-seo-indexing-notice saman-seo-indexing-notice--info">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <circle cx="12" cy="12" r="10"/>
                                     <path d="M12 16v-4M12 8h.01"/>
@@ -485,8 +485,8 @@ const SEOPanel = ({
                             <>
                                 {/* Indexing Status */}
                                 {indexingStatus.has_been_indexed && indexingStatus.last_submission && (
-                                    <div className={`wpseopilot-indexing-status wpseopilot-indexing-status--${indexingStatus.last_submission.status}`}>
-                                        <div className="wpseopilot-indexing-status-icon">
+                                    <div className={`saman-seo-indexing-status saman-seo-indexing-status--${indexingStatus.last_submission.status}`}>
+                                        <div className="saman-seo-indexing-status-icon">
                                             {indexingStatus.last_submission.status === 'success' ? (
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                     <path d="M20 6L9 17l-5-5"/>
@@ -498,7 +498,7 @@ const SEOPanel = ({
                                                 </svg>
                                             )}
                                         </div>
-                                        <div className="wpseopilot-indexing-status-text">
+                                        <div className="saman-seo-indexing-status-text">
                                             <strong>
                                                 {indexingStatus.last_submission.status === 'success' ? 'Submitted' : 'Failed'}
                                             </strong>
@@ -508,14 +508,14 @@ const SEOPanel = ({
                                 )}
 
                                 {!indexingStatus.has_been_indexed && (
-                                    <div className="wpseopilot-indexing-status wpseopilot-indexing-status--never">
-                                        <div className="wpseopilot-indexing-status-icon">
+                                    <div className="saman-seo-indexing-status saman-seo-indexing-status--never">
+                                        <div className="saman-seo-indexing-status-icon">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <circle cx="12" cy="12" r="10"/>
                                                 <path d="M12 6v6l4 2"/>
                                             </svg>
                                         </div>
-                                        <div className="wpseopilot-indexing-status-text">
+                                        <div className="saman-seo-indexing-status-text">
                                             <strong>Not submitted</strong>
                                             <span>Request indexing to notify search engines</span>
                                         </div>
@@ -524,7 +524,7 @@ const SEOPanel = ({
 
                                 {/* Error message */}
                                 {indexError && (
-                                    <div className="wpseopilot-indexing-notice wpseopilot-indexing-notice--error">
+                                    <div className="saman-seo-indexing-notice saman-seo-indexing-notice--error">
                                         {indexError}
                                     </div>
                                 )}
@@ -532,13 +532,13 @@ const SEOPanel = ({
                                 {/* Request Indexing Button */}
                                 <Button
                                     variant="secondary"
-                                    className="wpseopilot-indexing-button"
+                                    className="saman-seo-indexing-button"
                                     onClick={handleRequestIndexing}
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <span className="wpseopilot-indexing-spinner" />
+                                            <span className="saman-seo-indexing-spinner" />
                                             Submitting...
                                         </>
                                     ) : (
@@ -551,7 +551,7 @@ const SEOPanel = ({
                                     )}
                                 </Button>
 
-                                <p className="wpseopilot-field-help">
+                                <p className="saman-seo-field-help">
                                     Submit this URL to search engines via IndexNow for faster discovery.
                                     {indexingStatus.total_submissions > 0 && (
                                         <> Submitted {indexingStatus.total_submissions} time{indexingStatus.total_submissions !== 1 ? 's' : ''}.</>
@@ -565,16 +565,16 @@ const SEOPanel = ({
 
             {/* Social Tab */}
             {activeTab === 'social' && (
-                <div className="wpseopilot-tab-content">
+                <div className="saman-seo-tab-content">
                     {/* Social Preview */}
-                    <div className="wpseopilot-social-preview">
-                        <label className="wpseopilot-section-label">Social Preview</label>
-                        <div className="wpseopilot-social-card">
-                            <div className="wpseopilot-social-image">
+                    <div className="saman-seo-social-preview">
+                        <label className="saman-seo-section-label">Social Preview</label>
+                        <div className="saman-seo-social-card">
+                            <div className="saman-seo-social-image">
                                 {seoMeta.og_image || featuredImage ? (
                                     <img src={seoMeta.og_image || featuredImage} alt="" />
                                 ) : (
-                                    <div className="wpseopilot-social-placeholder">
+                                    <div className="saman-seo-social-placeholder">
                                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                                             <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
                                             <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
@@ -584,29 +584,29 @@ const SEOPanel = ({
                                     </div>
                                 )}
                             </div>
-                            <div className="wpseopilot-social-content">
-                                <div className="wpseopilot-social-url">{new URL(postUrl).hostname}</div>
-                                <div className="wpseopilot-social-title">{effectiveTitle}</div>
-                                <div className="wpseopilot-social-desc">{effectiveDescription || 'No description available'}</div>
+                            <div className="saman-seo-social-content">
+                                <div className="saman-seo-social-url">{new URL(postUrl).hostname}</div>
+                                <div className="saman-seo-social-title">{effectiveTitle}</div>
+                                <div className="saman-seo-social-desc">{effectiveDescription || 'No description available'}</div>
                             </div>
                         </div>
                     </div>
 
                     {/* OG Image */}
-                    <div className="wpseopilot-field">
-                        <div className="wpseopilot-field-header">
+                    <div className="saman-seo-field">
+                        <div className="saman-seo-field-header">
                             <label>Social Image URL</label>
                         </div>
                         <input
                             type="url"
-                            className="wpseopilot-field-input"
+                            className="saman-seo-field-input"
                             value={seoMeta.og_image || ''}
                             onChange={(e) => updateMeta('og_image', e.target.value)}
                             placeholder="https://..."
                         />
-                        <p className="wpseopilot-field-help">1200x630 recommended. Leave empty to use featured image.</p>
+                        <p className="saman-seo-field-help">1200x630 recommended. Leave empty to use featured image.</p>
                         {!seoMeta.og_image && featuredImage && (
-                            <p className="wpseopilot-field-note">
+                            <p className="saman-seo-field-note">
                                 Using featured image as fallback
                             </p>
                         )}
@@ -615,7 +615,7 @@ const SEOPanel = ({
                     {/* Media Library Button */}
                     <Button
                         variant="secondary"
-                        className="wpseopilot-media-button"
+                        className="saman-seo-media-button"
                         onClick={() => {
                             const frame = wp.media({
                                 title: 'Select Social Image',

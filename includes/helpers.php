@@ -2,10 +2,10 @@
 /**
  * Shared helper functions.
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  */
 
-namespace WPSEOPilot\Helpers {
+namespace Saman\SEO\Helpers {
 
 	use WP_Post;
 
@@ -23,6 +23,46 @@ namespace WPSEOPilot\Helpers {
 		$value = \get_option( $key, $default );
 
 		return '' === $value ? $default : $value;
+	}
+
+	/**
+	 * Check if a module is enabled.
+	 *
+	 * Uses the new `SAMAN_SEO_module_*` option keys that match the React UI.
+	 * Falls back to legacy `SAMAN_SEO_enable_*` options for backward compatibility.
+	 *
+	 * @param string $module Module slug (e.g., 'sitemap', 'redirects', '404_log').
+	 *
+	 * @return bool True if the module is enabled, false otherwise.
+	 */
+	function module_enabled( string $module ): bool {
+		$value = \get_option( 'SAMAN_SEO_module_' . $module );
+
+		// If the new option exists, use it.
+		if ( false !== $value ) {
+			return '1' === $value;
+		}
+
+		// Fall back to legacy option if new one doesn't exist.
+		$legacy_map = [
+			'sitemap'       => 'SAMAN_SEO_enable_sitemap_enhancer',
+			'redirects'     => 'SAMAN_SEO_enable_redirect_manager',
+			'404_log'       => 'SAMAN_SEO_enable_404_logging',
+			'llm_txt'       => 'SAMAN_SEO_enable_llm_txt',
+			'local_seo'     => 'SAMAN_SEO_enable_local_seo',
+			'social_cards'  => 'SAMAN_SEO_enable_og_preview',
+			'analytics'     => 'SAMAN_SEO_enable_analytics',
+			'admin_bar'     => 'SAMAN_SEO_enable_admin_bar',
+			'internal_links' => 'SAMAN_SEO_enable_internal_linking',
+			'ai_assistant'  => 'SAMAN_SEO_enable_ai_assistant',
+		];
+
+		if ( isset( $legacy_map[ $module ] ) ) {
+			return '1' === \get_option( $legacy_map[ $module ], '1' );
+		}
+
+		// Default enabled for new/unknown modules.
+		return true;
 	}
 
 	/**
@@ -53,7 +93,7 @@ namespace WPSEOPilot\Helpers {
 			];
 		}
 
-		$meta = (array) \get_post_meta( $post->ID, '_wpseopilot_meta', true );
+		$meta = (array) \get_post_meta( $post->ID, '_SAMAN_SEO_meta', true );
 
 		$defaults = [
 			'title'       => '',
@@ -89,7 +129,7 @@ namespace WPSEOPilot\Helpers {
 			'site_title'    => \get_bloginfo( 'name' ),
 			'sitename'      => \get_bloginfo( 'name' ), // Add sitename here too
 			'tagline'       => \get_bloginfo( 'description' ),
-			'separator'     => get_option( 'wpseopilot_title_separator', '-' ),
+			'separator'     => get_option( 'SAMAN_SEO_title_separator', '-' ),
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),
@@ -171,7 +211,7 @@ namespace WPSEOPilot\Helpers {
 			return '';
 		}
 
-		$post_type_templates = \get_option( 'wpseopilot_post_type_title_templates', [] );
+		$post_type_templates = \get_option( 'SAMAN_SEO_post_type_title_templates', [] );
 		if ( ! is_array( $post_type_templates ) ) {
 			$post_type_templates = [];
 		}
@@ -179,7 +219,7 @@ namespace WPSEOPilot\Helpers {
 		if ( ! empty( $post->post_type ) && ! empty( $post_type_templates[ $post->post_type ] ) ) {
 			$template = $post_type_templates[ $post->post_type ];
 		} else {
-			$template = get_option( 'wpseopilot_default_title_template', '{{post_title}} | {{site_title}}' );
+			$template = get_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' );
 		}
 
 		return replace_template_variables( $template, $post );
@@ -378,11 +418,11 @@ namespace WPSEOPilot\Helpers {
 	function calculate_seo_score( $post ) {
 		$post = \get_post( $post );
 
-		$default_summary = \__( 'Add content to generate a score.', 'wp-seo-pilot' );
+		$default_summary = \__( 'Add content to generate a score.', 'saman-seo' );
 		$default_result  = [
 			'score'                => 0,
 			'level'                => 'low',
-			'label'                => \__( 'Needs attention', 'wp-seo-pilot' ),
+			'label'                => \__( 'Needs attention', 'saman-seo' ),
 			'summary'              => $default_summary,
 			'has_keyphrase'        => false,
 			'metrics'              => [],
@@ -395,7 +435,7 @@ namespace WPSEOPilot\Helpers {
 
 		// Get SEO meta including focus keyphrase and secondary keyphrases.
 		$meta                  = get_post_meta( $post );
-		$all_meta              = (array) \get_post_meta( $post->ID, '_wpseopilot_meta', true );
+		$all_meta              = (array) \get_post_meta( $post->ID, '_SAMAN_SEO_meta', true );
 		$focus_keyphrase       = isset( $all_meta['focus_keyphrase'] ) ? trim( sanitize_text_field( $all_meta['focus_keyphrase'] ) ) : '';
 		$has_keyphrase         = ! empty( $focus_keyphrase );
 		$secondary_keyphrases  = isset( $all_meta['secondary_keyphrases'] ) && is_array( $all_meta['secondary_keyphrases'] )
@@ -440,25 +480,25 @@ namespace WPSEOPilot\Helpers {
 		$title_length = $strlen( $title_text );
 		if ( 0 === $title_length ) {
 			$title_score  = 0;
-			$title_status = \__( 'Add a meta title for this post.', 'wp-seo-pilot' );
+			$title_status = \__( 'Add a meta title for this post.', 'saman-seo' );
 		} elseif ( $title_length < 30 ) {
 			$title_score  = 5;
-			$title_status = sprintf( \__( 'Length: %d chars (too short, aim for 50-60).', 'wp-seo-pilot' ), $title_length );
+			$title_status = sprintf( \__( 'Length: %d chars (too short, aim for 50-60).', 'saman-seo' ), $title_length );
 		} elseif ( $title_length <= 60 ) {
 			$title_score  = 10;
-			$title_status = sprintf( \__( 'Length: %d chars (ideal).', 'wp-seo-pilot' ), $title_length );
+			$title_status = sprintf( \__( 'Length: %d chars (ideal).', 'saman-seo' ), $title_length );
 		} elseif ( $title_length <= 70 ) {
 			$title_score  = 8;
-			$title_status = sprintf( \__( 'Length: %d chars (slightly long).', 'wp-seo-pilot' ), $title_length );
+			$title_status = sprintf( \__( 'Length: %d chars (slightly long).', 'saman-seo' ), $title_length );
 		} else {
 			$title_score  = 5;
-			$title_status = sprintf( \__( 'Length: %d chars (too long, may truncate).', 'wp-seo-pilot' ), $title_length );
+			$title_status = sprintf( \__( 'Length: %d chars (too long, may truncate).', 'saman-seo' ), $title_length );
 		}
 
 		$metrics[]    = [
 			'key'         => 'title_length',
-			'label'       => \__( 'Title length', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'Title', 'wp-seo-pilot' ),
+			'label'       => \__( 'Title length', 'saman-seo' ),
+			'issue_label' => \__( 'Title', 'saman-seo' ),
 			'status'      => $title_status,
 			'score'       => $title_score,
 			'max'         => 10,
@@ -471,25 +511,25 @@ namespace WPSEOPilot\Helpers {
 		$desc_length = $strlen( $desc_text );
 		if ( 0 === $desc_length ) {
 			$desc_score  = 0;
-			$desc_status = \__( 'Add a custom meta description.', 'wp-seo-pilot' );
+			$desc_status = \__( 'Add a custom meta description.', 'saman-seo' );
 		} elseif ( $desc_length < 80 ) {
 			$desc_score  = 5;
-			$desc_status = sprintf( \__( 'Length: %d chars (extend toward 120-155).', 'wp-seo-pilot' ), $desc_length );
+			$desc_status = sprintf( \__( 'Length: %d chars (extend toward 120-155).', 'saman-seo' ), $desc_length );
 		} elseif ( $desc_length <= 155 ) {
 			$desc_score  = 10;
-			$desc_status = sprintf( \__( 'Length: %d chars (ideal).', 'wp-seo-pilot' ), $desc_length );
+			$desc_status = sprintf( \__( 'Length: %d chars (ideal).', 'saman-seo' ), $desc_length );
 		} elseif ( $desc_length <= 180 ) {
 			$desc_score  = 8;
-			$desc_status = sprintf( \__( 'Length: %d chars (trim slightly).', 'wp-seo-pilot' ), $desc_length );
+			$desc_status = sprintf( \__( 'Length: %d chars (trim slightly).', 'saman-seo' ), $desc_length );
 		} else {
 			$desc_score  = 5;
-			$desc_status = sprintf( \__( 'Length: %d chars (too long, will truncate).', 'wp-seo-pilot' ), $desc_length );
+			$desc_status = sprintf( \__( 'Length: %d chars (too long, will truncate).', 'saman-seo' ), $desc_length );
 		}
 
 		$metrics[]    = [
 			'key'         => 'description_length',
-			'label'       => \__( 'Meta description', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'Description', 'wp-seo-pilot' ),
+			'label'       => \__( 'Meta description', 'saman-seo' ),
+			'issue_label' => \__( 'Description', 'saman-seo' ),
 			'status'      => $desc_status,
 			'score'       => $desc_score,
 			'max'         => 10,
@@ -502,13 +542,13 @@ namespace WPSEOPilot\Helpers {
 		$has_h1    = ! empty( $h1_text );
 		$h1_score  = $has_h1 ? 8 : 0;
 		$h1_status = $has_h1
-			? \__( 'Primary heading present.', 'wp-seo-pilot' )
-			: \__( 'Add a single H1 to introduce the page.', 'wp-seo-pilot' );
+			? \__( 'Primary heading present.', 'saman-seo' )
+			: \__( 'Add a single H1 to introduce the page.', 'saman-seo' );
 
 		$metrics[]    = [
 			'key'         => 'h1_presence',
-			'label'       => \__( 'H1 heading', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'H1', 'wp-seo-pilot' ),
+			'label'       => \__( 'H1 heading', 'saman-seo' ),
+			'issue_label' => \__( 'H1', 'saman-seo' ),
 			'status'      => $h1_status,
 			'score'       => $h1_score,
 			'max'         => 8,
@@ -520,22 +560,22 @@ namespace WPSEOPilot\Helpers {
 		// 4. Content length (max 12 pts).
 		if ( $word_count < 100 ) {
 			$content_score  = 0;
-			$content_status = sprintf( \__( '%d words (add more content, aim for 300+).', 'wp-seo-pilot' ), $word_count );
+			$content_status = sprintf( \__( '%d words (add more content, aim for 300+).', 'saman-seo' ), $word_count );
 		} elseif ( $word_count < 300 ) {
 			$content_score  = 6;
-			$content_status = sprintf( \__( '%d words (thin content, aim for 300+).', 'wp-seo-pilot' ), $word_count );
+			$content_status = sprintf( \__( '%d words (thin content, aim for 300+).', 'saman-seo' ), $word_count );
 		} elseif ( $word_count < 600 ) {
 			$content_score  = 10;
-			$content_status = sprintf( \__( '%d words (good length).', 'wp-seo-pilot' ), $word_count );
+			$content_status = sprintf( \__( '%d words (good length).', 'saman-seo' ), $word_count );
 		} else {
 			$content_score  = 12;
-			$content_status = sprintf( \__( '%d words (comprehensive).', 'wp-seo-pilot' ), $word_count );
+			$content_status = sprintf( \__( '%d words (comprehensive).', 'saman-seo' ), $word_count );
 		}
 
 		$metrics[]    = [
 			'key'         => 'content_length',
-			'label'       => \__( 'Content length', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'Content', 'wp-seo-pilot' ),
+			'label'       => \__( 'Content length', 'saman-seo' ),
+			'issue_label' => \__( 'Content', 'saman-seo' ),
 			'status'      => $content_status,
 			'score'       => $content_score,
 			'max'         => 12,
@@ -552,13 +592,13 @@ namespace WPSEOPilot\Helpers {
 			$kw_in_title       = contains_keyphrase( $title_text, $focus_keyphrase );
 			$kw_title_score    = $kw_in_title ? 8 : 0;
 			$kw_title_status   = $kw_in_title
-				? \__( 'Focus keyphrase appears in title.', 'wp-seo-pilot' )
-				: \__( 'Add your keyphrase to the title.', 'wp-seo-pilot' );
+				? \__( 'Focus keyphrase appears in title.', 'saman-seo' )
+				: \__( 'Add your keyphrase to the title.', 'saman-seo' );
 
 			$metrics[]    = [
 				'key'         => 'keyphrase_in_title',
-				'label'       => \__( 'Keyphrase in title', 'wp-seo-pilot' ),
-				'issue_label' => \__( 'Keyphrase in title', 'wp-seo-pilot' ),
+				'label'       => \__( 'Keyphrase in title', 'saman-seo' ),
+				'issue_label' => \__( 'Keyphrase in title', 'saman-seo' ),
 				'status'      => $kw_title_status,
 				'score'       => $kw_title_score,
 				'max'         => 8,
@@ -571,13 +611,13 @@ namespace WPSEOPilot\Helpers {
 			$kw_in_desc      = contains_keyphrase( $desc_text, $focus_keyphrase );
 			$kw_desc_score   = $kw_in_desc ? 6 : 0;
 			$kw_desc_status  = $kw_in_desc
-				? \__( 'Focus keyphrase appears in description.', 'wp-seo-pilot' )
-				: \__( 'Add your keyphrase to the meta description.', 'wp-seo-pilot' );
+				? \__( 'Focus keyphrase appears in description.', 'saman-seo' )
+				: \__( 'Add your keyphrase to the meta description.', 'saman-seo' );
 
 			$metrics[]    = [
 				'key'         => 'keyphrase_in_description',
-				'label'       => \__( 'Keyphrase in description', 'wp-seo-pilot' ),
-				'issue_label' => \__( 'Keyphrase in desc', 'wp-seo-pilot' ),
+				'label'       => \__( 'Keyphrase in description', 'saman-seo' ),
+				'issue_label' => \__( 'Keyphrase in desc', 'saman-seo' ),
 				'status'      => $kw_desc_status,
 				'score'       => $kw_desc_score,
 				'max'         => 6,
@@ -590,13 +630,13 @@ namespace WPSEOPilot\Helpers {
 			$kw_in_h1      = $has_h1 && contains_keyphrase( $h1_text, $focus_keyphrase );
 			$kw_h1_score   = $kw_in_h1 ? 5 : 0;
 			$kw_h1_status  = $kw_in_h1
-				? \__( 'Focus keyphrase appears in H1.', 'wp-seo-pilot' )
-				: ( $has_h1 ? \__( 'Add your keyphrase to the H1 heading.', 'wp-seo-pilot' ) : \__( 'Add an H1 with your keyphrase.', 'wp-seo-pilot' ) );
+				? \__( 'Focus keyphrase appears in H1.', 'saman-seo' )
+				: ( $has_h1 ? \__( 'Add your keyphrase to the H1 heading.', 'saman-seo' ) : \__( 'Add an H1 with your keyphrase.', 'saman-seo' ) );
 
 			$metrics[]    = [
 				'key'         => 'keyphrase_in_h1',
-				'label'       => \__( 'Keyphrase in H1', 'wp-seo-pilot' ),
-				'issue_label' => \__( 'Keyphrase in H1', 'wp-seo-pilot' ),
+				'label'       => \__( 'Keyphrase in H1', 'saman-seo' ),
+				'issue_label' => \__( 'Keyphrase in H1', 'saman-seo' ),
 				'status'      => $kw_h1_status,
 				'score'       => $kw_h1_score,
 				'max'         => 5,
@@ -609,25 +649,25 @@ namespace WPSEOPilot\Helpers {
 			$density = calculate_keyphrase_density( $content_text, $focus_keyphrase, $word_count );
 			if ( $density < 0.3 ) {
 				$density_score  = 0;
-				$density_status = sprintf( \__( 'Density: %.1f%% (too low, aim for 0.5-2.5%%).', 'wp-seo-pilot' ), $density );
+				$density_status = sprintf( \__( 'Density: %.1f%% (too low, aim for 0.5-2.5%%).', 'saman-seo' ), $density );
 			} elseif ( $density < 0.5 ) {
 				$density_score  = 3;
-				$density_status = sprintf( \__( 'Density: %.1f%% (slightly low).', 'wp-seo-pilot' ), $density );
+				$density_status = sprintf( \__( 'Density: %.1f%% (slightly low).', 'saman-seo' ), $density );
 			} elseif ( $density <= 2.5 ) {
 				$density_score  = 6;
-				$density_status = sprintf( \__( 'Density: %.1f%% (ideal range).', 'wp-seo-pilot' ), $density );
+				$density_status = sprintf( \__( 'Density: %.1f%% (ideal range).', 'saman-seo' ), $density );
 			} elseif ( $density <= 3.5 ) {
 				$density_score  = 3;
-				$density_status = sprintf( \__( 'Density: %.1f%% (slightly high).', 'wp-seo-pilot' ), $density );
+				$density_status = sprintf( \__( 'Density: %.1f%% (slightly high).', 'saman-seo' ), $density );
 			} else {
 				$density_score  = 0;
-				$density_status = sprintf( \__( 'Density: %.1f%% (keyword stuffing risk).', 'wp-seo-pilot' ), $density );
+				$density_status = sprintf( \__( 'Density: %.1f%% (keyword stuffing risk).', 'saman-seo' ), $density );
 			}
 
 			$metrics[]    = [
 				'key'         => 'keyphrase_density',
-				'label'       => \__( 'Keyphrase density', 'wp-seo-pilot' ),
-				'issue_label' => \__( 'Keyword density', 'wp-seo-pilot' ),
+				'label'       => \__( 'Keyphrase density', 'saman-seo' ),
+				'issue_label' => \__( 'Keyword density', 'saman-seo' ),
 				'status'      => $density_status,
 				'score'       => $density_score,
 				'max'         => 6,
@@ -641,13 +681,13 @@ namespace WPSEOPilot\Helpers {
 			$kw_in_intro       = contains_keyphrase( $first_paragraph, $focus_keyphrase );
 			$kw_intro_score    = $kw_in_intro ? 5 : 0;
 			$kw_intro_status   = $kw_in_intro
-				? \__( 'Focus keyphrase appears in introduction.', 'wp-seo-pilot' )
-				: \__( 'Mention your keyphrase in the first paragraph.', 'wp-seo-pilot' );
+				? \__( 'Focus keyphrase appears in introduction.', 'saman-seo' )
+				: \__( 'Mention your keyphrase in the first paragraph.', 'saman-seo' );
 
 			$metrics[]    = [
 				'key'         => 'keyphrase_in_intro',
-				'label'       => \__( 'Keyphrase in intro', 'wp-seo-pilot' ),
-				'issue_label' => \__( 'Keyphrase in intro', 'wp-seo-pilot' ),
+				'label'       => \__( 'Keyphrase in intro', 'saman-seo' ),
+				'issue_label' => \__( 'Keyphrase in intro', 'saman-seo' ),
 				'status'      => $kw_intro_status,
 				'score'       => $kw_intro_score,
 				'max'         => 5,
@@ -689,15 +729,15 @@ namespace WPSEOPilot\Helpers {
 				// Add informational metric for the analysis tab.
 				$sec_status = sprintf(
 					/* translators: %1$s: coverage score, %2$.1f: density percentage */
-					\__( 'Coverage: %1$s • Density: %2$.1f%%', 'wp-seo-pilot' ),
+					\__( 'Coverage: %1$s ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Density: %2$.1f%%', 'saman-seo' ),
 					$sec_checks_passed . '/4',
 					$sec_density
 				);
 
 				$metrics[] = [
 					'key'         => 'secondary_keyphrase_' . ( $idx + 1 ),
-					'label'       => sprintf( \__( 'Secondary: "%s"', 'wp-seo-pilot' ), $sec_keyphrase ),
-					'issue_label' => sprintf( \__( 'Secondary #%d', 'wp-seo-pilot' ), $idx + 1 ),
+					'label'       => sprintf( \__( 'Secondary: "%s"', 'saman-seo' ), $sec_keyphrase ),
+					'issue_label' => sprintf( \__( 'Secondary #%d', 'saman-seo' ), $idx + 1 ),
 					'status'      => $sec_status,
 					'score'       => 0, // Informational only.
 					'max'         => 0,
@@ -716,22 +756,22 @@ namespace WPSEOPilot\Helpers {
 		$h2_count = count_headings( $content_html, 2 );
 		if ( 0 === $h2_count ) {
 			$h2_score  = 0;
-			$h2_status = \__( 'No H2 headings found. Add subheadings.', 'wp-seo-pilot' );
+			$h2_status = \__( 'No H2 headings found. Add subheadings.', 'saman-seo' );
 		} elseif ( 1 === $h2_count ) {
 			$h2_score  = 5;
-			$h2_status = \__( '1 H2 heading found. Consider adding more.', 'wp-seo-pilot' );
+			$h2_status = \__( '1 H2 heading found. Consider adding more.', 'saman-seo' );
 		} elseif ( $h2_count <= 5 ) {
 			$h2_score  = 8;
-			$h2_status = sprintf( \__( '%d H2 headings (well structured).', 'wp-seo-pilot' ), $h2_count );
+			$h2_status = sprintf( \__( '%d H2 headings (well structured).', 'saman-seo' ), $h2_count );
 		} else {
 			$h2_score  = 6;
-			$h2_status = sprintf( \__( '%d H2 headings (many sections).', 'wp-seo-pilot' ), $h2_count );
+			$h2_status = sprintf( \__( '%d H2 headings (many sections).', 'saman-seo' ), $h2_count );
 		}
 
 		$metrics[]    = [
 			'key'         => 'h2_headings',
-			'label'       => \__( 'H2 subheadings', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'H2 headings', 'wp-seo-pilot' ),
+			'label'       => \__( 'H2 subheadings', 'saman-seo' ),
+			'issue_label' => \__( 'H2 headings', 'saman-seo' ),
 			'status'      => $h2_status,
 			'score'       => $h2_score,
 			'max'         => 8,
@@ -745,19 +785,19 @@ namespace WPSEOPilot\Helpers {
 		$h3_count = count_headings( $content_html, 3 );
 		if ( 0 === $h3_count ) {
 			$h3_score  = 3;
-			$h3_status = \__( 'No H3 headings. Consider adding for longer content.', 'wp-seo-pilot' );
+			$h3_status = \__( 'No H3 headings. Consider adding for longer content.', 'saman-seo' );
 		} elseif ( $h3_count <= 6 ) {
 			$h3_score  = 7;
-			$h3_status = sprintf( \__( '%d H3 headings (good detail).', 'wp-seo-pilot' ), $h3_count );
+			$h3_status = sprintf( \__( '%d H3 headings (good detail).', 'saman-seo' ), $h3_count );
 		} else {
 			$h3_score  = 5;
-			$h3_status = sprintf( \__( '%d H3 headings (many subsections).', 'wp-seo-pilot' ), $h3_count );
+			$h3_status = sprintf( \__( '%d H3 headings (many subsections).', 'saman-seo' ), $h3_count );
 		}
 
 		$metrics[]    = [
 			'key'         => 'h3_headings',
-			'label'       => \__( 'H3 subheadings', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'H3 headings', 'wp-seo-pilot' ),
+			'label'       => \__( 'H3 subheadings', 'saman-seo' ),
+			'issue_label' => \__( 'H3 headings', 'saman-seo' ),
 			'status'      => $h3_status,
 			'score'       => $h3_score,
 			'max'         => 7,
@@ -801,22 +841,22 @@ namespace WPSEOPilot\Helpers {
 
 		if ( 0 === $internal_links ) {
 			$int_link_score  = 0;
-			$int_link_status = \__( 'Add internal links to related posts.', 'wp-seo-pilot' );
+			$int_link_status = \__( 'Add internal links to related posts.', 'saman-seo' );
 		} elseif ( 1 === $internal_links ) {
 			$int_link_score  = 4;
-			$int_link_status = \__( '1 internal link found — add more.', 'wp-seo-pilot' );
+			$int_link_status = \__( '1 internal link found ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â add more.', 'saman-seo' );
 		} elseif ( $internal_links <= 3 ) {
 			$int_link_score  = 6;
-			$int_link_status = sprintf( \__( '%d internal links — good start.', 'wp-seo-pilot' ), $internal_links );
+			$int_link_status = sprintf( \__( '%d internal links ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â good start.', 'saman-seo' ), $internal_links );
 		} else {
 			$int_link_score  = 8;
-			$int_link_status = sprintf( \__( '%d internal links (excellent).', 'wp-seo-pilot' ), $internal_links );
+			$int_link_status = sprintf( \__( '%d internal links (excellent).', 'saman-seo' ), $internal_links );
 		}
 
 		$metrics[]    = [
 			'key'         => 'internal_links',
-			'label'       => \__( 'Internal links', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'Internal links', 'wp-seo-pilot' ),
+			'label'       => \__( 'Internal links', 'saman-seo' ),
+			'issue_label' => \__( 'Internal links', 'saman-seo' ),
 			'status'      => $int_link_status,
 			'score'       => $int_link_score,
 			'max'         => 8,
@@ -830,19 +870,19 @@ namespace WPSEOPilot\Helpers {
 		$external_links = count_external_links( $content_html );
 		if ( 0 === $external_links ) {
 			$ext_link_score  = 0;
-			$ext_link_status = \__( 'No external links. Consider citing sources.', 'wp-seo-pilot' );
+			$ext_link_status = \__( 'No external links. Consider citing sources.', 'saman-seo' );
 		} elseif ( $external_links <= 3 ) {
 			$ext_link_score  = 4;
-			$ext_link_status = sprintf( \__( '%d external link(s) (good for credibility).', 'wp-seo-pilot' ), $external_links );
+			$ext_link_status = sprintf( \__( '%d external link(s) (good for credibility).', 'saman-seo' ), $external_links );
 		} else {
 			$ext_link_score  = 3;
-			$ext_link_status = sprintf( \__( '%d external links (watch link equity).', 'wp-seo-pilot' ), $external_links );
+			$ext_link_status = sprintf( \__( '%d external links (watch link equity).', 'saman-seo' ), $external_links );
 		}
 
 		$metrics[]    = [
 			'key'         => 'external_links',
-			'label'       => \__( 'External links', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'External links', 'wp-seo-pilot' ),
+			'label'       => \__( 'External links', 'saman-seo' ),
+			'issue_label' => \__( 'External links', 'saman-seo' ),
 			'status'      => $ext_link_status,
 			'score'       => $ext_link_score,
 			'max'         => 4,
@@ -868,23 +908,23 @@ namespace WPSEOPilot\Helpers {
 
 		if ( 0 === $images_total ) {
 			$alt_score  = 3;
-			$alt_status = \__( 'No inline images (not required).', 'wp-seo-pilot' );
+			$alt_status = \__( 'No inline images (not required).', 'saman-seo' );
 		} else {
 			$coverage  = $images_with_alt / max( 1, $images_total );
 			$alt_score = (int) round( 3 * $coverage );
 			if ( $coverage >= 0.9 ) {
-				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images (great).', 'wp-seo-pilot' ), $images_with_alt, $images_total );
+				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images (great).', 'saman-seo' ), $images_with_alt, $images_total );
 			} elseif ( $coverage >= 0.5 ) {
-				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images — add more.', 'wp-seo-pilot' ), $images_with_alt, $images_total );
+				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â add more.', 'saman-seo' ), $images_with_alt, $images_total );
 			} else {
-				$alt_status = sprintf( \__( 'Only %1$d of %2$d images have alt text.', 'wp-seo-pilot' ), $images_with_alt, $images_total );
+				$alt_status = sprintf( \__( 'Only %1$d of %2$d images have alt text.', 'saman-seo' ), $images_with_alt, $images_total );
 			}
 		}
 
 		$metrics[]    = [
 			'key'         => 'image_alts',
-			'label'       => \__( 'Image alt text', 'wp-seo-pilot' ),
-			'issue_label' => \__( 'Image alts', 'wp-seo-pilot' ),
+			'label'       => \__( 'Image alt text', 'saman-seo' ),
+			'issue_label' => \__( 'Image alts', 'saman-seo' ),
 			'status'      => $alt_status,
 			'score'       => $alt_score,
 			'max'         => 3,
@@ -907,13 +947,13 @@ namespace WPSEOPilot\Helpers {
 		// Determine level and label.
 		if ( $total_score >= 70 ) {
 			$level = 'good';
-			$label = \__( 'Green zone', 'wp-seo-pilot' );
+			$label = \__( 'Green zone', 'saman-seo' );
 		} elseif ( $total_score >= 40 ) {
 			$level = 'fair';
-			$label = \__( 'Needs tweaks', 'wp-seo-pilot' );
+			$label = \__( 'Needs tweaks', 'saman-seo' );
 		} else {
 			$level = 'low';
-			$label = \__( 'Needs attention', 'wp-seo-pilot' );
+			$label = \__( 'Needs attention', 'saman-seo' );
 		}
 
 		// Build summary from failing metrics.
@@ -937,12 +977,12 @@ namespace WPSEOPilot\Helpers {
 				0,
 				3
 			);
-			$summary = implode( ' • ', $issue_labels );
+			$summary = implode( ' ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ', $issue_labels );
 			if ( count( $issues ) > 3 ) {
 				$summary .= sprintf( ' (+%d more)', count( $issues ) - 3 );
 			}
 		} else {
-			$summary = \__( 'All checks look good!', 'wp-seo-pilot' );
+			$summary = \__( 'All checks look good!', 'saman-seo' );
 		}
 
 		$result = [
@@ -955,7 +995,7 @@ namespace WPSEOPilot\Helpers {
 			'secondary_keyphrases' => $secondary_analysis,
 		];
 
-		return \apply_filters( 'wpseopilot_seo_score', $result, $post );
+		return \apply_filters( 'SAMAN_SEO_seo_score', $result, $post );
 	}
 
 	/**
@@ -969,7 +1009,7 @@ namespace WPSEOPilot\Helpers {
 	 * @return string|null
 	 */
 	function breadcrumbs( $args = null, $echo = true ) {
-		$plugin  = \WPSEOPilot\Plugin::instance();
+		$plugin  = \Saman\SEO\Plugin::instance();
 		$service = $plugin->get( 'breadcrumbs' );
 
 		if ( ! $service ) {
@@ -999,6 +1039,17 @@ namespace WPSEOPilot\Helpers {
 
 namespace {
 	/**
+	 * Check if a module is enabled.
+	 *
+	 * @param string $module Module slug (e.g., 'sitemap', 'redirects', '404_log').
+	 *
+	 * @return bool True if the module is enabled, false otherwise.
+	 */
+	function SAMAN_SEO_module_enabled( string $module ): bool {
+		return \Saman\SEO\Helpers\module_enabled( $module );
+	}
+
+	/**
 	 * Render breadcrumbs in theme templates.
 	 *
 	 * @param array|null $args Optional arguments to override settings.
@@ -1006,8 +1057,8 @@ namespace {
 	 *
 	 * @return string|null
 	 */
-	function wpseopilot_breadcrumbs( $args = null, $echo = true ) {
-		return \WPSEOPilot\Helpers\breadcrumbs( $args, $echo );
+	function SAMAN_SEO_breadcrumbs( $args = null, $echo = true ) {
+		return \Saman\SEO\Helpers\breadcrumbs( $args, $echo );
 	}
 
 	/**
@@ -1019,8 +1070,8 @@ namespace {
 	 *
 	 * @return int|\WP_Error Redirect ID or WP_Error.
 	 */
-	function wpseopilot_create_redirect( $source, $target, $status_code = 301 ) {
-		$plugin = \WPSEOPilot\Plugin::instance();
+	function SAMAN_SEO_create_redirect( $source, $target, $status_code = 301 ) {
+		$plugin = \Saman\SEO\Plugin::instance();
 		$svc    = $plugin->get( 'redirects' );
 
 		if ( ! $svc ) {

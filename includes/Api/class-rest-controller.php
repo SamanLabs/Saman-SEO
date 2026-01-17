@@ -2,11 +2,11 @@
 /**
  * REST Controller Base Class
  *
- * @package WPSEOPilot
+ * @package Saman\SEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Api;
+namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -22,7 +22,7 @@ abstract class REST_Controller {
      *
      * @var string
      */
-    protected $namespace = 'wpseopilot/v2';
+    protected $namespace = 'saman-seo/v1';
 
     /**
      * Register routes - must be implemented by child classes.

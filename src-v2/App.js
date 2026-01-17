@@ -37,29 +37,29 @@ const PageLoader = () => (
 );
 
 const viewToPage = {
-    dashboard: 'wpseopilot-dashboard',
-    'search-appearance': 'wpseopilot-search-appearance',
-    sitemap: 'wpseopilot-sitemap',
-    tools: 'wpseopilot-tools',
-    redirects: 'wpseopilot-redirects',
-    '404-log': 'wpseopilot-404-log',
-    'internal-linking': 'wpseopilot-internal-linking',
-    audit: 'wpseopilot-audit',
-    'ai-assistant': 'wpseopilot-ai-assistant',
-    assistants: 'wpseopilot-assistants',
-    settings: 'wpseopilot-settings',
-    more: 'wpseopilot-more',
-    'bulk-editor': 'wpseopilot-bulk-editor',
-    'content-gaps': 'wpseopilot-content-gaps',
-    'schema-builder': 'wpseopilot-schema-builder',
-    'link-health': 'wpseopilot-link-health',
-    'local-seo': 'wpseopilot-local-seo',
-    'robots-txt': 'wpseopilot-robots-txt',
-    'image-seo': 'wpseopilot-image-seo',
-    'instant-indexing': 'wpseopilot-instant-indexing',
-    'schema-validator': 'wpseopilot-schema-validator',
-    'htaccess-editor': 'wpseopilot-htaccess-editor',
-    'mobile-friendly': 'wpseopilot-mobile-friendly',
+    dashboard: 'saman-seo-dashboard',
+    'search-appearance': 'saman-seo-search-appearance',
+    sitemap: 'saman-seo-sitemap',
+    tools: 'saman-seo-tools',
+    redirects: 'saman-seo-redirects',
+    '404-log': 'saman-seo-404-log',
+    'internal-linking': 'saman-seo-internal-linking',
+    audit: 'saman-seo-audit',
+    'ai-assistant': 'saman-seo-ai-assistant',
+    assistants: 'saman-seo-assistants',
+    settings: 'saman-seo-settings',
+    more: 'saman-seo-more',
+    'bulk-editor': 'saman-seo-bulk-editor',
+    'content-gaps': 'saman-seo-content-gaps',
+    'schema-builder': 'saman-seo-schema-builder',
+    'link-health': 'saman-seo-link-health',
+    'local-seo': 'saman-seo-local-seo',
+    'robots-txt': 'saman-seo-robots-txt',
+    'image-seo': 'saman-seo-image-seo',
+    'instant-indexing': 'saman-seo-instant-indexing',
+    'schema-validator': 'saman-seo-schema-validator',
+    'htaccess-editor': 'saman-seo-htaccess-editor',
+    'mobile-friendly': 'saman-seo-mobile-friendly',
 };
 
 const pageToView = Object.entries(viewToPage).reduce((acc, [view, page]) => {
@@ -76,7 +76,7 @@ const App = ({ initialView = 'dashboard' }) => {
     useEffect(() => {
         const checkSetupStatus = async () => {
             try {
-                const response = await apiFetch({ path: '/wpseopilot/v2/setup/status' });
+                const response = await apiFetch({ path: '/saman-seo/v1/setup/status' });
                 if (response.success && response.data.show_wizard) {
                     setShowSetup(true);
                 }
@@ -103,12 +103,12 @@ const App = ({ initialView = 'dashboard' }) => {
             return;
         }
 
-        const menu = document.getElementById('toplevel_page_wpseopilot');
+        const menu = document.getElementById('toplevel_page_saman-seo');
         if (!menu) {
             return;
         }
 
-        const submenuLinks = menu.querySelectorAll('.wp-submenu a[href*="page=wpseopilot"]');
+        const submenuLinks = menu.querySelectorAll('.wp-submenu a[href*="page=saman-seo"]');
         submenuLinks.forEach((link) => {
             link.removeAttribute('aria-current');
             const listItem = link.closest('li');
@@ -174,13 +174,13 @@ const App = ({ initialView = 'dashboard' }) => {
                 return;
             }
 
-            const menu = document.getElementById('toplevel_page_wpseopilot');
+            const menu = document.getElementById('toplevel_page_saman-seo');
             if (!menu || !menu.contains(link)) {
                 return;
             }
 
             const href = link.getAttribute('href');
-            if (!href || !href.includes('page=wpseopilot')) {
+            if (!href || !href.includes('page=saman-seo')) {
                 return;
             }
 
@@ -252,8 +252,8 @@ const App = ({ initialView = 'dashboard' }) => {
     // Show loading while checking setup status
     if (!setupChecked) {
         return (
-            <div className="wp-seo-pilot-admin">
-                <div className="wp-seo-pilot-shell">
+            <div className="saman-seo-admin">
+                <div className="saman-seo-shell">
                     <div className="content-area">
                         <div className="loading-state">Loading...</div>
                     </div>
@@ -265,7 +265,7 @@ const App = ({ initialView = 'dashboard' }) => {
     // Show setup wizard if needed
     if (showSetup) {
         return (
-            <div className="wp-seo-pilot-admin">
+            <div className="saman-seo-admin">
                 <Suspense fallback={<PageLoader />}>
                     <Setup onComplete={handleSetupComplete} onSkip={handleSetupSkip} />
                 </Suspense>
@@ -274,8 +274,8 @@ const App = ({ initialView = 'dashboard' }) => {
     }
 
     return (
-        <div className="wp-seo-pilot-admin">
-            <div className="wp-seo-pilot-shell">
+        <div className="saman-seo-admin">
+            <div className="saman-seo-shell">
                 <Header currentView={currentView} onNavigate={handleNavigate} />
                 <div className="content-area">
                     <Suspense fallback={<PageLoader />}>

@@ -35,7 +35,7 @@ const ImageSeo = () => {
         setLoading(true);
         try {
             const response = await apiFetch({
-                path: `wpseopilot/v2/images?filter=${filter}&page=${page}&per_page=${perPage}&search=${encodeURIComponent(search)}`,
+                path: `saman-seo/v1/images?filter=${filter}&page=${page}&per_page=${perPage}&search=${encodeURIComponent(search)}`,
             });
             setImages(response.images || []);
             setStats(response.stats || {});
@@ -57,7 +57,7 @@ const ImageSeo = () => {
         setSaving({ ...saving, [imageId]: true });
         try {
             await apiFetch({
-                path: `wpseopilot/v2/images/${imageId}`,
+                path: `saman-seo/v1/images/${imageId}`,
                 method: 'POST',
                 data: { alt: newAlt },
             });
@@ -93,7 +93,7 @@ const ImageSeo = () => {
         setSaving({ ...saving, [imageId]: true });
         try {
             const response = await apiFetch({
-                path: `wpseopilot/v2/images/${imageId}/generate-alt`,
+                path: `saman-seo/v1/images/${imageId}/generate-alt`,
                 method: 'POST',
             });
             if (response.alt) {
