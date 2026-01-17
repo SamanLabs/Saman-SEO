@@ -82,13 +82,13 @@ class GitHub_Updater {
                 'icon'        => 'https://raw.githubusercontent.com/jhd3197/WP-SEO-Pilot/main/assets/images/icon-128.png',
                 'banner'      => 'https://raw.githubusercontent.com/jhd3197/WP-SEO-Pilot/main/assets/images/banner-772x250.png',
             ],
-            'wp-ai-pilot/wp-ai-pilot.php' => [
-                'slug'        => 'wp-ai-pilot',
-                'repo'        => 'jhd3197/WP-AI-Pilot',
-                'name'        => 'WP AI Pilot',
+            'saman-labs-ai/saman-labs-ai.php' => [
+                'slug'        => 'saman-labs-ai',
+                'repo'        => 'jhd3197/Saman-Labs-AI',
+                'name'        => 'Saman Labs AI',
                 'description' => 'Centralized AI management for WordPress',
-                'icon'        => 'https://raw.githubusercontent.com/jhd3197/WP-AI-Pilot/main/assets/images/icon-128.png',
-                'banner'      => 'https://raw.githubusercontent.com/jhd3197/WP-AI-Pilot/main/assets/images/banner-772x250.png',
+                'icon'        => 'https://raw.githubusercontent.com/jhd3197/Saman-Labs-AI/main/assets/images/icon-128.png',
+                'banner'      => 'https://raw.githubusercontent.com/jhd3197/Saman-Labs-AI/main/assets/images/banner-772x250.png',
             ],
             'wp-security-pilot/wp-security-pilot.php' => [
                 'slug'        => 'wp-security-pilot',

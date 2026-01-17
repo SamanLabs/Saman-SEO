@@ -410,13 +410,13 @@ class Admin_UI {
 			[
 				'variables'  => $variables,
 				'aiEnabled'  => $ai_enabled,
-				'aiProvider' => $ai_provider, // 'wp-ai-pilot', 'native', or 'none'
+				'aiProvider' => $ai_provider, // 'samanlabs-ai', 'native', or 'none'
 				'aiPilot'    => [
 					'installed'   => $ai_status['installed'],
 					'active'      => $ai_status['active'],
 					'ready'       => $ai_status['ready'],
 					'version'     => $ai_status['version'] ?? null,
-					'settingsUrl' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+					'settingsUrl' => admin_url( 'admin.php?page=samanlabs-ai' ),
 				],
 				'siteTitle'  => get_bloginfo( 'name' ),
 				'tagline'    => get_bloginfo( 'description' ),

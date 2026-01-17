@@ -2,7 +2,7 @@
 /**
  * Assistants REST Controller
  *
- * Simplified controller that delegates AI chat to WP AI Pilot.
+ * Simplified controller that delegates AI chat to Saman Labs AI.
  * Keeps custom assistants CRUD and usage tracking local.
  *
  * @package SamanLabs\SEO
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * REST API controller for AI assistants.
- * Chat is handled by WP AI Pilot. Custom assistants CRUD remains local.
+ * Chat is handled by Saman Labs AI. Custom assistants CRUD remains local.
  */
 class Assistants_Controller extends REST_Controller {
 
@@ -59,7 +59,7 @@ class Assistants_Controller extends REST_Controller {
 			],
 		] );
 
-		// Chat with assistant (delegates to WP AI Pilot).
+		// Chat with assistant (delegates to Saman Labs AI).
 		register_rest_route( $this->namespace, '/assistants/chat', [
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
@@ -112,7 +112,7 @@ class Assistants_Controller extends REST_Controller {
 
 	/**
 	 * Get all available assistants.
-	 * Returns built-in SEO assistants registered with WP AI Pilot + custom assistants.
+	 * Returns built-in SEO assistants registered with Saman Labs AI + custom assistants.
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return \WP_REST_Response
@@ -120,7 +120,7 @@ class Assistants_Controller extends REST_Controller {
 	public function get_assistants( $request ) {
 		$assistants = [];
 
-		// Add built-in SEO assistants (registered with WP AI Pilot).
+		// Add built-in SEO assistants (registered with Saman Labs AI).
 		$assistants[] = [
 			'id'                => 'seo-general',
 			'name'              => __( 'SEO Assistant', 'saman-labs-seo' ),
@@ -177,7 +177,7 @@ class Assistants_Controller extends REST_Controller {
 
 	/**
 	 * Chat with an assistant.
-	 * Delegates to WP AI Pilot for AI processing.
+	 * Delegates to Saman Labs AI for AI processing.
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return \WP_REST_Response
@@ -200,20 +200,20 @@ class Assistants_Controller extends REST_Controller {
 			return $this->error( __( 'Message is required.', 'saman-labs-seo' ), 'missing_message', 400 );
 		}
 
-		// Check if WP AI Pilot is ready.
+		// Check if Saman Labs AI is ready.
 		if ( ! AI_Pilot::is_ready() ) {
 			$status = AI_Pilot::get_status();
 
 			if ( ! $status['installed'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is required for AI assistants. Please install it from the More page.', 'saman-labs-seo' ),
+					__( 'Saman Labs AI is required for AI assistants. Please install it from the More page.', 'saman-labs-seo' ),
 					'ai_not_installed',
 					400
 				);
 			}
 
 			return $this->error(
-				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'saman-labs-seo' ),
+				__( 'Saman Labs AI needs configuration. Please add an API key in Saman Labs AI settings.', 'saman-labs-seo' ),
 				'ai_not_configured',
 				400
 			);
@@ -224,7 +224,7 @@ class Assistants_Controller extends REST_Controller {
 			return $this->chat_with_custom_assistant( $assistant_id, $message, $context );
 		}
 
-		// Use WP AI Pilot for built-in assistants.
+		// Use Saman Labs AI for built-in assistants.
 		$response = AI_Pilot::assistant_chat( $assistant_id, $message, $context );
 
 		if ( is_wp_error( $response ) ) {
@@ -272,7 +272,7 @@ class Assistants_Controller extends REST_Controller {
 			],
 		];
 
-		// Use WP AI Pilot for the actual chat.
+		// Use Saman Labs AI for the actual chat.
 		$response = AI_Pilot::chat( $messages );
 
 		if ( is_wp_error( $response ) ) {

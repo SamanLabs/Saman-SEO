@@ -314,7 +314,7 @@ class Admin_V2 {
                 'active'      => $ai_status['active'],
                 'ready'       => $ai_status['ready'],
                 'version'     => $ai_status['version'] ?? null,
-                'settingsUrl' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+                'settingsUrl' => admin_url( 'admin.php?page=samanlabs-ai' ),
             ],
         ] );
     }

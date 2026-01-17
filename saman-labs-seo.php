@@ -123,7 +123,7 @@ add_action(
 
 		\SamanLabs\SEO\Plugin::instance()->boot();
 
-		// Initialize WP AI Pilot integration (registers assistants, hooks for AI features).
+		// Initialize Saman Labs AI integration (registers assistants, hooks for AI features).
 		if ( class_exists( '\SamanLabs\SEO\Integration\AI_Pilot' ) ) {
 			\SamanLabs\SEO\Integration\AI_Pilot::init();
 		}

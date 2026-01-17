@@ -2,7 +2,7 @@
 /**
  * AI REST Controller
  *
- * Simplified controller that delegates all AI operations to WP AI Pilot.
+ * Simplified controller that delegates all AI operations to Saman Labs AI.
  *
  * @package SamanLabs\SEO
  * @since 0.2.0
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * REST API controller for AI generation.
- * All AI operations are handled by WP AI Pilot.
+ * All AI operations are handled by Saman Labs AI.
  */
 class Ai_Controller extends REST_Controller {
 
@@ -101,13 +101,13 @@ class Ai_Controller extends REST_Controller {
 			);
 		}
 
-		// Check if WP AI Pilot is ready.
+		// Check if Saman Labs AI is ready.
 		if ( ! AI_Pilot::is_ready() ) {
 			$status = AI_Pilot::get_status();
 
 			if ( ! $status['installed'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is required for AI features. Please install it from the More page.', 'saman-labs-seo' ),
+					__( 'Saman Labs AI is required for AI features. Please install it from the More page.', 'saman-labs-seo' ),
 					'ai_not_installed',
 					400
 				);
@@ -115,14 +115,14 @@ class Ai_Controller extends REST_Controller {
 
 			if ( ! $status['active'] ) {
 				return $this->error(
-					__( 'WP AI Pilot is installed but not activated. Please activate it.', 'saman-labs-seo' ),
+					__( 'Saman Labs AI is installed but not activated. Please activate it.', 'saman-labs-seo' ),
 					'ai_not_active',
 					400
 				);
 			}
 
 			return $this->error(
-				__( 'WP AI Pilot needs configuration. Please add an API key in WP AI Pilot settings.', 'saman-labs-seo' ),
+				__( 'Saman Labs AI needs configuration. Please add an API key in Saman Labs AI settings.', 'saman-labs-seo' ),
 				'ai_not_configured',
 				400
 			);
@@ -160,7 +160,7 @@ class Ai_Controller extends REST_Controller {
 		}
 
 		return $this->success( $results, __( 'AI generation completed.', 'saman-labs-seo' ), [
-			'provider' => 'wp-ai-pilot',
+			'provider' => 'samanlabs-ai',
 		] );
 	}
 
@@ -184,19 +184,19 @@ class Ai_Controller extends REST_Controller {
 				'active'       => $status['active'],
 				'ready'        => $status['ready'],
 				'version'      => $status['version'] ?? null,
-				'settings_url' => admin_url( 'admin.php?page=wp-ai-pilot' ),
+				'settings_url' => admin_url( 'admin.php?page=samanlabs-ai' ),
 			],
 		];
 
 		if ( $ready ) {
-			$response['message']      = __( 'Connected to WP AI Pilot', 'saman-labs-seo' );
+			$response['message']      = __( 'Connected to Saman Labs AI', 'saman-labs-seo' );
 			$response['models_count'] = count( AI_Pilot::get_models() );
 		} elseif ( $status['installed'] && ! $status['active'] ) {
-			$response['message'] = __( 'WP AI Pilot needs to be activated', 'saman-labs-seo' );
+			$response['message'] = __( 'Saman Labs AI needs to be activated', 'saman-labs-seo' );
 		} elseif ( $status['installed'] && ! $status['ready'] ) {
-			$response['message'] = __( 'WP AI Pilot needs configuration', 'saman-labs-seo' );
+			$response['message'] = __( 'Saman Labs AI needs configuration', 'saman-labs-seo' );
 		} else {
-			$response['message'] = __( 'Install WP AI Pilot to enable AI features', 'saman-labs-seo' );
+			$response['message'] = __( 'Install Saman Labs AI to enable AI features', 'saman-labs-seo' );
 		}
 
 		return $this->success( $response );
