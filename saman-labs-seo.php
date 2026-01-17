@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Saman Labs SEO
+ * Plugin Name: Saman SEO
  * Plugin URI:  https://github.com/jhd3197/saman-labs-seo
  * Description: Opinionated all-in-one SEO toolkit that keeps titles, metadata, structured data, redirects, and audits in sync with WordPress.
  * Version:     2.0.0

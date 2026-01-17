@@ -157,7 +157,7 @@ class AI_Pilot {
 		wp_ai_pilot()->register_plugin( [
 			'slug'        => 'saman-labs-seo',
 			'file'        => 'saman-labs-seo/saman-labs-seo.php',
-			'name'        => 'Saman Labs SEO',
+			'name'        => 'Saman SEO',
 			'permissions' => [ 'generate', 'chat', 'assistants' ],
 		] );
 	}

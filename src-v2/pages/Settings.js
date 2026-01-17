@@ -757,7 +757,7 @@ const BreadcrumbsTab = ({ settings, updateSetting }) => {
 
                 <div className="side-card">
                     <h4>Gutenberg Block</h4>
-                    <p className="muted">Search for "Saman Labs SEO Breadcrumbs" in the block inserter to add breadcrumbs to any page.</p>
+                    <p className="muted">Search for "Saman SEO Breadcrumbs" in the block inserter to add breadcrumbs to any page.</p>
                 </div>
 
                 <div className="side-card success">

@@ -117,19 +117,19 @@ class Admin_UI {
 		if ( ! AI_Pilot::is_installed() ) {
 			$message = sprintf(
 				/* translators: %s: link to install Saman Labs AI */
-				__( '<strong>Saman Labs SEO:</strong> Install %s to enable AI-powered SEO features like automatic title and description generation.', 'saman-labs-seo' ),
+				__( '<strong>Saman SEO:</strong> Install %s to enable AI-powered SEO features like automatic title and description generation.', 'saman-labs-seo' ),
 				'<a href="' . esc_url( admin_url( 'plugin-install.php?s=saman-labs-ai&tab=search&type=term' ) ) . '">Saman Labs AI</a>'
 			);
 		} elseif ( ! AI_Pilot::is_active() ) {
 			$message = sprintf(
 				/* translators: %s: link to plugins page */
-				__( '<strong>Saman Labs SEO:</strong> Saman Labs AI is installed but not active. %s to enable AI features.', 'saman-labs-seo' ),
+				__( '<strong>Saman SEO:</strong> Saman Labs AI is installed but not active. %s to enable AI features.', 'saman-labs-seo' ),
 				'<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">' . __( 'Activate it', 'saman-labs-seo' ) . '</a>'
 			);
 		} else {
 			$message = sprintf(
 				/* translators: %s: link to settings */
-				__( '<strong>Saman Labs SEO:</strong> Saman Labs AI needs configuration. %s to enable AI features.', 'saman-labs-seo' ),
+				__( '<strong>Saman SEO:</strong> Saman Labs AI needs configuration. %s to enable AI features.', 'saman-labs-seo' ),
 				'<a href="' . esc_url( admin_url( 'admin.php?page=samanlabs-ai' ) ) . '">' . __( 'Configure it', 'saman-labs-seo' ) . '</a>'
 			);
 		}

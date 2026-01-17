@@ -1,7 +1,7 @@
 {
   "name": "saman-labs-seo",
   "version": "2.0.0",
-  "description": "Asset build pipeline for the Saman Labs SEO plugin",
+  "description": "Asset build pipeline for the Saman SEO plugin",
   "private": true,
   "scripts": {
     "clean:css": "rimraf --glob \"assets/css/*.css\"",

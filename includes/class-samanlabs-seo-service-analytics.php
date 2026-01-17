@@ -176,7 +176,7 @@ class Analytics {
 			window.samanlabsSeoDebug = " . ( defined( 'WP_DEBUG' ) && WP_DEBUG ? 'true' : 'false' ) . ";
 
 			if (window.samanlabsSeoDebug) {
-				console.log('Saman Labs SEO Analytics: Initialized', {
+				console.log('Saman SEO Analytics: Initialized', {
 					siteId: '{$this->site_id}',
 					visitorId: '{$visitor_id}',
 					version: '{$plugin_version}',
