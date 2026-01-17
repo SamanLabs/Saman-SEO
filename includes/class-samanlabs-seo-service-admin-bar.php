@@ -26,9 +26,8 @@ class Admin_Bar {
 	 * @return void
 	 */
 	public function boot() {
-		// Check if admin bar is enabled in settings
-		$enabled = get_option( 'samanlabs_seo_enable_admin_bar', true );
-		if ( false === $enabled || '0' === $enabled || 0 === $enabled ) {
+		// Check if admin bar is enabled in settings.
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( 'admin_bar' ) ) {
 			return;
 		}
 
