@@ -1,7 +1,7 @@
 // Social Page Specific Styles
 
-.wpseopilot-social-page {
-	.wpseopilot-settings-grid {
+.samanlabs-seo-social-page {
+	.samanlabs-seo-settings-grid {
 		display: grid;
 		grid-template-columns: 2fr 1fr;
 		gap: @spacing-lg;
@@ -12,7 +12,7 @@
 		}
 	}
 
-	.wpseopilot-form-section {
+	.samanlabs-seo-form-section {
 		border-bottom: 1px solid @color-border-light;
 		padding-bottom: @spacing-lg;
 		margin-bottom: @spacing-lg;
@@ -31,7 +31,7 @@
 		}
 	}
 
-	.wpseopilot-accordion {
+	.samanlabs-seo-accordion {
 		border-bottom: 1px solid @color-border-light;
 
 		&:last-child {
@@ -50,12 +50,12 @@
 				background: @color-bg-light;
 			}
 
-			.wpseopilot-accordion-title {
+			.samanlabs-seo-accordion-title {
 				font-weight: @font-weight-medium;
 				color: @color-text;
 			}
 
-			.wpseopilot-accordion-badge {
+			.samanlabs-seo-accordion-badge {
 				font-size: @font-size-small;
 				color: @color-text-lighter;
 				background: @color-bg-light;
@@ -69,13 +69,13 @@
 			background: @color-bg-light;
 		}
 
-		.wpseopilot-accordion__body {
+		.samanlabs-seo-accordion__body {
 			padding: @spacing-lg;
 			background: @color-bg;
 		}
 	}
 
-	.wpseopilot-info-list {
+	.samanlabs-seo-info-list {
 		list-style: none;
 		padding: 0;
 		margin: 0;
@@ -94,7 +94,7 @@
 		}
 	}
 
-	.wpseopilot-settings-footer {
+	.samanlabs-seo-settings-footer {
 		margin-top: @spacing-xl;
 		padding-top: @spacing-lg;
 		border-top: 1px solid @color-border-light;
@@ -102,13 +102,13 @@
 }
 
 // Social Card Preview Styles
-.wpseopilot-social-card-preview__controls {
+.samanlabs-seo-social-card-preview__controls {
 	display: flex;
 	align-items: flex-end;
 	gap: @spacing-md;
 	margin-bottom: @spacing-lg;
 
-	.wpseopilot-form-field {
+	.samanlabs-seo-form-field {
 		flex: 1;
 		margin-bottom: 0;
 	}
@@ -121,7 +121,7 @@
 	}
 }
 
-.wpseopilot-social-card-preview__frame {
+.samanlabs-seo-social-card-preview__frame {
 	position: relative;
 	background: @color-bg-light;
 	border: 1px solid @color-border;
@@ -140,13 +140,13 @@
 			opacity: 0.3;
 		}
 
-		.wpseopilot-social-card-preview__loading {
+		.samanlabs-seo-social-card-preview__loading {
 			display: flex;
 		}
 	}
 }
 
-.wpseopilot-social-card-preview__loading {
+.samanlabs-seo-social-card-preview__loading {
 	display: none;
 	position: absolute;
 	top: 50%;
@@ -162,7 +162,7 @@
 }
 
 // Layout Selector
-.wpseopilot-layout-selector {
+.samanlabs-seo-layout-selector {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	gap: @spacing-md;
@@ -173,7 +173,7 @@
 	}
 }
 
-.wpseopilot-layout-option {
+.samanlabs-seo-layout-option {
 	display: block;
 	position: relative;
 	cursor: pointer;
@@ -184,7 +184,7 @@
 		width: 0;
 		height: 0;
 
-		&:checked + .wpseopilot-layout-option__content {
+		&:checked + .samanlabs-seo-layout-option__content {
 			background: lighten(@color-primary, 45%);
 			border-color: @color-primary;
 
@@ -206,13 +206,13 @@
 			}
 		}
 
-		&:focus + .wpseopilot-layout-option__content {
+		&:focus + .samanlabs-seo-layout-option__content {
 			box-shadow: 0 0 0 2px @color-primary;
 		}
 	}
 }
 
-.wpseopilot-layout-option__content {
+.samanlabs-seo-layout-option__content {
 	position: relative;
 	padding: @spacing-md;
 	border: 2px solid @color-border;
@@ -239,7 +239,7 @@
 }
 
 // Color Picker Styles
-.wpseopilot-color-picker {
+.samanlabs-seo-color-picker {
 	width: 60px;
 	height: 40px;
 	padding: 4px;
@@ -263,7 +263,7 @@
 	}
 }
 
-.wpseopilot-color-text {
+.samanlabs-seo-color-text {
 	vertical-align: middle;
 	margin-left: @spacing-sm;
 	max-width: 120px;
@@ -271,7 +271,7 @@
 }
 
 // Media Upload
-.wpseopilot-media-upload {
+.samanlabs-seo-media-upload {
 	display: flex;
 	gap: @spacing-sm;
 	align-items: center;
@@ -282,7 +282,7 @@
 }
 
 // Status Badge
-.wpseopilot-status-badge {
+.samanlabs-seo-status-badge {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -298,13 +298,13 @@
 		height: 18px;
 	}
 
-	&.wpseopilot-status-badge--success {
+	&.samanlabs-seo-status-badge--success {
 		background: #d4edda;
 		color: #155724;
 		border: 1px solid #c3e6cb;
 	}
 
-	&.wpseopilot-status-badge--inactive {
+	&.samanlabs-seo-status-badge--inactive {
 		background: #f8f9fa;
 		color: #6c757d;
 		border: 1px solid #dee2e6;

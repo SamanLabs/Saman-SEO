@@ -1,7 +1,7 @@
 // Global Plugin Top Bar
 // Appears on all WP SEO Pilot admin pages
 
-.wpseopilot-topbar {
+.samanlabs-seo-topbar {
 	background: @color-bg;
 	border-bottom: 1px solid @color-border-light;
 	margin: 0 -20px 20px -20px;
@@ -9,7 +9,7 @@
 	position: relative;
 	z-index: @z-topbar;
 
-	.wpseopilot-topbar-inner {
+	.samanlabs-seo-topbar-inner {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -18,13 +18,13 @@
 		margin: 0 auto;
 	}
 
-	.wpseopilot-topbar-left {
+	.samanlabs-seo-topbar-left {
 		display: flex;
 		align-items: center;
 		gap: @spacing-xl;
 	}
 
-	.wpseopilot-branding {
+	.samanlabs-seo-branding {
 		display: flex;
 		align-items: center;
 		gap: @spacing-sm;
@@ -45,7 +45,7 @@
 		}
 	}
 
-	.wpseopilot-section-label {
+	.samanlabs-seo-section-label {
 		font-size: @font-size-small;
 		color: @color-text-lighter;
 		text-transform: uppercase;
@@ -53,7 +53,7 @@
 		font-weight: @font-weight-medium;
 	}
 
-	.wpseopilot-nav {
+	.samanlabs-seo-nav {
 		ul {
 			display: flex;
 			gap: 0;
@@ -89,7 +89,7 @@
 		}
 	}
 
-	.wpseopilot-topbar-actions {
+	.samanlabs-seo-topbar-actions {
 		display: flex;
 		align-items: center;
 		gap: @spacing-sm;
@@ -101,14 +101,14 @@
 }
 
 // Adjust main content area
-.wpseopilot-page {
+.samanlabs-seo-page {
 	max-width: 1400px;
 	margin: 0 auto;
 }
 
 // Modern Tab Navigation (for pages with sub-sections like SEO Defaults)
-.wpseopilot-tabs__nav,
-.wpseopilot-links__tabs {
+.samanlabs-seo-tabs__nav,
+.samanlabs-seo-links__tabs {
 	border-bottom: 1px solid @color-border-light;
 	margin: 0 0 @spacing-lg 0;
 	padding: 0;
@@ -151,8 +151,8 @@
 }
 
 // Fix FOUC - hide inactive tabs by default until JS initializes
-.wpseopilot-tabs {
-	.wpseopilot-tab-panel {
+.samanlabs-seo-tabs {
+	.samanlabs-seo-tab-panel {
 		display: none;
 
 		&.is-active {
@@ -161,8 +161,8 @@
 	}
 
 	// Once JS is ready, ensure proper display
-	&.wpseopilot-tabs--ready {
-		.wpseopilot-tab-panel {
+	&.samanlabs-seo-tabs--ready {
+		.samanlabs-seo-tab-panel {
 			display: none;
 
 			&.is-active {
