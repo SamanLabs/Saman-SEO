@@ -67,7 +67,7 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	public function boot() {
-		if ( '1' !== get_option( 'samanlabs_seo_enable_redirect_manager', '1' ) ) {
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( 'redirects' ) ) {
 			return;
 		}
 
