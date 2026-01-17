@@ -188,11 +188,15 @@ class Admin_V2 {
         $visible_subpages = [
             'dashboard'          => __( 'Dashboard', 'saman-labs-seo' ),
             'search-appearance'  => __( 'Search Appearance', 'saman-labs-seo' ),
-            'sitemap'            => __( 'Sitemap', 'saman-labs-seo' ),
             'tools'              => __( 'Tools', 'saman-labs-seo' ),
             'settings'           => __( 'Settings', 'saman-labs-seo' ),
             'more'               => __( 'More', 'saman-labs-seo' ),
         ];
+
+        // Conditionally add sitemap menu based on module toggle.
+        if ( \SamanLabs\SEO\Helpers\module_enabled( 'sitemap' ) ) {
+            $visible_subpages['sitemap'] = __( 'Sitemap', 'saman-labs-seo' );
+        }
 
         foreach ( $visible_subpages as $slug => $title ) {
             add_submenu_page(
@@ -207,17 +211,11 @@ class Admin_V2 {
 
         // Hidden subpages - accessible via React navigation but not shown in WP menu
         $hidden_subpages = [
-            'redirects'        => __( 'Redirects', 'saman-labs-seo' ),
-            '404-log'          => __( '404 Log', 'saman-labs-seo' ),
-            'internal-linking' => __( 'Internal Linking', 'saman-labs-seo' ),
             'audit'            => __( 'Site Audit', 'saman-labs-seo' ),
-            'ai-assistant'     => __( 'AI Assistant', 'saman-labs-seo' ),
-            'assistants'       => __( 'AI Assistants', 'saman-labs-seo' ),
             'bulk-editor'      => __( 'Bulk Editor', 'saman-labs-seo' ),
             'content-gaps'     => __( 'Content Gaps', 'saman-labs-seo' ),
             'schema-builder'   => __( 'Schema Builder', 'saman-labs-seo' ),
             'link-health'      => __( 'Link Health', 'saman-labs-seo' ),
-            'local-seo'        => __( 'Local SEO', 'saman-labs-seo' ),
             'robots-txt'        => __( 'robots.txt Editor', 'saman-labs-seo' ),
             'image-seo'         => __( 'Image SEO', 'saman-labs-seo' ),
             'instant-indexing'  => __( 'Instant Indexing', 'saman-labs-seo' ),
@@ -225,6 +223,24 @@ class Admin_V2 {
             'htaccess-editor'   => __( '.htaccess Editor', 'saman-labs-seo' ),
             'mobile-friendly'   => __( 'Mobile Friendly Test', 'saman-labs-seo' ),
         ];
+
+        // Conditionally add module-dependent hidden pages.
+        if ( \SamanLabs\SEO\Helpers\module_enabled( 'redirects' ) ) {
+            $hidden_subpages['redirects'] = __( 'Redirects', 'saman-labs-seo' );
+        }
+        if ( \SamanLabs\SEO\Helpers\module_enabled( '404_log' ) ) {
+            $hidden_subpages['404-log'] = __( '404 Log', 'saman-labs-seo' );
+        }
+        if ( \SamanLabs\SEO\Helpers\module_enabled( 'internal_links' ) ) {
+            $hidden_subpages['internal-linking'] = __( 'Internal Linking', 'saman-labs-seo' );
+        }
+        if ( \SamanLabs\SEO\Helpers\module_enabled( 'local_seo' ) ) {
+            $hidden_subpages['local-seo'] = __( 'Local SEO', 'saman-labs-seo' );
+        }
+        if ( \SamanLabs\SEO\Helpers\module_enabled( 'ai_assistant' ) ) {
+            $hidden_subpages['ai-assistant'] = __( 'AI Assistant', 'saman-labs-seo' );
+            $hidden_subpages['assistants'] = __( 'AI Assistants', 'saman-labs-seo' );
+        }
 
         foreach ( $hidden_subpages as $slug => $title ) {
             add_submenu_page(
@@ -297,6 +313,20 @@ class Admin_V2 {
         $ai_enabled  = AI_Pilot::ai_enabled();
         $ai_provider = AI_Pilot::get_provider();
 
+        // Get module status for React UI
+        $modules = [
+            'sitemap'        => \SamanLabs\SEO\Helpers\module_enabled( 'sitemap' ),
+            'redirects'      => \SamanLabs\SEO\Helpers\module_enabled( 'redirects' ),
+            '404_log'        => \SamanLabs\SEO\Helpers\module_enabled( '404_log' ),
+            'llm_txt'        => \SamanLabs\SEO\Helpers\module_enabled( 'llm_txt' ),
+            'local_seo'      => \SamanLabs\SEO\Helpers\module_enabled( 'local_seo' ),
+            'social_cards'   => \SamanLabs\SEO\Helpers\module_enabled( 'social_cards' ),
+            'analytics'      => \SamanLabs\SEO\Helpers\module_enabled( 'analytics' ),
+            'admin_bar'      => \SamanLabs\SEO\Helpers\module_enabled( 'admin_bar' ),
+            'internal_links' => \SamanLabs\SEO\Helpers\module_enabled( 'internal_links' ),
+            'ai_assistant'   => \SamanLabs\SEO\Helpers\module_enabled( 'ai_assistant' ),
+        ];
+
         // Pass configuration to React app
         wp_localize_script( 'samanlabs-seo-admin-v2', 'samanlabs-seoV2Settings', [
             'initialView' => $initial_view,
@@ -316,6 +346,7 @@ class Admin_V2 {
                 'version'     => $ai_status['version'] ?? null,
                 'settingsUrl' => admin_url( 'admin.php?page=samanlabs-ai' ),
             ],
+            'modules'     => $modules,
         ] );
     }
 
