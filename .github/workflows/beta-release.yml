@@ -1,24 +1,25 @@
 name: Create Beta Release
 
 on:
-  # Manual trigger with version input
-  workflow_dispatch:
-    inputs:
-      beta_number:
-        description: 'Beta number (e.g., 1, 2, 3)'
-        required: true
-        default: '1'
-      description:
-        description: 'Beta release description'
-        required: false
-        default: 'Beta release for testing'
-
-  # Auto-trigger on push to dev branch
+  # Tag-based trigger for beta versions
   push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
     branches:
       - dev
       - beta
       - develop
+
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Full version (e.g., 2.0.0-beta.1). Leave empty for auto-increment.'
+        required: false
+      description:
+        description: 'Beta release description'
+        required: false
+        default: 'Beta release for testing'
 
 permissions:
   contents: write
@@ -33,49 +34,50 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from plugin file
+      - name: Determine version
         id: get_version
         run: |
-          VERSION=$(grep -oP "^\s*\*\s*Version:\s*\K[\d.]+" saman-seo.php | head -1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Base version: $VERSION"
+          # If triggered by tag push
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+            VERSION=${TAG_NAME#v}
+            echo "Source: tag push"
 
-      - name: Determine beta number
-        id: beta_number
-        run: |
-          BASE_VERSION=${{ steps.get_version.outputs.version }}
+          # If manual trigger with version specified
+          elif [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Source: manual input"
 
-          # If manual trigger, use input
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            BETA_NUM=${{ github.event.inputs.beta_number }}
+          # Auto-determine from plugin file and increment beta
           else
-            # Auto-increment: find highest existing beta for this version
+            BASE_VERSION=$(grep -oP "^\s*\*\s*Version:\s*\K[\d.]+" saman-seo.php | head -1)
+
+            # Find highest existing beta for this version
             EXISTING_BETAS=$(git tag -l "v${BASE_VERSION}-beta.*" | grep -oP "beta\.\K\d+" | sort -n | tail -1)
             if [ -z "$EXISTING_BETAS" ]; then
               BETA_NUM=1
             else
               BETA_NUM=$((EXISTING_BETAS + 1))
             fi
+
+            VERSION="${BASE_VERSION}-beta.${BETA_NUM}"
+            echo "Source: auto-increment (base: $BASE_VERSION, beta: $BETA_NUM)"
           fi
 
-          BETA_VERSION="${BASE_VERSION}-beta.${BETA_NUM}"
-          ZIP_VERSION=$(echo $BETA_VERSION | sed 's/\./-/g')
+          ZIP_VERSION=$(echo $VERSION | sed 's/\./-/g')
+          TAG="v$VERSION"
 
-          echo "beta_num=$BETA_NUM" >> $GITHUB_OUTPUT
-          echo "beta_version=$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "zip_version=$ZIP_VERSION" >> $GITHUB_OUTPUT
-          echo "tag=v$BETA_VERSION" >> $GITHUB_OUTPUT
-          echo "Beta version: $BETA_VERSION"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Final version: $VERSION"
 
-      - name: Check if tag exists
-        id: check_tag
+      - name: Check if tag exists (for non-tag triggers)
+        if: "!startsWith(github.ref, 'refs/tags/')"
         run: |
-          if git rev-parse "${{ steps.beta_number.outputs.tag }}" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "::error::Tag ${{ steps.beta_number.outputs.tag }} already exists!"
+          if git rev-parse "${{ steps.get_version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "::error::Tag ${{ steps.get_version.outputs.tag }} already exists!"
             exit 1
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Setup Node.js
@@ -90,38 +92,36 @@ jobs:
 
       - name: Create plugin zip
         run: |
-          # Create temp directory for clean plugin
+          VERSION=${{ steps.get_version.outputs.zip_version }}
+
           mkdir -p saman-seo
 
-          # Copy only production files
+          # Copy production files
           cp -r assets saman-seo/
-          cp -r build-v2 saman-seo/
-          cp -r build-editor saman-seo/
-          cp -r build-admin-list saman-seo/
+          cp -r build-v2 saman-seo/ 2>/dev/null || true
+          cp -r build-editor saman-seo/ 2>/dev/null || true
+          cp -r build-admin-list saman-seo/ 2>/dev/null || true
           cp -r includes saman-seo/
           cp -r languages saman-seo/ 2>/dev/null || mkdir -p saman-seo/languages
           cp saman-seo.php saman-seo/
           cp readme.txt saman-seo/ 2>/dev/null || true
           cp LICENSE saman-seo/ 2>/dev/null || true
 
-          # Create the zip
-          zip -r saman-seo-${{ steps.beta_number.outputs.zip_version }}.zip saman-seo
-
-          # Cleanup
+          zip -r saman-seo-$VERSION.zip saman-seo
           rm -rf saman-seo
 
-          echo "Created saman-seo-${{ steps.beta_number.outputs.zip_version }}.zip"
+          echo "Created saman-seo-$VERSION.zip"
 
       - name: Prepare release notes
-        id: release_notes
         run: |
+          VERSION=${{ steps.get_version.outputs.version }}
           DESCRIPTION="${{ github.event.inputs.description }}"
           if [ -z "$DESCRIPTION" ]; then
             DESCRIPTION="Beta release for testing new features."
           fi
 
           {
-            echo "## Beta Release ${{ steps.beta_number.outputs.beta_version }}"
+            echo "## Beta Release $VERSION"
             echo ""
             echo "⚠️ **This is a pre-release version for testing purposes.**"
             echo ""
@@ -131,28 +131,26 @@ jobs:
             echo "### How to Install"
             echo "1. Go to **SEO Pilot → More**"
             echo "2. Click **Check for Updates** to find this beta"
-            echo "3. Click **Update** to install this beta"
+            echo "3. Click **Update** to install"
             echo ""
             echo "### Feedback"
             echo "Please report any issues at: https://github.com/${{ github.repository }}/issues"
             echo ""
             echo "---"
-            echo ""
-            echo "Base version: ${{ steps.get_version.outputs.version }}"
-            echo "Commit: ${{ github.sha }}"
+            echo "Commit: \`${{ github.sha }}\`"
           } > release_notes.md
 
           cat release_notes.md
 
       - name: Create Pre-Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.beta_number.outputs.tag }}
-          name: Saman SEO ${{ steps.beta_number.outputs.beta_version }} (Beta)
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: Saman SEO ${{ steps.get_version.outputs.version }} (Beta)
           body_path: release_notes.md
           draft: false
           prerelease: true
-          files: saman-seo-${{ steps.beta_number.outputs.zip_version }}.zip
+          files: saman-seo-${{ steps.get_version.outputs.zip_version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -160,6 +158,6 @@ jobs:
         run: |
           echo "## Beta Release Created" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ steps.beta_number.outputs.beta_version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** ${{ steps.beta_number.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Zip:** saman-seo-${{ steps.beta_number.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ steps.get_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Zip:** saman-seo-${{ steps.get_version.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY
