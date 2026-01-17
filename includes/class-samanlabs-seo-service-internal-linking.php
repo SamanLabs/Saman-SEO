@@ -91,6 +91,11 @@ class Internal_Linking {
 	 * @return void
 	 */
 	public function boot() {
+		// Check if module is enabled.
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( 'internal_links' ) ) {
+			return;
+		}
+
 		add_action( 'admin_init', [ $this, 'ensure_role_capabilities' ] );
 		// V1 menu disabled - React UI handles menu registration
 		// add_action( 'admin_menu', [ $this, 'register_menu' ] );

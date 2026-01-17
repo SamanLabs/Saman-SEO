@@ -28,6 +28,11 @@ class AI_Assistant {
 	 * @return void
 	 */
 	public function boot() {
+		// Check if module is enabled.
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( 'ai_assistant' ) ) {
+			return;
+		}
+
 		// V1 menu disabled - React UI handles AI via REST API
 		// All AI operations now delegate to Saman Labs AI via Integration\AI_Pilot
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
