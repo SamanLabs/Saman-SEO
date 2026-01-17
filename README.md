@@ -1,7 +1,8 @@
 # Saman SEO
 
 <p align="center">
-  <img width="641" alt="Saman SEO" src="https://github.com/user-attachments/assets/e1219160-3178-4eaf-a193-565d113e03bf" />
+  <img width="640" alt="Saman SEO" src="https://github.com/user-attachments/assets/5d0ac010-07d2-41bf-9793-321523a225f4" />
+
 </p>
 
 <p align="center">
