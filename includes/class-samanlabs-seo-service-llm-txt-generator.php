@@ -20,7 +20,7 @@ class LLM_TXT_Generator {
 	 * @return void
 	 */
 	public function boot() {
-		if ( '1' !== get_option( 'samanlabs_seo_enable_llm_txt', '0' ) ) {
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( 'llm_txt' ) ) {
 			return;
 		}
 
