@@ -181,7 +181,7 @@ class Request_Monitor {
 
 		$site_name = get_bloginfo( 'name' );
 		$site_url  = home_url();
-		$admin_url = admin_url( 'admin.php?page=wpseopilot-v2#/404-log' );
+		$admin_url = admin_url( 'admin.php?page=samanlabs-seo-v2#/404-log' );
 
 		$subject = sprintf(
 			/* translators: %s: Site name */
@@ -327,12 +327,12 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
-		if ( 'wp-seo-pilot_page_wpseopilot-404' !== $hook ) {
+		if ( 'wp-seo-pilot_page_samanlabs-seo-404' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
@@ -346,11 +346,11 @@ class Request_Monitor {
 	 */
 	public function register_page() {
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( '404 Log', 'saman-labs-seo' ),
 			__( '404 Log', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-404',
+			'samanlabs-seo-404',
 			[ $this, 'render_page' ],
 			12
 		);
@@ -421,7 +421,7 @@ class Request_Monitor {
 		}
 
 		$total_pages = max( 1, (int) ceil( $total_count / $per_page ) );
-		$base_url    = menu_page_url( 'wpseopilot-404', false );
+		$base_url    = menu_page_url( 'samanlabs-seo-404', false );
 
 		include SAMANLABS_SEO_PATH . 'templates/404-log.php';
 	}

@@ -30,45 +30,45 @@ $design_settings = wp_parse_args( $design_settings, $design_defaults );
 $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 ?>
 
-<div class="wpseopilot-settings-grid">
-	<div class="wpseopilot-settings-main">
+<div class="samanlabs-seo-settings-grid">
+	<div class="samanlabs-seo-settings-main">
 
 		<!-- Live Preview Card -->
-		<div class="wpseopilot-settings-card">
-			<div class="wpseopilot-settings-card__header">
+		<div class="samanlabs-seo-settings-card">
+			<div class="samanlabs-seo-settings-card__header">
 				<h2><?php esc_html_e( 'Live Preview', 'saman-labs-seo' ); ?></h2>
-				<p class="wpseopilot-settings-card__description">
+				<p class="samanlabs-seo-settings-card__description">
 					<?php esc_html_e( 'Preview how your social cards will look when shared on social media.', 'saman-labs-seo' ); ?>
 				</p>
 			</div>
-			<div class="wpseopilot-settings-card__body">
+			<div class="samanlabs-seo-settings-card__body">
 
 				<!-- Preview Controls -->
-				<div class="wpseopilot-social-card-preview__controls">
-					<div class="wpseopilot-form-field">
-						<label for="wpseopilot-preview-title">
+				<div class="samanlabs-seo-social-card-preview__controls">
+					<div class="samanlabs-seo-form-field">
+						<label for="samanlabs-seo-preview-title">
 							<?php esc_html_e( 'Sample Title', 'saman-labs-seo' ); ?>
 						</label>
 						<input
 							type="text"
-							id="wpseopilot-preview-title"
+							id="samanlabs-seo-preview-title"
 							class="regular-text"
 							value="<?php esc_attr_e( 'Sample Post Title - Understanding Core Web Vitals', 'saman-labs-seo' ); ?>"
 						/>
 					</div>
-					<button type="button" id="wpseopilot-refresh-preview" class="button">
+					<button type="button" id="samanlabs-seo-refresh-preview" class="button">
 						<span class="dashicons dashicons-update"></span>
 						<?php esc_html_e( 'Refresh Preview', 'saman-labs-seo' ); ?>
 					</button>
 				</div>
 
 				<!-- Preview Frame -->
-				<div class="wpseopilot-social-card-preview__frame">
-					<div class="wpseopilot-social-card-preview__loading">
+				<div class="samanlabs-seo-social-card-preview__frame">
+					<div class="samanlabs-seo-social-card-preview__loading">
 						<span class="spinner is-active"></span>
 					</div>
 					<img
-						id="wpseopilot-social-card-preview-img"
+						id="samanlabs-seo-social-card-preview-img"
 						src="<?php echo esc_url( home_url( '/?samanlabs_seo_social_card=1&title=' . urlencode( 'Sample Post Title - Understanding Core Web Vitals' ) ) ); ?>"
 						alt="<?php esc_attr_e( 'Social card preview', 'saman-labs-seo' ); ?>"
 					/>
@@ -78,19 +78,19 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 		</div>
 
 		<!-- Design Customization Card -->
-		<div class="wpseopilot-settings-card">
-			<div class="wpseopilot-settings-card__header">
+		<div class="samanlabs-seo-settings-card">
+			<div class="samanlabs-seo-settings-card__header">
 				<h2><?php esc_html_e( 'Design Customization', 'saman-labs-seo' ); ?></h2>
-				<p class="wpseopilot-settings-card__description">
+				<p class="samanlabs-seo-settings-card__description">
 					<?php esc_html_e( 'Customize the appearance of your social cards to match your brand.', 'saman-labs-seo' ); ?>
 				</p>
 			</div>
-			<div class="wpseopilot-settings-card__body">
+			<div class="samanlabs-seo-settings-card__body">
 
 				<!-- Layout Selection -->
-				<div class="wpseopilot-form-field">
+				<div class="samanlabs-seo-form-field">
 					<label><?php esc_html_e( 'Layout Style', 'saman-labs-seo' ); ?></label>
-					<div class="wpseopilot-layout-selector">
+					<div class="samanlabs-seo-layout-selector">
 						<?php
 						$layouts = [
 							'default'  => [
@@ -114,14 +114,14 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 						foreach ( $layouts as $layout_key => $layout_info ) :
 							$checked = checked( $design_settings['layout'], $layout_key, false );
 							?>
-							<label class="wpseopilot-layout-option">
+							<label class="samanlabs-seo-layout-option">
 								<input
 									type="radio"
 									name="samanlabs_seo_social_card_design[layout]"
 									value="<?php echo esc_attr( $layout_key ); ?>"
 									<?php echo $checked; ?>
 								/>
-								<div class="wpseopilot-layout-option__content">
+								<div class="samanlabs-seo-layout-option__content">
 									<strong><?php echo esc_html( $layout_info['label'] ); ?></strong>
 									<span><?php echo esc_html( $layout_info['description'] ); ?></span>
 								</div>
@@ -131,71 +131,71 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 				</div>
 
 				<!-- Color Settings -->
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-background-color">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-background-color">
 						<?php esc_html_e( 'Background Color', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="color"
-						id="wpseopilot-background-color"
+						id="samanlabs-seo-background-color"
 						name="samanlabs_seo_social_card_design[background_color]"
-						class="wpseopilot-color-picker"
+						class="samanlabs-seo-color-picker"
 						value="<?php echo esc_attr( $design_settings['background_color'] ); ?>"
 					/>
 					<input
 						type="text"
-						class="wpseopilot-color-text regular-text"
+						class="samanlabs-seo-color-text regular-text"
 						value="<?php echo esc_attr( $design_settings['background_color'] ); ?>"
 						readonly
 					/>
 				</div>
 
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-accent-color">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-accent-color">
 						<?php esc_html_e( 'Accent Color', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="color"
-						id="wpseopilot-accent-color"
+						id="samanlabs-seo-accent-color"
 						name="samanlabs_seo_social_card_design[accent_color]"
-						class="wpseopilot-color-picker"
+						class="samanlabs-seo-color-picker"
 						value="<?php echo esc_attr( $design_settings['accent_color'] ); ?>"
 					/>
 					<input
 						type="text"
-						class="wpseopilot-color-text regular-text"
+						class="samanlabs-seo-color-text regular-text"
 						value="<?php echo esc_attr( $design_settings['accent_color'] ); ?>"
 						readonly
 					/>
 				</div>
 
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-text-color">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-text-color">
 						<?php esc_html_e( 'Text Color', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="color"
-						id="wpseopilot-text-color"
+						id="samanlabs-seo-text-color"
 						name="samanlabs_seo_social_card_design[text_color]"
-						class="wpseopilot-color-picker"
+						class="samanlabs-seo-color-picker"
 						value="<?php echo esc_attr( $design_settings['text_color'] ); ?>"
 					/>
 					<input
 						type="text"
-						class="wpseopilot-color-text regular-text"
+						class="samanlabs-seo-color-text regular-text"
 						value="<?php echo esc_attr( $design_settings['text_color'] ); ?>"
 						readonly
 					/>
 				</div>
 
 				<!-- Font Sizes -->
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-title-font-size">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-title-font-size">
 						<?php esc_html_e( 'Title Font Size (px)', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="number"
-						id="wpseopilot-title-font-size"
+						id="samanlabs-seo-title-font-size"
 						name="samanlabs_seo_social_card_design[title_font_size]"
 						class="small-text"
 						value="<?php echo esc_attr( $design_settings['title_font_size'] ); ?>"
@@ -205,13 +205,13 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 					/>
 				</div>
 
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-site-font-size">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-site-font-size">
 						<?php esc_html_e( 'Site Name Font Size (px)', 'saman-labs-seo' ); ?>
 					</label>
 					<input
 						type="number"
-						id="wpseopilot-site-font-size"
+						id="samanlabs-seo-site-font-size"
 						name="samanlabs_seo_social_card_design[site_font_size]"
 						class="small-text"
 						value="<?php echo esc_attr( $design_settings['site_font_size'] ); ?>"
@@ -222,19 +222,19 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 				</div>
 
 				<!-- Logo Settings -->
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-logo-url">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-logo-url">
 						<?php esc_html_e( 'Logo URL', 'saman-labs-seo' ); ?>
 					</label>
-					<div class="wpseopilot-media-upload">
+					<div class="samanlabs-seo-media-upload">
 						<input
 							type="url"
-							id="wpseopilot-logo-url"
+							id="samanlabs-seo-logo-url"
 							name="samanlabs_seo_social_card_design[logo_url]"
 							class="regular-text"
 							value="<?php echo esc_attr( $design_settings['logo_url'] ); ?>"
 						/>
-						<button type="button" class="button wpseopilot-media-upload-btn" data-target="#wpseopilot-logo-url">
+						<button type="button" class="button samanlabs-seo-media-upload-btn" data-target="#samanlabs-seo-logo-url">
 							<?php esc_html_e( 'Choose Image', 'saman-labs-seo' ); ?>
 						</button>
 					</div>
@@ -243,11 +243,11 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 					</p>
 				</div>
 
-				<div class="wpseopilot-form-field">
-					<label for="wpseopilot-logo-position">
+				<div class="samanlabs-seo-form-field">
+					<label for="samanlabs-seo-logo-position">
 						<?php esc_html_e( 'Logo Position', 'saman-labs-seo' ); ?>
 					</label>
-					<select id="wpseopilot-logo-position" name="samanlabs_seo_social_card_design[logo_position]">
+					<select id="samanlabs-seo-logo-position" name="samanlabs_seo_social_card_design[logo_position]">
 						<option value="top-left" <?php selected( $design_settings['logo_position'], 'top-left' ); ?>>
 							<?php esc_html_e( 'Top Left', 'saman-labs-seo' ); ?>
 						</option>
@@ -272,27 +272,27 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 	</div>
 
 	<!-- Sidebar -->
-	<div class="wpseopilot-settings-sidebar">
+	<div class="samanlabs-seo-settings-sidebar">
 
 		<!-- Module Status -->
-		<div class="wpseopilot-settings-card">
-			<div class="wpseopilot-settings-card__header">
+		<div class="samanlabs-seo-settings-card">
+			<div class="samanlabs-seo-settings-card__header">
 				<h3><?php esc_html_e( 'Module Status', 'saman-labs-seo' ); ?></h3>
 			</div>
-			<div class="wpseopilot-settings-card__body">
+			<div class="samanlabs-seo-settings-card__body">
 				<?php if ( $module_enabled ) : ?>
-					<div class="wpseopilot-status-badge wpseopilot-status-badge--success">
+					<div class="samanlabs-seo-status-badge samanlabs-seo-status-badge--success">
 						<span class="dashicons dashicons-yes-alt"></span>
 						<?php esc_html_e( 'Active', 'saman-labs-seo' ); ?>
 					</div>
 					<p><?php esc_html_e( 'Dynamic social card generator is enabled.', 'saman-labs-seo' ); ?></p>
 				<?php else : ?>
-					<div class="wpseopilot-status-badge wpseopilot-status-badge--inactive">
+					<div class="samanlabs-seo-status-badge samanlabs-seo-status-badge--inactive">
 						<span class="dashicons dashicons-warning"></span>
 						<?php esc_html_e( 'Disabled', 'saman-labs-seo' ); ?>
 					</div>
 					<p><?php esc_html_e( 'Dynamic social card generator is currently disabled.', 'saman-labs-seo' ); ?></p>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot#modules' ) ); ?>" class="button">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=samanlabs-seo#modules' ) ); ?>" class="button">
 						<?php esc_html_e( 'Enable in Modules', 'saman-labs-seo' ); ?>
 					</a>
 				<?php endif; ?>
@@ -300,11 +300,11 @@ $module_enabled = '1' === get_option( 'samanlabs_seo_enable_og_preview', '1' );
 		</div>
 
 		<!-- Info Card -->
-		<div class="wpseopilot-settings-card">
-			<div class="wpseopilot-settings-card__header">
+		<div class="samanlabs-seo-settings-card">
+			<div class="samanlabs-seo-settings-card__header">
 				<h3><?php esc_html_e( 'About Social Cards', 'saman-labs-seo' ); ?></h3>
 			</div>
-			<div class="wpseopilot-settings-card__body">
+			<div class="samanlabs-seo-settings-card__body">
 				<p>
 					<?php esc_html_e( 'Social cards are automatically generated images that appear when your content is shared on social media platforms like Facebook, Twitter, and LinkedIn.', 'saman-labs-seo' ); ?>
 				</p>

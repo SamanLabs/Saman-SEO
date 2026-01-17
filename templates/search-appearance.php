@@ -32,43 +32,43 @@ $taxonomies = get_taxonomies(
 \WPSEOPilot\Admin_Topbar::render( 'types' );
 ?>
 
-<div class="wrap wpseopilot-page wpseopilot-search-appearance-page">
+<div class="wrap samanlabs-seo-page samanlabs-seo-search-appearance-page">
 	<form method="post" action="options.php">
 		<?php settings_fields( 'samanlabs_seo_search_appearance' ); ?>
 
-		<div class="wpseopilot-tabs" data-component="wpseopilot-tabs">
-			<div class="nav-tab-wrapper wpseopilot-tabs__nav" role="tablist">
-				<a href="#global" class="nav-tab nav-tab-active" data-wpseopilot-tab="wpseopilot-tab-global">
+		<div class="samanlabs-seo-tabs" data-component="samanlabs-seo-tabs">
+			<div class="nav-tab-wrapper samanlabs-seo-tabs__nav" role="tablist">
+				<a href="#global" class="nav-tab nav-tab-active" data-samanlabs-seo-tab="samanlabs-seo-tab-global">
 					<?php esc_html_e( 'Global Settings', 'saman-labs-seo' ); ?>
 				</a>
-				<a href="#content-types" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-content-types">
+				<a href="#content-types" class="nav-tab" data-samanlabs-seo-tab="samanlabs-seo-tab-content-types">
 					<?php esc_html_e( 'Content Types', 'saman-labs-seo' ); ?>
 				</a>
-				<a href="#taxonomies" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-taxonomies">
+				<a href="#taxonomies" class="nav-tab" data-samanlabs-seo-tab="samanlabs-seo-tab-taxonomies">
 					<?php esc_html_e( 'Taxonomies', 'saman-labs-seo' ); ?>
 				</a>
-				<a href="#archives" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-archives">
+				<a href="#archives" class="nav-tab" data-samanlabs-seo-tab="samanlabs-seo-tab-archives">
 					<?php esc_html_e( 'Archives', 'saman-labs-seo' ); ?>
 				</a>
-			<a href="#social" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-social">
+			<a href="#social" class="nav-tab" data-samanlabs-seo-tab="samanlabs-seo-tab-social">
 				<?php esc_html_e( 'Social Settings', 'saman-labs-seo' ); ?>
 			</a>
-			<a href="#social-cards" class="nav-tab" data-wpseopilot-tab="wpseopilot-tab-social-cards">
+			<a href="#social-cards" class="nav-tab" data-samanlabs-seo-tab="samanlabs-seo-tab-social-cards">
 				<?php esc_html_e( 'Social Cards', 'saman-labs-seo' ); ?>
 			</a>
 			</div>
 			<!-- Global Settings Tab -->
-			<div id="wpseopilot-tab-global" class="wpseopilot-tab-panel is-active">
-				<div class="wpseopilot-settings-grid">
-					<div class="wpseopilot-settings-main">
+			<div id="samanlabs-seo-tab-global" class="samanlabs-seo-tab-panel is-active">
+				<div class="samanlabs-seo-settings-grid">
+					<div class="samanlabs-seo-settings-main">
 
 						<!-- Homepage Defaults Card -->
-						<div class="wpseopilot-card">
-							<div class="wpseopilot-card-header">
+						<div class="samanlabs-seo-card">
+							<div class="samanlabs-seo-card-header">
 								<h2><?php esc_html_e( 'Homepage Defaults', 'saman-labs-seo' ); ?></h2>
 								<p><?php esc_html_e( 'Configure default SEO settings for your homepage.', 'saman-labs-seo' ); ?></p>
 							</div>
-							<div class="wpseopilot-card-body">
+							<div class="samanlabs-seo-card-body">
 
 								<!-- Google Preview -->
 								<?php
@@ -78,12 +78,12 @@ $taxonomies = get_taxonomies(
 								include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 								?>
 
-								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
+								<div class="samanlabs-seo-form-row samanlabs-seo-form-row--separator">
 									<label for="homepage_meta_title">
 										<strong><?php esc_html_e( 'Meta Title', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The title tag for your homepage', 'saman-labs-seo' ); ?></span>
+										<span class="samanlabs-seo-label-hint"><?php esc_html_e( 'The title tag for your homepage', 'saman-labs-seo' ); ?></span>
 									</label>
-									<div class="wpseopilot-flex-input">
+									<div class="samanlabs-seo-flex-input">
 										<input
 											type="text"
 											id="homepage_meta_title"
@@ -93,19 +93,19 @@ $taxonomies = get_taxonomies(
 											data-preview-field="title"
 											data-context="global"
 										/>
-										<button type="button" class="button wpseopilot-trigger-vars" data-target="homepage_meta_title">
+										<button type="button" class="button samanlabs-seo-trigger-vars" data-target="homepage_meta_title">
 											<span class="dashicons dashicons-editor-code"></span>
 											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
-								<div class="wpseopilot-form-row">
+								<div class="samanlabs-seo-form-row">
 									<label for="homepage_meta_description">
 										<strong><?php esc_html_e( 'Meta Description', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'The meta description for your homepage', 'saman-labs-seo' ); ?></span>
+										<span class="samanlabs-seo-label-hint"><?php esc_html_e( 'The meta description for your homepage', 'saman-labs-seo' ); ?></span>
 									</label>
-									<div class="wpseopilot-flex-input">
+									<div class="samanlabs-seo-flex-input">
 										<textarea
 											id="homepage_meta_description"
 											name="samanlabs_seo_homepage_defaults[meta_description]"
@@ -114,17 +114,17 @@ $taxonomies = get_taxonomies(
 											data-preview-field="description"
 											data-context="global"
 										><?php echo esc_textarea( $homepage_defaults['meta_description'] ?? '' ); ?></textarea>
-										<button type="button" class="button wpseopilot-trigger-vars" data-target="homepage_meta_description">
+										<button type="button" class="button samanlabs-seo-trigger-vars" data-target="homepage_meta_description">
 											<span class="dashicons dashicons-editor-code"></span>
 											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
-								<div class="wpseopilot-form-row">
+								<div class="samanlabs-seo-form-row">
 									<label for="homepage_meta_keywords">
 										<strong><?php esc_html_e( 'Meta Keywords', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Comma-separated keywords (optional)', 'saman-labs-seo' ); ?></span>
+										<span class="samanlabs-seo-label-hint"><?php esc_html_e( 'Comma-separated keywords (optional)', 'saman-labs-seo' ); ?></span>
 									</label>
 									<input
 										type="text"
@@ -135,10 +135,10 @@ $taxonomies = get_taxonomies(
 									/>
 								</div>
 
-								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
+								<div class="samanlabs-seo-form-row samanlabs-seo-form-row--separator">
 									<label>
 										<strong><?php esc_html_e( 'Title Divider', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint"><?php esc_html_e( 'Choose the character that separates title parts', 'saman-labs-seo' ); ?></span>
+										<span class="samanlabs-seo-label-hint"><?php esc_html_e( 'Choose the character that separates title parts', 'saman-labs-seo' ); ?></span>
 									</label>
 									<?php
 									$current_separator = get_option( 'samanlabs_seo_title_separator', '-' );
@@ -155,32 +155,32 @@ $taxonomies = get_taxonomies(
 										'→'  => [ 'label' => 'Arrow', 'preview' => '→' ],
 									];
 									?>
-									<div class="wpseopilot-separator-selector" data-component="separator-selector">
-										<div class="wpseopilot-separator-grid">
+									<div class="samanlabs-seo-separator-selector" data-component="separator-selector">
+										<div class="samanlabs-seo-separator-grid">
 											<?php foreach ( $separators as $value => $config ) : ?>
 												<button
 													type="button"
-													class="wpseopilot-separator-option<?php echo ( $current_separator === $value ) ? ' is-active' : ''; ?>"
+													class="samanlabs-seo-separator-option<?php echo ( $current_separator === $value ) ? ' is-active' : ''; ?>"
 													data-separator="<?php echo esc_attr( $value ); ?>"
 													title="<?php echo esc_attr( $config['label'] ); ?>"
 												>
-													<span class="wpseopilot-separator-preview"><?php echo esc_html( $config['preview'] ); ?></span>
-													<span class="wpseopilot-separator-label"><?php echo esc_html( $config['label'] ); ?></span>
+													<span class="samanlabs-seo-separator-preview"><?php echo esc_html( $config['preview'] ); ?></span>
+													<span class="samanlabs-seo-separator-label"><?php echo esc_html( $config['label'] ); ?></span>
 												</button>
 											<?php endforeach; ?>
 											<button
 												type="button"
-												class="wpseopilot-separator-option wpseopilot-separator-custom<?php echo ( ! isset( $separators[ $current_separator ] ) && ! empty( $current_separator ) ) ? ' is-active' : ''; ?>"
+												class="samanlabs-seo-separator-option samanlabs-seo-separator-custom<?php echo ( ! isset( $separators[ $current_separator ] ) && ! empty( $current_separator ) ) ? ' is-active' : ''; ?>"
 												data-separator="custom"
 												title="<?php esc_attr_e( 'Custom', 'saman-labs-seo' ); ?>"
 											>
-												<span class="wpseopilot-separator-preview">
+												<span class="samanlabs-seo-separator-preview">
 													<?php echo isset( $separators[ $current_separator ] ) ? '?' : esc_html( $current_separator ); ?>
 												</span>
-												<span class="wpseopilot-separator-label"><?php esc_html_e( 'Custom', 'saman-labs-seo' ); ?></span>
+												<span class="samanlabs-seo-separator-label"><?php esc_html_e( 'Custom', 'saman-labs-seo' ); ?></span>
 											</button>
 										</div>
-										<div class="wpseopilot-separator-custom-input" style="<?php echo isset( $separators[ $current_separator ] ) ? 'display: none;' : ''; ?>">
+										<div class="samanlabs-seo-separator-custom-input" style="<?php echo isset( $separators[ $current_separator ] ) ? 'display: none;' : ''; ?>">
 											<input
 												type="text"
 												id="samanlabs_seo_custom_separator"
@@ -214,11 +214,11 @@ $taxonomies = get_taxonomies(
 
 					</div>
 
-					<div class="wpseopilot-settings-sidebar">
-						<div class="wpseopilot-info-card">
+					<div class="samanlabs-seo-settings-sidebar">
+						<div class="samanlabs-seo-info-card">
 							<h3><?php esc_html_e( 'Homepage SEO', 'saman-labs-seo' ); ?></h3>
 							<p><?php esc_html_e( 'Your homepage is often the most important page for SEO. Make sure to craft compelling title and description tags.', 'saman-labs-seo' ); ?></p>
-							<ul class="wpseopilot-info-list">
+							<ul class="samanlabs-seo-info-list">
 								<li><?php esc_html_e( 'Keep title under 60 characters', 'saman-labs-seo' ); ?></li>
 								<li><?php esc_html_e( 'Keep description under 155 characters', 'saman-labs-seo' ); ?></li>
 								<li><?php esc_html_e( 'Include your primary keywords', 'saman-labs-seo' ); ?></li>
@@ -229,9 +229,9 @@ $taxonomies = get_taxonomies(
 			</div>
 
 			<!-- Content Types Tab -->
-			<div id="wpseopilot-tab-content-types" class="wpseopilot-tab-panel">
-				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
-					<div class="wpseopilot-card-header">
+			<div id="samanlabs-seo-tab-content-types" class="samanlabs-seo-tab-panel">
+				<div class="samanlabs-seo-card samanlabs-seo-card-body--no-padding">
+					<div class="samanlabs-seo-card-header">
 						<h2><?php esc_html_e( 'Content Type Settings', 'saman-labs-seo' ); ?></h2>
 						<p><?php esc_html_e( 'Configure SEO settings for each post type.', 'saman-labs-seo' ); ?></p>
 					</div>
@@ -241,15 +241,15 @@ $taxonomies = get_taxonomies(
 						$label = $object->labels->name ?? $slug;
 						$settings = $post_type_defaults[ $slug ] ?? [];
 						?>
-						<details class="wpseopilot-accordion" data-accordion-slug="<?php echo esc_attr( $slug ); ?>">
+						<details class="samanlabs-seo-accordion" data-accordion-slug="<?php echo esc_attr( $slug ); ?>">
 							<summary>
-								<span class="wpseopilot-accordion-title"><?php echo esc_html( $label ); ?></span>
-								<span class="wpseopilot-accordion-badge"><?php echo esc_html( $slug ); ?></span>
+								<span class="samanlabs-seo-accordion-title"><?php echo esc_html( $label ); ?></span>
+								<span class="samanlabs-seo-accordion-badge"><?php echo esc_html( $slug ); ?></span>
 							</summary>
-							<div class="wpseopilot-accordion__body">
+							<div class="samanlabs-seo-accordion__body">
 
 								<!-- Google Preview (shared across all sub-tabs) -->
-								<div class="wpseopilot-accordion__preview">
+								<div class="samanlabs-seo-accordion__preview">
 									<?php
 									$preview_title = $settings['title_template'] ?? '{{post_title}} {{separator}} {{site_title}}';
 									$preview_description = $settings['description_template'] ?? '{{post_excerpt}}';
@@ -259,12 +259,12 @@ $taxonomies = get_taxonomies(
 								</div>
 
 								<!-- Nested Sub-Tabs -->
-								<div class="wpseopilot-accordion-tabs" data-component="wpseopilot-accordion-tabs">
-									<div class="wpseopilot-accordion-tabs__nav" role="tablist">
+								<div class="samanlabs-seo-accordion-tabs" data-component="samanlabs-seo-accordion-tabs">
+									<div class="samanlabs-seo-accordion-tabs__nav" role="tablist">
 										<button
 											type="button"
-											class="wpseopilot-accordion-tab is-active"
-											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-title-description"
+											class="samanlabs-seo-accordion-tab is-active"
+											data-accordion-tab="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-title-description"
 											aria-selected="true"
 											role="tab"
 										>
@@ -272,8 +272,8 @@ $taxonomies = get_taxonomies(
 										</button>
 										<button
 											type="button"
-											class="wpseopilot-accordion-tab"
-											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-schema"
+											class="samanlabs-seo-accordion-tab"
+											data-accordion-tab="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-schema"
 											aria-selected="false"
 											role="tab"
 										>
@@ -281,8 +281,8 @@ $taxonomies = get_taxonomies(
 										</button>
 										<button
 											type="button"
-											class="wpseopilot-accordion-tab"
-											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-custom-fields"
+											class="samanlabs-seo-accordion-tab"
+											data-accordion-tab="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-custom-fields"
 											aria-selected="false"
 											role="tab"
 										>
@@ -290,8 +290,8 @@ $taxonomies = get_taxonomies(
 										</button>
 										<button
 											type="button"
-											class="wpseopilot-accordion-tab"
-											data-accordion-tab="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-advanced"
+											class="samanlabs-seo-accordion-tab"
+											data-accordion-tab="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-advanced"
 											aria-selected="false"
 											role="tab"
 										>
@@ -301,32 +301,32 @@ $taxonomies = get_taxonomies(
 
 									<!-- Sub-Tab Panels -->
 									<div
-										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-title-description"
-										class="wpseopilot-accordion-tab-panel is-active"
+										id="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-title-description"
+										class="samanlabs-seo-accordion-tab-panel is-active"
 										role="tabpanel"
 									>
 										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/title-description.php'; ?>
 									</div>
 
 									<div
-										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-schema"
-										class="wpseopilot-accordion-tab-panel"
+										id="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-schema"
+										class="samanlabs-seo-accordion-tab-panel"
 										role="tabpanel"
 									>
 										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/schema.php'; ?>
 									</div>
 
 									<div
-										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-custom-fields"
-										class="wpseopilot-accordion-tab-panel"
+										id="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-custom-fields"
+										class="samanlabs-seo-accordion-tab-panel"
 										role="tabpanel"
 									>
 										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/custom-fields.php'; ?>
 									</div>
 
 									<div
-										id="wpseopilot-accordion-<?php echo esc_attr( $slug ); ?>-advanced"
-										class="wpseopilot-accordion-tab-panel"
+										id="samanlabs-seo-accordion-<?php echo esc_attr( $slug ); ?>-advanced"
+										class="samanlabs-seo-accordion-tab-panel"
 										role="tabpanel"
 									>
 										<?php include SAMANLABS_SEO_PATH . 'templates/components/post-type-fields/advanced.php'; ?>
@@ -340,9 +340,9 @@ $taxonomies = get_taxonomies(
 			</div>
 
 			<!-- Taxonomies Tab -->
-			<div id="wpseopilot-tab-taxonomies" class="wpseopilot-tab-panel">
-				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
-					<div class="wpseopilot-card-header">
+			<div id="samanlabs-seo-tab-taxonomies" class="samanlabs-seo-tab-panel">
+				<div class="samanlabs-seo-card samanlabs-seo-card-body--no-padding">
+					<div class="samanlabs-seo-card-header">
 						<h2><?php esc_html_e( 'Taxonomy Settings', 'saman-labs-seo' ); ?></h2>
 						<p><?php esc_html_e( 'Configure SEO settings for category and tag archives.', 'saman-labs-seo' ); ?></p>
 					</div>
@@ -352,12 +352,12 @@ $taxonomies = get_taxonomies(
 						$label = $object->labels->name ?? $slug;
 						$settings = $taxonomy_defaults[ $slug ] ?? [];
 						?>
-						<details class="wpseopilot-accordion">
+						<details class="samanlabs-seo-accordion">
 							<summary>
-								<span class="wpseopilot-accordion-title"><?php echo esc_html( $label ); ?></span>
-								<span class="wpseopilot-accordion-badge"><?php echo esc_html( $slug ); ?></span>
+								<span class="samanlabs-seo-accordion-title"><?php echo esc_html( $label ); ?></span>
+								<span class="samanlabs-seo-accordion-badge"><?php echo esc_html( $slug ); ?></span>
 							</summary>
-							<div class="wpseopilot-accordion__body">
+							<div class="samanlabs-seo-accordion__body">
 
 								<!-- Google Preview -->
 								<?php
@@ -368,31 +368,31 @@ $taxonomies = get_taxonomies(
 								include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 								?>
 
-								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
+								<div class="samanlabs-seo-form-row samanlabs-seo-form-row--separator">
 									<label>
 										<strong><?php esc_html_e( 'Show in Search Results?', 'saman-labs-seo' ); ?></strong>
 									</label>
-									<label class="wpseopilot-toggle">
+									<label class="samanlabs-seo-toggle">
 										<input
 											type="checkbox"
 											name="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][noindex]"
 											value="1"
 											<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 										/>
-										<span class="wpseopilot-toggle-label">
+										<span class="samanlabs-seo-toggle-label">
 											<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
 								</div>
 
-								<div class="wpseopilot-form-row">
+								<div class="samanlabs-seo-form-row">
 									<label>
 										<strong><?php esc_html_e( 'Title Template', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint">
+										<span class="samanlabs-seo-label-hint">
 											<?php esc_html_e( 'Use {{term}} for term name, {{sitename}} for site name', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
-									<div class="wpseopilot-flex-input">
+									<div class="samanlabs-seo-flex-input">
 										<input
 											type="text"
 											name="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]"
@@ -402,21 +402,21 @@ $taxonomies = get_taxonomies(
 											data-context="taxonomy:<?php echo esc_attr( $slug ); ?>"
 											placeholder="<?php echo esc_attr__( '{{term}} Archives {{separator}} {{sitename}}', 'saman-labs-seo' ); ?>"
 										/>
-										<button type="button" class="button wpseopilot-trigger-vars" data-target="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]">
+										<button type="button" class="button samanlabs-seo-trigger-vars" data-target="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][title_template]">
 											<span class="dashicons dashicons-editor-code"></span>
 											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
-								<div class="wpseopilot-form-row">
+								<div class="samanlabs-seo-form-row">
 									<label>
 										<strong><?php esc_html_e( 'Description Template', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint">
+										<span class="samanlabs-seo-label-hint">
 											<?php esc_html_e( 'Use {{term_description}} for term description', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
-									<div class="wpseopilot-flex-input">
+									<div class="samanlabs-seo-flex-input">
 										<textarea
 											name="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
 											rows="2"
@@ -425,7 +425,7 @@ $taxonomies = get_taxonomies(
 											data-context="taxonomy:<?php echo esc_attr( $slug ); ?>"
 											placeholder="<?php echo esc_attr__( '{{term_description}}', 'saman-labs-seo' ); ?>"
 										><?php echo esc_textarea( $settings['description_template'] ?? '{{term_description}}' ); ?></textarea>
-										<button type="button" class="button wpseopilot-trigger-vars" data-target="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]">
+										<button type="button" class="button samanlabs-seo-trigger-vars" data-target="samanlabs_seo_taxonomy_defaults[<?php echo esc_attr( $slug ); ?>][description_template]">
 											<span class="dashicons dashicons-editor-code"></span>
 											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
@@ -439,9 +439,9 @@ $taxonomies = get_taxonomies(
 			</div>
 
 			<!-- Archives Tab -->
-			<div id="wpseopilot-tab-archives" class="wpseopilot-tab-panel">
-				<div class="wpseopilot-card wpseopilot-card-body--no-padding">
-					<div class="wpseopilot-card-header">
+			<div id="samanlabs-seo-tab-archives" class="samanlabs-seo-tab-panel">
+				<div class="samanlabs-seo-card samanlabs-seo-card-body--no-padding">
+					<div class="samanlabs-seo-card-header">
 						<h2><?php esc_html_e( 'Archive & Special Page Settings', 'saman-labs-seo' ); ?></h2>
 						<p><?php esc_html_e( 'Configure SEO settings for author, date, search archives, and special pages like 404.', 'saman-labs-seo' ); ?></p>
 					</div>
@@ -457,12 +457,12 @@ $taxonomies = get_taxonomies(
 
 					<?php foreach ( $archive_types as $type => $label ) : ?>
 						<?php $settings = $archive_defaults[ $type ] ?? []; ?>
-						<details class="wpseopilot-accordion">
+						<details class="samanlabs-seo-accordion">
 							<summary>
-								<span class="wpseopilot-accordion-title"><?php echo esc_html( $label ); ?></span>
-								<span class="wpseopilot-accordion-badge"><?php echo esc_html( $type ); ?></span>
+								<span class="samanlabs-seo-accordion-title"><?php echo esc_html( $label ); ?></span>
+								<span class="samanlabs-seo-accordion-badge"><?php echo esc_html( $type ); ?></span>
 							</summary>
-							<div class="wpseopilot-accordion__body">
+							<div class="samanlabs-seo-accordion__body">
 
 								<!-- Google Preview -->
 								<?php
@@ -473,27 +473,27 @@ $taxonomies = get_taxonomies(
 								include SAMANLABS_SEO_PATH . 'templates/components/google-preview.php';
 								?>
 
-								<div class="wpseopilot-form-row wpseopilot-form-row--separator">
+								<div class="samanlabs-seo-form-row samanlabs-seo-form-row--separator">
 									<label>
 										<strong><?php esc_html_e( 'Show in Search Results?', 'saman-labs-seo' ); ?></strong>
 									</label>
-									<label class="wpseopilot-toggle">
+									<label class="samanlabs-seo-toggle">
 										<input
 											type="checkbox"
 											name="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][noindex]"
 											value="1"
 											<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 										/>
-										<span class="wpseopilot-toggle-label">
+										<span class="samanlabs-seo-toggle-label">
 											<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-labs-seo' ); ?>
 										</span>
 									</label>
 								</div>
 
-								<div class="wpseopilot-form-row">
+								<div class="samanlabs-seo-form-row">
 									<label>
 										<strong><?php esc_html_e( 'Title Template', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint">
+										<span class="samanlabs-seo-label-hint">
 											<?php
 											if ( 'author' === $type ) {
 												esc_html_e( 'Use {{author}} for author name', 'saman-labs-seo' );
@@ -507,7 +507,7 @@ $taxonomies = get_taxonomies(
 											?>
 										</span>
 									</label>
-									<div class="wpseopilot-flex-input">
+									<div class="samanlabs-seo-flex-input">
 										<input
 											type="text"
 											name="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]"
@@ -527,17 +527,17 @@ $taxonomies = get_taxonomies(
 											}
 											?>"
 										/>
-										<button type="button" class="button wpseopilot-trigger-vars" data-target="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]">
+										<button type="button" class="button samanlabs-seo-trigger-vars" data-target="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][title_template]">
 											<span class="dashicons dashicons-editor-code"></span>
 											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
 									</div>
 								</div>
 
-								<div class="wpseopilot-form-row">
+								<div class="samanlabs-seo-form-row">
 									<label>
 										<strong><?php esc_html_e( 'Meta Description', 'saman-labs-seo' ); ?></strong>
-										<span class="wpseopilot-label-hint">
+										<span class="samanlabs-seo-label-hint">
 											<?php
 											if ( 'author' === $type ) {
 												esc_html_e( 'Description for author archive pages', 'saman-labs-seo' );
@@ -551,7 +551,7 @@ $taxonomies = get_taxonomies(
 											?>
 										</span>
 									</label>
-									<div class="wpseopilot-flex-input">
+									<div class="samanlabs-seo-flex-input">
 										<textarea
 											name="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][description_template]"
 											rows="3"
@@ -570,7 +570,7 @@ $taxonomies = get_taxonomies(
 											}
 											?>"
 										><?php echo esc_textarea( $settings['description_template'] ?? '' ); ?></textarea>
-										<button type="button" class="button wpseopilot-trigger-vars" data-target="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][description_template]">
+										<button type="button" class="button samanlabs-seo-trigger-vars" data-target="samanlabs_seo_archive_defaults[<?php echo esc_attr( $type ); ?>][description_template]">
 											<span class="dashicons dashicons-editor-code"></span>
 											<?php esc_html_e( 'Variables', 'saman-labs-seo' ); ?>
 										</button>
@@ -584,16 +584,16 @@ $taxonomies = get_taxonomies(
 			</div>
 
 		<!-- Social Settings Tab -->
-		<div id="wpseopilot-tab-social" class="wpseopilot-tab-panel">
+		<div id="samanlabs-seo-tab-social" class="samanlabs-seo-tab-panel">
 			<?php include __DIR__ . '/components/social-settings-tab.php'; ?>
 		</div>
 
 	<!-- Social Cards Tab -->
-	<div id="wpseopilot-tab-social-cards" class="wpseopilot-tab-panel">
+	<div id="samanlabs-seo-tab-social-cards" class="samanlabs-seo-tab-panel">
 		<?php include __DIR__ . '/components/social-cards-tab.php'; ?>
 	</div>
 
-			<div class="wpseopilot-tabs__actions">
+			<div class="samanlabs-seo-tabs__actions">
 				<?php submit_button( __( 'Save Search Appearance Settings', 'saman-labs-seo' ), 'primary', 'submit', false ); ?>
 			</div>
 		</div>

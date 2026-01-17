@@ -24,19 +24,19 @@ class Admin_Topbar {
 	public static function render( $active_page = '', $section_label = '', $actions = [] ) {
 		$nav_items = self::get_nav_items();
 		?>
-		<div class="wpseopilot-topbar">
-			<div class="wpseopilot-topbar-inner">
-				<div class="wpseopilot-topbar-left">
-					<div class="wpseopilot-branding">
+		<div class="samanlabs-seo-topbar">
+			<div class="samanlabs-seo-topbar-inner">
+				<div class="samanlabs-seo-topbar-left">
+					<div class="samanlabs-seo-branding">
 						<span class="dashicons dashicons-airplane"></span>
 						<h1><?php esc_html_e( 'WP SEO Pilot', 'saman-labs-seo' ); ?></h1>
 					</div>
 
 					<?php if ( ! empty( $section_label ) ) : ?>
-						<span class="wpseopilot-section-label"><?php echo esc_html( $section_label ); ?></span>
+						<span class="samanlabs-seo-section-label"><?php echo esc_html( $section_label ); ?></span>
 					<?php endif; ?>
 
-					<nav class="wpseopilot-nav">
+					<nav class="samanlabs-seo-nav">
 						<ul>
 							<?php foreach ( $nav_items as $slug => $item ) : ?>
 								<li>
@@ -50,7 +50,7 @@ class Admin_Topbar {
 					</nav>
 				</div>
 
-				<div class="wpseopilot-topbar-actions">
+				<div class="samanlabs-seo-topbar-actions">
 					<?php if ( ! empty( $actions ) ) : ?>
 						<?php foreach ( $actions as $action ) : ?>
 							<?php if ( isset( $action['type'] ) && $action['type'] === 'button' ) : ?>
@@ -65,7 +65,7 @@ class Admin_Topbar {
 
 					<!-- GitHub Link -->
 					<a href="https://github.com/jhd3197/WP-SEO-Pilot"
-					   class="wpseopilot-github-link"
+					   class="samanlabs-seo-github-link"
 					   target="_blank"
 					   rel="noopener noreferrer"
 					   title="<?php esc_attr_e( 'Star on GitHub', 'saman-labs-seo' ); ?>">
@@ -88,35 +88,35 @@ class Admin_Topbar {
 		$items = [
 			'defaults'   => [
 				'label' => __( 'Defaults', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo' ),
 			],
 			'types'      => [
 				'label' => __( 'Search Appearance', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-types' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-types' ),
 			],
 			'ai'         => [
 				'label' => __( 'AI', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-ai' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-ai' ),
 			],
 			'internal-linking' => [
 				'label' => __( 'Internal Links', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-links' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-links' ),
 			],
 			'redirects'  => [
 				'label' => __( 'Redirects', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-redirects' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-redirects' ),
 			],
 			'audit'      => [
 				'label' => __( 'Audit', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-audit' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-audit' ),
 			],
 			'404-log'    => [
 				'label' => __( '404 Log', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-404' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-404' ),
 			],
 			'sitemap'    => [
 				'label' => __( 'Sitemap', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-sitemap' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-sitemap' ),
 			],
 		];
 
@@ -124,7 +124,7 @@ class Admin_Topbar {
 		if ( '1' === get_option( 'samanlabs_seo_enable_local_seo', '0' ) ) {
 			$items['local-seo'] = [
 				'label' => __( 'Local SEO', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-local-seo' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-local-seo' ),
 			];
 		}
 

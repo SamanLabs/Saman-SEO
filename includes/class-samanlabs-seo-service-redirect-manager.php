@@ -58,7 +58,7 @@ class Redirect_Manager {
 	 * @return string
 	 */
 	private function get_admin_redirect_url() {
-		return admin_url( 'admin.php?page=wpseopilot-redirects' );
+		return admin_url( 'admin.php?page=samanlabs-seo-redirects' );
 	}
 
 	/**
@@ -187,7 +187,7 @@ class Redirect_Manager {
 		delete_transient( 'samanlabs_seo_slug_changed_' . $user_id );
 
 		?>
-		<div class="notice notice-info is-dismissible wpseopilot-slug-notice">
+		<div class="notice notice-info is-dismissible samanlabs-seo-slug-notice">
 			<p>
 				<?php
 				printf(
@@ -200,7 +200,7 @@ class Redirect_Manager {
 			</p>
 			<p>
 				<button type="button" 
-					class="button button-primary wpseopilot-create-redirect-btn"
+					class="button button-primary samanlabs-seo-create-redirect-btn"
 					data-source="<?php echo esc_attr( $data['old_url'] ); ?>"
 					data-target="<?php echo esc_attr( $data['new_url'] ); ?>"
 					data-nonce="<?php echo esc_attr( wp_create_nonce( 'samanlabs_seo_create_redirect' ) ); ?>">
@@ -595,11 +595,11 @@ class Redirect_Manager {
 	 */
 	public function register_menu() {
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Redirect Manager', 'saman-labs-seo' ),
 			__( 'Redirects', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-redirects',
+			'samanlabs-seo-redirects',
 			[ $this, 'render_page' ],
 			11
 		);
@@ -631,7 +631,7 @@ class Redirect_Manager {
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION

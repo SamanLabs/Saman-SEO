@@ -96,7 +96,7 @@ class Analytics {
 	 * Determine which interface is being used
 	 */
 	private function get_interface_type( $page ) {
-		if ( strpos( $page, 'wpseopilot-v2' ) !== false ) {
+		if ( strpos( $page, 'samanlabs-seo-v2' ) !== false ) {
 			return 'React';
 		}
 		return 'Legacy';
@@ -120,12 +120,12 @@ class Analytics {
 
 		$page = sanitize_text_field( $_GET['page'] );
 
-		if ( strpos( $page, 'wpseopilot' ) === false && $page !== 'saman-labs-seo' ) {
+		if ( strpos( $page, 'samanlabs-seo' ) === false && $page !== 'saman-labs-seo' ) {
 			return;
 		}
 
 		wp_enqueue_script(
-			'wpseopilot-matomo',
+			'samanlabs-seo-matomo',
 			$this->matomo_url . '/matomo.js',
 			[],
 			SAMANLABS_SEO_VERSION,
@@ -133,8 +133,8 @@ class Analytics {
 		);
 
 		$activation_time = get_option( 'samanlabs_seo_track_activation', 0 );
-		$page_name       = str_replace( 'wpseopilot-', '', $page );
-		$page_name       = str_replace( 'wpseopilot', 'dashboard', $page_name );
+		$page_name       = str_replace( 'samanlabs-seo-', '', $page );
+		$page_name       = str_replace( 'samanlabs-seo', 'dashboard', $page_name );
 		$page_name       = str_replace( 'v2-', '', $page_name ); // Clean up v2 prefix
 		$page_title      = ucwords( str_replace( '-', ' ', $page_name ) );
 
@@ -180,10 +180,10 @@ class Analytics {
 			_paq.push(['enableHeartBeatTimer']);
 
 			// Debug flag for development
-			window.wpseopilotDebug = " . ( defined( 'WP_DEBUG' ) && WP_DEBUG ? 'true' : 'false' ) . ";
+			window.samanlabsSeoDebug = " . ( defined( 'WP_DEBUG' ) && WP_DEBUG ? 'true' : 'false' ) . ";
 
-			if (window.wpseopilotDebug) {
-				console.log('WP SEO Pilot Analytics: Initialized', {
+			if (window.samanlabsSeoDebug) {
+				console.log('Saman Labs SEO Analytics: Initialized', {
 					siteId: '{$this->site_id}',
 					visitorId: '{$visitor_id}',
 					version: '{$plugin_version}',
@@ -200,14 +200,14 @@ class Analytics {
 			delete_option( 'samanlabs_seo_track_activation' );
 		}
 
-		wp_add_inline_script( 'wpseopilot-matomo', $matomo_config, 'before' );
+		wp_add_inline_script( 'samanlabs-seo-matomo', $matomo_config, 'before' );
 	}
 
 	/**
 	 * Add async/defer to Matomo script for performance
 	 */
 	public function add_async_defer_attribute( $tag, $handle ) {
-		if ( 'wpseopilot-matomo' !== $handle ) {
+		if ( 'samanlabs-seo-matomo' !== $handle ) {
 			return $tag;
 		}
 		return str_replace( ' src', ' defer async src', $tag );

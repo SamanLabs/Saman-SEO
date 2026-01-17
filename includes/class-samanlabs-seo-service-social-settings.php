@@ -48,7 +48,7 @@ class Social_Settings {
 			<div class="notice notice-info">
 				<p><?php esc_html_e( 'Social Settings have been moved to Search Appearance for better organization.', 'saman-labs-seo' ); ?></p>
 				<p>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-types#social' ) ); ?>" class="button button-primary">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=samanlabs-seo-types#social' ) ); ?>" class="button button-primary">
 						<?php esc_html_e( 'Go to Social Settings →', 'saman-labs-seo' ); ?>
 					</a>
 				</p>
@@ -63,26 +63,26 @@ class Social_Settings {
 	 * @param string $hook Hook suffix.
 	 */
 	public function enqueue_assets( $hook ) {
-		if ( 'wp-seo-pilot_page_wpseopilot-social' !== $hook ) {
+		if ( 'wp-seo-pilot_page_samanlabs-seo-social' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
 			SAMANLABS_SEO_VERSION,

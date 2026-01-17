@@ -38,11 +38,11 @@ class AI_Assistant {
 	 */
 	public function register_page() {
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'AI', 'saman-labs-seo' ),
 			__( 'AI', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-ai',
+			'samanlabs-seo-ai',
 			[ $this, 'render_page' ]
 		);
 	}
@@ -55,12 +55,12 @@ class AI_Assistant {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
-		if ( 'samanlabs_seo_page_wpseopilot-ai' !== $hook ) {
+		if ( 'samanlabs_seo_page_samanlabs-seo-ai' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
@@ -78,14 +78,14 @@ class AI_Assistant {
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
@@ -239,7 +239,7 @@ class AI_Assistant {
 
 		$redirect_url = add_query_arg(
 			[
-				'page'                => 'wpseopilot-ai',
+				'page'                => 'samanlabs-seo-ai',
 				'samanlabs_seo_ai_reset' => '1',
 			],
 			admin_url( 'admin.php' )

@@ -40,7 +40,7 @@ class Htaccess_Controller extends REST_Controller {
         $this->namespace     = 'samanlabs-seo/v1';
         $this->rest_base     = 'htaccess';
         $this->htaccess_path = ABSPATH . '.htaccess';
-        $this->backup_dir    = WP_CONTENT_DIR . '/wpseopilot-backups/htaccess/';
+        $this->backup_dir    = WP_CONTENT_DIR . '/samanlabs-seo-backups/htaccess/';
     }
 
     /**

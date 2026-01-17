@@ -87,7 +87,7 @@ class Admin_UI {
 		}
 
 		add_meta_box(
-			'wpseopilot-meta',
+			'samanlabs-seo-meta',
 			__( 'WP SEO Pilot', 'saman-labs-seo' ),
 			[ $this, 'render_meta_box' ],
 			[ 'post', 'page' ],
@@ -134,11 +134,11 @@ class Admin_UI {
 	 */
 	public function enqueue_admin_assets( $hook ) {
 		// Exclude sitemap settings page from rich input transformation
-		if ( 'wp-seo-pilot_page_wpseopilot-sitemap' === $hook ) {
+		if ( 'wp-seo-pilot_page_samanlabs-seo-sitemap' === $hook ) {
 			return;
 		}
 
-		$should_enqueue = ( false !== strpos( $hook, 'wpseopilot' ) );
+		$should_enqueue = ( false !== strpos( $hook, 'samanlabs-seo' ) );
 
 		if ( ! $should_enqueue ) {
 			foreach ( [ 'post.php', 'post-new.php', 'edit.php' ] as $needle ) {
@@ -154,14 +154,14 @@ class Admin_UI {
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
 			SAMANLABS_SEO_VERSION,
@@ -169,9 +169,9 @@ class Admin_UI {
 		);
 
 		wp_enqueue_script(
-			'wpseopilot-seo-tags',
+			'samanlabs-seo-seo-tags',
 			SAMANLABS_SEO_URL . 'assets/js/seo-tags.js',
-			[ 'jquery', 'wpseopilot-admin' ],
+			[ 'jquery', 'samanlabs-seo-admin' ],
 			SAMANLABS_SEO_VERSION,
 			true
 		);
@@ -186,7 +186,7 @@ class Admin_UI {
 		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
 		$settings_svc = new Settings();
 		wp_localize_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			'WPSEOPilotAdmin',
 			[
 				'mediaTitle'  => __( 'Select image', 'saman-labs-seo' ),
@@ -230,7 +230,7 @@ class Admin_UI {
 			];
 
 		wp_enqueue_script(
-			'wpseopilot-admin-list',
+			'samanlabs-seo-admin-list',
 			$build_url . 'index.js',
 			$asset['dependencies'],
 			$asset['version'],
@@ -238,7 +238,7 @@ class Admin_UI {
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-admin-list',
+			'samanlabs-seo-admin-list',
 			$build_url . 'index.css',
 			[],
 			$asset['version']
@@ -264,7 +264,7 @@ class Admin_UI {
 			];
 
 		wp_enqueue_script(
-			'wpseopilot-editor-v2',
+			'samanlabs-seo-editor-v2',
 			$build_url . 'index.js',
 			$asset['dependencies'],
 			$asset['version'],
@@ -272,7 +272,7 @@ class Admin_UI {
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-editor-v2',
+			'samanlabs-seo-editor-v2',
 			$build_url . 'index.css',
 			[],
 			$asset['version']
@@ -289,8 +289,8 @@ class Admin_UI {
 
 		// Localize data for the React editor
 		wp_localize_script(
-			'wpseopilot-editor-v2',
-			'wpseopilotEditor',
+			'samanlabs-seo-editor-v2',
+			'samanlabs-seoEditor',
 			[
 				'variables'  => $variables,
 				'aiEnabled'  => $ai_enabled,
@@ -332,7 +332,7 @@ class Admin_UI {
 		}
 
 		wp_localize_script(
-			'wpseopilot-editor',
+			'samanlabs-seo-editor',
 			'WPSEOPilotEditor',
 			[
 				'defaultTitle'       => get_option( 'samanlabs_seo_default_title_template', '{{post_title}} | {{site_title}}' ),
@@ -366,7 +366,7 @@ class Admin_UI {
 	 * @return array
 	 */
 	public function add_posts_column( $columns ) {
-		$columns['wpseopilot'] = __( 'SEO', 'saman-labs-seo' );
+		$columns['samanlabs-seo'] = __( 'SEO', 'saman-labs-seo' );
 		return $columns;
 	}
 
@@ -379,7 +379,7 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function render_posts_column( $column, $post_id ) {
-		if ( 'wpseopilot' !== $column ) {
+		if ( 'samanlabs-seo' !== $column ) {
 			return;
 		}
 
@@ -413,7 +413,7 @@ class Admin_UI {
 
 		// Output placeholder for React hydration.
 		printf(
-			'<div class="wpseopilot-badge-placeholder" data-post-id="%d" data-score="%d" data-level="%s" data-label="%s" data-issues="%s" data-flags="%s"></div>',
+			'<div class="samanlabs-seo-badge-placeholder" data-post-id="%d" data-score="%d" data-level="%s" data-label="%s" data-issues="%s" data-flags="%s"></div>',
 			absint( $post_id ),
 			absint( $score['score'] ),
 			esc_attr( $score['level'] ),
@@ -438,7 +438,7 @@ class Admin_UI {
 
 		$actions['samanlabs_seo_edit'] = sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( get_edit_post_link( $post->ID ) . '#wpseopilot' ),
+			esc_url( get_edit_post_link( $post->ID ) . '#samanlabs-seo' ),
 			esc_html__( 'Edit SEO', 'saman-labs-seo' )
 		);
 
@@ -570,7 +570,7 @@ class Admin_UI {
 		?>
 		<script>
 			jQuery(function ($) {
-				$('#wpseopilot-meta .hndle').pointer({
+				$('#samanlabs-seo-meta .hndle').pointer({
 					content: '<h3><?php echo esc_js( __( 'SEO fields live here', 'saman-labs-seo' ) ); ?></h3><p><?php echo esc_js( __( 'Update title, description, and previews without scrolling.', 'saman-labs-seo' ) ); ?></p>',
 					position: { edge: 'left', align: 'center' },
 					close: function () {}

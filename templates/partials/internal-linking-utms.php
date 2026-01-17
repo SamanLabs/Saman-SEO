@@ -9,8 +9,8 @@ $form_action = admin_url( 'admin-post.php' );
 $editing     = $template_to_edit ?? null;
 
 ?>
-<div class="wpseopilot-links__split">
-	<div class="wpseopilot-card">
+<div class="samanlabs-seo-links__split">
+	<div class="samanlabs-seo-card">
 		<h3><?php esc_html_e( 'UTM Templates', 'saman-labs-seo' ); ?></h3>
 		<p><?php esc_html_e( 'Define reusable parameter sets so rules and categories can inherit consistent tracking.', 'saman-labs-seo' ); ?></p>
 		<table class="widefat striped">
@@ -65,9 +65,9 @@ $editing     = $template_to_edit ?? null;
 		</table>
 	</div>
 
-	<div class="wpseopilot-card">
+	<div class="samanlabs-seo-card">
 		<h3><?php echo esc_html( $editing ? __( 'Edit template', 'saman-labs-seo' ) : __( 'Add template', 'saman-labs-seo' ) ); ?></h3>
-		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__utm-form">
+		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="samanlabs-seo-links__utm-form">
 			<?php wp_nonce_field( 'samanlabs_seo_save_link_template' ); ?>
 			<input type="hidden" name="action" value="samanlabs_seo_save_link_template" />
 			<?php if ( $editing ) : ?>
@@ -79,7 +79,7 @@ $editing     = $template_to_edit ?? null;
 				<span><?php esc_html_e( 'Name', 'saman-labs-seo' ); ?></span>
 				<input type="text" name="template[name]" value="<?php echo esc_attr( $editing['name'] ?? '' ); ?>" required />
 			</label>
-			<div class="wpseopilot-grid">
+			<div class="samanlabs-seo-grid">
 				<label>
 					<span><?php esc_html_e( 'utm_source', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_source]" value="<?php echo esc_attr( $editing['utm_source'] ?? '' ); ?>" />
@@ -93,7 +93,7 @@ $editing     = $template_to_edit ?? null;
 					<input type="text" name="template[utm_campaign]" value="<?php echo esc_attr( $editing['utm_campaign'] ?? '' ); ?>" />
 				</label>
 			</div>
-			<div class="wpseopilot-grid">
+			<div class="samanlabs-seo-grid">
 				<label>
 					<span><?php esc_html_e( 'utm_term (optional)', 'saman-labs-seo' ); ?></span>
 					<input type="text" name="template[utm_term]" value="<?php echo esc_attr( $editing['utm_term'] ?? '' ); ?>" />
@@ -105,36 +105,36 @@ $editing     = $template_to_edit ?? null;
 			</div>
 			<fieldset>
 				<legend><?php esc_html_e( 'Apply to', 'saman-labs-seo' ); ?></legend>
-				<label class="wpseopilot-links__choice">
+				<label class="samanlabs-seo-links__choice">
 					<input type="radio" name="template[apply_to]" value="internal" <?php checked( 'internal', $editing['apply_to'] ?? 'both' ); ?> />
 					<span><?php esc_html_e( 'Internal links only', 'saman-labs-seo' ); ?></span>
 				</label>
-				<label class="wpseopilot-links__choice">
+				<label class="samanlabs-seo-links__choice">
 					<input type="radio" name="template[apply_to]" value="external" <?php checked( 'external', $editing['apply_to'] ?? 'both' ); ?> />
 					<span><?php esc_html_e( 'External links only', 'saman-labs-seo' ); ?></span>
 				</label>
-				<label class="wpseopilot-links__choice">
+				<label class="samanlabs-seo-links__choice">
 					<input type="radio" name="template[apply_to]" value="both" <?php checked( 'both', $editing['apply_to'] ?? 'both' ); ?> />
 					<span><?php esc_html_e( 'Both', 'saman-labs-seo' ); ?></span>
 				</label>
 			</fieldset>
 			<fieldset>
 				<legend><?php esc_html_e( 'Append mode', 'saman-labs-seo' ); ?></legend>
-				<label class="wpseopilot-links__choice">
+				<label class="samanlabs-seo-links__choice">
 					<input type="radio" name="template[append_mode]" value="append_if_missing" <?php checked( 'append_if_missing', $editing['append_mode'] ?? 'append_if_missing' ); ?> />
 					<span><?php esc_html_e( 'Append if missing', 'saman-labs-seo' ); ?></span>
 				</label>
-				<label class="wpseopilot-links__choice">
+				<label class="samanlabs-seo-links__choice">
 					<input type="radio" name="template[append_mode]" value="always_overwrite" <?php checked( 'always_overwrite', $editing['append_mode'] ?? '' ); ?> />
 					<span><?php esc_html_e( 'Always overwrite', 'saman-labs-seo' ); ?></span>
 				</label>
-				<label class="wpseopilot-links__choice">
+				<label class="samanlabs-seo-links__choice">
 					<input type="radio" name="template[append_mode]" value="never" <?php checked( 'never', $editing['append_mode'] ?? '' ); ?> />
 					<span><?php esc_html_e( 'Never overwrite existing params', 'saman-labs-seo' ); ?></span>
 				</label>
 			</fieldset>
 
-			<div class="wpseopilot-links__helper">
+			<div class="samanlabs-seo-links__helper">
 				<strong><?php esc_html_e( 'Token helper', 'saman-labs-seo' ); ?></strong>
 				<p><?php esc_html_e( 'Tokens: {post_id}, {post_slug}, {post_type}, {post_title}, {primary_category}, {keyword}, {rule_id}, {date:Ymd}, {author}, {site_name}.', 'saman-labs-seo' ); ?></p>
 			</div>

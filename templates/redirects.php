@@ -14,13 +14,13 @@ $samanlabs_seo_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_uns
 // Render top bar
 \WPSEOPilot\Admin_Topbar::render( 'redirects' );
 ?>
-<div class="wrap wpseopilot-page">
+<div class="wrap samanlabs-seo-page">
 
 	<?php
 	$suggestions = get_option( 'samanlabs_seo_monitor_slugs', [] );
 	if ( ! empty( $suggestions ) ) :
 		?>
-		<div class="wpseopilot-card" style="margin-bottom: 20px; border-left: 4px solid #ffba00;">
+		<div class="samanlabs-seo-card" style="margin-bottom: 20px; border-left: 4px solid #ffba00;">
 			<h2><?php esc_html_e( '⚠️ Detected Slug Changes', 'saman-labs-seo' ); ?></h2>
 			<p><?php esc_html_e( 'The following posts have changed their URL structure. You should probably create redirects to prevent 404 errors.', 'saman-labs-seo' ); ?></p>
 			<table class="wp-list-table widefat striped" style="margin-top: 10px;">
@@ -37,7 +37,7 @@ $samanlabs_seo_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_uns
 							<td><code><?php echo esc_html( $suggestion['source'] ); ?></code></td>
 							<td><a href="<?php echo esc_url( $suggestion['target'] ); ?>" target="_blank"><?php echo esc_html( $suggestion['target'] ); ?></a></td>
 							<td>
-								<a href="<?php echo esc_url( add_query_arg( [ 'prefill' => $suggestion['source'], 'target_prefill' => $suggestion['target'] ], admin_url( 'admin.php?page=wpseopilot-redirects' ) ) ); ?>" class="button button-small button-primary" onclick="
+								<a href="<?php echo esc_url( add_query_arg( [ 'prefill' => $suggestion['source'], 'target_prefill' => $suggestion['target'] ], admin_url( 'admin.php?page=samanlabs-seo-redirects' ) ) ); ?>" class="button button-small button-primary" onclick="
 									event.preventDefault();
 									document.getElementById('source').value = '<?php echo esc_js( $suggestion['source'] ); ?>';
 									document.getElementById('target').value = '<?php echo esc_js( $suggestion['target'] ); ?>';
@@ -53,7 +53,7 @@ $samanlabs_seo_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_uns
 		</div>
 	<?php endif; ?>
 
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-card">
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="samanlabs-seo-card">
 		<?php wp_nonce_field( 'samanlabs_seo_redirect' ); ?>
 		<input type="hidden" name="action" value="samanlabs_seo_save_redirect" />
 		<table class="form-table">

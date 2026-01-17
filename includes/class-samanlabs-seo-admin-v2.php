@@ -34,7 +34,7 @@ class Admin_V2 {
      *
      * @var string
      */
-    const MENU_SLUG = 'wpseopilot';
+    const MENU_SLUG = 'samanlabs-seo';
 
     /**
      * View mapping for WordPress pages to React views.
@@ -44,48 +44,48 @@ class Admin_V2 {
      */
     private $view_map = [
         // New URLs (primary)
-        'wpseopilot'                    => 'dashboard',
-        'wpseopilot-dashboard'          => 'dashboard',
-        'wpseopilot-search-appearance'  => 'search-appearance',
-        'wpseopilot-sitemap'            => 'sitemap',
-        'wpseopilot-tools'              => 'tools',
-        'wpseopilot-redirects'          => 'redirects',
-        'wpseopilot-404-log'            => '404-log',
-        'wpseopilot-internal-linking'   => 'internal-linking',
-        'wpseopilot-audit'              => 'audit',
-        'wpseopilot-ai-assistant'       => 'ai-assistant',
-        'wpseopilot-assistants'         => 'assistants',
-        'wpseopilot-settings'           => 'settings',
-        'wpseopilot-more'               => 'more',
-        'wpseopilot-bulk-editor'        => 'bulk-editor',
-        'wpseopilot-content-gaps'       => 'content-gaps',
-        'wpseopilot-schema-builder'     => 'schema-builder',
-        'wpseopilot-link-health'        => 'link-health',
-        'wpseopilot-local-seo'          => 'local-seo',
-        'wpseopilot-robots-txt'         => 'robots-txt',
-        'wpseopilot-image-seo'          => 'image-seo',
-        'wpseopilot-instant-indexing'   => 'instant-indexing',
-        'wpseopilot-schema-validator'   => 'schema-validator',
-        'wpseopilot-htaccess-editor'    => 'htaccess-editor',
-        'wpseopilot-mobile-friendly'    => 'mobile-friendly',
+        'samanlabs-seo'                    => 'dashboard',
+        'samanlabs-seo-dashboard'          => 'dashboard',
+        'samanlabs-seo-search-appearance'  => 'search-appearance',
+        'samanlabs-seo-sitemap'            => 'sitemap',
+        'samanlabs-seo-tools'              => 'tools',
+        'samanlabs-seo-redirects'          => 'redirects',
+        'samanlabs-seo-404-log'            => '404-log',
+        'samanlabs-seo-internal-linking'   => 'internal-linking',
+        'samanlabs-seo-audit'              => 'audit',
+        'samanlabs-seo-ai-assistant'       => 'ai-assistant',
+        'samanlabs-seo-assistants'         => 'assistants',
+        'samanlabs-seo-settings'           => 'settings',
+        'samanlabs-seo-more'               => 'more',
+        'samanlabs-seo-bulk-editor'        => 'bulk-editor',
+        'samanlabs-seo-content-gaps'       => 'content-gaps',
+        'samanlabs-seo-schema-builder'     => 'schema-builder',
+        'samanlabs-seo-link-health'        => 'link-health',
+        'samanlabs-seo-local-seo'          => 'local-seo',
+        'samanlabs-seo-robots-txt'         => 'robots-txt',
+        'samanlabs-seo-image-seo'          => 'image-seo',
+        'samanlabs-seo-instant-indexing'   => 'instant-indexing',
+        'samanlabs-seo-schema-validator'   => 'schema-validator',
+        'samanlabs-seo-htaccess-editor'    => 'htaccess-editor',
+        'samanlabs-seo-mobile-friendly'    => 'mobile-friendly',
         // Legacy V2 URLs (backwards compatibility)
-        'wpseopilot-v2'                    => 'dashboard',
-        'wpseopilot-v2-dashboard'          => 'dashboard',
-        'wpseopilot-v2-search-appearance'  => 'search-appearance',
-        'wpseopilot-v2-sitemap'            => 'sitemap',
-        'wpseopilot-v2-tools'              => 'tools',
-        'wpseopilot-v2-redirects'          => 'redirects',
-        'wpseopilot-v2-404-log'            => '404-log',
-        'wpseopilot-v2-internal-linking'   => 'internal-linking',
-        'wpseopilot-v2-audit'              => 'audit',
-        'wpseopilot-v2-ai-assistant'       => 'ai-assistant',
-        'wpseopilot-v2-assistants'         => 'assistants',
-        'wpseopilot-v2-settings'           => 'settings',
-        'wpseopilot-v2-more'               => 'more',
-        'wpseopilot-v2-bulk-editor'        => 'bulk-editor',
-        'wpseopilot-v2-content-gaps'       => 'content-gaps',
-        'wpseopilot-v2-schema-builder'     => 'schema-builder',
-        'wpseopilot-v2-link-health'        => 'link-health',
+        'samanlabs-seo-v2'                    => 'dashboard',
+        'samanlabs-seo-v2-dashboard'          => 'dashboard',
+        'samanlabs-seo-v2-search-appearance'  => 'search-appearance',
+        'samanlabs-seo-v2-sitemap'            => 'sitemap',
+        'samanlabs-seo-v2-tools'              => 'tools',
+        'samanlabs-seo-v2-redirects'          => 'redirects',
+        'samanlabs-seo-v2-404-log'            => '404-log',
+        'samanlabs-seo-v2-internal-linking'   => 'internal-linking',
+        'samanlabs-seo-v2-audit'              => 'audit',
+        'samanlabs-seo-v2-ai-assistant'       => 'ai-assistant',
+        'samanlabs-seo-v2-assistants'         => 'assistants',
+        'samanlabs-seo-v2-settings'           => 'settings',
+        'samanlabs-seo-v2-more'               => 'more',
+        'samanlabs-seo-v2-bulk-editor'        => 'bulk-editor',
+        'samanlabs-seo-v2-content-gaps'       => 'content-gaps',
+        'samanlabs-seo-v2-schema-builder'     => 'schema-builder',
+        'samanlabs-seo-v2-link-health'        => 'link-health',
     ];
 
     /**
@@ -95,13 +95,13 @@ class Admin_V2 {
      */
     private $legacy_redirects = [
         // Only include redirects where old URL differs from new URL
-        'wpseopilot-types'        => 'wpseopilot-search-appearance',
-        'wpseopilot-404-errors'   => 'wpseopilot-404-log',
-        'wpseopilot-internal'     => 'wpseopilot-internal-linking',
-        'wpseopilot-ai'           => 'wpseopilot-ai-assistant',
-        'wpseopilot-local-seo'    => 'wpseopilot-settings',
-        'wpseopilot-links'        => 'wpseopilot-internal-linking',
-        'wpseopilot-404'          => 'wpseopilot-404-log',
+        'samanlabs-seo-types'        => 'samanlabs-seo-search-appearance',
+        'samanlabs-seo-404-errors'   => 'samanlabs-seo-404-log',
+        'samanlabs-seo-internal'     => 'samanlabs-seo-internal-linking',
+        'samanlabs-seo-ai'           => 'samanlabs-seo-ai-assistant',
+        'samanlabs-seo-local-seo'    => 'samanlabs-seo-settings',
+        'samanlabs-seo-links'        => 'samanlabs-seo-internal-linking',
+        'samanlabs-seo-404'          => 'samanlabs-seo-404-log',
     ];
 
     /**
@@ -162,8 +162,8 @@ class Admin_V2 {
         }
 
         // Redirect old V2 URLs to new URLs (remove -v2 prefix)
-        if ( strpos( $page, 'wpseopilot-v2' ) === 0 ) {
-            $new_page = str_replace( 'wpseopilot-v2', 'wpseopilot', $page );
+        if ( strpos( $page, 'samanlabs-seo-v2' ) === 0 ) {
+            $new_page = str_replace( 'samanlabs-seo-v2', 'samanlabs-seo', $page );
             wp_safe_redirect( admin_url( 'admin.php?page=' . $new_page ) );
             exit;
         }
@@ -245,7 +245,7 @@ class Admin_V2 {
      * Render the React app mount point.
      */
     public function render_app() {
-        echo '<div id="wpseopilot-v2-root"></div>';
+        echo '<div id="samanlabs-seo-v2-root"></div>';
     }
 
     /**
@@ -255,7 +255,7 @@ class Admin_V2 {
      */
     public function enqueue_assets( $hook ) {
         // Only load on our plugin pages (both new and legacy URLs)
-        if ( strpos( $hook, 'wpseopilot' ) === false ) {
+        if ( strpos( $hook, 'samanlabs-seo' ) === false ) {
             return;
         }
 
@@ -273,7 +273,7 @@ class Admin_V2 {
 
         // Enqueue React app script
         wp_enqueue_script(
-            'wpseopilot-admin-v2',
+            'samanlabs-seo-admin-v2',
             $build_url . 'index.js',
             $asset['dependencies'],
             $asset['version'],
@@ -282,7 +282,7 @@ class Admin_V2 {
 
         // Enqueue React app styles (bundled by webpack)
         wp_enqueue_style(
-            'wpseopilot-admin-v2',
+            'samanlabs-seo-admin-v2',
             $build_url . 'index.css',
             [],
             $asset['version']
@@ -298,7 +298,7 @@ class Admin_V2 {
         $ai_provider = AI_Pilot::get_provider();
 
         // Pass configuration to React app
-        wp_localize_script( 'wpseopilot-admin-v2', 'wpseopilotV2Settings', [
+        wp_localize_script( 'samanlabs-seo-admin-v2', 'samanlabs-seoV2Settings', [
             'initialView' => $initial_view,
             'restUrl'     => rest_url( 'samanlabs-seo/v1/' ),
             'nonce'       => wp_create_nonce( 'wp_rest' ),

@@ -12,7 +12,7 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 
-<div class="wpseopilot-form-row">
+<div class="samanlabs-seo-form-row">
 	<?php
 	$current_schema = $settings['schema_type'] ?? 'Article';
 	$schema_options = [
@@ -54,27 +54,27 @@ defined( 'ABSPATH' ) || exit;
 		],
 	];
 	?>
-	<div class="wpseopilot-radio-card-grid">
+	<div class="samanlabs-seo-radio-card-grid">
 		<?php foreach ( $schema_options as $key => $opt ) : ?>
-			<label class="wpseopilot-radio-card <?php echo ( $current_schema === $opt['val'] ) ? 'is-selected' : ''; ?>">
+			<label class="samanlabs-seo-radio-card <?php echo ( $current_schema === $opt['val'] ) ? 'is-selected' : ''; ?>">
 				<input
 					type="radio"
 					name="samanlabs_seo_post_type_defaults[<?php echo esc_attr( $slug ); ?>][schema_type]"
 					value="<?php echo esc_attr( $opt['val'] ); ?>"
 					<?php checked( $current_schema, $opt['val'] ); ?>
 				/>
-				<span class="wpseopilot-radio-card__icon">
+				<span class="samanlabs-seo-radio-card__icon">
 					<span class="dashicons <?php echo esc_attr( $opt['icon'] ); ?>"></span>
 				</span>
-				<span class="wpseopilot-radio-card__title"><?php echo esc_html( $opt['label'] ); ?></span>
-				<span class="wpseopilot-radio-card__desc"><?php echo esc_html( $opt['desc'] ); ?></span>
+				<span class="samanlabs-seo-radio-card__title"><?php echo esc_html( $opt['label'] ); ?></span>
+				<span class="samanlabs-seo-radio-card__desc"><?php echo esc_html( $opt['desc'] ); ?></span>
 			</label>
 		<?php endforeach; ?>
 	</div>
 </div>
 
-<div class="wpseopilot-form-row">
-	<p class="wpseopilot-info-notice">
+<div class="samanlabs-seo-form-row">
+	<p class="samanlabs-seo-info-notice">
 		<span class="dashicons dashicons-info"></span>
 		<?php esc_html_e( 'Additional schema configuration options will be available in future updates.', 'saman-labs-seo' ); ?>
 	</p>

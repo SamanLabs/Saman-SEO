@@ -649,26 +649,26 @@ class Breadcrumbs {
 
 		ob_start();
 		?>
-		<nav class="wpseopilot-breadcrumbs wpseopilot-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'saman-labs-seo' ); ?>">
-			<ol class="wpseopilot-breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
+		<nav class="samanlabs-seo-breadcrumbs samanlabs-seo-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'saman-labs-seo' ); ?>">
+			<ol class="samanlabs-seo-breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
 				<?php foreach ( $crumbs as $index => $crumb ) : ?>
 					<?php
 					$is_last  = ( $index === $total - 1 );
 					$position = $index + 1;
 					?>
-					<li class="wpseopilot-breadcrumbs__item<?php echo $is_last ? ' wpseopilot-breadcrumbs__item--current' : ''; ?>" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+					<li class="samanlabs-seo-breadcrumbs__item<?php echo $is_last ? ' samanlabs-seo-breadcrumbs__item--current' : ''; ?>" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
 						<?php if ( ! empty( $crumb['url'] ) && ! $is_last ) : ?>
-							<a class="wpseopilot-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>" itemprop="item">
+							<a class="samanlabs-seo-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>" itemprop="item">
 								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
 							</a>
 						<?php else : ?>
-							<span class="wpseopilot-breadcrumbs__current" itemprop="item">
+							<span class="samanlabs-seo-breadcrumbs__current" itemprop="item">
 								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
 							</span>
 						<?php endif; ?>
 						<meta itemprop="position" content="<?php echo esc_attr( $position ); ?>" />
 						<?php if ( ! $is_last ) : ?>
-							<span class="wpseopilot-breadcrumbs__separator" aria-hidden="true"><?php echo $separator; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+							<span class="samanlabs-seo-breadcrumbs__separator" aria-hidden="true"><?php echo $separator; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<?php endif; ?>
 					</li>
 				<?php endforeach; ?>
@@ -735,7 +735,7 @@ class Breadcrumbs {
 
 		// Register the editor script.
 		wp_register_script(
-			'wpseopilot-breadcrumbs-block',
+			'samanlabs-seo-breadcrumbs-block',
 			SAMANLABS_SEO_URL . 'blocks/breadcrumbs/index.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-server-side-render', 'wp-i18n' ],
 			SAMANLABS_SEO_VERSION,
@@ -743,9 +743,9 @@ class Breadcrumbs {
 		);
 
 		register_block_type(
-			'wpseopilot/breadcrumbs',
+			'samanlabs-seo/breadcrumbs',
 			[
-				'editor_script'   => 'wpseopilot-breadcrumbs-block',
+				'editor_script'   => 'samanlabs-seo-breadcrumbs-block',
 				'render_callback' => [ $this, 'render_block' ],
 				'attributes'      => [
 					'separator'   => [
@@ -882,7 +882,7 @@ class Breadcrumbs {
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-breadcrumbs',
+			'samanlabs-seo-breadcrumbs',
 			SAMANLABS_SEO_URL . 'assets/css/breadcrumbs.css',
 			[],
 			SAMANLABS_SEO_VERSION

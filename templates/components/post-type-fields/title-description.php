@@ -12,18 +12,18 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 
-<div class="wpseopilot-form-row">
+<div class="samanlabs-seo-form-row">
 	<label>
 		<strong><?php esc_html_e( 'Show in Search Results?', 'saman-labs-seo' ); ?></strong>
 	</label>
-	<label class="wpseopilot-toggle">
+	<label class="samanlabs-seo-toggle">
 		<input
 			type="checkbox"
 			name="samanlabs_seo_post_type_defaults[<?php echo esc_attr( $slug ); ?>][noindex]"
 			value="1"
 			<?php checked( $settings['noindex'] ?? false, 1 ); ?>
 		/>
-		<span class="wpseopilot-toggle-label">
+		<span class="samanlabs-seo-toggle-label">
 			<?php esc_html_e( 'Hide from search engines (noindex)', 'saman-labs-seo' ); ?>
 		</span>
 	</label>
@@ -32,14 +32,14 @@ defined( 'ABSPATH' ) || exit;
 	</p>
 </div>
 
-<div class="wpseopilot-form-row">
+<div class="samanlabs-seo-form-row">
 	<label for="title_template_<?php echo esc_attr( $slug ); ?>">
 		<strong><?php esc_html_e( 'Title Template', 'saman-labs-seo' ); ?></strong>
-		<span class="wpseopilot-label-hint">
+		<span class="samanlabs-seo-label-hint">
 			<?php esc_html_e( 'Use variables like {{post_title}}, {{site_title}}, {{separator}}', 'saman-labs-seo' ); ?>
 		</span>
 	</label>
-	<div class="wpseopilot-flex-input">
+	<div class="samanlabs-seo-flex-input">
 		<input
 			type="text"
 			id="title_template_<?php echo esc_attr( $slug ); ?>"
@@ -51,7 +51,7 @@ defined( 'ABSPATH' ) || exit;
 		/>
 		<button
 			type="button"
-			class="button wpseopilot-trigger-vars"
+			class="button samanlabs-seo-trigger-vars"
 			data-target="title_template_<?php echo esc_attr( $slug ); ?>"
 		>
 			<span class="dashicons dashicons-editor-code"></span>
@@ -60,14 +60,14 @@ defined( 'ABSPATH' ) || exit;
 	</div>
 </div>
 
-<div class="wpseopilot-form-row">
+<div class="samanlabs-seo-form-row">
 	<label for="desc_template_<?php echo esc_attr( $slug ); ?>">
 		<strong><?php esc_html_e( 'Description Template', 'saman-labs-seo' ); ?></strong>
-		<span class="wpseopilot-label-hint">
+		<span class="samanlabs-seo-label-hint">
 			<?php esc_html_e( 'Use variables like {{post_excerpt}}, {{post_date}}, {{category}}', 'saman-labs-seo' ); ?>
 		</span>
 	</label>
-	<div class="wpseopilot-flex-input">
+	<div class="samanlabs-seo-flex-input">
 		<textarea
 			id="desc_template_<?php echo esc_attr( $slug ); ?>"
 			name="samanlabs_seo_post_type_defaults[<?php echo esc_attr( $slug ); ?>][description_template]"
@@ -78,7 +78,7 @@ defined( 'ABSPATH' ) || exit;
 		><?php echo esc_textarea( $settings['description_template'] ?? '{{post_excerpt}}' ); ?></textarea>
 		<button
 			type="button"
-			class="button wpseopilot-trigger-vars"
+			class="button samanlabs-seo-trigger-vars"
 			data-target="desc_template_<?php echo esc_attr( $slug ); ?>"
 		>
 			<span class="dashicons dashicons-editor-code"></span>

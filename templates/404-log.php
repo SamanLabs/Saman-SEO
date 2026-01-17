@@ -12,31 +12,31 @@
 // Render top bar
 \WPSEOPilot\Admin_Topbar::render( '404-log' );
 ?>
-<div class="wrap wpseopilot-page">
+<div class="wrap samanlabs-seo-page">
 
-	<form method="get" class="wpseopilot-404-controls">
-		<input type="hidden" name="page" value="wpseopilot-404" />
-		<label for="wpseopilot-404-sort">
+	<form method="get" class="samanlabs-seo-404-controls">
+		<input type="hidden" name="page" value="samanlabs-seo-404" />
+		<label for="samanlabs-seo-404-sort">
 			<?php esc_html_e( 'Sort by', 'saman-labs-seo' ); ?>
-			<select id="wpseopilot-404-sort" name="sort">
+			<select id="samanlabs-seo-404-sort" name="sort">
 				<option value="recent" <?php selected( $sort, 'recent' ); ?>><?php esc_html_e( 'Most recent (Date & Time)', 'saman-labs-seo' ); ?></option>
 				<option value="top" <?php selected( $sort, 'top' ); ?>><?php esc_html_e( 'Top hits', 'saman-labs-seo' ); ?></option>
 			</select>
 		</label>
-		<label for="wpseopilot-404-per-page" style="margin-left:1em;">
+		<label for="samanlabs-seo-404-per-page" style="margin-left:1em;">
 			<?php esc_html_e( 'Rows per page', 'saman-labs-seo' ); ?>
-			<select id="wpseopilot-404-per-page" name="per_page">
+			<select id="samanlabs-seo-404-per-page" name="per_page">
 				<?php foreach ( [ 25, 50, 100, 200 ] as $option ) : ?>
 					<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $per_page, $option ); ?>><?php echo esc_html( $option ); ?></option>
 				<?php endforeach; ?>
 			</select>
 		</label>
-		<label for="wpseopilot-404-hide-spam" style="margin-left:1em;">
-			<input id="wpseopilot-404-hide-spam" type="checkbox" name="hide_spam" value="1" <?php checked( $hide_spam ); ?> />
+		<label for="samanlabs-seo-404-hide-spam" style="margin-left:1em;">
+			<input id="samanlabs-seo-404-hide-spam" type="checkbox" name="hide_spam" value="1" <?php checked( $hide_spam ); ?> />
 			<?php esc_html_e( 'Hide spammy extensions', 'saman-labs-seo' ); ?>
 		</label>
-		<label for="wpseopilot-404-hide-images" style="margin-left:1em;">
-			<input id="wpseopilot-404-hide-images" type="checkbox" name="hide_images" value="1" <?php checked( $hide_images ); ?> />
+		<label for="samanlabs-seo-404-hide-images" style="margin-left:1em;">
+			<input id="samanlabs-seo-404-hide-images" type="checkbox" name="hide_images" value="1" <?php checked( $hide_images ); ?> />
 			<?php esc_html_e( 'Hide image extensions', 'saman-labs-seo' ); ?>
 		</label>
 		<button type="submit" class="button button-secondary" style="margin-left:1em;">
@@ -73,7 +73,7 @@
 						<td>
 							<?php echo esc_html( $row->request_uri ); ?>
 							<?php if ( ! empty( $row->redirect_exists ) ) : ?>
-								<span class="wpseopilot-404-tag" style="margin-left:0.5em;display:inline-block;padding:0 6px;border-radius:10px;background:#e6f2ff;color:#0b57d0;font-size:11px;line-height:18px;">
+								<span class="samanlabs-seo-404-tag" style="margin-left:0.5em;display:inline-block;padding:0 6px;border-radius:10px;background:#e6f2ff;color:#0b57d0;font-size:11px;line-height:18px;">
 									<?php esc_html_e( 'Redirect exists', 'saman-labs-seo' ); ?>
 								</span>
 							<?php endif; ?>
@@ -82,7 +82,7 @@
 						<td><?php echo esc_html( mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $row->last_seen ) ); ?></td>
 						<td><?php echo esc_html( $row->device_label ?: __( 'Unknown device', 'saman-labs-seo' ) ); ?></td>
 						<td>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpseopilot-redirects&prefill=' . rawurlencode( $row->request_uri ) ) ); ?>" class="button button-small"><?php esc_html_e( 'Create redirect', 'saman-labs-seo' ); ?></a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=samanlabs-seo-redirects&prefill=' . rawurlencode( $row->request_uri ) ) ); ?>" class="button button-small"><?php esc_html_e( 'Create redirect', 'saman-labs-seo' ); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>

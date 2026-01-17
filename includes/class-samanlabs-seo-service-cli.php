@@ -25,7 +25,7 @@ class CLI {
 		}
 
 		\WP_CLI::add_command(
-			'wpseopilot redirects',
+			'samanlabs-seo redirects',
 			new class() extends \WP_CLI_Command {
 
 				/**

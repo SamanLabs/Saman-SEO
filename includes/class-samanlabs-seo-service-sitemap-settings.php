@@ -67,11 +67,11 @@ class Sitemap_Settings {
 	 */
 	public function register_menu() {
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Sitemap Settings', 'saman-labs-seo' ),
 			__( 'Sitemap', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-sitemap',
+			'samanlabs-seo-sitemap',
 			[ $this, 'render_settings_page' ]
 		);
 	}
@@ -119,13 +119,13 @@ class Sitemap_Settings {
 	 * @param string $hook Hook suffix.
 	 */
 	public function enqueue_assets( $hook ) {
-		if ( 'wp-seo-pilot_page_wpseopilot-sitemap' !== $hook ) {
+		if ( 'wp-seo-pilot_page_samanlabs-seo-sitemap' !== $hook ) {
 			return;
 		}
 
 		// Enqueue new modern plugin styles
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
@@ -133,7 +133,7 @@ class Sitemap_Settings {
 
 		// Enqueue admin.js for tab switching functionality
 		wp_enqueue_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
 			SAMANLABS_SEO_VERSION,
@@ -142,7 +142,7 @@ class Sitemap_Settings {
 
 		// Add inline script data
 		wp_localize_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			'WPSEOPilotSitemap',
 			[
 				'ajax_url' => admin_url( 'admin-ajax.php' ),

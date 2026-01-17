@@ -38,11 +38,11 @@ class Local_SEO {
 	 */
 	public function register_menu() {
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Local SEO', 'saman-labs-seo' ),
 			__( 'Local SEO', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-local-seo',
+			'samanlabs-seo-local-seo',
 			[ $this, 'render_page' ]
 		);
 	}
@@ -602,21 +602,21 @@ class Local_SEO {
 		wp_enqueue_media();
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
 			SAMANLABS_SEO_VERSION,

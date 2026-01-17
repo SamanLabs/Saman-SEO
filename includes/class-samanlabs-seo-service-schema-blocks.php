@@ -39,21 +39,21 @@ class Schema_Blocks {
 
 		// Register FAQ block.
 		register_block_type(
-			'wpseopilot/faq',
+			'samanlabs-seo/faq',
 			[
-				'editor_script' => 'wpseopilot-faq-block',
-				'editor_style'  => 'wpseopilot-schema-blocks-editor',
-				'style'         => 'wpseopilot-schema-blocks',
+				'editor_script' => 'samanlabs-seo-faq-block',
+				'editor_style'  => 'samanlabs-seo-schema-blocks-editor',
+				'style'         => 'samanlabs-seo-schema-blocks',
 			]
 		);
 
 		// Register HowTo block.
 		register_block_type(
-			'wpseopilot/howto',
+			'samanlabs-seo/howto',
 			[
-				'editor_script' => 'wpseopilot-howto-block',
-				'editor_style'  => 'wpseopilot-schema-blocks-editor',
-				'style'         => 'wpseopilot-schema-blocks',
+				'editor_script' => 'samanlabs-seo-howto-block',
+				'editor_style'  => 'samanlabs-seo-schema-blocks-editor',
+				'style'         => 'samanlabs-seo-schema-blocks',
 			]
 		);
 	}
@@ -66,7 +66,7 @@ class Schema_Blocks {
 	public function enqueue_editor_assets() {
 		// FAQ Block.
 		wp_register_script(
-			'wpseopilot-faq-block',
+			'samanlabs-seo-faq-block',
 			SAMANLABS_SEO_URL . 'blocks/faq/index.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
 			SAMANLABS_SEO_VERSION,
@@ -75,7 +75,7 @@ class Schema_Blocks {
 
 		// HowTo Block.
 		wp_register_script(
-			'wpseopilot-howto-block',
+			'samanlabs-seo-howto-block',
 			SAMANLABS_SEO_URL . 'blocks/howto/index.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
 			SAMANLABS_SEO_VERSION,
@@ -84,7 +84,7 @@ class Schema_Blocks {
 
 		// Editor styles.
 		wp_register_style(
-			'wpseopilot-schema-blocks-editor',
+			'samanlabs-seo-schema-blocks-editor',
 			SAMANLABS_SEO_URL . 'assets/css/schema-blocks-editor.css',
 			[],
 			SAMANLABS_SEO_VERSION
@@ -92,7 +92,7 @@ class Schema_Blocks {
 
 		// Create inline editor styles if file doesn't exist.
 		if ( ! file_exists( SAMANLABS_SEO_PATH . 'assets/css/schema-blocks-editor.css' ) ) {
-			wp_add_inline_style( 'wpseopilot-schema-blocks-editor', $this->get_editor_styles() );
+			wp_add_inline_style( 'samanlabs-seo-schema-blocks-editor', $this->get_editor_styles() );
 		}
 	}
 
@@ -112,12 +112,12 @@ class Schema_Blocks {
 			return;
 		}
 
-		$has_faq   = has_block( 'wpseopilot/faq', $post );
-		$has_howto = has_block( 'wpseopilot/howto', $post );
+		$has_faq   = has_block( 'samanlabs-seo/faq', $post );
+		$has_howto = has_block( 'samanlabs-seo/howto', $post );
 
 		if ( $has_faq || $has_howto ) {
 			wp_register_style(
-				'wpseopilot-schema-blocks',
+				'samanlabs-seo-schema-blocks',
 				SAMANLABS_SEO_URL . 'assets/css/schema-blocks.css',
 				[],
 				SAMANLABS_SEO_VERSION
@@ -125,10 +125,10 @@ class Schema_Blocks {
 
 			// Create inline styles if file doesn't exist.
 			if ( ! file_exists( SAMANLABS_SEO_PATH . 'assets/css/schema-blocks.css' ) ) {
-				wp_add_inline_style( 'wpseopilot-schema-blocks', $this->get_frontend_styles() );
+				wp_add_inline_style( 'samanlabs-seo-schema-blocks', $this->get_frontend_styles() );
 			}
 
-			wp_enqueue_style( 'wpseopilot-schema-blocks' );
+			wp_enqueue_style( 'samanlabs-seo-schema-blocks' );
 		}
 	}
 
@@ -140,14 +140,14 @@ class Schema_Blocks {
 	private function get_editor_styles() {
 		return '
 			/* FAQ Block Editor */
-			.wpseopilot-faq-block {
+			.samanlabs-seo-faq-block {
 				padding: 20px;
 				border: 1px solid #ddd;
 				border-radius: 8px;
 				background: #f9f9f9;
 			}
-			.wpseopilot-faq-header,
-			.wpseopilot-howto-header {
+			.samanlabs-seo-faq-header,
+			.samanlabs-seo-howto-header {
 				display: flex;
 				align-items: center;
 				gap: 10px;
@@ -155,8 +155,8 @@ class Schema_Blocks {
 				padding-bottom: 12px;
 				border-bottom: 1px solid #ddd;
 			}
-			.wpseopilot-faq-icon,
-			.wpseopilot-howto-icon {
+			.samanlabs-seo-faq-icon,
+			.samanlabs-seo-howto-icon {
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -168,14 +168,14 @@ class Schema_Blocks {
 				font-weight: bold;
 				font-size: 14px;
 			}
-			.wpseopilot-faq-label,
-			.wpseopilot-howto-label {
+			.samanlabs-seo-faq-label,
+			.samanlabs-seo-howto-label {
 				font-weight: 600;
 				font-size: 14px;
 				color: #1d2327;
 			}
-			.wpseopilot-faq-badge,
-			.wpseopilot-howto-badge {
+			.samanlabs-seo-faq-badge,
+			.samanlabs-seo-howto-badge {
 				margin-left: auto;
 				padding: 2px 8px;
 				background: #00a32a;
@@ -183,35 +183,35 @@ class Schema_Blocks {
 				font-size: 11px;
 				border-radius: 3px;
 			}
-			.wpseopilot-faq-items {
+			.samanlabs-seo-faq-items {
 				display: flex;
 				flex-direction: column;
 				gap: 16px;
 			}
-			.wpseopilot-faq-item {
+			.samanlabs-seo-faq-item {
 				padding: 16px;
 				background: #fff;
 				border: 1px solid #e0e0e0;
 				border-radius: 6px;
 			}
-			.wpseopilot-faq-item-header,
-			.wpseopilot-howto-step-header {
+			.samanlabs-seo-faq-item-header,
+			.samanlabs-seo-howto-step-header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
 				margin-bottom: 10px;
 			}
-			.wpseopilot-faq-number,
-			.wpseopilot-howto-step-number {
+			.samanlabs-seo-faq-number,
+			.samanlabs-seo-howto-step-number {
 				font-weight: 600;
 				color: #2271b1;
 			}
-			.wpseopilot-faq-controls,
-			.wpseopilot-howto-controls {
+			.samanlabs-seo-faq-controls,
+			.samanlabs-seo-howto-controls {
 				display: flex;
 				gap: 4px;
 			}
-			.wpseopilot-faq-question {
+			.samanlabs-seo-faq-question {
 				font-weight: 600;
 				font-size: 15px;
 				margin-bottom: 8px;
@@ -219,32 +219,32 @@ class Schema_Blocks {
 				background: #f5f5f5;
 				border-radius: 4px;
 			}
-			.wpseopilot-faq-answer {
+			.samanlabs-seo-faq-answer {
 				font-size: 14px;
 				color: #50575e;
 				padding: 8px;
 			}
-			.wpseopilot-faq-add,
-			.wpseopilot-howto-add {
+			.samanlabs-seo-faq-add,
+			.samanlabs-seo-howto-add {
 				margin-top: 16px;
 			}
 
 			/* HowTo Block Editor */
-			.wpseopilot-howto-block {
+			.samanlabs-seo-howto-block {
 				padding: 20px;
 				border: 1px solid #ddd;
 				border-radius: 8px;
 				background: #f9f9f9;
 			}
-			.wpseopilot-howto-title {
+			.samanlabs-seo-howto-title {
 				font-size: 20px;
 				margin: 0 0 10px;
 			}
-			.wpseopilot-howto-description {
+			.samanlabs-seo-howto-description {
 				color: #50575e;
 				margin: 0 0 16px;
 			}
-			.wpseopilot-howto-meta {
+			.samanlabs-seo-howto-meta {
 				padding: 12px;
 				background: #fff;
 				border: 1px solid #e0e0e0;
@@ -252,19 +252,19 @@ class Schema_Blocks {
 				margin-bottom: 16px;
 				font-size: 13px;
 			}
-			.wpseopilot-howto-steps {
+			.samanlabs-seo-howto-steps {
 				margin: 0;
 				padding: 0;
 				list-style: none;
 			}
-			.wpseopilot-howto-step {
+			.samanlabs-seo-howto-step {
 				padding: 16px;
 				background: #fff;
 				border: 1px solid #e0e0e0;
 				border-radius: 6px;
 				margin-bottom: 12px;
 			}
-			.wpseopilot-howto-step-title {
+			.samanlabs-seo-howto-step-title {
 				font-weight: 600;
 				font-size: 15px;
 				margin-bottom: 8px;
@@ -272,12 +272,12 @@ class Schema_Blocks {
 				background: #f5f5f5;
 				border-radius: 4px;
 			}
-			.wpseopilot-howto-step-description {
+			.samanlabs-seo-howto-step-description {
 				font-size: 14px;
 				color: #50575e;
 				padding: 8px;
 			}
-			.wpseopilot-howto-step-image img {
+			.samanlabs-seo-howto-step-image img {
 				max-width: 200px;
 				height: auto;
 				border-radius: 4px;
@@ -294,21 +294,21 @@ class Schema_Blocks {
 	private function get_frontend_styles() {
 		return '
 			/* FAQ Block Frontend */
-			.wpseopilot-faq {
+			.samanlabs-seo-faq {
 				margin: 2em 0;
 			}
-			.wpseopilot-faq-list {
+			.samanlabs-seo-faq-list {
 				border: 1px solid #e0e0e0;
 				border-radius: 8px;
 				overflow: hidden;
 			}
-			.wpseopilot-faq .wpseopilot-faq-item {
+			.samanlabs-seo-faq .samanlabs-seo-faq-item {
 				border-bottom: 1px solid #e0e0e0;
 			}
-			.wpseopilot-faq .wpseopilot-faq-item:last-child {
+			.samanlabs-seo-faq .samanlabs-seo-faq-item:last-child {
 				border-bottom: none;
 			}
-			.wpseopilot-faq .wpseopilot-faq-question {
+			.samanlabs-seo-faq .samanlabs-seo-faq-question {
 				display: block;
 				padding: 16px 40px 16px 16px;
 				font-weight: 600;
@@ -317,10 +317,10 @@ class Schema_Blocks {
 				list-style: none;
 				background: #f9f9f9;
 			}
-			.wpseopilot-faq .wpseopilot-faq-question::-webkit-details-marker {
+			.samanlabs-seo-faq .samanlabs-seo-faq-question::-webkit-details-marker {
 				display: none;
 			}
-			.wpseopilot-faq .wpseopilot-faq-question::after {
+			.samanlabs-seo-faq .samanlabs-seo-faq-question::after {
 				content: "+";
 				position: absolute;
 				right: 16px;
@@ -329,33 +329,33 @@ class Schema_Blocks {
 				font-size: 20px;
 				color: #666;
 			}
-			.wpseopilot-faq details[open] .wpseopilot-faq-question::after {
+			.samanlabs-seo-faq details[open] .samanlabs-seo-faq-question::after {
 				content: "−";
 			}
-			.wpseopilot-faq .wpseopilot-faq-answer {
+			.samanlabs-seo-faq .samanlabs-seo-faq-answer {
 				padding: 16px;
 				background: #fff;
 			}
 
 			/* HowTo Block Frontend */
-			.wpseopilot-howto {
+			.samanlabs-seo-howto {
 				margin: 2em 0;
 			}
-			.wpseopilot-howto-content {
+			.samanlabs-seo-howto-content {
 				border: 1px solid #e0e0e0;
 				border-radius: 8px;
 				padding: 24px;
 				background: #fff;
 			}
-			.wpseopilot-howto-title {
+			.samanlabs-seo-howto-title {
 				margin: 0 0 12px;
 				font-size: 24px;
 			}
-			.wpseopilot-howto-description {
+			.samanlabs-seo-howto-description {
 				color: #666;
 				margin: 0 0 20px;
 			}
-			.wpseopilot-howto-meta {
+			.samanlabs-seo-howto-meta {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 16px;
@@ -365,16 +365,16 @@ class Schema_Blocks {
 				margin-bottom: 24px;
 				font-size: 14px;
 			}
-			.wpseopilot-howto-meta > * {
+			.samanlabs-seo-howto-meta > * {
 				flex: 1 1 auto;
 			}
-			.wpseopilot-howto-steps {
+			.samanlabs-seo-howto-steps {
 				margin: 0;
 				padding: 0;
 				list-style: none;
 				counter-reset: step-counter;
 			}
-			.wpseopilot-howto-step {
+			.samanlabs-seo-howto-step {
 				position: relative;
 				padding: 20px 20px 20px 60px;
 				margin-bottom: 16px;
@@ -382,7 +382,7 @@ class Schema_Blocks {
 				border-radius: 8px;
 				counter-increment: step-counter;
 			}
-			.wpseopilot-howto-step::before {
+			.samanlabs-seo-howto-step::before {
 				content: counter(step-counter);
 				position: absolute;
 				left: 16px;
@@ -397,16 +397,16 @@ class Schema_Blocks {
 				justify-content: center;
 				font-weight: bold;
 			}
-			.wpseopilot-howto-step-title {
+			.samanlabs-seo-howto-step-title {
 				display: block;
 				font-weight: 600;
 				font-size: 16px;
 				margin-bottom: 8px;
 			}
-			.wpseopilot-howto-step-description {
+			.samanlabs-seo-howto-step-description {
 				color: #444;
 			}
-			.wpseopilot-howto-step-image {
+			.samanlabs-seo-howto-step-image {
 				max-width: 100%;
 				height: auto;
 				border-radius: 6px;

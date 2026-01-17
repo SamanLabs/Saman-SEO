@@ -34,8 +34,8 @@ $bulk_actions = [
 $rules_empty = empty( $rules );
 
 ?>
-<div class="wpseopilot-card wpseopilot-links__rules">
-	<div class="wpseopilot-links__panel-head">
+<div class="samanlabs-seo-card samanlabs-seo-links__rules">
+	<div class="samanlabs-seo-links__panel-head">
 		<div>
 			<h2><?php esc_html_e( 'Rules', 'saman-labs-seo' ); ?></h2>
 			<p><?php esc_html_e( 'Define how keywords become links, inherit settings from categories, and control limits + placements.', 'saman-labs-seo' ); ?></p>
@@ -47,7 +47,7 @@ $rules_empty = empty( $rules );
 		</div>
 	</div>
 
-	<form class="wpseopilot-links__filters" method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+	<form class="samanlabs-seo-links__filters" method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
 		<input type="hidden" name="page" value="<?php echo esc_attr( $page_slug ); ?>" />
 		<input type="hidden" name="tab" value="rules" />
 
@@ -84,24 +84,24 @@ $rules_empty = empty( $rules );
 			</select>
 		</label>
 
-		<label class="wpseopilot-links__search">
+		<label class="samanlabs-seo-links__search">
 			<span><?php esc_html_e( 'Search', 'saman-labs-seo' ); ?></span>
 			<input type="search" name="s" value="<?php echo esc_attr( $search_term ); ?>" placeholder="<?php esc_attr_e( 'Title or keyword', 'saman-labs-seo' ); ?>" />
 		</label>
 
-		<div class="wpseopilot-links__filter-actions">
+		<div class="samanlabs-seo-links__filter-actions">
 			<button type="submit" class="button"><?php esc_html_e( 'Filter', 'saman-labs-seo' ); ?></button>
 			<a class="button button-link" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'rules' ], $page_url ) ); ?>"><?php esc_html_e( 'Reset', 'saman-labs-seo' ); ?></a>
 		</div>
 	</form>
 
 	<?php if ( $rules_empty ) : ?>
-		<div class="wpseopilot-links__empty">
+		<div class="samanlabs-seo-links__empty">
 			<p><?php esc_html_e( 'No rules yet. Create your first internal link rule.', 'saman-labs-seo' ); ?></p>
 			<a class="button button-primary" href="<?php echo esc_url( add_query_arg( [ 'tab' => 'new' ], $page_url ) ); ?>"><?php esc_html_e( 'Create rule', 'saman-labs-seo' ); ?></a>
 		</div>
 	<?php else : ?>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-links__table-form" data-bulk-form>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="samanlabs-seo-links__table-form" data-bulk-form>
 			<?php wp_nonce_field( 'samanlabs_seo_bulk_link_rules' ); ?>
 			<input type="hidden" name="action" value="samanlabs_seo_bulk_link_rules" />
 
@@ -199,7 +199,7 @@ $rules_empty = empty( $rules );
 						</td>
 						<td>
 							<?php if ( $category ) : ?>
-								<span class="wpseopilot-pill" style="--wpseopilot-pill-color: <?php echo esc_attr( $category['color'] ); ?>">
+								<span class="samanlabs-seo-pill" style="--samanlabs-seo-pill-color: <?php echo esc_attr( $category['color'] ); ?>">
 									<?php echo esc_html( $category['name'] ); ?>
 								</span>
 							<?php else : ?>
@@ -233,7 +233,7 @@ $rules_empty = empty( $rules );
 							<?php echo esc_html( sprintf( '%1$d · %2$s', $max_page, ( null === $limit_block ) ? '—' : $limit_block ) ); ?>
 						</td>
 						<td>
-							<span class="wpseopilot-status wpseopilot-status--<?php echo ( 'active' === $status ) ? 'success' : 'muted'; ?>">
+							<span class="samanlabs-seo-status samanlabs-seo-status--<?php echo ( 'active' === $status ) ? 'success' : 'muted'; ?>">
 								<?php echo ( 'active' === $status ) ? esc_html__( 'Active', 'saman-labs-seo' ) : esc_html__( 'Inactive', 'saman-labs-seo' ); ?>
 							</span>
 						</td>
@@ -242,7 +242,7 @@ $rules_empty = empty( $rules );
 				</tbody>
 			</table>
 
-			<div class="wpseopilot-links__bulk">
+			<div class="samanlabs-seo-links__bulk">
 				<label>
 					<span class="screen-reader-text"><?php esc_html_e( 'Bulk actions', 'saman-labs-seo' ); ?></span>
 					<select name="bulk_action" data-bulk-action>
@@ -251,7 +251,7 @@ $rules_empty = empty( $rules );
 						<?php endforeach; ?>
 					</select>
 				</label>
-				<label class="wpseopilot-links__bulk-category" data-bulk-category hidden>
+				<label class="samanlabs-seo-links__bulk-category" data-bulk-category hidden>
 					<span class="screen-reader-text"><?php esc_html_e( 'Select category', 'saman-labs-seo' ); ?></span>
 					<select name="bulk_category">
 						<option value="__none__"><?php esc_html_e( 'Remove category', 'saman-labs-seo' ); ?></option>

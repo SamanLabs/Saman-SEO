@@ -83,7 +83,7 @@ class Importers {
 
 		nocache_headers();
 		header( 'Content-Type: application/json' );
-		header( 'Content-Disposition: attachment; filename="wpseopilot-export-' . gmdate( 'Ymd-His' ) . '.json"' );
+		header( 'Content-Disposition: attachment; filename="samanlabs-seo-export-' . gmdate( 'Ymd-His' ) . '.json"' );
 		echo wp_json_encode( $data );
 		exit;
 	}

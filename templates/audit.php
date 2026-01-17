@@ -30,12 +30,12 @@ $severity_labels = [
 // Render top bar
 \WPSEOPilot\Admin_Topbar::render( 'audit' );
 ?>
-<div class="wrap wpseopilot-page wpseopilot-audit">
+<div class="wrap samanlabs-seo-page samanlabs-seo-audit">
 
-	<div class="wpseopilot-audit__summary">
-		<section class="wpseopilot-card">
+	<div class="samanlabs-seo-audit__summary">
+		<section class="samanlabs-seo-card">
 			<h2><?php esc_html_e( 'Snapshot', 'saman-labs-seo' ); ?></h2>
-			<ul class="wpseopilot-audit__stats">
+			<ul class="samanlabs-seo-audit__stats">
 				<li>
 					<strong><?php echo esc_html( number_format_i18n( $scanned ) ); ?></strong>
 					<span><?php esc_html_e( 'Posts scanned', 'saman-labs-seo' ); ?></span>
@@ -51,29 +51,29 @@ $severity_labels = [
 			</ul>
 		</section>
 
-		<section class="wpseopilot-card">
+		<section class="samanlabs-seo-card">
 			<h2><?php esc_html_e( 'Severity Mix', 'saman-labs-seo' ); ?></h2>
-			<div class="wpseopilot-audit__bar">
+			<div class="samanlabs-seo-audit__bar">
 				<?php foreach ( $severity_breakdown as $severity => $count ) : ?>
 					<?php
 					$percent = $total_issues ? ( $count / max( 1, $total_issues ) ) * 100 : 0;
 					?>
-					<span class="wpseopilot-audit__bar-segment <?php echo esc_attr( $severity_colors[ $severity ] ?? '' ); ?>" style="width: <?php echo esc_attr( $percent ); ?>%"></span>
+					<span class="samanlabs-seo-audit__bar-segment <?php echo esc_attr( $severity_colors[ $severity ] ?? '' ); ?>" style="width: <?php echo esc_attr( $percent ); ?>%"></span>
 				<?php endforeach; ?>
 			</div>
-			<ul class="wpseopilot-audit__legend">
+			<ul class="samanlabs-seo-audit__legend">
 				<?php foreach ( $severity_breakdown as $severity => $count ) : ?>
 					<li>
-						<span class="wpseopilot-dot <?php echo esc_attr( $severity_colors[ $severity ] ?? '' ); ?>"></span>
+						<span class="samanlabs-seo-dot <?php echo esc_attr( $severity_colors[ $severity ] ?? '' ); ?>"></span>
 						<?php echo esc_html( sprintf( '%1$s · %2$d', $severity_labels[ $severity ] ?? ucfirst( $severity ), $count ) ); ?>
 					</li>
 				<?php endforeach; ?>
 			</ul>
 		</section>
 
-		<section class="wpseopilot-card">
+		<section class="samanlabs-seo-card">
 			<h2><?php esc_html_e( 'Top Issue Types', 'saman-labs-seo' ); ?></h2>
-			<ol class="wpseopilot-audit__types">
+			<ol class="samanlabs-seo-audit__types">
 				<?php if ( $type_breakdown ) : ?>
 					<?php $count = 0; ?>
 					<?php foreach ( $type_breakdown as $type => $type_count ) : ?>
@@ -113,7 +113,7 @@ $severity_labels = [
 		</section>
 	</div>
 
-	<section class="wpseopilot-card">
+	<section class="samanlabs-seo-card">
 		<h2><?php esc_html_e( 'Issue Log', 'saman-labs-seo' ); ?></h2>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
@@ -130,7 +130,7 @@ $severity_labels = [
 						<tr>
 							<td><a href="<?php echo esc_url( get_edit_post_link( $issue['post_id'] ) ); ?>"><?php echo esc_html( $issue['title'] ); ?></a></td>
 							<td><?php echo esc_html( $issue['message'] ); ?></td>
-							<td><span class="wpseopilot-chip"><?php echo esc_html( ucfirst( $issue['severity'] ) ); ?></span></td>
+							<td><span class="samanlabs-seo-chip"><?php echo esc_html( ucfirst( $issue['severity'] ) ); ?></span></td>
 							<td><?php echo esc_html( $issue['action'] ); ?></td>
 						</tr>
 					<?php endforeach; ?>
@@ -144,10 +144,10 @@ $severity_labels = [
 	</section>
 
 	<?php if ( ! empty( $recommendations ) ) : ?>
-		<section class="wpseopilot-card">
+		<section class="samanlabs-seo-card">
 			<h2><?php esc_html_e( 'Suggested Default Titles, Descriptions & Tags', 'saman-labs-seo' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'Use these auto-generated fallbacks whenever editors leave fields blank.', 'saman-labs-seo' ); ?></p>
-			<table class="wpseopilot-mini-table">
+			<table class="samanlabs-seo-mini-table">
 				<thead>
 					<tr>
 						<th><?php esc_html_e( 'Post', 'saman-labs-seo' ); ?></th>
@@ -165,10 +165,10 @@ $severity_labels = [
 							<td>
 								<?php if ( ! empty( $suggestion['suggested_tags'] ) ) : ?>
 									<?php foreach ( $suggestion['suggested_tags'] as $tag ) : ?>
-										<span class="wpseopilot-tag-chip"><?php echo esc_html( $tag ); ?></span>
+										<span class="samanlabs-seo-tag-chip"><?php echo esc_html( $tag ); ?></span>
 									<?php endforeach; ?>
 								<?php else : ?>
-									<span class="wpseopilot-muted"><?php esc_html_e( 'No tags detected', 'saman-labs-seo' ); ?></span>
+									<span class="samanlabs-seo-muted"><?php esc_html_e( 'No tags detected', 'saman-labs-seo' ); ?></span>
 								<?php endif; ?>
 							</td>
 						</tr>

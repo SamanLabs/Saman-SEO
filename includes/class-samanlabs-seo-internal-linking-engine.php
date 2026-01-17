@@ -577,9 +577,9 @@ class Engine {
 	private function process_chunk( $chunk, array $rules, array &$state, $post, $url, $context ) {
 		libxml_use_internal_errors( true );
 		$dom = new DOMDocument();
-		$wrapper = '<div id="wpseopilot-link-root">' . $chunk . '</div>';
+		$wrapper = '<div id="samanlabs-seo-link-root">' . $chunk . '</div>';
 		$dom->loadHTML( '<?xml encoding="utf-8" ?>' . $wrapper, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-		$root = $dom->getElementById( 'wpseopilot-link-root' );
+		$root = $dom->getElementById( 'samanlabs-seo-link-root' );
 
 		if ( ! $root instanceof DOMElement ) {
 			return $chunk;

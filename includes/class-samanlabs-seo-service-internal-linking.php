@@ -25,7 +25,7 @@ class Internal_Linking {
 	/**
 	 * Page slug.
 	 */
-	private const PAGE_SLUG = 'wpseopilot-links';
+	private const PAGE_SLUG = 'samanlabs-seo-links';
 
 	/**
 	 * Flash transient key.
@@ -120,7 +120,7 @@ class Internal_Linking {
 	 */
 	public function register_menu() {
 		$this->page_hook = add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Internal Linking', 'saman-labs-seo' ),
 			__( 'Internal Linking', 'saman-labs-seo' ),
 			self::CAPABILITY,
@@ -143,28 +143,28 @@ class Internal_Linking {
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-internal-linking',
+			'samanlabs-seo-internal-linking',
 			SAMANLABS_SEO_URL . 'assets/css/internal-linking.css',
-			[ 'wpseopilot-admin' ],
+			[ 'samanlabs-seo-admin' ],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_script(
-			'wpseopilot-internal-linking',
+			'samanlabs-seo-internal-linking',
 			SAMANLABS_SEO_URL . 'assets/js/internal-linking.js',
 			[ 'jquery', 'wp-util' ],
 			SAMANLABS_SEO_VERSION,
@@ -172,7 +172,7 @@ class Internal_Linking {
 		);
 
 		wp_localize_script(
-			'wpseopilot-internal-linking',
+			'samanlabs-seo-internal-linking',
 			'WPSEOPilotLinks',
 			[
 				'ajax'   => admin_url( 'admin-ajax.php' ),

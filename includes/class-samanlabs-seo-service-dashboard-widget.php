@@ -68,47 +68,47 @@ class Dashboard_Widget {
     public function render_widget() {
         $stats = $this->get_summary_stats();
         $recent = $this->get_recent_404s( 5 );
-        $admin_url = admin_url( 'admin.php?page=wpseopilot-v2#/404-log' );
+        $admin_url = admin_url( 'admin.php?page=samanlabs-seo-v2#/404-log' );
         ?>
-        <div class="wpseopilot-dashboard-widget">
-            <div class="wpseopilot-widget-stats">
-                <div class="wpseopilot-widget-stat">
-                    <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['total'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Total 404s', 'saman-labs-seo' ); ?></span>
+        <div class="samanlabs-seo-dashboard-widget">
+            <div class="samanlabs-seo-widget-stats">
+                <div class="samanlabs-seo-widget-stat">
+                    <span class="samanlabs-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['total'] ) ); ?></span>
+                    <span class="samanlabs-seo-widget-stat__label"><?php esc_html_e( 'Total 404s', 'saman-labs-seo' ); ?></span>
                 </div>
-                <div class="wpseopilot-widget-stat">
-                    <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['need_redirect'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Need Redirect', 'saman-labs-seo' ); ?></span>
+                <div class="samanlabs-seo-widget-stat">
+                    <span class="samanlabs-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['need_redirect'] ) ); ?></span>
+                    <span class="samanlabs-seo-widget-stat__label"><?php esc_html_e( 'Need Redirect', 'saman-labs-seo' ); ?></span>
                 </div>
-                <div class="wpseopilot-widget-stat">
-                    <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['last_24h'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Last 24h', 'saman-labs-seo' ); ?></span>
+                <div class="samanlabs-seo-widget-stat">
+                    <span class="samanlabs-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['last_24h'] ) ); ?></span>
+                    <span class="samanlabs-seo-widget-stat__label"><?php esc_html_e( 'Last 24h', 'saman-labs-seo' ); ?></span>
                 </div>
-                <div class="wpseopilot-widget-stat">
-                    <span class="wpseopilot-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['bots'] ) ); ?></span>
-                    <span class="wpseopilot-widget-stat__label"><?php esc_html_e( 'Bots', 'saman-labs-seo' ); ?></span>
+                <div class="samanlabs-seo-widget-stat">
+                    <span class="samanlabs-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['bots'] ) ); ?></span>
+                    <span class="samanlabs-seo-widget-stat__label"><?php esc_html_e( 'Bots', 'saman-labs-seo' ); ?></span>
                 </div>
             </div>
 
             <?php if ( ! empty( $recent ) ) : ?>
-                <div class="wpseopilot-widget-recent">
+                <div class="samanlabs-seo-widget-recent">
                     <h4><?php esc_html_e( 'Recent 404s', 'saman-labs-seo' ); ?></h4>
                     <ul>
                         <?php foreach ( $recent as $entry ) : ?>
                             <li>
                                 <code><?php echo esc_html( $this->truncate_url( $entry->request_uri, 40 ) ); ?></code>
-                                <span class="wpseopilot-widget-hits"><?php echo esc_html( number_format_i18n( $entry->hits ) ); ?> <?php esc_html_e( 'hits', 'saman-labs-seo' ); ?></span>
+                                <span class="samanlabs-seo-widget-hits"><?php echo esc_html( number_format_i18n( $entry->hits ) ); ?> <?php esc_html_e( 'hits', 'saman-labs-seo' ); ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
             <?php elseif ( 0 === $stats['total'] ) : ?>
-                <div class="wpseopilot-widget-empty">
+                <div class="samanlabs-seo-widget-empty">
                     <p><?php esc_html_e( 'No 404 errors recorded yet. Great!', 'saman-labs-seo' ); ?></p>
                 </div>
             <?php endif; ?>
 
-            <p class="wpseopilot-widget-footer">
+            <p class="samanlabs-seo-widget-footer">
                 <a href="<?php echo esc_url( $admin_url ); ?>" class="button button-primary">
                     <?php esc_html_e( 'View All 404s', 'saman-labs-seo' ); ?>
                 </a>
@@ -116,41 +116,41 @@ class Dashboard_Widget {
         </div>
 
         <style>
-            .wpseopilot-dashboard-widget {
+            .samanlabs-seo-dashboard-widget {
                 margin: -12px;
             }
-            .wpseopilot-widget-stats {
+            .samanlabs-seo-widget-stats {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 0;
                 border-bottom: 1px solid #c3c4c7;
                 background: #f6f7f7;
             }
-            .wpseopilot-widget-stat {
+            .samanlabs-seo-widget-stat {
                 padding: 12px 8px;
                 text-align: center;
                 border-right: 1px solid #c3c4c7;
             }
-            .wpseopilot-widget-stat:last-child {
+            .samanlabs-seo-widget-stat:last-child {
                 border-right: none;
             }
-            .wpseopilot-widget-stat__value {
+            .samanlabs-seo-widget-stat__value {
                 display: block;
                 font-size: 20px;
                 font-weight: 600;
                 color: #1d2327;
                 line-height: 1.2;
             }
-            .wpseopilot-widget-stat__label {
+            .samanlabs-seo-widget-stat__label {
                 display: block;
                 font-size: 11px;
                 color: #646970;
                 margin-top: 2px;
             }
-            .wpseopilot-widget-recent {
+            .samanlabs-seo-widget-recent {
                 padding: 12px;
             }
-            .wpseopilot-widget-recent h4 {
+            .samanlabs-seo-widget-recent h4 {
                 font-size: 12px;
                 font-weight: 600;
                 color: #1d2327;
@@ -158,22 +158,22 @@ class Dashboard_Widget {
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-            .wpseopilot-widget-recent ul {
+            .samanlabs-seo-widget-recent ul {
                 margin: 0;
                 padding: 0;
                 list-style: none;
             }
-            .wpseopilot-widget-recent li {
+            .samanlabs-seo-widget-recent li {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 padding: 6px 0;
                 border-bottom: 1px solid #f0f0f1;
             }
-            .wpseopilot-widget-recent li:last-child {
+            .samanlabs-seo-widget-recent li:last-child {
                 border-bottom: none;
             }
-            .wpseopilot-widget-recent code {
+            .samanlabs-seo-widget-recent code {
                 font-size: 12px;
                 background: none;
                 padding: 0;
@@ -183,20 +183,20 @@ class Dashboard_Widget {
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
-            .wpseopilot-widget-hits {
+            .samanlabs-seo-widget-hits {
                 font-size: 11px;
                 color: #646970;
                 white-space: nowrap;
             }
-            .wpseopilot-widget-empty {
+            .samanlabs-seo-widget-empty {
                 padding: 16px 12px;
                 text-align: center;
             }
-            .wpseopilot-widget-empty p {
+            .samanlabs-seo-widget-empty p {
                 margin: 0;
                 color: #646970;
             }
-            .wpseopilot-widget-footer {
+            .samanlabs-seo-widget-footer {
                 padding: 12px;
                 margin: 0;
                 background: #f6f7f7;

@@ -99,53 +99,53 @@ class Admin_Bar {
 
 		// Build the main menu item with score
 		$wp_admin_bar->add_node( [
-			'id'    => 'wpseopilot-seo',
+			'id'    => 'samanlabs-seo-seo',
 			'title' => $this->render_indicator_html( $score, $color_class ),
 			'href'  => get_edit_post_link( $post->ID ),
 			'meta'  => [
-				'class' => 'wpseopilot-admin-bar-item wpseopilot-admin-bar-item--has-score',
+				'class' => 'samanlabs-seo-admin-bar-item samanlabs-seo-admin-bar-item--has-score',
 				'title' => sprintf( __( 'SEO Score: %d/100', 'saman-labs-seo' ), $score ),
 			],
 		] );
 
 		// Add score details submenu
 		$wp_admin_bar->add_node( [
-			'id'     => 'wpseopilot-seo-score',
-			'parent' => 'wpseopilot-seo',
+			'id'     => 'samanlabs-seo-seo-score',
+			'parent' => 'samanlabs-seo-seo',
 			'title'  => sprintf(
-				'<span class="wpseopilot-ab-label">%s</span><span class="wpseopilot-ab-value">%d/100</span>',
+				'<span class="samanlabs-seo-ab-label">%s</span><span class="samanlabs-seo-ab-value">%d/100</span>',
 				__( 'Score', 'saman-labs-seo' ),
 				$score
 			),
-			'meta'   => [ 'class' => 'wpseopilot-ab-score-item' ],
+			'meta'   => [ 'class' => 'samanlabs-seo-ab-score-item' ],
 		] );
 
 		// Add status text
 		$status_text = $this->get_status_text( $level );
 		$wp_admin_bar->add_node( [
-			'id'     => 'wpseopilot-seo-status',
-			'parent' => 'wpseopilot-seo',
+			'id'     => 'samanlabs-seo-seo-status',
+			'parent' => 'samanlabs-seo-seo',
 			'title'  => sprintf(
-				'<span class="wpseopilot-ab-label">%s</span><span class="wpseopilot-ab-status wpseopilot-ab-status--%s">%s</span>',
+				'<span class="samanlabs-seo-ab-label">%s</span><span class="samanlabs-seo-ab-status samanlabs-seo-ab-status--%s">%s</span>',
 				__( 'Status', 'saman-labs-seo' ),
 				esc_attr( $level ),
 				esc_html( $status_text )
 			),
-			'meta'   => [ 'class' => 'wpseopilot-ab-status-item' ],
+			'meta'   => [ 'class' => 'samanlabs-seo-ab-status-item' ],
 		] );
 
 		// Add issues count if any
 		$issue_count = count( $issues );
 		if ( $issue_count > 0 ) {
 			$wp_admin_bar->add_node( [
-				'id'     => 'wpseopilot-seo-issues',
-				'parent' => 'wpseopilot-seo',
+				'id'     => 'samanlabs-seo-seo-issues',
+				'parent' => 'samanlabs-seo-seo',
 				'title'  => sprintf(
-					'<span class="wpseopilot-ab-label">%s</span><span class="wpseopilot-ab-value wpseopilot-ab-issues">%d</span>',
+					'<span class="samanlabs-seo-ab-label">%s</span><span class="samanlabs-seo-ab-value samanlabs-seo-ab-issues">%d</span>',
 					__( 'Issues', 'saman-labs-seo' ),
 					$issue_count
 				),
-				'meta'   => [ 'class' => 'wpseopilot-ab-issues-item' ],
+				'meta'   => [ 'class' => 'samanlabs-seo-ab-issues-item' ],
 			] );
 
 			// Show top 3 issues
@@ -154,15 +154,15 @@ class Admin_Bar {
 				$severity = isset( $issue['severity'] ) ? $issue['severity'] : 'warning';
 				$message  = isset( $issue['message'] ) ? $issue['message'] : '';
 				$wp_admin_bar->add_node( [
-					'id'     => 'wpseopilot-seo-issue-' . $index,
-					'parent' => 'wpseopilot-seo',
+					'id'     => 'samanlabs-seo-seo-issue-' . $index,
+					'parent' => 'samanlabs-seo-seo',
 					'title'  => sprintf(
-						'<span class="wpseopilot-ab-issue-icon">%s</span><span class="wpseopilot-ab-issue-text">%s</span>',
+						'<span class="samanlabs-seo-ab-issue-icon">%s</span><span class="samanlabs-seo-ab-issue-text">%s</span>',
 						'high' === $severity ? '!' : '?',
 						esc_html( wp_trim_words( $message, 8, '...' ) )
 					),
 					'meta'   => [
-						'class' => 'wpseopilot-ab-issue-item wpseopilot-ab-issue--' . esc_attr( $severity ),
+						'class' => 'samanlabs-seo-ab-issue-item samanlabs-seo-ab-issue--' . esc_attr( $severity ),
 					],
 				] );
 			}
@@ -170,42 +170,42 @@ class Admin_Bar {
 
 		// Add separator
 		$wp_admin_bar->add_node( [
-			'id'     => 'wpseopilot-seo-sep',
-			'parent' => 'wpseopilot-seo',
-			'title'  => '<hr class="wpseopilot-ab-separator" />',
-			'meta'   => [ 'class' => 'wpseopilot-ab-separator-item' ],
+			'id'     => 'samanlabs-seo-seo-sep',
+			'parent' => 'samanlabs-seo-seo',
+			'title'  => '<hr class="samanlabs-seo-ab-separator" />',
+			'meta'   => [ 'class' => 'samanlabs-seo-ab-separator-item' ],
 		] );
 
 		// Add edit link
 		$wp_admin_bar->add_node( [
-			'id'     => 'wpseopilot-seo-edit',
-			'parent' => 'wpseopilot-seo',
+			'id'     => 'samanlabs-seo-seo-edit',
+			'parent' => 'samanlabs-seo-seo',
 			'title'  => sprintf(
 				'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> %s',
 				__( 'Edit SEO Settings', 'saman-labs-seo' )
 			),
-			'href'   => get_edit_post_link( $post->ID ) . '#wpseopilot-seo-panel',
-			'meta'   => [ 'class' => 'wpseopilot-ab-action-link' ],
+			'href'   => get_edit_post_link( $post->ID ) . '#samanlabs-seo-seo-panel',
+			'meta'   => [ 'class' => 'samanlabs-seo-ab-action-link' ],
 		] );
 
 		// Add view full analysis link
 		$wp_admin_bar->add_node( [
-			'id'     => 'wpseopilot-seo-analyze',
-			'parent' => 'wpseopilot-seo',
+			'id'     => 'samanlabs-seo-seo-analyze',
+			'parent' => 'samanlabs-seo-seo',
 			'title'  => sprintf(
 				'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> %s',
 				__( 'Full Analysis', 'saman-labs-seo' )
 			),
-			'href'   => admin_url( 'admin.php?page=wpseopilot-audit&post_id=' . $post->ID ),
-			'meta'   => [ 'class' => 'wpseopilot-ab-action-link' ],
+			'href'   => admin_url( 'admin.php?page=samanlabs-seo-audit&post_id=' . $post->ID ),
+			'meta'   => [ 'class' => 'samanlabs-seo-ab-action-link' ],
 		] );
 
 		// Add separator before navigation
 		$wp_admin_bar->add_node( [
-			'id'     => 'wpseopilot-seo-sep2',
-			'parent' => 'wpseopilot-seo',
-			'title'  => '<hr class="wpseopilot-ab-separator" />',
-			'meta'   => [ 'class' => 'wpseopilot-ab-separator-item' ],
+			'id'     => 'samanlabs-seo-seo-sep2',
+			'parent' => 'samanlabs-seo-seo',
+			'title'  => '<hr class="samanlabs-seo-ab-separator" />',
+			'meta'   => [ 'class' => 'samanlabs-seo-ab-separator-item' ],
 		] );
 
 		// Add quick navigation links
@@ -221,11 +221,11 @@ class Admin_Bar {
 	private function add_general_menu( $wp_admin_bar ) {
 		// Build the main menu item (just branding)
 		$wp_admin_bar->add_node( [
-			'id'    => 'wpseopilot-seo',
-			'title' => '<svg class="wpseopilot-ab-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span class="wpseopilot-ab-text">WP SEO Pilot</span>',
-			'href'  => admin_url( 'admin.php?page=wpseopilot' ),
+			'id'    => 'samanlabs-seo-seo',
+			'title' => '<svg class="samanlabs-seo-ab-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span class="samanlabs-seo-ab-text">WP SEO Pilot</span>',
+			'href'  => admin_url( 'admin.php?page=samanlabs-seo' ),
 			'meta'  => [
-				'class' => 'wpseopilot-admin-bar-item',
+				'class' => 'samanlabs-seo-admin-bar-item',
 				'title' => __( 'WP SEO Pilot', 'saman-labs-seo' ),
 			],
 		] );
@@ -254,42 +254,42 @@ class Admin_Bar {
 		$nav_items = [
 			'dashboard'  => [
 				'label' => __( 'Dashboard', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo' ),
 			],
 			'redirects'  => [
 				'label' => __( 'Redirects', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-redirects' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-redirects' ),
 			],
 			'404'        => [
 				'label' => __( '404 Monitor', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-404' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-404' ),
 			],
 			'audit'      => [
 				'label' => __( 'Site Audit', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-audit' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-audit' ),
 			],
 			'sitemap'    => [
 				'label' => __( 'Sitemap', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-sitemap' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-sitemap' ),
 			],
 			'settings'   => [
 				'label' => __( 'Settings', 'saman-labs-seo' ),
-				'url'   => admin_url( 'admin.php?page=wpseopilot-settings' ),
+				'url'   => admin_url( 'admin.php?page=samanlabs-seo-settings' ),
 			],
 		];
 
 		foreach ( $nav_items as $key => $item ) {
 			$icon = isset( $icons[ $key ] ) ? $icons[ $key ] : '';
 			$wp_admin_bar->add_node( [
-				'id'     => 'wpseopilot-nav-' . $key,
-				'parent' => 'wpseopilot-seo',
+				'id'     => 'samanlabs-seo-nav-' . $key,
+				'parent' => 'samanlabs-seo-seo',
 				'title'  => sprintf(
 					'%s <span>%s</span>',
 					$icon,
 					esc_html( $item['label'] )
 				),
 				'href'   => $item['url'],
-				'meta'   => [ 'class' => 'wpseopilot-ab-nav-link' ],
+				'meta'   => [ 'class' => 'samanlabs-seo-ab-nav-link' ],
 			] );
 		}
 	}
@@ -303,9 +303,9 @@ class Admin_Bar {
 	 */
 	private function render_indicator_html( $score, $color_class ) {
 		return sprintf(
-			'<span class="wpseopilot-ab-indicator wpseopilot-ab-indicator--%s"></span>
-			<span class="wpseopilot-ab-text">SEO</span>
-			<span class="wpseopilot-ab-score">%d</span>',
+			'<span class="samanlabs-seo-ab-indicator samanlabs-seo-ab-indicator--%s"></span>
+			<span class="samanlabs-seo-ab-text">SEO</span>
+			<span class="samanlabs-seo-ab-score">%d</span>',
 			esc_attr( $color_class ),
 			$score
 		);
@@ -418,23 +418,23 @@ class Admin_Bar {
 			return;
 		}
 		?>
-		<style id="wpseopilot-admin-bar-css">
+		<style id="samanlabs-seo-admin-bar-css">
 			/* Admin Bar SEO Menu */
-			#wpadminbar .wpseopilot-admin-bar-item > .ab-item {
+			#wpadminbar .samanlabs-seo-admin-bar-item > .ab-item {
 				display: flex !important;
 				align-items: center;
 				gap: 6px;
 				height: 32px;
 			}
 
-			#wpadminbar .wpseopilot-ab-icon {
+			#wpadminbar .samanlabs-seo-ab-icon {
 				font-size: 16px;
 				width: 16px;
 				height: 16px;
 				line-height: 16px;
 			}
 
-			#wpadminbar .wpseopilot-ab-indicator {
+			#wpadminbar .samanlabs-seo-ab-indicator {
 				width: 10px;
 				height: 10px;
 				border-radius: 50%;
@@ -442,29 +442,29 @@ class Admin_Bar {
 				box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
 			}
 
-			#wpadminbar .wpseopilot-ab-indicator--good {
+			#wpadminbar .samanlabs-seo-ab-indicator--good {
 				background: #00a32a;
 				box-shadow: 0 0 0 2px rgba(0,163,42,0.3);
 			}
 
-			#wpadminbar .wpseopilot-ab-indicator--fair {
+			#wpadminbar .samanlabs-seo-ab-indicator--fair {
 				background: #dba617;
 				box-shadow: 0 0 0 2px rgba(219,166,23,0.3);
 			}
 
-			#wpadminbar .wpseopilot-ab-indicator--poor {
+			#wpadminbar .samanlabs-seo-ab-indicator--poor {
 				background: #d63638;
 				box-shadow: 0 0 0 2px rgba(214,54,56,0.3);
 			}
 
-			#wpadminbar .wpseopilot-ab-text {
+			#wpadminbar .samanlabs-seo-ab-text {
 				font-weight: 600;
 				font-size: 11px;
 				text-transform: uppercase;
 				letter-spacing: 0.5px;
 			}
 
-			#wpadminbar .wpseopilot-ab-score {
+			#wpadminbar .samanlabs-seo-ab-score {
 				background: rgba(255,255,255,0.1);
 				padding: 2px 6px;
 				border-radius: 3px;
@@ -473,52 +473,52 @@ class Admin_Bar {
 			}
 
 			/* Dropdown Styles */
-			#wpadminbar .wpseopilot-admin-bar-item .ab-submenu {
+			#wpadminbar .samanlabs-seo-admin-bar-item .ab-submenu {
 				min-width: 200px !important;
 				padding: 8px 0 !important;
 			}
 
-			#wpadminbar .wpseopilot-admin-bar-item .ab-submenu .ab-item {
+			#wpadminbar .samanlabs-seo-admin-bar-item .ab-submenu .ab-item {
 				display: flex !important;
 				align-items: center;
 				padding: 6px 12px !important;
 				line-height: 1.4 !important;
 			}
 
-			#wpadminbar .wpseopilot-ab-label {
+			#wpadminbar .samanlabs-seo-ab-label {
 				color: rgba(255,255,255,0.6);
 				font-size: 11px;
 				flex: 1;
 			}
 
-			#wpadminbar .wpseopilot-ab-value {
+			#wpadminbar .samanlabs-seo-ab-value {
 				font-weight: 600;
 				font-size: 12px;
 			}
 
-			#wpadminbar .wpseopilot-ab-status {
+			#wpadminbar .samanlabs-seo-ab-status {
 				font-weight: 600;
 				font-size: 11px;
 				padding: 2px 8px;
 				border-radius: 3px;
 			}
 
-			#wpadminbar .wpseopilot-ab-status--good {
+			#wpadminbar .samanlabs-seo-ab-status--good {
 				background: rgba(0,163,42,0.2);
 				color: #68de7c;
 			}
 
-			#wpadminbar .wpseopilot-ab-status--fair {
+			#wpadminbar .samanlabs-seo-ab-status--fair {
 				background: rgba(219,166,23,0.2);
 				color: #f0c33c;
 			}
 
-			#wpadminbar .wpseopilot-ab-status--poor {
+			#wpadminbar .samanlabs-seo-ab-status--poor {
 				background: rgba(214,54,56,0.2);
 				color: #f86368;
 			}
 
-			#wpadminbar .wpseopilot-ab-issues {
+			#wpadminbar .samanlabs-seo-ab-issues {
 				background: rgba(214,54,56,0.2);
 				color: #f86368;
 				padding: 2px 8px;
@@ -526,13 +526,13 @@ class Admin_Bar {
 			}
 
 			/* Issue items */
-			#wpadminbar .wpseopilot-ab-issue-item .ab-item {
+			#wpadminbar .samanlabs-seo-ab-issue-item .ab-item {
 				font-size: 11px !important;
 				color: rgba(255,255,255,0.7) !important;
 				gap: 8px;
 			}
 
-			#wpadminbar .wpseopilot-ab-issue-icon {
+			#wpadminbar .samanlabs-seo-ab-issue-icon {
 				width: 16px;
 				height: 16px;
 				border-radius: 50%;
@@ -544,18 +544,18 @@ class Admin_Bar {
 				flex-shrink: 0;
 			}
 
-			#wpadminbar .wpseopilot-ab-issue--high .wpseopilot-ab-issue-icon {
+			#wpadminbar .samanlabs-seo-ab-issue--high .samanlabs-seo-ab-issue-icon {
 				background: rgba(214,54,56,0.3);
 				color: #f86368;
 			}
 
-			#wpadminbar .wpseopilot-ab-issue--warning .wpseopilot-ab-issue-icon,
-			#wpadminbar .wpseopilot-ab-issue--medium .wpseopilot-ab-issue-icon {
+			#wpadminbar .samanlabs-seo-ab-issue--warning .samanlabs-seo-ab-issue-icon,
+			#wpadminbar .samanlabs-seo-ab-issue--medium .samanlabs-seo-ab-issue-icon {
 				background: rgba(219,166,23,0.3);
 				color: #f0c33c;
 			}
 
-			#wpadminbar .wpseopilot-ab-issue-text {
+			#wpadminbar .samanlabs-seo-ab-issue-text {
 				flex: 1;
 				white-space: nowrap;
 				overflow: hidden;
@@ -563,38 +563,38 @@ class Admin_Bar {
 			}
 
 			/* Separator */
-			#wpadminbar .wpseopilot-ab-separator {
+			#wpadminbar .samanlabs-seo-ab-separator {
 				margin: 6px 12px;
 				border: 0;
 				border-top: 1px solid rgba(255,255,255,0.1);
 			}
 
-			#wpadminbar .wpseopilot-ab-separator-item .ab-item {
+			#wpadminbar .samanlabs-seo-ab-separator-item .ab-item {
 				padding: 0 !important;
 				height: auto !important;
 			}
 
 			/* Action & Nav links */
-			#wpadminbar .wpseopilot-ab-action-link .ab-item,
-			#wpadminbar .wpseopilot-ab-nav-link .ab-item {
+			#wpadminbar .samanlabs-seo-ab-action-link .ab-item,
+			#wpadminbar .samanlabs-seo-ab-nav-link .ab-item {
 				display: flex !important;
 				align-items: center;
 				gap: 8px;
 			}
 
-			#wpadminbar .wpseopilot-ab-action-link svg,
-			#wpadminbar .wpseopilot-ab-nav-link svg {
+			#wpadminbar .samanlabs-seo-ab-action-link svg,
+			#wpadminbar .samanlabs-seo-ab-nav-link svg {
 				flex-shrink: 0;
 				opacity: 0.7;
 			}
 
-			#wpadminbar .wpseopilot-ab-action-link:hover svg,
-			#wpadminbar .wpseopilot-ab-nav-link:hover svg {
+			#wpadminbar .samanlabs-seo-ab-action-link:hover svg,
+			#wpadminbar .samanlabs-seo-ab-nav-link:hover svg {
 				opacity: 1;
 			}
 
 			/* Hover states */
-			#wpadminbar .wpseopilot-admin-bar-item:hover > .ab-item {
+			#wpadminbar .samanlabs-seo-admin-bar-item:hover > .ab-item {
 				background: rgba(255,255,255,0.1) !important;
 			}
 		</style>

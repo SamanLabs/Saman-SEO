@@ -35,11 +35,11 @@ class Audit {
 	 */
 	public function register_page() {
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Audit', 'saman-labs-seo' ),
 			__( 'Audit', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-audit',
+			'samanlabs-seo-audit',
 			[ $this, 'render_page' ],
 			13
 		);
@@ -56,14 +56,14 @@ class Audit {
 		}
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION

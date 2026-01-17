@@ -112,7 +112,7 @@ class Settings {
 			add_option( $key, $default );
 		}
 
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_title_template', [ $this, 'sanitize_template' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_title_template', [ $this, 'sanitize_template' ] );
 
 		// Consolidated Search Appearance Settings
 		$group = 'samanlabs_seo_search_appearance';
@@ -145,28 +145,28 @@ class Settings {
 		register_setting( 'samanlabs_seo_ai_tuning', 'samanlabs_seo_ai_prompt_description', 'sanitize_textarea_field' );
 		register_setting( 'samanlabs_seo_ai_key', 'samanlabs_seo_openai_api_key', [ $this, 'sanitize_api_key' ] );
 		
-		register_setting( 'wpseopilot', 'samanlabs_seo_homepage_description_prompt', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_homepage_description_prompt', 'sanitize_textarea_field' );
 		register_setting( 'samanlabs_seo_knowledge', 'samanlabs_seo_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
 		register_setting( 'samanlabs_seo_knowledge', 'samanlabs_seo_homepage_organization_name', 'sanitize_text_field' );
 		register_setting( 'samanlabs_seo_knowledge', 'samanlabs_seo_homepage_organization_logo', 'esc_url_raw' );
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_meta_description', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_og_image', 'esc_url_raw' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_meta_description', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_og_image', 'esc_url_raw' );
 		register_setting( 'samanlabs_seo_social', 'samanlabs_seo_social_defaults', [ $this, 'sanitize_social_defaults' ] );
 		register_setting( 'samanlabs_seo_social', 'samanlabs_seo_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_social_width', 'absint' );
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_social_height', 'absint' );
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_noindex', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_default_nofollow', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_global_robots', 'sanitize_text_field' );
-		register_setting( 'wpseopilot', 'samanlabs_seo_hreflang_map', [ $this, 'sanitize_json' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_robots_txt', 'sanitize_textarea_field' );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_sitemap_enhancer', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_redirect_manager', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_404_logging', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_og_preview', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_llm_txt', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_local_seo', [ $this, 'sanitize_bool' ] );
-		register_setting( 'wpseopilot', 'samanlabs_seo_enable_analytics', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_social_width', 'absint' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_social_height', 'absint' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_noindex', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_default_nofollow', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_global_robots', 'sanitize_text_field' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_hreflang_map', [ $this, 'sanitize_json' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_robots_txt', 'sanitize_textarea_field' );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_sitemap_enhancer', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_redirect_manager', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_404_logging', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_og_preview', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_llm_txt', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_local_seo', [ $this, 'sanitize_bool' ] );
+		register_setting( 'samanlabs-seo', 'samanlabs_seo_enable_analytics', [ $this, 'sanitize_bool' ] );
 	}
 
 	/**
@@ -277,27 +277,27 @@ class Settings {
 			__( 'WP SEO Pilot', 'saman-labs-seo' ),
 			__( 'WP SEO Pilot', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot',
+			'samanlabs-seo',
 			[ $this, 'render_settings_page' ],
 			'dashicons-airplane',
 			58
 		);
 
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Defaults', 'saman-labs-seo' ),
 			__( 'Defaults', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot',
+			'samanlabs-seo',
 			[ $this, 'render_settings_page' ]
 		);
 
 		add_submenu_page(
-			'wpseopilot',
+			'samanlabs-seo',
 			__( 'Search Appearance', 'saman-labs-seo' ),
 			__( 'Search Appearance', 'saman-labs-seo' ),
 			'manage_options',
-			'wpseopilot-types',
+			'samanlabs-seo-types',
 			[ $this, 'render_post_type_defaults_page' ]
 		);
 	}
@@ -901,7 +901,7 @@ class Settings {
 
 		wp_enqueue_media();
 		wp_enqueue_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
 			SAMANLABS_SEO_VERSION,
@@ -909,7 +909,7 @@ class Settings {
 		);
 
 		wp_localize_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			'WPSEOPilotAdmin',
 			[
 				'mediaTitle'  => __( 'Select default image', 'saman-labs-seo' ),
@@ -918,14 +918,14 @@ class Settings {
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION
@@ -945,7 +945,7 @@ class Settings {
 		}
 
 		wp_enqueue_script(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/js/admin.js',
 			[ 'jquery' ],
 			SAMANLABS_SEO_VERSION,
@@ -953,14 +953,14 @@ class Settings {
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-admin',
+			'samanlabs-seo-admin',
 			SAMANLABS_SEO_URL . 'assets/css/admin.css',
 			[],
 			SAMANLABS_SEO_VERSION
 		);
 
 		wp_enqueue_style(
-			'wpseopilot-plugin',
+			'samanlabs-seo-plugin',
 			SAMANLABS_SEO_URL . 'assets/css/plugin.css',
 			[],
 			SAMANLABS_SEO_VERSION

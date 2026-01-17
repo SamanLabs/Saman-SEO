@@ -14,8 +14,8 @@ foreach ( $utm_templates as $template ) {
 }
 
 ?>
-<div class="wpseopilot-links__split">
-	<div class="wpseopilot-card">
+<div class="samanlabs-seo-links__split">
+	<div class="samanlabs-seo-card">
 		<h3><?php esc_html_e( 'Categories', 'saman-labs-seo' ); ?></h3>
 		<p><?php esc_html_e( 'Group rules, pick a color, optionally inherit UTMs and set per-category caps.', 'saman-labs-seo' ); ?></p>
 		<table class="widefat striped">
@@ -45,14 +45,14 @@ foreach ( $utm_templates as $template ) {
 							<strong><?php echo esc_html( $category['name'] ); ?></strong>
 							<div class="description"><?php echo esc_html( $category['description'] ); ?></div>
 						</td>
-						<td><span class="wpseopilot-color-chip" style="background-color: <?php echo esc_attr( $category['color'] ); ?>;"></span></td>
+						<td><span class="samanlabs-seo-color-chip" style="background-color: <?php echo esc_attr( $category['color'] ); ?>;"></span></td>
 						<td><?php echo esc_html( $template_label ?: '—' ); ?></td>
 						<td><?php echo esc_html( $cap ?: '—' ); ?></td>
 						<td><?php echo esc_html( $count ); ?></td>
 						<td>
 							<a href="<?php echo esc_url( add_query_arg( [ 'tab' => 'categories', 'category' => $category['id'] ], $page_url ) ); ?>"><?php esc_html_e( 'Edit', 'saman-labs-seo' ); ?></a>
 							<div>
-								<form method="get" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wpseopilot-links__delete-category">
+								<form method="get" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="samanlabs-seo-links__delete-category">
 									<input type="hidden" name="action" value="samanlabs_seo_delete_link_category" />
 									<input type="hidden" name="category" value="<?php echo esc_attr( $category['id'] ); ?>" />
 									<?php wp_nonce_field( 'samanlabs_seo_delete_link_category' ); ?>
@@ -82,9 +82,9 @@ foreach ( $utm_templates as $template ) {
 		</table>
 	</div>
 
-	<div class="wpseopilot-card">
+	<div class="samanlabs-seo-card">
 		<h3><?php echo esc_html( $editing ? __( 'Edit category', 'saman-labs-seo' ) : __( 'Add category', 'saman-labs-seo' ) ); ?></h3>
-		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="wpseopilot-links__category-form">
+		<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="samanlabs-seo-links__category-form">
 			<?php wp_nonce_field( 'samanlabs_seo_save_link_category' ); ?>
 			<input type="hidden" name="action" value="samanlabs_seo_save_link_category" />
 			<?php if ( $editing ) : ?>
