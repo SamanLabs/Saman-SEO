@@ -85,7 +85,7 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	public function boot() {
-		if ( '1' !== get_option( 'samanlabs_seo_enable_sitemap_enhancer', '0' ) ) {
+		if ( ! \SamanLabs\SEO\Helpers\module_enabled( 'sitemap' ) ) {
 			return;
 		}
 
