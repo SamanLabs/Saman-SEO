@@ -39,6 +39,122 @@ class Admin_UI {
 		add_filter( 'handle_bulk_actions-edit-post', [ $this, 'handle_bulk_actions' ], 10, 3 );
 		add_action( 'admin_post_samanlabs_seo_toggle_noindex', [ $this, 'handle_toggle_noindex' ] );
 		add_action( 'wp_ajax_samanlabs_seo_render_preview', [ $this, 'ajax_render_preview' ] );
+
+		// Add admin notice for Saman Labs AI installation
+		add_action( 'admin_notices', [ $this, 'ai_installation_notice' ] );
+		add_action( 'wp_ajax_samanlabs_seo_dismiss_ai_notice', [ $this, 'dismiss_ai_notice' ] );
+	}
+
+	/**
+	 * AJAX handler to dismiss AI installation notice.
+	 *
+	 * @return void
+	 */
+	public function dismiss_ai_notice() {
+		check_ajax_referer( 'dismiss_ai_notice', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Permission denied' );
+		}
+
+		update_user_meta( get_current_user_id(), 'samanlabs_seo_ai_notice_dismissed', true );
+		wp_send_json_success();
+	}
+
+	/**
+	 * Display admin notice if Saman Labs AI is not installed/configured.
+	 *
+	 * Shows on SEO-related pages to prompt users to install Saman Labs AI
+	 * for AI-powered features.
+	 *
+	 * @return void
+	 */
+	public function ai_installation_notice() {
+		// Only show to users who can manage options
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Only show on relevant pages
+		$screen = get_current_screen();
+		if ( ! $screen ) {
+			return;
+		}
+
+		// Show on plugin pages and post editor
+		$relevant_pages = [
+			'samanlabs-seo',
+			'post',
+			'page',
+		];
+
+		$is_relevant = false;
+		foreach ( $relevant_pages as $page ) {
+			if ( false !== strpos( $screen->id, $page ) ) {
+				$is_relevant = true;
+				break;
+			}
+		}
+
+		if ( ! $is_relevant ) {
+			return;
+		}
+
+		// Check if notice was dismissed
+		$dismissed = get_user_meta( get_current_user_id(), 'samanlabs_seo_ai_notice_dismissed', true );
+		if ( $dismissed ) {
+			return;
+		}
+
+		// Check Saman Labs AI status
+		if ( AI_Pilot::is_ready() ) {
+			return; // AI is working, no notice needed
+		}
+
+		$notice_class = 'notice notice-info is-dismissible samanlabs-seo-ai-notice';
+		$notice_id    = 'samanlabs-seo-ai-notice';
+
+		if ( ! AI_Pilot::is_installed() ) {
+			$message = sprintf(
+				/* translators: %s: link to install Saman Labs AI */
+				__( '<strong>Saman Labs SEO:</strong> Install %s to enable AI-powered SEO features like automatic title and description generation.', 'saman-labs-seo' ),
+				'<a href="' . esc_url( admin_url( 'plugin-install.php?s=saman-labs-ai&tab=search&type=term' ) ) . '">Saman Labs AI</a>'
+			);
+		} elseif ( ! AI_Pilot::is_active() ) {
+			$message = sprintf(
+				/* translators: %s: link to plugins page */
+				__( '<strong>Saman Labs SEO:</strong> Saman Labs AI is installed but not active. %s to enable AI features.', 'saman-labs-seo' ),
+				'<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">' . __( 'Activate it', 'saman-labs-seo' ) . '</a>'
+			);
+		} else {
+			$message = sprintf(
+				/* translators: %s: link to settings */
+				__( '<strong>Saman Labs SEO:</strong> Saman Labs AI needs configuration. %s to enable AI features.', 'saman-labs-seo' ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=samanlabs-ai' ) ) . '">' . __( 'Configure it', 'saman-labs-seo' ) . '</a>'
+			);
+		}
+
+		printf(
+			'<div id="%s" class="%s" data-nonce="%s"><p>%s</p></div>',
+			esc_attr( $notice_id ),
+			esc_attr( $notice_class ),
+			esc_attr( wp_create_nonce( 'dismiss_ai_notice' ) ),
+			wp_kses_post( $message )
+		);
+
+		// Add inline script to handle dismiss
+		?>
+		<script>
+		jQuery(function($) {
+			$(document).on('click', '#samanlabs-seo-ai-notice .notice-dismiss', function() {
+				$.post(ajaxurl, {
+					action: 'samanlabs_seo_dismiss_ai_notice',
+					nonce: $('#samanlabs-seo-ai-notice').data('nonce')
+				});
+			});
+		});
+		</script>
+		<?php
 	}
 
 	/**
@@ -119,7 +235,7 @@ class Admin_UI {
 
 		wp_nonce_field( 'samanlabs_seo_meta', 'samanlabs_seo_meta_nonce' );
 
-		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
+		$ai_enabled = AI_Pilot::is_ready();
 		$seo_score  = calculate_seo_score( $post );
 
 		include SAMANLABS_SEO_PATH . 'templates/meta-box.php';
@@ -183,7 +299,7 @@ class Admin_UI {
 			update_option( 'samanlabs_seo_show_tour', '0' );
 		}
 
-		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
+		$ai_enabled = AI_Pilot::is_ready();
 		$settings_svc = new Settings();
 		wp_localize_script(
 			'samanlabs-seo-admin',
@@ -197,7 +313,7 @@ class Admin_UI {
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'samanlabs_seo_ai_generate' ),
 					'strings' => [
-						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'saman-labs-seo' ),
+						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-labs-seo' ),
 						'running'  => __( 'Asking AI for ideas…', 'saman-labs-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-labs-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-labs-seo' ),
@@ -319,7 +435,7 @@ class Admin_UI {
 			$post_type_descriptions = [];
 		}
 
-		$ai_enabled = ! empty( get_option( 'samanlabs_seo_openai_api_key', '' ) );
+		// AI enabled status is already set above via AI_Pilot integration
 
 		// Check for pending slug change redirect for this user.
 		$user_id     = get_current_user_id();
@@ -348,7 +464,7 @@ class Admin_UI {
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'samanlabs_seo_ai_generate' ),
 					'strings' => [
-						'disabled' => __( 'Add your OpenAI key under WP SEO Pilot → AI to enable suggestions.', 'saman-labs-seo' ),
+						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-labs-seo' ),
 						'running'  => __( 'Asking AI for ideas…', 'saman-labs-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-labs-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-labs-seo' ),
