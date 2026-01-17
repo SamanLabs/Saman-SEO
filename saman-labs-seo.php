@@ -107,10 +107,6 @@ spl_autoload_register(
 
 require_once SAMANLABS_SEO_PATH . 'includes/helpers.php';
 
-if ( file_exists( SAMANLABS_SEO_PATH . 'test-analytics-simple.php' ) ) {
-	require_once SAMANLABS_SEO_PATH . 'test-analytics-simple.php';
-}
-
 /**
  * Bootstrap the plugin.
  */
