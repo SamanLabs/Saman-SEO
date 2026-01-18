@@ -2,6 +2,8 @@ name: Create Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
@@ -11,6 +13,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Skip if commit message contains [skip ci] or [skip release]
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[skip release]')"
 
     steps:
       - name: Checkout code
@@ -18,19 +22,53 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from tag
+      - name: Determine version
         id: get_version
         run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/}
-          VERSION=${TAG_NAME#v}
+          # If triggered by tag push, use the tag version
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+            VERSION=${TAG_NAME#v}
+            echo "Source: tag push ($TAG_NAME)"
+          else
+            # Auto-increment: get latest tag and bump patch version
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v2.0.0")
+            LATEST_VERSION=${LATEST_TAG#v}
+
+            # Parse version components
+            MAJOR=$(echo $LATEST_VERSION | cut -d. -f1)
+            MINOR=$(echo $LATEST_VERSION | cut -d. -f2)
+            PATCH=$(echo $LATEST_VERSION | cut -d. -f3 | cut -d- -f1)
+
+            # Increment patch
+            NEW_PATCH=$((PATCH + 1))
+            VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+            TAG_NAME="v$VERSION"
+
+            echo "Source: auto-increment from $LATEST_TAG to $TAG_NAME"
+          fi
+
           ZIP_VERSION=$(echo $VERSION | sed 's/\./-/g')
 
           echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "zip_version=$ZIP_VERSION" >> $GITHUB_OUTPUT
-          echo "Version from tag: $VERSION"
+          echo "Version: $VERSION"
+
+      - name: Check if release already exists
+        id: check_release
+        run: |
+          TAG="${{ steps.get_version.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $TAG does not exist, will create"
+          fi
 
       - name: Update plugin version
+        if: steps.check_release.outputs.exists != 'true'
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
 
@@ -44,16 +82,19 @@ jobs:
           grep -E "(Version:|SAMANSEO_VERSION)" saman-seo.php | head -2
 
       - name: Setup Node.js
+        if: steps.check_release.outputs.exists != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install dependencies and build
+        if: steps.check_release.outputs.exists != 'true'
         run: |
           npm install
           npm run build
 
       - name: Create plugin zip
+        if: steps.check_release.outputs.exists != 'true'
         run: |
           VERSION=${{ steps.get_version.outputs.zip_version }}
 
@@ -74,6 +115,7 @@ jobs:
           echo "Created saman-seo-$VERSION.zip"
 
       - name: Generate release notes
+        if: steps.check_release.outputs.exists != 'true'
         id: release_notes
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
@@ -98,6 +140,7 @@ jobs:
           cat release_notes.md
 
       - name: Create Release
+        if: steps.check_release.outputs.exists != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_version.outputs.tag }}
@@ -109,10 +152,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Skip notice
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "::notice::Release ${{ steps.get_version.outputs.tag }} already exists, skipping."
+
       - name: Summary
         run: |
-          echo "## Release Created" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** ${{ steps.get_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Zip:** saman-seo-${{ steps.get_version.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_release.outputs.exists }}" == "true" ]; then
+            echo "## Release Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Release ${{ steps.get_version.outputs.tag }} already exists." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Release Created" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Version:** ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tag:** ${{ steps.get_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Zip:** saman-seo-${{ steps.get_version.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY
+          fi
