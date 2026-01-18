@@ -488,7 +488,7 @@ export default function Header({ currentView, onNavigate }) {
             </nav>
             <div className="header-actions">
                 <a
-                    href="https://github.com/jhd3197/wp-seo-pilot"
+                    href="https://github.com/SamanLabs/Saman-SEO"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="button ghost"

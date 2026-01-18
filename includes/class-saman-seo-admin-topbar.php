@@ -64,7 +64,7 @@ class Admin_Topbar {
 					<?php endif; ?>
 
 					<!-- GitHub Link -->
-					<a href="https://github.com/jhd3197/WP-SEO-Pilot"
+					<a href="https://github.com/SamanLabs/Saman-SEO"
 					   class="saman-seo-github-link"
 					   target="_blank"
 					   rel="noopener noreferrer"

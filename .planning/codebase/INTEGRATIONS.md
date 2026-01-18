@@ -77,9 +77,9 @@
 | **File** | `includes/Updater/class-github-updater.php` |
 
 **Managed Plugins:**
-- wp-seo-pilot/wp-seo-pilot.php (jhd3197/WP-SEO-Pilot)
-- wp-ai-pilot/wp-ai-pilot.php (jhd3197/WP-AI-Pilot)
-- wp-security-pilot/wp-security-pilot.php (jhd3197/WP-Security-Pilot)
+- wp-seo-pilot/wp-seo-pilot.php (SamanLabs/Saman-SEO)
+- wp-ai-pilot/wp-ai-pilot.php (SamanLabs/Saman-AI)
+- wp-security-pilot/wp-security-pilot.php (SamanLabs/Saman-Security)
 
 **Caching:**
 - Stable releases: 12 hours

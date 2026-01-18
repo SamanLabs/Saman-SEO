@@ -710,4 +710,4 @@ Or via admin: **Saman SEO → General Settings** → Uncheck **Enable Local SEO*
 
 ---
 
-**For more help, visit the [GitHub repository](https://github.com/jhd3197/WP-SEO-Pilot).**
+**For more help, visit the [GitHub repository](https://github.com/SamanLabs/Saman-SEO).**

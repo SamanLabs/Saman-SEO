@@ -962,4 +962,4 @@ if ( is_wp_error( $result ) ) {
 
 ---
 
-**For more examples, visit the [GitHub repository](https://github.com/jhd3197/WP-SEO-Pilot).**
+**For more examples, visit the [GitHub repository](https://github.com/SamanLabs/Saman-SEO).**

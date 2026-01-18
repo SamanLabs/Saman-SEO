@@ -751,4 +751,4 @@ For sites with 1,000+ redirects:
 
 ---
 
-**For more help, visit the [GitHub repository](https://github.com/jhd3197/WP-SEO-Pilot).**
+**For more help, visit the [GitHub repository](https://github.com/SamanLabs/Saman-SEO).**
