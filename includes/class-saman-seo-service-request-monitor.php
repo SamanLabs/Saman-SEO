@@ -277,7 +277,7 @@ class Request_Monitor {
 
 		if ( ! $this->has_column( 'device_label' ) ) {
 			global $wpdb;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema corrections require direct queries.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Schema corrections require direct queries.
 			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN device_label varchar(80) DEFAULT ''" );
 		}
 	}
@@ -392,15 +392,14 @@ class Request_Monitor {
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
 			$count_sql = $wpdb->prepare( $count_sql, $params );
 		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom ordering/pagination requires direct queries, SQL prepared conditionally above.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, custom pagination requires direct queries.
 		$total_count = (int) $wpdb->get_var( $count_sql );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom ordering/pagination requires direct queries.
 		$order_by_sql = ( 'hits' === $order_by ) ? 'hits' : 'last_seen';
 		$sql = "SELECT * FROM {$this->table}{$where_sql} ORDER BY {$order_by_sql} DESC LIMIT %d OFFSET %d";
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom ordering/pagination requires direct queries, SQL built with safe table name.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
 		$sql = $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom ordering/pagination requires direct queries, SQL prepared above.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, custom pagination requires direct queries.
 		$rows = $wpdb->get_results( $sql );
 
 		if ( $rows ) {
@@ -600,7 +599,7 @@ class Request_Monitor {
 		$requests     = array_values( array_unique( $requests ) );
 		$placeholders = implode( ',', array_fill( 0, count( $requests ), '%s' ) );
 		$sql          = "SELECT source FROM {$redirect_table} WHERE source IN ({$placeholders})";
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Matching redirects against 404 log rows requires direct query, table name is safe and placeholders are dynamically generated.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, matching redirects against 404 log requires direct query.
 		$sources = $wpdb->get_col( $wpdb->prepare( $sql, $requests ) );
 
 		$lookup = $sources ? array_fill_keys( $sources, true ) : [];

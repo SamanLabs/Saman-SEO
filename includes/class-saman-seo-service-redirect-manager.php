@@ -245,7 +245,7 @@ class Redirect_Manager {
 			}
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, checking redirect existence requires direct query.
 		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$this->table} WHERE source = %s", $normalized ) );
 
 		if ( $exists ) {
