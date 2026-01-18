@@ -21,6 +21,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Determine version
         id: get_version
@@ -30,71 +36,75 @@ jobs:
             TAG_NAME=${GITHUB_REF#refs/tags/}
             VERSION=${TAG_NAME#v}
             echo "Source: tag push ($TAG_NAME)"
+            echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "is_tag_push=true" >> $GITHUB_OUTPUT
           else
-            # Auto-increment: get latest tag and bump patch version
-            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v2.0.0")
-            LATEST_VERSION=${LATEST_TAG#v}
+            # Get ALL stable version tags (exclude betas), find the highest
+            LATEST_STABLE=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | grep -v beta | sort -V | tail -1)
+
+            if [ -z "$LATEST_STABLE" ]; then
+              LATEST_STABLE="v2.0.0"
+            fi
+
+            echo "Latest stable tag: $LATEST_STABLE"
+            LATEST_VERSION=${LATEST_STABLE#v}
 
             # Parse version components
             MAJOR=$(echo $LATEST_VERSION | cut -d. -f1)
             MINOR=$(echo $LATEST_VERSION | cut -d. -f2)
-            PATCH=$(echo $LATEST_VERSION | cut -d. -f3 | cut -d- -f1)
+            PATCH=$(echo $LATEST_VERSION | cut -d. -f3)
 
-            # Increment patch
-            NEW_PATCH=$((PATCH + 1))
-            VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-            TAG_NAME="v$VERSION"
+            # Keep incrementing patch until we find a version that doesn't exist
+            while true; do
+              PATCH=$((PATCH + 1))
+              VERSION="${MAJOR}.${MINOR}.${PATCH}"
+              TAG_NAME="v$VERSION"
 
-            echo "Source: auto-increment from $LATEST_TAG to $TAG_NAME"
+              if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+                echo "Found available version: $TAG_NAME"
+                break
+              fi
+              echo "Tag $TAG_NAME exists, trying next..."
+            done
+
+            echo "Source: auto-increment from $LATEST_STABLE to $TAG_NAME"
+            echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "is_tag_push=false" >> $GITHUB_OUTPUT
           fi
 
           ZIP_VERSION=$(echo $VERSION | sed 's/\./-/g')
-
-          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "zip_version=$ZIP_VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
+          echo "Final version: $VERSION"
 
-      - name: Check if release already exists
-        id: check_release
-        run: |
-          TAG="${{ steps.get_version.outputs.tag }}"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Tag $TAG already exists"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Tag $TAG does not exist, will create"
-          fi
-
-      - name: Update plugin version
-        if: steps.check_release.outputs.exists != 'true'
+      - name: Update plugin version in files
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
 
-          # Update Version header
-          sed -i "s/^\(\s*\*\s*Version:\s*\)[0-9]\+\.[0-9]\+\.[0-9]\+/\1$VERSION/" saman-seo.php
+          # Update Version header in plugin file
+          sed -i "s/^\(\s*\*\s*Version:\s*\)[0-9]\+\.[0-9]\+\.[0-9]\+.*/\1$VERSION/" saman-seo.php
 
-          # Update SAMANSEO_VERSION constant
-          sed -i "s/define( 'SAMANSEO_VERSION', '[^']*' );/define( 'SAMANSEO_VERSION', '$VERSION' );/" saman-seo.php
+          # Update SAMAN_SEO_VERSION constant
+          sed -i "s/define( 'SAMAN_SEO_VERSION', '[^']*' );/define( 'SAMAN_SEO_VERSION', '$VERSION' );/" saman-seo.php
+
+          # Update readme.txt Stable tag
+          sed -i "s/^Stable tag:.*/Stable tag: $VERSION/" readme.txt 2>/dev/null || true
 
           echo "Updated plugin to version $VERSION"
-          grep -E "(Version:|SAMANSEO_VERSION)" saman-seo.php | head -2
+          grep -E "(Version:|SAMAN_SEO_VERSION)" saman-seo.php | head -2
 
       - name: Setup Node.js
-        if: steps.check_release.outputs.exists != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install dependencies and build
-        if: steps.check_release.outputs.exists != 'true'
         run: |
           npm install
           npm run build
 
       - name: Create plugin zip
-        if: steps.check_release.outputs.exists != 'true'
         run: |
           VERSION=${{ steps.get_version.outputs.zip_version }}
 
@@ -126,21 +136,21 @@ jobs:
           echo "Created saman-seo-$VERSION.zip"
 
       - name: Generate release notes
-        if: steps.check_release.outputs.exists != 'true'
-        id: release_notes
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          # Find previous stable tag
+          PREV_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | grep -v beta | sort -V | tail -2 | head -1)
 
           {
             echo "## Saman SEO v$VERSION"
             echo ""
-            if [ -n "$PREV_TAG" ]; then
+            if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "v$VERSION" ]; then
               echo "### Changes since $PREV_TAG"
               echo ""
               git log $PREV_TAG..HEAD --pretty=format:"- %s" --no-merges | head -50
             else
-              echo "Initial release"
+              echo "Initial stable release"
             fi
             echo ""
             echo ""
@@ -150,8 +160,22 @@ jobs:
 
           cat release_notes.md
 
+      - name: Commit version update
+        if: steps.get_version.outputs.is_tag_push != 'true'
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+
+          # Only commit if there are changes
+          if ! git diff --quiet saman-seo.php readme.txt 2>/dev/null; then
+            git add saman-seo.php readme.txt 2>/dev/null || git add saman-seo.php
+            git commit -m "chore: bump version to $VERSION [skip ci]"
+            git push origin main
+            echo "Committed version bump to $VERSION"
+          else
+            echo "No version changes to commit"
+          fi
+
       - name: Create Release
-        if: steps.check_release.outputs.exists != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_version.outputs.tag }}
@@ -163,21 +187,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Skip notice
-        if: steps.check_release.outputs.exists == 'true'
-        run: |
-          echo "::notice::Release ${{ steps.get_version.outputs.tag }} already exists, skipping."
-
       - name: Summary
         run: |
-          if [ "${{ steps.check_release.outputs.exists }}" == "true" ]; then
-            echo "## Release Skipped" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Release ${{ steps.get_version.outputs.tag }} already exists." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## Release Created" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **Version:** ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Tag:** ${{ steps.get_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Zip:** saman-seo-${{ steps.get_version.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "## Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ steps.get_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Zip:** saman-seo-${{ steps.get_version.outputs.zip_version }}.zip" >> $GITHUB_STEP_SUMMARY
