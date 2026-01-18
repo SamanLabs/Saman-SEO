@@ -19,7 +19,7 @@ Saman SEO is more than just another plugin—it's a movement toward transparency
 
 ### 🐛 Report Bugs
 
-Found a bug? Please [open an issue](https://github.com/jhd3197/WP-SEO-Pilot/issues) with:
+Found a bug? Please [open an issue](https://github.com/SamanLabs/Saman-SEO/issues) with:
 
 - **Clear description** of the problem
 - **Steps to reproduce** the issue
@@ -29,7 +29,7 @@ Found a bug? Please [open an issue](https://github.com/jhd3197/WP-SEO-Pilot/issu
 
 ### 💡 Suggest Features
 
-Have an idea for improvement? [Open a feature request](https://github.com/jhd3197/WP-SEO-Pilot/issues) including:
+Have an idea for improvement? [Open a feature request](https://github.com/SamanLabs/Saman-SEO/issues) including:
 
 - **Use case**: What problem does this solve?
 - **Proposed solution**: How should it work?
@@ -52,7 +52,7 @@ Code contributions follow our standard workflow (see below).
 
 ### 💬 Join Discussions
 
-Participate in [GitHub Discussions](https://github.com/jhd3197/WP-SEO-Pilot/discussions):
+Participate in [GitHub Discussions](https://github.com/SamanLabs/Saman-SEO/discussions):
 
 - Answer questions from other users
 - Share your use cases and implementations
@@ -75,7 +75,7 @@ Participate in [GitHub Discussions](https://github.com/jhd3197/WP-SEO-Pilot/disc
 
 1. **Fork the repository**
    ```bash
-   # Visit https://github.com/jhd3197/WP-SEO-Pilot and click "Fork"
+   # Visit https://github.com/SamanLabs/Saman-SEO and click "Fork"
    ```
 
 2. **Clone your fork**
@@ -86,7 +86,7 @@ Participate in [GitHub Discussions](https://github.com/jhd3197/WP-SEO-Pilot/disc
 
 3. **Add upstream remote**
    ```bash
-   git remote add upstream https://github.com/jhd3197/WP-SEO-Pilot.git
+   git remote add upstream https://github.com/SamanLabs/Saman-SEO.git
    ```
 
 4. **Install dependencies**
@@ -388,7 +388,7 @@ By contributing to Saman SEO, you agree that your contributions will be licensed
 
 ## Questions?
 
-- **GitHub Discussions**: [Ask questions](https://github.com/jhd3197/WP-SEO-Pilot/discussions)
+- **GitHub Discussions**: [Ask questions](https://github.com/SamanLabs/Saman-SEO/discussions)
 
 ---
 

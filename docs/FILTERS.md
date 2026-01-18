@@ -1257,4 +1257,4 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 
 ---
 
-**For more examples and use cases, visit the [GitHub repository](https://github.com/jhd3197/WP-SEO-Pilot).**
+**For more examples and use cases, visit the [GitHub repository](https://github.com/SamanLabs/Saman-SEO).**

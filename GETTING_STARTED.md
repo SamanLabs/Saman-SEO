@@ -8,7 +8,7 @@ This guide will help you install and configure Saman SEO for your WordPress site
 
 ### Method 1: WordPress Admin (Recommended)
 
-1. Download the latest release from [GitHub Releases](https://github.com/jhd3197/WP-SEO-Pilot/releases)
+1. Download the latest release from [GitHub Releases](https://github.com/SamanLabs/Saman-SEO/releases)
 2. Log in to your WordPress admin dashboard
 3. Navigate to **Plugins → Add New → Upload Plugin**
 4. Click **Choose File** and select the downloaded ZIP file
@@ -454,6 +454,6 @@ AI Suggestions: Enabled
 ## Getting Help
 
 - **Documentation:** [docs/](.)
-- **Issues:** [GitHub Issues](https://github.com/jhd3197/WP-SEO-Pilot/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/jhd3197/WP-SEO-Pilot/discussions)
+- **Issues:** [GitHub Issues](https://github.com/SamanLabs/Saman-SEO/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/SamanLabs/Saman-SEO/discussions)
 

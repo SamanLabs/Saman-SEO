@@ -1149,4 +1149,4 @@ add_filter( 'samanseo_robots_array', function( $directives ) {
 
 ---
 
-**For questions or contributions, visit the [GitHub repository](https://github.com/jhd3197/WP-SEO-Pilot).**
+**For questions or contributions, visit the [GitHub repository](https://github.com/SamanLabs/Saman-SEO).**

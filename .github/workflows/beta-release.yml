@@ -96,7 +96,7 @@ jobs:
 
           mkdir -p saman-seo
 
-          # Copy production files
+          # Copy only production files (whitelist approach)
           cp -r assets saman-seo/
           cp -r build saman-seo/
           cp -r includes saman-seo/
@@ -104,6 +104,17 @@ jobs:
           cp saman-seo.php saman-seo/
           cp readme.txt saman-seo/ 2>/dev/null || true
           cp LICENSE saman-seo/ 2>/dev/null || true
+
+          # Remove any dev/config files that might have snuck in
+          find saman-seo -name "*.md" ! -name "readme.txt" -type f -delete 2>/dev/null || true
+          find saman-seo -name ".git*" -delete 2>/dev/null || true
+          find saman-seo -name ".claude*" -delete 2>/dev/null || true
+          find saman-seo -name ".vscode*" -delete 2>/dev/null || true
+          find saman-seo -name ".DS_Store" -delete 2>/dev/null || true
+          find saman-seo -name "*.log" -delete 2>/dev/null || true
+          find saman-seo -name ".planning" -type d -exec rm -rf {} + 2>/dev/null || true
+          find saman-seo -name "docs" -type d -exec rm -rf {} + 2>/dev/null || true
+          find saman-seo -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true
 
           zip -r saman-seo-$VERSION.zip saman-seo
           rm -rf saman-seo
