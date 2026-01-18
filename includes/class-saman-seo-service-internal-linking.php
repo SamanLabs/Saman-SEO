@@ -338,10 +338,11 @@ class Internal_Linking {
 		$this->guard_capability();
 		check_admin_referer( 'SAMAN_SEO_save_link_rule' );
 
-		$payload = isset( $_POST['rule'] ) ? (array) $_POST['rule'] : [];
-		$payload = wp_unslash( $payload );
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array is sanitized field-by-field in repository->sanitize_rule().
+		$payload = isset( $_POST['rule'] ) ? (array) wp_unslash( $_POST['rule'] ) : [];
 
 		if ( isset( $payload['category'] ) && '__new__' === $payload['category'] ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array is sanitized field-by-field in repository->sanitize_category().
 			$new_category = isset( $_POST['new_category'] ) ? (array) wp_unslash( $_POST['new_category'] ) : [];
 			$category     = $this->repository->save_category( $new_category );
 

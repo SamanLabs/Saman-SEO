@@ -159,7 +159,7 @@ class Post_Meta {
 			return;
 		}
 
-		if ( ! isset( $_POST['SAMAN_SEO_meta_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['SAMAN_SEO_meta_nonce'] ), 'SAMAN_SEO_meta' ) ) {
+		if ( ! isset( $_POST['SAMAN_SEO_meta_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['SAMAN_SEO_meta_nonce'] ) ), 'SAMAN_SEO_meta' ) ) {
 			return;
 		}
 

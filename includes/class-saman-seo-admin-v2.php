@@ -152,7 +152,7 @@ class Admin_V2 {
             return;
         }
 
-        $page = sanitize_text_field( $_GET['page'] );
+        $page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 
         // Redirect legacy V1 URLs
         if ( isset( $this->legacy_redirects[ $page ] ) ) {
@@ -309,7 +309,7 @@ class Admin_V2 {
         );
 
         // Determine initial view from page parameter
-        $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : self::MENU_SLUG;
+        $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : self::MENU_SLUG;
         $initial_view = isset( $this->view_map[ $page ] ) ? $this->view_map[ $page ] : 'dashboard';
 
         // Get AI status

@@ -711,7 +711,7 @@ class Redirect_Manager {
 
 		check_admin_referer( 'SAMAN_SEO_dismiss_slug' );
 
-		$key = isset( $_GET['key'] ) ? sanitize_text_field( $_GET['key'] ) : '';
+		$key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
 
 		if ( $key ) {
 			$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
