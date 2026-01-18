@@ -7,6 +7,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 ?>
 <?php
 $SAMAN_SEO_prefill = isset( $_GET['prefill'] ) ? sanitize_text_field( wp_unslash( $_GET['prefill'] ) ) : '';

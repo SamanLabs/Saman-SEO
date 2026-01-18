@@ -81,7 +81,7 @@ wp-seo-pilot/
  *
  * @return int|WP_Error       Redirect ID or WP_Error on failure.
  */
-function wpseopilot_create_redirect( $source, $target, $status_code = 301 );
+function samanseo_create_redirect( $source, $target, $status_code = 301 );
 ```
 
 **Example:**
@@ -94,7 +94,7 @@ $old_urls = [
 ];
 
 foreach ( $old_urls as $source => $target ) {
-    $result = wpseopilot_create_redirect( $source, $target );
+    $result = samanseo_create_redirect( $source, $target );
     
     if ( is_wp_error( $result ) ) {
         error_log( sprintf(
@@ -118,13 +118,13 @@ foreach ( $old_urls as $source => $target ) {
  *
  * @return string|false   Meta value or false if not set.
  */
-function wpseopilot_get_meta( $post_id, $key );
+function samanseo_get_meta( $post_id, $key );
 ```
 
 **Example:**
 ```php
 $post_id = 123;
-$seo_title = wpseopilot_get_meta( $post_id, 'title' );
+$seo_title = samanseo_get_meta( $post_id, 'title' );
 
 if ( ! $seo_title ) {
     // Fall back to post title
@@ -144,7 +144,7 @@ if ( ! $seo_title ) {
  *
  * @return bool           True on success, false on failure.
  */
-function wpseopilot_update_meta( $post_id, $key, $value );
+function samanseo_update_meta( $post_id, $key, $value );
 ```
 
 **Example:**
@@ -157,9 +157,9 @@ $post_id = wp_insert_post([
 ]);
 
 if ( $post_id ) {
-    wpseopilot_update_meta( $post_id, 'title', 'New Product Launch 2024 | Buy Now' );
-    wpseopilot_update_meta( $post_id, 'description', 'Discover our latest product with advanced features...' );
-    wpseopilot_update_meta( $post_id, 'og_image', 'https://cdn.example.com/product-launch.jpg' );
+    samanseo_update_meta( $post_id, 'title', 'New Product Launch 2024 | Buy Now' );
+    samanseo_update_meta( $post_id, 'description', 'Discover our latest product with advanced features...' );
+    samanseo_update_meta( $post_id, 'og_image', 'https://cdn.example.com/product-launch.jpg' );
 }
 ```
 
@@ -178,40 +178,40 @@ if ( $post_id ) {
  *
  * @return string|void         Breadcrumb HTML if $echo is false.
  */
-function wpseopilot_breadcrumbs( $post = null, $echo = true );
+function samanseo_breadcrumbs( $post = null, $echo = true );
 ```
 
 **Usage in Theme:**
 ```php
 <?php
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs();
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs();
 }
 ?>
 ```
 
 **Shortcode:**
 ```
-[wpseopilot_breadcrumbs]
+[samanseo_breadcrumbs]
 ```
 
 **Custom Styling:**
 ```css
-.wpseopilot-breadcrumbs {
+.samanseo-breadcrumbs {
     font-size: 14px;
     color: #666;
 }
 
-.wpseopilot-breadcrumbs a {
+.samanseo-breadcrumbs a {
     color: #0073aa;
     text-decoration: none;
 }
 
-.wpseopilot-breadcrumbs a:hover {
+.samanseo-breadcrumbs a:hover {
     text-decoration: underline;
 }
 
-.wpseopilot-breadcrumbs .separator {
+.samanseo-breadcrumbs .separator {
     margin: 0 8px;
 }
 ```
@@ -222,29 +222,29 @@ if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
 
 ### Action Hooks
 
-#### `wpseopilot_before_head_output`
+#### `samanseo_before_head_output`
 
 Fires before Saman SEO outputs any `<head>` tags.
 
 ```php
-add_action( 'wpseopilot_before_head_output', function() {
+add_action( 'samanseo_before_head_output', function() {
     // Add custom meta tags
     echo '<meta name="custom-tag" content="value">';
 });
 ```
 
-#### `wpseopilot_after_head_output`
+#### `samanseo_after_head_output`
 
 Fires after Saman SEO outputs all `<head>` tags.
 
 ```php
-add_action( 'wpseopilot_after_head_output', function() {
+add_action( 'samanseo_after_head_output', function() {
     // Add verification codes
     echo '<meta name="google-site-verification" content="your-code">';
 });
 ```
 
-#### `wpseopilot_sitemap_generated`
+#### `samanseo_sitemap_generated`
 
 Fires after a sitemap is generated.
 
@@ -252,7 +252,7 @@ Fires after a sitemap is generated.
 - `$sitemap_type` (string) - Type of sitemap ('post', 'page', 'category', etc.)
 
 ```php
-add_action( 'wpseopilot_sitemap_generated', function( $sitemap_type ) {
+add_action( 'samanseo_sitemap_generated', function( $sitemap_type ) {
     // Log sitemap generation
     error_log( "Sitemap generated: {$sitemap_type}" );
     
@@ -268,12 +268,12 @@ add_action( 'wpseopilot_sitemap_generated', function( $sitemap_type ) {
 See the **[Filter Reference](FILTERS.md)** for comprehensive filter documentation.
 
 **Most Common Filters:**
-- `wpseopilot_title` - Modify SEO title
-- `wpseopilot_description` - Modify meta description
-- `wpseopilot_canonical` - Modify canonical URL
-- `wpseopilot_og_image` - Modify Open Graph image
-- `wpseopilot_jsonld` - Modify structured data
-- `wpseopilot_sitemap_entry` - Modify sitemap entries
+- `samanseo_title` - Modify SEO title
+- `samanseo_description` - Modify meta description
+- `samanseo_canonical` - Modify canonical URL
+- `samanseo_og_image` - Modify Open Graph image
+- `samanseo_jsonld` - Modify structured data
+- `samanseo_sitemap_entry` - Modify sitemap entries
 
 ---
 
@@ -283,7 +283,7 @@ See the **[Filter Reference](FILTERS.md)** for comprehensive filter documentatio
 
 SEO data is stored in a single serialized meta field:
 
-**Meta Key:** `_wpseopilot_meta`
+**Meta Key:** `_samanseo_meta`
 
 **Structure:**
 ```php
@@ -307,7 +307,7 @@ global $wpdb;
 $results = $wpdb->get_results(
     "SELECT post_id, meta_value 
      FROM {$wpdb->postmeta} 
-     WHERE meta_key = '_wpseopilot_meta' 
+     WHERE meta_key = '_samanseo_meta' 
      AND meta_value LIKE '%\"title\"%'"
 );
 
@@ -321,11 +321,11 @@ foreach ( $results as $row ) {
 
 ### Redirects Table
 
-**Table Name:** `{prefix}wpseopilot_redirects`
+**Table Name:** `{prefix}samanseo_redirects`
 
 **Schema:**
 ```sql
-CREATE TABLE {prefix}wpseopilot_redirects (
+CREATE TABLE {prefix}samanseo_redirects (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     source varchar(255) NOT NULL,
     target varchar(255) NOT NULL,
@@ -341,7 +341,7 @@ CREATE TABLE {prefix}wpseopilot_redirects (
 **Direct Database Access:**
 ```php
 global $wpdb;
-$table = $wpdb->prefix . 'wpseopilot_redirects';
+$table = $wpdb->prefix . 'samanseo_redirects';
 
 // Get most used redirects
 $top_redirects = $wpdb->get_results(
@@ -362,7 +362,7 @@ Add product-specific SEO enhancements:
 
 ```php
 // Add price to product titles in search results
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_singular( 'product' ) && function_exists( 'wc_get_product' ) ) {
         $product = wc_get_product( $post->ID );
         if ( $product ) {
@@ -374,7 +374,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add product schema to structured data
-add_filter( 'wpseopilot_jsonld', function( $graph ) {
+add_filter( 'samanseo_jsonld', function( $graph ) {
     if ( is_singular( 'product' ) && function_exists( 'wc_get_product' ) ) {
         $product = wc_get_product( get_queried_object_id() );
         
@@ -416,7 +416,7 @@ register_post_type( 'portfolio', [
 ]);
 
 // Set default SEO template for portfolio items
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_singular( 'portfolio' ) ) {
         $client = get_post_meta( $post->ID, 'client_name', true );
         if ( $client ) {
@@ -427,7 +427,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add portfolio items to sitemap with high priority
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     if ( 'portfolio' === $post_type ) {
         $entry['priority'] = 0.9;
         $entry['changefreq'] = 'monthly';
@@ -440,7 +440,7 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type )
 
 ```php
 // Add language-specific title suffix
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( function_exists( 'pll_current_language' ) ) {
         $lang = pll_current_language();
         $suffixes = [
@@ -457,7 +457,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Set canonical to default language version
-add_filter( 'wpseopilot_canonical', function( $url ) {
+add_filter( 'samanseo_canonical', function( $url ) {
     if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post' ) ) {
         $lang = pll_current_language();
         if ( $lang !== pll_default_language() ) {
@@ -472,7 +472,7 @@ add_filter( 'wpseopilot_canonical', function( $url ) {
 });
 
 // Add hreflang tags
-add_action( 'wpseopilot_after_head_output', function() {
+add_action( 'samanseo_after_head_output', function() {
     if ( function_exists( 'pll_the_languages' ) && is_singular() ) {
         $post = get_queried_object();
         $translations = pll_the_languages([
@@ -500,7 +500,7 @@ add_action( 'wpseopilot_after_head_output', function() {
 **1. Use Object Caching**
 ```php
 // Cache expensive operations
-$cache_key = 'wpseopilot_custom_' . $post_id;
+$cache_key = 'samanseo_custom_' . $post_id;
 $cached = wp_cache_get( $cache_key );
 
 if ( false === $cached ) {
@@ -516,21 +516,21 @@ return $cached;
 ```php
 // Only add filters when needed
 if ( is_singular( 'product' ) ) {
-    add_filter( 'wpseopilot_title', 'my_product_title_filter', 10, 2 );
-    add_filter( 'wpseopilot_jsonld', 'my_product_schema_filter' );
+    add_filter( 'samanseo_title', 'my_product_title_filter', 10, 2 );
+    add_filter( 'samanseo_jsonld', 'my_product_schema_filter' );
 }
 ```
 
 **3. Database Query Optimization**
 ```php
 // Bad: N+1 query problem
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id ) {
     $custom_data = get_post_meta( $post_id, 'custom_field', true ); // Runs for EVERY post
     // ...
 }, 10, 2 );
 
 // Good: Batch query
-add_action( 'wpseopilot_sitemap_before_generate', function( $post_ids ) {
+add_action( 'samanseo_sitemap_before_generate', function( $post_ids ) {
     global $custom_data_cache;
     $custom_data_cache = [];
     
@@ -539,7 +539,7 @@ add_action( 'wpseopilot_sitemap_before_generate', function( $post_ids ) {
     }
 });
 
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id ) {
     global $custom_data_cache;
     $custom_data = $custom_data_cache[ $post_id ] ?? '';
     // ...
@@ -550,7 +550,7 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id ) {
 
 **1. Sanitize Output**
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     $custom_title = get_post_meta( $post->ID, 'custom_title', true );
     
     // Always sanitize user input
@@ -560,7 +560,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 
 **2. Validate URLs**
 ```php
-add_filter( 'wpseopilot_canonical', function( $url ) {
+add_filter( 'samanseo_canonical', function( $url ) {
     $custom_canonical = get_option( 'custom_canonical' );
     
     // Validate URL before using
@@ -575,14 +575,14 @@ add_filter( 'wpseopilot_canonical', function( $url ) {
 **3. Capability Checks**
 ```php
 add_action( 'admin_init', function() {
-    if ( isset( $_POST['wpseopilot_custom_action'] ) ) {
+    if ( isset( $_POST['samanseo_custom_action'] ) ) {
         // Always check capabilities
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_die( 'Unauthorized' );
         }
         
         // Verify nonce
-        if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'wpseopilot_custom_action' ) ) {
+        if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'samanseo_custom_action' ) ) {
             wp_die( 'Invalid nonce' );
         }
         
@@ -611,8 +611,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class My_SEO_Customizations {
     
     public function __construct() {
-        add_filter( 'wpseopilot_title', [ $this, 'custom_title' ], 10, 2 );
-        add_filter( 'wpseopilot_jsonld', [ $this, 'custom_schema' ] );
+        add_filter( 'samanseo_title', [ $this, 'custom_title' ], 10, 2 );
+        add_filter( 'samanseo_jsonld', [ $this, 'custom_schema' ] );
     }
     
     public function custom_title( $title, $post ) {
@@ -645,7 +645,7 @@ define( 'WP_DEBUG_DISPLAY', false );
 ### Log Filter Output
 
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     error_log( sprintf(
         'SEO Title for post %d: %s',
         $post ? $post->ID : 0,
@@ -665,7 +665,7 @@ add_action( 'template_redirect', function() {
         header( 'Content-Type: text/plain' );
         
         // Get sitemap data
-        $sitemap = new WPSeoPilot_Sitemaps();
+        $sitemap = new SamanSEO_Sitemaps();
         $data = $sitemap->generate_post_sitemap( 'post', 1 );
         
         echo "Sitemap Entry Count: " . count( $data ) . "\n\n";
@@ -684,18 +684,18 @@ add_action( 'template_redirect', function() {
 ### Unit Testing Example
 
 ```php
-class Test_WPSeoPilot_Filters extends WP_UnitTestCase {
+class Test_SamanSEO_Filters extends WP_UnitTestCase {
     
     public function test_custom_title_filter() {
         $post_id = $this->factory->post->create([
             'post_title' => 'Test Post',
         ]);
         
-        add_filter( 'wpseopilot_title', function( $title ) {
+        add_filter( 'samanseo_title', function( $title ) {
             return $title . ' | Custom Suffix';
         });
         
-        $title = apply_filters( 'wpseopilot_title', get_the_title( $post_id ), get_post( $post_id ) );
+        $title = apply_filters( 'samanseo_title', get_the_title( $post_id ), get_post( $post_id ) );
         
         $this->assertEquals( 'Test Post | Custom Suffix', $title );
     }

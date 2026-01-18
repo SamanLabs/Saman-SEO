@@ -78,19 +78,19 @@ npm run format:js      # Prettier formatting
 
 **WordPress Tables Used:**
 - `wp_options` - Plugin settings (50+ options)
-- `wp_postmeta` - Per-post SEO metadata (`_wpseopilot_meta`)
+- `wp_postmeta` - Per-post SEO metadata (`_samanseo_meta`)
 - `wp_posts` - Content for analysis
 
 **Custom Tables Created:**
 | Table | Purpose | Schema Version |
 |-------|---------|----------------|
-| `wp_wpseopilot_redirects` | 301/302 redirect storage | 2 |
-| `wp_wpseopilot_404_log` | 404 error logging | 5 |
-| `wp_wpseopilot_404_ignore_patterns` | 404 exclusion patterns | 1 |
-| `wp_wpseopilot_link_health` | Broken link tracking | 1 |
-| `wp_wpseopilot_link_scans` | Link scan history | 1 |
-| `wp_wpseopilot_indexnow_log` | IndexNow submissions | 1 |
-| `wp_wpseopilot_custom_models` | Custom AI models | 1 |
+| `wp_samanseo_redirects` | 301/302 redirect storage | 2 |
+| `wp_samanseo_404_log` | 404 error logging | 5 |
+| `wp_samanseo_404_ignore_patterns` | 404 exclusion patterns | 1 |
+| `wp_samanseo_link_health` | Broken link tracking | 1 |
+| `wp_samanseo_link_scans` | Link scan history | 1 |
+| `wp_samanseo_indexnow_log` | IndexNow submissions | 1 |
+| `wp_samanseo_custom_models` | Custom AI models | 1 |
 
 ## System Requirements
 

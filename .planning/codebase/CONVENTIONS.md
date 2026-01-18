@@ -21,11 +21,11 @@
 /**
  * Service description.
  *
- * @package WPSEOPilot
+ * @package SamanSEO
  * @since 0.2.0
  */
 
-namespace WPSEOPilot\Service;
+namespace SamanSEO\Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -86,14 +86,14 @@ class Example_Service {
 |------|------------|---------|
 | Local | `snake_case` | `$redirect_url` |
 | Class Properties | `snake_case` | `$this->api_key` |
-| Constants | `SCREAMING_SNAKE_CASE` | `WPSEOPILOT_VERSION` |
+| Constants | `SCREAMING_SNAKE_CASE` | `SAMANSEO_VERSION` |
 | Temporary | Descriptive `snake_case` | `$temp_data` |
 
 ### Files
 
 | Type | Pattern | Example |
 |------|---------|---------|
-| Classes | `class-{slug}.php` | `class-wpseopilot-service-frontend.php` |
+| Classes | `class-{slug}.php` | `class-samanseo-service-frontend.php` |
 | Templates | `{feature}.php` | `settings-page.php` |
 | LESS | `{feature}.less` | `admin.less` |
 | React | `PascalCase.js` | `SearchPreview.js` |
@@ -111,7 +111,7 @@ class Example_Service {
  * Long description with more details about what this does,
  * why it exists, and how to use it.
  *
- * @package WPSEOPilot
+ * @package SamanSEO
  * @since 0.2.0
  */
 ```
@@ -191,7 +191,7 @@ class Plugin {
 }
 
 // Usage
-$plugin = \WPSEOPilot\Plugin::instance();
+$plugin = \SamanSEO\Plugin::instance();
 ```
 
 ### Service Container Pattern
@@ -218,7 +218,7 @@ public function get( $key ) {
 
 ```php
 abstract class REST_Controller {
-	protected $namespace = 'wpseopilot/v2';
+	protected $namespace = 'samanseo/v2';
 
 	abstract public function register_routes();
 
@@ -354,8 +354,8 @@ if ( method_exists( $service, 'boot' ) ) {
 }
 
 // Before using optional class
-if ( class_exists( '\WPSEOPilot\Integration\AI_Pilot' ) ) {
-	\WPSEOPilot\Integration\AI_Pilot::init();
+if ( class_exists( '\SamanSEO\Integration\AI_Pilot' ) ) {
+	\SamanSEO\Integration\AI_Pilot::init();
 }
 ```
 
@@ -380,11 +380,11 @@ public function boot() {
 
 ```php
 public function boot() {
-	add_action( 'wp_ajax_wpseopilot_generate', [ $this, 'ajax_generate' ] );
+	add_action( 'wp_ajax_samanseo_generate', [ $this, 'ajax_generate' ] );
 }
 
 public function ajax_generate() {
-	check_ajax_referer( 'wpseopilot_nonce', 'nonce' );
+	check_ajax_referer( 'samanseo_nonce', 'nonce' );
 
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_send_json_error( 'Unauthorized' );
@@ -399,24 +399,24 @@ public function ajax_generate() {
 
 ```php
 // Get with default
-$value = get_option( 'wpseopilot_setting', 'default' );
+$value = get_option( 'samanseo_setting', 'default' );
 
 // Update
-update_option( 'wpseopilot_setting', $value );
+update_option( 'samanseo_setting', $value );
 
 // Delete
-delete_option( 'wpseopilot_setting' );
+delete_option( 'samanseo_setting' );
 ```
 
 ### Post Meta
 
 ```php
 // Single meta key stores serialized JSON
-$meta = get_post_meta( $post_id, '_wpseopilot_meta', true );
+$meta = get_post_meta( $post_id, '_samanseo_meta', true );
 $meta = $meta ? json_decode( $meta, true ) : [];
 
 // Update
-update_post_meta( $post_id, '_wpseopilot_meta', wp_json_encode( $meta ) );
+update_post_meta( $post_id, '_samanseo_meta', wp_json_encode( $meta ) );
 ```
 
 ## JavaScript/React Conventions
@@ -431,12 +431,12 @@ const SearchPreview = ({ postId }) => {
 	const [data, setData] = useState(null);
 
 	useEffect(() => {
-		apiFetch({ path: `/wpseopilot/v2/meta/${postId}` })
+		apiFetch({ path: `/samanseo/v2/meta/${postId}` })
 			.then(setData);
 	}, [postId]);
 
 	return (
-		<div className="wpseopilot-preview">
+		<div className="samanseo-preview">
 			{/* Component content */}
 		</div>
 	);
@@ -457,7 +457,7 @@ export const useSettings = () => {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		apiFetch({ path: '/wpseopilot/v2/settings' })
+		apiFetch({ path: '/samanseo/v2/settings' })
 			.then(setSettings)
 			.finally(() => setLoading(false));
 	}, []);
@@ -470,13 +470,13 @@ export const useSettings = () => {
 
 ```css
 /* BEM-ish naming with plugin prefix */
-.wpseopilot-panel { }
-.wpseopilot-panel__header { }
-.wpseopilot-panel__content { }
-.wpseopilot-panel--active { }
+.samanseo-panel { }
+.samanseo-panel__header { }
+.samanseo-panel__content { }
+.samanseo-panel--active { }
 
 /* Component-specific */
-.wpseopilot-search-preview { }
-.wpseopilot-search-preview__title { }
-.wpseopilot-search-preview__url { }
+.samanseo-search-preview { }
+.samanseo-search-preview__title { }
+.samanseo-search-preview__url { }
 ```

@@ -755,13 +755,14 @@ class Redirect_Manager {
 		global $wpdb;
 
 		// First, try exact match (non-regex redirects).
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				'SELECT * FROM ' . $this->table . ' WHERE source = %s AND is_regex = 0 LIMIT 1',
 				$request
 			)
 		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 
 		$target         = null;
 		$matched_source = $request;
@@ -777,10 +778,11 @@ class Redirect_Manager {
 
 		// If no exact match, try regex redirects.
 		if ( ! $row ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
 			$regex_redirects = $wpdb->get_results(
 				'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1'
 			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 
 			if ( $regex_redirects ) {
 				foreach ( $regex_redirects as $regex_row ) {

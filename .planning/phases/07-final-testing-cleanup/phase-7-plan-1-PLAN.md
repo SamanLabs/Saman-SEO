@@ -19,9 +19,9 @@ php -l saman-labs-seo.php
 
 ### Task 2: Check for remaining old prefixes
 Search for any lingering old brand references that should have been renamed:
-- `wpseopilot_` (lowercase with underscore)
-- `WPSEOPILOT_` (uppercase constants)
-- `WPSEOPilot` (class/namespace references)
+- `samanseo_` (lowercase with underscore)
+- `SAMANSEO_` (uppercase constants)
+- `SamanSEO` (class/namespace references)
 - `wp-seo-pilot` (slug references in strings)
 
 ### Task 3: Verify plugin activation works
@@ -89,7 +89,7 @@ Example commits:
 ## Success Criteria
 
 - [ ] All PHP files pass syntax check
-- [ ] No old prefixes remain (wpseopilot_, WPSEOPILOT_, WPSEOPilot)
+- [ ] No old prefixes remain (samanseo_, SAMANSEO_, SamanSEO)
 - [ ] Plugin activates/deactivates without errors
 - [ ] All feature toggles work correctly
 - [ ] AI graceful degradation works

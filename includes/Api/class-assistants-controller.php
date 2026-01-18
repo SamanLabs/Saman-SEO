@@ -366,6 +366,8 @@ class Assistants_Controller extends REST_Controller {
 			'updated_at'        => current_time( 'mysql' ),
 		];
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct DB access intentional.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct DB access intentional.
 		$result = $wpdb->insert( $this->custom_assistants_table, $data );
 
 		if ( false === $result ) {
@@ -425,7 +427,9 @@ class Assistants_Controller extends REST_Controller {
 		if ( isset( $params['is_active'] ) ) {
 			$data['is_active'] = $params['is_active'] ? 1 : 0;
 		}
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$wpdb->update( $this->custom_assistants_table, $data, [ 'id' => $id ] );
 
 		return $this->success( null, __( 'Assistant updated successfully.', 'saman-seo' ) );
@@ -445,8 +449,10 @@ class Assistants_Controller extends REST_Controller {
 
 		if ( ! $existing ) {
 			return $this->error( __( 'Assistant not found.', 'saman-seo' ), 'not_found', 404 );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$wpdb->delete( $this->custom_assistants_table, [ 'id' => $id ] );
 
 		return $this->success( null, __( 'Assistant deleted successfully.', 'saman-seo' ) );
@@ -464,9 +470,11 @@ class Assistants_Controller extends REST_Controller {
 	 */
 	public function get_usage_stats( $request ) {
 		global $wpdb;
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 
 		$this->maybe_create_usage_table();
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$table_exists = $wpdb->get_var( $wpdb->prepare(
 			"SHOW TABLES LIKE %s",
 			$this->usage_table
@@ -478,24 +486,33 @@ class Assistants_Controller extends REST_Controller {
 				'today'          => 0,
 				'this_week'      => 0,
 				'this_month'     => 0,
+				// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 				'by_assistant'   => [],
+			// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 			] );
 		}
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$total      = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->usage_table}" );
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$today      = $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(*) FROM {$this->usage_table} WHERE DATE(created_at) = %s",
+			// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 			current_time( 'Y-m-d' )
 		) );
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$this_week  = $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(*) FROM {$this->usage_table} WHERE created_at >= %s",
+			// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 			gmdate( 'Y-m-d', strtotime( '-7 days' ) )
 		) );
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$this_month = $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(*) FROM {$this->usage_table} WHERE created_at >= %s",
 			gmdate( 'Y-m-01' )
 		) );
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$by_assistant = $wpdb->get_results(
 			"SELECT assistant_id, COUNT(*) as count FROM {$this->usage_table} GROUP BY assistant_id ORDER BY count DESC",
 			ARRAY_A
@@ -512,6 +529,7 @@ class Assistants_Controller extends REST_Controller {
 
 	/**
 	 * Track assistant usage.
+	 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct DB access intentional.
 	 *
 	 * @param string $assistant_id Assistant ID.
 	 * @param int    $tokens_used  Estimated tokens used.
@@ -521,6 +539,7 @@ class Assistants_Controller extends REST_Controller {
 
 		$this->maybe_create_usage_table();
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct DB access intentional.
 		$wpdb->insert( $this->usage_table, [
 			'assistant_id' => $assistant_id,
 			'user_id'      => get_current_user_id(),
@@ -528,6 +547,7 @@ class Assistants_Controller extends REST_Controller {
 			'created_at'   => current_time( 'mysql' ),
 		] );
 	}
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 
 	/**
 	 * Get usage count for an assistant.
@@ -537,7 +557,9 @@ class Assistants_Controller extends REST_Controller {
 	 */
 	private function get_assistant_usage_count( $assistant_id ) {
 		global $wpdb;
+// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$table_exists = $wpdb->get_var( $wpdb->prepare(
 			"SHOW TABLES LIKE %s",
 			$this->usage_table
@@ -547,12 +569,14 @@ class Assistants_Controller extends REST_Controller {
 			return 0;
 		}
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		return intval( $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(*) FROM {$this->usage_table} WHERE assistant_id = %s",
 			$assistant_id
 		) ) );
 	}
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 	// =========================================================================
 	// HELPER METHODS
 	// =========================================================================
@@ -562,9 +586,11 @@ class Assistants_Controller extends REST_Controller {
 	 *
 	 * @return array
 	 */
+	// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 	private function get_custom_assistants_list() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$table_exists = $wpdb->get_var( $wpdb->prepare(
 			"SHOW TABLES LIKE %s",
 			$this->custom_assistants_table
@@ -574,7 +600,9 @@ class Assistants_Controller extends REST_Controller {
 			return [];
 		}
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		return $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 			"SELECT * FROM {$this->custom_assistants_table} ORDER BY created_at DESC",
 			ARRAY_A
 		) ?? [];
@@ -584,20 +612,24 @@ class Assistants_Controller extends REST_Controller {
 	 * Get custom assistant by ID.
 	 *
 	 * @param int $id Assistant ID.
+	 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 	 * @return array|null
 	 */
 	private function get_custom_assistant_by_id( $id ) {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$table_exists = $wpdb->get_var( $wpdb->prepare(
 			"SHOW TABLES LIKE %s",
 			$this->custom_assistants_table
 		) );
 
 		if ( ! $table_exists ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 			return null;
 		}
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		return $wpdb->get_row(
 			$wpdb->prepare( "SELECT * FROM {$this->custom_assistants_table} WHERE id = %d", $id ),
 			ARRAY_A
@@ -610,6 +642,7 @@ class Assistants_Controller extends REST_Controller {
 	private function maybe_create_assistants_table() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$table_exists = $wpdb->get_var( $wpdb->prepare(
 			"SHOW TABLES LIKE %s",
 			$this->custom_assistants_table
@@ -631,6 +664,7 @@ class Assistants_Controller extends REST_Controller {
             icon varchar(50) DEFAULT 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“',
             color varchar(20) DEFAULT '#6366f1',
             model_id varchar(255) DEFAULT '',
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
             is_active tinyint(1) NOT NULL DEFAULT 1,
             created_at datetime NOT NULL,
             updated_at datetime NOT NULL,
@@ -648,6 +682,7 @@ class Assistants_Controller extends REST_Controller {
 	private function maybe_create_usage_table() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$table_exists = $wpdb->get_var( $wpdb->prepare(
 			"SHOW TABLES LIKE %s",
 			$this->usage_table

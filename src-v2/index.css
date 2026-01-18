@@ -2121,6 +2121,13 @@ input:checked + .ai-generate-modal__checkbox-mark::after {
   border-color: rgba(139, 92, 246, 0.5);
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, #ffffff 100%);
 }
+.managed-plugin-card.coming-soon {
+  opacity: 0.85;
+  border-style: dashed;
+}
+.managed-plugin-card.coming-soon:hover {
+  opacity: 1;
+}
 .managed-plugin-header {
   display: flex;
   align-items: flex-start;
@@ -2289,6 +2296,11 @@ input:checked + .ai-generate-modal__checkbox-mark::after {
 .badge.beta {
   background: rgba(139, 92, 246, 0.16);
   color: #8b5cf6;
+}
+.badge.coming-soon {
+  background: rgba(107, 114, 128, 0.16);
+  color: #6b7280;
+  font-size: 11px;
 }
 .empty-state {
   text-align: center;

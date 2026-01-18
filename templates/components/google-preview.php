@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 $preview_title = $preview_title ?? get_bloginfo( 'name' );
 $preview_url = $preview_url ?? home_url();
 $preview_description = $preview_description ?? get_bloginfo( 'description' );
-$preview_domain = parse_url( home_url(), PHP_URL_HOST );
+$preview_domain = wp_parse_url( home_url(), PHP_URL_HOST );
 ?>
 
 <div class="saman-seo-google-preview">

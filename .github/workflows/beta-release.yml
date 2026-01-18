@@ -98,9 +98,7 @@ jobs:
 
           # Copy production files
           cp -r assets saman-seo/
-          cp -r build-v2 saman-seo/ 2>/dev/null || true
-          cp -r build-editor saman-seo/ 2>/dev/null || true
-          cp -r build-admin-list saman-seo/ 2>/dev/null || true
+          cp -r build saman-seo/
           cp -r includes saman-seo/
           cp -r languages saman-seo/ 2>/dev/null || mkdir -p saman-seo/languages
           cp saman-seo.php saman-seo/

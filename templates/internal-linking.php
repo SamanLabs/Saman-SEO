@@ -24,6 +24,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $tabs = [
 	'rules'      => __( 'Rules', 'saman-seo' ),
 	'new'        => __( 'Add Rule', 'saman-seo' ),
@@ -47,7 +49,7 @@ $current_rule = $rule_to_edit ?: $rule_defaults;
 
 	<h2 class="nav-tab-wrapper saman-seo-links__tabs">
 		<?php foreach ( $tabs as $tab => $label ) : ?>
-			<a href="<?php echo $tab_url( $tab ); ?>" class="nav-tab <?php echo ( $active_tab === $tab ) ? 'nav-tab-active' : ''; ?>">
+			<a href="<?php echo esc_url( $tab_url( $tab ) ); ?>" class="nav-tab <?php echo ( $active_tab === $tab ) ? 'nav-tab-active' : ''; ?>">
 				<?php echo esc_html( $label ); ?>
 			</a>
 		<?php endforeach; ?>

@@ -28,7 +28,7 @@ Saman SEO provides comprehensive XML sitemap functionality that:
 
 **Sitemap URL:** `https://yoursite.com/wp-sitemap.xml`
 
-**Location:** `includes/class-wpseopilot-service-sitemap-enhancer.php`, `includes/class-wpseopilot-service-sitemap-settings.php`
+**Location:** `includes/class-samanseo-service-sitemap-enhancer.php`, `includes/class-samanseo-service-sitemap-settings.php`
 
 ---
 
@@ -42,19 +42,19 @@ Navigate to **Saman SEO → Sitemaps** in your WordPress admin.
 
 ### Enable/Disable Sitemaps
 
-**Option:** `wpseopilot_sitemap_enabled`
+**Option:** `samanseo_sitemap_enabled`
 
 ```php
 // Via admin UI or programmatically
-update_option( 'wpseopilot_sitemap_enabled', '1' ); // Enable
-update_option( 'wpseopilot_sitemap_enabled', '0' ); // Disable
+update_option( 'samanseo_sitemap_enabled', '1' ); // Enable
+update_option( 'samanseo_sitemap_enabled', '0' ); // Disable
 ```
 
 ---
 
 ### Post Types
 
-**Option:** `wpseopilot_sitemap_post_types`
+**Option:** `samanseo_sitemap_post_types`
 
 Select which post types to include in the sitemap:
 
@@ -67,7 +67,7 @@ Select which post types to include in the sitemap:
 **Example:**
 
 ```php
-update_option( 'wpseopilot_sitemap_post_types', [
+update_option( 'samanseo_sitemap_post_types', [
     'post',
     'page',
     'product'
@@ -78,7 +78,7 @@ update_option( 'wpseopilot_sitemap_post_types', [
 
 ### Taxonomies
 
-**Option:** `wpseopilot_sitemap_taxonomies`
+**Option:** `samanseo_sitemap_taxonomies`
 
 Include category and tag archive pages:
 
@@ -89,7 +89,7 @@ Include category and tag archive pages:
 **Example:**
 
 ```php
-update_option( 'wpseopilot_sitemap_taxonomies', [
+update_option( 'samanseo_sitemap_taxonomies', [
     'category',
     'post_tag',
     'product_cat'
@@ -100,14 +100,14 @@ update_option( 'wpseopilot_sitemap_taxonomies', [
 
 ### Max URLs Per Sitemap
 
-**Option:** `wpseopilot_sitemap_max_urls`
+**Option:** `samanseo_sitemap_max_urls`
 
 Limit the number of URLs per sitemap page (Google recommends max 50,000).
 
 **Default:** 2000
 
 ```php
-update_option( 'wpseopilot_sitemap_max_urls', 2000 );
+update_option( 'samanseo_sitemap_max_urls', 2000 );
 ```
 
 ---
@@ -116,38 +116,38 @@ update_option( 'wpseopilot_sitemap_max_urls', 2000 );
 
 ### Sitemap Index
 
-**Option:** `wpseopilot_sitemap_enable_index`
+**Option:** `samanseo_sitemap_enable_index`
 
 Enable sitemap index for large sites (splits sitemaps by post type).
 
 **Default:** Enabled
 
 ```php
-update_option( 'wpseopilot_sitemap_enable_index', '1' );
+update_option( 'samanseo_sitemap_enable_index', '1' );
 ```
 
 ---
 
 ### Dynamic vs. Static Generation
 
-**Option:** `wpseopilot_sitemap_dynamic_generation`
+**Option:** `samanseo_sitemap_dynamic_generation`
 
 - **Dynamic (Default):** Sitemaps generated on-the-fly when requested
 - **Static:** Pre-generate and cache sitemaps
 
 ```php
 // Dynamic generation
-update_option( 'wpseopilot_sitemap_dynamic_generation', '1' );
+update_option( 'samanseo_sitemap_dynamic_generation', '1' );
 
 // Static generation (caching)
-update_option( 'wpseopilot_sitemap_dynamic_generation', '0' );
+update_option( 'samanseo_sitemap_dynamic_generation', '0' );
 ```
 
 ---
 
 ### Scheduled Updates
 
-**Option:** `wpseopilot_sitemap_schedule_updates`
+**Option:** `samanseo_sitemap_schedule_updates`
 
 Schedule automatic sitemap regeneration:
 
@@ -158,46 +158,46 @@ Schedule automatic sitemap regeneration:
 - `weekly` - Once per week
 
 ```php
-update_option( 'wpseopilot_sitemap_schedule_updates', 'daily' );
+update_option( 'samanseo_sitemap_schedule_updates', 'daily' );
 ```
 
 ---
 
 ### Include Author Pages
 
-**Option:** `wpseopilot_sitemap_include_author_pages`
+**Option:** `samanseo_sitemap_include_author_pages`
 
 Include author archive pages in sitemap.
 
 ```php
-update_option( 'wpseopilot_sitemap_include_author_pages', '1' );
+update_option( 'samanseo_sitemap_include_author_pages', '1' );
 ```
 
 ---
 
 ### Include Date Archives
 
-**Option:** `wpseopilot_sitemap_include_date_archives`
+**Option:** `samanseo_sitemap_include_date_archives`
 
 Include date-based archive pages (year, month, day).
 
 ```php
-update_option( 'wpseopilot_sitemap_include_date_archives', '1' );
+update_option( 'samanseo_sitemap_include_date_archives', '1' );
 ```
 
 ---
 
 ### Exclude Images
 
-**Option:** `wpseopilot_sitemap_exclude_images`
+**Option:** `samanseo_sitemap_exclude_images`
 
 Exclude images from sitemap (reduces file size).
 
 **Default:** Images are included
 
 ```php
-update_option( 'wpseopilot_sitemap_exclude_images', '0' ); // Include images
-update_option( 'wpseopilot_sitemap_exclude_images', '1' ); // Exclude images
+update_option( 'samanseo_sitemap_exclude_images', '0' ); // Include images
+update_option( 'samanseo_sitemap_exclude_images', '1' ); // Exclude images
 ```
 
 ---
@@ -232,7 +232,7 @@ Includes all public post types and taxonomies based on settings.
 
 ### 2. Google News Sitemap
 
-**Option:** `wpseopilot_sitemap_enable_google_news`
+**Option:** `samanseo_sitemap_enable_google_news`
 
 Special sitemap for Google News (includes only recent articles, typically last 2 days).
 
@@ -242,13 +242,13 @@ Special sitemap for Google News (includes only recent articles, typically last 2
 
 ```php
 // Enable Google News sitemap
-update_option( 'wpseopilot_sitemap_enable_google_news', '1' );
+update_option( 'samanseo_sitemap_enable_google_news', '1' );
 
 // Set publication name
-update_option( 'wpseopilot_sitemap_google_news_name', 'My News Site' );
+update_option( 'samanseo_sitemap_google_news_name', 'My News Site' );
 
 // Set post types to include
-update_option( 'wpseopilot_sitemap_google_news_post_types', [ 'post', 'news' ] );
+update_option( 'samanseo_sitemap_google_news_post_types', [ 'post', 'news' ] );
 ```
 
 **Example Output:**
@@ -275,21 +275,21 @@ update_option( 'wpseopilot_sitemap_google_news_post_types', [ 'post', 'news' ] )
 
 ### 3. RSS Feed Sitemap
 
-**Option:** `wpseopilot_sitemap_enable_rss`
+**Option:** `samanseo_sitemap_enable_rss`
 
 RSS-style sitemap for feed readers.
 
 **URL:** `https://yoursite.com/rss-sitemap.xml`
 
 ```php
-update_option( 'wpseopilot_sitemap_enable_rss', '1' );
+update_option( 'samanseo_sitemap_enable_rss', '1' );
 ```
 
 ---
 
 ### 4. Custom Pages
 
-**Option:** `wpseopilot_sitemap_additional_pages`
+**Option:** `samanseo_sitemap_additional_pages`
 
 Add custom URLs not managed by WordPress.
 
@@ -311,7 +311,7 @@ $custom_pages = [
     ]
 ];
 
-update_option( 'wpseopilot_sitemap_additional_pages', json_encode( $custom_pages ) );
+update_option( 'samanseo_sitemap_additional_pages', json_encode( $custom_pages ) );
 ```
 
 ---
@@ -320,10 +320,10 @@ update_option( 'wpseopilot_sitemap_additional_pages', json_encode( $custom_pages
 
 ### Filter Individual Sitemap Entries
 
-**Filter:** `wpseopilot_sitemap_entry`
+**Filter:** `samanseo_sitemap_entry`
 
 ```php
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // Set high priority for featured posts
     if ( get_post_meta( $post_id, '_is_featured', true ) ) {
         $entry['priority'] = 1.0;
@@ -358,10 +358,10 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type )
 
 ### Filter Sitemap Images
 
-**Filter:** `wpseopilot_sitemap_images`
+**Filter:** `samanseo_sitemap_images`
 
 ```php
-add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
+add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
     // Add product gallery images
     $gallery = get_post_meta( $post_id, '_product_gallery', true );
 
@@ -379,10 +379,10 @@ add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
 
 ### Filter Post Query Arguments
 
-**Filter:** `wpseopilot_sitemap_post_query_args`
+**Filter:** `samanseo_sitemap_post_query_args`
 
 ```php
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     // Only include in-stock products
     if ( $post_type === 'product' ) {
         $args['meta_query'] = [
@@ -404,10 +404,10 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 
 ### Filter Sitemap Index Items
 
-**Filter:** `wpseopilot_sitemap_index_items`
+**Filter:** `samanseo_sitemap_index_items`
 
 ```php
-add_filter( 'wpseopilot_sitemap_index_items', function( $items ) {
+add_filter( 'samanseo_sitemap_index_items', function( $items ) {
     // Add external sitemap to index
     $items[] = [
         'loc' => 'https://example.com/external-sitemap.xml',
@@ -422,10 +422,10 @@ add_filter( 'wpseopilot_sitemap_index_items', function( $items ) {
 
 ### Modify Last Modified Timestamp
 
-**Filter:** `wpseopilot_sitemap_lastmod`
+**Filter:** `samanseo_sitemap_lastmod`
 
 ```php
-add_filter( 'wpseopilot_sitemap_lastmod', function( $lastmod, $group, $page ) {
+add_filter( 'samanseo_sitemap_lastmod', function( $lastmod, $group, $page ) {
     // Force current timestamp for posts
     if ( $group === 'post' ) {
         return gmdate( 'c' );
@@ -439,21 +439,21 @@ add_filter( 'wpseopilot_sitemap_lastmod', function( $lastmod, $group, $page ) {
 
 ### Disable Core WordPress Sitemaps
 
-**Filter:** `wpseopilot_disable_core_sitemaps`
+**Filter:** `samanseo_disable_core_sitemaps`
 
 ```php
 // Keep core sitemaps enabled alongside Saman SEO
-add_filter( 'wpseopilot_disable_core_sitemaps', '__return_false' );
+add_filter( 'samanseo_disable_core_sitemaps', '__return_false' );
 ```
 
 ---
 
 ### Custom Sitemap Stylesheet
 
-**Filter:** `wpseopilot_sitemap_stylesheet`
+**Filter:** `samanseo_sitemap_stylesheet`
 
 ```php
-add_filter( 'wpseopilot_sitemap_stylesheet', function( $url ) {
+add_filter( 'samanseo_sitemap_stylesheet', function( $url ) {
     return get_stylesheet_directory_uri() . '/sitemap.xsl';
 });
 ```
@@ -467,7 +467,7 @@ add_filter( 'wpseopilot_sitemap_stylesheet', function( $url ) {
 For sites with 10,000+ URLs:
 
 ```php
-update_option( 'wpseopilot_sitemap_dynamic_generation', '0' );
+update_option( 'samanseo_sitemap_dynamic_generation', '0' );
 ```
 
 ---
@@ -475,7 +475,7 @@ update_option( 'wpseopilot_sitemap_dynamic_generation', '0' );
 ### 2. Limit URLs Per Page
 
 ```php
-update_option( 'wpseopilot_sitemap_max_urls', 1000 );
+update_option( 'samanseo_sitemap_max_urls', 1000 );
 ```
 
 ---
@@ -483,7 +483,7 @@ update_option( 'wpseopilot_sitemap_max_urls', 1000 );
 ### 3. Exclude Unnecessary Post Types
 
 ```php
-update_option( 'wpseopilot_sitemap_post_types', [ 'post', 'page' ] );
+update_option( 'samanseo_sitemap_post_types', [ 'post', 'page' ] );
 ```
 
 ---
@@ -491,7 +491,7 @@ update_option( 'wpseopilot_sitemap_post_types', [ 'post', 'page' ] );
 ### 4. Exclude Images for Faster Generation
 
 ```php
-update_option( 'wpseopilot_sitemap_exclude_images', '1' );
+update_option( 'samanseo_sitemap_exclude_images', '1' );
 ```
 
 ---
@@ -499,7 +499,7 @@ update_option( 'wpseopilot_sitemap_exclude_images', '1' );
 ### 5. Cache Sitemap Queries
 
 ```php
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     $args['cache_results'] = true;
     $args['update_post_meta_cache'] = false;
     $args['update_post_term_cache'] = false;
@@ -515,7 +515,7 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 Instead of on-demand generation, pre-generate sitemaps:
 
 ```php
-update_option( 'wpseopilot_sitemap_schedule_updates', 'hourly' );
+update_option( 'samanseo_sitemap_schedule_updates', 'hourly' );
 ```
 
 ---
@@ -532,7 +532,7 @@ Navigate to **Saman SEO → Sitemaps** and click **Regenerate Sitemap**.
 
 ```php
 // Trigger manual regeneration
-do_action( 'wpseopilot_sitemap_regenerated' );
+do_action( 'samanseo_sitemap_regenerated' );
 ```
 
 ---
@@ -542,7 +542,7 @@ do_action( 'wpseopilot_sitemap_regenerated' );
 While not directly available, you can trigger via PHP:
 
 ```bash
-wp eval 'do_action( "wpseopilot_sitemap_regenerated" );'
+wp eval 'do_action( "samanseo_sitemap_regenerated" );'
 ```
 
 ---
@@ -574,7 +574,7 @@ wp eval 'do_action( "wpseopilot_sitemap_regenerated" );'
 Automatically ping search engines when sitemap updates:
 
 ```php
-add_action( 'wpseopilot_sitemap_regenerated', function() {
+add_action( 'samanseo_sitemap_regenerated', function() {
     $sitemap_url = home_url( '/wp-sitemap.xml' );
 
     // Ping Google
@@ -619,7 +619,7 @@ wp rewrite flush
 **Debug:**
 
 ```php
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     error_log( 'Sitemap Query Args: ' . print_r( $args, true ) );
     return $args;
 }, 10, 2 );
@@ -633,14 +633,14 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 
 **Solution:**
 
-1. Reduce `wpseopilot_sitemap_max_urls`:
+1. Reduce `samanseo_sitemap_max_urls`:
    ```php
-   update_option( 'wpseopilot_sitemap_max_urls', 1000 );
+   update_option( 'samanseo_sitemap_max_urls', 1000 );
    ```
 
 2. Exclude images:
    ```php
-   update_option( 'wpseopilot_sitemap_exclude_images', '1' );
+   update_option( 'samanseo_sitemap_exclude_images', '1' );
    ```
 
 3. Split by post type (enable sitemap index)
@@ -651,14 +651,14 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 
 **Check:**
 
-1. `wpseopilot_sitemap_exclude_images` is set to `0`
+1. `samanseo_sitemap_exclude_images` is set to `0`
 2. Posts have featured images
 3. Image URLs are valid
 
 **Add custom images:**
 
 ```php
-add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
+add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
     // Add first gallery image
     $gallery = get_post_gallery_images( $post_id );
     if ( ! empty( $gallery ) ) {

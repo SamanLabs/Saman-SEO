@@ -1,7 +1,7 @@
 /**
  * Saman SEO Breadcrumbs Block
  *
- * @package WPSEOPilot
+ * @package SamanSEO
  */
 
 ( function( blocks, element, blockEditor, components, serverSideRender, i18n ) {

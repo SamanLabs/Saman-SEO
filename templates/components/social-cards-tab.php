@@ -119,7 +119,10 @@ $module_enabled = '1' === get_option( 'SAMAN_SEO_enable_og_preview', '1' );
 									type="radio"
 									name="SAMAN_SEO_social_card_design[layout]"
 									value="<?php echo esc_attr( $layout_key ); ?>"
-									<?php echo $checked; ?>
+									<?php
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- checked() returns safe HTML.
+									echo $checked;
+									?>
 								/>
 								<div class="saman-seo-layout-option__content">
 									<strong><?php echo esc_html( $layout_info['label'] ); ?></strong>

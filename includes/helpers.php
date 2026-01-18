@@ -483,15 +483,19 @@ namespace Saman\SEO\Helpers {
 			$title_status = \__( 'Add a meta title for this post.', 'saman-seo' );
 		} elseif ( $title_length < 30 ) {
 			$title_score  = 5;
+			// translators: %d is the count
 			$title_status = sprintf( \__( 'Length: %d chars (too short, aim for 50-60).', 'saman-seo' ), $title_length );
 		} elseif ( $title_length <= 60 ) {
 			$title_score  = 10;
+			// translators: %d is the count
 			$title_status = sprintf( \__( 'Length: %d chars (ideal).', 'saman-seo' ), $title_length );
 		} elseif ( $title_length <= 70 ) {
 			$title_score  = 8;
+			// translators: %d is the count
 			$title_status = sprintf( \__( 'Length: %d chars (slightly long).', 'saman-seo' ), $title_length );
 		} else {
 			$title_score  = 5;
+			// translators: %d is the count
 			$title_status = sprintf( \__( 'Length: %d chars (too long, may truncate).', 'saman-seo' ), $title_length );
 		}
 
@@ -514,15 +518,19 @@ namespace Saman\SEO\Helpers {
 			$desc_status = \__( 'Add a custom meta description.', 'saman-seo' );
 		} elseif ( $desc_length < 80 ) {
 			$desc_score  = 5;
+			// translators: %d is the count
 			$desc_status = sprintf( \__( 'Length: %d chars (extend toward 120-155).', 'saman-seo' ), $desc_length );
 		} elseif ( $desc_length <= 155 ) {
 			$desc_score  = 10;
+			// translators: %d is the count
 			$desc_status = sprintf( \__( 'Length: %d chars (ideal).', 'saman-seo' ), $desc_length );
 		} elseif ( $desc_length <= 180 ) {
 			$desc_score  = 8;
+			// translators: %d is the count
 			$desc_status = sprintf( \__( 'Length: %d chars (trim slightly).', 'saman-seo' ), $desc_length );
 		} else {
 			$desc_score  = 5;
+			// translators: %d is the count
 			$desc_status = sprintf( \__( 'Length: %d chars (too long, will truncate).', 'saman-seo' ), $desc_length );
 		}
 
@@ -560,15 +568,19 @@ namespace Saman\SEO\Helpers {
 		// 4. Content length (max 12 pts).
 		if ( $word_count < 100 ) {
 			$content_score  = 0;
+			// translators: %d is the word count
 			$content_status = sprintf( \__( '%d words (add more content, aim for 300+).', 'saman-seo' ), $word_count );
 		} elseif ( $word_count < 300 ) {
 			$content_score  = 6;
+			// translators: %d is the word count
 			$content_status = sprintf( \__( '%d words (thin content, aim for 300+).', 'saman-seo' ), $word_count );
 		} elseif ( $word_count < 600 ) {
 			$content_score  = 10;
+			// translators: %d is the word count
 			$content_status = sprintf( \__( '%d words (good length).', 'saman-seo' ), $word_count );
 		} else {
 			$content_score  = 12;
+			// translators: %d is the word count
 			$content_status = sprintf( \__( '%d words (comprehensive).', 'saman-seo' ), $word_count );
 		}
 
@@ -649,18 +661,23 @@ namespace Saman\SEO\Helpers {
 			$density = calculate_keyphrase_density( $content_text, $focus_keyphrase, $word_count );
 			if ( $density < 0.3 ) {
 				$density_score  = 0;
+				// translators: Placeholder values
 				$density_status = sprintf( \__( 'Density: %.1f%% (too low, aim for 0.5-2.5%%).', 'saman-seo' ), $density );
 			} elseif ( $density < 0.5 ) {
 				$density_score  = 3;
+				// translators: Placeholder values
 				$density_status = sprintf( \__( 'Density: %.1f%% (slightly low).', 'saman-seo' ), $density );
 			} elseif ( $density <= 2.5 ) {
 				$density_score  = 6;
+				// translators: Placeholder values
 				$density_status = sprintf( \__( 'Density: %.1f%% (ideal range).', 'saman-seo' ), $density );
 			} elseif ( $density <= 3.5 ) {
 				$density_score  = 3;
+				// translators: Placeholder values
 				$density_status = sprintf( \__( 'Density: %.1f%% (slightly high).', 'saman-seo' ), $density );
 			} else {
 				$density_score  = 0;
+				// translators: Placeholder values
 				$density_status = sprintf( \__( 'Density: %.1f%% (keyword stuffing risk).', 'saman-seo' ), $density );
 			}
 
@@ -736,7 +753,9 @@ namespace Saman\SEO\Helpers {
 
 				$metrics[] = [
 					'key'         => 'secondary_keyphrase_' . ( $idx + 1 ),
+					// translators: Placeholder values
 					'label'       => sprintf( \__( 'Secondary: "%s"', 'saman-seo' ), $sec_keyphrase ),
+					// translators: Placeholder values
 					'issue_label' => sprintf( \__( 'Secondary #%d', 'saman-seo' ), $idx + 1 ),
 					'status'      => $sec_status,
 					'score'       => 0, // Informational only.
@@ -762,9 +781,11 @@ namespace Saman\SEO\Helpers {
 			$h2_status = \__( '1 H2 heading found. Consider adding more.', 'saman-seo' );
 		} elseif ( $h2_count <= 5 ) {
 			$h2_score  = 8;
+			// translators: %d is the count
 			$h2_status = sprintf( \__( '%d H2 headings (well structured).', 'saman-seo' ), $h2_count );
 		} else {
 			$h2_score  = 6;
+			// translators: %d is the count
 			$h2_status = sprintf( \__( '%d H2 headings (many sections).', 'saman-seo' ), $h2_count );
 		}
 
@@ -788,9 +809,11 @@ namespace Saman\SEO\Helpers {
 			$h3_status = \__( 'No H3 headings. Consider adding for longer content.', 'saman-seo' );
 		} elseif ( $h3_count <= 6 ) {
 			$h3_score  = 7;
+			// translators: %d is the count
 			$h3_status = sprintf( \__( '%d H3 headings (good detail).', 'saman-seo' ), $h3_count );
 		} else {
 			$h3_score  = 5;
+			// translators: %d is the count
 			$h3_status = sprintf( \__( '%d H3 headings (many subsections).', 'saman-seo' ), $h3_count );
 		}
 
@@ -847,9 +870,11 @@ namespace Saman\SEO\Helpers {
 			$int_link_status = \__( '1 internal link found ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â add more.', 'saman-seo' );
 		} elseif ( $internal_links <= 3 ) {
 			$int_link_score  = 6;
+			// translators: %d is the count
 			$int_link_status = sprintf( \__( '%d internal links ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â good start.', 'saman-seo' ), $internal_links );
 		} else {
 			$int_link_score  = 8;
+			// translators: %d is the count
 			$int_link_status = sprintf( \__( '%d internal links (excellent).', 'saman-seo' ), $internal_links );
 		}
 
@@ -873,9 +898,11 @@ namespace Saman\SEO\Helpers {
 			$ext_link_status = \__( 'No external links. Consider citing sources.', 'saman-seo' );
 		} elseif ( $external_links <= 3 ) {
 			$ext_link_score  = 4;
+			// translators: %d is the count
 			$ext_link_status = sprintf( \__( '%d external link(s) (good for credibility).', 'saman-seo' ), $external_links );
 		} else {
 			$ext_link_score  = 3;
+			// translators: %d is the count
 			$ext_link_status = sprintf( \__( '%d external links (watch link equity).', 'saman-seo' ), $external_links );
 		}
 
@@ -913,10 +940,13 @@ namespace Saman\SEO\Helpers {
 			$coverage  = $images_with_alt / max( 1, $images_total );
 			$alt_score = (int) round( 3 * $coverage );
 			if ( $coverage >= 0.9 ) {
+				// translators: Placeholders are numbered parameters
 				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images (great).', 'saman-seo' ), $images_with_alt, $images_total );
 			} elseif ( $coverage >= 0.5 ) {
+				// translators: Placeholders are numbered parameters
 				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â add more.', 'saman-seo' ), $images_with_alt, $images_total );
 			} else {
+				// translators: Placeholders are numbered parameters
 				$alt_status = sprintf( \__( 'Only %1$d of %2$d images have alt text.', 'saman-seo' ), $images_with_alt, $images_total );
 			}
 		}

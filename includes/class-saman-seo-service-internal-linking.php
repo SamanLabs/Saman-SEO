@@ -190,6 +190,7 @@ class Internal_Linking {
 					'previewRunning'  => __( 'Generating previewÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦', 'saman-seo' ),
 					'previewEmpty'    => __( 'No replacements found.', 'saman-seo' ),
 					'previewError'    => __( 'Unable to run preview.', 'saman-seo' ),
+					// translators: Placeholder values
 					'previewSuccess'  => __( 'Preview complete: %d replacement(s).', 'saman-seo' ),
 					'save_success'    => __( 'Rule saved.', 'saman-seo' ),
 					'category_prompt' => __( 'Provide a category name to continue.', 'saman-seo' ),
@@ -410,6 +411,7 @@ class Internal_Linking {
 		$affected = $this->repository->bulk_update_rules( $rule_ids, $action );
 
 		if ( $affected > 0 ) {
+			/* translators: %d: number of rules updated */
 			$message = sprintf( _n( '%d rule updated.', '%d rules updated.', $affected, 'saman-seo' ), $affected );
 			$this->flash_notice( $message );
 		}

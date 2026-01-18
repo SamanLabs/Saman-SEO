@@ -9,8 +9,8 @@
 
 - Rename `wp-seo-pilot.php` → `saman-labs-seo.php`
 - Update plugin header metadata
-- Rename constants `WPSEOPILOT_*` → `SAMANLABS_SEO_*`
-- Update root namespace `WPSEOPilot` → `SamanLabs\SEO`
+- Rename constants `SAMANSEO_*` → `SAMANLABS_SEO_*`
+- Update root namespace `SamanSEO` → `SamanLabs\SEO`
 - Update autoloader paths and mappings
 
 **Research needed:** No — straightforward file/string changes
@@ -20,7 +20,7 @@
 ### Phase 2: PHP Classes & Services Rebrand
 **Goal:** Rename all PHP class files and update internal references
 
-- Rename all `class-wpseopilot-*` files → `class-samanlabs-seo-*`
+- Rename all `class-samanseo-*` files → `class-samanlabs-seo-*`
 - Update class names in service layer
 - Update API controller namespaces
 - Update integration class names
@@ -33,9 +33,9 @@
 ### Phase 3: Database & Options Rebrand
 **Goal:** Rename all database tables, options, and post meta keys
 
-- Rename tables: `wp_wpseopilot_*` → `wp_samanlabs_seo_*`
-- Rename options: `wpseopilot_*` → `samanlabs_seo_*`
-- Rename post meta: `_wpseopilot_meta` → `_samanlabs_seo_meta`
+- Rename tables: `wp_samanseo_*` → `wp_samanlabs_seo_*`
+- Rename options: `samanseo_*` → `samanlabs_seo_*`
+- Rename post meta: `_samanseo_meta` → `_samanlabs_seo_meta`
 - Update all database queries and option references
 
 **Research needed:** No — systematic changes, can reinstall fresh
@@ -45,11 +45,11 @@
 ### Phase 4: REST API & Frontend Rebrand
 **Goal:** Update REST namespace, CSS classes, hooks, and React paths
 
-- Change REST namespace: `wpseopilot/v2` → `samanlabs-seo/v1`
+- Change REST namespace: `samanseo/v2` → `samanlabs-seo/v1`
 - Update all React `apiFetch` paths
-- Rename CSS classes: `.wpseopilot-*` → `.samanlabs-seo-*`
+- Rename CSS classes: `.samanseo-*` → `.samanlabs-seo-*`
 - Update LESS source files
-- Rename hooks: `wpseopilot_*` → `samanlabs_seo_*`
+- Rename hooks: `samanseo_*` → `samanlabs_seo_*`
 - Rebuild all assets
 
 **Research needed:** No — systematic changes

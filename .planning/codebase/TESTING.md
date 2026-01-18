@@ -159,7 +159,7 @@ tests/
 
 | Pattern | Location | Benefit |
 |---------|----------|---------|
-| Service Container | `class-wpseopilot-plugin.php` | Easy to mock services |
+| Service Container | `class-samanseo-plugin.php` | Easy to mock services |
 | Abstract Base Classes | `class-rest-controller.php` | Interface contracts |
 | Helper Functions | `helpers.php` | Isolated, testable units |
 | Dependency Injection | Some services | Swappable dependencies |
@@ -220,10 +220,10 @@ tests/
 /**
  * Tests for helper functions.
  *
- * @package WPSEOPilot\Tests
+ * @package SamanSEO\Tests
  */
 
-namespace WPSEOPilot\Tests\Unit;
+namespace SamanSEO\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
@@ -235,7 +235,7 @@ class HelpersTest extends TestCase {
         $default = 'test_default';
 
         // Act
-        $result = \WPSEOPilot\Helpers\get_option( $key, $default );
+        $result = \SamanSEO\Helpers\get_option( $key, $default );
 
         // Assert
         $this->assertEquals( $default, $result );
@@ -247,7 +247,7 @@ class HelpersTest extends TestCase {
         $context = [ 'title' => 'My Post' ];
 
         // Act
-        $result = \WPSEOPilot\Helpers\replace_template_variables( $template, $context );
+        $result = \SamanSEO\Helpers\replace_template_variables( $template, $context );
 
         // Assert
         $this->assertStringContainsString( 'My Post', $result );

@@ -22,7 +22,7 @@ Complete reference for all Saman SEO filters with practical examples.
 
 ## Global SEO Output
 
-### `wpseopilot_title`
+### `samanseo_title`
 
 Modify the SEO title output in the `<title>` tag.
 
@@ -32,7 +32,7 @@ Modify the SEO title output in the `<title>` tag.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     // Append site branding to product titles
     if ( is_singular( 'product' ) ) {
         return $title . ' | ' . get_bloginfo( 'name' );
@@ -41,7 +41,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 ```
 
-### `wpseopilot_description`
+### `samanseo_description`
 
 Modify the meta description tag content.
 
@@ -51,7 +51,7 @@ Modify the meta description tag content.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_description', function( $desc, $post ) {
+add_filter( 'samanseo_description', function( $desc, $post ) {
     // Force specific description for homepage
     if ( is_front_page() ) {
         return 'Welcome to our platform - the best solution for your needs.';
@@ -60,7 +60,7 @@ add_filter( 'wpseopilot_description', function( $desc, $post ) {
 }, 10, 2 );
 ```
 
-### `wpseopilot_canonical`
+### `samanseo_canonical`
 
 Modify or suppress the canonical URL.
 
@@ -70,7 +70,7 @@ Modify or suppress the canonical URL.
 **Example:**
 ```php
 // Remove canonical for specific post types
-add_filter( 'wpseopilot_canonical', function( $url ) {
+add_filter( 'samanseo_canonical', function( $url ) {
     if ( is_post_type_archive( 'private_docs' ) ) {
         return false; // Suppress canonical
     }
@@ -78,12 +78,12 @@ add_filter( 'wpseopilot_canonical', function( $url ) {
 });
 
 // Force HTTPS canonical
-add_filter( 'wpseopilot_canonical', function( $url ) {
+add_filter( 'samanseo_canonical', function( $url ) {
     return str_replace( 'http://', 'https://', $url );
 });
 ```
 
-### `wpseopilot_robots`
+### `samanseo_robots`
 
 Modify the robots meta tag directives (string format).
 
@@ -92,7 +92,7 @@ Modify the robots meta tag directives (string format).
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_robots', function( $robots ) {
+add_filter( 'samanseo_robots', function( $robots ) {
     // Force noindex on staging
     if ( defined( 'WP_ENV' ) && WP_ENV === 'staging' ) {
         return 'noindex, nofollow';
@@ -111,7 +111,7 @@ Modify SEO elements based on post ID, post type, or other contextual data.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     // Custom title for specific post
     if ( $post && $post->ID === 123 ) {
         return 'Special Landing Page Title';
@@ -128,7 +128,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
     return $title;
 }, 10, 2 );
 
-add_filter( 'wpseopilot_description', function( $desc, $post ) {
+add_filter( 'samanseo_description', function( $desc, $post ) {
     // Pull description from custom field
     if ( $post && get_post_meta( $post->ID, 'custom_seo_desc', true ) ) {
         return get_post_meta( $post->ID, 'custom_seo_desc', true );
@@ -141,7 +141,7 @@ add_filter( 'wpseopilot_description', function( $desc, $post ) {
 
 ## Robots & Indexing
 
-### `wpseopilot_robots_array`
+### `samanseo_robots_array`
 
 Modify robots directives as an array (more flexible than string format).
 
@@ -150,7 +150,7 @@ Modify robots directives as an array (more flexible than string format).
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_robots_array', function( $robots ) {
+add_filter( 'samanseo_robots_array', function( $robots ) {
     // Noindex all author archives
     if ( is_author() ) {
         $robots[] = 'noindex';
@@ -162,7 +162,7 @@ add_filter( 'wpseopilot_robots_array', function( $robots ) {
 });
 
 // Conditional indexing based on custom field
-add_filter( 'wpseopilot_robots_array', function( $robots ) {
+add_filter( 'samanseo_robots_array', function( $robots ) {
     if ( is_singular() ) {
         $post = get_queried_object();
         if ( get_post_meta( $post->ID, 'hide_from_search', true ) ) {
@@ -182,7 +182,7 @@ add_filter( 'wpseopilot_robots_array', function( $robots ) {
 **Example:**
 ```php
 // Canonical for paginated archives
-add_filter( 'wpseopilot_canonical', function( $url ) {
+add_filter( 'samanseo_canonical', function( $url ) {
     if ( is_paged() && is_category() ) {
         // Point paginated pages to page 1
         $category = get_queried_object();
@@ -192,7 +192,7 @@ add_filter( 'wpseopilot_canonical', function( $url ) {
 });
 
 // Custom canonical for translated content
-add_filter( 'wpseopilot_canonical', function( $url ) {
+add_filter( 'samanseo_canonical', function( $url ) {
     if ( function_exists( 'pll_current_language' ) ) {
         $lang = pll_current_language();
         if ( $lang !== 'en' ) {
@@ -216,7 +216,7 @@ add_filter( 'wpseopilot_canonical', function( $url ) {
 
 ```php
 // Override OG title
-add_filter( 'wpseopilot_og_title', function( $title, $post ) {
+add_filter( 'samanseo_og_title', function( $title, $post ) {
     if ( is_singular( 'event' ) ) {
         $event_date = get_post_meta( $post->ID, 'event_date', true );
         return $title . ' - ' . date( 'M j, Y', strtotime( $event_date ) );
@@ -225,7 +225,7 @@ add_filter( 'wpseopilot_og_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Override OG description
-add_filter( 'wpseopilot_og_description', function( $desc, $post ) {
+add_filter( 'samanseo_og_description', function( $desc, $post ) {
     if ( is_singular( 'product' ) ) {
         return 'Shop now and save! ' . $desc;
     }
@@ -233,13 +233,13 @@ add_filter( 'wpseopilot_og_description', function( $desc, $post ) {
 }, 10, 2 );
 
 // Override OG URL
-add_filter( 'wpseopilot_og_url', function( $url, $post ) {
+add_filter( 'samanseo_og_url', function( $url, $post ) {
     // Add tracking parameters
     return add_query_arg( 'utm_source', 'facebook', $url );
 }, 10, 2 );
 
 // Override OG type
-add_filter( 'wpseopilot_og_type', function( $type, $post ) {
+add_filter( 'samanseo_og_type', function( $type, $post ) {
     if ( is_singular( 'event' ) ) {
         return 'event';
     }
@@ -250,7 +250,7 @@ add_filter( 'wpseopilot_og_type', function( $type, $post ) {
 }, 10, 2 );
 
 // Override OG image
-add_filter( 'wpseopilot_og_image', function( $image, $post ) {
+add_filter( 'samanseo_og_image', function( $image, $post ) {
     // Use custom field image
     if ( $post ) {
         $custom_img = get_post_meta( $post->ID, 'social_share_image', true );
@@ -268,19 +268,19 @@ add_filter( 'wpseopilot_og_image', function( $image, $post ) {
 
 ```php
 // Override Twitter title
-add_filter( 'wpseopilot_twitter_title', function( $title ) {
+add_filter( 'samanseo_twitter_title', function( $title ) {
     // Shorten for Twitter's display
     return wp_trim_words( $title, 10, '...' );
 });
 
 // Override Twitter description
-add_filter( 'wpseopilot_twitter_description', function( $desc ) {
+add_filter( 'samanseo_twitter_description', function( $desc ) {
     // Ensure under 200 characters
     return mb_substr( $desc, 0, 200 );
 });
 
 // Override Twitter image
-add_filter( 'wpseopilot_twitter_image', function( $img ) {
+add_filter( 'samanseo_twitter_image', function( $img ) {
     if ( empty( $img ) ) {
         return get_template_directory_uri() . '/assets/default-twitter-card.jpg';
     }
@@ -292,13 +292,13 @@ add_filter( 'wpseopilot_twitter_image', function( $img ) {
 
 ## Schema / Structured Data
 
-### `wpseopilot_jsonld`
+### `samanseo_jsonld`
 
 Filter the entire structured data graph before output.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_jsonld', function( $graph ) {
+add_filter( 'samanseo_jsonld', function( $graph ) {
     // Add organization schema
     $graph[] = [
         '@type' => 'Organization',
@@ -319,13 +319,13 @@ add_filter( 'wpseopilot_jsonld', function( $graph ) {
 });
 ```
 
-### `wpseopilot_schema_webpage`
+### `samanseo_schema_webpage`
 
 Modify WebPage schema specifically.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_schema_webpage', function( $data ) {
+add_filter( 'samanseo_schema_webpage', function( $data ) {
     if ( is_singular( 'tutorial' ) ) {
         $data['@type'] = 'TechArticle';
         $data['proficiencyLevel'] = 'Beginner';
@@ -334,13 +334,13 @@ add_filter( 'wpseopilot_schema_webpage', function( $data ) {
 });
 ```
 
-### `wpseopilot_schema_article`
+### `samanseo_schema_article`
 
 Modify Article schema specifically.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_schema_article', function( $data ) {
+add_filter( 'samanseo_schema_article', function( $data ) {
     $post = get_queried_object();
     
     // Add word count
@@ -358,7 +358,7 @@ add_filter( 'wpseopilot_schema_article', function( $data ) {
 
 ## Breadcrumbs
 
-### `wpseopilot_breadcrumb_links`
+### `samanseo_breadcrumb_links`
 
 Modify the breadcrumb trail array.
 
@@ -367,7 +367,7 @@ Modify the breadcrumb trail array.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_breadcrumb_links', function( $links ) {
+add_filter( 'samanseo_breadcrumb_links', function( $links ) {
     // Insert custom breadcrumb after home
     array_splice( $links, 1, 0, [
         [
@@ -380,7 +380,7 @@ add_filter( 'wpseopilot_breadcrumb_links', function( $links ) {
 });
 
 // Remove category from breadcrumbs
-add_filter( 'wpseopilot_breadcrumb_links', function( $links ) {
+add_filter( 'samanseo_breadcrumb_links', function( $links ) {
     return array_filter( $links, function( $link ) {
         return ! str_contains( $link['url'], '/category/' );
     });
@@ -391,13 +391,13 @@ add_filter( 'wpseopilot_breadcrumb_links', function( $links ) {
 
 ## XML Sitemaps
 
-### `wpseopilot_sitemap_map`
+### `samanseo_sitemap_map`
 
 Modify which post types, taxonomies, or custom groups appear in the sitemap index.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_sitemap_map', function( $map ) {
+add_filter( 'samanseo_sitemap_map', function( $map ) {
     // Remove private post type
     foreach ( $map as $key => $group ) {
         if ( 'private_docs' === $group['subtype'] ) {
@@ -416,7 +416,7 @@ add_filter( 'wpseopilot_sitemap_map', function( $map ) {
 });
 ```
 
-### `wpseopilot_sitemap_post_query_args`
+### `samanseo_sitemap_post_query_args`
 
 Modify WP_Query arguments for sitemap generation.
 
@@ -426,7 +426,7 @@ Modify WP_Query arguments for sitemap generation.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     // Exclude specific posts
     if ( 'post' === $post_type ) {
         $args['post__not_in'] = [ 123, 456, 789 ];
@@ -445,7 +445,7 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 }, 10, 2 );
 ```
 
-### `wpseopilot_sitemap_entry`
+### `samanseo_sitemap_entry`
 
 Modify individual sitemap entries (priority, changefreq, images, etc.).
 
@@ -456,7 +456,7 @@ Modify individual sitemap entries (priority, changefreq, images, etc.).
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // High priority for featured posts
     if ( get_post_meta( $post_id, 'featured', true ) ) {
         $entry['priority'] = 1.0;
@@ -480,7 +480,7 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type )
 }, 10, 3 );
 ```
 
-### `wpseopilot_sitemap_images`
+### `samanseo_sitemap_images`
 
 Customize image entries for a specific post.
 
@@ -490,7 +490,7 @@ Customize image entries for a specific post.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
+add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
     // Add CDN version of featured image
     $featured_id = get_post_thumbnail_id( $post_id );
     if ( $featured_id ) {
@@ -504,24 +504,24 @@ add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
 }, 10, 2 );
 ```
 
-### `wpseopilot_sitemap_max_urls`
+### `samanseo_sitemap_max_urls`
 
 Change the maximum number of URLs per sitemap page.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_sitemap_max_urls', function( $max ) {
+add_filter( 'samanseo_sitemap_max_urls', function( $max ) {
     return 500; // Reduce from default 1000
 });
 ```
 
-### `wpseopilot_sitemap_excluded_terms`
+### `samanseo_sitemap_excluded_terms`
 
 Exclude specific taxonomy terms from sitemaps.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_sitemap_excluded_terms', function( $excluded ) {
+add_filter( 'samanseo_sitemap_excluded_terms', function( $excluded ) {
     $excluded[] = 'uncategorized';
     $excluded[] = 'private';
     return $excluded;
@@ -532,7 +532,7 @@ add_filter( 'wpseopilot_sitemap_excluded_terms', function( $excluded ) {
 
 ## Feature Toggles
 
-### `wpseopilot_feature_toggle`
+### `samanseo_feature_toggle`
 
 Enable or disable specific plugin features.
 
@@ -548,7 +548,7 @@ Enable or disable specific plugin features.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
     // Disable sitemaps (using another plugin)
     if ( 'sitemaps' === $feature ) {
         return false;
@@ -567,13 +567,13 @@ add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
 
 ## Social Meta Tags
 
-### `wpseopilot_social_tags`
+### `samanseo_social_tags`
 
 Filter the complete social meta tag array (supports duplicates).
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_social_tags', function( $tags ) {
+add_filter( 'samanseo_social_tags', function( $tags ) {
     // Add multiple OG images
     $tags['og:image'] = array_filter([
         $tags['og:image'] ?? '',
@@ -597,13 +597,13 @@ add_filter( 'wpseopilot_social_tags', function( $tags ) {
 });
 ```
 
-### `wpseopilot_social_multi_tags`
+### `samanseo_social_multi_tags`
 
 Control which social tags can appear multiple times.
 
 **Example:**
 ```php
-add_filter( 'wpseopilot_social_multi_tags', function( $multi_tags ) {
+add_filter( 'samanseo_social_multi_tags', function( $multi_tags ) {
     // Allow multiple authors
     $multi_tags[] = 'article:author';
     return $multi_tags;
@@ -640,14 +640,14 @@ function get_custom_seo_data( $post_id ) {
     return $cache[ $post_id ];
 }
 
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( ! $post ) return $title;
     
     $custom = get_custom_seo_data( $post->ID );
     return ! empty( $custom['title'] ) ? $custom['title'] : $title;
 }, 10, 2 );
 
-add_filter( 'wpseopilot_og_image', function( $image, $post ) {
+add_filter( 'samanseo_og_image', function( $image, $post ) {
     if ( ! $post ) return $image;
     
     $custom = get_custom_seo_data( $post->ID );
@@ -658,7 +658,7 @@ add_filter( 'wpseopilot_og_image', function( $image, $post ) {
 ### Multilingual SEO
 
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( function_exists( 'pll_current_language' ) ) {
         $lang = pll_current_language();
         $translations = [
@@ -690,8 +690,8 @@ When multiple filters may conflict, use priority values strategically:
 **Example:**
 ```php
 // Run before most other filters
-add_filter( 'wpseopilot_title', 'my_early_title_mod', 5, 2 );
+add_filter( 'samanseo_title', 'my_early_title_mod', 5, 2 );
 
 // Run after most other filters
-add_filter( 'wpseopilot_title', 'my_final_title_mod', 50, 2 );
+add_filter( 'samanseo_title', 'my_final_title_mod', 50, 2 );
 ```

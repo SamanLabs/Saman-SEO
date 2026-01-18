@@ -37,11 +37,11 @@ jobs:
           # Update Version header
           sed -i "s/^\(\s*\*\s*Version:\s*\)[0-9]\+\.[0-9]\+\.[0-9]\+/\1$VERSION/" saman-seo.php
 
-          # Update WPSEOPILOT_VERSION constant
-          sed -i "s/define( 'WPSEOPILOT_VERSION', '[^']*' );/define( 'WPSEOPILOT_VERSION', '$VERSION' );/" saman-seo.php
+          # Update SAMANSEO_VERSION constant
+          sed -i "s/define( 'SAMANSEO_VERSION', '[^']*' );/define( 'SAMANSEO_VERSION', '$VERSION' );/" saman-seo.php
 
           echo "Updated plugin to version $VERSION"
-          grep -E "(Version:|WPSEOPILOT_VERSION)" saman-seo.php | head -2
+          grep -E "(Version:|SAMANSEO_VERSION)" saman-seo.php | head -2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -61,9 +61,7 @@ jobs:
 
           # Copy production files
           cp -r assets saman-seo/
-          cp -r build-v2 saman-seo/ 2>/dev/null || true
-          cp -r build-editor saman-seo/ 2>/dev/null || true
-          cp -r build-admin-list saman-seo/ 2>/dev/null || true
+          cp -r build saman-seo/
           cp -r includes saman-seo/
           cp -r languages saman-seo/ 2>/dev/null || mkdir -p saman-seo/languages
           cp saman-seo.php saman-seo/

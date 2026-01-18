@@ -32,9 +32,9 @@ Saman SEO's Internal Linking Engine automatically inserts contextual internal li
 **Location:** Navigate to **Saman SEO → Internal Linking**
 
 **Files:**
-- `includes/class-wpseopilot-service-internal-linking.php`
-- `includes/class-wpseopilot-internal-linking-engine.php`
-- `includes/class-wpseopilot-internal-linking-repository.php`
+- `includes/class-samanseo-service-internal-linking.php`
+- `includes/class-samanseo-internal-linking-engine.php`
+- `includes/class-samanseo-internal-linking-repository.php`
 
 ---
 
@@ -535,7 +535,7 @@ Track with UTM parameters:
 ### Get All Rules
 
 ```php
-$linking_service = \WPSEOPilot\Plugin::get_instance()->get_service( 'internal_linking' );
+$linking_service = \SamanSEO\Plugin::get_instance()->get_service( 'internal_linking' );
 $repository = $linking_service->get_repository();
 
 $rules = $repository->get_rules();
@@ -590,7 +590,7 @@ $repository->bulk_update_rules( $updates );
 ### Filter Link Suggestions
 
 ```php
-add_filter( 'wpseopilot_link_suggestions', function( $suggestions, $post_id ) {
+add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
     // Add custom suggestion
     $suggestions[] = [
         'url' => '/custom-page/',
@@ -608,7 +608,7 @@ add_filter( 'wpseopilot_link_suggestions', function( $suggestions, $post_id ) {
 ### Filter User Roles
 
 ```php
-add_filter( 'wpseopilot_internal_link_roles', function( $roles ) {
+add_filter( 'samanseo_internal_link_roles', function( $roles ) {
     $roles[] = 'editor';
     $roles[] = 'author';
 
@@ -677,7 +677,7 @@ Enable caching in settings to avoid re-processing content on every page load.
 For very long posts (10,000+ words), consider excluding from automatic linking:
 
 ```php
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     // Exclude posts over 5000 words
     $args['meta_query'][] = [
         'key' => '_word_count',

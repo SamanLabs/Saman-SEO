@@ -3,7 +3,7 @@
  *
  * Creates an FAQ section with automatic FAQPage schema markup.
  *
- * @package WPSEOPilot
+ * @package SamanSEO
  */
 
 ( function( blocks, element, blockEditor, components, i18n ) {

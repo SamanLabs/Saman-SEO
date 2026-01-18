@@ -5,6 +5,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $form_action      = admin_url( 'admin-post.php' );
 $editing          = $category_to_edit ?? null;
 $category_id      = $editing['id'] ?? '';

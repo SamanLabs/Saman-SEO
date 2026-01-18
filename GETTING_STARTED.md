@@ -278,7 +278,7 @@ Saman SEO works with multilingual plugins. For best results:
 
 **Example Filter (Advanced):**
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( function_exists( 'pll_current_language' ) ) {
         $lang = pll_current_language();
         $suffixes = [

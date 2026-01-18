@@ -5,6 +5,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $form_action = admin_url( 'admin-post.php' );
 $editing     = $template_to_edit ?? null;
 

@@ -10,6 +10,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $SAMAN_SEO_ai_enabled = ! empty( $ai_enabled );
 $SAMAN_SEO_score      = is_array( $seo_score ) ? $seo_score : [];
 $SAMAN_SEO_score_level = isset( $SAMAN_SEO_score['level'] ) ? sanitize_html_class( $SAMAN_SEO_score['level'] ) : 'low';

@@ -31,9 +31,9 @@ Saman SEO includes a powerful redirect manager that:
 
 **Location:** Navigate to **Saman SEO → Redirects**
 
-**File:** `includes/class-wpseopilot-service-redirect-manager.php`
+**File:** `includes/class-samanseo-service-redirect-manager.php`
 
-**Database Table:** `wp_wpseopilot_redirects`
+**Database Table:** `wp_samanseo_redirects`
 
 ---
 
@@ -207,9 +207,9 @@ Track 404 errors (page not found) to identify broken links and redirect opportun
 
 **Location:** Navigate to **Saman SEO → 404 Monitor**
 
-**File:** `includes/class-wpseopilot-service-request-monitor.php`
+**File:** `includes/class-samanseo-service-request-monitor.php`
 
-**Database Table:** `wp_wpseopilot_404_log`
+**Database Table:** `wp_samanseo_404_log`
 
 ---
 
@@ -294,7 +294,7 @@ Look for common typos in URLs:
 **Disable 404 Logging:**
 
 ```php
-update_option( 'wpseopilot_enable_404_logging', '0' );
+update_option( 'samanseo_enable_404_logging', '0' );
 ```
 
 ---
@@ -310,7 +310,7 @@ Manage redirects via command line for bulk operations and automation.
 ### List All Redirects
 
 ```bash
-wp wpseopilot redirects list --format=table
+wp saman-seo redirects list --format=table
 ```
 
 ---
@@ -318,7 +318,7 @@ wp wpseopilot redirects list --format=table
 ### Export Redirects
 
 ```bash
-wp wpseopilot redirects export redirects.json
+wp saman-seo redirects export redirects.json
 ```
 
 ---
@@ -326,7 +326,7 @@ wp wpseopilot redirects export redirects.json
 ### Import Redirects
 
 ```bash
-wp wpseopilot redirects import redirects.json
+wp saman-seo redirects import redirects.json
 ```
 
 ---
@@ -337,7 +337,7 @@ wp wpseopilot redirects import redirects.json
 
 ```php
 // Create a 301 redirect
-$result = wpseopilot_create_redirect( '/old-url', '/new-url', 301 );
+$result = samanseo_create_redirect( '/old-url', '/new-url', 301 );
 
 if ( is_wp_error( $result ) ) {
     echo 'Error: ' . $result->get_error_message();
@@ -346,7 +346,7 @@ if ( is_wp_error( $result ) ) {
 }
 ```
 
-**Function:** `wpseopilot_create_redirect()`
+**Function:** `samanseo_create_redirect()`
 
 **Location:** `includes/helpers.php:733`
 
@@ -362,7 +362,7 @@ $redirects = [
 ];
 
 foreach ( $redirects as $redirect ) {
-    wpseopilot_create_redirect( $redirect[0], $redirect[1], $redirect[2] );
+    samanseo_create_redirect( $redirect[0], $redirect[1], $redirect[2] );
 }
 ```
 
@@ -376,7 +376,7 @@ add_action( 'trashed_post', function( $post_id ) {
     $old_url = '/' . $post->post_name;
 
     // Redirect deleted posts to homepage or category
-    wpseopilot_create_redirect( $old_url, home_url( '/' ), 301 );
+    samanseo_create_redirect( $old_url, home_url( '/' ), 301 );
 });
 ```
 
@@ -386,7 +386,7 @@ add_action( 'trashed_post', function( $post_id ) {
 
 ```php
 global $wpdb;
-$table = $wpdb->prefix . 'wpseopilot_redirects';
+$table = $wpdb->prefix . 'samanseo_redirects';
 
 $redirects = $wpdb->get_results( "
     SELECT * FROM {$table}
@@ -406,7 +406,7 @@ foreach ( $redirects as $redirect ) {
 
 ```php
 global $wpdb;
-$table = $wpdb->prefix . 'wpseopilot_redirects';
+$table = $wpdb->prefix . 'samanseo_redirects';
 
 $wpdb->delete( $table, [ 'source' => '/old-url' ], [ '%s' ] );
 ```
@@ -455,7 +455,7 @@ When content is permanently moved:
 Periodically remove redirects with 0 hits after 6+ months:
 
 ```bash
-wp wpseopilot redirects list --format=csv | awk -F',' '$5 == 0 {print $0}'
+wp saman-seo redirects list --format=csv | awk -F',' '$5 == 0 {print $0}'
 ```
 
 ---
@@ -501,7 +501,7 @@ For critical redirects, document:
 Before importing or bulk deleting:
 
 ```bash
-wp wpseopilot redirects export backup-$(date +%Y%m%d).json
+wp saman-seo redirects export backup-$(date +%Y%m%d).json
 ```
 
 ---
@@ -537,7 +537,7 @@ foreach ( $posts as $post ) {
     $old_url = '/blog/' . $post->post_name;
     $new_url = '/' . $post->post_name;
 
-    wpseopilot_create_redirect( $old_url, $new_url, 301 );
+    samanseo_create_redirect( $old_url, $new_url, 301 );
 }
 ```
 
@@ -549,7 +549,7 @@ Redirect old seasonal content:
 
 ```php
 // Redirect 2024 holiday guide to 2025
-wpseopilot_create_redirect(
+samanseo_create_redirect(
     '/holiday-shopping-guide-2024',
     '/holiday-shopping-guide-2025',
     302  // Temporary, since it's seasonal
@@ -563,7 +563,7 @@ wpseopilot_create_redirect(
 Product no longer available, redirect to category:
 
 ```php
-wpseopilot_create_redirect(
+samanseo_create_redirect(
     '/product/discontinued-item',
     '/product-category/similar-products',
     301
@@ -581,7 +581,7 @@ $old_posts = [ '/post-1', '/post-2', '/post-3' ];
 $new_guide = '/complete-guide';
 
 foreach ( $old_posts as $old_post ) {
-    wpseopilot_create_redirect( $old_post, $new_guide, 301 );
+    samanseo_create_redirect( $old_post, $new_guide, 301 );
 }
 ```
 
@@ -605,7 +605,7 @@ foreach ( $old_posts as $old_post ) {
 // Add to functions.php temporarily
 add_action( 'template_redirect', function() {
     global $wpdb;
-    $table = $wpdb->prefix . 'wpseopilot_redirects';
+    $table = $wpdb->prefix . 'samanseo_redirects';
     $path = $_SERVER['REQUEST_URI'];
 
     $redirect = $wpdb->get_row( $wpdb->prepare(
@@ -665,7 +665,7 @@ add_action( 'template_redirect', function() {
 **Enable manually:**
 
 ```php
-update_option( 'wpseopilot_enable_redirect_manager', '1' );
+update_option( 'samanseo_enable_redirect_manager', '1' );
 ```
 
 ---
@@ -676,12 +676,12 @@ update_option( 'wpseopilot_enable_redirect_manager', '1' );
 
 Redirects are cached in WordPress object cache for performance.
 
-**Cache Key:** `wpseopilot_redirects`
+**Cache Key:** `samanseo_redirects`
 
 **Clear cache:**
 
 ```php
-wp_cache_delete( 'wpseopilot_redirects', 'wpseopilot_redirects' );
+wp_cache_delete( 'samanseo_redirects', 'samanseo_redirects' );
 ```
 
 ---

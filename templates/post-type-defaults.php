@@ -15,6 +15,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 call_user_func(
 	static function ( $post_types, $post_type_templates, $post_type_descriptions, $post_type_keywords, $post_type_settings, $taxonomy_settings, $archive_settings, $taxonomies, $settings_instance ) {
 		$schema_pages    = $settings_instance->get_schema_page_options();

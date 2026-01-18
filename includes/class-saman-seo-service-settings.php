@@ -272,6 +272,7 @@ class Settings {
 						$custom_vars[] = [
 							'tag'     => 'cf_' . $key,
 							'label'   => $key,
+							// translators: Placeholder values
 							'desc'    => sprintf( __( 'Custom Field: %s', 'saman-seo' ), $key ),
 							'preview' => $preview,
 						];
@@ -282,6 +283,7 @@ class Settings {
 					// Use a key like "post_type:book" so frontend can match it
 					$context_key = 'post_type:' . $pt->name;
 					$variables[ $context_key ] = [
+						// translators: Placeholder values
 						'label' => sprintf( __( '%s Custom Fields', 'saman-seo' ), $pt->label ),
 						'vars'  => $custom_vars,
 					];

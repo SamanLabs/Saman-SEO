@@ -34,9 +34,9 @@ wp-seo-pilot/
 
 ```
 includes/
-├── class-wpseopilot-plugin.php           # Main service container (singleton)
-├── class-wpseopilot-admin-v2.php         # React admin loader
-├── class-wpseopilot-admin-topbar.php     # Admin header component
+├── class-samanseo-plugin.php           # Main service container (singleton)
+├── class-samanseo-admin-v2.php         # React admin loader
+├── class-samanseo-admin-topbar.php     # Admin header component
 ├── helpers.php                            # Utility functions (34KB)
 │
 ├── Api/                                   # REST API controllers (20+ files)
@@ -65,15 +65,15 @@ includes/
 │       └── class-seo-reporter-assistant.php
 │
 ├── Service/                               # Specialized schema services
-│   ├── class-wpseopilot-service-video-schema.php
-│   ├── class-wpseopilot-service-course-schema.php
-│   ├── class-wpseopilot-service-book-schema.php
-│   ├── class-wpseopilot-service-music-schema.php
-│   ├── class-wpseopilot-service-movie-schema.php
-│   ├── class-wpseopilot-service-restaurant-schema.php
-│   ├── class-wpseopilot-service-service-schema.php
-│   ├── class-wpseopilot-service-job-posting-schema.php
-│   └── class-wpseopilot-service-software-schema.php
+│   ├── class-samanseo-service-video-schema.php
+│   ├── class-samanseo-service-course-schema.php
+│   ├── class-samanseo-service-book-schema.php
+│   ├── class-samanseo-service-music-schema.php
+│   ├── class-samanseo-service-movie-schema.php
+│   ├── class-samanseo-service-restaurant-schema.php
+│   ├── class-samanseo-service-service-schema.php
+│   ├── class-samanseo-service-job-posting-schema.php
+│   └── class-samanseo-service-software-schema.php
 │
 ├── Integration/                           # Third-party integrations
 │   ├── class-ai-pilot.php                 # WP AI Pilot integration
@@ -86,34 +86,34 @@ includes/
 │   └── Twiglet.php                        # Template variable engine
 │
 └── [Service files in root includes/]
-    ├── class-wpseopilot-service-frontend.php     # 28KB - head rendering
-    ├── class-wpseopilot-service-settings.php     # 34KB - global settings
-    ├── class-wpseopilot-service-post-meta.php    # Per-post meta
-    ├── class-wpseopilot-service-admin-ui.php     # 22KB - classic editor
-    ├── class-wpseopilot-service-redirect-manager.php   # 26KB
-    ├── class-wpseopilot-service-sitemap-enhancer.php   # 40KB - largest service
-    ├── class-wpseopilot-service-sitemap-settings.php
-    ├── class-wpseopilot-service-jsonld.php       # Structured data
-    ├── class-wpseopilot-service-local-seo.php    # Local business
-    ├── class-wpseopilot-service-breadcrumbs.php  # Breadcrumb markup
-    ├── class-wpseopilot-service-audit.php        # SEO audit
-    ├── class-wpseopilot-service-ai-assistant.php # AI integration
-    ├── class-wpseopilot-service-internal-linking.php
-    ├── class-wpseopilot-service-link-health.php
-    ├── class-wpseopilot-service-request-monitor.php   # 28KB - 404 logging
-    ├── class-wpseopilot-service-analytics.php
-    ├── class-wpseopilot-service-admin-bar.php
-    ├── class-wpseopilot-service-dashboard-widget.php
-    ├── class-wpseopilot-service-social-settings.php
-    ├── class-wpseopilot-service-social-card-generator.php
-    ├── class-wpseopilot-service-robots-manager.php
-    ├── class-wpseopilot-service-llm-txt-generator.php
-    ├── class-wpseopilot-service-indexnow.php
-    ├── class-wpseopilot-service-compatibility.php
-    ├── class-wpseopilot-service-cli.php
-    ├── class-wpseopilot-service-schema-blocks.php
-    ├── class-wpseopilot-internal-linking-engine.php
-    └── class-wpseopilot-internal-linking-repository.php
+    ├── class-samanseo-service-frontend.php     # 28KB - head rendering
+    ├── class-samanseo-service-settings.php     # 34KB - global settings
+    ├── class-samanseo-service-post-meta.php    # Per-post meta
+    ├── class-samanseo-service-admin-ui.php     # 22KB - classic editor
+    ├── class-samanseo-service-redirect-manager.php   # 26KB
+    ├── class-samanseo-service-sitemap-enhancer.php   # 40KB - largest service
+    ├── class-samanseo-service-sitemap-settings.php
+    ├── class-samanseo-service-jsonld.php       # Structured data
+    ├── class-samanseo-service-local-seo.php    # Local business
+    ├── class-samanseo-service-breadcrumbs.php  # Breadcrumb markup
+    ├── class-samanseo-service-audit.php        # SEO audit
+    ├── class-samanseo-service-ai-assistant.php # AI integration
+    ├── class-samanseo-service-internal-linking.php
+    ├── class-samanseo-service-link-health.php
+    ├── class-samanseo-service-request-monitor.php   # 28KB - 404 logging
+    ├── class-samanseo-service-analytics.php
+    ├── class-samanseo-service-admin-bar.php
+    ├── class-samanseo-service-dashboard-widget.php
+    ├── class-samanseo-service-social-settings.php
+    ├── class-samanseo-service-social-card-generator.php
+    ├── class-samanseo-service-robots-manager.php
+    ├── class-samanseo-service-llm-txt-generator.php
+    ├── class-samanseo-service-indexnow.php
+    ├── class-samanseo-service-compatibility.php
+    ├── class-samanseo-service-cli.php
+    ├── class-samanseo-service-schema-blocks.php
+    ├── class-samanseo-internal-linking-engine.php
+    └── class-samanseo-internal-linking-repository.php
 ```
 
 ### `/src-v2/` - React Source
@@ -247,10 +247,10 @@ docs/
 
 | Namespace | File Pattern | Example |
 |-----------|--------------|---------|
-| `WPSEOPilot\Service\*` | `class-wpseopilot-service-{name}.php` | `class-wpseopilot-service-frontend.php` |
-| `WPSEOPilot\Api\*` | `class-{name}-controller.php` | `class-dashboard-controller.php` |
-| `WPSEOPilot\Api\Assistants\*` | `class-{name}-assistant.php` | `class-general-seo-assistant.php` |
-| `WPSEOPilot\Integration\*` | `class-{name}.php` | `class-ai-pilot.php` |
+| `SamanSEO\Service\*` | `class-samanseo-service-{name}.php` | `class-samanseo-service-frontend.php` |
+| `SamanSEO\Api\*` | `class-{name}-controller.php` | `class-dashboard-controller.php` |
+| `SamanSEO\Api\Assistants\*` | `class-{name}-assistant.php` | `class-general-seo-assistant.php` |
+| `SamanSEO\Integration\*` | `class-{name}.php` | `class-ai-pilot.php` |
 
 ### React Components
 
@@ -277,7 +277,7 @@ docs/
 | Gutenberg Editor | `src-v2/editor/index.js` | Block editor integration |
 | Admin List | `src-v2/admin-list/` | Post list enhancements |
 | REST API | `includes/Api/class-rest-controller.php` | API base class |
-| Frontend | `includes/class-wpseopilot-service-frontend.php` | Head rendering |
+| Frontend | `includes/class-samanseo-service-frontend.php` | Head rendering |
 
 ## Notable File Sizes
 
@@ -285,7 +285,7 @@ docs/
 |------|------|-------|
 | `includes/Api/class-redirects-controller.php` | 72KB | Largest - complex CRUD |
 | `includes/Api/class-tools-controller.php` | 52KB | Bulk operations |
-| `includes/class-wpseopilot-service-sitemap-enhancer.php` | 40KB | Largest service |
+| `includes/class-samanseo-service-sitemap-enhancer.php` | 40KB | Largest service |
 | `includes/helpers.php` | 34KB | All utility functions |
-| `includes/class-wpseopilot-service-settings.php` | 34KB | Many options |
+| `includes/class-samanseo-service-settings.php` | 34KB | Many options |
 | `assets/css/plugin.css` | 35KB | Main compiled CSS |

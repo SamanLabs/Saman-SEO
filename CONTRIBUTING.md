@@ -193,7 +193,7 @@ git push origin feature/your-feature-name
  *
  * @return bool True on success, false on failure.
  */
-function wpseopilot_example_function( $param1, $param2 = [] ) {
+function samanseo_example_function( $param1, $param2 = [] ) {
 	// Early return for invalid input
 	if ( empty( $param1 ) ) {
 		return false;
@@ -203,7 +203,7 @@ function wpseopilot_example_function( $param1, $param2 = [] ) {
 	$sanitized_input = sanitize_text_field( $param1 );
 	
 	// Use filters to allow extensibility
-	$result = apply_filters( 'wpseopilot_example_result', $sanitized_input, $param2 );
+	$result = apply_filters( 'samanseo_example_result', $sanitized_input, $param2 );
 	
 	return true;
 }
@@ -242,7 +242,7 @@ function exampleFunction( param1, param2 = {} ) {
 @border-radius: 4px;
 
 // Organize by component
-.wpseopilot-metabox {
+.samanseo-metabox {
 	padding: 20px;
 	border-radius: @border-radius;
 	

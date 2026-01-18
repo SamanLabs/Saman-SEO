@@ -26,11 +26,16 @@ class Video_Schema {
 	/**
 	 * Add VideoObject schema to the JSON-LD graph.
 	 *
-	 * @param array $graph The existing JSON-LD graph.
-	 * @param \WP_Post $post  The current post object.
+	 * @param array         $graph The existing JSON-LD graph.
+	 * @param \WP_Post|null $post  The current post object (optional).
 	 * @return array The modified JSON-LD graph.
 	 */
-	public function add_video_schema_to_graph( $graph, $post ) {
+	public function add_video_schema_to_graph( $graph, $post = null ) {
+		// Bail early if no post context.
+		if ( ! $post instanceof \WP_Post ) {
+			return $graph;
+		}
+
 		// For now, let's assume we identify a video post by a custom field or post format.
 		// This is just a placeholder for the logic to identify a video post.
 		if ( 'video' !== get_post_format( $post->ID ) ) {

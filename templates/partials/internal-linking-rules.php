@@ -5,6 +5,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $filter_status   = $filters['status'] ?? '';
 $filter_category = $filters['category'] ?? '';
 $filter_types    = (array) ( $filters['post_type'] ?? [] );

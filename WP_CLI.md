@@ -10,7 +10,7 @@ WP-CLI commands are automatically available when Saman SEO is active. No additio
 
 Verify installation:
 ```bash
-wp wpseopilot
+wp saman-seo 
 ```
 
 ---
@@ -22,7 +22,7 @@ wp wpseopilot
 Display all configured redirects.
 
 ```bash
-wp wpseopilot redirects list [--format=<format>]
+wp saman-seo redirects list [--format=<format>]
 ```
 
 **Options:**
@@ -31,13 +31,13 @@ wp wpseopilot redirects list [--format=<format>]
 **Examples:**
 ```bash
 # Display as table
-wp wpseopilot redirects list
+wp saman-seo redirects list
 
 # Export as CSV
-wp wpseopilot redirects list --format=csv > redirects.csv
+wp saman-seo redirects list --format=csv > redirects.csv
 
 # JSON output
-wp wpseopilot redirects list --format=json
+wp saman-seo redirects list --format=json
 ```
 
 **Sample Output (Table):**
@@ -56,7 +56,7 @@ wp wpseopilot redirects list --format=json
 Export all redirects to a JSON file.
 
 ```bash
-wp wpseopilot redirects export <file>
+wp saman-seo redirects export <file>
 ```
 
 **Arguments:**
@@ -64,7 +64,7 @@ wp wpseopilot redirects export <file>
 
 **Example:**
 ```bash
-wp wpseopilot redirects export /tmp/redirects.json
+wp saman-seo redirects export /tmp/redirects.json
 ```
 
 **Export Format:**
@@ -94,7 +94,7 @@ wp wpseopilot redirects export /tmp/redirects.json
 Import redirects from a JSON file.
 
 ```bash
-wp wpseopilot redirects import <file> [--skip-duplicates] [--update-existing]
+wp saman-seo redirects import <file> [--skip-duplicates] [--update-existing]
 ```
 
 **Arguments:**
@@ -107,10 +107,10 @@ wp wpseopilot redirects import <file> [--skip-duplicates] [--update-existing]
 **Example:**
 ```bash
 # Import new redirects only
-wp wpseopilot redirects import redirects.json --skip-duplicates
+wp saman-seo redirects import redirects.json --skip-duplicates
 
 # Update existing redirects
-wp wpseopilot redirects import redirects.json --update-existing
+wp saman-seo redirects import redirects.json --update-existing
 ```
 
 **Import File Format:**
@@ -134,7 +134,7 @@ wp wpseopilot redirects import redirects.json --update-existing
 Create a new redirect.
 
 ```bash
-wp wpseopilot redirects add <source> <target> [--status=<code>]
+wp saman-seo redirects add <source> <target> [--status=<code>]
 ```
 
 **Arguments:**
@@ -147,10 +147,10 @@ wp wpseopilot redirects add <source> <target> [--status=<code>]
 **Examples:**
 ```bash
 # Create 301 redirect
-wp wpseopilot redirects add /old-page /new-page
+wp saman-seo redirects add /old-page /new-page
 
 # Create 302 temporary redirect
-wp wpseopilot redirects add /temp-page /final-page --status=302
+wp saman-seo redirects add /temp-page /final-page --status=302
 ```
 
 ### Delete Redirect
@@ -158,7 +158,7 @@ wp wpseopilot redirects add /temp-page /final-page --status=302
 Remove a redirect.
 
 ```bash
-wp wpseopilot redirects delete <source>
+wp saman-seo redirects delete <source>
 ```
 
 **Arguments:**
@@ -166,7 +166,7 @@ wp wpseopilot redirects delete <source>
 
 **Example:**
 ```bash
-wp wpseopilot redirects delete /old-page
+wp saman-seo redirects delete /old-page
 ```
 
 ### Clear All Redirects
@@ -174,7 +174,7 @@ wp wpseopilot redirects delete /old-page
 Delete all redirects (with confirmation).
 
 ```bash
-wp wpseopilot redirects clear [--yes]
+wp saman-seo redirects clear [--yes]
 ```
 
 **Options:**
@@ -182,7 +182,7 @@ wp wpseopilot redirects clear [--yes]
 
 **Example:**
 ```bash
-wp wpseopilot redirects clear --yes
+wp saman-seo redirects clear --yes
 ```
 
 ---
@@ -194,12 +194,12 @@ wp wpseopilot redirects clear --yes
 Force regeneration of all sitemaps.
 
 ```bash
-wp wpseopilot sitemaps regenerate
+wp saman-seo sitemaps regenerate
 ```
 
 **Example:**
 ```bash
-wp wpseopilot sitemaps regenerate
+wp saman-seo sitemaps regenerate
 ```
 
 ### Ping Search Engines
@@ -207,12 +207,12 @@ wp wpseopilot sitemaps regenerate
 Notify search engines of sitemap updates.
 
 ```bash
-wp wpseopilot sitemaps ping
+wp saman-seo sitemaps ping
 ```
 
 **Example:**
 ```bash
-wp wpseopilot sitemaps ping
+wp saman-seo sitemaps ping
 ```
 
 ### List Sitemap URLs
@@ -220,12 +220,12 @@ wp wpseopilot sitemaps ping
 Display all sitemap URLs.
 
 ```bash
-wp wpseopilot sitemaps list
+wp saman-seo sitemaps list
 ```
 
 **Example:**
 ```bash
-wp wpseopilot sitemaps list
+wp saman-seo sitemaps list
 ```
 
 **Sample Output:**
@@ -256,7 +256,7 @@ https://example.com/sitemap-news.xml
 Scan site for SEO issues.
 
 ```bash
-wp wpseopilot audit run [--post-type=<type>] [--limit=<number>]
+wp saman-seo audit run [--post-type=<type>] [--limit=<number>]
 ```
 
 **Options:**
@@ -266,13 +266,13 @@ wp wpseopilot audit run [--post-type=<type>] [--limit=<number>]
 **Examples:**
 ```bash
 # Audit all content
-wp wpseopilot audit run
+wp saman-seo audit run
 
 # Audit only posts
-wp wpseopilot audit run --post-type=post
+wp saman-seo audit run --post-type=post
 
 # Audit first 100 pages
-wp wpseopilot audit run --post-type=page --limit=100
+wp saman-seo audit run --post-type=page --limit=100
 ```
 
 ### List Issues
@@ -280,7 +280,7 @@ wp wpseopilot audit run --post-type=page --limit=100
 Display audit issues.
 
 ```bash
-wp wpseopilot audit list [--severity=<level>] [--format=<format>]
+wp saman-seo audit list [--severity=<level>] [--format=<format>]
 ```
 
 **Options:**
@@ -290,13 +290,13 @@ wp wpseopilot audit list [--severity=<level>] [--format=<format>]
 **Examples:**
 ```bash
 # Show all issues
-wp wpseopilot audit list
+wp saman-seo audit list
 
 # Show only critical issues
-wp wpseopilot audit list --severity=critical
+wp saman-seo audit list --severity=critical
 
 # Export issues as CSV
-wp wpseopilot audit list --format=csv > seo-issues.csv
+wp saman-seo audit list --format=csv > seo-issues.csv
 ```
 
 ### Fix Issues
@@ -304,7 +304,7 @@ wp wpseopilot audit list --format=csv > seo-issues.csv
 Auto-fix common SEO issues.
 
 ```bash
-wp wpseopilot audit fix [--issue-type=<type>] [--dry-run]
+wp saman-seo audit fix [--issue-type=<type>] [--dry-run]
 ```
 
 **Options:**
@@ -314,10 +314,10 @@ wp wpseopilot audit fix [--issue-type=<type>] [--dry-run]
 **Examples:**
 ```bash
 # Auto-generate missing titles
-wp wpseopilot audit fix --issue-type=missing-title
+wp saman-seo audit fix --issue-type=missing-title
 
 # Preview fixes without applying
-wp wpseopilot audit fix --dry-run
+wp saman-seo audit fix --dry-run
 ```
 
 ---
@@ -329,7 +329,7 @@ wp wpseopilot audit fix --dry-run
 Update SEO metadata for multiple posts.
 
 ```bash
-wp wpseopilot meta update <field> <value> [--post-type=<type>] [--post-id=<ids>]
+wp saman-seo meta update <field> <value> [--post-type=<type>] [--post-id=<ids>]
 ```
 
 **Arguments:**
@@ -343,10 +343,10 @@ wp wpseopilot meta update <field> <value> [--post-type=<type>] [--post-id=<ids>]
 **Examples:**
 ```bash
 # Set robots to noindex for all drafts
-wp wpseopilot meta update robots "noindex,nofollow" --post-type=post --post-status=draft
+wp saman-seo meta update robots "noindex,nofollow" --post-type=post --post-status=draft
 
 # Update canonical for specific posts
-wp wpseopilot meta update canonical "https://example.com/new-url" --post-id=123,456,789
+wp saman-seo meta update canonical "https://example.com/new-url" --post-id=123,456,789
 ```
 
 ### Bulk Generate Titles
@@ -354,7 +354,7 @@ wp wpseopilot meta update canonical "https://example.com/new-url" --post-id=123,
 Auto-generate SEO titles for posts missing them.
 
 ```bash
-wp wpseopilot meta generate-titles [--post-type=<type>] [--overwrite]
+wp saman-seo meta generate-titles [--post-type=<type>] [--overwrite]
 ```
 
 **Options:**
@@ -364,10 +364,10 @@ wp wpseopilot meta generate-titles [--post-type=<type>] [--overwrite]
 **Examples:**
 ```bash
 # Generate missing titles for posts
-wp wpseopilot meta generate-titles --post-type=post
+wp saman-seo meta generate-titles --post-type=post
 
 # Regenerate all page titles
-wp wpseopilot meta generate-titles --post-type=page --overwrite
+wp saman-seo meta generate-titles --post-type=page --overwrite
 ```
 
 ### Bulk Generate Descriptions
@@ -375,7 +375,7 @@ wp wpseopilot meta generate-titles --post-type=page --overwrite
 Auto-generate meta descriptions.
 
 ```bash
-wp wpseopilot meta generate-descriptions [--post-type=<type>] [--overwrite]
+wp saman-seo meta generate-descriptions [--post-type=<type>] [--overwrite]
 ```
 
 **Options:**
@@ -385,10 +385,10 @@ wp wpseopilot meta generate-descriptions [--post-type=<type>] [--overwrite]
 **Examples:**
 ```bash
 # Generate missing descriptions
-wp wpseopilot meta generate-descriptions --post-type=post
+wp saman-seo meta generate-descriptions --post-type=post
 
 # Regenerate all descriptions
-wp wpseopilot meta generate-descriptions --overwrite
+wp saman-seo meta generate-descriptions --overwrite
 ```
 
 ---
@@ -400,7 +400,7 @@ wp wpseopilot meta generate-descriptions --overwrite
 Import SEO data from Yoast SEO.
 
 ```bash
-wp wpseopilot import yoast [--dry-run] [--post-type=<type>]
+wp saman-seo import yoast [--dry-run] [--post-type=<type>]
 ```
 
 **Options:**
@@ -410,10 +410,10 @@ wp wpseopilot import yoast [--dry-run] [--post-type=<type>]
 **Example:**
 ```bash
 # Preview Yoast import
-wp wpseopilot import yoast --dry-run
+wp saman-seo import yoast --dry-run
 
 # Import Yoast data
-wp wpseopilot import yoast
+wp saman-seo import yoast
 ```
 
 ### Import from Rank Math
@@ -421,12 +421,12 @@ wp wpseopilot import yoast
 Import SEO data from Rank Math.
 
 ```bash
-wp wpseopilot import rankmath [--dry-run] [--post-type=<type>]
+wp saman-seo import rankmath [--dry-run] [--post-type=<type>]
 ```
 
 **Example:**
 ```bash
-wp wpseopilot import rankmath
+wp saman-seo import rankmath
 ```
 
 ### Import from All in One SEO
@@ -434,12 +434,12 @@ wp wpseopilot import rankmath
 Import SEO data from All in One SEO Pack.
 
 ```bash
-wp wpseopilot import aioseo [--dry-run] [--post-type=<type>]
+wp saman-seo import aioseo [--dry-run] [--post-type=<type>]
 ```
 
 **Example:**
 ```bash
-wp wpseopilot import aioseo
+wp saman-seo import aioseo
 ```
 
 ---
@@ -451,7 +451,7 @@ wp wpseopilot import aioseo
 Clear all Saman SEO cached data.
 
 ```bash
-wp wpseopilot cache clear [--type=<cache-type>]
+wp saman-seo cache clear [--type=<cache-type>]
 ```
 
 **Options:**
@@ -460,10 +460,10 @@ wp wpseopilot cache clear [--type=<cache-type>]
 **Examples:**
 ```bash
 # Clear all caches
-wp wpseopilot cache clear
+wp saman-seo cache clear
 
 # Clear only sitemap cache
-wp wpseopilot cache clear --type=sitemaps
+wp saman-seo cache clear --type=sitemaps
 ```
 
 ---
@@ -475,20 +475,20 @@ wp wpseopilot cache clear --type=sitemaps
 Show scheduled Saman SEO tasks.
 
 ```bash
-wp wpseopilot cron list
+wp saman-seo cron list
 ```
 
 **Example:**
 ```bash
-wp wpseopilot cron list
+wp saman-seo cron list
 ```
 
 **Sample Output:**
 ```
 Scheduled Tasks:
-- wpseopilot_sitemap_update: Next run in 2 hours
-- wpseopilot_audit_scan: Next run in 1 day
-- wpseopilot_cleanup_logs: Next run in 7 days
+- samanseo_sitemap_update: Next run in 2 hours
+- samanseo_audit_scan: Next run in 1 day
+- samanseo_cleanup_logs: Next run in 7 days
 ```
 
 ---
@@ -501,9 +501,9 @@ Combine multiple commands for complex operations:
 
 ```bash
 # Export redirects, clear all, import new set
-wp wpseopilot redirects export backup.json && \
-wp wpseopilot redirects clear --yes && \
-wp wpseopilot redirects import new-redirects.json
+wp saman-seo redirects export backup.json && \
+wp saman-seo redirects clear --yes && \
+wp saman-seo redirects import new-redirects.json
 ```
 
 ### Cron Integration
@@ -512,8 +512,8 @@ Run maintenance tasks via system cron:
 
 ```bash
 # Add to crontab
-0 2 * * * /usr/local/bin/wp wpseopilot sitemaps regenerate --path=/var/www/html
-0 3 * * 0 /usr/local/bin/wp wpseopilot audit run --path=/var/www/html
+0 2 * * * /usr/local/bin/wp saman-seo sitemaps regenerate --path=/var/www/html
+0 3 * * 0 /usr/local/bin/wp saman-seo audit run --path=/var/www/html
 ```
 
 ### Scripted Bulk Updates
@@ -524,19 +524,19 @@ Automate SEO updates:
 #!/bin/bash
 
 # Backup current redirects
-wp wpseopilot redirects export "/backups/redirects-$(date +%Y%m%d).json"
+wp saman-seo redirects export "/backups/redirects-$(date +%Y%m%d).json"
 
 # Run audit
-wp wpseopilot audit run
+wp saman-seo audit run
 
 # Auto-fix issues
-wp wpseopilot audit fix
+wp saman-seo audit fix
 
 # Regenerate sitemaps
-wp wpseopilot sitemaps regenerate
+wp saman-seo sitemaps regenerate
 
 # Ping search engines
-wp wpseopilot sitemaps ping
+wp saman-seo sitemaps ping
 
 echo "SEO maintenance complete"
 ```
@@ -550,7 +550,7 @@ echo "SEO maintenance complete"
 Add `--debug` flag to any command:
 
 ```bash
-wp wpseopilot redirects list --debug
+wp saman-seo redirects list --debug
 ```
 
 ### Test Individual Commands
@@ -558,8 +558,8 @@ wp wpseopilot redirects list --debug
 Use `--dry-run` when available:
 
 ```bash
-wp wpseopilot audit fix --dry-run
-wp wpseopilot import yoast --dry-run
+wp saman-seo audit fix --dry-run
+wp saman-seo import yoast --dry-run
 ```
 
 ---
@@ -574,7 +574,7 @@ WP-CLI commands use standard exit codes:
 
 **Example in Scripts:**
 ```bash
-if wp wpseopilot redirects add /old /new; then
+if wp saman-seo redirects add /old /new; then
     echo "Redirect created successfully"
 else
     echo "Failed to create redirect"

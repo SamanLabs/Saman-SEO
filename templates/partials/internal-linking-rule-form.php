@@ -5,6 +5,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $is_edit          = ! empty( $current_rule['id'] );
 $form_action      = admin_url( 'admin-post.php' );
 $form_heading     = $is_edit ? __( 'Edit rule', 'saman-seo' ) : __( 'Add rule', 'saman-seo' );

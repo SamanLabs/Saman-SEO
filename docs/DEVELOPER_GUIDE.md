@@ -27,27 +27,27 @@ Saman SEO follows a service-oriented architecture with clean separation of conce
 
 | Service | File | Responsibility |
 |---------|------|----------------|
-| **Frontend** | `class-wpseopilot-service-frontend.php` | Meta tag rendering, title generation |
-| **Admin UI** | `class-wpseopilot-service-admin-ui.php` | Meta boxes, admin columns, scores |
-| **Post Meta** | `class-wpseopilot-service-post-meta.php` | REST API, meta storage |
-| **Sitemap Enhancer** | `class-wpseopilot-service-sitemap-enhancer.php` | Sitemap generation and filtering |
-| **Redirect Manager** | `class-wpseopilot-service-redirect-manager.php` | 301 redirects, 404 tracking |
-| **Internal Linking** | `class-wpseopilot-service-internal-linking.php` | Automated link insertion |
-| **AI Assistant** | `class-wpseopilot-service-ai-assistant.php` | OpenAI integration |
-| **JSON-LD** | `class-wpseopilot-service-jsonld.php` | Structured data generation |
-| **Local SEO** | `class-wpseopilot-service-local-seo.php` | LocalBusiness schema |
-| **Audit** | `class-wpseopilot-service-audit.php` | Site-wide SEO analysis |
+| **Frontend** | `class-samanseo-service-frontend.php` | Meta tag rendering, title generation |
+| **Admin UI** | `class-samanseo-service-admin-ui.php` | Meta boxes, admin columns, scores |
+| **Post Meta** | `class-samanseo-service-post-meta.php` | REST API, meta storage |
+| **Sitemap Enhancer** | `class-samanseo-service-sitemap-enhancer.php` | Sitemap generation and filtering |
+| **Redirect Manager** | `class-samanseo-service-redirect-manager.php` | 301 redirects, 404 tracking |
+| **Internal Linking** | `class-samanseo-service-internal-linking.php` | Automated link insertion |
+| **AI Assistant** | `class-samanseo-service-ai-assistant.php` | OpenAI integration |
+| **JSON-LD** | `class-samanseo-service-jsonld.php` | Structured data generation |
+| **Local SEO** | `class-samanseo-service-local-seo.php` | LocalBusiness schema |
+| **Audit** | `class-samanseo-service-audit.php` | Site-wide SEO analysis |
 
 ### Plugin Bootstrap
 
 The plugin is bootstrapped via the singleton pattern:
 
 ```php
-$plugin = \WPSEOPilot\Plugin::get_instance();
+$plugin = \SamanSEO\Plugin::get_instance();
 ```
 
 **Main Plugin File:** `wp-seo-pilot.php`
-**Plugin Class:** `includes/class-wpseopilot-plugin.php`
+**Plugin Class:** `includes/class-samanseo-plugin.php`
 
 All services are registered and initialized in `Plugin::init()` (line 60).
 
@@ -55,7 +55,7 @@ All services are registered and initialized in `Plugin::init()` (line 60).
 
 ## Action Hooks
 
-### `wpseopilot_booted`
+### `samanseo_booted`
 
 Fires when the plugin has fully initialized all services.
 
@@ -65,17 +65,17 @@ Fires when the plugin has fully initialized all services.
 **Usage:**
 
 ```php
-add_action( 'wpseopilot_booted', function( $plugin ) {
+add_action( 'samanseo_booted', function( $plugin ) {
     // Plugin is fully loaded, all services available
     error_log( 'Saman SEO initialized!' );
 }, 10, 1 );
 ```
 
-**Location:** `includes/class-wpseopilot-plugin.php:78`
+**Location:** `includes/class-samanseo-plugin.php:78`
 
 ---
 
-### `wpseopilot_sitemap_regenerated`
+### `samanseo_sitemap_regenerated`
 
 Fires after the sitemap has been regenerated (manual or scheduled).
 
@@ -84,7 +84,7 @@ Fires after the sitemap has been regenerated (manual or scheduled).
 **Usage:**
 
 ```php
-add_action( 'wpseopilot_sitemap_regenerated', function() {
+add_action( 'samanseo_sitemap_regenerated', function() {
     // Notify external service that sitemap updated
     wp_remote_post( 'https://api.example.com/sitemap-update', [
         'body' => [ 'sitemap_url' => home_url( '/wp-sitemap.xml' ) ]
@@ -92,7 +92,7 @@ add_action( 'wpseopilot_sitemap_regenerated', function() {
 });
 ```
 
-**Location:** `includes/class-wpseopilot-service-sitemap-settings.php:365`
+**Location:** `includes/class-samanseo-service-sitemap-settings.php:365`
 
 ---
 
@@ -102,7 +102,7 @@ For complete filter documentation with examples, see **[Filter Reference](FILTER
 
 ### Meta Tag Filters
 
-#### `wpseopilot_title`
+#### `samanseo_title`
 
 Filter the page title before output.
 
@@ -113,7 +113,7 @@ Filter the page title before output.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     // Add store name to all product titles
     if ( $post && get_post_type( $post ) === 'product' ) {
         return $title . ' | MyStore';
@@ -122,11 +122,11 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:64, 305, 665`
+**Location:** `includes/class-samanseo-service-frontend.php:64, 305, 665`
 
 ---
 
-#### `wpseopilot_description`
+#### `samanseo_description`
 
 Filter the meta description before output.
 
@@ -137,7 +137,7 @@ Filter the meta description before output.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_description', function( $description, $post ) {
+add_filter( 'samanseo_description', function( $description, $post ) {
     // Append CTA to all descriptions
     if ( is_singular( 'product' ) ) {
         return $description . ' Order now for free shipping!';
@@ -146,11 +146,11 @@ add_filter( 'wpseopilot_description', function( $description, $post ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:100`
+**Location:** `includes/class-samanseo-service-frontend.php:100`
 
 ---
 
-#### `wpseopilot_canonical`
+#### `samanseo_canonical`
 
 Filter the canonical URL before output.
 
@@ -161,17 +161,17 @@ Filter the canonical URL before output.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_canonical', function( $canonical, $post ) {
+add_filter( 'samanseo_canonical', function( $canonical, $post ) {
     // Force HTTPS on all canonical URLs
     return str_replace( 'http://', 'https://', $canonical );
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:103, 170`
+**Location:** `includes/class-samanseo-service-frontend.php:103, 170`
 
 ---
 
-#### `wpseopilot_robots`
+#### `samanseo_robots`
 
 Filter the robots meta tag content.
 
@@ -181,7 +181,7 @@ Filter the robots meta tag content.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_robots', function( $robots ) {
+add_filter( 'samanseo_robots', function( $robots ) {
     // Force noindex on staging environment
     if ( wp_get_environment_type() === 'staging' ) {
         return 'noindex, nofollow';
@@ -190,13 +190,13 @@ add_filter( 'wpseopilot_robots', function( $robots ) {
 });
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:521`
+**Location:** `includes/class-samanseo-service-frontend.php:521`
 
 ---
 
 ### Social Media Filters
 
-#### `wpseopilot_og_image`
+#### `samanseo_og_image`
 
 Filter the Open Graph image URL.
 
@@ -209,7 +209,7 @@ Filter the Open Graph image URL.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
+add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
     // Use CDN URL for all OG images
     if ( $post && $post->ID === 42 ) {
         return 'https://cdn.example.com/special-promo.jpg';
@@ -218,11 +218,11 @@ add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
 }, 10, 4 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:587`
+**Location:** `includes/class-samanseo-service-frontend.php:587`
 
 ---
 
-#### `wpseopilot_og_title`
+#### `samanseo_og_title`
 
 Filter the Open Graph title tag.
 
@@ -233,7 +233,7 @@ Filter the Open Graph title tag.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_og_title', function( $title, $post ) {
+add_filter( 'samanseo_og_title', function( $title, $post ) {
     // Customize OG title for products
     if ( get_post_type( $post ) === 'product' ) {
         return 'Shop: ' . $title;
@@ -242,11 +242,11 @@ add_filter( 'wpseopilot_og_title', function( $title, $post ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:194`
+**Location:** `includes/class-samanseo-service-frontend.php:194`
 
 ---
 
-#### `wpseopilot_social_tags`
+#### `samanseo_social_tags`
 
 Filter all social meta tags at once.
 
@@ -259,7 +259,7 @@ Filter all social meta tags at once.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults ) {
+add_filter( 'samanseo_social_tags', function( $tags, $post, $meta, $defaults ) {
     // Add custom OG tag
     $tags['og:custom'] = 'custom-value';
 
@@ -270,13 +270,13 @@ add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults )
 }, 10, 4 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:274`
+**Location:** `includes/class-samanseo-service-frontend.php:274`
 
 ---
 
 ### Structured Data Filters
 
-#### `wpseopilot_jsonld`
+#### `samanseo_jsonld`
 
 Filter the complete JSON-LD output before rendering.
 
@@ -287,7 +287,7 @@ Filter the complete JSON-LD output before rendering.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
+add_filter( 'samanseo_jsonld', function( $payload, $post ) {
     // Add custom schema
     $payload['@graph'][] = [
         '@type' => 'Product',
@@ -303,11 +303,11 @@ add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:328`
+**Location:** `includes/class-samanseo-service-frontend.php:328`
 
 ---
 
-#### `wpseopilot_schema_webpage`
+#### `samanseo_schema_webpage`
 
 Filter the WebPage schema specifically.
 
@@ -318,7 +318,7 @@ Filter the WebPage schema specifically.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_schema_webpage', function( $schema, $post ) {
+add_filter( 'samanseo_schema_webpage', function( $schema, $post ) {
     // Add breadcrumb to schema
     $schema['breadcrumb'] = [
         '@type' => 'BreadcrumbList',
@@ -331,11 +331,11 @@ add_filter( 'wpseopilot_schema_webpage', function( $schema, $post ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-jsonld.php:75`
+**Location:** `includes/class-samanseo-service-jsonld.php:75`
 
 ---
 
-#### `wpseopilot_schema_article`
+#### `samanseo_schema_article`
 
 Filter the Article schema for posts.
 
@@ -346,7 +346,7 @@ Filter the Article schema for posts.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_schema_article', function( $schema, $post ) {
+add_filter( 'samanseo_schema_article', function( $schema, $post ) {
     // Add author information
     $author = get_userdata( $post->post_author );
     $schema['author'] = [
@@ -359,13 +359,13 @@ add_filter( 'wpseopilot_schema_article', function( $schema, $post ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-jsonld.php:94`
+**Location:** `includes/class-samanseo-service-jsonld.php:94`
 
 ---
 
 ### Sitemap Filters
 
-#### `wpseopilot_sitemap_entry`
+#### `samanseo_sitemap_entry`
 
 Filter individual sitemap entries.
 
@@ -377,7 +377,7 @@ Filter individual sitemap entries.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // Set high priority for featured posts
     if ( get_post_meta( $post_id, '_is_featured', true ) ) {
         $entry['priority'] = 1.0;
@@ -388,11 +388,11 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type )
 }, 10, 3 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-sitemap-enhancer.php:165`
+**Location:** `includes/class-samanseo-service-sitemap-enhancer.php:165`
 
 ---
 
-#### `wpseopilot_sitemap_images`
+#### `samanseo_sitemap_images`
 
 Filter images included in sitemap for a post.
 
@@ -403,7 +403,7 @@ Filter images included in sitemap for a post.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
+add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
     // Add gallery images to sitemap
     $gallery = get_post_meta( $post_id, '_product_gallery', true );
     if ( $gallery ) {
@@ -414,11 +414,11 @@ add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-sitemap-enhancer.php:237`
+**Location:** `includes/class-samanseo-service-sitemap-enhancer.php:237`
 
 ---
 
-#### `wpseopilot_sitemap_post_query_args`
+#### `samanseo_sitemap_post_query_args`
 
 Filter WP_Query arguments for sitemap generation.
 
@@ -429,7 +429,7 @@ Filter WP_Query arguments for sitemap generation.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     // Only include published products in stock
     if ( $post_type === 'product' ) {
         $args['meta_query'] = [
@@ -444,13 +444,13 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-sitemap-enhancer.php:292`
+**Location:** `includes/class-samanseo-service-sitemap-enhancer.php:292`
 
 ---
 
 ### Breadcrumb Filters
 
-#### `wpseopilot_breadcrumb_links`
+#### `samanseo_breadcrumb_links`
 
 Filter the breadcrumb trail array.
 
@@ -470,7 +470,7 @@ Filter the breadcrumb trail array.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
     // Insert custom breadcrumb for products
     if ( get_post_type( $post ) === 'product' ) {
         array_splice( $crumbs, 1, 0, [
@@ -488,7 +488,7 @@ add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
 
 ### Score & Analysis Filters
 
-#### `wpseopilot_seo_score`
+#### `samanseo_seo_score`
 
 Filter the calculated SEO score for a post.
 
@@ -499,7 +499,7 @@ Filter the calculated SEO score for a post.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
+add_filter( 'samanseo_seo_score', function( $result, $post ) {
     // Adjust scoring for products
     if ( get_post_type( $post ) === 'product' ) {
         // Penalize if missing price
@@ -519,7 +519,7 @@ add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
 
 ### Feature Toggle Filters
 
-#### `wpseopilot_feature_toggle`
+#### `samanseo_feature_toggle`
 
 Enable or disable specific plugin features.
 
@@ -537,7 +537,7 @@ Enable or disable specific plugin features.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
     // Disable redirects on development
     if ( $feature === 'redirects' && wp_get_environment_type() === 'local' ) {
         return false;
@@ -547,11 +547,11 @@ add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
 }, 10, 2 );
 ```
 
-**Location:** `includes/class-wpseopilot-service-admin-ui.php:27`
+**Location:** `includes/class-samanseo-service-admin-ui.php:27`
 
 ---
 
-#### `wpseopilot_score_post_types`
+#### `samanseo_score_post_types`
 
 Filter which post types show SEO score in admin.
 
@@ -561,7 +561,7 @@ Filter which post types show SEO score in admin.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_score_post_types', function( $post_types ) {
+add_filter( 'samanseo_score_post_types', function( $post_types ) {
     // Add 'product' post type to scored types
     $post_types[] = 'product';
 
@@ -572,13 +572,13 @@ add_filter( 'wpseopilot_score_post_types', function( $post_types ) {
 });
 ```
 
-**Location:** `includes/class-wpseopilot-service-admin-ui.php:65`
+**Location:** `includes/class-samanseo-service-admin-ui.php:65`
 
 ---
 
 ### Internal Linking Filters
 
-#### `wpseopilot_link_suggestions`
+#### `samanseo_link_suggestions`
 
 Filter the internal link suggestions shown in post editor.
 
@@ -589,7 +589,7 @@ Filter the internal link suggestions shown in post editor.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_link_suggestions', function( $suggestions, $post_id ) {
+add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
     // Add custom link suggestion
     $suggestions[] = [
         'url' => '/custom-page',
@@ -606,7 +606,7 @@ add_filter( 'wpseopilot_link_suggestions', function( $suggestions, $post_id ) {
 
 ---
 
-#### `wpseopilot_internal_link_roles`
+#### `samanseo_internal_link_roles`
 
 Filter which user roles can manage internal linking.
 
@@ -616,7 +616,7 @@ Filter which user roles can manage internal linking.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_internal_link_roles', function( $roles ) {
+add_filter( 'samanseo_internal_link_roles', function( $roles ) {
     // Allow editors to manage internal links
     $roles[] = 'editor';
 
@@ -624,13 +624,13 @@ add_filter( 'wpseopilot_internal_link_roles', function( $roles ) {
 });
 ```
 
-**Location:** `includes/class-wpseopilot-service-internal-linking.php:755`
+**Location:** `includes/class-samanseo-service-internal-linking.php:755`
 
 ---
 
 ### LLM.txt Filters
 
-#### `wpseopilot_llm_txt_content`
+#### `samanseo_llm_txt_content`
 
 Filter the complete llm.txt file content.
 
@@ -640,7 +640,7 @@ Filter the complete llm.txt file content.
 **Usage:**
 
 ```php
-add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
+add_filter( 'samanseo_llm_txt_content', function( $content ) {
     // Append custom instructions for AI
     $content .= "\n\n# Custom Instructions\n";
     $content .= "This site specializes in WordPress SEO solutions.\n";
@@ -649,7 +649,7 @@ add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
 });
 ```
 
-**Location:** `includes/class-wpseopilot-service-llm-txt-generator.php:176`
+**Location:** `includes/class-samanseo-service-llm-txt-generator.php:176`
 
 ---
 
@@ -657,7 +657,7 @@ add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
 
 ### Creating Redirects
 
-**Function:** `wpseopilot_create_redirect()`
+**Function:** `samanseo_create_redirect()`
 
 ```php
 /**
@@ -668,7 +668,7 @@ add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
  * @param int    $status_code HTTP status code (301, 302, 307, 308)
  * @return bool|WP_Error True on success, WP_Error on failure
  */
-$result = wpseopilot_create_redirect( '/old-url', '/new-url', 301 );
+$result = samanseo_create_redirect( '/old-url', '/new-url', 301 );
 
 if ( is_wp_error( $result ) ) {
     error_log( 'Redirect failed: ' . $result->get_error_message() );
@@ -683,7 +683,7 @@ if ( is_wp_error( $result ) ) {
 
 ### Rendering Breadcrumbs
 
-**Function:** `wpseopilot_breadcrumbs()`
+**Function:** `samanseo_breadcrumbs()`
 
 ```php
 /**
@@ -695,12 +695,12 @@ if ( is_wp_error( $result ) ) {
  */
 
 // In your theme template
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs();
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs();
 }
 
 // Or get the HTML
-$breadcrumbs_html = wpseopilot_breadcrumbs( null, false );
+$breadcrumbs_html = samanseo_breadcrumbs( null, false );
 ```
 
 **Location:** `includes/helpers.php:720`
@@ -711,20 +711,20 @@ $breadcrumbs_html = wpseopilot_breadcrumbs( null, false );
 
 Saman SEO provides namespaced helper functions for common tasks.
 
-**Namespace:** `WPSEOPilot\Helpers`
+**Namespace:** `SamanSEO\Helpers`
 
 ### Get Option
 
 ```php
-use function WPSEOPilot\Helpers\get_option;
+use function SamanSEO\Helpers\get_option;
 
-$default_title = get_option( 'wpseopilot_default_title_template', '{{post_title}} | {{site_title}}' );
+$default_title = get_option( 'samanseo_default_title_template', '{{post_title}} | {{site_title}}' );
 ```
 
 ### Get Post Meta
 
 ```php
-use function WPSEOPilot\Helpers\get_post_meta;
+use function SamanSEO\Helpers\get_post_meta;
 
 $meta = get_post_meta( $post_id );
 // Returns: [ 'title' => '', 'description' => '', 'canonical' => '', ... ]
@@ -733,7 +733,7 @@ $meta = get_post_meta( $post_id );
 ### Replace Template Variables
 
 ```php
-use function WPSEOPilot\Helpers\replace_template_variables;
+use function SamanSEO\Helpers\replace_template_variables;
 
 $template = '{{post_title}} | {{site_title}}';
 $output = replace_template_variables( $template, $post );
@@ -743,7 +743,7 @@ $output = replace_template_variables( $template, $post );
 ### Generate Title from Template
 
 ```php
-use function WPSEOPilot\Helpers\generate_title_from_template;
+use function SamanSEO\Helpers\generate_title_from_template;
 
 $title = generate_title_from_template( $post, 'post' );
 ```
@@ -751,7 +751,7 @@ $title = generate_title_from_template( $post, 'post' );
 ### Calculate SEO Score
 
 ```php
-use function WPSEOPilot\Helpers\calculate_seo_score;
+use function SamanSEO\Helpers\calculate_seo_score;
 
 $score_data = calculate_seo_score( $post );
 // Returns: [ 'score' => 85, 'issues' => [...], 'suggestions' => [...] ]
@@ -760,7 +760,7 @@ $score_data = calculate_seo_score( $post );
 ### Generate Breadcrumbs
 
 ```php
-use function WPSEOPilot\Helpers\breadcrumbs;
+use function SamanSEO\Helpers\breadcrumbs;
 
 $breadcrumbs_html = breadcrumbs( $post, false );
 ```
@@ -773,10 +773,10 @@ $breadcrumbs_html = breadcrumbs( $post, false );
 
 ### Redirects Table
 
-**Table Name:** `wp_wpseopilot_redirects`
+**Table Name:** `wp_samanseo_redirects`
 
 ```sql
-CREATE TABLE wp_wpseopilot_redirects (
+CREATE TABLE wp_samanseo_redirects (
     id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     source VARCHAR(255) NOT NULL,
     target VARCHAR(255) NOT NULL,
@@ -792,7 +792,7 @@ CREATE TABLE wp_wpseopilot_redirects (
 
 ```php
 global $wpdb;
-$table = $wpdb->prefix . 'wpseopilot_redirects';
+$table = $wpdb->prefix . 'samanseo_redirects';
 
 $redirects = $wpdb->get_results( "
     SELECT * FROM {$table}
@@ -806,10 +806,10 @@ $redirects = $wpdb->get_results( "
 
 ### 404 Log Table
 
-**Table Name:** `wp_wpseopilot_404_log`
+**Table Name:** `wp_samanseo_404_log`
 
 ```sql
-CREATE TABLE wp_wpseopilot_404_log (
+CREATE TABLE wp_samanseo_404_log (
     id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     request_uri VARCHAR(255) NOT NULL,
     user_agent TEXT DEFAULT NULL,
@@ -825,7 +825,7 @@ CREATE TABLE wp_wpseopilot_404_log (
 
 ```php
 global $wpdb;
-$table = $wpdb->prefix . 'wpseopilot_404_log';
+$table = $wpdb->prefix . 'samanseo_404_log';
 
 $top_404s = $wpdb->get_results( "
     SELECT request_uri, hits, last_seen
@@ -852,7 +852,7 @@ All SEO meta fields are exposed via the WordPress REST API.
   "id": 123,
   "title": { "rendered": "Post Title" },
   "meta": {
-    "_wpseopilot_meta": {
+    "_samanseo_meta": {
       "title": "Custom SEO Title",
       "description": "Custom meta description",
       "canonical": "",
@@ -873,7 +873,7 @@ All SEO meta fields are exposed via the WordPress REST API.
 ```json
 {
   "meta": {
-    "_wpseopilot_meta": {
+    "_samanseo_meta": {
       "title": "New SEO Title",
       "description": "New description"
     }
@@ -889,7 +889,7 @@ wp.apiFetch({
     method: 'POST',
     data: {
         meta: {
-            _wpseopilot_meta: {
+            _samanseo_meta: {
                 title: 'New SEO Title',
                 description: 'Updated description'
             }
@@ -900,7 +900,7 @@ wp.apiFetch({
 });
 ```
 
-**Location:** `includes/class-wpseopilot-service-post-meta.php`
+**Location:** `includes/class-samanseo-service-post-meta.php`
 
 ---
 
@@ -937,7 +937,7 @@ if ( current_user_can( 'manage_seopilot_links' ) ) {
 
 ## Feature Toggles
 
-Control which features are enabled using the `wpseopilot_feature_toggle` filter.
+Control which features are enabled using the `samanseo_feature_toggle` filter.
 
 ### Available Features
 
@@ -952,7 +952,7 @@ Control which features are enabled using the `wpseopilot_feature_toggle` filter.
 ### Example: Disable on Staging
 
 ```php
-add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
     if ( wp_get_environment_type() !== 'production' ) {
         // Disable certain features on non-production
         if ( in_array( $feature, [ 'redirects', 'llm_txt' ], true ) ) {
@@ -973,8 +973,8 @@ add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
 Always import helper functions to avoid conflicts:
 
 ```php
-use function WPSEOPilot\Helpers\get_option;
-use function WPSEOPilot\Helpers\replace_template_variables;
+use function SamanSEO\Helpers\get_option;
+use function SamanSEO\Helpers\replace_template_variables;
 ```
 
 ### 2. Check for Function Existence
@@ -982,8 +982,8 @@ use function WPSEOPilot\Helpers\replace_template_variables;
 When using public functions in themes, check if they exist:
 
 ```php
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs();
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs();
 }
 ```
 
@@ -992,7 +992,7 @@ if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
 Always return the original value if you don't modify it:
 
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( some_condition() ) {
         return modified_title();
     }
@@ -1007,10 +1007,10 @@ Be mindful of filter priorities:
 
 ```php
 // Run early (before default processing)
-add_filter( 'wpseopilot_title', 'my_function', 5, 2 );
+add_filter( 'samanseo_title', 'my_function', 5, 2 );
 
 // Run late (after other modifications)
-add_filter( 'wpseopilot_title', 'my_function', 20, 2 );
+add_filter( 'samanseo_title', 'my_function', 20, 2 );
 ```
 
 ### 5. Cache Expensive Operations
@@ -1018,16 +1018,16 @@ add_filter( 'wpseopilot_title', 'my_function', 20, 2 );
 If your filter does heavy processing, cache the result:
 
 ```php
-add_filter( 'wpseopilot_og_image', function( $image, $post ) {
+add_filter( 'samanseo_og_image', function( $image, $post ) {
     $cache_key = 'custom_og_image_' . $post->ID;
-    $cached = wp_cache_get( $cache_key, 'wpseopilot' );
+    $cached = wp_cache_get( $cache_key, 'samanseo' );
 
     if ( false !== $cached ) {
         return $cached;
     }
 
     $custom_image = expensive_operation( $post );
-    wp_cache_set( $cache_key, $custom_image, 'wpseopilot', HOUR_IN_SECONDS );
+    wp_cache_set( $cache_key, $custom_image, 'samanseo', HOUR_IN_SECONDS );
 
     return $custom_image;
 }, 10, 2 );
@@ -1041,7 +1041,7 @@ When creating redirects or modifying metadata programmatically:
 $source = sanitize_text_field( $_POST['source'] );
 $target = esc_url_raw( $_POST['target'] );
 
-wpseopilot_create_redirect( $source, $target, 301 );
+samanseo_create_redirect( $source, $target, 301 );
 ```
 
 ### 7. Handle Errors Gracefully
@@ -1049,7 +1049,7 @@ wpseopilot_create_redirect( $source, $target, 301 );
 Check for `WP_Error` returns:
 
 ```php
-$result = wpseopilot_create_redirect( '/old', '/new' );
+$result = samanseo_create_redirect( '/old', '/new' );
 
 if ( is_wp_error( $result ) ) {
     wp_die( $result->get_error_message() );
@@ -1073,7 +1073,7 @@ add_action( 'init', function() {
 });
 
 // Set custom title template for portfolio
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( get_post_type( $post ) === 'portfolio' ) {
         $client = get_post_meta( $post->ID, 'client_name', true );
         return $title . ' - Client: ' . $client . ' | ' . get_bloginfo( 'name' );
@@ -1083,7 +1083,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Custom schema for portfolio items
-add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
+add_filter( 'samanseo_jsonld', function( $payload, $post ) {
     if ( get_post_type( $post ) === 'portfolio' ) {
         $payload['@graph'][] = [
             '@type' => 'CreativeWork',
@@ -1104,7 +1104,7 @@ add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
 
 ```php
 // Apply different settings per site in multisite
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_multisite() ) {
         $site_id = get_current_blog_id();
 
@@ -1122,7 +1122,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 
 ```php
 // Automatically noindex old posts
-add_filter( 'wpseopilot_robots_array', function( $directives ) {
+add_filter( 'samanseo_robots_array', function( $directives ) {
     global $post;
 
     if ( $post && is_singular( 'post' ) ) {

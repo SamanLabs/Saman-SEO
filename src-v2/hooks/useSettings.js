@@ -1,7 +1,7 @@
 /**
  * useSettings Hook - Manages plugin settings state
  *
- * @package WPSEOPilot
+ * @package SamanSEO
  */
 
 import { useState, useEffect, useCallback } from '@wordpress/element';

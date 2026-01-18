@@ -177,6 +177,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
             $issues[] = [
                 'type'    => 'warning',
                 'message' => sprintf(
+                    // translators: %d is the number of posts
                     __( '%d posts are missing meta descriptions', 'saman-seo' ),
                     count( $posts_without_desc )
                 ),
@@ -191,6 +192,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
             $issues[] = [
                 'type'    => 'info',
                 'message' => sprintf(
+                    // translators: %d is the number of posts
                     __( '%d posts are using default titles (no custom SEO title)', 'saman-seo' ),
                     count( $posts_without_title )
                 ),
@@ -204,6 +206,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
             $issues[] = [
                 'type'    => 'warning',
                 'message' => sprintf(
+                    // translators: %d is the number of posts
                     __( '%d posts have titles longer than 60 characters', 'saman-seo' ),
                     count( $long_titles )
                 ),
@@ -275,7 +278,9 @@ GOOD: 'Looked at your site. Here's what's up:'";
 
         // Content overview
         $message .= "ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â  **Content**\n";
+        // translators: %d is the count
         $message .= sprintf( __( "- %d published posts\n", 'saman-seo' ), $stats['total_posts'] );
+        // translators: %d is the count
         $message .= sprintf( __( "- %d published pages\n\n", 'saman-seo' ), $stats['total_pages'] );
 
         // Issues summary
@@ -284,6 +289,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
         if ( $stats['posts_without_description'] > 0 ) {
             $has_issues = true;
             $message .= sprintf(
+                // translators: %d is the number of posts
                 __( "ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â %d posts missing meta descriptions\n", 'saman-seo' ),
                 $stats['posts_without_description']
             );
@@ -292,6 +298,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
         if ( $stats['posts_with_long_titles'] > 0 ) {
             $has_issues = true;
             $message .= sprintf(
+                // translators: %d is the number of posts
                 __( "ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â %d posts have titles too long for search results\n", 'saman-seo' ),
                 $stats['posts_with_long_titles']
             );
@@ -306,6 +313,8 @@ GOOD: 'Looked at your site. Here's what's up:'";
 
     /**
      * Get posts without a specific meta field.
+     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
+     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
      *
      * @param string $meta_key Meta key to check.
      * @return array Post IDs.
@@ -313,6 +322,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
     private function get_posts_without_meta( $meta_key ) {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
         $results = $wpdb->get_col( $wpdb->prepare(
             "SELECT p.ID FROM {$wpdb->posts} p
             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = %s
@@ -326,7 +336,9 @@ GOOD: 'Looked at your site. Here's what's up:'";
         return $results ?? [];
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
     /**
+     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
      * Get posts with titles longer than 60 characters.
      *
      * @return array Posts with long titles.
@@ -334,6 +346,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
     private function get_posts_with_long_titles() {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
         $results = $wpdb->get_results(
             "SELECT ID, post_title FROM {$wpdb->posts}
             WHERE post_status = 'publish'

@@ -31,7 +31,7 @@ Saman SEO's Local SEO module helps local businesses improve their visibility in 
 
 **Location:** Navigate to **Saman SEO → Local SEO**
 
-**File:** `includes/class-wpseopilot-service-local-seo.php`
+**File:** `includes/class-samanseo-service-local-seo.php`
 
 ---
 
@@ -44,7 +44,7 @@ Navigate to **Saman SEO → General Settings**
 Find **Local SEO Settings** and check **Enable Local SEO**.
 
 ```php
-update_option( 'wpseopilot_enable_local_seo', '1' );
+update_option( 'samanseo_enable_local_seo', '1' );
 ```
 
 ---
@@ -59,7 +59,7 @@ Navigate to **Saman SEO → Local SEO** to access the configuration panel.
 
 ### Business Name
 
-**Option:** `wpseopilot_local_business_name`
+**Option:** `samanseo_local_business_name`
 
 Your official business name (as registered).
 
@@ -69,14 +69,14 @@ Joe's Coffee Shop
 ```
 
 ```php
-update_option( 'wpseopilot_local_business_name', 'Joe\'s Coffee Shop' );
+update_option( 'samanseo_local_business_name', 'Joe\'s Coffee Shop' );
 ```
 
 ---
 
 ### Business Type
 
-**Option:** `wpseopilot_local_business_type`
+**Option:** `samanseo_local_business_type`
 
 Select from Schema.org business types:
 
@@ -97,7 +97,7 @@ Restaurant
 ```
 
 ```php
-update_option( 'wpseopilot_local_business_type', 'Restaurant' );
+update_option( 'samanseo_local_business_type', 'Restaurant' );
 ```
 
 **Full List:** [Schema.org LocalBusiness Types](https://schema.org/LocalBusiness)
@@ -106,7 +106,7 @@ update_option( 'wpseopilot_local_business_type', 'Restaurant' );
 
 ### Business Description
 
-**Option:** `wpseopilot_local_description`
+**Option:** `samanseo_local_description`
 
 A brief description of your business (1-2 sentences).
 
@@ -116,14 +116,14 @@ Joe's Coffee Shop is a family-owned café serving artisan coffee and fresh pastr
 ```
 
 ```php
-update_option( 'wpseopilot_local_description', 'Joe\'s Coffee Shop is a family-owned café...' );
+update_option( 'samanseo_local_description', 'Joe\'s Coffee Shop is a family-owned café...' );
 ```
 
 ---
 
 ### Business Logo
 
-**Option:** `wpseopilot_local_logo`
+**Option:** `samanseo_local_logo`
 
 URL to your business logo image.
 
@@ -138,14 +138,14 @@ https://example.com/wp-content/uploads/logo.png
 ```
 
 ```php
-update_option( 'wpseopilot_local_logo', 'https://example.com/logo.png' );
+update_option( 'samanseo_local_logo', 'https://example.com/logo.png' );
 ```
 
 ---
 
 ### Business Image
 
-**Option:** `wpseopilot_local_image`
+**Option:** `samanseo_local_image`
 
 URL to a representative image of your business (storefront, interior, etc.).
 
@@ -155,14 +155,14 @@ https://example.com/wp-content/uploads/storefront.jpg
 ```
 
 ```php
-update_option( 'wpseopilot_local_image', 'https://example.com/storefront.jpg' );
+update_option( 'samanseo_local_image', 'https://example.com/storefront.jpg' );
 ```
 
 ---
 
 ### Price Range
 
-**Option:** `wpseopilot_local_price_range`
+**Option:** `samanseo_local_price_range`
 
 Indicate your price range using dollar signs.
 
@@ -178,7 +178,7 @@ $$
 ```
 
 ```php
-update_option( 'wpseopilot_local_price_range', '$$' );
+update_option( 'samanseo_local_price_range', '$$' );
 ```
 
 ---
@@ -187,7 +187,7 @@ update_option( 'wpseopilot_local_price_range', '$$' );
 
 ### Phone Number
 
-**Option:** `wpseopilot_local_phone`
+**Option:** `samanseo_local_phone`
 
 Business phone number.
 
@@ -201,14 +201,14 @@ Business phone number.
 ```
 
 ```php
-update_option( 'wpseopilot_local_phone', '+1-555-123-4567' );
+update_option( 'samanseo_local_phone', '+1-555-123-4567' );
 ```
 
 ---
 
 ### Email Address
 
-**Option:** `wpseopilot_local_email`
+**Option:** `samanseo_local_email`
 
 Business email contact.
 
@@ -218,7 +218,7 @@ contact@joescoffee.com
 ```
 
 ```php
-update_option( 'wpseopilot_local_email', 'contact@joescoffee.com' );
+update_option( 'samanseo_local_email', 'contact@joescoffee.com' );
 ```
 
 ---
@@ -227,7 +227,7 @@ update_option( 'wpseopilot_local_email', 'contact@joescoffee.com' );
 
 ### Street Address
 
-**Option:** `wpseopilot_local_street`
+**Option:** `samanseo_local_street`
 
 Street address line.
 
@@ -237,14 +237,14 @@ Street address line.
 ```
 
 ```php
-update_option( 'wpseopilot_local_street', '123 Main Street' );
+update_option( 'samanseo_local_street', '123 Main Street' );
 ```
 
 ---
 
 ### City
 
-**Option:** `wpseopilot_local_city`
+**Option:** `samanseo_local_city`
 
 **Example:**
 ```
@@ -252,14 +252,14 @@ San Francisco
 ```
 
 ```php
-update_option( 'wpseopilot_local_city', 'San Francisco' );
+update_option( 'samanseo_local_city', 'San Francisco' );
 ```
 
 ---
 
 ### State/Province
 
-**Option:** `wpseopilot_local_state`
+**Option:** `samanseo_local_state`
 
 **Example:**
 ```
@@ -268,14 +268,14 @@ California
 ```
 
 ```php
-update_option( 'wpseopilot_local_state', 'CA' );
+update_option( 'samanseo_local_state', 'CA' );
 ```
 
 ---
 
 ### ZIP/Postal Code
 
-**Option:** `wpseopilot_local_zip`
+**Option:** `samanseo_local_zip`
 
 **Example:**
 ```
@@ -283,14 +283,14 @@ update_option( 'wpseopilot_local_state', 'CA' );
 ```
 
 ```php
-update_option( 'wpseopilot_local_zip', '94102' );
+update_option( 'samanseo_local_zip', '94102' );
 ```
 
 ---
 
 ### Country
 
-**Option:** `wpseopilot_local_country`
+**Option:** `samanseo_local_country`
 
 **Example:**
 ```
@@ -300,14 +300,14 @@ US
 ```
 
 ```php
-update_option( 'wpseopilot_local_country', 'United States' );
+update_option( 'samanseo_local_country', 'United States' );
 ```
 
 ---
 
 ### Geographic Coordinates
 
-**Option:** `wpseopilot_local_latitude`, `wpseopilot_local_longitude`
+**Option:** `samanseo_local_latitude`, `samanseo_local_longitude`
 
 Precise geo-coordinates for map display.
 
@@ -324,15 +324,15 @@ Longitude: -122.4194
 ```
 
 ```php
-update_option( 'wpseopilot_local_latitude', '37.7749' );
-update_option( 'wpseopilot_local_longitude', '-122.4194' );
+update_option( 'samanseo_local_latitude', '37.7749' );
+update_option( 'samanseo_local_longitude', '-122.4194' );
 ```
 
 ---
 
 ## Social Profiles
 
-**Option:** `wpseopilot_local_social_profiles`
+**Option:** `samanseo_local_social_profiles`
 
 List of your business's social media profiles.
 
@@ -356,7 +356,7 @@ $social_profiles = [
     'https://www.instagram.com/joescoffee'
 ];
 
-update_option( 'wpseopilot_local_social_profiles', json_encode( $social_profiles ) );
+update_option( 'samanseo_local_social_profiles', json_encode( $social_profiles ) );
 ```
 
 **Via Admin UI:**
@@ -372,7 +372,7 @@ https://www.instagram.com/joescoffee
 
 ## Opening Hours
 
-**Option:** `wpseopilot_local_opening_hours`
+**Option:** `samanseo_local_opening_hours`
 
 Specify when your business is open.
 
@@ -391,7 +391,7 @@ $opening_hours = [
     'Sunday' => [ 'open' => '10:00', 'close' => '16:00' ]
 ];
 
-update_option( 'wpseopilot_local_opening_hours', json_encode( $opening_hours ) );
+update_option( 'samanseo_local_opening_hours', json_encode( $opening_hours ) );
 ```
 
 **Time Format:** 24-hour format (HH:MM)
@@ -545,20 +545,20 @@ Only include profiles you actively maintain.
 ### Example 1: Restaurant
 
 ```php
-update_option( 'wpseopilot_enable_local_seo', '1' );
-update_option( 'wpseopilot_local_business_name', 'Bella Italian Bistro' );
-update_option( 'wpseopilot_local_business_type', 'Restaurant' );
-update_option( 'wpseopilot_local_description', 'Authentic Italian cuisine in the heart of downtown. Family recipes since 1985.' );
-update_option( 'wpseopilot_local_price_range', '$$$' );
-update_option( 'wpseopilot_local_phone', '+1-555-987-6543' );
-update_option( 'wpseopilot_local_email', 'info@bellabistro.com' );
-update_option( 'wpseopilot_local_street', '456 Oak Avenue' );
-update_option( 'wpseopilot_local_city', 'Chicago' );
-update_option( 'wpseopilot_local_state', 'IL' );
-update_option( 'wpseopilot_local_zip', '60601' );
-update_option( 'wpseopilot_local_country', 'United States' );
-update_option( 'wpseopilot_local_latitude', '41.8781' );
-update_option( 'wpseopilot_local_longitude', '-87.6298' );
+update_option( 'samanseo_enable_local_seo', '1' );
+update_option( 'samanseo_local_business_name', 'Bella Italian Bistro' );
+update_option( 'samanseo_local_business_type', 'Restaurant' );
+update_option( 'samanseo_local_description', 'Authentic Italian cuisine in the heart of downtown. Family recipes since 1985.' );
+update_option( 'samanseo_local_price_range', '$$$' );
+update_option( 'samanseo_local_phone', '+1-555-987-6543' );
+update_option( 'samanseo_local_email', 'info@bellabistro.com' );
+update_option( 'samanseo_local_street', '456 Oak Avenue' );
+update_option( 'samanseo_local_city', 'Chicago' );
+update_option( 'samanseo_local_state', 'IL' );
+update_option( 'samanseo_local_zip', '60601' );
+update_option( 'samanseo_local_country', 'United States' );
+update_option( 'samanseo_local_latitude', '41.8781' );
+update_option( 'samanseo_local_longitude', '-87.6298' );
 
 $opening_hours = [
     'Monday' => [ 'open' => 'closed', 'close' => 'closed' ],
@@ -569,7 +569,7 @@ $opening_hours = [
     'Saturday' => [ 'open' => '12:00', 'close' => '23:00' ],
     'Sunday' => [ 'open' => '12:00', 'close' => '21:00' ]
 ];
-update_option( 'wpseopilot_local_opening_hours', json_encode( $opening_hours ) );
+update_option( 'samanseo_local_opening_hours', json_encode( $opening_hours ) );
 ```
 
 ---
@@ -577,23 +577,23 @@ update_option( 'wpseopilot_local_opening_hours', json_encode( $opening_hours ) )
 ### Example 2: Law Firm
 
 ```php
-update_option( 'wpseopilot_enable_local_seo', '1' );
-update_option( 'wpseopilot_local_business_name', 'Smith & Associates Law' );
-update_option( 'wpseopilot_local_business_type', 'Attorney' );
-update_option( 'wpseopilot_local_description', 'Experienced legal representation in family law, estate planning, and business matters.' );
-update_option( 'wpseopilot_local_phone', '+1-555-321-9876' );
-update_option( 'wpseopilot_local_email', 'contact@smithlaw.com' );
-update_option( 'wpseopilot_local_street', '789 Legal Plaza, Suite 200' );
-update_option( 'wpseopilot_local_city', 'Boston' );
-update_option( 'wpseopilot_local_state', 'MA' );
-update_option( 'wpseopilot_local_zip', '02108' );
-update_option( 'wpseopilot_local_country', 'United States' );
+update_option( 'samanseo_enable_local_seo', '1' );
+update_option( 'samanseo_local_business_name', 'Smith & Associates Law' );
+update_option( 'samanseo_local_business_type', 'Attorney' );
+update_option( 'samanseo_local_description', 'Experienced legal representation in family law, estate planning, and business matters.' );
+update_option( 'samanseo_local_phone', '+1-555-321-9876' );
+update_option( 'samanseo_local_email', 'contact@smithlaw.com' );
+update_option( 'samanseo_local_street', '789 Legal Plaza, Suite 200' );
+update_option( 'samanseo_local_city', 'Boston' );
+update_option( 'samanseo_local_state', 'MA' );
+update_option( 'samanseo_local_zip', '02108' );
+update_option( 'samanseo_local_country', 'United States' );
 
 $social_profiles = [
     'https://www.linkedin.com/company/smithlaw',
     'https://www.facebook.com/smithlawfirm'
 ];
-update_option( 'wpseopilot_local_social_profiles', json_encode( $social_profiles ) );
+update_option( 'samanseo_local_social_profiles', json_encode( $social_profiles ) );
 ```
 
 ---
@@ -601,16 +601,16 @@ update_option( 'wpseopilot_local_social_profiles', json_encode( $social_profiles
 ### Example 3: Retail Store
 
 ```php
-update_option( 'wpseopilot_enable_local_seo', '1' );
-update_option( 'wpseopilot_local_business_name', 'Green Thumb Garden Center' );
-update_option( 'wpseopilot_local_business_type', 'Store' );
-update_option( 'wpseopilot_local_description', 'Your local source for plants, gardening supplies, and expert advice.' );
-update_option( 'wpseopilot_local_price_range', '$$' );
-update_option( 'wpseopilot_local_phone', '+1-555-111-2222' );
-update_option( 'wpseopilot_local_street', '321 Garden Road' );
-update_option( 'wpseopilot_local_city', 'Portland' );
-update_option( 'wpseopilot_local_state', 'OR' );
-update_option( 'wpseopilot_local_zip', '97201' );
+update_option( 'samanseo_enable_local_seo', '1' );
+update_option( 'samanseo_local_business_name', 'Green Thumb Garden Center' );
+update_option( 'samanseo_local_business_type', 'Store' );
+update_option( 'samanseo_local_description', 'Your local source for plants, gardening supplies, and expert advice.' );
+update_option( 'samanseo_local_price_range', '$$' );
+update_option( 'samanseo_local_phone', '+1-555-111-2222' );
+update_option( 'samanseo_local_street', '321 Garden Road' );
+update_option( 'samanseo_local_city', 'Portland' );
+update_option( 'samanseo_local_state', 'OR' );
+update_option( 'samanseo_local_zip', '97201' );
 
 $opening_hours = [
     'Monday' => [ 'open' => '09:00', 'close' => '18:00' ],
@@ -621,7 +621,7 @@ $opening_hours = [
     'Saturday' => [ 'open' => '09:00', 'close' => '17:00' ],
     'Sunday' => [ 'open' => '10:00', 'close' => '16:00' ]
 ];
-update_option( 'wpseopilot_local_opening_hours', json_encode( $opening_hours ) );
+update_option( 'samanseo_local_opening_hours', json_encode( $opening_hours ) );
 ```
 
 ---
@@ -676,7 +676,7 @@ Use these tools to validate your LocalBusiness schema:
 **Issue:** Google shows incorrect business category
 
 **Solution:**
-1. Verify `wpseopilot_local_business_type` is set correctly
+1. Verify `samanseo_local_business_type` is set correctly
 2. Update Google My Business profile to match
 3. Request re-indexing
 
@@ -687,7 +687,7 @@ Use these tools to validate your LocalBusiness schema:
 To disable the Local SEO module:
 
 ```php
-update_option( 'wpseopilot_enable_local_seo', '0' );
+update_option( 'samanseo_enable_local_seo', '0' );
 ```
 
 Or via admin: **Saman SEO → General Settings** → Uncheck **Enable Local SEO**

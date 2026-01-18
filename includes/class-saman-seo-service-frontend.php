@@ -111,7 +111,7 @@ class Frontend {
 		if ( empty( $description ) && ( is_category() || is_tag() || is_tax() ) ) {
 			$term = get_queried_object();
 			if ( $term instanceof \WP_Term ) {
-				$term_desc = term_description( $term->term_id, $term->taxonomy );
+				$term_desc = term_description( $term->term_id );
 				if ( ! empty( $term_desc ) ) {
 					$description = wp_strip_all_tags( $term_desc );
 				}
