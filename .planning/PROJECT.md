@@ -43,7 +43,7 @@ Transform Saman SEO into Saman Labs SEO — a focused SEO plugin that delegates 
 
 - New SEO features — focus is rebrand and architecture fixes
 - Migration tooling — personal use only, can reinstall fresh
-- Backward compatibility — clean break from wpseopilot_ prefixes
+- Backward compatibility — clean break from samanseo_ prefixes
 
 ## Context
 
@@ -59,28 +59,28 @@ Transform Saman SEO into Saman Labs SEO — a focused SEO plugin that delegates 
 - React admin via @wordpress/element
 - 5 custom database tables (will need renamed)
 - 50+ wp_options entries (will need renamed)
-- REST API namespace `wpseopilot/v2` → `samanlabs-seo/v1`
+- REST API namespace `samanseo/v2` → `samanlabs-seo/v1`
 
 ### Key Files Affected
 
 **Bootstrap:**
 - `wp-seo-pilot.php` → `saman-labs-seo.php`
-- Constants: `WPSEOPILOT_*` → `SAMANLABS_SEO_*`
-- Namespace: `WPSEOPilot` → `SamanLabs\SEO`
+- Constants: `SAMANSEO_*` → `SAMANLABS_SEO_*`
+- Namespace: `SamanSEO` → `SamanLabs\SEO`
 
 **Database:**
-- Tables: `wp_wpseopilot_*` → `wp_samanlabs_seo_*`
-- Options: `wpseopilot_*` → `samanlabs_seo_*`
-- Post meta: `_wpseopilot_meta` → `_samanlabs_seo_meta`
+- Tables: `wp_samanseo_*` → `wp_samanlabs_seo_*`
+- Options: `samanseo_*` → `samanlabs_seo_*`
+- Post meta: `_samanseo_meta` → `_samanlabs_seo_meta`
 
 **REST API:**
-- Namespace: `wpseopilot/v2` → `samanlabs-seo/v1`
+- Namespace: `samanseo/v2` → `samanlabs-seo/v1`
 
 **CSS Classes:**
-- `.wpseopilot-*` → `.samanlabs-seo-*`
+- `.samanseo-*` → `.samanlabs-seo-*`
 
 **Hooks:**
-- Actions/filters: `wpseopilot_*` → `samanlabs_seo_*`
+- Actions/filters: `samanseo_*` → `samanlabs_seo_*`
 
 ## Key Decisions
 

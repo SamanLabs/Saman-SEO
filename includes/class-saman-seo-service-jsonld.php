@@ -127,7 +127,7 @@ class JsonLD {
 
 		return [
 			'@context' => 'https://schema.org',
-			'@graph'   => apply_filters( 'SAMAN_SEO_jsonld_graph', $graph ),
+			'@graph'   => apply_filters( 'SAMAN_SEO_jsonld_graph', $graph, $post ),
 		];
 	}
 

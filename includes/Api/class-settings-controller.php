@@ -85,6 +85,8 @@ class Settings_Controller extends REST_Controller {
     public function get_settings() {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
         $options = $wpdb->get_results(
             "SELECT option_name, option_value
              FROM {$wpdb->options}

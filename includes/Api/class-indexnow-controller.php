@@ -613,12 +613,16 @@ class IndexNow_Controller extends REST_Controller {
 		$table = $wpdb->prefix . 'SAMAN_SEO_indexnow_log';
 
 		// Get the most recent submission for this post.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$latest = $wpdb->get_row( $wpdb->prepare(
 			"SELECT * FROM {$table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$post_id
 		) );
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		// Get total submissions for this post.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$total_submissions = $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(*) FROM {$table} WHERE post_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$post_id
@@ -762,8 +766,10 @@ class IndexNow_Controller extends REST_Controller {
 
 		$log_table = $wpdb->prefix . 'SAMAN_SEO_indexnow_log';
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		foreach ( $query->posts as $post ) {
 			// Get latest submission for this post.
+			// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 			$latest = $wpdb->get_row( $wpdb->prepare(
 				"SELECT status, submitted_at FROM {$log_table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$post->ID
@@ -801,9 +807,11 @@ class IndexNow_Controller extends REST_Controller {
 				'last_indexed_ago' => $last_indexed ? human_time_diff( strtotime( $last_indexed ) ) . ' ago' : null,
 			];
 		}
+// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 
 		// Get stats for header.
 		$total_published = wp_count_posts( $post_type )->publish;
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$total_indexed   = $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(DISTINCT post_id) FROM {$log_table} WHERE status = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'success'

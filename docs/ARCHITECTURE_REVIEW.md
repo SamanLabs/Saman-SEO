@@ -37,10 +37,10 @@ Saman SEO has a **solid foundation** with good separation of concerns, service-o
 wp-seo-pilot/
 ├── wp-seo-pilot.php                    # Bootstrap file
 ├── includes/
-│   ├── class-wpseopilot-plugin.php     # Main orchestrator (Singleton)
-│   ├── class-wpseopilot-service-*.php  # 18+ service classes
-│   ├── class-wpseopilot-internal-*     # Internal linking components
-│   ├── class-wpseopilot-admin-topbar.php
+│   ├── class-samanseo-plugin.php     # Main orchestrator (Singleton)
+│   ├── class-samanseo-service-*.php  # 18+ service classes
+│   ├── class-samanseo-internal-*     # Internal linking components
+│   ├── class-samanseo-admin-topbar.php
 │   ├── helpers.php                     # Global helper functions
 │   ├── useragent_detect_browser.php    # User agent detection
 │   └── src/
@@ -68,11 +68,11 @@ wp-seo-pilot/
 
 | Data Type | Storage Method | Location |
 |-----------|----------------|----------|
-| **Redirects** | Custom database table | `wp_wpseopilot_redirects` |
-| **404 Logs** | Custom database table | `wp_wpseopilot_404_log` |
-| **Internal Link Rules** | WordPress options | `wpseopilot_link_rules` |
-| **Settings** | WordPress options (80+ keys) | Various `wpseopilot_*` options |
-| **Post Meta** | Single JSON meta key | `_wpseopilot_meta` |
+| **Redirects** | Custom database table | `wp_samanseo_redirects` |
+| **404 Logs** | Custom database table | `wp_samanseo_404_log` |
+| **Internal Link Rules** | WordPress options | `samanseo_link_rules` |
+| **Settings** | WordPress options (80+ keys) | Various `samanseo_*` options |
+| **Post Meta** | Single JSON meta key | `_samanseo_meta` |
 
 ### Current Service Count
 
@@ -128,7 +128,7 @@ Custom autoloader handles class loading automatically.
 ```php
 spl_autoload_register(
     static function ( $class ) {
-        if ( 0 !== strpos( $class, 'WPSEOPilot\\' ) ) {
+        if ( 0 !== strpos( $class, 'SamanSEO\\' ) ) {
             return;
         }
         // Auto-load class files
@@ -144,7 +144,7 @@ spl_autoload_register(
 
 Services are registered centrally and can be retrieved as needed.
 
-**Code:** `class-wpseopilot-plugin.php:89-95`
+**Code:** `class-samanseo-plugin.php:89-95`
 
 ```php
 private function register( $key, $service ) {
@@ -164,9 +164,9 @@ private function register( $key, $service ) {
 50+ filters and 2 action hooks provide extensive customization.
 
 **Examples:**
-- `wpseopilot_title` - Modify page titles
-- `wpseopilot_sitemap_entry` - Customize sitemap entries
-- `wpseopilot_jsonld` - Alter structured data
+- `samanseo_title` - Modify page titles
+- `samanseo_sitemap_entry` - Customize sitemap entries
+- `samanseo_jsonld` - Alter structured data
 
 **Impact:** Developers can extend without modifying core code.
 
@@ -176,7 +176,7 @@ private function register( $key, $service ) {
 
 Post meta exposed via REST API with schema validation.
 
-**Code:** `class-wpseopilot-service-post-meta.php`
+**Code:** `class-samanseo-service-post-meta.php`
 
 **Impact:** Gutenberg integration, headless WordPress support.
 
@@ -186,7 +186,7 @@ Post meta exposed via REST API with schema validation.
 
 Internal linking uses repository for data access abstraction.
 
-**Code:** `class-wpseopilot-internal-linking-repository.php`
+**Code:** `class-samanseo-internal-linking-repository.php`
 
 **Impact:** Cleaner code, easier to test and swap data sources.
 
@@ -196,7 +196,7 @@ Internal linking uses repository for data access abstraction.
 
 Command-line tools for automation and bulk operations.
 
-**Code:** `class-wpseopilot-service-cli.php`
+**Code:** `class-samanseo-service-cli.php`
 
 **Impact:** DevOps-friendly, scriptable workflows.
 
@@ -208,7 +208,7 @@ Services can be enabled/disabled via filters.
 
 **Example:**
 ```php
-apply_filters( 'wpseopilot_feature_toggle', true, 'redirects' );
+apply_filters( 'samanseo_feature_toggle', true, 'redirects' );
 ```
 
 **Impact:** Easy A/B testing, gradual rollouts.
@@ -219,7 +219,7 @@ apply_filters( 'wpseopilot_feature_toggle', true, 'redirects' );
 
 Automatically detects and handles conflicts with other SEO plugins.
 
-**Code:** `class-wpseopilot-service-compatibility.php`
+**Code:** `class-samanseo-service-compatibility.php`
 
 **Impact:** Graceful coexistence, better user experience.
 
@@ -229,7 +229,7 @@ Automatically detects and handles conflicts with other SEO plugins.
 
 All SEO data stored in one meta key as JSON.
 
-**Key:** `_wpseopilot_meta`
+**Key:** `_samanseo_meta`
 
 **Impact:** Efficient queries, easy export/import, portable.
 
@@ -260,7 +260,7 @@ All SEO data stored in one meta key as JSON.
 **Short-term:**
 ```php
 // Combine related settings into single JSON option
-update_option( 'wpseopilot_settings', [
+update_option( 'samanseo_settings', [
     'ai' => [ 'model' => 'gpt-4o-mini', 'api_key' => '...' ],
     'sitemap' => [ 'enabled' => true, 'max_urls' => 2000 ],
     // ... etc
@@ -278,13 +278,13 @@ update_option( 'wpseopilot_settings', [
 
 **Issue:** 40+ `add_option()` calls in `activate()` method.
 
-**Code:** `class-wpseopilot-plugin.php:113-165`
+**Code:** `class-samanseo-plugin.php:113-165`
 
 ```php
 public static function activate() {
-    add_option( 'wpseopilot_default_title_template', '...' );
-    add_option( 'wpseopilot_post_type_title_templates', [] );
-    add_option( 'wpseopilot_post_type_meta_descriptions', [] );
+    add_option( 'samanseo_default_title_template', '...' );
+    add_option( 'samanseo_post_type_title_templates', [] );
+    add_option( 'samanseo_post_type_meta_descriptions', [] );
     // ... 40 more lines
 }
 ```
@@ -300,8 +300,8 @@ public static function activate() {
 Create a settings schema:
 
 ```php
-// includes/class-wpseopilot-settings-schema.php
-namespace WPSEOPilot;
+// includes/class-samanseo-settings-schema.php
+namespace SamanSEO;
 
 class Settings_Schema {
     public static function get_defaults() {
@@ -330,7 +330,7 @@ public static function activate() {
     $schema = Settings_Schema::get_defaults();
 
     foreach ( $schema as $group => $settings ) {
-        add_option( "wpseopilot_{$group}_settings", $settings, '', false );
+        add_option( "samanseo_{$group}_settings", $settings, '', false );
     }
 }
 ```
@@ -359,8 +359,8 @@ public static function activate() {
 Implement a migration system:
 
 ```php
-// includes/class-wpseopilot-database-migrator.php
-namespace WPSEOPilot;
+// includes/class-samanseo-database-migrator.php
+namespace SamanSEO;
 
 class Database_Migrator {
     private $migrations = [
@@ -369,12 +369,12 @@ class Database_Migrator {
     ];
 
     public function run() {
-        $current_version = get_option( 'wpseopilot_db_version', '0.0.0' );
+        $current_version = get_option( 'samanseo_db_version', '0.0.0' );
 
         foreach ( $this->migrations as $version => $method ) {
             if ( version_compare( $current_version, $version, '<' ) ) {
                 $this->$method();
-                update_option( 'wpseopilot_db_version', $version );
+                update_option( 'samanseo_db_version', $version );
             }
         }
     }
@@ -386,7 +386,7 @@ class Database_Migrator {
     private function migration_1_1_0() {
         // Add new column to redirects table
         global $wpdb;
-        $wpdb->query( "ALTER TABLE {$wpdb->prefix}wpseopilot_redirects ADD COLUMN redirect_type VARCHAR(50) DEFAULT 'manual'" );
+        $wpdb->query( "ALTER TABLE {$wpdb->prefix}samanseo_redirects ADD COLUMN redirect_type VARCHAR(50) DEFAULT 'manual'" );
     }
 }
 ```
@@ -414,8 +414,8 @@ $this->register( 'redirects', new Service\Redirect_Manager() );
 Use a simple DI container:
 
 ```php
-// includes/class-wpseopilot-container.php
-namespace WPSEOPilot;
+// includes/class-samanseo-container.php
+namespace SamanSEO;
 
 class Container {
     private $bindings = [];
@@ -481,8 +481,8 @@ $this->register( 'redirects', $container->make( 'redirects' ) );
 Create repositories for all data access:
 
 ```php
-// includes/repositories/class-wpseopilot-redirect-repository.php
-namespace WPSEOPilot\Repositories;
+// includes/repositories/class-samanseo-redirect-repository.php
+namespace SamanSEO\Repositories;
 
 class Redirect_Repository {
     private $table_name;
@@ -490,7 +490,7 @@ class Redirect_Repository {
 
     public function __construct( $cache = null ) {
         global $wpdb;
-        $this->table_name = $wpdb->prefix . 'wpseopilot_redirects';
+        $this->table_name = $wpdb->prefix . 'samanseo_redirects';
         $this->cache = $cache;
     }
 
@@ -548,7 +548,7 @@ class Redirect_Repository {
 
 **Current:**
 ```php
-wp_cache_get( 'wpseopilot_redirects', 'wpseopilot_redirects' );
+wp_cache_get( 'samanseo_redirects', 'samanseo_redirects' );
 ```
 
 **Problems:**
@@ -559,11 +559,11 @@ wp_cache_get( 'wpseopilot_redirects', 'wpseopilot_redirects' );
 **Recommendation:**
 
 ```php
-// includes/class-wpseopilot-cache-manager.php
-namespace WPSEOPilot;
+// includes/class-samanseo-cache-manager.php
+namespace SamanSEO;
 
 class Cache_Manager {
-    private $prefix = 'wpseopilot_';
+    private $prefix = 'samanseo_';
     private $default_expiration = 3600;
 
     public function get( $key, $group = 'default' ) {
@@ -665,9 +665,9 @@ composer require --dev yoast/phpunit-polyfills
 
 ```php
 // tests/test-redirect-repository.php
-namespace WPSEOPilot\Tests;
+namespace SamanSEO\Tests;
 
-use WPSEOPilot\Repositories\Redirect_Repository;
+use SamanSEO\Repositories\Redirect_Repository;
 
 class Test_Redirect_Repository extends \WP_UnitTestCase {
     private $repository;
@@ -716,7 +716,7 @@ class Test_Redirect_Repository extends \WP_UnitTestCase {
 
 **Current:**
 ```php
-do_action( 'wpseopilot_sitemap_regenerated' );
+do_action( 'samanseo_sitemap_regenerated' );
 ```
 
 **Benefit of Event System:**
@@ -727,8 +727,8 @@ do_action( 'wpseopilot_sitemap_regenerated' );
 **Recommendation:**
 
 ```php
-// includes/class-wpseopilot-event-dispatcher.php
-namespace WPSEOPilot;
+// includes/class-samanseo-event-dispatcher.php
+namespace SamanSEO;
 
 class Event_Dispatcher {
     private $listeners = [];
@@ -756,7 +756,7 @@ class Event_Dispatcher {
         }
 
         // Also trigger WordPress hook for backward compatibility
-        do_action( "wpseopilot_{$event}", $data );
+        do_action( "samanseo_{$event}", $data );
     }
 }
 
@@ -782,8 +782,8 @@ $events->listen( 'redirect.created', function( $data ) {
 **Recommendation:**
 
 ```php
-// includes/class-wpseopilot-notice-manager.php
-namespace WPSEOPilot;
+// includes/class-samanseo-notice-manager.php
+namespace SamanSEO;
 
 class Notice_Manager {
     private $notices = [];
@@ -845,8 +845,8 @@ $notices->error( 'Failed to save settings. Please try again.' );
 **Recommendation:**
 
 ```php
-// includes/validators/class-wpseopilot-redirect-validator.php
-namespace WPSEOPilot\Validators;
+// includes/validators/class-samanseo-redirect-validator.php
+namespace SamanSEO\Validators;
 
 class Redirect_Validator {
     public function validate( array $data ) {
@@ -901,31 +901,31 @@ public function create( array $data ) {
 
 **Current (assumed):**
 ```php
-wp_enqueue_style( 'wpseopilot-admin', WPSEOPILOT_URL . 'assets/admin.css' );
+wp_enqueue_style( 'samanseo-admin', SAMANSEO_URL . 'assets/admin.css' );
 ```
 
 **Recommendation:**
 
 ```php
 wp_enqueue_style(
-    'wpseopilot-admin',
-    WPSEOPILOT_URL . 'assets/admin.css',
+    'samanseo-admin',
+    SAMANSEO_URL . 'assets/admin.css',
     [],
-    WPSEOPILOT_VERSION . '.' . filemtime( WPSEOPILOT_PATH . 'assets/admin.css' )
+    SAMANSEO_VERSION . '.' . filemtime( SAMANSEO_PATH . 'assets/admin.css' )
 );
 ```
 
 Or use a manifest file from build process:
 
 ```php
-// includes/class-wpseopilot-asset-manager.php
-namespace WPSEOPilot;
+// includes/class-samanseo-asset-manager.php
+namespace SamanSEO;
 
 class Asset_Manager {
     private $manifest;
 
     public function __construct() {
-        $manifest_path = WPSEOPILOT_PATH . 'assets/manifest.json';
+        $manifest_path = SAMANSEO_PATH . 'assets/manifest.json';
         if ( file_exists( $manifest_path ) ) {
             $this->manifest = json_decode( file_get_contents( $manifest_path ), true );
         }
@@ -935,9 +935,9 @@ class Asset_Manager {
         $versioned_file = $this->manifest[ $file ] ?? $file;
         wp_enqueue_style(
             $handle,
-            WPSEOPILOT_URL . 'assets/' . $versioned_file,
+            SAMANSEO_URL . 'assets/' . $versioned_file,
             [],
-            WPSEOPILOT_VERSION
+            SAMANSEO_VERSION
         );
     }
 }
@@ -1191,13 +1191,13 @@ class Asset_Manager {
        0,
        substr( SECURE_AUTH_KEY, 0, 16 )
    );
-   update_option( 'wpseopilot_openai_api_key', $encrypted_key );
+   update_option( 'samanseo_openai_api_key', $encrypted_key );
    ```
 
 2. **Security Headers for Admin Pages**
    ```php
    add_action( 'admin_head', function() {
-       if ( is_wpseopilot_page() ) {
+       if ( is_samanseo_page() ) {
            header( 'X-Content-Type-Options: nosniff' );
            header( 'X-Frame-Options: DENY' );
        }
@@ -1207,10 +1207,10 @@ class Asset_Manager {
 3. **CSRF Protection for All Forms**
    ```php
    // In form
-   wp_nonce_field( 'wpseopilot_save_redirect', 'wpseopilot_redirect_nonce' );
+   wp_nonce_field( 'samanseo_save_redirect', 'samanseo_redirect_nonce' );
 
    // In handler
-   if ( ! wp_verify_nonce( $_POST['wpseopilot_redirect_nonce'], 'wpseopilot_save_redirect' ) ) {
+   if ( ! wp_verify_nonce( $_POST['samanseo_redirect_nonce'], 'samanseo_save_redirect' ) ) {
        wp_die( 'Security check failed' );
    }
    ```

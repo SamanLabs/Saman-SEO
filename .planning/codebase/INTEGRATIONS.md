@@ -11,8 +11,8 @@
 |-----------|-------|
 | **Endpoint** | `https://api.openai.com/v1/chat/completions` |
 | **Authentication** | Bearer token (API key) |
-| **Files** | `includes/class-wpseopilot-service-ai-assistant.php`, `includes/Api/class-setup-controller.php`, `includes/Api/class-tools-controller.php` |
-| **Key Storage** | `wpseopilot_openai_api_key` option |
+| **Files** | `includes/class-samanseo-service-ai-assistant.php`, `includes/Api/class-setup-controller.php`, `includes/Api/class-tools-controller.php` |
+| **Key Storage** | `samanseo_openai_api_key` option |
 
 **Usage:**
 - Generate SEO titles (max 60 characters)
@@ -49,7 +49,7 @@
 |-----------|-------|
 | **Primary Endpoint** | `https://api.indexnow.org/indexnow` |
 | **Authentication** | API key in request body |
-| **File** | `includes/class-wpseopilot-service-indexnow.php` |
+| **File** | `includes/class-samanseo-service-indexnow.php` |
 
 **Alternative Endpoints:**
 - Bing: `https://www.bing.com/indexnow`
@@ -67,7 +67,7 @@
 }
 ```
 
-**Logging:** Submissions logged to `wp_wpseopilot_indexnow_log` table
+**Logging:** Submissions logged to `wp_samanseo_indexnow_log` table
 
 ### GitHub API
 
@@ -90,7 +90,7 @@
 | Attribute | Value |
 |-----------|-------|
 | **Endpoint** | `https://matomo.builditdesign.com` |
-| **File** | `includes/class-wpseopilot-service-analytics.php` |
+| **File** | `includes/class-samanseo-service-analytics.php` |
 
 **Usage:** Plugin activation tracking and usage analytics
 
@@ -121,7 +121,7 @@ AI_Pilot::is_loaded()    // Check if plugin is active
 |-----------|-------|
 | **File** | `includes/Integration/class-woocommerce.php` |
 | **Status** | Optional (checks if WooCommerce active) |
-| **Hook** | `wpseopilot_jsonld_graph` filter (priority 25) |
+| **Hook** | `samanseo_jsonld_graph` filter (priority 25) |
 
 **Features:**
 - Adds Product schema for WooCommerce products
@@ -140,7 +140,7 @@ WooCommerce::is_active() // Check if WooCommerce is active
 
 ### REST API Namespace
 
-**Namespace:** `wpseopilot/v2`
+**Namespace:** `samanseo/v2`
 
 **Controllers (20+):**
 | Controller | Endpoints |
@@ -184,27 +184,27 @@ WooCommerce::is_active() // Check if WooCommerce is active
 | `pre_get_document_title` | 0 | Frontend | Override page title |
 | `post_row_actions` | 10 | Admin_UI | Add SEO actions |
 | `bulk_actions-edit-post` | 10 | Admin_UI | Bulk SEO actions |
-| `wpseopilot_jsonld_graph` | 15 | Breadcrumbs | Add breadcrumb schema |
-| `wpseopilot_jsonld_graph` | 20 | Local_SEO | Add local business schema |
-| `wpseopilot_jsonld_graph` | 25 | WooCommerce | Add product schema |
-| `wpseopilot_feature_toggle` | 10 | Compatibility | Enable/disable features |
+| `samanseo_jsonld_graph` | 15 | Breadcrumbs | Add breadcrumb schema |
+| `samanseo_jsonld_graph` | 20 | Local_SEO | Add local business schema |
+| `samanseo_jsonld_graph` | 25 | WooCommerce | Add product schema |
+| `samanseo_feature_toggle` | 10 | Compatibility | Enable/disable features |
 | `script_loader_tag` | 10 | Analytics | Add async/defer |
 
 ### Custom WordPress Hooks
 
 **Actions:**
 ```php
-do_action( 'wpseopilot_booted' );              // After plugin initialized
-do_action( 'wpseopilot_404_logged', $url );   // After 404 recorded
+do_action( 'samanseo_booted' );              // After plugin initialized
+do_action( 'samanseo_404_logged', $url );   // After 404 recorded
 ```
 
 **Filters:**
 ```php
-apply_filters( 'wpseopilot_title', $title );           // Modify title
-apply_filters( 'wpseopilot_og_image', $image_url );    // Override OG image
-apply_filters( 'wpseopilot_jsonld_graph', $graph );    // Modify JSON-LD
-apply_filters( 'wpseopilot_link_suggestions', $links ); // Filter suggestions
-apply_filters( 'wpseopilot_managed_plugins', $plugins ); // Add to updater
+apply_filters( 'samanseo_title', $title );           // Modify title
+apply_filters( 'samanseo_og_image', $image_url );    // Override OG image
+apply_filters( 'samanseo_jsonld_graph', $graph );    // Modify JSON-LD
+apply_filters( 'samanseo_link_suggestions', $links ); // Filter suggestions
+apply_filters( 'samanseo_managed_plugins', $plugins ); // Add to updater
 ```
 
 ## Database Integration
@@ -214,26 +214,26 @@ apply_filters( 'wpseopilot_managed_plugins', $plugins ); // Add to updater
 | Table | Usage |
 |-------|-------|
 | `wp_options` | Plugin settings (50+ options) |
-| `wp_postmeta` | Per-post SEO data (`_wpseopilot_meta`) |
+| `wp_postmeta` | Per-post SEO data (`_samanseo_meta`) |
 | `wp_posts` | Content for analysis |
 
 ### Custom Tables
 
 | Table | Purpose | Service |
 |-------|---------|---------|
-| `wp_wpseopilot_redirects` | 301/302 redirect storage | Redirect_Manager |
-| `wp_wpseopilot_404_log` | 404 error logging | Request_Monitor |
-| `wp_wpseopilot_404_ignore_patterns` | 404 exclusion patterns | Request_Monitor |
-| `wp_wpseopilot_link_health` | Broken link tracking | Link_Health |
-| `wp_wpseopilot_link_scans` | Link scan history | Link_Health |
-| `wp_wpseopilot_indexnow_log` | IndexNow submissions | IndexNow |
-| `wp_wpseopilot_custom_models` | Custom AI models | Tools_Controller |
+| `wp_samanseo_redirects` | 301/302 redirect storage | Redirect_Manager |
+| `wp_samanseo_404_log` | 404 error logging | Request_Monitor |
+| `wp_samanseo_404_ignore_patterns` | 404 exclusion patterns | Request_Monitor |
+| `wp_samanseo_link_health` | Broken link tracking | Link_Health |
+| `wp_samanseo_link_scans` | Link scan history | Link_Health |
+| `wp_samanseo_indexnow_log` | IndexNow submissions | IndexNow |
+| `wp_samanseo_custom_models` | Custom AI models | Tools_Controller |
 
 ### Transients
 
 | Transient | TTL | Purpose |
 |-----------|-----|---------|
-| `wpseopilot_slug_changed_{user_id}` | 60s | Slug change detection |
+| `samanseo_slug_changed_{user_id}` | 60s | Slug change detection |
 | Redirect cache | 30s | Redirect matching |
 | Update checks | 12h/6h | GitHub release caching |
 
@@ -241,17 +241,17 @@ apply_filters( 'wpseopilot_managed_plugins', $plugins ); // Add to updater
 
 | Action | Frequency | Service | Purpose |
 |--------|-----------|---------|---------|
-| `wpseopilot_check_updates` | Daily | GitHub_Updater | Check for updates |
-| `wpseopilot_404_cleanup` | Daily | Request_Monitor | Clean old 404 logs |
-| `wpseopilot_link_health_scan` | Configurable | Link_Health | Scan for broken links |
+| `samanseo_check_updates` | Daily | GitHub_Updater | Check for updates |
+| `samanseo_404_cleanup` | Daily | Request_Monitor | Clean old 404 logs |
+| `samanseo_link_health_scan` | Configurable | Link_Health | Scan for broken links |
 
 ## AJAX Handlers
 
 | Action | Service | Purpose |
 |--------|---------|---------|
-| `wp_ajax_wpseopilot_generate_ai` | AI_Assistant | Generate AI suggestions |
-| `wp_ajax_wpseopilot_render_preview` | Post_Meta | Render SERP/social previews |
-| `wp_ajax_wpseopilot_create_automatic_redirect` | Redirect_Manager | Create redirects on slug change |
+| `wp_ajax_samanseo_generate_ai` | AI_Assistant | Generate AI suggestions |
+| `wp_ajax_samanseo_render_preview` | Post_Meta | Render SERP/social previews |
+| `wp_ajax_samanseo_create_automatic_redirect` | Redirect_Manager | Create redirects on slug change |
 
 ## WP-CLI Support
 
@@ -259,7 +259,7 @@ apply_filters( 'wpseopilot_managed_plugins', $plugins ); // Add to updater
 |-----------|-------|
 | **Service** | `Service\CLI` |
 | **Condition** | Enabled only if `WP_CLI` is defined |
-| **File** | `includes/class-wpseopilot-service-cli.php` |
+| **File** | `includes/class-samanseo-service-cli.php` |
 
 **Purpose:** Command-line interface for plugin management (redirects, bulk operations)
 

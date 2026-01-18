@@ -7,6 +7,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 ?>
 <?php
 // Render top bar
@@ -15,7 +17,7 @@
 <div class="wrap saman-seo-page">
 
 	<form method="get" class="saman-seo-404-controls">
-		<input type="hidden" name="page" value="saman-seo-404" />
+		<input type="hidden" name="page" value="saman-seo-404-log" />
 		<label for="saman-seo-404-sort">
 			<?php esc_html_e( 'Sort by', 'saman-seo' ); ?>
 			<select id="saman-seo-404-sort" name="sort">
@@ -49,9 +51,9 @@
 		printf(
 			/* translators: 1: total log entries, 2: current page, 3: total pages */
 			esc_html__( '%1$s entries logged. Page %2$s of %3$s.', 'saman-seo' ),
-			number_format_i18n( $total_count ),
-			number_format_i18n( $page ),
-			number_format_i18n( $total_pages )
+			esc_html( number_format_i18n( $total_count ) ),
+			esc_html( number_format_i18n( $page ) ),
+			esc_html( number_format_i18n( $total_pages ) )
 		);
 		?>
 	</p>
@@ -123,7 +125,8 @@
 		) : '';
 		?>
 		<div class="tablenav-pages" style="margin-top:1em;">
-			<span class="displaying-num"><?php echo esc_html( sprintf( _n( '%s item', '%s items', $total_count, 'saman-seo' ), number_format_i18n( $total_count ) ) ); ?></span>
+			<?php /* translators: %s: number of items */ ?>
+		<span class="displaying-num"><?php echo esc_html( sprintf( _n( '%s item', '%s items', $total_count, 'saman-seo' ), number_format_i18n( $total_count ) ) ); ?></span>
 			<span class="pagination-links">
 				<?php if ( $prev_link ) : ?>
 					<a class="prev-page" href="<?php echo esc_url( $prev_link ); ?>">&lsaquo; <?php esc_html_e( 'Previous', 'saman-seo' ); ?></a>

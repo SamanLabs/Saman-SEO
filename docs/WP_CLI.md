@@ -42,9 +42,9 @@ Look for `wp-seo-pilot` in the list with status `active`.
 
 ## Redirect Management
 
-All redirect commands are namespaced under `wp wpseopilot redirects`.
+All redirect commands are namespaced under `wp saman-seo redirects`.
 
-**Location:** `includes/class-wpseopilot-service-cli.php`
+**Location:** `includes/class-samanseo-service-cli.php`
 
 ---
 
@@ -55,7 +55,7 @@ Display all redirects in your site.
 **Command:**
 
 ```bash
-wp wpseopilot redirects list [--format=<format>]
+wp saman-seo redirects list [--format=<format>]
 ```
 
 **Options:**
@@ -69,7 +69,7 @@ wp wpseopilot redirects list [--format=<format>]
 #### Table Format (Default)
 
 ```bash
-wp wpseopilot redirects list
+wp saman-seo redirects list
 ```
 
 **Output:**
@@ -89,7 +89,7 @@ wp wpseopilot redirects list
 #### JSON Format
 
 ```bash
-wp wpseopilot redirects list --format=json
+wp saman-seo redirects list --format=json
 ```
 
 **Output:**
@@ -120,7 +120,7 @@ wp wpseopilot redirects list --format=json
 #### CSV Format
 
 ```bash
-wp wpseopilot redirects list --format=csv
+wp saman-seo redirects list --format=csv
 ```
 
 **Output:**
@@ -136,7 +136,7 @@ id,source,target,status_code,hits,last_hit
 #### Count Format
 
 ```bash
-wp wpseopilot redirects list --format=count
+wp saman-seo redirects list --format=count
 ```
 
 **Output:**
@@ -154,7 +154,7 @@ Export all redirects to a JSON file for backup or migration.
 **Command:**
 
 ```bash
-wp wpseopilot redirects export <file>
+wp saman-seo redirects export <file>
 ```
 
 **Arguments:**
@@ -168,7 +168,7 @@ wp wpseopilot redirects export <file>
 #### Basic Export
 
 ```bash
-wp wpseopilot redirects export redirects.json
+wp saman-seo redirects export redirects.json
 ```
 
 **Output:**
@@ -182,7 +182,7 @@ Success: Exported 15 redirects to redirects.json
 #### Export to Specific Path
 
 ```bash
-wp wpseopilot redirects export /backups/redirects-2025-12-15.json
+wp saman-seo redirects export /backups/redirects-2025-12-15.json
 ```
 
 ---
@@ -219,7 +219,7 @@ Import redirects from a JSON file.
 **Command:**
 
 ```bash
-wp wpseopilot redirects import <file>
+wp saman-seo redirects import <file>
 ```
 
 **Arguments:**
@@ -233,7 +233,7 @@ wp wpseopilot redirects import <file>
 #### Basic Import
 
 ```bash
-wp wpseopilot redirects import redirects.json
+wp saman-seo redirects import redirects.json
 ```
 
 **Output:**
@@ -254,7 +254,7 @@ Success: Imported 2 redirects.
 curl -o redirects.json https://example.com/redirects.json
 
 # Then import
-wp wpseopilot redirects import redirects.json
+wp saman-seo redirects import redirects.json
 ```
 
 ---
@@ -295,12 +295,12 @@ The import file must be valid JSON with this structure:
 
 ```bash
 # Export current redirects
-wp wpseopilot redirects export backup-$(date +%Y%m%d).json
+wp saman-seo redirects export backup-$(date +%Y%m%d).json
 
 # Make changes...
 
 # If needed, restore from backup
-wp wpseopilot redirects import backup-20251215.json
+wp saman-seo redirects import backup-20251215.json
 ```
 
 ---
@@ -311,7 +311,7 @@ wp wpseopilot redirects import backup-20251215.json
 
 ```bash
 # Export redirects
-wp wpseopilot redirects export production-redirects.json
+wp saman-seo redirects export production-redirects.json
 
 # Download file
 scp production-redirects.json user@staging-server:/tmp/
@@ -321,7 +321,7 @@ scp production-redirects.json user@staging-server:/tmp/
 
 ```bash
 # Import redirects
-wp wpseopilot redirects import /tmp/production-redirects.json
+wp saman-seo redirects import /tmp/production-redirects.json
 ```
 
 ---
@@ -344,7 +344,7 @@ Create a JSON file with all your redirects:
 Import:
 
 ```bash
-wp wpseopilot redirects import bulk-redirects.json
+wp saman-seo redirects import bulk-redirects.json
 ```
 
 ---
@@ -353,7 +353,7 @@ wp wpseopilot redirects import bulk-redirects.json
 
 ```bash
 # Export as JSON
-wp wpseopilot redirects list --format=json > redirects.json
+wp saman-seo redirects list --format=json > redirects.json
 
 # Process with jq to find top redirects by hits
 cat redirects.json | jq -r 'sort_by(.hits | tonumber) | reverse | .[0:10] | .[] | "\(.hits) hits: \(.source) → \(.target)"'
@@ -388,7 +388,7 @@ Convert to JSON:
 csvtojson redirects.csv > redirects.json
 
 # Import
-wp wpseopilot redirects import redirects.json
+wp saman-seo redirects import redirects.json
 ```
 
 ---
@@ -397,7 +397,7 @@ wp wpseopilot redirects import redirects.json
 
 ```bash
 # Get all redirects as CSV
-wp wpseopilot redirects list --format=csv > redirects-audit.csv
+wp saman-seo redirects list --format=csv > redirects-audit.csv
 
 # Open in spreadsheet software for analysis
 # Or process with command-line tools:
@@ -412,7 +412,7 @@ awk -F',' 'NR>1 {count[$4]++} END {for (code in count) print code": "count[code]
 
 ```bash
 # List redirects with 0 hits (not triggered)
-wp wpseopilot redirects list --format=csv | awk -F',' '$5 == 0 {print $0}'
+wp saman-seo redirects list --format=csv | awk -F',' '$5 == 0 {print $0}'
 
 # Manual review and cleanup via admin or database
 ```
@@ -430,7 +430,7 @@ Add to cron:
 crontab -e
 
 # Add daily backup at 2 AM
-0 2 * * * cd /var/www/html && wp wpseopilot redirects export /backups/redirects-$(date +\%Y\%m\%d).json
+0 2 * * * cd /var/www/html && wp saman-seo redirects export /backups/redirects-$(date +\%Y\%m\%d).json
 ```
 
 ---
@@ -446,15 +446,15 @@ crontab -e
 
 # Backup production redirects first
 echo "Backing up production redirects..."
-wp wpseopilot redirects export /backups/prod-redirects-$(date +%Y%m%d-%H%M%S).json --path=/var/www/production
+wp saman-seo redirects export /backups/prod-redirects-$(date +%Y%m%d-%H%M%S).json --path=/var/www/production
 
 # Export from staging
 echo "Exporting staging redirects..."
-wp wpseopilot redirects export /tmp/staging-redirects.json --path=/var/www/staging
+wp saman-seo redirects export /tmp/staging-redirects.json --path=/var/www/staging
 
 # Import to production
 echo "Importing to production..."
-wp wpseopilot redirects import /tmp/staging-redirects.json --path=/var/www/production
+wp saman-seo redirects import /tmp/staging-redirects.json --path=/var/www/production
 
 echo "Deployment complete!"
 ```
@@ -482,7 +482,7 @@ LOCAL_PATH="/var/www/staging"
 
 # Export from remote
 echo "Exporting from production..."
-ssh $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_PATH && wp wpseopilot redirects export /tmp/prod-redirects.json"
+ssh $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_PATH && wp saman-seo redirects export /tmp/prod-redirects.json"
 
 # Download
 echo "Downloading..."
@@ -490,7 +490,7 @@ scp $REMOTE_USER@$REMOTE_HOST:/tmp/prod-redirects.json /tmp/
 
 # Import locally
 echo "Importing to staging..."
-cd $LOCAL_PATH && wp wpseopilot redirects import /tmp/prod-redirects.json
+cd $LOCAL_PATH && wp saman-seo redirects import /tmp/prod-redirects.json
 
 echo "Sync complete!"
 ```
@@ -506,7 +506,7 @@ echo "Sync complete!"
 
 # Monitor redirect count and alert on changes
 
-CURRENT_COUNT=$(wp wpseopilot redirects list --format=count)
+CURRENT_COUNT=$(wp saman-seo redirects list --format=count)
 LAST_COUNT=$(cat /tmp/redirect-count.txt 2>/dev/null || echo 0)
 
 if [ "$CURRENT_COUNT" -ne "$LAST_COUNT" ]; then
@@ -529,7 +529,7 @@ While WP-CLI commands are for terminal use, you can achieve similar functionalit
 ```php
 // Get all redirects
 global $wpdb;
-$table = $wpdb->prefix . 'wpseopilot_redirects';
+$table = $wpdb->prefix . 'samanseo_redirects';
 $redirects = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY hits DESC" );
 
 // Export as JSON
@@ -541,7 +541,7 @@ $json = file_get_contents( 'redirects.json' );
 $redirects = json_decode( $json, true );
 
 foreach ( $redirects as $redirect ) {
-    wpseopilot_create_redirect(
+    samanseo_create_redirect(
         $redirect['source'],
         $redirect['target'],
         $redirect['status_code']
@@ -558,7 +558,7 @@ foreach ( $redirects as $redirect ) {
 **Error:**
 
 ```
-Error: 'wpseopilot' is not a registered wp command.
+Error: 'samanseo' is not a registered wp command.
 ```
 
 **Solution:**
@@ -616,7 +616,7 @@ Error: Permission denied
 
 ```bash
 # Run as correct user
-sudo -u www-data wp wpseopilot redirects list
+sudo -u www-data wp saman-seo redirects list
 
 # Or fix permissions
 chown www-data:www-data redirects.json
@@ -629,8 +629,8 @@ chown www-data:www-data redirects.json
 ### 1. Always Backup Before Importing
 
 ```bash
-wp wpseopilot redirects export backup.json
-wp wpseopilot redirects import new-redirects.json
+wp saman-seo redirects export backup.json
+wp saman-seo redirects import new-redirects.json
 ```
 
 ### 2. Use Version Control for Redirect Files

@@ -5,6 +5,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $form_action        = admin_url( 'admin-post.php' );
 $heading_behavior   = $settings['default_heading_behavior'] ?? 'none';
 $heading_levels     = $settings['default_heading_levels'] ?? [];

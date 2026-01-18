@@ -42,6 +42,15 @@
         border-color: fade(@color-beta, 50%);
         background: linear-gradient(135deg, fade(@color-beta, 5%) 0%, @color-surface 100%);
     }
+
+    &.coming-soon {
+        opacity: 0.85;
+        border-style: dashed;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
 }
 
 // Header section
@@ -248,6 +257,12 @@
     &.beta {
         background: fade(@color-beta, 16%);
         color: @color-beta;
+    }
+
+    &.coming-soon {
+        background: fade(@color-muted, 16%);
+        color: @color-muted;
+        font-size: @font-size-xs;
     }
 }
 

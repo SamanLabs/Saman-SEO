@@ -34,7 +34,7 @@ Build AI-powered SEO assistants that feel like helpful teammates, not robots. Cr
 ### Migration Approach (Simple)
 Since it's internal websites only:
 - [ ] Swap menu links from V1 to V2
-- [ ] Map URLs: `?page=wpseopilot-*` → `?page=wpseopilot-v2-*`
+- [ ] Map URLs: `?page=samanseo-*` → `?page=samanseo-v2-*`
 - [ ] Remove V1 menu items
 - [ ] Done. No migration wizard needed.
 
@@ -78,7 +78,7 @@ Step 5: Done
 - [x] `src-v2/pages/Setup.js` - Setup wizard with 5 steps
 - [x] `src-v2/less/pages/_setup.less` - Setup wizard styles
 - [x] `includes/Api/class-setup-controller.php` - Save setup data
-- [x] Track `wpseopilot_setup_completed` option
+- [x] Track `samanseo_setup_completed` option
 - [x] Reset wizard button in Settings > Tools
 
 ### 1.2 Matomo Analytics (Opt-in)
@@ -111,7 +111,7 @@ What we NEVER track:
 - [ ] One-click disable anytime
 
 **Files:**
-- [ ] `includes/class-wpseopilot-service-analytics.php` (update existing)
+- [ ] `includes/class-samanseo-service-analytics.php` (update existing)
 - [ ] Add opt-in UI to Setup wizard and Settings
 
 ---
@@ -156,8 +156,8 @@ includes/Api/
 ```
 
 **Database Tables:**
-- [x] `wp_wpseopilot_custom_assistants` - Custom assistants storage
-- [x] `wp_wpseopilot_assistant_usage` - Usage tracking
+- [x] `wp_samanseo_custom_assistants` - Custom assistants storage
+- [x] `wp_samanseo_assistant_usage` - Usage tracking
 
 **Features Completed:**
 - [x] Built-in assistants (General SEO, SEO Reporter)
@@ -527,7 +527,7 @@ add_filter('pilot_ai_assistants', function($assistants) {
 ### Assistant API Structure
 
 ```php
-// POST /wpseopilot/v2/assistants/chat
+// POST /samanseo/v2/assistants/chat
 {
     "assistant": "seo-reporter",
     "message": "Give me this week's report",

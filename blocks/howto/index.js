@@ -3,7 +3,7 @@
  *
  * Creates a step-by-step guide with automatic HowTo schema markup.
  *
- * @package WPSEOPilot
+ * @package SamanSEO
  */
 
 ( function( blocks, element, blockEditor, components, i18n ) {

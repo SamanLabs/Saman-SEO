@@ -18,7 +18,7 @@ $with_title = $wpdb->get_var(
     "SELECT COUNT(DISTINCT pm.post_id)
      FROM {$wpdb->postmeta} pm
      JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-     WHERE pm.meta_key = '_wpseopilot_meta'
+     WHERE pm.meta_key = '_samanseo_meta'
      AND p.post_status = 'publish'
      AND pm.meta_value LIKE '%\"title\"%'
      AND pm.meta_value NOT LIKE '%\"title\":\"\"%'"
@@ -47,12 +47,12 @@ $settings[ $key ] = maybe_unserialize( $opt->option_value );
 
 #### API Key Stored in Plain Text
 
-**Files:** `includes/class-wpseopilot-service-ai-assistant.php`, `includes/class-wpseopilot-plugin.php`
+**Files:** `includes/class-samanseo-service-ai-assistant.php`, `includes/class-samanseo-plugin.php`
 
 **Issue:** OpenAI API key stored unencrypted in `wp_options`
 
 ```php
-$api_key = get_option( 'wpseopilot_openai_api_key', '' );
+$api_key = get_option( 'samanseo_openai_api_key', '' );
 ```
 
 **Impact:** Credential exposure if database is compromised
@@ -155,13 +155,13 @@ AND pm.meta_value LIKE '%\"title\"%'
 
 #### Repeated get_option() Calls
 
-**File:** `includes/class-wpseopilot-service-analytics.php`, lines 55-58
+**File:** `includes/class-samanseo-service-analytics.php`, lines 55-58
 
 **Issue:** Multiple separate option lookups
 
 ```php
-$module_enabled = get_option( 'wpseopilot_module_analytics', '0' );
-$legacy_enabled = get_option( 'wpseopilot_enable_analytics', '1' );
+$module_enabled = get_option( 'samanseo_module_analytics', '0' );
+$legacy_enabled = get_option( 'samanseo_enable_analytics', '1' );
 ```
 
 **Impact:** Unnecessary database queries
@@ -171,7 +171,7 @@ $legacy_enabled = get_option( 'wpseopilot_enable_analytics', '1' );
 
 #### Heavy Operations in Early Hooks
 
-**File:** `includes/class-wpseopilot-service-redirect-manager.php`, line 78
+**File:** `includes/class-samanseo-service-redirect-manager.php`, line 78
 
 **Issue:** Redirect checking at priority 0 on `template_redirect`
 
@@ -195,7 +195,7 @@ $legacy_enabled = get_option( 'wpseopilot_enable_analytics', '1' );
 
 #### Tight Coupling Between Components
 
-**File:** `includes/class-wpseopilot-service-internal-linking.php`, lines 62-63
+**File:** `includes/class-samanseo-service-internal-linking.php`, lines 62-63
 
 **Issue:** Services instantiate dependencies directly
 
@@ -231,7 +231,7 @@ $this->engine = new Linking_Engine( $this->repository );
 
 #### Hardcoded Configuration
 
-**Files:** `includes/class-wpseopilot-service-analytics.php`, lines 35-36
+**Files:** `includes/class-samanseo-service-analytics.php`, lines 35-36
 
 **Issue:** Values that should be configurable are hardcoded
 

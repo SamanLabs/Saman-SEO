@@ -20,7 +20,7 @@ Complete documentation of all filter hooks available in Saman SEO with practical
 
 ## Meta Tag Filters
 
-### `wpseopilot_title`
+### `samanseo_title`
 
 Filter the page title before output in `<title>` tag.
 
@@ -28,13 +28,13 @@ Filter the page title before output in `<title>` tag.
 - `$title` (string) - The generated title
 - `$post` (WP_Post|null) - Current post object (null on archives/homepage)
 
-**File:** `includes/class-wpseopilot-service-frontend.php:64, 305, 665`
+**File:** `includes/class-samanseo-service-frontend.php:64, 305, 665`
 
 **Examples:**
 
 ```php
 // Add suffix to all product titles
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( $post && get_post_type( $post ) === 'product' ) {
         return $title . ' - Buy Online';
     }
@@ -42,7 +42,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Customize homepage title
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_front_page() ) {
         return 'Welcome to ' . get_bloginfo( 'name' ) . ' - ' . get_bloginfo( 'description' );
     }
@@ -50,7 +50,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add category to post titles
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_single() && $post ) {
         $categories = get_the_category( $post->ID );
         if ( ! empty( $categories ) ) {
@@ -63,7 +63,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 
 ---
 
-### `wpseopilot_description`
+### `samanseo_description`
 
 Filter the meta description before output.
 
@@ -71,13 +71,13 @@ Filter the meta description before output.
 - `$description` (string) - The generated description
 - `$post` (WP_Post) - Current post object
 
-**File:** `includes/class-wpseopilot-service-frontend.php:100`
+**File:** `includes/class-samanseo-service-frontend.php:100`
 
 **Examples:**
 
 ```php
 // Append CTA to all product descriptions
-add_filter( 'wpseopilot_description', function( $description, $post ) {
+add_filter( 'samanseo_description', function( $description, $post ) {
     if ( get_post_type( $post ) === 'product' ) {
         return $description . ' Free shipping on orders over $50.';
     }
@@ -85,7 +85,7 @@ add_filter( 'wpseopilot_description', function( $description, $post ) {
 }, 10, 2 );
 
 // Ensure description doesn't exceed 155 characters
-add_filter( 'wpseopilot_description', function( $description, $post ) {
+add_filter( 'samanseo_description', function( $description, $post ) {
     if ( strlen( $description ) > 155 ) {
         return substr( $description, 0, 152 ) . '...';
     }
@@ -93,7 +93,7 @@ add_filter( 'wpseopilot_description', function( $description, $post ) {
 }, 10, 2 );
 
 // Add location to local business descriptions
-add_filter( 'wpseopilot_description', function( $description, $post ) {
+add_filter( 'samanseo_description', function( $description, $post ) {
     if ( get_post_type( $post ) === 'location' ) {
         $city = get_post_meta( $post->ID, 'city', true );
         return $description . ' Located in ' . $city . '.';
@@ -104,7 +104,7 @@ add_filter( 'wpseopilot_description', function( $description, $post ) {
 
 ---
 
-### `wpseopilot_canonical`
+### `samanseo_canonical`
 
 Filter the canonical URL before output.
 
@@ -112,18 +112,18 @@ Filter the canonical URL before output.
 - `$canonical` (string) - The canonical URL
 - `$post` (WP_Post) - Current post object
 
-**File:** `includes/class-wpseopilot-service-frontend.php:103, 170`
+**File:** `includes/class-samanseo-service-frontend.php:103, 170`
 
 **Examples:**
 
 ```php
 // Force HTTPS on all canonical URLs
-add_filter( 'wpseopilot_canonical', function( $canonical, $post ) {
+add_filter( 'samanseo_canonical', function( $canonical, $post ) {
     return str_replace( 'http://', 'https://', $canonical );
 }, 10, 2 );
 
 // Point duplicate content to main version
-add_filter( 'wpseopilot_canonical', function( $canonical, $post ) {
+add_filter( 'samanseo_canonical', function( $canonical, $post ) {
     // If this is a variation, point to parent product
     $parent_id = get_post_meta( $post->ID, '_parent_product', true );
     if ( $parent_id ) {
@@ -133,14 +133,14 @@ add_filter( 'wpseopilot_canonical', function( $canonical, $post ) {
 }, 10, 2 );
 
 // Use custom domain for canonical
-add_filter( 'wpseopilot_canonical', function( $canonical, $post ) {
+add_filter( 'samanseo_canonical', function( $canonical, $post ) {
     return str_replace( 'www.example.com', 'example.com', $canonical );
 }, 10, 2 );
 ```
 
 ---
 
-### `wpseopilot_keywords`
+### `samanseo_keywords`
 
 Filter meta keywords (legacy, not widely used).
 
@@ -148,13 +148,13 @@ Filter meta keywords (legacy, not widely used).
 - `$keywords` (string) - Comma-separated keywords
 - `$post` (WP_Post) - Current post object
 
-**File:** `includes/class-wpseopilot-service-frontend.php:132`
+**File:** `includes/class-samanseo-service-frontend.php:132`
 
 **Example:**
 
 ```php
 // Add post tags as keywords
-add_filter( 'wpseopilot_keywords', function( $keywords, $post ) {
+add_filter( 'samanseo_keywords', function( $keywords, $post ) {
     $tags = get_the_tags( $post->ID );
     if ( $tags ) {
         $tag_names = wp_list_pluck( $tags, 'name' );
@@ -166,20 +166,20 @@ add_filter( 'wpseopilot_keywords', function( $keywords, $post ) {
 
 ---
 
-### `wpseopilot_robots_array`
+### `samanseo_robots_array`
 
 Filter the robots directives as an array before joining.
 
 **Parameters:**
 - `$directives` (array) - Array of directives (e.g., `['index', 'follow']`)
 
-**File:** `includes/class-wpseopilot-service-frontend.php:512`
+**File:** `includes/class-samanseo-service-frontend.php:512`
 
 **Examples:**
 
 ```php
 // Noindex all posts older than 2 years
-add_filter( 'wpseopilot_robots_array', function( $directives ) {
+add_filter( 'samanseo_robots_array', function( $directives ) {
     global $post;
 
     if ( $post && is_singular( 'post' ) ) {
@@ -194,7 +194,7 @@ add_filter( 'wpseopilot_robots_array', function( $directives ) {
 });
 
 // Add max-snippet directive
-add_filter( 'wpseopilot_robots_array', function( $directives ) {
+add_filter( 'samanseo_robots_array', function( $directives ) {
     $directives[] = 'max-snippet:160';
     $directives[] = 'max-image-preview:large';
     $directives[] = 'max-video-preview:-1';
@@ -205,20 +205,20 @@ add_filter( 'wpseopilot_robots_array', function( $directives ) {
 
 ---
 
-### `wpseopilot_robots`
+### `samanseo_robots`
 
 Filter the final robots meta tag content string.
 
 **Parameters:**
 - `$robots` (string) - Comma-separated robots directives
 
-**File:** `includes/class-wpseopilot-service-frontend.php:521`
+**File:** `includes/class-samanseo-service-frontend.php:521`
 
 **Examples:**
 
 ```php
 // Force noindex on staging
-add_filter( 'wpseopilot_robots', function( $robots ) {
+add_filter( 'samanseo_robots', function( $robots ) {
     if ( wp_get_environment_type() === 'staging' ) {
         return 'noindex, nofollow';
     }
@@ -226,7 +226,7 @@ add_filter( 'wpseopilot_robots', function( $robots ) {
 });
 
 // Remove nofollow but keep other directives
-add_filter( 'wpseopilot_robots', function( $robots ) {
+add_filter( 'samanseo_robots', function( $robots ) {
     return str_replace( 'nofollow', '', $robots );
 });
 ```
@@ -235,7 +235,7 @@ add_filter( 'wpseopilot_robots', function( $robots ) {
 
 ## Social Media Filters
 
-### `wpseopilot_og_url`
+### `samanseo_og_url`
 
 Filter the Open Graph URL tag.
 
@@ -243,20 +243,20 @@ Filter the Open Graph URL tag.
 - `$url` (string) - OG URL
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:173`
+**File:** `includes/class-samanseo-service-frontend.php:173`
 
 **Example:**
 
 ```php
 // Use custom domain for OG URLs
-add_filter( 'wpseopilot_og_url', function( $url, $post ) {
+add_filter( 'samanseo_og_url', function( $url, $post ) {
     return str_replace( 'staging.example.com', 'example.com', $url );
 }, 10, 2 );
 ```
 
 ---
 
-### `wpseopilot_og_title`
+### `samanseo_og_title`
 
 Filter the Open Graph title tag.
 
@@ -264,13 +264,13 @@ Filter the Open Graph title tag.
 - `$title` (string) - OG title
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:194`
+**File:** `includes/class-samanseo-service-frontend.php:194`
 
 **Examples:**
 
 ```php
 // Prepend category to OG title
-add_filter( 'wpseopilot_og_title', function( $title, $post ) {
+add_filter( 'samanseo_og_title', function( $title, $post ) {
     if ( is_single() ) {
         $categories = get_the_category( $post->ID );
         if ( ! empty( $categories ) ) {
@@ -281,7 +281,7 @@ add_filter( 'wpseopilot_og_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Truncate long titles for better social display
-add_filter( 'wpseopilot_og_title', function( $title, $post ) {
+add_filter( 'samanseo_og_title', function( $title, $post ) {
     if ( strlen( $title ) > 60 ) {
         return substr( $title, 0, 57 ) . '...';
     }
@@ -291,7 +291,7 @@ add_filter( 'wpseopilot_og_title', function( $title, $post ) {
 
 ---
 
-### `wpseopilot_og_description`
+### `samanseo_og_description`
 
 Filter the Open Graph description tag.
 
@@ -299,13 +299,13 @@ Filter the Open Graph description tag.
 - `$description` (string) - OG description
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:218`
+**File:** `includes/class-samanseo-service-frontend.php:218`
 
 **Example:**
 
 ```php
 // Use excerpt for OG description if no custom description
-add_filter( 'wpseopilot_og_description', function( $description, $post ) {
+add_filter( 'samanseo_og_description', function( $description, $post ) {
     if ( empty( $description ) && has_excerpt( $post ) ) {
         return wp_trim_words( get_the_excerpt( $post ), 30 );
     }
@@ -315,7 +315,7 @@ add_filter( 'wpseopilot_og_description', function( $description, $post ) {
 
 ---
 
-### `wpseopilot_og_type`
+### `samanseo_og_type`
 
 Filter the Open Graph type tag.
 
@@ -323,13 +323,13 @@ Filter the Open Graph type tag.
 - `$og_type` (string) - OG type (default: 'website' or 'article')
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:259`
+**File:** `includes/class-samanseo-service-frontend.php:259`
 
 **Examples:**
 
 ```php
 // Set video type for video posts
-add_filter( 'wpseopilot_og_type', function( $og_type, $post ) {
+add_filter( 'samanseo_og_type', function( $og_type, $post ) {
     if ( has_post_format( 'video', $post ) ) {
         return 'video.other';
     }
@@ -337,7 +337,7 @@ add_filter( 'wpseopilot_og_type', function( $og_type, $post ) {
 }, 10, 2 );
 
 // Set product type for WooCommerce products
-add_filter( 'wpseopilot_og_type', function( $og_type, $post ) {
+add_filter( 'samanseo_og_type', function( $og_type, $post ) {
     if ( get_post_type( $post ) === 'product' ) {
         return 'product';
     }
@@ -347,7 +347,7 @@ add_filter( 'wpseopilot_og_type', function( $og_type, $post ) {
 
 ---
 
-### `wpseopilot_og_image`
+### `samanseo_og_image`
 
 Filter the Open Graph image URL.
 
@@ -357,13 +357,13 @@ Filter the Open Graph image URL.
 - `$meta` (array) - Post meta data
 - `$defaults` (array) - Default settings
 
-**File:** `includes/class-wpseopilot-service-frontend.php:587`
+**File:** `includes/class-samanseo-service-frontend.php:587`
 
 **Examples:**
 
 ```php
 // Use first gallery image if no featured image
-add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
+add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
     if ( empty( $image ) ) {
         $gallery = get_post_gallery_images( $post );
         if ( ! empty( $gallery ) ) {
@@ -374,12 +374,12 @@ add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
 }, 10, 4 );
 
 // Use CDN URL for images
-add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
+add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
     return str_replace( 'example.com', 'cdn.example.com', $image );
 }, 10, 4 );
 
 // Use specific image for specific post
-add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
+add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
     if ( $post->ID === 42 ) {
         return 'https://cdn.example.com/special-promo.jpg';
     }
@@ -389,7 +389,7 @@ add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
 
 ---
 
-### `wpseopilot_twitter_title`
+### `samanseo_twitter_title`
 
 Filter the Twitter Card title.
 
@@ -397,13 +397,13 @@ Filter the Twitter Card title.
 - `$title` (string) - Twitter title
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:238`
+**File:** `includes/class-samanseo-service-frontend.php:238`
 
 **Example:**
 
 ```php
 // Keep Twitter titles short
-add_filter( 'wpseopilot_twitter_title', function( $title, $post ) {
+add_filter( 'samanseo_twitter_title', function( $title, $post ) {
     if ( strlen( $title ) > 55 ) {
         return substr( $title, 0, 52 ) . '...';
     }
@@ -413,7 +413,7 @@ add_filter( 'wpseopilot_twitter_title', function( $title, $post ) {
 
 ---
 
-### `wpseopilot_twitter_description`
+### `samanseo_twitter_description`
 
 Filter the Twitter Card description.
 
@@ -421,20 +421,20 @@ Filter the Twitter Card description.
 - `$description` (string) - Twitter description
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:239`
+**File:** `includes/class-samanseo-service-frontend.php:239`
 
 **Example:**
 
 ```php
 // Shorten Twitter descriptions
-add_filter( 'wpseopilot_twitter_description', function( $description, $post ) {
+add_filter( 'samanseo_twitter_description', function( $description, $post ) {
     return wp_trim_words( $description, 25 );
 }, 10, 2 );
 ```
 
 ---
 
-### `wpseopilot_twitter_image`
+### `samanseo_twitter_image`
 
 Filter the Twitter Card image URL.
 
@@ -442,13 +442,13 @@ Filter the Twitter Card image URL.
 - `$image` (string) - Image URL
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:243`
+**File:** `includes/class-samanseo-service-frontend.php:243`
 
 **Example:**
 
 ```php
 // Use square image for Twitter
-add_filter( 'wpseopilot_twitter_image', function( $image, $post ) {
+add_filter( 'samanseo_twitter_image', function( $image, $post ) {
     $square_image = get_post_meta( $post->ID, '_square_image', true );
     return $square_image ?: $image;
 }, 10, 2 );
@@ -456,7 +456,7 @@ add_filter( 'wpseopilot_twitter_image', function( $image, $post ) {
 
 ---
 
-### `wpseopilot_social_tags`
+### `samanseo_social_tags`
 
 Filter all social meta tags at once.
 
@@ -466,13 +466,13 @@ Filter all social meta tags at once.
 - `$meta` (array) - Post meta data
 - `$defaults` (array) - Default settings
 
-**File:** `includes/class-wpseopilot-service-frontend.php:274`
+**File:** `includes/class-samanseo-service-frontend.php:274`
 
 **Examples:**
 
 ```php
 // Add custom Facebook tags
-add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults ) {
+add_filter( 'samanseo_social_tags', function( $tags, $post, $meta, $defaults ) {
     $tags['fb:app_id'] = '1234567890';
     $tags['fb:pages'] = '9876543210';
 
@@ -480,7 +480,7 @@ add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults )
 }, 10, 4 );
 
 // Add article tags for posts
-add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults ) {
+add_filter( 'samanseo_social_tags', function( $tags, $post, $meta, $defaults ) {
     if ( is_single() && get_post_type( $post ) === 'post' ) {
         $tags['article:published_time'] = get_the_date( 'c', $post );
         $tags['article:modified_time'] = get_the_modified_date( 'c', $post );
@@ -493,7 +493,7 @@ add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults )
 }, 10, 4 );
 
 // Remove certain tags
-add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults ) {
+add_filter( 'samanseo_social_tags', function( $tags, $post, $meta, $defaults ) {
     unset( $tags['twitter:card'] );
     return $tags;
 }, 10, 4 );
@@ -501,20 +501,20 @@ add_filter( 'wpseopilot_social_tags', function( $tags, $post, $meta, $defaults )
 
 ---
 
-### `wpseopilot_social_multi_tags`
+### `samanseo_social_multi_tags`
 
 Filter multi-value social tags (tags that can appear multiple times).
 
 **Parameters:**
 - `$multi` (array) - Array of multi-value tags
 
-**File:** `includes/class-wpseopilot-service-frontend.php:747`
+**File:** `includes/class-samanseo-service-frontend.php:747`
 
 **Example:**
 
 ```php
 // Add multiple article:tag values
-add_filter( 'wpseopilot_social_multi_tags', function( $multi ) {
+add_filter( 'samanseo_social_multi_tags', function( $multi ) {
     global $post;
 
     if ( is_single() ) {
@@ -534,7 +534,7 @@ add_filter( 'wpseopilot_social_multi_tags', function( $multi ) {
 
 ## Structured Data Filters
 
-### `wpseopilot_jsonld`
+### `samanseo_jsonld`
 
 Filter the complete JSON-LD output before rendering.
 
@@ -542,13 +542,13 @@ Filter the complete JSON-LD output before rendering.
 - `$payload` (array) - Complete JSON-LD schema array
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-frontend.php:328`
+**File:** `includes/class-samanseo-service-frontend.php:328`
 
 **Examples:**
 
 ```php
 // Add Product schema to product posts
-add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
+add_filter( 'samanseo_jsonld', function( $payload, $post ) {
     if ( get_post_type( $post ) === 'product' ) {
         $price = get_post_meta( $post->ID, '_price', true );
 
@@ -570,7 +570,7 @@ add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
 }, 10, 2 );
 
 // Add FAQ schema
-add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
+add_filter( 'samanseo_jsonld', function( $payload, $post ) {
     $faqs = get_post_meta( $post->ID, '_faqs', true );
 
     if ( $faqs ) {
@@ -599,7 +599,7 @@ add_filter( 'wpseopilot_jsonld', function( $payload, $post ) {
 
 ---
 
-### `wpseopilot_schema_webpage`
+### `samanseo_schema_webpage`
 
 Filter the WebPage schema specifically.
 
@@ -607,13 +607,13 @@ Filter the WebPage schema specifically.
 - `$schema` (array) - WebPage schema object
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-jsonld.php:75`
+**File:** `includes/class-samanseo-service-jsonld.php:75`
 
 **Example:**
 
 ```php
 // Add breadcrumb to WebPage schema
-add_filter( 'wpseopilot_schema_webpage', function( $schema, $post ) {
+add_filter( 'samanseo_schema_webpage', function( $schema, $post ) {
     $schema['breadcrumb'] = [
         '@type' => 'BreadcrumbList',
         'itemListElement' => [
@@ -637,7 +637,7 @@ add_filter( 'wpseopilot_schema_webpage', function( $schema, $post ) {
 
 ---
 
-### `wpseopilot_schema_article`
+### `samanseo_schema_article`
 
 Filter the Article schema for posts.
 
@@ -645,13 +645,13 @@ Filter the Article schema for posts.
 - `$schema` (array) - Article schema object
 - `$post` (WP_Post) - Current post
 
-**File:** `includes/class-wpseopilot-service-jsonld.php:94`
+**File:** `includes/class-samanseo-service-jsonld.php:94`
 
 **Examples:**
 
 ```php
 // Add author details to Article schema
-add_filter( 'wpseopilot_schema_article', function( $schema, $post ) {
+add_filter( 'samanseo_schema_article', function( $schema, $post ) {
     $author = get_userdata( $post->post_author );
 
     $schema['author'] = [
@@ -665,7 +665,7 @@ add_filter( 'wpseopilot_schema_article', function( $schema, $post ) {
 }, 10, 2 );
 
 // Add word count and reading time
-add_filter( 'wpseopilot_schema_article', function( $schema, $post ) {
+add_filter( 'samanseo_schema_article', function( $schema, $post ) {
     $content = get_post_field( 'post_content', $post );
     $word_count = str_word_count( strip_tags( $content ) );
 
@@ -678,20 +678,20 @@ add_filter( 'wpseopilot_schema_article', function( $schema, $post ) {
 
 ---
 
-### `wpseopilot_jsonld_graph`
+### `samanseo_jsonld_graph`
 
 Filter the complete JSON-LD @graph array.
 
 **Parameters:**
 - `$graph` (array) - Complete @graph array
 
-**File:** `includes/class-wpseopilot-service-jsonld.php:102`
+**File:** `includes/class-samanseo-service-jsonld.php:102`
 
 **Example:**
 
 ```php
 // Add global Organization schema to all pages
-add_filter( 'wpseopilot_jsonld_graph', function( $graph ) {
+add_filter( 'samanseo_jsonld_graph', function( $graph ) {
     $graph[] = [
         '@type' => 'Organization',
         'name' => get_bloginfo( 'name' ),
@@ -712,7 +712,7 @@ add_filter( 'wpseopilot_jsonld_graph', function( $graph ) {
 
 ## Sitemap Filters
 
-### `wpseopilot_sitemap_entry`
+### `samanseo_sitemap_entry`
 
 Filter individual sitemap entry data.
 
@@ -721,13 +721,13 @@ Filter individual sitemap entry data.
 - `$post_id` (int) - Post ID
 - `$post_type` (string) - Post type
 
-**File:** `includes/class-wpseopilot-service-sitemap-enhancer.php:165`
+**File:** `includes/class-samanseo-service-sitemap-enhancer.php:165`
 
 **Examples:**
 
 ```php
 // Set high priority for featured posts
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     if ( get_post_meta( $post_id, '_is_featured', true ) ) {
         $entry['priority'] = 1.0;
         $entry['changefreq'] = 'daily';
@@ -737,7 +737,7 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type )
 }, 10, 3 );
 
 // Exclude out-of-stock products
-add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     if ( $post_type === 'product' ) {
         $stock = get_post_meta( $post_id, '_stock_status', true );
 
@@ -752,7 +752,7 @@ add_filter( 'wpseopilot_sitemap_entry', function( $entry, $post_id, $post_type )
 
 ---
 
-### `wpseopilot_sitemap_images`
+### `samanseo_sitemap_images`
 
 Filter images included in sitemap for a post.
 
@@ -760,13 +760,13 @@ Filter images included in sitemap for a post.
 - `$images` (array) - Array of image URLs
 - `$post_id` (int) - Post ID
 
-**File:** `includes/class-wpseopilot-service-sitemap-enhancer.php:237`
+**File:** `includes/class-samanseo-service-sitemap-enhancer.php:237`
 
 **Example:**
 
 ```php
 // Add product gallery images
-add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
+add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
     $gallery = get_post_meta( $post_id, '_product_gallery', true );
 
     if ( $gallery && is_array( $gallery ) ) {
@@ -781,7 +781,7 @@ add_filter( 'wpseopilot_sitemap_images', function( $images, $post_id ) {
 
 ---
 
-### `wpseopilot_sitemap_post_query_args`
+### `samanseo_sitemap_post_query_args`
 
 Filter WP_Query arguments for sitemap generation.
 
@@ -789,13 +789,13 @@ Filter WP_Query arguments for sitemap generation.
 - `$args` (array) - Query arguments
 - `$post_type` (string) - Post type being queried
 
-**File:** `includes/class-wpseopilot-service-sitemap-enhancer.php:292`
+**File:** `includes/class-samanseo-service-sitemap-enhancer.php:292`
 
 **Examples:**
 
 ```php
 // Only include in-stock products
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     if ( $post_type === 'product' ) {
         $args['meta_query'] = [
             [
@@ -809,7 +809,7 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 }, 10, 2 );
 
 // Exclude draft and private posts
-add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
     $args['post_status'] = 'publish';
     return $args;
 }, 10, 2 );
@@ -817,20 +817,20 @@ add_filter( 'wpseopilot_sitemap_post_query_args', function( $args, $post_type ) 
 
 ---
 
-### `wpseopilot_sitemap_index_items`
+### `samanseo_sitemap_index_items`
 
 Filter items in the sitemap index.
 
 **Parameters:**
 - `$items` (array) - Array of sitemap index items
 
-**File:** `includes/class-wpseopilot-service-sitemap-enhancer.php:457`
+**File:** `includes/class-samanseo-service-sitemap-enhancer.php:457`
 
 **Example:**
 
 ```php
 // Add external sitemap to index
-add_filter( 'wpseopilot_sitemap_index_items', function( $items ) {
+add_filter( 'samanseo_sitemap_index_items', function( $items ) {
     $items[] = [
         'loc' => 'https://example.com/external-sitemap.xml',
         'lastmod' => date( 'c' )
@@ -842,7 +842,7 @@ add_filter( 'wpseopilot_sitemap_index_items', function( $items ) {
 
 ---
 
-### `wpseopilot_sitemap_lastmod`
+### `samanseo_sitemap_lastmod`
 
 Filter the lastmod timestamp for sitemap groups.
 
@@ -851,13 +851,13 @@ Filter the lastmod timestamp for sitemap groups.
 - `$group` (string) - Sitemap group name
 - `$page` (int) - Page number
 
-**File:** `includes/class-wpseopilot-service-sitemap-enhancer.php:777`
+**File:** `includes/class-samanseo-service-sitemap-enhancer.php:777`
 
 **Example:**
 
 ```php
 // Force current timestamp for frequently updated content
-add_filter( 'wpseopilot_sitemap_lastmod', function( $lastmod, $group, $page ) {
+add_filter( 'samanseo_sitemap_lastmod', function( $lastmod, $group, $page ) {
     if ( $group === 'post' ) {
         return date( 'c' );
     }
@@ -868,27 +868,27 @@ add_filter( 'wpseopilot_sitemap_lastmod', function( $lastmod, $group, $page ) {
 
 ---
 
-### `wpseopilot_disable_core_sitemaps`
+### `samanseo_disable_core_sitemaps`
 
 Control whether WordPress core sitemaps should be disabled.
 
 **Parameters:**
 - `$should_disable` (bool) - Whether to disable core sitemaps
 
-**File:** `includes/class-wpseopilot-service-sitemap-enhancer.php:1174`
+**File:** `includes/class-samanseo-service-sitemap-enhancer.php:1174`
 
 **Example:**
 
 ```php
 // Keep core sitemaps enabled
-add_filter( 'wpseopilot_disable_core_sitemaps', '__return_false' );
+add_filter( 'samanseo_disable_core_sitemaps', '__return_false' );
 ```
 
 ---
 
 ## Breadcrumb Filters
 
-### `wpseopilot_breadcrumb_links`
+### `samanseo_breadcrumb_links`
 
 Filter the breadcrumb trail array before rendering.
 
@@ -911,7 +911,7 @@ Filter the breadcrumb trail array before rendering.
 
 ```php
 // Add custom breadcrumb for products
-add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
     if ( get_post_type( $post ) === 'product' ) {
         // Insert "Shop" between Home and product
         array_splice( $crumbs, 1, 0, [
@@ -923,13 +923,13 @@ add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
 }, 10, 2 );
 
 // Remove home breadcrumb
-add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
     array_shift( $crumbs ); // Remove first item (Home)
     return $crumbs;
 }, 10, 2 );
 
 // Add parent pages to breadcrumb
-add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
     if ( $post->post_parent ) {
         $parent_crumbs = [];
         $parent_id = $post->post_parent;
@@ -955,7 +955,7 @@ add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
 
 ## Internal Linking Filters
 
-### `wpseopilot_link_suggestions`
+### `samanseo_link_suggestions`
 
 Filter internal link suggestions shown in the post editor.
 
@@ -969,7 +969,7 @@ Filter internal link suggestions shown in the post editor.
 
 ```php
 // Add related posts as suggestions
-add_filter( 'wpseopilot_link_suggestions', function( $suggestions, $post_id ) {
+add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
     $related = get_post_meta( $post_id, '_related_posts', true );
 
     if ( $related && is_array( $related ) ) {
@@ -989,20 +989,20 @@ add_filter( 'wpseopilot_link_suggestions', function( $suggestions, $post_id ) {
 
 ---
 
-### `wpseopilot_internal_link_roles`
+### `samanseo_internal_link_roles`
 
 Filter which user roles can manage internal linking.
 
 **Parameters:**
 - `$roles` (array) - Array of role slugs
 
-**File:** `includes/class-wpseopilot-service-internal-linking.php:755`
+**File:** `includes/class-samanseo-service-internal-linking.php:755`
 
 **Example:**
 
 ```php
 // Allow editors to manage internal links
-add_filter( 'wpseopilot_internal_link_roles', function( $roles ) {
+add_filter( 'samanseo_internal_link_roles', function( $roles ) {
     $roles[] = 'editor';
     $roles[] = 'author';
 
@@ -1014,7 +1014,7 @@ add_filter( 'wpseopilot_internal_link_roles', function( $roles ) {
 
 ## Score & Analysis Filters
 
-### `wpseopilot_seo_score`
+### `samanseo_seo_score`
 
 Filter the calculated SEO score for a post.
 
@@ -1028,7 +1028,7 @@ Filter the calculated SEO score for a post.
 
 ```php
 // Penalize posts without featured images
-add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
+add_filter( 'samanseo_seo_score', function( $result, $post ) {
     if ( ! has_post_thumbnail( $post ) ) {
         $result['score'] -= 5;
         $result['issues'][] = 'Missing featured image';
@@ -1039,7 +1039,7 @@ add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
 }, 10, 2 );
 
 // Bonus for posts with video
-add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
+add_filter( 'samanseo_seo_score', function( $result, $post ) {
     if ( has_post_format( 'video', $post ) || strpos( $post->post_content, '<video' ) !== false ) {
         $result['score'] += 5;
         $result['suggestions'][] = 'Great! Video content detected.';
@@ -1049,7 +1049,7 @@ add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
 }, 10, 2 );
 
 // Check for external links
-add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
+add_filter( 'samanseo_seo_score', function( $result, $post ) {
     preg_match_all( '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/i', $post->post_content, $matches );
 
     $external_links = 0;
@@ -1072,7 +1072,7 @@ add_filter( 'wpseopilot_seo_score', function( $result, $post ) {
 
 ## Feature Control Filters
 
-### `wpseopilot_feature_toggle`
+### `samanseo_feature_toggle`
 
 Enable or disable specific plugin features.
 
@@ -1087,13 +1087,13 @@ Enable or disable specific plugin features.
 - `redirects` - Redirect manager
 - `llm_txt` - LLM.txt generation
 
-**File:** `includes/class-wpseopilot-service-admin-ui.php:27`
+**File:** `includes/class-samanseo-service-admin-ui.php:27`
 
 **Examples:**
 
 ```php
 // Disable sitemaps on staging
-add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
     if ( $feature === 'sitemaps' && wp_get_environment_type() === 'staging' ) {
         return false;
     }
@@ -1102,7 +1102,7 @@ add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
 }, 10, 2 );
 
 // Disable all features except metabox on local
-add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
     if ( wp_get_environment_type() === 'local' && $feature !== 'metabox' ) {
         return false;
     }
@@ -1113,20 +1113,20 @@ add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
 
 ---
 
-### `wpseopilot_score_post_types`
+### `samanseo_score_post_types`
 
 Filter which post types show SEO score in admin.
 
 **Parameters:**
 - `$post_types` (array) - Array of post type slugs
 
-**File:** `includes/class-wpseopilot-service-admin-ui.php:65`
+**File:** `includes/class-samanseo-service-admin-ui.php:65`
 
 **Example:**
 
 ```php
 // Add custom post types to scoring
-add_filter( 'wpseopilot_score_post_types', function( $post_types ) {
+add_filter( 'samanseo_score_post_types', function( $post_types ) {
     $post_types[] = 'product';
     $post_types[] = 'portfolio';
     $post_types[] = 'event';
@@ -1139,20 +1139,20 @@ add_filter( 'wpseopilot_score_post_types', function( $post_types ) {
 
 ## Content Filters
 
-### `wpseopilot_llm_txt_content`
+### `samanseo_llm_txt_content`
 
 Filter the complete llm.txt file content before output.
 
 **Parameters:**
 - `$content` (string) - Generated llm.txt content
 
-**File:** `includes/class-wpseopilot-service-llm-txt-generator.php:176`
+**File:** `includes/class-samanseo-service-llm-txt-generator.php:176`
 
 **Examples:**
 
 ```php
 // Add custom sections to llm.txt
-add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
+add_filter( 'samanseo_llm_txt_content', function( $content ) {
     $content .= "\n\n# Custom Instructions\n";
     $content .= "This site focuses on WordPress development and SEO.\n";
     $content .= "All code examples are in PHP unless otherwise noted.\n";
@@ -1161,7 +1161,7 @@ add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
 });
 
 // Add sitemap URL to llm.txt
-add_filter( 'wpseopilot_llm_txt_content', function( $content ) {
+add_filter( 'samanseo_llm_txt_content', function( $content ) {
     $content .= "\n\n# Sitemap\n";
     $content .= home_url( '/wp-sitemap.xml' ) . "\n";
 
@@ -1182,7 +1182,7 @@ Most Saman SEO filters use priority `10` by default.
 Use priority less than `10`:
 
 ```php
-add_filter( 'wpseopilot_title', 'my_function', 5, 2 );
+add_filter( 'samanseo_title', 'my_function', 5, 2 );
 ```
 
 ### Running After Plugin Filters
@@ -1190,7 +1190,7 @@ add_filter( 'wpseopilot_title', 'my_function', 5, 2 );
 Use priority greater than `10`:
 
 ```php
-add_filter( 'wpseopilot_title', 'my_function', 15, 2 );
+add_filter( 'samanseo_title', 'my_function', 15, 2 );
 ```
 
 ### Running Last
@@ -1198,7 +1198,7 @@ add_filter( 'wpseopilot_title', 'my_function', 15, 2 );
 Use a high priority:
 
 ```php
-add_filter( 'wpseopilot_title', 'my_function', 999, 2 );
+add_filter( 'samanseo_title', 'my_function', 999, 2 );
 ```
 
 ---
@@ -1208,7 +1208,7 @@ add_filter( 'wpseopilot_title', 'my_function', 999, 2 );
 ### Conditional Filtering
 
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( ! $post || ! some_condition() ) {
         return $title; // Always return original if no modification
     }
@@ -1221,7 +1221,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 ### Type-Safe Filtering
 
 ```php
-add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
+add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
     // Ensure $image is a string
     if ( ! is_string( $image ) ) {
         $image = '';
@@ -1236,7 +1236,7 @@ add_filter( 'wpseopilot_og_image', function( $image, $post, $meta, $defaults ) {
 ### Debugging Filters
 
 ```php
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     error_log( 'Title before: ' . $title );
 
     $title = your_modification( $title, $post );

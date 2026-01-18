@@ -6,11 +6,11 @@ Update REST API namespace, admin menu slugs, CSS class prefixes, and rebuild all
 ## Scope
 
 ### REST API Namespace (7 occurrences in PHP)
-- `wpseopilot/v2` → `samanlabs-seo/v1`
+- `samanseo/v2` → `samanlabs-seo/v1`
 
 ### Admin Menu Slugs (~56 occurrences in PHP)
-- `wpseopilot` → `samanlabs-seo`
-- `wpseopilot-dashboard` → `samanlabs-seo-dashboard`
+- `samanseo` → `samanlabs-seo`
+- `samanseo-dashboard` → `samanlabs-seo-dashboard`
 - All subpage slugs
 
 ### JavaScript API Paths (~164 occurrences across 57 JS files)
@@ -33,7 +33,7 @@ Update REST API namespace, admin menu slugs, CSS class prefixes, and rebuild all
 - Build directories
 
 ### HTML Element IDs/Classes in PHP Templates
-- Various PHP templates with `wpseopilot-*` identifiers
+- Various PHP templates with `samanseo-*` identifiers
 
 ---
 
@@ -44,7 +44,7 @@ Update REST API namespace, admin menu slugs, CSS class prefixes, and rebuild all
 
 Replace:
 ```
-wpseopilot/v2 → samanlabs-seo/v1
+samanseo/v2 → samanlabs-seo/v1
 ```
 
 Files:
@@ -65,8 +65,8 @@ Files:
 
 Replace all patterns:
 ```
-'wpseopilot' → 'samanlabs-seo'
-'wpseopilot-dashboard' → 'samanlabs-seo-dashboard'
+'samanseo' → 'samanlabs-seo'
+'samanseo-dashboard' → 'samanlabs-seo-dashboard'
 ... (all admin page slugs)
 ```
 
@@ -85,7 +85,7 @@ Key files:
 
 Replace:
 ```
-wpseopilot/v2 → samanlabs-seo/v1
+samanseo/v2 → samanlabs-seo/v1
 ```
 
 Files include:
@@ -105,8 +105,8 @@ Files include:
 
 Replace:
 ```
-.wpseopilot- → .samanlabs-seo-
-wpseopilot- → samanlabs-seo- (in ID selectors)
+.samanseo- → .samanlabs-seo-
+samanseo- → samanlabs-seo- (in ID selectors)
 ```
 
 Directories:
@@ -122,8 +122,8 @@ Directories:
 
 Replace:
 ```
-class="wpseopilot- → class="samanlabs-seo-
-id="wpseopilot- → id="samanlabs-seo-
+class="samanseo- → class="samanlabs-seo-
+id="samanseo- → id="samanlabs-seo-
 ```
 
 Template directories:
@@ -140,8 +140,8 @@ Template directories:
 
 Replace all remaining:
 ```
-'wpseopilot → 'samanlabs-seo
-wpseopilot- → samanlabs-seo-
+'samanseo → 'samanlabs-seo
+samanseo- → samanlabs-seo-
 ```
 
 This catches:
@@ -174,19 +174,19 @@ This regenerates:
 ## Verification
 
 After all changes:
-1. Grep for `wpseopilot` in PHP/JS/LESS files (should return 0)
+1. Grep for `samanseo` in PHP/JS/LESS files (should return 0)
 2. Verify builds complete successfully
 3. Check no broken references remain
 
 ```bash
 # PHP files
-grep -r "wpseopilot" --include="*.php" . | grep -v ".planning"
+grep -r "samanseo" --include="*.php" . | grep -v ".planning"
 
 # JS source files
-grep -r "wpseopilot" --include="*.js" src-v2/
+grep -r "samanseo" --include="*.js" src-v2/
 
 # LESS source files
-grep -r "wpseopilot" --include="*.less" assets/less/ src-v2/less/
+grep -r "samanseo" --include="*.less" assets/less/ src-v2/less/
 ```
 
 ---
@@ -199,7 +199,7 @@ grep -r "wpseopilot" --include="*.less" assets/less/ src-v2/less/
 - [ ] All LESS source files updated
 - [ ] All PHP templates updated
 - [ ] Frontend builds complete successfully
-- [ ] No `wpseopilot` references remain in source files
+- [ ] No `samanseo` references remain in source files
 
 ---
 

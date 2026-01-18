@@ -28,7 +28,7 @@ Saman SEO integrates with OpenAI's GPT models to provide intelligent SEO suggest
 
 **Location:** Navigate to **Saman SEO → AI Assistant**
 
-**File:** `includes/class-wpseopilot-service-ai-assistant.php`
+**File:** `includes/class-samanseo-service-ai-assistant.php`
 
 ---
 
@@ -53,18 +53,18 @@ Saman SEO integrates with OpenAI's GPT models to provide intelligent SEO suggest
 3. Paste your API key in **OpenAI API Key** field
 4. Click **Save Changes**
 
-**Option:** `wpseopilot_openai_api_key`
+**Option:** `samanseo_openai_api_key`
 
 ```php
 // Programmatically set API key
-update_option( 'wpseopilot_openai_api_key', 'sk-your-api-key-here' );
+update_option( 'samanseo_openai_api_key', 'sk-your-api-key-here' );
 ```
 
 ---
 
 ### Step 3: Choose AI Model
 
-**Option:** `wpseopilot_ai_model`
+**Option:** `samanseo_ai_model`
 
 **Available Models:**
 
@@ -78,7 +78,7 @@ update_option( 'wpseopilot_openai_api_key', 'sk-your-api-key-here' );
 
 ```php
 // Set AI model
-update_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
+update_option( 'samanseo_ai_model', 'gpt-4o-mini' );
 ```
 
 **Model Selection Guidelines:**
@@ -99,7 +99,7 @@ update_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
 4. Review the suggestion
 5. Click **Use This Title** or regenerate
 
-**AJAX Handler:** `wp_ajax_wpseopilot_generate_ai`
+**AJAX Handler:** `wp_ajax_samanseo_generate_ai`
 
 ---
 
@@ -160,7 +160,7 @@ Saman SEO allows complete customization of AI prompts to match your brand voice 
 
 ### System Prompt
 
-**Option:** `wpseopilot_ai_prompt_system`
+**Option:** `samanseo_ai_prompt_system`
 
 The system prompt establishes the AI's role and behavior.
 
@@ -179,14 +179,14 @@ You are an expert SEO copywriter specialized in creating compelling, search-engi
 ```php
 $system_prompt = "You are a professional SEO expert for a tech blog. Write in a casual, friendly tone that appeals to developers and tech enthusiasts. Focus on clear, actionable language.";
 
-update_option( 'wpseopilot_ai_prompt_system', $system_prompt );
+update_option( 'samanseo_ai_prompt_system', $system_prompt );
 ```
 
 ---
 
 ### Title Generation Prompt
 
-**Option:** `wpseopilot_ai_prompt_title`
+**Option:** `samanseo_ai_prompt_title`
 
 **Default:**
 
@@ -228,14 +228,14 @@ Make it action-oriented, include numbers if relevant, and keep it under 60 chara
 
 Title:";
 
-update_option( 'wpseopilot_ai_prompt_title', $title_prompt );
+update_option( 'samanseo_ai_prompt_title', $title_prompt );
 ```
 
 ---
 
 ### Description Generation Prompt
 
-**Option:** `wpseopilot_ai_prompt_description`
+**Option:** `samanseo_ai_prompt_description`
 
 **Default:**
 
@@ -268,7 +268,7 @@ Include: Key benefit, call-to-action, urgency
 
 Description:";
 
-update_option( 'wpseopilot_ai_prompt_description', $description_prompt );
+update_option( 'samanseo_ai_prompt_description', $description_prompt );
 ```
 
 ---
@@ -281,7 +281,7 @@ update_option( 'wpseopilot_ai_prompt_description', $description_prompt );
 // For medical/health sites
 $system_prompt = "You are a medical content specialist. Write evidence-based, YMYL-compliant SEO metadata. Avoid sensationalism. Use professional, trustworthy language.";
 
-update_option( 'wpseopilot_ai_prompt_system', $system_prompt );
+update_option( 'samanseo_ai_prompt_system', $system_prompt );
 ```
 
 ---
@@ -292,7 +292,7 @@ update_option( 'wpseopilot_ai_prompt_system', $system_prompt );
 // For fun, casual brands
 $system_prompt = "You're a creative copywriter for a playful brand. Write SEO metadata that's witty, engaging, and slightly cheeky while remaining professional and accurate.";
 
-update_option( 'wpseopilot_ai_prompt_system', $system_prompt );
+update_option( 'samanseo_ai_prompt_system', $system_prompt );
 ```
 
 ---
@@ -310,7 +310,7 @@ Include location naturally. Keep it under 60 characters.
 
 Title:";
 
-update_option( 'wpseopilot_ai_prompt_title', $title_prompt );
+update_option( 'samanseo_ai_prompt_title', $title_prompt );
 ```
 
 ---
@@ -333,7 +333,7 @@ Length: 150-160 characters
 
 Description:";
 
-update_option( 'wpseopilot_ai_prompt_description', $description_prompt );
+update_option( 'samanseo_ai_prompt_description', $description_prompt );
 ```
 
 ---
@@ -436,7 +436,7 @@ Pricing is based on tokens (roughly 4 characters = 1 token).
 
 ```php
 // For straightforward blog posts
-update_option( 'wpseopilot_ai_model', 'gpt-4o-mini' );
+update_option( 'samanseo_ai_model', 'gpt-4o-mini' );
 ```
 
 ---
@@ -555,10 +555,10 @@ Or programmatically:
 
 ```php
 // Reset all AI settings to defaults
-delete_option( 'wpseopilot_ai_model' );
-delete_option( 'wpseopilot_ai_prompt_system' );
-delete_option( 'wpseopilot_ai_prompt_title' );
-delete_option( 'wpseopilot_ai_prompt_description' );
+delete_option( 'samanseo_ai_model' );
+delete_option( 'samanseo_ai_prompt_system' );
+delete_option( 'samanseo_ai_prompt_title' );
+delete_option( 'samanseo_ai_prompt_description' );
 ```
 
 ---
@@ -572,10 +572,10 @@ delete_option( 'wpseopilot_ai_prompt_description' );
 
 ```php
 // wp-config.php
-define( 'WPSEOPILOT_OPENAI_KEY', getenv( 'OPENAI_API_KEY' ) );
+define( 'SAMANSEO_OPENAI_KEY', getenv( 'OPENAI_API_KEY' ) );
 
 // In plugin
-$api_key = defined( 'WPSEOPILOT_OPENAI_KEY' ) ? WPSEOPILOT_OPENAI_KEY : get_option( 'wpseopilot_openai_api_key' );
+$api_key = defined( 'SAMANSEO_OPENAI_KEY' ) ? SAMANSEO_OPENAI_KEY : get_option( 'samanseo_openai_api_key' );
 ```
 
 ---
@@ -585,7 +585,7 @@ $api_key = defined( 'WPSEOPILOT_OPENAI_KEY' ) ? WPSEOPILOT_OPENAI_KEY : get_opti
 Only allow trusted users to access AI features:
 
 ```php
-add_filter( 'wpseopilot_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
     if ( $feature === 'ai_assistant' && ! current_user_can( 'manage_options' ) ) {
         return false;
     }

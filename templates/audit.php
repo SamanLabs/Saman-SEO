@@ -10,6 +10,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $total_issues       = $stats['total'] ?? count( $issues );
 $severity_breakdown = $stats['severity'] ?? [];
 $type_breakdown     = $stats['types'] ?? [];

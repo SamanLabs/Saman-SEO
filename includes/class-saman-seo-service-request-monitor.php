@@ -185,18 +185,9 @@ class Request_Monitor {
 			$site_name
 		);
 
+		/* translators: 1: request URI, 2: hit count, 3: site URL, 4: admin URL */
 		$message = sprintf(
-			/* translators: 1: request URI, 2: hit count, 3: site URL, 4: admin URL */
-			__(
-				"Hello,\n\nA 404 error on your site has reached the notification threshold.\n\n" .
-				"URL: %1\$s\n" .
-				"Hits: %2\$d\n\n" .
-				"Site: %3\$s\n\n" .
-				"You may want to create a redirect for this URL to improve user experience and SEO.\n\n" .
-				"View and manage 404 errors:\n%4\$s\n\n" .
-				"--\nThis notification was sent by Saman SEO.\nYou can disable these notifications in Settings > Advanced > 404 Monitor.",
-				'saman-seo'
-			),
+			__( "Hello,\n\nA 404 error on your site has reached the notification threshold.\n\nURL: %1\$s\nHits: %2\$d\n\nSite: %3\$s\n\nYou may want to create a redirect for this URL to improve user experience and SEO.\n\nView and manage 404 errors:\n%4\$s\n\n--\nThis notification was sent by Saman SEO.\nYou can disable these notifications in Settings > Advanced > 404 Monitor.", 'saman-seo' ),
 			$request_uri,
 			$hits,
 			$site_url,
@@ -398,17 +389,18 @@ class Request_Monitor {
 
 		$count_sql = "SELECT COUNT(*) FROM {$this->table}{$where_sql}";
 		if ( $params ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
 			$count_sql = $wpdb->prepare( $count_sql, $params );
 		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom ordering/pagination requires direct queries.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom ordering/pagination requires direct queries, SQL prepared conditionally above.
 		$total_count = (int) $wpdb->get_var( $count_sql );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom ordering/pagination requires direct queries.
 		$order_by_sql = ( 'hits' === $order_by ) ? 'hits' : 'last_seen';
 		$sql = "SELECT * FROM {$this->table}{$where_sql} ORDER BY {$order_by_sql} DESC LIMIT %d OFFSET %d";
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom ordering/pagination requires direct queries.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom ordering/pagination requires direct queries, SQL built with safe table name.
 		$sql = $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom ordering/pagination requires direct queries.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom ordering/pagination requires direct queries, SQL prepared above.
 		$rows = $wpdb->get_results( $sql );
 
 		if ( $rows ) {
@@ -417,7 +409,11 @@ class Request_Monitor {
 		}
 
 		$total_pages = max( 1, (int) ceil( $total_count / $per_page ) );
-		$base_url    = menu_page_url( 'saman-seo-404', false );
+		$base_url    = menu_page_url( 'saman-seo-404-log', false );
+		// Fallback if menu page not registered yet.
+		if ( empty( $base_url ) ) {
+			$base_url = admin_url( 'admin.php?page=saman-seo-404-log' );
+		}
 
 		include SAMAN_SEO_PATH . 'templates/404-log.php';
 	}
@@ -453,13 +449,14 @@ class Request_Monitor {
 		$now        = current_time( 'mysql' );
 
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Each request URI must be checked against the custom 404 log table directly.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Each request URI must be checked against the custom 404 log table directly, table name is safe.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				'SELECT id, hits, user_agent, is_bot FROM ' . $this->table . ' WHERE request_uri = %s LIMIT 1',
 				$request
 			)
 		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( $row ) {
 			$update_data = [
@@ -603,7 +600,7 @@ class Request_Monitor {
 		$requests     = array_values( array_unique( $requests ) );
 		$placeholders = implode( ',', array_fill( 0, count( $requests ), '%s' ) );
 		$sql          = "SELECT source FROM {$redirect_table} WHERE source IN ({$placeholders})";
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Matching redirects against 404 log rows requires direct query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Matching redirects against 404 log rows requires direct query, table name is safe and placeholders are dynamically generated.
 		$sources = $wpdb->get_col( $wpdb->prepare( $sql, $requests ) );
 
 		$lookup = $sources ? array_fill_keys( $sources, true ) : [];
@@ -1117,7 +1114,7 @@ class Request_Monitor {
 	private function has_column( $column ) {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Inspecting table schema requires a direct query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Inspecting table schema requires a direct query, table name is safe.
 		$existing = $wpdb->get_var( $wpdb->prepare( 'SHOW COLUMNS FROM ' . $this->table . ' LIKE %s', $column ) );
 
 		return ! empty( $existing );

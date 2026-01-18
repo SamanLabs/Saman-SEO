@@ -267,7 +267,7 @@ class Htaccess_Controller extends REST_Controller {
         // Delete oldest files
         $to_delete = array_slice( $files, 0, count( $files ) - 10 );
         foreach ( $to_delete as $file ) {
-            @unlink( $file );
+            wp_delete_file( $file );
         }
     }
 

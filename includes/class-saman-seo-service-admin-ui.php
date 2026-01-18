@@ -334,8 +334,8 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function enqueue_admin_list_assets() {
-		$build_dir = SAMAN_SEO_PATH . 'build-admin-list/';
-		$build_url = SAMAN_SEO_URL . 'build-admin-list/';
+		$build_dir = SAMAN_SEO_PATH . 'build/admin-list/';
+		$build_url = SAMAN_SEO_URL . 'build/admin-list/';
 
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
@@ -368,8 +368,8 @@ class Admin_UI {
 	 */
 	public function enqueue_editor_assets() {
 		// Load V2 React editor sidebar
-		$build_dir = SAMAN_SEO_PATH . 'build-editor/';
-		$build_url = SAMAN_SEO_URL . 'build-editor/';
+		$build_dir = SAMAN_SEO_PATH . 'build/editor/';
+		$build_url = SAMAN_SEO_URL . 'build/editor/';
 
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )

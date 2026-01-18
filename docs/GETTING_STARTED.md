@@ -182,7 +182,7 @@ Every post and page gets granular control over:
 - Open Graph and Twitter Card metadata
 - Custom social images
 
-**Stored as:** Single JSON object in `_wpseopilot_meta` post meta key
+**Stored as:** Single JSON object in `_samanseo_meta` post meta key
 
 ### 2. XML Sitemaps
 
@@ -314,7 +314,7 @@ See **[AI Assistant Guide](AI_ASSISTANT.md)** for configuration.
 
 ## Post Meta Storage
 
-All SEO metadata is stored in a single post meta key: `_wpseopilot_meta`
+All SEO metadata is stored in a single post meta key: `_samanseo_meta`
 
 **Structure:**
 ```json

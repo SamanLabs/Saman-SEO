@@ -64,7 +64,7 @@ This is SEO without secrets—because better SEO comes from better collaboration
 ## Features
 
 ### Core SEO Management
-- **Per-Post SEO Fields**: Complete meta control stored in `_wpseopilot_meta` with Gutenberg sidebar and classic editor support
+- **Per-Post SEO Fields**: Complete meta control stored in `_samanseo_meta` with Gutenberg sidebar and classic editor support
 - **Server-Rendered Output**: `<title>`, meta descriptions, canonical URLs, robots directives, Open Graph, Twitter Cards, and JSON-LD structured data
 - **Site-Wide Templates**: Centralized defaults for titles, descriptions, social images, robots directives, and hreflang attributes
 - **Post-Type Granularity**: Dedicated defaults for each content type—no more one-size-fits-all configurations
@@ -135,8 +135,8 @@ Navigate to **Saman SEO → Defaults** to set template-driven defaults that appl
 
 ```php
 // Render breadcrumbs in your theme
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs();
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs();
 }
 ```
 
@@ -144,7 +144,7 @@ if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
 
 ```php
 // Create a 301 redirect programmatically
-$result = wpseopilot_create_redirect( '/old-url', '/new-url' );
+$result = samanseo_create_redirect( '/old-url', '/new-url' );
 
 if ( is_wp_error( $result ) ) {
     error_log( 'Redirect failed: ' . $result->get_error_message() );
@@ -155,7 +155,7 @@ if ( is_wp_error( $result ) ) {
 
 ```php
 // Modify SEO title dynamically
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_singular( 'product' ) ) {
         return $title . ' | Buy Now';
     }
@@ -163,7 +163,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Override Open Graph image
-add_filter( 'wpseopilot_og_image', function( $image, $post ) {
+add_filter( 'samanseo_og_image', function( $image, $post ) {
     if ( $post && $post->ID === 42 ) {
         return 'https://cdn.example.com/special-image.jpg';
     }
@@ -179,13 +179,13 @@ For comprehensive filter documentation, see **[docs/FILTERS.md](docs/FILTERS.md)
 
 ```bash
 # List all redirects
-wp wpseopilot redirects list --format=table
+wp saman-seo redirects list --format=table
 
 # Export redirects to JSON
-wp wpseopilot redirects export redirects.json
+wp saman-seo redirects export redirects.json
 
 # Import redirects from JSON
-wp wpseopilot redirects import redirects.json
+wp saman-seo redirects import redirects.json
 ```
 
 Full WP-CLI documentation: **[docs/WP_CLI.md](docs/WP_CLI.md)**

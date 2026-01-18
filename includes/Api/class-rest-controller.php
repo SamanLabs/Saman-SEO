@@ -25,6 +25,13 @@ abstract class REST_Controller {
     protected $namespace = 'saman-seo/v1';
 
     /**
+     * REST base for this controller.
+     *
+     * @var string
+     */
+    protected $rest_base = '';
+
+    /**
      * Register routes - must be implemented by child classes.
      */
     abstract public function register_routes();

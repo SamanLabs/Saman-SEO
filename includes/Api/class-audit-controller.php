@@ -428,6 +428,7 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'medium',
+                    // translators: Placeholder values
                     'message'  => sprintf( __( 'Meta title too long (%d characters).', 'saman-seo' ), strlen( $meta['title'] ) ),
                     'action'   => __( 'Shorten to under 65 characters.', 'saman-seo' ),
                     'type'     => 'title_length',
@@ -454,6 +455,7 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
+                    // translators: Placeholder values
                     'message'  => sprintf( __( 'Meta description too long (%d characters).', 'saman-seo' ), strlen( $meta['description'] ) ),
                     'action'   => __( 'Shorten to under 160 characters.', 'saman-seo' ),
                     'type'     => 'description_length',
@@ -471,6 +473,7 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'medium',
+                    /* translators: %d: number of images missing alt text */
                     'message'  => sprintf( _n( '%d image missing alt text.', '%d images missing alt text.', $missing, 'saman-seo' ), $missing ),
                     'action'   => __( 'Add descriptive alt attributes.', 'saman-seo' ),
                     'type'     => 'missing_alt',
@@ -486,6 +489,7 @@ class Audit_Controller extends REST_Controller {
                     'title'    => $title,
                     'edit_url' => get_edit_post_link( $post_id, 'raw' ),
                     'severity' => 'low',
+                    // translators: Placeholder values
                     'message'  => sprintf( __( 'Low word count (%d words).', 'saman-seo' ), $word_count ),
                     'action'   => __( 'Consider adding more content (300+ words recommended).', 'saman-seo' ),
                     'type'     => 'low_word_count',
@@ -543,6 +547,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'medium',
                 'type'     => 'title_length',
+                // translators: Placeholder values
                 'message'  => sprintf( __( 'Meta title too long (%d characters).', 'saman-seo' ), strlen( $meta['title'] ) ),
             ];
         }
@@ -558,6 +563,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'low',
                 'type'     => 'description_length',
+                // translators: Placeholder values
                 'message'  => sprintf( __( 'Meta description too long (%d characters).', 'saman-seo' ), strlen( $meta['description'] ) ),
             ];
         }
@@ -569,6 +575,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'medium',
                 'type'     => 'missing_alt',
+                // translators: Placeholder values
                 'message'  => sprintf( __( '%d images missing alt text.', 'saman-seo' ), $img_count - $alt_count ),
             ];
         }
@@ -579,6 +586,7 @@ class Audit_Controller extends REST_Controller {
             $issues[] = [
                 'severity' => 'low',
                 'type'     => 'low_word_count',
+                // translators: Placeholder values
                 'message'  => sprintf( __( 'Low word count (%d words).', 'saman-seo' ), $word_count ),
             ];
         }

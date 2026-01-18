@@ -16,14 +16,14 @@ This guide covers all public functions, template tags, and shortcodes available 
 
 ## Breadcrumbs
 
-### `wpseopilot_breadcrumbs()`
+### `samanseo_breadcrumbs()`
 
 Render SEO-friendly breadcrumb navigation with Schema.org markup.
 
 **Function Signature:**
 
 ```php
-wpseopilot_breadcrumbs( $post = null, $echo = true )
+samanseo_breadcrumbs( $post = null, $echo = true )
 ```
 
 **Parameters:**
@@ -42,8 +42,8 @@ wpseopilot_breadcrumbs( $post = null, $echo = true )
 ```php
 // In your theme template (header.php, single.php, page.php, etc.)
 <?php
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs();
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs();
 }
 ?>
 ```
@@ -54,8 +54,8 @@ if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
 
 ```php
 <?php
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    $breadcrumbs_html = wpseopilot_breadcrumbs( null, false );
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    $breadcrumbs_html = samanseo_breadcrumbs( null, false );
 
     // Do something with the HTML
     echo '<div class="custom-wrapper">' . $breadcrumbs_html . '</div>';
@@ -71,8 +71,8 @@ if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
 <?php
 $custom_post = get_post( 123 );
 
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs( $custom_post );
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs( $custom_post );
 }
 ?>
 ```
@@ -89,7 +89,7 @@ The breadcrumbs are rendered with:
 **Example HTML Output:**
 
 ```html
-<nav aria-label="Breadcrumb" class="wpseopilot-breadcrumbs">
+<nav aria-label="Breadcrumb" class="samanseo-breadcrumbs">
     <ol itemscope itemtype="https://schema.org/BreadcrumbList">
         <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
             <a itemprop="item" href="https://example.com/">
@@ -118,13 +118,13 @@ The breadcrumbs are rendered with:
 Add custom CSS to your theme:
 
 ```css
-.wpseopilot-breadcrumbs {
+.samanseo-breadcrumbs {
     font-size: 14px;
     color: #666;
     margin-bottom: 20px;
 }
 
-.wpseopilot-breadcrumbs ol {
+.samanseo-breadcrumbs ol {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -132,30 +132,30 @@ Add custom CSS to your theme:
     flex-wrap: wrap;
 }
 
-.wpseopilot-breadcrumbs li {
+.samanseo-breadcrumbs li {
     display: inline;
 }
 
-.wpseopilot-breadcrumbs li::after {
+.samanseo-breadcrumbs li::after {
     content: ' › ';
     padding: 0 8px;
     color: #999;
 }
 
-.wpseopilot-breadcrumbs li:last-child::after {
+.samanseo-breadcrumbs li:last-child::after {
     content: '';
 }
 
-.wpseopilot-breadcrumbs a {
+.samanseo-breadcrumbs a {
     color: #0073aa;
     text-decoration: none;
 }
 
-.wpseopilot-breadcrumbs a:hover {
+.samanseo-breadcrumbs a:hover {
     text-decoration: underline;
 }
 
-.wpseopilot-breadcrumbs li:last-child span {
+.samanseo-breadcrumbs li:last-child span {
     color: #333;
 }
 ```
@@ -164,10 +164,10 @@ Add custom CSS to your theme:
 
 ### Filtering Breadcrumbs
 
-Customize breadcrumb output using the `wpseopilot_breadcrumb_links` filter:
+Customize breadcrumb output using the `samanseo_breadcrumb_links` filter:
 
 ```php
-add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
     // Add custom breadcrumb for products
     if ( get_post_type( $post ) === 'product' ) {
         array_splice( $crumbs, 1, 0, [
@@ -179,7 +179,7 @@ add_filter( 'wpseopilot_breadcrumb_links', function( $crumbs, $post ) {
 }, 10, 2 );
 ```
 
-See **[Filter Reference](FILTERS.md#wpseopilot_breadcrumb_links)** for more examples.
+See **[Filter Reference](FILTERS.md#samanseo_breadcrumb_links)** for more examples.
 
 ---
 
@@ -187,7 +187,7 @@ See **[Filter Reference](FILTERS.md#wpseopilot_breadcrumb_links)** for more exam
 
 Saman SEO provides namespaced helper functions for accessing SEO data programmatically.
 
-**Namespace:** `WPSEOPilot\Helpers`
+**Namespace:** `SamanSEO\Helpers`
 
 ---
 
@@ -198,7 +198,7 @@ Fetch a plugin option with default fallback.
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\get_option( $key, $default = '' )
+\SamanSEO\Helpers\get_option( $key, $default = '' )
 ```
 
 **Parameters:**
@@ -211,9 +211,9 @@ Fetch a plugin option with default fallback.
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\get_option;
+use function SamanSEO\Helpers\get_option;
 
-$default_title_template = get_option( 'wpseopilot_default_title_template', '{{post_title}} | {{site_title}}' );
+$default_title_template = get_option( 'samanseo_default_title_template', '{{post_title}} | {{site_title}}' );
 
 echo 'Title template: ' . $default_title_template;
 ```
@@ -227,7 +227,7 @@ Fetch SEO metadata for a post with sensible defaults.
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\get_post_meta( $post_id )
+\SamanSEO\Helpers\get_post_meta( $post_id )
 ```
 
 **Parameters:**
@@ -252,7 +252,7 @@ Fetch SEO metadata for a post with sensible defaults.
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\get_post_meta;
+use function SamanSEO\Helpers\get_post_meta;
 
 $meta = get_post_meta( get_the_ID() );
 
@@ -270,7 +270,7 @@ Replace template variables (e.g., `{{post_title}}`) with actual values.
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\replace_template_variables( $template, $post )
+\SamanSEO\Helpers\replace_template_variables( $template, $post )
 ```
 
 **Parameters:**
@@ -293,7 +293,7 @@ Replace template variables (e.g., `{{post_title}}`) with actual values.
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\replace_template_variables;
+use function SamanSEO\Helpers\replace_template_variables;
 
 $template = '{{post_title}} by {{author}} | {{site_title}}';
 $post = get_post( 123 );
@@ -313,7 +313,7 @@ Generate a complete SEO title using template and post data.
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\generate_title_from_template( $post, $post_type )
+\SamanSEO\Helpers\generate_title_from_template( $post, $post_type )
 ```
 
 **Parameters:**
@@ -326,7 +326,7 @@ Generate a complete SEO title using template and post data.
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\generate_title_from_template;
+use function SamanSEO\Helpers\generate_title_from_template;
 
 $post = get_post( get_the_ID() );
 $title = generate_title_from_template( $post, 'post' );
@@ -343,7 +343,7 @@ Generate a trimmed snippet from post content.
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\generate_content_snippet( $post, $length = 160 )
+\SamanSEO\Helpers\generate_content_snippet( $post, $length = 160 )
 ```
 
 **Parameters:**
@@ -356,7 +356,7 @@ Generate a trimmed snippet from post content.
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\generate_content_snippet;
+use function SamanSEO\Helpers\generate_content_snippet;
 
 $snippet = generate_content_snippet( get_post( 123 ), 200 );
 
@@ -372,7 +372,7 @@ Calculate the SEO score for a post.
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\calculate_seo_score( $post )
+\SamanSEO\Helpers\calculate_seo_score( $post )
 ```
 
 **Parameters:**
@@ -400,7 +400,7 @@ Calculate the SEO score for a post.
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\calculate_seo_score;
+use function SamanSEO\Helpers\calculate_seo_score;
 
 $post = get_post( get_the_ID() );
 $score_data = calculate_seo_score( $post );
@@ -425,7 +425,7 @@ Generate breadcrumb HTML (alias for namespaced version).
 **Function Signature:**
 
 ```php
-\WPSEOPilot\Helpers\breadcrumbs( $post = null, $echo = true )
+\SamanSEO\Helpers\breadcrumbs( $post = null, $echo = true )
 ```
 
 **Parameters:**
@@ -438,7 +438,7 @@ Generate breadcrumb HTML (alias for namespaced version).
 **Example:**
 
 ```php
-use function WPSEOPilot\Helpers\breadcrumbs;
+use function SamanSEO\Helpers\breadcrumbs;
 
 $html = breadcrumbs( null, false );
 echo '<div class="my-breadcrumbs">' . $html . '</div>';
@@ -448,18 +448,18 @@ echo '<div class="my-breadcrumbs">' . $html . '</div>';
 
 ## Shortcodes
 
-### `[wpseopilot_breadcrumbs]`
+### `[samanseo_breadcrumbs]`
 
 Render breadcrumbs anywhere via shortcode.
 
-**Location:** `includes/class-wpseopilot-service-frontend.php:39`
+**Location:** `includes/class-samanseo-service-frontend.php:39`
 
 ---
 
 ### Basic Usage
 
 ```
-[wpseopilot_breadcrumbs]
+[samanseo_breadcrumbs]
 ```
 
 ---
@@ -471,7 +471,7 @@ Add breadcrumbs directly in post/page content:
 ```
 Welcome to our site! Here's where you are:
 
-[wpseopilot_breadcrumbs]
+[samanseo_breadcrumbs]
 
 Now let's get started...
 ```
@@ -483,7 +483,7 @@ Now let's get started...
 Use the shortcode in a Text widget or Custom HTML widget:
 
 ```
-[wpseopilot_breadcrumbs]
+[samanseo_breadcrumbs]
 ```
 
 ---
@@ -493,21 +493,21 @@ Use the shortcode in a Text widget or Custom HTML widget:
 Execute shortcode in PHP:
 
 ```php
-<?php echo do_shortcode( '[wpseopilot_breadcrumbs]' ); ?>
+<?php echo do_shortcode( '[samanseo_breadcrumbs]' ); ?>
 ```
 
 ---
 
 ## Programmatic Functions
 
-### `wpseopilot_create_redirect()`
+### `samanseo_create_redirect()`
 
 Create a redirect programmatically.
 
 **Function Signature:**
 
 ```php
-wpseopilot_create_redirect( $source, $target, $status_code = 301 )
+samanseo_create_redirect( $source, $target, $status_code = 301 )
 ```
 
 **Parameters:**
@@ -526,7 +526,7 @@ wpseopilot_create_redirect( $source, $target, $status_code = 301 )
 
 ```php
 // Create a 301 permanent redirect
-$result = wpseopilot_create_redirect( '/old-page', '/new-page' );
+$result = samanseo_create_redirect( '/old-page', '/new-page' );
 
 if ( is_wp_error( $result ) ) {
     error_log( 'Redirect failed: ' . $result->get_error_message() );
@@ -541,7 +541,7 @@ if ( is_wp_error( $result ) ) {
 
 ```php
 // Create a 302 temporary redirect
-wpseopilot_create_redirect( '/promo', '/limited-time-offer', 302 );
+samanseo_create_redirect( '/promo', '/limited-time-offer', 302 );
 ```
 
 ---
@@ -550,7 +550,7 @@ wpseopilot_create_redirect( '/promo', '/limited-time-offer', 302 );
 
 ```php
 // Redirect to external URL
-wpseopilot_create_redirect( '/old-blog', 'https://newblog.com', 301 );
+samanseo_create_redirect( '/old-blog', 'https://newblog.com', 301 );
 ```
 
 ---
@@ -565,7 +565,7 @@ $redirects = [
 ];
 
 foreach ( $redirects as $redirect ) {
-    wpseopilot_create_redirect( $redirect[0], $redirect[1], 301 );
+    samanseo_create_redirect( $redirect[0], $redirect[1], 301 );
 }
 ```
 
@@ -574,7 +574,7 @@ foreach ( $redirects as $redirect ) {
 ### Error Handling
 
 ```php
-$result = wpseopilot_create_redirect( '/source', '/target', 301 );
+$result = samanseo_create_redirect( '/source', '/target', 301 );
 
 if ( is_wp_error( $result ) ) {
     switch ( $result->get_error_code() ) {
@@ -621,8 +621,8 @@ if ( is_wp_error( $result ) ) {
 
         <?php
         // Display breadcrumbs on all pages except homepage
-        if ( ! is_front_page() && function_exists( 'wpseopilot_breadcrumbs' ) ) {
-            wpseopilot_breadcrumbs();
+        if ( ! is_front_page() && function_exists( 'samanseo_breadcrumbs' ) ) {
+            samanseo_breadcrumbs();
         }
         ?>
     </div>
@@ -637,7 +637,7 @@ if ( is_wp_error( $result ) ) {
 
 ```php
 <?php
-use function WPSEOPilot\Helpers\calculate_seo_score;
+use function SamanSEO\Helpers\calculate_seo_score;
 
 get_header();
 
@@ -683,11 +683,11 @@ get_footer();
 **functions.php:**
 
 ```php
-use function WPSEOPilot\Helpers\generate_title_from_template;
-use function WPSEOPilot\Helpers\replace_template_variables;
+use function SamanSEO\Helpers\generate_title_from_template;
+use function SamanSEO\Helpers\replace_template_variables;
 
 // Custom title for product archive
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( is_post_type_archive( 'product' ) ) {
         return 'Shop Our Products | ' . get_bloginfo( 'name' );
     }
@@ -696,7 +696,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add pricing to product titles
-add_filter( 'wpseopilot_title', function( $title, $post ) {
+add_filter( 'samanseo_title', function( $title, $post ) {
     if ( $post && get_post_type( $post ) === 'product' ) {
         $price = get_post_meta( $post->ID, '_price', true );
 
@@ -717,7 +717,7 @@ add_filter( 'wpseopilot_title', function( $title, $post ) {
 
 ```php
 <?php
-use function WPSEOPilot\Helpers\get_post_meta;
+use function SamanSEO\Helpers\get_post_meta;
 
 get_header();
 
@@ -781,8 +781,8 @@ add_action( 'post_updated', function( $post_id, $post_after, $post_before ) {
         $new_url = '/' . $post_after->post_name;
 
         // Create redirect
-        if ( function_exists( 'wpseopilot_create_redirect' ) ) {
-            $result = wpseopilot_create_redirect( $old_url, $new_url, 301 );
+        if ( function_exists( 'samanseo_create_redirect' ) ) {
+            $result = samanseo_create_redirect( $old_url, $new_url, 301 );
 
             if ( ! is_wp_error( $result ) ) {
                 add_action( 'admin_notices', function() {
@@ -802,7 +802,7 @@ add_action( 'post_updated', function( $post_id, $post_after, $post_before ) {
 
 ```css
 /* Breadcrumb container */
-.wpseopilot-breadcrumbs {
+.samanseo-breadcrumbs {
     background: #f5f5f5;
     padding: 10px 20px;
     border-radius: 4px;
@@ -811,7 +811,7 @@ add_action( 'post_updated', function( $post_id, $post_after, $post_before ) {
 }
 
 /* Breadcrumb list */
-.wpseopilot-breadcrumbs ol {
+.samanseo-breadcrumbs ol {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -821,49 +821,49 @@ add_action( 'post_updated', function( $post_id, $post_after, $post_before ) {
 }
 
 /* Breadcrumb items */
-.wpseopilot-breadcrumbs li {
+.samanseo-breadcrumbs li {
     display: inline-flex;
     align-items: center;
 }
 
 /* Separator */
-.wpseopilot-breadcrumbs li::after {
+.samanseo-breadcrumbs li::after {
     content: '›';
     margin: 0 10px;
     color: #999;
     font-weight: bold;
 }
 
-.wpseopilot-breadcrumbs li:last-child::after {
+.samanseo-breadcrumbs li:last-child::after {
     display: none;
 }
 
 /* Links */
-.wpseopilot-breadcrumbs a {
+.samanseo-breadcrumbs a {
     color: #0073aa;
     text-decoration: none;
     transition: color 0.2s;
 }
 
-.wpseopilot-breadcrumbs a:hover {
+.samanseo-breadcrumbs a:hover {
     color: #005177;
     text-decoration: underline;
 }
 
 /* Current page */
-.wpseopilot-breadcrumbs li:last-child span {
+.samanseo-breadcrumbs li:last-child span {
     color: #333;
     font-weight: 600;
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-    .wpseopilot-breadcrumbs {
+    .samanseo-breadcrumbs {
         font-size: 12px;
         padding: 8px 15px;
     }
 
-    .wpseopilot-breadcrumbs li::after {
+    .samanseo-breadcrumbs li::after {
         margin: 0 5px;
     }
 }
@@ -877,9 +877,9 @@ add_action( 'post_updated', function( $post_id, $post_after, $post_before ) {
 
 ```php
 <?php
-use function WPSEOPilot\Helpers\get_post_meta;
-use function WPSEOPilot\Helpers\calculate_seo_score;
-use function WPSEOPilot\Helpers\generate_content_snippet;
+use function SamanSEO\Helpers\get_post_meta;
+use function SamanSEO\Helpers\calculate_seo_score;
+use function SamanSEO\Helpers\generate_content_snippet;
 
 $post_id = get_the_ID();
 $meta = get_post_meta( $post_id );
@@ -922,16 +922,16 @@ $snippet = generate_content_snippet( get_post( $post_id ), 200 );
 ### 1. Always Check Function Existence
 
 ```php
-if ( function_exists( 'wpseopilot_breadcrumbs' ) ) {
-    wpseopilot_breadcrumbs();
+if ( function_exists( 'samanseo_breadcrumbs' ) ) {
+    samanseo_breadcrumbs();
 }
 ```
 
 ### 2. Use Namespaced Helpers
 
 ```php
-use function WPSEOPilot\Helpers\get_option;
-use function WPSEOPilot\Helpers\get_post_meta;
+use function SamanSEO\Helpers\get_option;
+use function SamanSEO\Helpers\get_post_meta;
 ```
 
 ### 3. Escape Output
@@ -945,7 +945,7 @@ echo esc_attr( $score['score'] );
 ### 4. Handle Errors
 
 ```php
-$result = wpseopilot_create_redirect( '/old', '/new' );
+$result = samanseo_create_redirect( '/old', '/new' );
 
 if ( is_wp_error( $result ) ) {
     error_log( 'Redirect error: ' . $result->get_error_message() );

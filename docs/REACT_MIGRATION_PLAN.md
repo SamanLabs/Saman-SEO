@@ -68,7 +68,7 @@ This document outlines the complete migration strategy for Saman SEO from the cu
 │  ├── Header.js (Navigation)                                 │
 │  └── Pages/ (10 page components)                            │
 ├─────────────────────────────────────────────────────────────┤
-│  REST API Endpoints (/wp-json/wpseopilot/v2/)              │
+│  REST API Endpoints (/wp-json/samanseo/v2/)              │
 │  ├── /settings                                              │
 │  ├── /redirects                                             │
 │  ├── /internal-links                                        │
@@ -116,8 +116,8 @@ wp-seo-pilot/
 ├── package.json                        # Updated for React build
 │
 ├── includes/                           # PHP Backend (mostly unchanged)
-│   ├── class-wpseopilot-plugin.php     # Updated to register V2 admin
-│   ├── class-wpseopilot-admin-v2.php   # NEW: V2 admin loader
+│   ├── class-samanseo-plugin.php     # Updated to register V2 admin
+│   ├── class-samanseo-admin-v2.php   # NEW: V2 admin loader
 │   ├── Api/                            # NEW: REST API controllers
 │   │   ├── class-rest-controller.php   # Base controller
 │   │   ├── class-settings-controller.php
@@ -210,11 +210,11 @@ wp-seo-pilot/
 ```
 
 ### Step 1.2: Create V2 Admin Loader Class
-**File:** `includes/class-wpseopilot-admin-v2.php`
+**File:** `includes/class-samanseo-admin-v2.php`
 
 ```php
 <?php
-namespace WPSEOPilot;
+namespace SamanSEO;
 
 class Admin_V2 {
     private static $instance = null;
@@ -238,7 +238,7 @@ class Admin_V2 {
             __('Saman SEO V2', 'wp-seo-pilot'),
             __('Saman SEO V2', 'wp-seo-pilot'),
             'manage_options',
-            'wpseopilot-v2',
+            'samanseo-v2',
             [$this, 'render_app'],
             'dashicons-chart-line',
             99
@@ -260,60 +260,60 @@ class Admin_V2 {
 
         foreach ($subpages as $slug => $title) {
             add_submenu_page(
-                'wpseopilot-v2',
+                'samanseo-v2',
                 $title,
                 $title,
                 'manage_options',
-                'wpseopilot-v2-' . $slug,
+                'samanseo-v2-' . $slug,
                 [$this, 'render_app']
             );
         }
 
         // Remove duplicate first submenu
-        remove_submenu_page('wpseopilot-v2', 'wpseopilot-v2');
+        remove_submenu_page('samanseo-v2', 'samanseo-v2');
     }
 
     public function render_app() {
-        echo '<div id="wpseopilot-v2-root"></div>';
+        echo '<div id="samanseo-v2-root"></div>';
     }
 
     public function enqueue_assets($hook) {
-        if (strpos($hook, 'wpseopilot-v2') === false) {
+        if (strpos($hook, 'samanseo-v2') === false) {
             return;
         }
 
-        $asset_file = WPSEOPILOT_PATH . 'assets/js/admin-v2.asset.php';
+        $asset_file = SAMANSEO_PATH . 'assets/js/admin-v2.asset.php';
         $asset = file_exists($asset_file)
             ? require $asset_file
-            : ['dependencies' => ['wp-api-fetch', 'wp-element'], 'version' => WPSEOPILOT_VERSION];
+            : ['dependencies' => ['wp-api-fetch', 'wp-element'], 'version' => SAMANSEO_VERSION];
 
         wp_enqueue_script(
-            'wpseopilot-admin-v2',
-            WPSEOPILOT_URL . 'assets/js/admin-v2.js',
+            'samanseo-admin-v2',
+            SAMANSEO_URL . 'assets/js/admin-v2.js',
             $asset['dependencies'],
             $asset['version'],
             true
         );
 
         wp_enqueue_style(
-            'wpseopilot-admin-v2',
-            WPSEOPILOT_URL . 'assets/js/admin-v2.css',
+            'samanseo-admin-v2',
+            SAMANSEO_URL . 'assets/js/admin-v2.css',
             [],
             $asset['version']
         );
 
         // Determine initial view from page slug
         $screen = get_current_screen();
-        $page = str_replace('toplevel_page_wpseopilot-v2', 'dashboard', $screen->id);
-        $page = str_replace('wp-seo-pilot-v2_page_wpseopilot-v2-', '', $page);
+        $page = str_replace('toplevel_page_samanseo-v2', 'dashboard', $screen->id);
+        $page = str_replace('wp-seo-pilot-v2_page_samanseo-v2-', '', $page);
 
-        wp_localize_script('wpseopilot-admin-v2', 'wpseopilotV2Settings', [
+        wp_localize_script('samanseo-admin-v2', 'samanseoV2Settings', [
             'initialView' => $page,
-            'restUrl'     => rest_url('wpseopilot/v2/'),
+            'restUrl'     => rest_url('samanseo/v2/'),
             'nonce'       => wp_create_nonce('wp_rest'),
             'adminUrl'    => admin_url(),
-            'pluginUrl'   => WPSEOPILOT_URL,
-            'version'     => WPSEOPILOT_VERSION,
+            'pluginUrl'   => SAMANSEO_URL,
+            'version'     => SAMANSEO_VERSION,
         ]);
     }
 
@@ -330,7 +330,7 @@ class Admin_V2 {
         ];
 
         foreach ($controllers as $controller) {
-            $class = "\\WPSEOPilot\\Api\\{$controller}_Controller";
+            $class = "\\SamanSEO\\Api\\{$controller}_Controller";
             if (class_exists($class)) {
                 (new $class())->register_routes();
             }
@@ -347,12 +347,12 @@ import { render } from '@wordpress/element';
 import App from './App';
 import './index.css';
 
-const settings = window?.wpseopilotV2Settings || {};
+const settings = window?.samanseoV2Settings || {};
 const initialView = settings.initialView || 'dashboard';
 
 render(
     <App initialView={initialView} settings={settings} />,
-    document.getElementById('wpseopilot-v2-root')
+    document.getElementById('samanseo-v2-root')
 );
 ```
 
@@ -374,16 +374,16 @@ import LocalSeo from './pages/LocalSeo';
 import Settings from './pages/Settings';
 
 const viewToPage = {
-    'dashboard': 'wpseopilot-v2-dashboard',
-    'seo-defaults': 'wpseopilot-v2-seo-defaults',
-    'search-appearance': 'wpseopilot-v2-search-appearance',
-    'sitemap': 'wpseopilot-v2-sitemap',
-    'redirects': 'wpseopilot-v2-redirects',
-    'internal-linking': 'wpseopilot-v2-internal-linking',
-    'audit': 'wpseopilot-v2-audit',
-    'ai-assistant': 'wpseopilot-v2-ai-assistant',
-    'local-seo': 'wpseopilot-v2-local-seo',
-    'settings': 'wpseopilot-v2-settings',
+    'dashboard': 'samanseo-v2-dashboard',
+    'seo-defaults': 'samanseo-v2-seo-defaults',
+    'search-appearance': 'samanseo-v2-search-appearance',
+    'sitemap': 'samanseo-v2-sitemap',
+    'redirects': 'samanseo-v2-redirects',
+    'internal-linking': 'samanseo-v2-internal-linking',
+    'audit': 'samanseo-v2-audit',
+    'ai-assistant': 'samanseo-v2-ai-assistant',
+    'local-seo': 'samanseo-v2-local-seo',
+    'settings': 'samanseo-v2-settings',
 };
 
 export default function App({ initialView, settings }) {
@@ -392,7 +392,7 @@ export default function App({ initialView, settings }) {
     useEffect(() => {
         const handlePopState = () => {
             const params = new URLSearchParams(window.location.search);
-            const page = params.get('page') || 'wpseopilot-v2';
+            const page = params.get('page') || 'samanseo-v2';
             const newView = Object.entries(viewToPage)
                 .find(([, p]) => p === page)?.[0] || 'dashboard';
             setView(newView);
@@ -439,7 +439,7 @@ export default function App({ initialView, settings }) {
     };
 
     return (
-        <div className="wpseopilot-app">
+        <div className="samanseo-app">
             <Header currentView={view} onNavigate={navigateTo} />
             <main className="content-area">
                 {renderPage()}
@@ -575,7 +575,7 @@ export default function Header({ currentView, onNavigate }) {
 /* --------------------------------------------------------------------------
    Reset & Base
    -------------------------------------------------------------------------- */
-.wpseopilot-app {
+.samanseo-app {
     font-family: var(--font-sans);
     font-size: 14px;
     line-height: 1.5;
@@ -587,9 +587,9 @@ export default function Header({ currentView, onNavigate }) {
     margin-top: -10px;
 }
 
-.wpseopilot-app *,
-.wpseopilot-app *::before,
-.wpseopilot-app *::after {
+.samanseo-app *,
+.samanseo-app *::before,
+.samanseo-app *::after {
     box-sizing: border-box;
 }
 
@@ -1272,15 +1272,15 @@ export default function Header({ currentView, onNavigate }) {
 /* --------------------------------------------------------------------------
    WordPress Admin Overrides
    -------------------------------------------------------------------------- */
-#wpseopilot-v2-root {
+#samanseo-v2-root {
     margin: 0;
     padding: 0;
 }
 
 /* Hide WordPress update nags in our plugin pages */
-.wpseopilot-app .update-nag,
-.wpseopilot-app .updated,
-.wpseopilot-app .notice:not(.wpseopilot-notice) {
+.samanseo-app .update-nag,
+.samanseo-app .updated,
+.samanseo-app .notice:not(.samanseo-notice) {
     display: none !important;
 }
 ```
@@ -1380,10 +1380,10 @@ export default function PageName() {
 
 ```php
 <?php
-namespace WPSEOPilot\Api;
+namespace SamanSEO\Api;
 
 abstract class REST_Controller {
-    protected $namespace = 'wpseopilot/v2';
+    protected $namespace = 'samanseo/v2';
 
     abstract public function register_routes();
 
@@ -1410,7 +1410,7 @@ abstract class REST_Controller {
 
 ```php
 <?php
-namespace WPSEOPilot\Api;
+namespace SamanSEO\Api;
 
 class Settings_Controller extends REST_Controller {
     public function register_routes() {
@@ -1442,18 +1442,18 @@ class Settings_Controller extends REST_Controller {
     }
 
     public function get_settings() {
-        // Fetch all wpseopilot_ options
+        // Fetch all samanseo_ options
         global $wpdb;
 
         $options = $wpdb->get_results(
             "SELECT option_name, option_value
              FROM {$wpdb->options}
-             WHERE option_name LIKE 'wpseopilot_%'"
+             WHERE option_name LIKE 'samanseo_%'"
         );
 
         $settings = [];
         foreach ($options as $opt) {
-            $key = str_replace('wpseopilot_', '', $opt->option_name);
+            $key = str_replace('samanseo_', '', $opt->option_name);
             $settings[$key] = maybe_unserialize($opt->option_value);
         }
 
@@ -1462,7 +1462,7 @@ class Settings_Controller extends REST_Controller {
 
     public function get_setting($request) {
         $key = $request->get_param('key');
-        $value = get_option('wpseopilot_' . $key);
+        $value = get_option('samanseo_' . $key);
 
         return $this->success([
             'key'   => $key,
@@ -1474,7 +1474,7 @@ class Settings_Controller extends REST_Controller {
         $settings = $request->get_json_params();
 
         foreach ($settings as $key => $value) {
-            update_option('wpseopilot_' . $key, $value);
+            update_option('samanseo_' . $key, $value);
         }
 
         return $this->success(null, __('Settings saved successfully.', 'wp-seo-pilot'));
@@ -1484,7 +1484,7 @@ class Settings_Controller extends REST_Controller {
         $key = $request->get_param('key');
         $value = $request->get_json_params()['value'] ?? null;
 
-        update_option('wpseopilot_' . $key, $value);
+        update_option('samanseo_' . $key, $value);
 
         return $this->success([
             'key'   => $key,
@@ -1511,7 +1511,7 @@ export function useSettings() {
         try {
             setLoading(true);
             const response = await apiFetch({
-                path: '/wpseopilot/v2/settings',
+                path: '/samanseo/v2/settings',
             });
             setSettings(response.data || {});
             setError(null);
@@ -1526,7 +1526,7 @@ export function useSettings() {
         try {
             setSaving(true);
             await apiFetch({
-                path: '/wpseopilot/v2/settings',
+                path: '/samanseo/v2/settings',
                 method: 'POST',
                 data: newSettings,
             });
@@ -1545,7 +1545,7 @@ export function useSettings() {
         try {
             setSaving(true);
             await apiFetch({
-                path: `/wpseopilot/v2/settings/${key}`,
+                path: `/samanseo/v2/settings/${key}`,
                 method: 'PUT',
                 data: { value },
             });
@@ -1648,31 +1648,31 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 
 ### Features to Migrate:
 1. **Global Robots Settings**
-   - `wpseopilot_global_robots`
-   - `wpseopilot_default_noindex`
-   - `wpseopilot_default_nofollow`
+   - `samanseo_global_robots`
+   - `samanseo_default_noindex`
+   - `samanseo_default_nofollow`
 
 2. **Knowledge Graph / Organization**
-   - `wpseopilot_homepage_knowledge_type`
-   - `wpseopilot_homepage_organization_name`
-   - `wpseopilot_homepage_organization_logo`
+   - `samanseo_homepage_knowledge_type`
+   - `samanseo_homepage_organization_name`
+   - `samanseo_homepage_organization_logo`
 
 3. **Title Settings**
-   - `wpseopilot_title_separator`
-   - `wpseopilot_default_title_template`
+   - `samanseo_title_separator`
+   - `samanseo_default_title_template`
 
 4. **AI Configuration**
-   - `wpseopilot_openai_api_key`
-   - `wpseopilot_ai_model`
-   - `wpseopilot_ai_prompt_system`
-   - `wpseopilot_ai_prompt_title`
-   - `wpseopilot_ai_prompt_description`
+   - `samanseo_openai_api_key`
+   - `samanseo_ai_model`
+   - `samanseo_ai_prompt_system`
+   - `samanseo_ai_prompt_title`
+   - `samanseo_ai_prompt_description`
 
 5. **Feature Toggles**
-   - All `wpseopilot_enable_*` options
+   - All `samanseo_enable_*` options
 
 ### REST Endpoints Needed:
-- `GET/POST /wpseopilot/v2/settings` (already created)
+- `GET/POST /samanseo/v2/settings` (already created)
 
 ---
 
@@ -1692,9 +1692,9 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 - `Accordion.js` - Collapsible sections for post types
 
 ### REST Endpoints:
-- `GET/POST /wpseopilot/v2/search-appearance`
-- `GET/POST /wpseopilot/v2/post-type-defaults/{type}`
-- `GET/POST /wpseopilot/v2/taxonomy-defaults/{taxonomy}`
+- `GET/POST /samanseo/v2/search-appearance`
+- `GET/POST /samanseo/v2/post-type-defaults/{type}`
+- `GET/POST /samanseo/v2/taxonomy-defaults/{taxonomy}`
 
 ---
 
@@ -1711,8 +1711,8 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 - LLM.txt configuration
 
 ### REST Endpoints:
-- `GET/POST /wpseopilot/v2/sitemap/settings`
-- `POST /wpseopilot/v2/sitemap/regenerate`
+- `GET/POST /samanseo/v2/sitemap/settings`
+- `POST /samanseo/v2/sitemap/regenerate`
 
 ---
 
@@ -1732,13 +1732,13 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 - Clear old entries
 
 ### REST Endpoints:
-- `GET /wpseopilot/v2/redirects`
-- `POST /wpseopilot/v2/redirects`
-- `PUT /wpseopilot/v2/redirects/{id}`
-- `DELETE /wpseopilot/v2/redirects/{id}`
-- `GET /wpseopilot/v2/404-log`
-- `DELETE /wpseopilot/v2/404-log/{id}`
-- `DELETE /wpseopilot/v2/404-log` (bulk clear)
+- `GET /samanseo/v2/redirects`
+- `POST /samanseo/v2/redirects`
+- `PUT /samanseo/v2/redirects/{id}`
+- `DELETE /samanseo/v2/redirects/{id}`
+- `GET /samanseo/v2/404-log`
+- `DELETE /samanseo/v2/404-log/{id}`
+- `DELETE /samanseo/v2/404-log` (bulk clear)
 
 ### Components:
 - `DataTable.js` - Reusable data table with pagination
@@ -1756,11 +1756,11 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 - Settings
 
 ### REST Endpoints:
-- `GET/POST /wpseopilot/v2/internal-links/rules`
-- `PUT/DELETE /wpseopilot/v2/internal-links/rules/{id}`
-- `GET/POST /wpseopilot/v2/internal-links/categories`
-- `GET/POST /wpseopilot/v2/internal-links/templates`
-- `POST /wpseopilot/v2/internal-links/preview`
+- `GET/POST /samanseo/v2/internal-links/rules`
+- `PUT/DELETE /samanseo/v2/internal-links/rules/{id}`
+- `GET/POST /samanseo/v2/internal-links/categories`
+- `GET/POST /samanseo/v2/internal-links/templates`
+- `POST /samanseo/v2/internal-links/preview`
 
 ---
 
@@ -1774,9 +1774,9 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 - Reset to defaults
 
 ### REST Endpoints:
-- `GET/POST /wpseopilot/v2/ai/settings`
-- `POST /wpseopilot/v2/ai/generate`
-- `POST /wpseopilot/v2/ai/reset`
+- `GET/POST /samanseo/v2/ai/settings`
+- `POST /samanseo/v2/ai/generate`
+- `POST /samanseo/v2/ai/reset`
 
 ---
 
@@ -1796,10 +1796,10 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 - Social profiles
 
 ### REST Endpoints:
-- `GET /wpseopilot/v2/audit/scan`
-- `GET /wpseopilot/v2/audit/issues`
-- `POST /wpseopilot/v2/audit/resolve/{id}`
-- `GET/POST /wpseopilot/v2/local-seo`
+- `GET /samanseo/v2/audit/scan`
+- `GET /samanseo/v2/audit/issues`
+- `POST /samanseo/v2/audit/resolve/{id}`
+- `GET/POST /samanseo/v2/local-seo`
 
 ---
 
@@ -1869,7 +1869,7 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 ## API Reference
 
 ### REST API Namespace
-`/wp-json/wpseopilot/v2/`
+`/wp-json/samanseo/v2/`
 
 ### Endpoints Summary
 
@@ -1935,15 +1935,15 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 
 | V1 Option Key | V2 API Key | Notes |
 |---------------|------------|-------|
-| `wpseopilot_default_title_template` | `default_title_template` | Same |
-| `wpseopilot_title_separator` | `title_separator` | Same |
-| `wpseopilot_global_robots` | `global_robots` | Same |
-| `wpseopilot_openai_api_key` | `openai_api_key` | Encrypted |
-| `wpseopilot_ai_model` | `ai_model` | Same |
-| `wpseopilot_enable_sitemap_enhancer` | `enable_sitemap` | Renamed |
-| `wpseopilot_enable_redirect_manager` | `enable_redirects` | Renamed |
-| `wpseopilot_enable_404_logging` | `enable_404_logging` | Same |
-| `wpseopilot_enable_local_seo` | `enable_local_seo` | Same |
+| `samanseo_default_title_template` | `default_title_template` | Same |
+| `samanseo_title_separator` | `title_separator` | Same |
+| `samanseo_global_robots` | `global_robots` | Same |
+| `samanseo_openai_api_key` | `openai_api_key` | Encrypted |
+| `samanseo_ai_model` | `ai_model` | Same |
+| `samanseo_enable_sitemap_enhancer` | `enable_sitemap` | Renamed |
+| `samanseo_enable_redirect_manager` | `enable_redirects` | Renamed |
+| `samanseo_enable_404_logging` | `enable_404_logging` | Same |
+| `samanseo_enable_local_seo` | `enable_local_seo` | Same |
 | ... | ... | ... |
 
 ---
@@ -1951,15 +1951,15 @@ export default function SubTabs({ tabs, activeTab, onTabChange }) {
 ## Database Considerations
 
 ### Existing Tables (No Changes)
-- `{prefix}wpseopilot_redirects` - Used directly by V2
-- `{prefix}wpseopilot_404_log` - Used directly by V2
-- `{prefix}wpseopilot_internal_links` - Used directly by V2
+- `{prefix}samanseo_redirects` - Used directly by V2
+- `{prefix}samanseo_404_log` - Used directly by V2
+- `{prefix}samanseo_internal_links` - Used directly by V2
 
 ### Post Meta (No Changes)
-- `_wpseopilot_meta` - Same key, same structure
+- `_samanseo_meta` - Same key, same structure
 
 ### Options (No Changes)
-- All `wpseopilot_*` options remain unchanged
+- All `samanseo_*` options remain unchanged
 - V2 reads/writes to same options as V1
 
 ---

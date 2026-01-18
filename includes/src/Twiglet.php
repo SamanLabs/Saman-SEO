@@ -2,6 +2,8 @@
 
 namespace Twiglet;
 
+defined( 'ABSPATH' ) || exit;
+
 class Twiglet {
 
     /**
@@ -174,7 +176,7 @@ class Twiglet {
         $this->add_filter(
             'truncate',
             function ($value, int $length = 100, string $suffix = '…') {
-                $value = trim(strip_tags((string) $value));
+                $value = trim(wp_strip_all_tags((string) $value));
 
                 if (function_exists('mb_strlen')) {
                     if (\mb_strlen($value) <= $length) {

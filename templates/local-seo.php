@@ -376,6 +376,7 @@ if ( ! is_array( $social_profiles ) ) {
 							?>
 							<div class="saman-seo-form-row">
 								<label for="SAMAN_SEO_local_social_<?php echo esc_attr( $i ); ?>">
+									<?php /* translators: %d: social profile number */ ?>
 									<strong><?php echo esc_html( sprintf( __( 'Social Profile %d', 'saman-seo' ), $i + 1 ) ); ?></strong>
 								</label>
 								<input

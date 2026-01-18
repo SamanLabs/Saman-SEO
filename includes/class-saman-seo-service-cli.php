@@ -113,7 +113,7 @@ class CLI {
 						global $wpdb;
 						$table = esc_sql( $wpdb->prefix . 'SAMAN_SEO_redirects' );
 						$query = "SELECT id, source, target, status_code, hits, last_hit FROM `{$table}`";
-						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name already sanitized via esc_sql(), and results are cached immediately after.
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- Table name already sanitized via esc_sql(), and results are cached immediately after.
 						$raw_data = $wpdb->get_results( $query, ARRAY_A );
 
 						$data = array_map( [ $this, 'sanitize_redirect_row' ], $raw_data );
