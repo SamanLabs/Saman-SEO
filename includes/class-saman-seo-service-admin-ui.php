@@ -706,7 +706,7 @@ class Admin_UI {
 		}
 
 		$template = isset( $_POST['template'] ) ? wp_unslash( $_POST['template'] ) : '';
-		$context  = isset( $_POST['context'] ) ? sanitize_text_field( $_POST['context'] ) : 'global';
+		$context  = isset( $_POST['context'] ) ? sanitize_text_field( wp_unslash( $_POST['context'] ) ) : 'global';
 		$object_id = isset( $_POST['object_id'] ) ? absint( $_POST['object_id'] ) : 0;
 
 		$mock_object = null;

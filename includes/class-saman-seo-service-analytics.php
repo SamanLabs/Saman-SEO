@@ -111,7 +111,7 @@ class Analytics {
 			return;
 		}
 
-		$page = sanitize_text_field( $_GET['page'] );
+		$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 
 		if ( strpos( $page, 'saman-seo' ) === false && $page !== 'saman-seo' ) {
 			return;

@@ -639,16 +639,15 @@ class Redirects_Controller extends REST_Controller {
         // Get total count
         $count_sql = "SELECT COUNT(*) FROM {$this->redirects_table}{$where_sql}";
         if ( $params ) {
-            $count_sql = $wpdb->prepare( $count_sql, $params ); // phpcs:ignore WordPress.DB.PreparedSQL
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
+            $count_sql = $wpdb->prepare( $count_sql, $params );
         }
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- SQL prepared conditionally above.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, pagination requires direct query.
         $total = (int) $wpdb->get_var( $count_sql );
 
         // Get paginated results
         $sql = "SELECT * FROM {$this->redirects_table}{$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d";
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name and prepared with placeholders.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, pagination requires direct query.
         $redirects = $wpdb->get_results( $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) ) );
 
         $data = [];
@@ -678,8 +677,7 @@ class Redirects_Controller extends REST_Controller {
 
         $id = $request->get_param( 'id' );
 
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, fetching single redirect requires direct query.
         $redirect = $wpdb->get_row( $wpdb->prepare(
             "SELECT * FROM {$this->redirects_table} WHERE id = %d",
             $id
@@ -839,8 +837,7 @@ class Redirects_Controller extends REST_Controller {
         $ids          = array_filter( $ids );
         $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, bulk delete requires direct query.
         $deleted = $wpdb->query( $wpdb->prepare(
             "DELETE FROM {$this->redirects_table} WHERE id IN ({$placeholders})",
             $ids
@@ -862,11 +859,9 @@ class Redirects_Controller extends REST_Controller {
      */
     public function get_redirect_groups( $request ) {
         global $wpdb;
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        // Check if table and column exist
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
+        // Check if table exists
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema check requires direct query.
         $table_exists = $wpdb->get_var( $wpdb->prepare(
             "SHOW TABLES LIKE %s",
             $this->redirects_table
@@ -874,11 +869,9 @@ class Redirects_Controller extends REST_Controller {
 
         if ( ! $table_exists ) {
             return $this->success( [] );
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
         }
 
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, fetching groups requires direct query.
         $groups = $wpdb->get_col(
             "SELECT DISTINCT group_name FROM {$this->redirects_table} WHERE group_name != '' ORDER BY group_name ASC"
         );
@@ -924,7 +917,7 @@ class Redirects_Controller extends REST_Controller {
         if ( $target_path ) {
             $exclude_sql = $exclude_id ? $wpdb->prepare( ' AND id != %d', $exclude_id ) : '';
             // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, chain validation requires direct query.
             $reverse = $wpdb->get_row( $wpdb->prepare(
                 "SELECT * FROM {$this->redirects_table} WHERE source = %s{$exclude_sql} LIMIT 1",
                 $target_path
@@ -958,15 +951,13 @@ class Redirects_Controller extends REST_Controller {
                             $target_path,
                             $reverse->target
                         ),
-                    // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
                     ];
                 }
             }
         }
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         // Check if source already has a redirect pointing to it
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, chain detection requires direct query.
         $incoming = $wpdb->get_results( $wpdb->prepare(
             "SELECT source, target FROM {$this->redirects_table} WHERE target LIKE %s LIMIT 5",
             '%' . $wpdb->esc_like( $source ) . '%'
@@ -994,17 +985,15 @@ class Redirects_Controller extends REST_Controller {
     /**
      * Export redirects.
      *
-     // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
      * @param \WP_REST_Request $request Request object.
      * @return \WP_REST_Response|\WP_Error
      */
     public function export_redirects( $request ) {
         global $wpdb;
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         $format = $request->get_param( 'format' );
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, export requires direct query.
         $redirects = $wpdb->get_results( "SELECT * FROM {$this->redirects_table} ORDER BY id DESC" );
 
         if ( 'csv' === $format ) {
@@ -1154,19 +1143,17 @@ class Redirects_Controller extends REST_Controller {
         ];
 
         $result = $manager->create_redirect( $source, $target, $status_code, $extra );
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         if ( is_wp_error( $result ) ) {
             if ( 'redirect_exists' === $result->get_error_code() && $overwrite ) {
                 // Find existing and update
                 global $wpdb;
                 $table = $manager->get_table();
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
                 $normalized = '/' . ltrim( $source, '/' );
                 $normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
 
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, import requires direct query.
                 $existing_id = $wpdb->get_var( $wpdb->prepare(
                     "SELECT id FROM {$table} WHERE source = %s",
                     $normalized
@@ -1272,31 +1259,26 @@ class Redirects_Controller extends REST_Controller {
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
             $count_sql = $wpdb->prepare( $count_sql, $params );
         }
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- SQL prepared conditionally above.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, pagination requires direct query.
         $total_count = (int) $wpdb->get_var( $count_sql );
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         // Get bot count for stats
         $bot_count = 0;
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
         if ( $this->has_column( $this->log_table, 'is_bot' ) ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, stats require direct query.
             $bot_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table} WHERE is_bot = 1" );
         }
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         // Get ignored count for stats
         $ignored_count = 0;
         if ( $this->has_column( $this->log_table, 'is_ignored' ) ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, stats require direct query.
             $ignored_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table} WHERE is_ignored = 1" );
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
         }
 
         // Get rows
         $sql = "SELECT * FROM {$this->log_table}{$where_sql} ORDER BY {$order_by} DESC LIMIT %d OFFSET %d";
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name and prepared with placeholders.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, pagination requires direct query.
         $rows = $wpdb->get_results( $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) ) );
 
         // Check which rows have redirects
@@ -1342,14 +1324,13 @@ class Redirects_Controller extends REST_Controller {
      * @param string $table  Table name.
      * @param string $column Column name.
      * @return bool
-     // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
      */
     private function has_column( $table, $column ) {
         global $wpdb;
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, schema check requires direct query.
         $result = $wpdb->get_var( $wpdb->prepare(
-            'SHOW COLUMNS FROM ' . $table . ' LIKE %s', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            'SHOW COLUMNS FROM ' . $table . ' LIKE %s',
             $column
         ) );
 
@@ -1361,12 +1342,11 @@ class Redirects_Controller extends REST_Controller {
      *
      * @param \WP_REST_Request $request Request object.
      * @return \WP_REST_Response|\WP_Error
-     // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
      */
     public function clear_404_log( $request ) {
         global $wpdb;
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, truncate requires direct query.
         $wpdb->query( "TRUNCATE TABLE {$this->log_table}" );
 
         return $this->success( null, __( '404 log cleared.', 'saman-seo' ) );
@@ -1383,7 +1363,7 @@ class Redirects_Controller extends REST_Controller {
 
         $id = $request->get_param( 'id' );
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Delete requires direct query.
         $deleted = $wpdb->delete(
             $this->log_table,
             [ 'id' => $id ],
@@ -1391,7 +1371,6 @@ class Redirects_Controller extends REST_Controller {
         );
 
         if ( ! $deleted ) {
-            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
             return $this->error( __( 'Entry not found.', 'saman-seo' ), 'not_found', 404 );
         }
 
@@ -1406,12 +1385,11 @@ class Redirects_Controller extends REST_Controller {
      */
     public function get_404_suggestions( $request ) {
         global $wpdb;
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         $id = $request->get_param( 'id' );
 
         // Get the 404 entry
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, fetching entry requires direct query.
         $entry = $wpdb->get_row( $wpdb->prepare(
             "SELECT * FROM {$this->log_table} WHERE id = %d",
             $id
@@ -1511,12 +1489,11 @@ class Redirects_Controller extends REST_Controller {
 
         $id           = $request->get_param( 'id' );
         $target       = $request->get_param( 'target' );
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
         $status_code  = $request->get_param( 'status_code' );
         $delete_entry = $request->get_param( 'delete_entry' );
 
         // Get the 404 entry
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, fetching entry requires direct query.
         $entry = $wpdb->get_row( $wpdb->prepare(
             "SELECT * FROM {$this->log_table} WHERE id = %d",
             $id
@@ -1538,7 +1515,7 @@ class Redirects_Controller extends REST_Controller {
 
         // Delete the 404 entry if requested
         if ( $delete_entry ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Delete requires direct query.
             $wpdb->delete(
                 $this->log_table,
                 [ 'id' => $id ],
@@ -1583,7 +1560,6 @@ class Redirects_Controller extends REST_Controller {
             foreach ( $this->get_spam_url_patterns() as $pattern ) {
                 $filters[] = 'request_uri NOT LIKE %s';
                 $params[]  = $pattern;
-            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
             }
         }
 
@@ -1600,13 +1576,12 @@ class Redirects_Controller extends REST_Controller {
 
         $where_sql = $filters ? ' WHERE ' . implode( ' AND ', $filters ) : '';
 
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
         $sql = "SELECT * FROM {$this->log_table}{$where_sql} ORDER BY last_seen DESC";
         if ( $params ) {
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
             $sql = $wpdb->prepare( $sql, $params );
         }
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- SQL prepared conditionally above.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, export requires direct query.
         $rows = $wpdb->get_results( $sql );
 
         if ( 'csv' === $format ) {
@@ -1842,7 +1817,6 @@ class Redirects_Controller extends REST_Controller {
         if ( $this->redirects_table !== $has_table ) {
             foreach ( $rows as $row ) {
                 $row->redirect_exists = false;
-            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
             }
             return $rows;
         }
@@ -1860,12 +1834,11 @@ class Redirects_Controller extends REST_Controller {
             }
             return $rows;
         }
-// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
 
         $requests     = array_values( array_unique( $requests ) );
         $placeholders = implode( ',', array_fill( 0, count( $requests ), '%s' ) );
         $sql          = "SELECT source FROM {$this->redirects_table} WHERE source IN ({$placeholders})";
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name and dynamic placeholders, then prepared.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, matching redirects requires direct query.
         $sources = $wpdb->get_col( $wpdb->prepare( $sql, $requests ) );
 
         $lookup = $sources ? array_fill_keys( $sources, true ) : [];

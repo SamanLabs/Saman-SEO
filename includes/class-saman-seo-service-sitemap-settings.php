@@ -266,13 +266,13 @@ class Sitemap_Settings {
 
 		// Handle post types
 		$post_types = isset( $_POST['SAMAN_SEO_sitemap_post_types'] ) && is_array( $_POST['SAMAN_SEO_sitemap_post_types'] )
-			? array_map( 'sanitize_text_field', $_POST['SAMAN_SEO_sitemap_post_types'] )
+			? array_map( 'sanitize_text_field', wp_unslash( $_POST['SAMAN_SEO_sitemap_post_types'] ) )
 			: [];
 		update_option( 'SAMAN_SEO_sitemap_post_types', $post_types );
 
 		// Handle taxonomies
 		$taxonomies = isset( $_POST['SAMAN_SEO_sitemap_taxonomies'] ) && is_array( $_POST['SAMAN_SEO_sitemap_taxonomies'] )
-			? array_map( 'sanitize_text_field', $_POST['SAMAN_SEO_sitemap_taxonomies'] )
+			? array_map( 'sanitize_text_field', wp_unslash( $_POST['SAMAN_SEO_sitemap_taxonomies'] ) )
 			: [];
 		update_option( 'SAMAN_SEO_sitemap_taxonomies', $taxonomies );
 
@@ -281,18 +281,18 @@ class Sitemap_Settings {
 		update_option( 'SAMAN_SEO_sitemap_exclude_images', isset( $_POST['SAMAN_SEO_sitemap_exclude_images'] ) ? '1' : '0' );
 		update_option( 'SAMAN_SEO_sitemap_enable_rss', isset( $_POST['SAMAN_SEO_sitemap_enable_rss'] ) ? '1' : '0' );
 		update_option( 'SAMAN_SEO_sitemap_enable_google_news', isset( $_POST['SAMAN_SEO_sitemap_enable_google_news'] ) ? '1' : '0' );
-		update_option( 'SAMAN_SEO_sitemap_google_news_name', isset( $_POST['SAMAN_SEO_sitemap_google_news_name'] ) ? sanitize_text_field( $_POST['SAMAN_SEO_sitemap_google_news_name'] ) : get_bloginfo( 'name' ) );
+		update_option( 'SAMAN_SEO_sitemap_google_news_name', isset( $_POST['SAMAN_SEO_sitemap_google_news_name'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_sitemap_google_news_name'] ) ) : get_bloginfo( 'name' ) );
 
 		// Handle Google News post types
 		$google_news_post_types = isset( $_POST['SAMAN_SEO_sitemap_google_news_post_types'] ) && is_array( $_POST['SAMAN_SEO_sitemap_google_news_post_types'] )
-			? array_map( 'sanitize_text_field', $_POST['SAMAN_SEO_sitemap_google_news_post_types'] )
+			? array_map( 'sanitize_text_field', wp_unslash( $_POST['SAMAN_SEO_sitemap_google_news_post_types'] ) )
 			: [];
 		update_option( 'SAMAN_SEO_sitemap_google_news_post_types', $google_news_post_types );
 
 		// Handle additional pages
 		$additional_pages = [];
 		if ( isset( $_POST['SAMAN_SEO_sitemap_additional_pages'] ) && is_array( $_POST['SAMAN_SEO_sitemap_additional_pages'] ) ) {
-			foreach ( $_POST['SAMAN_SEO_sitemap_additional_pages'] as $page ) {
+			foreach ( wp_unslash( $_POST['SAMAN_SEO_sitemap_additional_pages'] ) as $page ) {
 				if ( ! empty( $page['url'] ) ) {
 					$additional_pages[] = [
 						'url'      => esc_url_raw( $page['url'] ),
@@ -305,7 +305,7 @@ class Sitemap_Settings {
 
 		// Schedule updates
 		$old_schedule = get_option( 'SAMAN_SEO_sitemap_schedule_updates', '' );
-		$new_schedule = isset( $_POST['SAMAN_SEO_sitemap_schedule_updates'] ) ? sanitize_text_field( $_POST['SAMAN_SEO_sitemap_schedule_updates'] ) : '';
+		$new_schedule = isset( $_POST['SAMAN_SEO_sitemap_schedule_updates'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_sitemap_schedule_updates'] ) ) : '';
 		update_option( 'SAMAN_SEO_sitemap_schedule_updates', $new_schedule );
 
 		if ( $old_schedule !== $new_schedule ) {
@@ -334,8 +334,8 @@ class Sitemap_Settings {
 		$posts_per_type = max( 1, min( 500, $posts_per_type ) );
 		update_option( 'SAMAN_SEO_llm_txt_posts_per_type', $posts_per_type );
 
-		update_option( 'SAMAN_SEO_llm_txt_title', isset( $_POST['SAMAN_SEO_llm_txt_title'] ) ? sanitize_text_field( $_POST['SAMAN_SEO_llm_txt_title'] ) : '' );
-		update_option( 'SAMAN_SEO_llm_txt_description', isset( $_POST['SAMAN_SEO_llm_txt_description'] ) ? sanitize_textarea_field( $_POST['SAMAN_SEO_llm_txt_description'] ) : '' );
+		update_option( 'SAMAN_SEO_llm_txt_title', isset( $_POST['SAMAN_SEO_llm_txt_title'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_llm_txt_title'] ) ) : '' );
+		update_option( 'SAMAN_SEO_llm_txt_description', isset( $_POST['SAMAN_SEO_llm_txt_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['SAMAN_SEO_llm_txt_description'] ) ) : '' );
 		update_option( 'SAMAN_SEO_llm_txt_include_excerpt', isset( $_POST['SAMAN_SEO_llm_txt_include_excerpt'] ) ? '1' : '0' );
 	}
 

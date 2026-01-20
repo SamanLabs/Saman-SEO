@@ -234,7 +234,7 @@ class Dashboard_Widget {
         }
 
         // Total count
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct query.
         $stats['total'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table}" );
 
         // Bot count (if column exists)
@@ -246,13 +246,13 @@ class Dashboard_Widget {
         ) );
 
         if ( $has_is_bot ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct query.
             $stats['bots'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table} WHERE is_bot = 1" );
         }
 
         // Last 24 hours
         $cutoff = gmdate( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct query.
         $stats['last_24h'] = (int) $wpdb->get_var( $wpdb->prepare(
             "SELECT COUNT(*) FROM {$this->log_table} WHERE last_seen > %s",
             $cutoff
@@ -267,7 +267,7 @@ class Dashboard_Widget {
         ) );
 
         if ( $redirects_exist ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct query.
             $stats['need_redirect'] = (int) $wpdb->get_var(
                 "SELECT COUNT(*) FROM {$this->log_table} l
                 WHERE NOT EXISTS (
@@ -301,7 +301,7 @@ class Dashboard_Widget {
             return [];
         }
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, fetching recent entries requires direct query.
         return $wpdb->get_results( $wpdb->prepare(
             "SELECT request_uri, hits FROM {$this->log_table} ORDER BY last_seen DESC LIMIT %d",
             $limit
