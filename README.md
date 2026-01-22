@@ -225,12 +225,6 @@ npm run watch
 
 ---
 
-## License
-
-[Your License Here]
-
----
-
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/SamanLabs/Saman-SEO/issues)
