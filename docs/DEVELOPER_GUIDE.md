@@ -1142,6 +1142,7 @@ add_filter( 'samanseo_robots_array', function( $directives ) {
 
 ## Related Documentation
 
+- **[Schema Developer API](SCHEMA_DEVELOPER_API.md)** - Extending the JSON-LD schema system with custom types and modifications
 - **[Filter Reference](FILTERS.md)** - Complete list of all filters
 - **[Template Tags](TEMPLATE_TAGS.md)** - Theme integration functions
 - **[WP-CLI Commands](WP_CLI.md)** - Command-line tools
