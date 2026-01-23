@@ -2037,16 +2037,19 @@
     width: 100%;
 }
 
+/* Modal content uses fixed height for consistent tab UX */
 .saman-seo-modal-wrapper .components-modal__content {
     padding: 0;
-    max-height: 80vh;
-    overflow-y: auto;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .saman-seo-modal-wrapper .components-modal__header {
     border-bottom: 1px solid #e0e0e0;
     padding: 16px 20px;
     margin: 0;
+    flex-shrink: 0;
 }
 
 .saman-seo-modal-wrapper .components-modal__header-heading {
@@ -2054,9 +2057,27 @@
     font-weight: 600;
 }
 
-/* Ensure panel fills modal width */
+/* Panel fills modal and uses flex layout */
 .saman-seo-modal-wrapper .saman-seo-editor-panel {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Score header and tabs stay fixed (don't shrink or grow) */
+.saman-seo-modal-wrapper .saman-seo-score-header,
+.saman-seo-modal-wrapper .saman-seo-tabs {
+    flex-shrink: 0;
+}
+
+/* Tab content scrolls internally */
+.saman-seo-modal-wrapper .saman-seo-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 /* Toolbar button styles */
