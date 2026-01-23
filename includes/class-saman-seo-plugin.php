@@ -17,6 +17,7 @@ use Saman\SEO\Schema\Types\Article_Schema;
 use Saman\SEO\Schema\Types\BlogPosting_Schema;
 use Saman\SEO\Schema\Types\NewsArticle_Schema;
 use Saman\SEO\Schema\Types\FAQPage_Schema;
+use Saman\SEO\Schema\Types\HowTo_Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -106,6 +107,15 @@ class Plugin {
 			FAQPage_Schema::class,
 			[
 				'label'    => __( 'FAQ Page', 'saman-seo' ),
+				'priority' => 18,
+			]
+		);
+
+		$registry->register(
+			'howto',
+			HowTo_Schema::class,
+			[
+				'label'    => __( 'How To', 'saman-seo' ),
 				'priority' => 18,
 			]
 		);
