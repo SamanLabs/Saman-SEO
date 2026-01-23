@@ -7,6 +7,13 @@
 
 namespace Saman\SEO;
 
+use Saman\SEO\Schema\Schema_Registry;
+use Saman\SEO\Schema\Types\WebSite_Schema;
+use Saman\SEO\Schema\Types\WebPage_Schema;
+use Saman\SEO\Schema\Types\Breadcrumb_Schema;
+use Saman\SEO\Schema\Types\Organization_Schema;
+use Saman\SEO\Schema\Types\Person_Schema;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -50,6 +57,14 @@ class Plugin {
 		if ( did_action( 'SAMAN_SEO_booted' ) ) {
 			return;
 		}
+
+		// Register core schema types before services.
+		$registry = Schema_Registry::instance();
+		$registry->register( 'website', WebSite_Schema::class, [ 'priority' => 1 ] );
+		$registry->register( 'organization', Organization_Schema::class, [ 'priority' => 2 ] );
+		$registry->register( 'person', Person_Schema::class, [ 'priority' => 2 ] );
+		$registry->register( 'webpage', WebPage_Schema::class, [ 'priority' => 10 ] );
+		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, [ 'priority' => 20 ] );
 
 		$this->register( 'compatibility', new Service\Compatibility() );
 		$this->register( 'settings', new Service\Settings() );

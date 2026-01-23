@@ -7,6 +7,9 @@
 
 namespace Saman\SEO\Service;
 
+use Saman\SEO\Schema\Schema_Registry;
+use Saman\SEO\Schema\Schema_Graph_Manager;
+use Saman\SEO\Schema\Schema_Context;
 use function Saman\SEO\Helpers\breadcrumbs;
 
 defined( 'ABSPATH' ) || exit;
@@ -28,105 +31,26 @@ class JsonLD {
 	/**
 	 * Build JSON-LD graph.
 	 *
-	 * @param array        $payload Existing payload.
-	 * @param \WP_Post|null $post   Post.
+	 * Delegates to Schema_Graph_Manager for graph construction.
+	 * The new schema engine handles all registered types and applies filters.
 	 *
-	 * @return array
+	 * @param array         $payload Existing payload (ignored, kept for filter signature).
+	 * @param \WP_Post|null $post    Post.
+	 *
+	 * @return array Complete JSON-LD structure with @context and @graph.
 	 */
 	public function build_payload( $payload, $post ) {
-		$graph   = [];
-		$site_id = home_url( '/' ) . '#website';
+		$context  = $post ? Schema_Context::from_post( $post ) : Schema_Context::from_current();
+		$registry = Schema_Registry::instance();
+		$manager  = new Schema_Graph_Manager( $registry );
 
-		// Get Knowledge Graph settings.
-		$knowledge_type = get_option( 'SAMAN_SEO_homepage_knowledge_type', 'organization' );
-		$publisher      = $this->get_publisher_schema( $knowledge_type );
-
-		$graph[] = [
-			'@type' => 'WebSite',
-			'@id'   => $site_id,
-			'url'   => home_url( '/' ),
-			'name'  => get_bloginfo( 'name' ),
-			'description' => get_option( 'SAMAN_SEO_default_meta_description', get_bloginfo( 'description' ) ),
-			'publisher'   => $publisher,
-		];
-
-		// Add Organization or Person schema to graph.
-		$graph[] = $publisher;
-
-		if ( $post ) {
-			$url    = get_permalink( $post );
-			$post_id = $url . '#webpage';
-
-			$webpage_schema = [
-				'@type'         => 'WebPage',
-				'@id'           => $post_id,
-				'url'           => $url,
-				'name'          => get_the_title( $post ),
-				'datePublished' => get_the_date( DATE_W3C, $post ),
-				'dateModified'  => get_the_modified_date( DATE_W3C, $post ),
-				'isPartOf'      => [ '@id' => $site_id ],
-				'breadcrumb'    => [ '@id' => $url . '#breadcrumb' ],
-				'primaryImageOfPage' => [
-					'@type' => 'ImageObject',
-					'url'   => get_the_post_thumbnail_url( $post, 'full' ) ?: get_option( 'SAMAN_SEO_default_og_image' ),
-				],
-			];
-
-			$graph[] = apply_filters( 'SAMAN_SEO_schema_webpage', $webpage_schema, $post );
-
-			// Determine schema type - check post type settings for custom type.
-			$schema_type   = 'Article';
-			$post_type     = get_post_type( $post );
-			$type_settings = get_option( 'SAMAN_SEO_post_type_seo_settings', [] );
-
-			if ( isset( $type_settings[ $post_type ]['schema_type'] ) && ! empty( $type_settings[ $post_type ]['schema_type'] ) ) {
-				$schema_type = $type_settings[ $post_type ]['schema_type'];
-			}
-
-			// Output article-type schema for posts and related content types.
-			if ( in_array( $post_type, [ 'post', 'article' ], true ) || in_array( $schema_type, [ 'Article', 'BlogPosting', 'NewsArticle' ], true ) ) {
-				$article_schema = [
-					'@type'        => $schema_type,
-					'@id'          => $url . '#article',
-					'headline'     => get_the_title( $post ),
-					'author'       => [
-						'@type' => 'Person',
-						'name'  => get_the_author_meta( 'display_name', $post->post_author ),
-					],
-					'image'        => [
-						get_the_post_thumbnail_url( $post, 'full' ) ?: get_option( 'SAMAN_SEO_default_og_image' ),
-					],
-					'datePublished' => get_the_date( DATE_W3C, $post ),
-					'dateModified'  => get_the_modified_date( DATE_W3C, $post ),
-					'isPartOf'      => [ '@id' => $post_id ],
-				];
-
-				// Add additional fields for NewsArticle.
-				if ( 'NewsArticle' === $schema_type ) {
-					$article_schema['mainEntityOfPage'] = [
-						'@type' => 'WebPage',
-						'@id'   => $url,
-					];
-					$article_schema['publisher'] = $this->get_organization_schema();
-					// Word count for NewsArticle.
-					$article_schema['wordCount'] = str_word_count( wp_strip_all_tags( $post->post_content ) );
-				}
-
-				$graph[] = apply_filters( 'SAMAN_SEO_schema_article', $article_schema, $post );
-			}
-
-			$graph[] = $this->breadcrumb_ld( $post );
-		}
-
-		return [
-			'@context' => 'https://schema.org',
-			'@graph'   => apply_filters( 'SAMAN_SEO_jsonld_graph', $graph, $post ),
-		];
+		return $manager->build( $context );
 	}
 
 	/**
 	 * Build breadcrumb list.
 	 *
+	 * @deprecated 1.0.0 Use Breadcrumb_Schema class instead.
 	 * @param \WP_Post $post Post obj.
 	 *
 	 * @return array
@@ -169,6 +93,7 @@ class JsonLD {
 	/**
 	 * Get publisher/entity schema based on Knowledge Graph settings.
 	 *
+	 * @deprecated 1.0.0 Use Organization_Schema or Person_Schema classes instead.
 	 * @param string $knowledge_type 'organization' or 'person'.
 	 *
 	 * @return array
@@ -184,6 +109,7 @@ class JsonLD {
 	/**
 	 * Build Organization schema from settings.
 	 *
+	 * @deprecated 1.0.0 Use Organization_Schema class instead.
 	 * @return array
 	 */
 	private function get_organization_schema() {
@@ -267,6 +193,7 @@ class JsonLD {
 	/**
 	 * Build Person schema from settings.
 	 *
+	 * @deprecated 1.0.0 Use Person_Schema class instead.
 	 * @return array
 	 */
 	private function get_person_schema() {
@@ -315,6 +242,7 @@ class JsonLD {
 	/**
 	 * Get social profiles from settings.
 	 *
+	 * @deprecated 1.0.0 Social profiles are now handled in Organization_Schema and Person_Schema.
 	 * @return array
 	 */
 	private function get_social_profiles() {
