@@ -179,28 +179,12 @@
 				return null;
 			}
 
-			// Build schema
-			const schema = showSchema ? {
-				'@context': 'https://schema.org',
-				'@type': 'FAQPage',
-				'mainEntity': validFaqs.map( faq => ( {
-					'@type': 'Question',
-					'name': faq.question.replace( /<[^>]*>/g, '' ),
-					'acceptedAnswer': {
-						'@type': 'Answer',
-						'text': faq.answer.replace( /<[^>]*>/g, '' ),
-					}
-				} ) )
-			} : null;
+			// Schema output removed - handled by PHP registry.
+			// showSchema attribute still controls whether registry includes this block.
 
 			return el(
 				'div',
 				blockProps,
-				showSchema && el(
-					'script',
-					{ type: 'application/ld+json' },
-					JSON.stringify( schema )
-				),
 				el(
 					'div',
 					{ className: 'samanseo-faq-list', itemScope: true, itemType: 'https://schema.org/FAQPage' },
