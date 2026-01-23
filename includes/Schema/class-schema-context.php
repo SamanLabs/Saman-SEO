@@ -135,7 +135,7 @@ class Schema_Context {
 	 *
 	 * Priority order:
 	 * 1. Post-specific override from _SAMAN_SEO_meta['schema_type']
-	 * 2. Post type default from SAMAN_SEO_post_type_seo_settings option
+	 * 2. Post type default from SAMAN_SEO_post_type_settings option
 	 * 3. Fallback to 'Article'
 	 *
 	 * @param Schema_Context $context The context to determine type for.
@@ -149,8 +149,8 @@ class Schema_Context {
 
 		// Check post type defaults.
 		if ( ! empty( $context->post_type ) ) {
-			$type_settings = get_option( 'SAMAN_SEO_post_type_seo_settings', [] );
-			if ( isset( $type_settings[ $context->post_type ]['schema_type'] ) ) {
+			$type_settings = get_option( 'SAMAN_SEO_post_type_settings', [] );
+			if ( ! empty( $type_settings[ $context->post_type ]['schema_type'] ) ) {
 				return $type_settings[ $context->post_type ]['schema_type'];
 			}
 		}
