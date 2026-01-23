@@ -203,6 +203,31 @@
             text-decoration: underline;
         }
     }
+
+    // CTA variant with button
+    &--cta {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-sm;
+        background: linear-gradient(135deg, fade(@color-primary, 8%) 0%, fade(@color-primary, 4%) 100%);
+        border: 1px solid fade(@color-primary, 15%);
+        border-left: 3px solid @color-primary;
+        border-radius: @radius-md;
+        padding: @spacing-lg;
+
+        strong {
+            font-size: @font-size-base;
+            color: @color-text;
+        }
+
+        p {
+            margin-bottom: @spacing-xs;
+        }
+
+        .button {
+            align-self: flex-start;
+        }
+    }
 }
 
 // Input with prefix (like @username)
@@ -527,5 +552,44 @@
         background: darken(@color-danger, 10%);
         border-color: darken(@color-danger, 10%);
         color: white;
+    }
+}
+
+// Image picker for settings
+.image-picker {
+    .image-preview {
+        position: relative;
+        display: inline-block;
+        max-width: 120px;
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: @radius-sm;
+            border: 1px solid @color-border;
+        }
+
+        .image-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: @color-danger;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+                background: darken(@color-danger, 10%);
+            }
+        }
     }
 }

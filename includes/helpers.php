@@ -58,7 +58,9 @@ namespace Saman\SEO\Helpers {
 		];
 
 		if ( isset( $legacy_map[ $module ] ) ) {
-			return '1' === \get_option( $legacy_map[ $module ], '1' );
+			// Local SEO defaults to disabled ('0'), others default to enabled ('1')
+			$default = ( 'local_seo' === $module ) ? '0' : '1';
+			return '1' === \get_option( $legacy_map[ $module ], $default );
 		}
 
 		// Default enabled for new/unknown modules.

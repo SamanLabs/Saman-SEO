@@ -1,0 +1,662 @@
+// Local SEO Page Styles
+// Settings grid layout with knowledge panel preview sidebar
+
+// Main Grid Layout
+.saman-seo-local-seo-page {
+	.saman-seo-settings-grid {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: @spacing-xl;
+		align-items: flex-start;
+
+		@media (max-width: 1200px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.saman-seo-settings-main {
+		min-width: 0;
+	}
+
+	.saman-seo-settings-sidebar {
+		position: sticky;
+		top: 32px + @spacing-lg; // Account for WP admin bar
+
+		@media (max-width: 1200px) {
+			position: static;
+			order: -1;
+		}
+	}
+}
+
+// Knowledge Panel Preview
+.saman-seo-knowledge-panel {
+	background: @color-bg;
+	border: 1px solid @color-border;
+	border-radius: @radius-lg;
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+	&__header {
+		background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+		color: #fff;
+		padding: @spacing-sm @spacing-md;
+		font-size: @font-size-small;
+		font-weight: @font-weight-medium;
+		display: flex;
+		align-items: center;
+		gap: @spacing-xs;
+
+		.dashicons {
+			font-size: 16px;
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	&__cover {
+		width: 100%;
+		height: 120px;
+		background: @color-bg-light;
+		background-size: cover;
+		background-position: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&.has-image {
+			// When image is set
+		}
+
+		.dashicons {
+			font-size: 48px;
+			width: 48px;
+			height: 48px;
+			color: @color-border;
+		}
+	}
+
+	&__body {
+		padding: @spacing-md;
+	}
+
+	&__identity {
+		display: flex;
+		gap: @spacing-md;
+		margin-bottom: @spacing-md;
+	}
+
+	&__logo {
+		width: 64px;
+		height: 64px;
+		border-radius: @radius-md;
+		background: @color-bg-light;
+		background-size: cover;
+		background-position: center;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid @color-border-light;
+
+		&.has-image {
+			// When logo is set
+		}
+
+		.dashicons {
+			font-size: 24px;
+			width: 24px;
+			height: 24px;
+			color: @color-border;
+		}
+	}
+
+	&__info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	&__name {
+		font-size: 18px;
+		font-weight: @font-weight-semibold;
+		color: @color-text;
+		margin: 0 0 4px 0;
+		line-height: @line-height-tight;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		&.is-empty {
+			color: @color-text-lighter;
+			font-style: italic;
+		}
+	}
+
+	&__type {
+		font-size: @font-size-small;
+		color: @color-text-lighter;
+		margin: 0;
+	}
+
+	&__description {
+		font-size: @font-size-base;
+		color: @color-text-light;
+		line-height: @line-height-base;
+		margin-bottom: @spacing-md;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+
+		&.is-empty {
+			color: @color-text-lighter;
+			font-style: italic;
+		}
+	}
+
+	&__details {
+		border-top: 1px solid @color-border-light;
+		padding-top: @spacing-md;
+	}
+
+	&__detail {
+		display: flex;
+		align-items: flex-start;
+		gap: @spacing-xs;
+		margin-bottom: @spacing-sm;
+		font-size: @font-size-base;
+		color: @color-text-light;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.dashicons {
+			font-size: 16px;
+			width: 16px;
+			height: 16px;
+			color: @color-text-lighter;
+			margin-top: 2px;
+			flex-shrink: 0;
+		}
+
+		span {
+			flex: 1;
+		}
+
+		&.is-empty {
+			color: @color-text-lighter;
+			font-style: italic;
+		}
+	}
+
+	&__hours-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-weight: @font-weight-medium;
+
+		&.is-open {
+			color: @color-success;
+		}
+
+		&.is-closed {
+			color: @color-error;
+		}
+	}
+
+	&__price {
+		font-weight: @font-weight-semibold;
+		color: @color-text;
+	}
+
+	&__social {
+		display: flex;
+		gap: @spacing-sm;
+		margin-top: @spacing-md;
+		padding-top: @spacing-md;
+		border-top: 1px solid @color-border-light;
+
+		a, span {
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			background: @color-bg-light;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: @color-text-lighter;
+			text-decoration: none;
+			transition: all @transition-fast;
+
+			.dashicons {
+				font-size: 16px;
+				width: 16px;
+				height: 16px;
+			}
+		}
+
+		a:hover {
+			background: @color-primary;
+			color: #fff;
+		}
+	}
+
+	&__actions {
+		padding: @spacing-md;
+		background: @color-bg-light;
+		border-top: 1px solid @color-border-light;
+		display: flex;
+		flex-direction: column;
+		gap: @spacing-xs;
+
+		.button {
+			width: 100%;
+			justify-content: center;
+		}
+	}
+}
+
+// Module Status Card (sidebar)
+.saman-seo-module-status-card {
+	.card();
+
+	h3 {
+		font-size: @font-size-large;
+		font-weight: @font-weight-semibold;
+		margin: 0 0 @spacing-md 0;
+	}
+
+	&__item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: @spacing-xs 0;
+		border-bottom: 1px solid @color-border-light;
+
+		&:last-child {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+	}
+
+	&__label {
+		font-size: @font-size-base;
+		color: @color-text-light;
+	}
+
+	&__value {
+		font-size: @font-size-base;
+		font-weight: @font-weight-medium;
+
+		&.is-complete {
+			color: @color-success;
+		}
+
+		&.is-incomplete {
+			color: @color-warning;
+		}
+
+		&.is-missing {
+			color: @color-error;
+		}
+	}
+}
+
+// Improved Opening Hours UI
+.saman-seo-hours {
+	&__presets {
+		display: flex;
+		flex-wrap: wrap;
+		gap: @spacing-xs;
+		margin-bottom: @spacing-lg;
+		padding-bottom: @spacing-lg;
+		border-bottom: 1px solid @color-border-light;
+
+		.button {
+			padding: 6px 12px;
+			font-size: @font-size-small;
+		}
+
+		.button.is-active {
+			background: @color-primary;
+			color: #fff;
+			border-color: @color-primary;
+		}
+	}
+
+	&__grid {
+		display: flex;
+		flex-direction: column;
+		gap: @spacing-sm;
+	}
+
+	&__row {
+		display: grid;
+		grid-template-columns: 140px auto 1fr auto;
+		gap: @spacing-md;
+		align-items: center;
+		padding: @spacing-sm;
+		background: @color-bg-light;
+		border-radius: @radius-md;
+		transition: background @transition-fast;
+
+		&:hover {
+			background: darken(@color-bg-light, 2%);
+		}
+
+		&.is-disabled {
+			opacity: 0.6;
+
+			.saman-seo-hours__times {
+				opacity: 0.4;
+				pointer-events: none;
+			}
+		}
+
+		@media (max-width: 600px) {
+			grid-template-columns: 1fr;
+			gap: @spacing-xs;
+		}
+	}
+
+	&__day {
+		display: flex;
+		align-items: center;
+		gap: @spacing-sm;
+
+		.saman-seo-toggle-switch {
+			flex-shrink: 0;
+		}
+
+		strong {
+			font-weight: @font-weight-medium;
+			color: @color-text;
+		}
+	}
+
+	&__times {
+		display: flex;
+		align-items: center;
+		gap: @spacing-xs;
+		transition: opacity @transition-fast;
+
+		input[type="time"] {
+			padding: 4px 8px;
+			border: 1px solid @color-border;
+			border-radius: @radius-sm;
+			font-size: @font-size-base;
+			min-width: 110px;
+
+			&:focus {
+				border-color: @color-primary;
+				box-shadow: 0 0 0 1px @color-primary;
+			}
+		}
+	}
+
+	&__separator {
+		color: @color-text-lighter;
+		font-weight: @font-weight-medium;
+	}
+
+	&__copy-btn {
+		font-size: @font-size-small;
+		padding: 4px 8px;
+		opacity: 0;
+		transition: opacity @transition-fast;
+
+		.saman-seo-hours__row:hover & {
+			opacity: 1;
+		}
+
+		@media (max-width: 600px) {
+			opacity: 1;
+		}
+	}
+
+	&__summary {
+		margin-top: @spacing-md;
+		padding: @spacing-sm @spacing-md;
+		background: lighten(@color-warning, 45%);
+		border: 1px solid lighten(@color-warning, 30%);
+		border-radius: @radius-md;
+		font-size: @font-size-small;
+		color: darken(@color-warning, 20%);
+
+		strong {
+			font-weight: @font-weight-semibold;
+		}
+	}
+}
+
+// Business Identity Card (synced fields highlight)
+.saman-seo-synced-notice {
+	display: flex;
+	align-items: flex-start;
+	gap: @spacing-sm;
+	padding: @spacing-sm @spacing-md;
+	background: @color-bg-hover;
+	border: 1px solid lighten(@color-primary, 30%);
+	border-radius: @radius-md;
+	margin-bottom: @spacing-lg;
+	font-size: @font-size-small;
+	color: @color-text-light;
+
+	.dashicons {
+		color: @color-primary;
+		font-size: 18px;
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+	}
+
+	a {
+		color: @color-primary;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+// Entity Type Radio Cards
+.saman-seo-entity-type-cards {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: @spacing-md;
+	margin-bottom: @spacing-lg;
+
+	@media (max-width: 480px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.saman-seo-entity-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: @spacing-lg;
+	border: 2px solid @color-border;
+	border-radius: @radius-lg;
+	cursor: pointer;
+	transition: all @transition-base;
+	background: @color-bg;
+
+	input[type="radio"] {
+		position: absolute;
+		top: @spacing-sm;
+		right: @spacing-sm;
+	}
+
+	.dashicons {
+		font-size: 40px;
+		width: 40px;
+		height: 40px;
+		color: @color-text-lighter;
+		margin-bottom: @spacing-sm;
+		transition: color @transition-fast;
+	}
+
+	strong {
+		font-size: @font-size-large;
+		color: @color-text;
+		margin-bottom: 4px;
+	}
+
+	span {
+		font-size: @font-size-small;
+		color: @color-text-lighter;
+	}
+
+	&:hover {
+		border-color: @color-primary-light;
+	}
+
+	&.is-selected {
+		border-color: @color-primary;
+		background: @color-bg-hover;
+
+		.dashicons {
+			color: @color-primary;
+		}
+	}
+}
+
+// Google Maps Integration
+.saman-seo-map-container {
+	margin-top: @spacing-md;
+
+	&__map {
+		width: 100%;
+		height: 300px;
+		border: 1px solid @color-border;
+		border-radius: @radius-md;
+		background: @color-bg-light;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: @color-text-lighter;
+
+		&.is-interactive {
+			cursor: crosshair;
+		}
+	}
+
+	&__placeholder {
+		text-align: center;
+		padding: @spacing-xl;
+
+		.dashicons {
+			font-size: 48px;
+			width: 48px;
+			height: 48px;
+			color: @color-border;
+			margin-bottom: @spacing-sm;
+		}
+
+		p {
+			margin: 0 0 @spacing-md 0;
+			color: @color-text-lighter;
+		}
+	}
+
+	&__coords {
+		display: flex;
+		gap: @spacing-md;
+		margin-top: @spacing-md;
+
+		.saman-seo-form-row {
+			flex: 1;
+			margin-bottom: 0;
+		}
+	}
+}
+
+// Configure Local SEO CTA (for Knowledge Graph tab)
+.saman-seo-local-seo-cta {
+	display: flex;
+	align-items: center;
+	gap: @spacing-md;
+	padding: @spacing-md;
+	margin-top: @spacing-lg;
+	background: linear-gradient(135deg, @color-bg-hover 0%, lighten(@color-primary, 48%) 100%);
+	border: 1px solid lighten(@color-primary, 35%);
+	border-radius: @radius-lg;
+
+	&__icon {
+		width: 48px;
+		height: 48px;
+		background: @color-primary;
+		border-radius: @radius-md;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+
+		.dashicons {
+			color: #fff;
+			font-size: 24px;
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	&__content {
+		flex: 1;
+
+		h4 {
+			font-size: @font-size-large;
+			font-weight: @font-weight-semibold;
+			color: @color-text;
+			margin: 0 0 4px 0;
+		}
+
+		p {
+			font-size: @font-size-base;
+			color: @color-text-light;
+			margin: 0;
+		}
+	}
+
+	&__action {
+		flex-shrink: 0;
+
+		.button-primary {
+			.button-primary();
+		}
+	}
+}
+
+// Quick Actions Card
+.saman-seo-quick-actions {
+	.card();
+
+	h3 {
+		font-size: @font-size-large;
+		font-weight: @font-weight-semibold;
+		margin: 0 0 @spacing-md 0;
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: @spacing-xs;
+
+		.button {
+			width: 100%;
+			justify-content: flex-start;
+			gap: @spacing-xs;
+			text-align: left;
+
+			.dashicons {
+				font-size: 16px;
+				width: 16px;
+				height: 16px;
+			}
+		}
+	}
+}

@@ -1,0 +1,433 @@
+// ==========================================================================
+// Local SEO Page Styles
+// ==========================================================================
+
+// Layout - Grid with sidebar
+.local-seo-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: start;
+
+    @media (max-width: 1100px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.local-seo-main {
+    min-width: 0;
+}
+
+.local-seo-sidebar {
+    position: sticky;
+    top: 32px;
+
+    @media (max-width: 1100px) {
+        position: static;
+        order: -1;
+    }
+}
+
+// Tabs
+.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid @color-border;
+}
+
+.tab {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    color: @color-text-secondary;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s ease;
+
+    &:hover {
+        color: @color-text;
+    }
+
+    &.active {
+        color: @color-primary;
+        border-bottom-color: @color-primary;
+    }
+}
+
+.tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+// Image picker
+.image-picker {
+    .image-preview {
+        position: relative;
+        display: inline-block;
+        max-width: 120px;
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid @color-border;
+        }
+
+        .image-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: @color-danger;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+                background: darken(@color-danger, 10%);
+            }
+        }
+    }
+}
+
+// Social profiles
+.social-profiles {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .form-field {
+        margin-bottom: 0;
+    }
+}
+
+// Hours presets
+.hours-presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid @color-border;
+
+    .presets-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: @color-text-secondary;
+    }
+}
+
+// Hours grid
+.hours-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hours-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: @color-surface-muted;
+    border-radius: 8px;
+    border: 1px solid @color-border;
+    transition: all 0.15s ease;
+
+    &.is-open {
+        background: fade(@color-success, 5%);
+        border-color: fade(@color-success, 20%);
+    }
+
+    &.is-closed {
+        opacity: 0.7;
+    }
+}
+
+.hours-toggle {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-track {
+        width: 40px;
+        height: 22px;
+        background: #ccc;
+        border-radius: 11px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+    }
+
+    input:checked + .toggle-track {
+        background: @color-success;
+
+        &::after {
+            transform: translateX(18px);
+        }
+    }
+}
+
+.hours-day {
+    width: 100px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.hours-time {
+    padding: 6px 10px;
+    border: 1px solid @color-border;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 120px;
+
+    &:focus {
+        outline: none;
+        border-color: @color-primary;
+        box-shadow: 0 0 0 2px fade(@color-primary, 20%);
+    }
+}
+
+.hours-separator {
+    color: @color-text-secondary;
+    font-size: 13px;
+}
+
+.hours-closed {
+    color: @color-text-secondary;
+    font-style: italic;
+}
+
+// Form help text
+.form-help {
+    margin-top: 8px;
+    font-size: 13px;
+    color: @color-text-secondary;
+
+    a {
+        color: @color-primary;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// ==========================================================================
+// Knowledge Panel Preview
+// ==========================================================================
+
+.knowledge-panel {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.knowledge-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: @color-surface-muted;
+    border-bottom: 1px solid @color-border;
+    font-size: 13px;
+    font-weight: 500;
+    color: @color-text-secondary;
+}
+
+.knowledge-panel__cover {
+    height: 120px;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.has-image {
+        background-size: cover;
+        background-position: center;
+    }
+
+    svg {
+        color: @color-text-secondary;
+    }
+}
+
+.knowledge-panel__body {
+    padding: 16px;
+}
+
+.knowledge-panel__identity {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.knowledge-panel__logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: @color-surface-muted;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid @color-border;
+
+    &.has-image {
+        background-size: cover;
+        background-position: center;
+        border: none;
+    }
+}
+
+.knowledge-panel__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.knowledge-panel__name {
+    margin: 0 0 2px;
+    font-size: 18px;
+    font-weight: 600;
+    color: @color-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.is-empty {
+        color: @color-text-secondary;
+        font-style: italic;
+    }
+}
+
+.knowledge-panel__type {
+    margin: 0;
+    font-size: 13px;
+    color: @color-text-secondary;
+}
+
+.knowledge-panel__description {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: @color-text-secondary;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    &.is-empty {
+        font-style: italic;
+        color: fade(@color-text-secondary, 60%);
+    }
+}
+
+.knowledge-panel__details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.knowledge-panel__detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: @color-text;
+
+    svg {
+        flex-shrink: 0;
+        color: @color-text-secondary;
+    }
+
+    &.is-empty {
+        color: @color-text-secondary;
+        font-style: italic;
+    }
+}
+
+.knowledge-panel__hours-status {
+    &.is-open {
+        color: @color-success;
+        font-weight: 500;
+    }
+
+    &.is-closed {
+        color: @color-text-secondary;
+    }
+}
+
+.knowledge-panel__price {
+    font-weight: 500;
+    color: @color-success;
+}
+
+.knowledge-panel__social {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid @color-border;
+
+    a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: @color-surface-muted;
+        text-decoration: none;
+        font-size: 16px;
+        transition: background 0.15s;
+
+        &:hover {
+            background: @color-border;
+        }
+    }
+}
+
+.knowledge-panel__actions {
+    padding: 12px 16px;
+    border-top: 1px solid @color-border;
+    background: @color-surface-muted;
+    display: flex;
+    justify-content: center;
+}
