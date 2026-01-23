@@ -8,9 +8,10 @@
 
 # Dev/planning files
 ARCHITECTURE.md
+.marketing
 SEARCH-APPEARANCE-UPDATE.md
 BUGFIXES.md
-.claude*
+.claude/settings.local.json
 tmpclaude-*
 .planning_old
 
