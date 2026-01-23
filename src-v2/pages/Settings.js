@@ -106,6 +106,7 @@ const Settings = () => {
     const [saved, setSaved] = useState(false);
     const [importFile, setImportFile] = useState(null);
     const [resettingWizard, setResettingWizard] = useState(false);
+    const [systemInfo, setSystemInfo] = useState({});
 
     // Fetch settings
     const fetchSettings = useCallback(async () => {
@@ -113,7 +114,11 @@ const Settings = () => {
         try {
             const res = await apiFetch({ path: '/saman-seo/v1/settings' });
             if (res.success && res.data) {
-                setSettings(prev => ({ ...prev, ...res.data }));
+                const { system_info, ...settingsData } = res.data;
+                setSettings(prev => ({ ...prev, ...settingsData }));
+                if (system_info) {
+                    setSystemInfo(system_info);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch settings:', error);
@@ -259,6 +264,7 @@ const Settings = () => {
                     resettingWizard={resettingWizard}
                     importFile={importFile}
                     setImportFile={setImportFile}
+                    systemInfo={systemInfo}
                 />
             )}
         </div>
@@ -1387,7 +1393,7 @@ const AdvancedTab = ({ settings, updateSetting }) => {
 };
 
 // Tools Tab
-const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resettingWizard, importFile, setImportFile }) => {
+const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resettingWizard, importFile, setImportFile, systemInfo }) => {
     return (
         <div className="settings-layout">
             <div className="settings-main">
@@ -1490,19 +1496,55 @@ const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resett
                     <div className="info-rows">
                         <div className="info-row">
                             <span>Version</span>
-                            <code>0.2.0</code>
-                        </div>
-                        <div className="info-row">
-                            <span>Interface</span>
-                            <code>React SPA</code>
-                        </div>
-                        <div className="info-row">
-                            <span>PHP</span>
-                            <code>8.1</code>
+                            <code>{systemInfo.plugin_version || 'Unknown'}</code>
                         </div>
                         <div className="info-row">
                             <span>WordPress</span>
-                            <code>6.4</code>
+                            <code>{systemInfo.wordpress || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>PHP</span>
+                            <code>{systemInfo.php || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>MySQL</span>
+                            <code>{systemInfo.mysql || 'Unknown'}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="side-card">
+                    <h4>Environment</h4>
+                    <div className="info-rows">
+                        <div className="info-row">
+                            <span>Memory Limit</span>
+                            <code>{systemInfo.memory_limit || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Max Upload</span>
+                            <code>{systemInfo.max_upload_size || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Timezone</span>
+                            <code>{systemInfo.timezone || 'UTC'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Debug Mode</span>
+                            <code>{systemInfo.debug_mode ? 'Enabled' : 'Disabled'}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="side-card">
+                    <h4>Theme</h4>
+                    <div className="info-rows">
+                        <div className="info-row">
+                            <span>Active Theme</span>
+                            <code>{systemInfo.theme || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Theme Version</span>
+                            <code>{systemInfo.theme_version || 'Unknown'}</code>
                         </div>
                     </div>
                 </div>

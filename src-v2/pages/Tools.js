@@ -1,4 +1,5 @@
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 
 // Most Popular Tools - Practical SEO tools that work NOW
 const popularTools = [
@@ -14,6 +15,7 @@ const popularTools = [
         ),
         color: '#2271b1',
         stats: 'Import/Export, Regex, Groups',
+        moduleKey: 'module_redirects',
     },
     {
         id: '404-log',
@@ -27,6 +29,7 @@ const popularTools = [
         ),
         color: '#d63638',
         stats: 'Real-time, Smart Suggestions',
+        moduleKey: 'module_404_log',
     },
     {
         id: 'instant-indexing',
@@ -39,6 +42,7 @@ const popularTools = [
         ),
         color: '#0891b2',
         stats: 'IndexNow, Bulk Submit',
+        moduleKey: 'module_indexnow',
     },
     {
         id: 'audit',
@@ -93,6 +97,7 @@ const aiTools = [
             </svg>
         ),
         color: '#8b5cf6',
+        moduleKey: 'module_schema',
     },
     {
         id: 'ai-assistant',
@@ -107,6 +112,7 @@ const aiTools = [
             </svg>
         ),
         color: '#ec4899',
+        moduleKey: 'module_ai_assistant',
     },
 ];
 
@@ -123,6 +129,7 @@ const moreTools = [
             </svg>
         ),
         color: '#0891b2',
+        moduleKey: 'module_internal_linking',
     },
     {
         id: 'link-health',
@@ -173,6 +180,7 @@ const moreTools = [
             </svg>
         ),
         color: '#dc2626',
+        moduleKey: 'module_local_seo',
     },
     {
         id: 'sitemap',
@@ -186,6 +194,7 @@ const moreTools = [
         ),
         color: '#0d9488',
         navigateTo: 'sitemap',
+        moduleKey: 'module_sitemap',
     },
     {
         id: 'schema-validator',
@@ -292,8 +301,51 @@ const comingSoonTools = [
 
 const Tools = ({ onNavigate }) => {
     const [hoveredTool, setHoveredTool] = useState(null);
+    const [settings, setSettings] = useState({});
+    const [loadingSettings, setLoadingSettings] = useState(true);
+
+    // Fetch settings on mount
+    const fetchSettings = useCallback(async () => {
+        try {
+            const res = await apiFetch({ path: '/saman-seo/v1/settings' });
+            if (res.success && res.data) {
+                const { system_info, ...settingsData } = res.data;
+                setSettings(settingsData);
+            }
+        } catch (error) {
+            console.error('Failed to fetch settings:', error);
+        } finally {
+            setLoadingSettings(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchSettings();
+    }, [fetchSettings]);
+
+    // Handle module toggle
+    const handleModuleToggle = async (moduleKey, enabled, e) => {
+        e.stopPropagation(); // Prevent card click
+
+        // Optimistic update
+        setSettings(prev => ({ ...prev, [moduleKey]: enabled }));
+
+        try {
+            await apiFetch({
+                path: '/saman-seo/v1/settings',
+                method: 'POST',
+                data: { [moduleKey]: enabled },
+            });
+        } catch (error) {
+            // Revert on error
+            setSettings(prev => ({ ...prev, [moduleKey]: !enabled }));
+            console.error('Failed to update setting:', error);
+        }
+    };
 
     const handleToolClick = (tool) => {
+        // Check if module is disabled
+        if (tool.moduleKey && !settings[tool.moduleKey]) return;
         if (tool.comingSoon) return;
 
         const viewId = tool.navigateTo || tool.id;
@@ -302,44 +354,73 @@ const Tools = ({ onNavigate }) => {
         }
     };
 
-    const ToolCard = ({ tool, size = 'large', showBadge = null }) => (
-        <button
-            type="button"
-            className={`tool-card ${size === 'compact' ? 'tool-card--compact' : ''} ${tool.comingSoon ? 'tool-card--disabled' : ''} ${hoveredTool === tool.id ? 'tool-card--hover' : ''}`}
-            onClick={() => handleToolClick(tool)}
-            onMouseEnter={() => setHoveredTool(tool.id)}
-            onMouseLeave={() => setHoveredTool(null)}
-            disabled={tool.comingSoon}
-        >
-            <div className={`tool-card__icon ${size === 'compact' ? 'tool-card__icon--small' : ''}`} style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
-                {tool.icon}
-            </div>
-            <div className="tool-card__content">
-                <div className="tool-card__header">
-                    <h3 className="tool-card__name">{tool.name}</h3>
-                    {showBadge && (
-                        <span className={`tool-card__badge ${showBadge === 'AI' ? 'tool-card__badge--ai' : ''}`}>
-                            {showBadge}
-                        </span>
-                    )}
-                    {tool.comingSoon && (
-                        <span className="tool-card__badge">Soon</span>
-                    )}
-                </div>
-                <p className="tool-card__desc">{tool.description}</p>
-                {tool.stats && size !== 'compact' && (
-                    <div className="tool-card__stats">{tool.stats}</div>
+    // Check if tool is disabled (has module key and module is off)
+    const isToolDisabled = (tool) => {
+        if (tool.comingSoon) return true;
+        if (tool.moduleKey && !settings[tool.moduleKey]) return true;
+        return false;
+    };
+
+    const ToolCard = ({ tool, size = 'large', showBadge = null }) => {
+        const disabled = isToolDisabled(tool);
+        const hasModuleToggle = tool.moduleKey && !tool.comingSoon;
+        const moduleEnabled = tool.moduleKey ? settings[tool.moduleKey] : true;
+
+        return (
+            <button
+                type="button"
+                className={`tool-card ${size === 'compact' ? 'tool-card--compact' : ''} ${disabled ? 'tool-card--disabled' : ''} ${hoveredTool === tool.id ? 'tool-card--hover' : ''}`}
+                onClick={() => handleToolClick(tool)}
+                onMouseEnter={() => setHoveredTool(tool.id)}
+                onMouseLeave={() => setHoveredTool(null)}
+                disabled={tool.comingSoon}
+            >
+                {/* Module Toggle in top-right */}
+                {hasModuleToggle && (
+                    <div className="tool-card__toggle" onClick={(e) => e.stopPropagation()}>
+                        <label className="toggle toggle--small">
+                            <input
+                                type="checkbox"
+                                checked={moduleEnabled}
+                                onChange={(e) => handleModuleToggle(tool.moduleKey, e.target.checked, e)}
+                            />
+                            <span className="toggle-track" />
+                        </label>
+                    </div>
                 )}
-            </div>
-            {size !== 'compact' && !tool.comingSoon && (
-                <div className="tool-card__arrow" style={{ color: tool.color }}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
+                <div className={`tool-card__icon ${size === 'compact' ? 'tool-card__icon--small' : ''}`} style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
+                    {tool.icon}
                 </div>
-            )}
-        </button>
-    );
+                <div className="tool-card__content">
+                    <div className="tool-card__header">
+                        <h3 className="tool-card__name">{tool.name}</h3>
+                        {showBadge && (
+                            <span className={`tool-card__badge ${showBadge === 'AI' ? 'tool-card__badge--ai' : ''}`}>
+                                {showBadge}
+                            </span>
+                        )}
+                        {tool.comingSoon && (
+                            <span className="tool-card__badge">Soon</span>
+                        )}
+                        {hasModuleToggle && !moduleEnabled && (
+                            <span className="tool-card__badge tool-card__badge--disabled">Disabled</span>
+                        )}
+                    </div>
+                    <p className="tool-card__desc">{tool.description}</p>
+                    {tool.stats && size !== 'compact' && (
+                        <div className="tool-card__stats">{tool.stats}</div>
+                    )}
+                </div>
+                {size !== 'compact' && !disabled && (
+                    <div className="tool-card__arrow" style={{ color: tool.color }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
+                )}
+            </button>
+        );
+    };
 
     return (
         <div className="page">

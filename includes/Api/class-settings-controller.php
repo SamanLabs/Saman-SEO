@@ -99,7 +99,45 @@ class Settings_Controller extends REST_Controller {
             $settings[ $key ] = maybe_unserialize( $opt->option_value );
         }
 
+        // Add system info.
+        $settings['system_info'] = $this->get_system_info();
+
         return $this->success( $settings );
+    }
+
+    /**
+     * Get system information.
+     *
+     * @return array
+     */
+    private function get_system_info() {
+        global $wp_version;
+
+        return [
+            'plugin_version'  => defined( 'SAMAN_SEO_VERSION' ) ? SAMAN_SEO_VERSION : 'Unknown',
+            'wordpress'       => $wp_version,
+            'php'             => phpversion(),
+            'mysql'           => $this->get_mysql_version(),
+            'server'          => isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : 'Unknown',
+            'memory_limit'    => ini_get( 'memory_limit' ),
+            'max_upload_size' => size_format( wp_max_upload_size() ),
+            'timezone'        => wp_timezone_string(),
+            'is_multisite'    => is_multisite(),
+            'debug_mode'      => defined( 'WP_DEBUG' ) && WP_DEBUG,
+            'theme'           => wp_get_theme()->get( 'Name' ),
+            'theme_version'   => wp_get_theme()->get( 'Version' ),
+        ];
+    }
+
+    /**
+     * Get MySQL version.
+     *
+     * @return string
+     */
+    private function get_mysql_version() {
+        global $wpdb;
+        $version = $wpdb->get_var( 'SELECT VERSION()' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        return $version ? $version : 'Unknown';
     }
 
     /**

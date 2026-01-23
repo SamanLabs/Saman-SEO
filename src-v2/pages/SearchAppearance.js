@@ -163,8 +163,9 @@ const SearchAppearance = () => {
     });
     const [cardPreviewTitle, setCardPreviewTitle] = useState('Sample Post Title - Understanding Core Web Vitals');
     const [cardModuleEnabled, setCardModuleEnabled] = useState(true);
-    const [previewPosts, setPreviewPosts] = useState([]);
+    const [previewPosts, setPreviewPosts] = useState({});
     const [selectedPreviewPost, setSelectedPreviewPost] = useState(null);
+    const [previewPostType, setPreviewPostType] = useState('post');
 
     // AI Generation modal state
     const [aiModal, setAiModal] = useState({
@@ -673,6 +674,10 @@ const SearchAppearance = () => {
                             <tbody>
                                 {postTypes.map((pt) => {
                                     const template = pt.title_template || '{{post_title}} {{separator}} {{site_title}}';
+                                    // Use sample title specific to this post type
+                                    const previewOverrides = {
+                                        post_title: pt.sample_title || pt.singular_name,
+                                    };
                                     return (
                                         <tr key={pt.slug}>
                                             <td>
@@ -682,7 +687,7 @@ const SearchAppearance = () => {
                                             <td>
                                                 <div className="title-preview-cell">
                                                     <span className="title-preview-cell__title">
-                                                        {renderTemplatePreview(template)}
+                                                        {renderTemplatePreview(template, previewOverrides)}
                                                     </span>
                                                     <code className="title-preview-cell__template">
                                                         {template}
@@ -750,6 +755,10 @@ const SearchAppearance = () => {
                             <tbody>
                                 {taxonomies.map((tax) => {
                                     const template = tax.title_template || '{{term_title}} {{separator}} {{site_title}}';
+                                    // Use sample term title specific to this taxonomy
+                                    const previewOverrides = {
+                                        term_title: tax.sample_term_title || tax.singular_name,
+                                    };
                                     return (
                                         <tr key={tax.slug}>
                                             <td>
@@ -759,7 +768,7 @@ const SearchAppearance = () => {
                                             <td>
                                                 <div className="title-preview-cell">
                                                     <span className="title-preview-cell__title">
-                                                        {renderTemplatePreview(template)}
+                                                        {renderTemplatePreview(template, previewOverrides)}
                                                     </span>
                                                     <code className="title-preview-cell__template">
                                                         {template}
@@ -830,6 +839,8 @@ const SearchAppearance = () => {
                             <tbody>
                                 {archives.map((archive) => {
                                     const template = archive.title_template || '{{archive_title}} {{separator}} {{site_title}}';
+                                    // Use sample values specific to this archive type
+                                    const previewOverrides = archive.sample_values || {};
                                     return (
                                         <tr key={archive.slug}>
                                             <td>
@@ -839,7 +850,7 @@ const SearchAppearance = () => {
                                             <td>
                                                 <div className="title-preview-cell">
                                                     <span className="title-preview-cell__title">
-                                                        {renderTemplatePreview(template)}
+                                                        {renderTemplatePreview(template, previewOverrides)}
                                                     </span>
                                                     <code className="title-preview-cell__template">
                                                         {template}
@@ -1385,31 +1396,50 @@ const SearchAppearance = () => {
                                         placeholder="Enter a sample title..."
                                     />
                                 </div>
-                                {previewPosts.length > 0 && (
-                                    <div style={{ flex: '1 1 200px' }}>
-                                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
-                                            Or select a post
-                                        </label>
-                                        <select
-                                            className="input"
-                                            value={selectedPreviewPost || ''}
-                                            onChange={(e) => {
-                                                const postId = e.target.value;
-                                                setSelectedPreviewPost(postId);
-                                                if (postId) {
-                                                    const post = previewPosts.find(p => String(p.id) === postId);
-                                                    if (post) {
-                                                        setCardPreviewTitle(post.title);
+                                {Object.keys(previewPosts).length > 0 && (
+                                    <>
+                                        <div style={{ flex: '0 0 140px' }}>
+                                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
+                                                Content type
+                                            </label>
+                                            <select
+                                                className="input"
+                                                value={previewPostType}
+                                                onChange={(e) => {
+                                                    setPreviewPostType(e.target.value);
+                                                    setSelectedPreviewPost('');
+                                                }}
+                                            >
+                                                {Object.entries(previewPosts).map(([slug, data]) => (
+                                                    <option key={slug} value={slug}>{data.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div style={{ flex: '1 1 200px' }}>
+                                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
+                                                Select content
+                                            </label>
+                                            <select
+                                                className="input"
+                                                value={selectedPreviewPost || ''}
+                                                onChange={(e) => {
+                                                    const postId = e.target.value;
+                                                    setSelectedPreviewPost(postId);
+                                                    if (postId && previewPosts[previewPostType]) {
+                                                        const post = previewPosts[previewPostType].posts.find(p => String(p.id) === postId);
+                                                        if (post) {
+                                                            setCardPreviewTitle(post.title);
+                                                        }
                                                     }
-                                                }
-                                            }}
-                                        >
-                                            <option value="">Custom text</option>
-                                            {previewPosts.map(post => (
-                                                <option key={post.id} value={post.id}>{post.title}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                                }}
+                                            >
+                                                <option value="">Custom text</option>
+                                                {previewPosts[previewPostType]?.posts?.map(post => (
+                                                    <option key={post.id} value={post.id}>{post.title}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </>
                                 )}
                             </div>
 

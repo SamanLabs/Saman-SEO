@@ -415,6 +415,16 @@ class SearchAppearance_Controller extends REST_Controller {
                 ? $pt_defaults['description_template']
                 : ( isset( $meta_descriptions[ $slug ] ) ? $meta_descriptions[ $slug ] : '' );
 
+            // Get a sample post for preview
+            $sample_post = get_posts( [
+                'post_type'      => $slug,
+                'post_status'    => 'publish',
+                'posts_per_page' => 1,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
+            ] );
+            $sample_title = ! empty( $sample_post ) ? $sample_post[0]->post_title : $post_type->labels->singular_name . ' Example';
+
             $data[] = [
                 'slug'                 => $slug,
                 'name'                 => $post_type->label,
@@ -427,6 +437,7 @@ class SearchAppearance_Controller extends REST_Controller {
                 'schema_page'          => isset( $pt_settings['schema_page'] ) ? $pt_settings['schema_page'] : 'WebPage',
                 'schema_article'       => isset( $pt_settings['schema_article'] ) ? $pt_settings['schema_article'] : 'Article',
                 'analysis_fields'      => isset( $pt_settings['analysis_fields'] ) ? $pt_settings['analysis_fields'] : '',
+                'sample_title'         => $sample_title,
             ];
         }
 
@@ -551,6 +562,16 @@ class SearchAppearance_Controller extends REST_Controller {
                 ? $tax_defaults['description_template']
                 : ( isset( $tax_settings['description'] ) ? $tax_settings['description'] : '' );
 
+            // Get a sample term for preview
+            $sample_terms = get_terms( [
+                'taxonomy'   => $slug,
+                'number'     => 1,
+                'hide_empty' => false,
+            ] );
+            $sample_term_title = ! empty( $sample_terms ) && ! is_wp_error( $sample_terms )
+                ? $sample_terms[0]->name
+                : $taxonomy->labels->singular_name;
+
             $data[] = [
                 'slug'                 => $slug,
                 'name'                 => $taxonomy->label,
@@ -560,6 +581,7 @@ class SearchAppearance_Controller extends REST_Controller {
                 'show_seo_controls'    => ! isset( $tax_settings['show_seo'] ) || ! empty( $tax_settings['show_seo'] ),
                 'title_template'       => $title_template,
                 'description_template' => $description_template,
+                'sample_term_title'    => $sample_term_title,
             ];
         }
 
@@ -660,6 +682,10 @@ class SearchAppearance_Controller extends REST_Controller {
         $defaults = get_option( 'SAMAN_SEO_archive_defaults', [] );
         $settings = get_option( 'SAMAN_SEO_archive_settings', [] );
 
+        // Get sample values for preview
+        $users = get_users( [ 'number' => 1, 'capability' => 'edit_posts' ] );
+        $sample_author = ! empty( $users ) ? $users[0]->display_name : 'John Doe';
+
         $archive_types = [
             'author' => [
                 'name'                        => __( 'Author Archives', 'saman-seo' ),
@@ -667,6 +693,9 @@ class SearchAppearance_Controller extends REST_Controller {
                 'default_title_template'      => '{{author}} {{separator}} {{site_title}}',
                 'default_description_template' => 'Articles written by {{author}}. {{author_bio}}',
                 'variables'                   => [ 'author', 'author_bio', 'separator', 'site_title' ],
+                'sample_values'               => [
+                    'author' => $sample_author,
+                ],
             ],
             'date'   => [
                 'name'                        => __( 'Date Archives', 'saman-seo' ),
@@ -674,6 +703,9 @@ class SearchAppearance_Controller extends REST_Controller {
                 'default_title_template'      => '{{date}} Archives {{separator}} {{site_title}}',
                 'default_description_template' => 'Browse our articles from {{date}}.',
                 'variables'                   => [ 'date', 'separator', 'site_title' ],
+                'sample_values'               => [
+                    'date' => date_i18n( 'F Y' ),
+                ],
             ],
             'search' => [
                 'name'                        => __( 'Search Results', 'saman-seo' ),
@@ -681,6 +713,9 @@ class SearchAppearance_Controller extends REST_Controller {
                 'default_title_template'      => 'Search: {{search_term}} {{separator}} {{site_title}}',
                 'default_description_template' => 'Search results for "{{search_term}}" on {{site_title}}.',
                 'variables'                   => [ 'search_term', 'separator', 'site_title' ],
+                'sample_values'               => [
+                    'search_term' => 'example query',
+                ],
             ],
             '404'    => [
                 'name'                        => __( '404 Page', 'saman-seo' ),
@@ -688,6 +723,9 @@ class SearchAppearance_Controller extends REST_Controller {
                 'default_title_template'      => 'Page Not Found {{separator}} {{site_title}}',
                 'default_description_template' => 'The page you are looking for could not be found.',
                 'variables'                   => [ 'request_url', 'separator', 'site_title' ],
+                'sample_values'               => [
+                    'request_url' => '/missing-page/',
+                ],
             ],
         ];
 
@@ -723,6 +761,7 @@ class SearchAppearance_Controller extends REST_Controller {
                 'title_template'       => $title_template,
                 'description_template' => $description_template,
                 'available_variables'  => $info['variables'],
+                'sample_values'        => $info['sample_values'],
             ];
         }
 
@@ -1109,26 +1148,44 @@ class SearchAppearance_Controller extends REST_Controller {
     /**
      * Get preview posts for social card preview.
      *
-     * @return array
+     * @return array Grouped by post type.
      */
     private function get_preview_posts() {
-        $posts = get_posts( [
-            'post_type'      => 'post',
-            'post_status'    => 'publish',
-            'posts_per_page' => 10,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
-        ] );
+        $post_types = get_post_types(
+            [
+                'public'  => true,
+                'show_ui' => true,
+            ],
+            'objects'
+        );
 
-        $preview_posts = [];
-        foreach ( $posts as $post ) {
-            $preview_posts[] = [
-                'id'    => $post->ID,
-                'title' => $post->post_title,
+        unset( $post_types['attachment'] );
+
+        $grouped = [];
+        foreach ( $post_types as $slug => $post_type ) {
+            $posts = get_posts( [
+                'post_type'      => $slug,
+                'post_status'    => 'publish',
+                'posts_per_page' => 5,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
+            ] );
+
+            $items = [];
+            foreach ( $posts as $post ) {
+                $items[] = [
+                    'id'    => $post->ID,
+                    'title' => $post->post_title,
+                ];
+            }
+
+            $grouped[ $slug ] = [
+                'label' => $post_type->label,
+                'posts' => $items,
             ];
         }
 
-        return $preview_posts;
+        return $grouped;
     }
 
     /**
