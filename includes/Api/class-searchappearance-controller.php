@@ -197,6 +197,43 @@ class SearchAppearance_Controller extends REST_Controller {
                 'permission_callback' => [ $this, 'permission_check' ],
             ],
         ] );
+
+        // Social defaults
+        register_rest_route( $this->namespace, '/search-appearance/social-defaults', [
+            [
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => [ $this, 'get_social_defaults' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+            ],
+            [
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => [ $this, 'save_social_defaults' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+            ],
+        ] );
+
+        // Post type social defaults
+        register_rest_route( $this->namespace, '/search-appearance/social-defaults/(?P<slug>[a-zA-Z0-9_-]+)', [
+            [
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => [ $this, 'save_post_type_social' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+            ],
+        ] );
+
+        // Card design
+        register_rest_route( $this->namespace, '/search-appearance/card-design', [
+            [
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => [ $this, 'get_card_design' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+            ],
+            [
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => [ $this, 'save_card_design' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+            ],
+        ] );
     }
 
     /**
@@ -213,26 +250,30 @@ class SearchAppearance_Controller extends REST_Controller {
         $archives   = $this->get_archives_data();
 
         return $this->success( [
-            'homepage'          => $homepage,
-            'separator'         => $separator,
-            'separator_options' => $this->separator_options,
-            'post_types'        => $post_types,
-            'taxonomies'        => $taxonomies,
-            'archives'          => $archives,
-            'schema_options'    => [
+            'homepage'                   => $homepage,
+            'separator'                  => $separator,
+            'separator_options'          => $this->separator_options,
+            'post_types'                 => $post_types,
+            'taxonomies'                 => $taxonomies,
+            'archives'                   => $archives,
+            'schema_options'             => [
                 'page'    => $this->schema_page_options,
                 'article' => $this->schema_article_options,
-				'medical' => $this->schema_medical_options,
+                'medical' => $this->schema_medical_options,
             ],
-            'site_info'         => [
+            'site_info'                  => [
                 'name'        => get_bloginfo( 'name' ),
                 'description' => get_bloginfo( 'description' ),
                 'url'         => home_url(),
                 'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
                 'favicon'     => get_site_icon_url( 32 ),
             ],
-            'variables'         => $this->get_variables_data(),
-            'variable_values'   => $this->get_variable_values_map(),
+            'variables'                  => $this->get_variables_data(),
+            'variable_values'            => $this->get_variable_values_map(),
+            'social_defaults'            => $this->get_social_defaults_data(),
+            'post_type_social_defaults'  => $this->get_post_type_social_defaults_data(),
+            'card_design'                => $this->get_card_design_data(),
+            'card_module_enabled'        => (bool) get_option( 'SAMAN_SEO_module_social_cards', true ),
         ] );
     }
 
@@ -921,5 +962,169 @@ class SearchAppearance_Controller extends REST_Controller {
         }
 
         return $map;
+    }
+
+    // =========================================================================
+    // SOCIAL DEFAULTS
+    // =========================================================================
+
+    /**
+     * Get social defaults.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function get_social_defaults( $request ) {
+        return $this->success( $this->get_social_defaults_data() );
+    }
+
+    /**
+     * Get social defaults data.
+     *
+     * @return array
+     */
+    private function get_social_defaults_data() {
+        $defaults = get_option( 'SAMAN_SEO_social_defaults', [] );
+
+        return wp_parse_args( $defaults, [
+            'og_title'            => '',
+            'og_description'      => '',
+            'twitter_title'       => '',
+            'twitter_description' => '',
+            'image_source'        => '',
+            'schema_itemtype'     => '',
+        ] );
+    }
+
+    /**
+     * Save social defaults.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function save_social_defaults( $request ) {
+        $params = $request->get_json_params();
+
+        $defaults = [
+            'og_title'            => isset( $params['og_title'] ) ? sanitize_text_field( $params['og_title'] ) : '',
+            'og_description'      => isset( $params['og_description'] ) ? sanitize_textarea_field( $params['og_description'] ) : '',
+            'twitter_title'       => isset( $params['twitter_title'] ) ? sanitize_text_field( $params['twitter_title'] ) : '',
+            'twitter_description' => isset( $params['twitter_description'] ) ? sanitize_textarea_field( $params['twitter_description'] ) : '',
+            'image_source'        => isset( $params['image_source'] ) ? esc_url_raw( $params['image_source'] ) : '',
+            'schema_itemtype'     => isset( $params['schema_itemtype'] ) ? sanitize_text_field( $params['schema_itemtype'] ) : '',
+        ];
+
+        update_option( 'SAMAN_SEO_social_defaults', $defaults );
+
+        // Also update the default_og_image in main settings for consistency.
+        if ( ! empty( $defaults['image_source'] ) ) {
+            update_option( 'SAMAN_SEO_default_og_image', $defaults['image_source'] );
+        }
+
+        return $this->success( $defaults, __( 'Social settings saved.', 'saman-seo' ) );
+    }
+
+    /**
+     * Get post type social defaults data.
+     *
+     * @return array
+     */
+    private function get_post_type_social_defaults_data() {
+        $defaults = get_option( 'SAMAN_SEO_post_type_social_defaults', [] );
+
+        if ( ! is_array( $defaults ) ) {
+            return [];
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * Save post type social settings.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function save_post_type_social( $request ) {
+        $slug   = sanitize_key( $request->get_param( 'slug' ) );
+        $params = $request->get_json_params();
+
+        $all_defaults = get_option( 'SAMAN_SEO_post_type_social_defaults', [] );
+
+        if ( ! is_array( $all_defaults ) ) {
+            $all_defaults = [];
+        }
+
+        $all_defaults[ $slug ] = [
+            'og_title'            => isset( $params['og_title'] ) ? sanitize_text_field( $params['og_title'] ) : '',
+            'og_description'      => isset( $params['og_description'] ) ? sanitize_textarea_field( $params['og_description'] ) : '',
+            'twitter_title'       => isset( $params['twitter_title'] ) ? sanitize_text_field( $params['twitter_title'] ) : '',
+            'twitter_description' => isset( $params['twitter_description'] ) ? sanitize_textarea_field( $params['twitter_description'] ) : '',
+            'image_source'        => isset( $params['image_source'] ) ? esc_url_raw( $params['image_source'] ) : '',
+            'schema_itemtype'     => isset( $params['schema_itemtype'] ) ? sanitize_text_field( $params['schema_itemtype'] ) : '',
+        ];
+
+        update_option( 'SAMAN_SEO_post_type_social_defaults', $all_defaults );
+
+        return $this->success( null, __( 'Post type social settings saved.', 'saman-seo' ) );
+    }
+
+    // =========================================================================
+    // CARD DESIGN
+    // =========================================================================
+
+    /**
+     * Get card design settings.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function get_card_design( $request ) {
+        return $this->success( $this->get_card_design_data() );
+    }
+
+    /**
+     * Get card design data.
+     *
+     * @return array
+     */
+    private function get_card_design_data() {
+        $design = get_option( 'SAMAN_SEO_card_design', [] );
+
+        return wp_parse_args( $design, [
+            'background_color' => '#1a1a36',
+            'accent_color'     => '#5a84ff',
+            'text_color'       => '#ffffff',
+            'title_font_size'  => 48,
+            'site_font_size'   => 24,
+            'logo_url'         => '',
+            'logo_position'    => 'bottom-left',
+            'layout'           => 'default',
+        ] );
+    }
+
+    /**
+     * Save card design settings.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public function save_card_design( $request ) {
+        $params = $request->get_json_params();
+
+        $design = [
+            'background_color' => isset( $params['background_color'] ) ? sanitize_hex_color( $params['background_color'] ) : '#1a1a36',
+            'accent_color'     => isset( $params['accent_color'] ) ? sanitize_hex_color( $params['accent_color'] ) : '#5a84ff',
+            'text_color'       => isset( $params['text_color'] ) ? sanitize_hex_color( $params['text_color'] ) : '#ffffff',
+            'title_font_size'  => isset( $params['title_font_size'] ) ? absint( $params['title_font_size'] ) : 48,
+            'site_font_size'   => isset( $params['site_font_size'] ) ? absint( $params['site_font_size'] ) : 24,
+            'logo_url'         => isset( $params['logo_url'] ) ? esc_url_raw( $params['logo_url'] ) : '',
+            'logo_position'    => isset( $params['logo_position'] ) ? sanitize_key( $params['logo_position'] ) : 'bottom-left',
+            'layout'           => isset( $params['layout'] ) ? sanitize_key( $params['layout'] ) : 'default',
+        ];
+
+        update_option( 'SAMAN_SEO_card_design', $design );
+
+        return $this->success( $design, __( 'Social card design saved.', 'saman-seo' ) );
     }
 }

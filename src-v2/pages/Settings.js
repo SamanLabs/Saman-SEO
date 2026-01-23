@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
 import AnalyticsNotice from '../components/AnalyticsNotice';
+import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
 import useUrlTab from '../hooks/useUrlTab';
 import { analytics } from '../utils/analytics';
 
@@ -798,9 +799,24 @@ const BreadcrumbsTab = ({ settings, updateSetting }) => {
 
 // Social Tab
 const SocialTab = ({ settings, updateSetting }) => {
-    const sampleTitle = 'Your Page Title';
-    const sampleDesc = 'Your page description will appear here when shared on social media platforms.';
-    const sampleDomain = 'yoursite.com';
+    const [siteInfo, setSiteInfo] = useState({
+        name: 'Your Site Name',
+        description: 'Your site description',
+        domain: 'yoursite.com',
+    });
+
+    // Fetch site info on mount
+    useEffect(() => {
+        apiFetch({ path: '/saman-seo/v1/search-appearance' })
+            .then((res) => {
+                if (res.success && res.data?.site_info) {
+                    setSiteInfo(res.data.site_info);
+                }
+            })
+            .catch(() => {
+                // Use defaults if fetch fails
+            });
+    }, []);
 
     return (
         <div className="settings-layout">
@@ -811,11 +827,68 @@ const SocialTab = ({ settings, updateSetting }) => {
 
                     <div className="settings-row">
                         <div className="settings-label">
-                            <label htmlFor="default-og-image">Default Share Image</label>
+                            <label>Default Share Image</label>
                             <p className="settings-help">Used when no featured image is available. Recommended: 1200x630px.</p>
                         </div>
                         <div className="settings-control">
-                            <input id="default-og-image" type="url" value={settings.default_og_image} onChange={(e) => updateSetting('default_og_image', e.target.value)} placeholder="https://example.com/share-image.jpg" />
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                {settings.default_og_image ? (
+                                    <div style={{ position: 'relative', width: '120px', height: '63px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                        <img
+                                            src={settings.default_og_image}
+                                            alt="Default social"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => updateSetting('default_og_image', '')}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '4px',
+                                                right: '4px',
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%',
+                                                background: 'rgba(0,0,0,0.6)',
+                                                color: '#fff',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '14px',
+                                                lineHeight: 1,
+                                            }}
+                                            title="Remove image"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div style={{ width: '120px', height: '63px', borderRadius: '4px', border: '2px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                                        No image
+                                    </div>
+                                )}
+                                <button
+                                    type="button"
+                                    className="button"
+                                    onClick={() => {
+                                        const frame = wp.media({
+                                            title: 'Select Default Share Image',
+                                            button: { text: 'Use Image' },
+                                            multiple: false,
+                                            library: { type: 'image' },
+                                        });
+                                        frame.on('select', () => {
+                                            const attachment = frame.state().get('selection').first().toJSON();
+                                            updateSetting('default_og_image', attachment.url);
+                                        });
+                                        frame.open();
+                                    }}
+                                >
+                                    {settings.default_og_image ? 'Change Image' : 'Select Image'}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -878,75 +951,19 @@ const SocialTab = ({ settings, updateSetting }) => {
             </div>
 
             <aside className="settings-sidebar">
-                {/* Facebook Preview */}
-                <div className="social-preview social-preview--facebook">
-                    <div className="social-preview__header">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        <span>Facebook</span>
-                    </div>
-                    <div className="social-preview__card">
-                        <div
-                            className="social-preview__image"
-                            style={{ backgroundImage: settings.default_og_image ? `url(${settings.default_og_image})` : 'none' }}
-                        >
-                            {!settings.default_og_image && (
-                                <div className="social-preview__placeholder">
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                                </div>
-                            )}
-                        </div>
-                        <div className="social-preview__body">
-                            <span className="social-preview__domain">{sampleDomain}</span>
-                            <span className="social-preview__title">{sampleTitle}</span>
-                            <span className="social-preview__desc">{sampleDesc}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Twitter Preview */}
-                <div className={`social-preview social-preview--twitter ${settings.twitter_card_type === 'summary' ? 'social-preview--summary' : ''}`}>
-                    <div className="social-preview__header">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                        <span>X (Twitter)</span>
-                    </div>
-                    {settings.twitter_card_type === 'summary' ? (
-                        <div className="social-preview__card social-preview__card--horizontal">
-                            <div
-                                className="social-preview__image social-preview__image--square"
-                                style={{ backgroundImage: settings.default_og_image ? `url(${settings.default_og_image})` : 'none' }}
-                            >
-                                {!settings.default_og_image && (
-                                    <div className="social-preview__placeholder">
-                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="social-preview__body">
-                                <span className="social-preview__title">{sampleTitle}</span>
-                                <span className="social-preview__desc">{sampleDesc}</span>
-                                <span className="social-preview__domain">{sampleDomain}</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="social-preview__card">
-                            <div
-                                className="social-preview__image"
-                                style={{ backgroundImage: settings.default_og_image ? `url(${settings.default_og_image})` : 'none' }}
-                            >
-                                {!settings.default_og_image && (
-                                    <div className="social-preview__placeholder">
-                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                                    </div>
-                                )}
-                                <span className="social-preview__domain-overlay">{sampleDomain}</span>
-                            </div>
-                            <div className="social-preview__body">
-                                <span className="social-preview__title">{sampleTitle}</span>
-                                <span className="social-preview__desc">{sampleDesc}</span>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <FacebookPreview
+                    image={settings.default_og_image}
+                    title={siteInfo.name}
+                    description={siteInfo.description}
+                    domain={siteInfo.domain}
+                />
+                <TwitterPreview
+                    image={settings.default_og_image}
+                    title={siteInfo.name}
+                    description={siteInfo.description}
+                    domain={siteInfo.domain}
+                    cardType={settings.twitter_card_type}
+                />
             </aside>
         </div>
     );
@@ -1493,14 +1510,9 @@ const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resett
                 <div className="side-card">
                     <h4>Need Help?</h4>
                     <p className="muted">Check the documentation or contact support.</p>
-                    <a href="#" className="button ghost">View Documentation</a>
+                    <a href="https://github.com/SamanLabs/Saman-SEO/blob/main/docs/GETTING_STARTED.md" className="button ghost">View Documentation</a>
                 </div>
 
-                <div className="side-card">
-                    <h4>Legacy Interface</h4>
-                    <p className="muted">Access V1 for features not yet migrated.</p>
-                    <a href="admin.php?page=saman-seo" className="button ghost">Open V1</a>
-                </div>
             </aside>
         </div>
     );

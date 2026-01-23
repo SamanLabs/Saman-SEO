@@ -115,8 +115,8 @@ const SEOSidebar = () => {
         const restBase = getRestBase(postType);
         apiFetch({ path: `/wp/v2/${restBase}/${postId}` })
             .then((post) => {
-                if (post.meta && post.meta._Saman_seo_meta) {
-                    const meta = post.meta._Saman_seo_meta;
+                if (post.meta && post.meta._SAMAN_SEO_meta) {
+                    const meta = post.meta._SAMAN_SEO_meta;
                     setSeoMeta({
                         title: meta.title || '',
                         description: meta.description || '',
@@ -187,7 +187,7 @@ const SEOSidebar = () => {
             focus_keyphrase: newMeta.focus_keyphrase,
         };
 
-        editPost({ meta: { _Saman_seo_meta: metaForSave } });
+        editPost({ meta: { _SAMAN_SEO_meta: metaForSave } });
     }, [seoMeta, editPost]);
 
     // Get effective title and description (with fallbacks)

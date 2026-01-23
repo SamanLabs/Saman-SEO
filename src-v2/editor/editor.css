@@ -1894,3 +1894,67 @@
     color: #fff;
     border-color: #b32d2e;
 }
+
+/* ========================================
+   Image Picker Component (Social Tab)
+   ======================================== */
+
+.saman-seo-image-picker {
+    margin-bottom: 10px;
+}
+
+.saman-seo-image-preview {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1200/630;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f6f7f7;
+}
+
+.saman-seo-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.saman-seo-image-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    transition: background 0.15s ease;
+}
+
+.saman-seo-image-remove:hover {
+    background: rgba(214, 54, 56, 0.9);
+}
+
+.saman-seo-image-placeholder {
+    width: 100%;
+    aspect-ratio: 1200/630;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #f6f7f7;
+    border: 2px dashed #e0e0e0;
+    border-radius: 6px;
+    color: #757575;
+}
+
+.saman-seo-image-placeholder span {
+    font-size: 12px;
+}
