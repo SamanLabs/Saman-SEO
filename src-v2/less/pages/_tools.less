@@ -9,15 +9,27 @@
     &:last-child {
         margin-bottom: 0;
     }
+
+    &--muted {
+        opacity: 0.8;
+    }
+}
+
+.tools-section__header {
+    margin-bottom: @spacing-lg;
 }
 
 .tools-section__title {
     font-size: @font-size-lg;
     font-weight: @font-weight-semibold;
     color: @color-text;
-    margin: 0 0 @spacing-lg;
-    padding-bottom: @spacing-sm;
-    border-bottom: 1px solid @color-border;
+    margin: 0 0 @spacing-xs;
+}
+
+.tools-section__subtitle {
+    margin: 0;
+    font-size: @font-size-sm;
+    color: @color-muted;
 }
 
 // Tools Grid
@@ -27,6 +39,10 @@
 
     &--large {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    &--medium {
+        grid-template-columns: repeat(3, 1fr);
     }
 
     &--small {
@@ -68,11 +84,20 @@
     }
 
     &--disabled {
-        cursor: not-allowed;
-        opacity: 0.7;
+        cursor: default;
 
         .tool-card__icon {
-            filter: grayscale(0.5);
+            filter: grayscale(0.6);
+            opacity: 0.5;
+        }
+
+        .tool-card__content {
+            opacity: 0.5;
+        }
+
+        // But keep toggle fully visible
+        .tool-card__toggle {
+            opacity: 1;
         }
     }
 
@@ -93,6 +118,31 @@
         .tool-card__desc {
             font-size: @font-size-sm;
             -webkit-line-clamp: 2;
+        }
+    }
+}
+
+// Toggle positioned in top-right of card
+.tool-card__toggle {
+    position: absolute;
+    top: @spacing-md;
+    right: @spacing-md;
+    z-index: 2;
+
+    // Small toggle variant
+    .toggle--small {
+        .toggle-track {
+            width: 36px;
+            height: 20px;
+
+            &::after {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        input:checked + .toggle-track::after {
+            transform: translateX(16px);
         }
     }
 }
@@ -149,6 +199,16 @@
     background: @color-surface-muted;
     border-radius: @radius-full;
     white-space: nowrap;
+
+    &--ai {
+        color: #7c3aed;
+        background: rgba(124, 58, 237, 0.1);
+    }
+
+    &--disabled {
+        color: #9ca3af;
+        background: rgba(156, 163, 175, 0.15);
+    }
 }
 
 .tool-card__desc {
@@ -206,11 +266,19 @@
     .tools-grid--small {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    .tools-grid--medium {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: @breakpoint-lg) {
     .tools-grid--large {
         grid-template-columns: 1fr;
+    }
+
+    .tools-grid--medium {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .tools-grid--small {
@@ -227,7 +295,8 @@
 }
 
 @media (max-width: @breakpoint-sm) {
-    .tools-grid--small {
+    .tools-grid--small,
+    .tools-grid--medium {
         grid-template-columns: 1fr;
     }
 

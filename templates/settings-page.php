@@ -414,6 +414,40 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					</table>
 					<?php submit_button( __( 'Save Knowledge Graph settings', 'saman-seo' ) ); ?>
 				</form>
+
+				<?php if ( '1' === get_option( 'SAMAN_SEO_enable_local_seo', '0' ) ) : ?>
+				<!-- Configure Local SEO CTA -->
+				<div class="saman-seo-local-seo-cta">
+					<div class="saman-seo-local-seo-cta__icon">
+						<span class="dashicons dashicons-location"></span>
+					</div>
+					<div class="saman-seo-local-seo-cta__content">
+						<h4><?php esc_html_e( 'Full Business Setup', 'saman-seo' ); ?></h4>
+						<p><?php esc_html_e( 'Configure your complete business profile including address, opening hours, contact info, and more for enhanced local search visibility.', 'saman-seo' ); ?></p>
+					</div>
+					<div class="saman-seo-local-seo-cta__action">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-local-seo' ) ); ?>" class="button button-primary">
+							<?php esc_html_e( 'Configure Local SEO', 'saman-seo' ); ?>
+						</a>
+					</div>
+				</div>
+				<?php else : ?>
+				<!-- Enable Local SEO CTA -->
+				<div class="saman-seo-local-seo-cta">
+					<div class="saman-seo-local-seo-cta__icon">
+						<span class="dashicons dashicons-location"></span>
+					</div>
+					<div class="saman-seo-local-seo-cta__content">
+						<h4><?php esc_html_e( 'Enable Local SEO', 'saman-seo' ); ?></h4>
+						<p><?php esc_html_e( 'Add your business address, opening hours, and contact information for enhanced local search visibility.', 'saman-seo' ); ?></p>
+					</div>
+					<div class="saman-seo-local-seo-cta__action">
+						<a href="#saman-seo-tab-modules" class="button button-secondary" data-saman-seo-tab="saman-seo-tab-modules">
+							<?php esc_html_e( 'Enable in Modules', 'saman-seo' ); ?>
+						</a>
+					</div>
+				</div>
+				<?php endif; ?>
 			</section>
 		</div>
 

@@ -18,10 +18,14 @@ const settingsTabs = [
 const defaultSettings = {
     // General
     separator: '-',
-    knowledge_graph_type: 'organization',
-    organization_name: '',
-    organization_logo: '',
-    person_name: '',
+    homepage_knowledge_type: 'organization',
+    homepage_organization_name: '',
+    homepage_organization_logo: '',
+    homepage_person_name: '',
+    homepage_person_image: '',
+    homepage_person_job_title: '',
+    homepage_person_url: '',
+    homepage_social_profiles: '',
     sidebar_logo: '',
     // Webmaster tools
     google_verification: '',
@@ -106,6 +110,7 @@ const Settings = () => {
     const [saved, setSaved] = useState(false);
     const [importFile, setImportFile] = useState(null);
     const [resettingWizard, setResettingWizard] = useState(false);
+    const [systemInfo, setSystemInfo] = useState({});
 
     // Fetch settings
     const fetchSettings = useCallback(async () => {
@@ -113,7 +118,11 @@ const Settings = () => {
         try {
             const res = await apiFetch({ path: '/saman-seo/v1/settings' });
             if (res.success && res.data) {
-                setSettings(prev => ({ ...prev, ...res.data }));
+                const { system_info, ...settingsData } = res.data;
+                setSettings(prev => ({ ...prev, ...settingsData }));
+                if (system_info) {
+                    setSystemInfo(system_info);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch settings:', error);
@@ -147,6 +156,22 @@ const Settings = () => {
             console.error('Failed to save settings:', error);
         } finally {
             setSaving(false);
+        }
+    };
+
+    // Media library picker
+    const openMediaLibrary = (settingKey) => {
+        if (window.wp && window.wp.media) {
+            const frame = window.wp.media({
+                title: 'Select Image',
+                button: { text: 'Use Image' },
+                multiple: false,
+            });
+            frame.on('select', () => {
+                const attachment = frame.state().get('selection').first().toJSON();
+                updateSetting(settingKey, attachment.url);
+            });
+            frame.open();
         }
     };
 
@@ -259,6 +284,7 @@ const Settings = () => {
                     resettingWizard={resettingWizard}
                     importFile={importFile}
                     setImportFile={setImportFile}
+                    systemInfo={systemInfo}
                 />
             )}
         </div>
@@ -324,46 +350,107 @@ const GeneralTab = ({ settings, updateSetting }) => {
                         <div className="settings-control">
                             <div className="radio-group">
                                 <label className="radio-item">
-                                    <input type="radio" name="kg_type" checked={settings.knowledge_graph_type === 'organization'} onChange={() => updateSetting('knowledge_graph_type', 'organization')} />
+                                    <input type="radio" name="kg_type" checked={settings.homepage_knowledge_type === 'organization'} onChange={() => updateSetting('homepage_knowledge_type', 'organization')} />
                                     <span>Organization</span>
                                 </label>
                                 <label className="radio-item">
-                                    <input type="radio" name="kg_type" checked={settings.knowledge_graph_type === 'person'} onChange={() => updateSetting('knowledge_graph_type', 'person')} />
+                                    <input type="radio" name="kg_type" checked={settings.homepage_knowledge_type === 'person'} onChange={() => updateSetting('homepage_knowledge_type', 'person')} />
                                     <span>Person</span>
                                 </label>
                             </div>
                         </div>
                     </div>
 
-                    {settings.knowledge_graph_type === 'organization' ? (
+                    {settings.homepage_knowledge_type === 'organization' ? (
                         <>
                             <div className="settings-row">
                                 <div className="settings-label">
                                     <label htmlFor="org-name">Organization Name</label>
                                 </div>
                                 <div className="settings-control">
-                                    <input id="org-name" type="text" value={settings.organization_name} onChange={(e) => updateSetting('organization_name', e.target.value)} placeholder="Acme Corporation" />
+                                    <input id="org-name" type="text" value={settings.homepage_organization_name} onChange={(e) => updateSetting('homepage_organization_name', e.target.value)} placeholder="Acme Corporation" />
                                 </div>
                             </div>
                             <div className="settings-row">
                                 <div className="settings-label">
-                                    <label htmlFor="org-logo">Logo URL</label>
+                                    <label>Logo</label>
                                     <p className="settings-help">Recommended: 112x112px minimum.</p>
                                 </div>
                                 <div className="settings-control">
-                                    <input id="org-logo" type="url" value={settings.organization_logo} onChange={(e) => updateSetting('organization_logo', e.target.value)} placeholder="https://example.com/logo.png" />
+                                    <div className="image-picker">
+                                        {settings.homepage_organization_logo ? (
+                                            <div className="image-preview">
+                                                <img src={settings.homepage_organization_logo} alt="Logo" />
+                                                <button className="image-remove" onClick={() => updateSetting('homepage_organization_logo', '')}>×</button>
+                                            </div>
+                                        ) : (
+                                            <button className="button ghost" onClick={() => openMediaLibrary('homepage_organization_logo')}>Select Logo</button>
+                                        )}
+                                    </div>
                                 </div>
+                            </div>
+                            <div className="settings-info-box settings-info-box--cta">
+                                <strong>Need more business details?</strong>
+                                <p>Add address, phone, opening hours, and social profiles in Local SEO for a complete Google Knowledge Panel.</p>
+                                <a href="admin.php?page=saman-seo-local-seo" className="button ghost small">Configure Local SEO →</a>
                             </div>
                         </>
                     ) : (
-                        <div className="settings-row">
-                            <div className="settings-label">
-                                <label htmlFor="person-name">Person Name</label>
+                        <>
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label htmlFor="person-name">Person Name</label>
+                                </div>
+                                <div className="settings-control">
+                                    <input id="person-name" type="text" value={settings.homepage_person_name} onChange={(e) => updateSetting('homepage_person_name', e.target.value)} placeholder="John Doe" />
+                                </div>
                             </div>
-                            <div className="settings-control">
-                                <input id="person-name" type="text" value={settings.person_name} onChange={(e) => updateSetting('person_name', e.target.value)} placeholder="John Doe" />
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label>Photo</label>
+                                    <p className="settings-help">Your profile photo for search results.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <div className="image-picker">
+                                        {settings.homepage_person_image ? (
+                                            <div className="image-preview">
+                                                <img src={settings.homepage_person_image} alt="Photo" />
+                                                <button className="image-remove" onClick={() => updateSetting('homepage_person_image', '')}>×</button>
+                                            </div>
+                                        ) : (
+                                            <button className="button ghost" onClick={() => openMediaLibrary('homepage_person_image')}>Select Photo</button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label htmlFor="person-job">Job Title</label>
+                                    <p className="settings-help">Your profession or role.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <input id="person-job" type="text" value={settings.homepage_person_job_title} onChange={(e) => updateSetting('homepage_person_job_title', e.target.value)} placeholder="Software Engineer" />
+                                </div>
+                            </div>
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label htmlFor="person-url">Website URL</label>
+                                    <p className="settings-help">Your personal website or portfolio.</p>
+                                </div>
+                                <div className="settings-control">
+                                    <input id="person-url" type="url" value={settings.homepage_person_url} onChange={(e) => updateSetting('homepage_person_url', e.target.value)} placeholder="https://johndoe.com" />
+                                </div>
+                            </div>
+                            <div className="settings-row">
+                                <div className="settings-label">
+                                    <label htmlFor="social-profiles">Social Profiles</label>
+                                    <p className="settings-help">One URL per line (Facebook, Twitter, LinkedIn, etc.)</p>
+                                </div>
+                                <div className="settings-control">
+                                    <textarea id="social-profiles" rows={4} value={settings.homepage_social_profiles} onChange={(e) => updateSetting('homepage_social_profiles', e.target.value)} placeholder="https://twitter.com/johndoe&#10;https://linkedin.com/in/johndoe" />
+                                </div>
+                            </div>
+                        </>
                     )}
                 </section>
 
@@ -1387,7 +1474,7 @@ const AdvancedTab = ({ settings, updateSetting }) => {
 };
 
 // Tools Tab
-const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resettingWizard, importFile, setImportFile }) => {
+const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resettingWizard, importFile, setImportFile, systemInfo }) => {
     return (
         <div className="settings-layout">
             <div className="settings-main">
@@ -1490,19 +1577,55 @@ const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resett
                     <div className="info-rows">
                         <div className="info-row">
                             <span>Version</span>
-                            <code>0.2.0</code>
-                        </div>
-                        <div className="info-row">
-                            <span>Interface</span>
-                            <code>React SPA</code>
-                        </div>
-                        <div className="info-row">
-                            <span>PHP</span>
-                            <code>8.1</code>
+                            <code>{systemInfo.plugin_version || 'Unknown'}</code>
                         </div>
                         <div className="info-row">
                             <span>WordPress</span>
-                            <code>6.4</code>
+                            <code>{systemInfo.wordpress || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>PHP</span>
+                            <code>{systemInfo.php || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>MySQL</span>
+                            <code>{systemInfo.mysql || 'Unknown'}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="side-card">
+                    <h4>Environment</h4>
+                    <div className="info-rows">
+                        <div className="info-row">
+                            <span>Memory Limit</span>
+                            <code>{systemInfo.memory_limit || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Max Upload</span>
+                            <code>{systemInfo.max_upload_size || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Timezone</span>
+                            <code>{systemInfo.timezone || 'UTC'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Debug Mode</span>
+                            <code>{systemInfo.debug_mode ? 'Enabled' : 'Disabled'}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="side-card">
+                    <h4>Theme</h4>
+                    <div className="info-rows">
+                        <div className="info-row">
+                            <span>Active Theme</span>
+                            <code>{systemInfo.theme || 'Unknown'}</code>
+                        </div>
+                        <div className="info-row">
+                            <span>Theme Version</span>
+                            <code>{systemInfo.theme_version || 'Unknown'}</code>
                         </div>
                     </div>
                 </div>

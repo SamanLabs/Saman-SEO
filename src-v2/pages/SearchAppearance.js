@@ -40,12 +40,56 @@ const schemaTypeOptions = [
     { value: 'localbusiness', label: 'Local business' },
 ];
 
-// Social card layout options
+// Social card layout options with sensible defaults for each
 const cardLayoutOptions = [
-    { value: 'default', label: 'Default', description: 'Title with accent bar at bottom' },
-    { value: 'centered', label: 'Centered', description: 'Centered text layout' },
-    { value: 'minimal', label: 'Minimal', description: 'Text only, no accent' },
-    { value: 'bold', label: 'Bold', description: 'Large accent block' },
+    {
+        value: 'default',
+        label: 'Classic',
+        description: 'Bottom accent stripe',
+        defaults: { title_font_size: 42, site_font_size: 18, title_weight: 600 },
+    },
+    {
+        value: 'centered',
+        label: 'Centered',
+        description: 'Centered text',
+        defaults: { title_font_size: 48, site_font_size: 20, title_weight: 500 },
+    },
+    {
+        value: 'minimal',
+        label: 'Minimal',
+        description: 'Clean, no accent',
+        defaults: { title_font_size: 36, site_font_size: 16, title_weight: 400 },
+    },
+    {
+        value: 'magazine',
+        label: 'Magazine',
+        description: 'Top bar, elegant',
+        defaults: { title_font_size: 44, site_font_size: 14, title_weight: 600 },
+    },
+    {
+        value: 'gradient',
+        label: 'Gradient',
+        description: 'Gradient overlay',
+        defaults: { title_font_size: 40, site_font_size: 18, title_weight: 500 },
+    },
+    {
+        value: 'corner',
+        label: 'Corner',
+        description: 'Corner accent',
+        defaults: { title_font_size: 38, site_font_size: 16, title_weight: 500 },
+    },
+];
+
+// Color presets for quick styling
+const colorPresets = [
+    { name: 'Dark Blue', bg: '#1a1a36', accent: '#5a84ff', text: '#ffffff' },
+    { name: 'Slate', bg: '#1e293b', accent: '#38bdf8', text: '#f1f5f9' },
+    { name: 'Forest', bg: '#14532d', accent: '#86efac', text: '#f0fdf4' },
+    { name: 'Charcoal', bg: '#18181b', accent: '#a78bfa', text: '#fafafa' },
+    { name: 'Navy', bg: '#0c1929', accent: '#f97316', text: '#fff7ed' },
+    { name: 'Wine', bg: '#450a0a', accent: '#fca5a5', text: '#fef2f2' },
+    { name: 'Ocean', bg: '#083344', accent: '#22d3ee', text: '#ecfeff' },
+    { name: 'Cream', bg: '#fef3c7', accent: '#d97706', text: '#451a03' },
 ];
 
 // Logo position options
@@ -109,14 +153,19 @@ const SearchAppearance = () => {
         background_color: '#1a1a36',
         accent_color: '#5a84ff',
         text_color: '#ffffff',
-        title_font_size: 48,
-        site_font_size: 24,
+        title_font_size: 42,
+        site_font_size: 18,
+        title_weight: 600,
         logo_url: '',
         logo_position: 'bottom-left',
+        logo_size: 48,
         layout: 'default',
     });
     const [cardPreviewTitle, setCardPreviewTitle] = useState('Sample Post Title - Understanding Core Web Vitals');
     const [cardModuleEnabled, setCardModuleEnabled] = useState(true);
+    const [previewPosts, setPreviewPosts] = useState({});
+    const [selectedPreviewPost, setSelectedPreviewPost] = useState(null);
+    const [previewPostType, setPreviewPostType] = useState('post');
 
     // AI Generation modal state
     const [aiModal, setAiModal] = useState({
@@ -185,13 +234,19 @@ const SearchAppearance = () => {
                     background_color: '#1a1a36',
                     accent_color: '#5a84ff',
                     text_color: '#ffffff',
-                    title_font_size: 48,
-                    site_font_size: 24,
+                    title_font_size: 42,
+                    site_font_size: 18,
+                    title_weight: 600,
                     logo_url: '',
                     logo_position: 'bottom-left',
+                    logo_size: 48,
                     layout: 'default',
                 });
                 setCardModuleEnabled(data.card_module_enabled !== false);
+                // Fetch posts for preview selector
+                if (data.preview_posts) {
+                    setPreviewPosts(data.preview_posts);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch search appearance settings:', error);
@@ -619,6 +674,10 @@ const SearchAppearance = () => {
                             <tbody>
                                 {postTypes.map((pt) => {
                                     const template = pt.title_template || '{{post_title}} {{separator}} {{site_title}}';
+                                    // Use sample title specific to this post type
+                                    const previewOverrides = {
+                                        post_title: pt.sample_title || pt.singular_name,
+                                    };
                                     return (
                                         <tr key={pt.slug}>
                                             <td>
@@ -628,7 +687,7 @@ const SearchAppearance = () => {
                                             <td>
                                                 <div className="title-preview-cell">
                                                     <span className="title-preview-cell__title">
-                                                        {renderTemplatePreview(template)}
+                                                        {renderTemplatePreview(template, previewOverrides)}
                                                     </span>
                                                     <code className="title-preview-cell__template">
                                                         {template}
@@ -696,6 +755,10 @@ const SearchAppearance = () => {
                             <tbody>
                                 {taxonomies.map((tax) => {
                                     const template = tax.title_template || '{{term_title}} {{separator}} {{site_title}}';
+                                    // Use sample term title specific to this taxonomy
+                                    const previewOverrides = {
+                                        term_title: tax.sample_term_title || tax.singular_name,
+                                    };
                                     return (
                                         <tr key={tax.slug}>
                                             <td>
@@ -705,7 +768,7 @@ const SearchAppearance = () => {
                                             <td>
                                                 <div className="title-preview-cell">
                                                     <span className="title-preview-cell__title">
-                                                        {renderTemplatePreview(template)}
+                                                        {renderTemplatePreview(template, previewOverrides)}
                                                     </span>
                                                     <code className="title-preview-cell__template">
                                                         {template}
@@ -776,6 +839,8 @@ const SearchAppearance = () => {
                             <tbody>
                                 {archives.map((archive) => {
                                     const template = archive.title_template || '{{archive_title}} {{separator}} {{site_title}}';
+                                    // Use sample values specific to this archive type
+                                    const previewOverrides = archive.sample_values || {};
                                     return (
                                         <tr key={archive.slug}>
                                             <td>
@@ -785,7 +850,7 @@ const SearchAppearance = () => {
                                             <td>
                                                 <div className="title-preview-cell">
                                                     <span className="title-preview-cell__title">
-                                                        {renderTemplatePreview(template)}
+                                                        {renderTemplatePreview(template, previewOverrides)}
                                                     </span>
                                                     <code className="title-preview-cell__template">
                                                         {template}
@@ -1312,86 +1377,204 @@ const SearchAppearance = () => {
 
                     <div className="settings-form">
                         {/* Live Preview */}
-                        <div style={{ marginBottom: '32px', padding: '24px', background: '#f8f9fa', borderRadius: '8px' }}>
-                            <h4 style={{ marginBottom: '16px' }}>Live Preview</h4>
-                            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', alignItems: 'flex-end' }}>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
-                                        Sample Title
+                        <div style={{ marginBottom: '32px', padding: '24px', background: '#f8f9fa', borderRadius: '12px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <h4 style={{ margin: 0 }}>Live Preview</h4>
+                            </div>
+
+                            {/* Preview Title Input */}
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                                <div style={{ flex: '1 1 300px' }}>
+                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
+                                        Preview Title
                                     </label>
                                     <input
                                         type="text"
                                         className="input"
                                         value={cardPreviewTitle}
                                         onChange={(e) => setCardPreviewTitle(e.target.value)}
+                                        placeholder="Enter a sample title..."
                                     />
                                 </div>
+                                {Object.keys(previewPosts).length > 0 && (
+                                    <>
+                                        <div style={{ flex: '0 0 140px' }}>
+                                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
+                                                Content type
+                                            </label>
+                                            <select
+                                                className="input"
+                                                value={previewPostType}
+                                                onChange={(e) => {
+                                                    setPreviewPostType(e.target.value);
+                                                    setSelectedPreviewPost('');
+                                                }}
+                                            >
+                                                {Object.entries(previewPosts).map(([slug, data]) => (
+                                                    <option key={slug} value={slug}>{data.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div style={{ flex: '1 1 200px' }}>
+                                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
+                                                Select content
+                                            </label>
+                                            <select
+                                                className="input"
+                                                value={selectedPreviewPost || ''}
+                                                onChange={(e) => {
+                                                    const postId = e.target.value;
+                                                    setSelectedPreviewPost(postId);
+                                                    if (postId && previewPosts[previewPostType]) {
+                                                        const post = previewPosts[previewPostType].posts.find(p => String(p.id) === postId);
+                                                        if (post) {
+                                                            setCardPreviewTitle(post.title);
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                <option value="">Custom text</option>
+                                                {previewPosts[previewPostType]?.posts?.map(post => (
+                                                    <option key={post.id} value={post.id}>{post.title}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </>
+                                )}
                             </div>
+
+                            {/* Card Preview */}
                             <div
                                 className="social-card-preview"
                                 style={{
                                     width: '100%',
                                     maxWidth: '600px',
                                     aspectRatio: '1200/630',
-                                    background: cardDesign.background_color,
+                                    background: cardDesign.layout === 'gradient'
+                                        ? `linear-gradient(135deg, ${cardDesign.background_color} 0%, ${cardDesign.accent_color}44 100%)`
+                                        : cardDesign.background_color,
                                     borderRadius: '8px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: cardDesign.layout === 'centered' ? 'center' : 'flex-end',
+                                    justifyContent: cardDesign.layout === 'centered' ? 'center' : cardDesign.layout === 'magazine' ? 'flex-end' : 'flex-end',
                                     alignItems: cardDesign.layout === 'centered' ? 'center' : 'flex-start',
-                                    padding: '32px',
+                                    padding: cardDesign.layout === 'magazine' ? '40px 32px' : '32px',
                                     position: 'relative',
                                     overflow: 'hidden',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                                 }}
                             >
-                                {cardDesign.layout !== 'minimal' && (
+                                {/* Layout-specific accent elements */}
+                                {cardDesign.layout === 'default' && (
                                     <div
                                         style={{
                                             position: 'absolute',
                                             bottom: 0,
                                             left: 0,
                                             right: 0,
-                                            height: cardDesign.layout === 'bold' ? '30%' : '6px',
+                                            height: '4px',
                                             background: cardDesign.accent_color,
                                         }}
                                     />
                                 )}
+                                {cardDesign.layout === 'magazine' && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: '4px',
+                                            background: cardDesign.accent_color,
+                                        }}
+                                    />
+                                )}
+                                {cardDesign.layout === 'corner' && (
+                                    <>
+                                        <div
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '80px',
+                                                height: '80px',
+                                                background: cardDesign.accent_color,
+                                                clipPath: 'polygon(0 0, 100% 0, 0 100%)',
+                                            }}
+                                        />
+                                        <div
+                                            style={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                right: 0,
+                                                width: '120px',
+                                                height: '120px',
+                                                background: cardDesign.accent_color,
+                                                clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+                                                opacity: 0.5,
+                                            }}
+                                        />
+                                    </>
+                                )}
+                                {cardDesign.layout === 'gradient' && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: '50%',
+                                            background: `linear-gradient(to top, ${cardDesign.background_color} 0%, transparent 100%)`,
+                                        }}
+                                    />
+                                )}
+
+                                {/* Logo */}
                                 {cardDesign.logo_url && (
                                     <img
                                         src={cardDesign.logo_url}
                                         alt="Logo"
                                         style={{
                                             position: 'absolute',
-                                            width: '48px',
-                                            height: '48px',
+                                            width: `${Math.max(24, (cardDesign.logo_size || 48) / 2.5)}px`,
+                                            height: `${Math.max(24, (cardDesign.logo_size || 48) / 2.5)}px`,
                                             objectFit: 'contain',
-                                            ...(cardDesign.logo_position === 'top-left' && { top: '24px', left: '24px' }),
-                                            ...(cardDesign.logo_position === 'top-right' && { top: '24px', right: '24px' }),
-                                            ...(cardDesign.logo_position === 'bottom-left' && { bottom: '24px', left: '24px' }),
-                                            ...(cardDesign.logo_position === 'bottom-right' && { bottom: '24px', right: '24px' }),
-                                            ...(cardDesign.logo_position === 'center' && { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }),
+                                            ...(cardDesign.logo_position === 'top-left' && { top: '20px', left: '20px' }),
+                                            ...(cardDesign.logo_position === 'top-right' && { top: '20px', right: '20px' }),
+                                            ...(cardDesign.logo_position === 'bottom-left' && { bottom: '20px', left: '20px' }),
+                                            ...(cardDesign.logo_position === 'bottom-right' && { bottom: '20px', right: '20px' }),
+                                            ...(cardDesign.logo_position === 'center' && { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.1, width: '40%', height: '40%' }),
                                         }}
                                     />
                                 )}
+
+                                {/* Title */}
                                 <h2
                                     style={{
                                         color: cardDesign.text_color,
-                                        fontSize: `${Math.max(16, cardDesign.title_font_size / 3)}px`,
-                                        fontWeight: 700,
+                                        fontSize: `${Math.max(14, cardDesign.title_font_size / 3)}px`,
+                                        fontWeight: cardDesign.title_weight || 600,
                                         margin: 0,
-                                        marginBottom: '8px',
+                                        marginBottom: '6px',
                                         textAlign: cardDesign.layout === 'centered' ? 'center' : 'left',
                                         zIndex: 1,
+                                        lineHeight: 1.3,
+                                        maxWidth: cardDesign.layout === 'centered' ? '90%' : '85%',
                                     }}
                                 >
                                     {cardPreviewTitle}
                                 </h2>
+
+                                {/* Site Name */}
                                 <span
                                     style={{
                                         color: cardDesign.text_color,
-                                        fontSize: `${Math.max(10, cardDesign.site_font_size / 3)}px`,
-                                        opacity: 0.8,
+                                        fontSize: `${Math.max(9, cardDesign.site_font_size / 3)}px`,
+                                        opacity: 0.7,
                                         zIndex: 1,
+                                        fontWeight: 400,
+                                        letterSpacing: cardDesign.layout === 'magazine' ? '0.5px' : '0',
+                                        textTransform: cardDesign.layout === 'magazine' ? 'uppercase' : 'none',
                                     }}
                                 >
                                     {siteInfo.name || 'Your Site Name'}
@@ -1403,22 +1586,23 @@ const SearchAppearance = () => {
                         <div className="settings-row compact">
                             <div className="settings-label">
                                 <label>Layout Style</label>
-                                <p className="settings-help">Choose the overall layout for social cards.</p>
+                                <p className="settings-help">Each layout has optimized defaults.</p>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '8px', maxWidth: '500px' }}>
                                     {cardLayoutOptions.map((layout) => (
                                         <label
                                             key={layout.value}
                                             style={{
                                                 display: 'flex',
                                                 flexDirection: 'column',
-                                                padding: '12px 16px',
-                                                border: `2px solid ${cardDesign.layout === layout.value ? '#2271b1' : '#ddd'}`,
+                                                alignItems: 'center',
+                                                padding: '12px 8px',
+                                                border: `2px solid ${cardDesign.layout === layout.value ? '#2271b1' : '#e0e0e0'}`,
                                                 borderRadius: '8px',
                                                 cursor: 'pointer',
                                                 background: cardDesign.layout === layout.value ? '#f0f6fc' : '#fff',
-                                                minWidth: '120px',
+                                                transition: 'all 0.15s ease',
                                             }}
                                         >
                                             <input
@@ -1426,153 +1610,287 @@ const SearchAppearance = () => {
                                                 name="card-layout"
                                                 value={layout.value}
                                                 checked={cardDesign.layout === layout.value}
-                                                onChange={(e) => setCardDesign({ ...cardDesign, layout: e.target.value })}
+                                                onChange={(e) => {
+                                                    const newLayout = e.target.value;
+                                                    const layoutConfig = cardLayoutOptions.find(l => l.value === newLayout);
+                                                    setCardDesign({
+                                                        ...cardDesign,
+                                                        layout: newLayout,
+                                                        ...(layoutConfig?.defaults || {}),
+                                                    });
+                                                }}
                                                 style={{ display: 'none' }}
                                             />
-                                            <strong style={{ fontSize: '14px' }}>{layout.label}</strong>
-                                            <span style={{ fontSize: '12px', color: '#666' }}>{layout.description}</span>
+                                            <span style={{ fontSize: '13px', fontWeight: 500 }}>{layout.label}</span>
+                                            <span style={{ fontSize: '11px', color: '#666', textAlign: 'center' }}>{layout.description}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Colors */}
+                        {/* Color Presets */}
                         <div className="settings-row compact">
                             <div className="settings-label">
-                                <label>Background Color</label>
+                                <label>Color Presets</label>
+                                <p className="settings-help">Quick color schemes to get started.</p>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    <input
-                                        type="color"
-                                        value={cardDesign.background_color}
-                                        onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
-                                        style={{ width: '48px', height: '36px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer' }}
-                                    />
-                                    <input
-                                        type="text"
-                                        className="input"
-                                        value={cardDesign.background_color}
-                                        onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
-                                        style={{ width: '100px' }}
-                                    />
+                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                    {colorPresets.map((preset) => (
+                                        <button
+                                            key={preset.name}
+                                            type="button"
+                                            onClick={() => setCardDesign({
+                                                ...cardDesign,
+                                                background_color: preset.bg,
+                                                accent_color: preset.accent,
+                                                text_color: preset.text,
+                                            })}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                padding: '6px 10px',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '6px',
+                                                background: '#fff',
+                                                cursor: 'pointer',
+                                                fontSize: '12px',
+                                            }}
+                                            title={preset.name}
+                                        >
+                                            <span style={{
+                                                width: '16px',
+                                                height: '16px',
+                                                borderRadius: '3px',
+                                                background: preset.bg,
+                                                border: '1px solid rgba(0,0,0,0.1)',
+                                            }} />
+                                            <span style={{
+                                                width: '16px',
+                                                height: '16px',
+                                                borderRadius: '3px',
+                                                background: preset.accent,
+                                                border: '1px solid rgba(0,0,0,0.1)',
+                                            }} />
+                                            <span style={{ color: '#666' }}>{preset.name}</span>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
 
+                        {/* Colors Row */}
                         <div className="settings-row compact">
                             <div className="settings-label">
-                                <label>Accent Color</label>
+                                <label>Colors</label>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    <input
-                                        type="color"
-                                        value={cardDesign.accent_color}
-                                        onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
-                                        style={{ width: '48px', height: '36px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer' }}
-                                    />
-                                    <input
-                                        type="text"
-                                        className="input"
-                                        value={cardDesign.accent_color}
-                                        onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
-                                        style={{ width: '100px' }}
-                                    />
+                                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: '#666' }}>Background</span>
+                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                            <input
+                                                type="color"
+                                                value={cardDesign.background_color}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
+                                                style={{ width: '36px', height: '32px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', padding: 0 }}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="input"
+                                                value={cardDesign.background_color}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
+                                                style={{ width: '80px', fontSize: '12px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: '#666' }}>Accent</span>
+                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                            <input
+                                                type="color"
+                                                value={cardDesign.accent_color}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
+                                                style={{ width: '36px', height: '32px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', padding: 0 }}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="input"
+                                                value={cardDesign.accent_color}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
+                                                style={{ width: '80px', fontSize: '12px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: '#666' }}>Text</span>
+                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                            <input
+                                                type="color"
+                                                value={cardDesign.text_color}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
+                                                style={{ width: '36px', height: '32px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', padding: 0 }}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="input"
+                                                value={cardDesign.text_color}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
+                                                style={{ width: '80px', fontSize: '12px' }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        {/* Typography */}
                         <div className="settings-row compact">
                             <div className="settings-label">
-                                <label>Text Color</label>
+                                <label>Typography</label>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    <input
-                                        type="color"
-                                        value={cardDesign.text_color}
-                                        onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
-                                        style={{ width: '48px', height: '36px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer' }}
-                                    />
-                                    <input
-                                        type="text"
-                                        className="input"
-                                        value={cardDesign.text_color}
-                                        onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
-                                        style={{ width: '100px' }}
-                                    />
+                                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: '#666' }}>Title Size</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <input
+                                                type="range"
+                                                min={24}
+                                                max={72}
+                                                value={cardDesign.title_font_size}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, title_font_size: parseInt(e.target.value) })}
+                                                style={{ width: '100px' }}
+                                            />
+                                            <span style={{ fontSize: '12px', color: '#666', minWidth: '40px' }}>{cardDesign.title_font_size}px</span>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: '#666' }}>Title Weight</span>
+                                        <select
+                                            className="input"
+                                            value={cardDesign.title_weight || 600}
+                                            onChange={(e) => setCardDesign({ ...cardDesign, title_weight: parseInt(e.target.value) })}
+                                            style={{ width: '100px', fontSize: '12px' }}
+                                        >
+                                            <option value={400}>Regular</option>
+                                            <option value={500}>Medium</option>
+                                            <option value={600}>Semibold</option>
+                                            <option value={700}>Bold</option>
+                                        </select>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: '#666' }}>Site Name Size</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <input
+                                                type="range"
+                                                min={12}
+                                                max={32}
+                                                value={cardDesign.site_font_size}
+                                                onChange={(e) => setCardDesign({ ...cardDesign, site_font_size: parseInt(e.target.value) })}
+                                                style={{ width: '100px' }}
+                                            />
+                                            <span style={{ fontSize: '12px', color: '#666', minWidth: '40px' }}>{cardDesign.site_font_size}px</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Font Sizes */}
-                        <div className="settings-row compact">
-                            <div className="settings-label">
-                                <label>Title Font Size (px)</label>
-                            </div>
-                            <div className="settings-control">
-                                <input
-                                    type="number"
-                                    className="input"
-                                    value={cardDesign.title_font_size}
-                                    onChange={(e) => setCardDesign({ ...cardDesign, title_font_size: parseInt(e.target.value) || 48 })}
-                                    min={24}
-                                    max={96}
-                                    style={{ width: '100px' }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="settings-row compact">
-                            <div className="settings-label">
-                                <label>Site Name Font Size (px)</label>
-                            </div>
-                            <div className="settings-control">
-                                <input
-                                    type="number"
-                                    className="input"
-                                    value={cardDesign.site_font_size}
-                                    onChange={(e) => setCardDesign({ ...cardDesign, site_font_size: parseInt(e.target.value) || 24 })}
-                                    min={12}
-                                    max={48}
-                                    style={{ width: '100px' }}
-                                />
                             </div>
                         </div>
 
                         {/* Logo Settings */}
                         <div className="settings-row compact">
                             <div className="settings-label">
-                                <label>Logo URL</label>
-                                <p className="settings-help">Upload a logo to display on social cards (200x200px recommended).</p>
+                                <label>Logo</label>
+                                <p className="settings-help">PNG with transparency works best.</p>
                             </div>
                             <div className="settings-control">
-                                <input
-                                    type="url"
-                                    className="input"
-                                    value={cardDesign.logo_url}
-                                    onChange={(e) => setCardDesign({ ...cardDesign, logo_url: e.target.value })}
-                                    placeholder="https://example.com/logo.png"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="settings-row compact">
-                            <div className="settings-label">
-                                <label>Logo Position</label>
-                            </div>
-                            <div className="settings-control">
-                                <select
-                                    className="input"
-                                    value={cardDesign.logo_position}
-                                    onChange={(e) => setCardDesign({ ...cardDesign, logo_position: e.target.value })}
-                                >
-                                    {logoPositionOptions.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                    {cardDesign.logo_url && (
+                                        <div style={{
+                                            width: '60px',
+                                            height: '60px',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: '#f5f5f5',
+                                            overflow: 'hidden',
+                                        }}>
+                                            <img
+                                                src={cardDesign.logo_url}
+                                                alt="Logo preview"
+                                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                            />
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button
+                                                type="button"
+                                                className="button"
+                                                onClick={() => {
+                                                    const frame = wp.media({
+                                                        title: 'Select Logo',
+                                                        button: { text: 'Use Logo' },
+                                                        multiple: false,
+                                                        library: { type: 'image' },
+                                                    });
+                                                    frame.on('select', () => {
+                                                        const attachment = frame.state().get('selection').first().toJSON();
+                                                        setCardDesign({ ...cardDesign, logo_url: attachment.url });
+                                                    });
+                                                    frame.open();
+                                                }}
+                                            >
+                                                {cardDesign.logo_url ? 'Change Logo' : 'Select Logo'}
+                                            </button>
+                                            {cardDesign.logo_url && (
+                                                <button
+                                                    type="button"
+                                                    className="button"
+                                                    onClick={() => setCardDesign({ ...cardDesign, logo_url: '' })}
+                                                    style={{ color: '#b32d2e' }}
+                                                >
+                                                    Remove
+                                                </button>
+                                            )}
+                                        </div>
+                                        {cardDesign.logo_url && (
+                                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                    <span style={{ fontSize: '12px', color: '#666' }}>Size</span>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <input
+                                                            type="range"
+                                                            min={24}
+                                                            max={120}
+                                                            value={cardDesign.logo_size || 48}
+                                                            onChange={(e) => setCardDesign({ ...cardDesign, logo_size: parseInt(e.target.value) })}
+                                                            style={{ width: '80px' }}
+                                                        />
+                                                        <span style={{ fontSize: '12px', color: '#666' }}>{cardDesign.logo_size || 48}px</span>
+                                                    </div>
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                    <span style={{ fontSize: '12px', color: '#666' }}>Position</span>
+                                                    <select
+                                                        className="input"
+                                                        value={cardDesign.logo_position}
+                                                        onChange={(e) => setCardDesign({ ...cardDesign, logo_position: e.target.value })}
+                                                        style={{ width: '120px', fontSize: '12px' }}
+                                                    >
+                                                        {logoPositionOptions.map((opt) => (
+                                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

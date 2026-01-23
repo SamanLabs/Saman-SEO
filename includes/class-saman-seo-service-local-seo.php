@@ -25,8 +25,8 @@ class Local_SEO {
 			return;
 		}
 
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
+		// Register menu for PHP template rendering
+		add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
 	}
@@ -54,6 +54,9 @@ class Local_SEO {
 	 */
 	public function register_settings() {
 		$group = 'SAMAN_SEO_local_seo';
+
+		// Synced Knowledge Graph settings (also saved from this page).
+		register_setting( $group, 'SAMAN_SEO_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
 
 		// Business Information.
 		register_setting( $group, 'SAMAN_SEO_local_business_name', 'sanitize_text_field' );
@@ -84,6 +87,9 @@ class Local_SEO {
 		// Opening Hours.
 		register_setting( $group, 'SAMAN_SEO_local_opening_hours', [ $this, 'sanitize_opening_hours' ] );
 
+		// Google Maps API Key.
+		register_setting( $group, 'SAMAN_SEO_google_maps_api_key', 'sanitize_text_field' );
+
 		// Multiple Locations.
 		register_setting( $group, 'SAMAN_SEO_local_enable_locations', [ $this, 'sanitize_bool' ] );
 		register_setting( $group, 'SAMAN_SEO_local_locations', [ $this, 'sanitize_locations' ] );
@@ -97,6 +103,16 @@ class Local_SEO {
 	 */
 	public function sanitize_bool( $value ) {
 		return ! empty( $value ) ? '1' : '0';
+	}
+
+	/**
+	 * Sanitize knowledge type.
+	 *
+	 * @param string $value Knowledge type (organization or person).
+	 * @return string
+	 */
+	public function sanitize_knowledge_type( $value ) {
+		return in_array( $value, [ 'organization', 'person' ], true ) ? $value : 'organization';
 	}
 
 	/**

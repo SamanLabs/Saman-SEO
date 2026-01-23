@@ -31,8 +31,7 @@ class Restaurant_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_restaurant_schema_to_graph( $graph, $post ) {
-		
-		if ( 'restaurant' !== get_post_type( $post->ID ) ) {
+		if ( ! $post || 'restaurant' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 

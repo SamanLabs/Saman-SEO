@@ -112,7 +112,7 @@ class Admin_Topbar {
 			],
 			'404-log'    => [
 				'label' => __( '404 Log', 'saman-seo' ),
-				'url'   => admin_url( 'admin.php?page=saman-seo-404' ),
+				'url'   => admin_url( 'admin.php?page=saman-seo-404-log' ),
 			],
 			'sitemap'    => [
 				'label' => __( 'Sitemap', 'saman-seo' ),

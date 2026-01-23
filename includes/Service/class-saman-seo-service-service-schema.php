@@ -31,8 +31,7 @@ class Service_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_service_schema_to_graph( $graph, $post ) {
-		
-		if ( 'service' !== get_post_type( $post->ID ) ) {
+		if ( ! $post || 'service' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 

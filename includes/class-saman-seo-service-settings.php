@@ -38,6 +38,11 @@ class Settings {
 		'SAMAN_SEO_homepage_knowledge_type' => 'organization',
 		'SAMAN_SEO_homepage_organization_name' => '',
 		'SAMAN_SEO_homepage_organization_logo' => '',
+		'SAMAN_SEO_homepage_person_name' => '',
+		'SAMAN_SEO_homepage_person_image' => '',
+		'SAMAN_SEO_homepage_person_job_title' => '',
+		'SAMAN_SEO_homepage_person_url' => '',
+		'SAMAN_SEO_homepage_social_profiles' => '',
 		'SAMAN_SEO_title_separator' => '-',
 		'SAMAN_SEO_default_meta_description' => '',
 		'SAMAN_SEO_default_og_image' => '',
@@ -164,6 +169,11 @@ class Settings {
 		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_knowledge_type', [ $this, 'sanitize_knowledge_type' ] );
 		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_organization_name', 'sanitize_text_field' );
 		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_organization_logo', 'esc_url_raw' );
+		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_person_name', 'sanitize_text_field' );
+		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_person_image', 'esc_url_raw' );
+		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_person_job_title', 'sanitize_text_field' );
+		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_person_url', 'esc_url_raw' );
+		register_setting( 'SAMAN_SEO_knowledge', 'SAMAN_SEO_homepage_social_profiles', 'sanitize_textarea_field' );
 		register_setting( 'saman-seo', 'SAMAN_SEO_default_meta_description', 'sanitize_textarea_field' );
 		register_setting( 'saman-seo', 'SAMAN_SEO_default_og_image', 'esc_url_raw' );
 		register_setting( 'SAMAN_SEO_social', 'SAMAN_SEO_social_defaults', [ $this, 'sanitize_social_defaults' ] );

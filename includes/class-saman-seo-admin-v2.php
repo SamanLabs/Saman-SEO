@@ -98,7 +98,6 @@ class Admin_V2 {
         'saman-seo-404-errors'   => 'saman-seo-404-log',
         'saman-seo-internal'     => 'saman-seo-internal-linking',
         'saman-seo-ai'           => 'saman-seo-ai-assistant',
-        'saman-seo-local-seo'    => 'saman-seo-settings',
         'saman-seo-links'        => 'saman-seo-internal-linking',
         'saman-seo-404'          => 'saman-seo-404-log',
     ];

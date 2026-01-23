@@ -15,6 +15,13 @@ defined( 'ABSPATH' ) || exit;
 class Social_Card_Generator {
 
 	/**
+	 * Current design settings.
+	 *
+	 * @var array
+	 */
+	private $current_design = [];
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
@@ -70,14 +77,17 @@ class Social_Card_Generator {
 			'background_color' => '#1a1a36',
 			'accent_color'     => '#5a84ff',
 			'text_color'       => '#ffffff',
-			'title_font_size'  => 48,
-			'site_font_size'   => 24,
+			'title_font_size'  => 42,
+			'site_font_size'   => 18,
+			'title_weight'     => 600,
 			'logo_url'         => '',
 			'logo_position'    => 'bottom-left',
+			'logo_size'        => 48,
 			'layout'           => 'default',
 		];
 
 		$design = wp_parse_args( $design_settings, $design_defaults );
+		$this->current_design = $design;
 
 		// Convert hex colors to RGB
 		$bg_rgb     = $this->hex_to_rgb( $design['background_color'] );
@@ -145,8 +155,14 @@ class Social_Card_Generator {
 			case 'minimal':
 				$this->render_minimal_layout( $img, $width, $height, $title, $text );
 				break;
-			case 'bold':
-				$this->render_bold_layout( $img, $width, $height, $title, $accent, $text );
+			case 'magazine':
+				$this->render_magazine_layout( $img, $width, $height, $title, $accent, $text );
+				break;
+			case 'gradient':
+				$this->render_gradient_layout( $img, $width, $height, $title, $bg, $accent, $text );
+				break;
+			case 'corner':
+				$this->render_corner_layout( $img, $width, $height, $title, $accent, $text );
 				break;
 			default:
 				$this->render_default_layout( $img, $width, $height, $title, $accent, $text );
@@ -165,11 +181,11 @@ class Social_Card_Generator {
 	 * @param int      $text Text color.
 	 */
 	private function render_default_layout( $img, $width, $height, $title, $accent, $text ) {
-		// Accent bar at bottom
-		imagefilledrectangle( $img, 0, $height - 80, $width, $height, $accent );
+		// Thin accent bar at bottom
+		imagefilledrectangle( $img, 0, $height - 8, $width, $height, $accent );
 		// Title and site name
-		imagestring( $img, 5, 40, 40, $title, $text );
-		imagestring( $img, 3, 40, $height - 60, get_bloginfo( 'name' ), $text );
+		imagestring( $img, 5, 60, $height - 120, $title, $text );
+		imagestring( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
 	}
 
 	/**
@@ -224,6 +240,90 @@ class Social_Card_Generator {
 	}
 
 	/**
+	 * Render magazine layout.
+	 *
+	 * @param resource $img Image resource.
+	 * @param int      $width Image width.
+	 * @param int      $height Image height.
+	 * @param string   $title Title text.
+	 * @param int      $accent Accent color.
+	 * @param int      $text Text color.
+	 */
+	private function render_magazine_layout( $img, $width, $height, $title, $accent, $text ) {
+		// Top accent bar
+		imagefilledrectangle( $img, 0, 0, $width, 8, $accent );
+		// Title at bottom
+		imagestring( $img, 5, 60, $height - 120, $title, $text );
+		// Site name uppercase style
+		imagestring( $img, 2, 60, $height - 80, strtoupper( get_bloginfo( 'name' ) ), $text );
+	}
+
+	/**
+	 * Render gradient layout.
+	 *
+	 * @param resource $img Image resource.
+	 * @param int      $width Image width.
+	 * @param int      $height Image height.
+	 * @param string   $title Title text.
+	 * @param int      $bg Background color.
+	 * @param int      $accent Accent color.
+	 * @param int      $text Text color.
+	 */
+	private function render_gradient_layout( $img, $width, $height, $title, $bg, $accent, $text ) {
+		// Simulate gradient by drawing horizontal lines with blended colors
+		$bg_rgb     = $this->get_color_components( $img, $bg );
+		$accent_rgb = $this->get_color_components( $img, $accent );
+
+		for ( $y = 0; $y < $height; $y++ ) {
+			$ratio = $y / $height;
+			$r     = (int) ( $bg_rgb['red'] + ( $accent_rgb['red'] - $bg_rgb['red'] ) * $ratio * 0.3 );
+			$g     = (int) ( $bg_rgb['green'] + ( $accent_rgb['green'] - $bg_rgb['green'] ) * $ratio * 0.3 );
+			$b     = (int) ( $bg_rgb['blue'] + ( $accent_rgb['blue'] - $bg_rgb['blue'] ) * $ratio * 0.3 );
+			$color = imagecolorallocate( $img, $r, $g, $b );
+			imageline( $img, 0, $y, $width, $y, $color );
+		}
+
+		// Title and site name
+		imagestring( $img, 5, 60, $height - 120, $title, $text );
+		imagestring( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
+	}
+
+	/**
+	 * Render corner layout.
+	 *
+	 * @param resource $img Image resource.
+	 * @param int      $width Image width.
+	 * @param int      $height Image height.
+	 * @param string   $title Title text.
+	 * @param int      $accent Accent color.
+	 * @param int      $text Text color.
+	 */
+	private function render_corner_layout( $img, $width, $height, $title, $accent, $text ) {
+		// Top-left corner accent (triangle)
+		$points_tl = [ 0, 0, 150, 0, 0, 150 ];
+		imagefilledpolygon( $img, $points_tl, 3, $accent );
+
+		// Bottom-right corner accent (triangle, semi-transparent effect via smaller size)
+		$points_br = [ $width, $height, $width - 200, $height, $width, $height - 200 ];
+		imagefilledpolygon( $img, $points_br, 3, $accent );
+
+		// Title and site name
+		imagestring( $img, 5, 60, $height - 120, $title, $text );
+		imagestring( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
+	}
+
+	/**
+	 * Get color components from allocated color.
+	 *
+	 * @param resource $img Image resource.
+	 * @param int      $color Allocated color.
+	 * @return array Color components.
+	 */
+	private function get_color_components( $img, $color ) {
+		return imagecolorsforindex( $img, $color );
+	}
+
+	/**
 	 * Add logo to image.
 	 *
 	 * @param resource $img Image resource.
@@ -264,43 +364,53 @@ class Social_Card_Generator {
 
 		$logo_width  = imagesx( $logo );
 		$logo_height = imagesy( $logo );
-		$max_logo_size = 150;
 
-		// Resize if needed
-		if ( $logo_width > $max_logo_size || $logo_height > $max_logo_size ) {
-			$ratio = min( $max_logo_size / $logo_width, $max_logo_size / $logo_height );
-			$new_width = (int) ( $logo_width * $ratio );
-			$new_height = (int) ( $logo_height * $ratio );
-		} else {
-			$new_width = $logo_width;
-			$new_height = $logo_height;
-		}
+		// Use logo_size from design settings, or default to 48
+		$max_logo_size = isset( $this->current_design['logo_size'] ) ? (int) $this->current_design['logo_size'] : 48;
+		$max_logo_size = max( 24, min( 120, $max_logo_size ) );
+
+		// Resize to fit within max size while maintaining aspect ratio
+		$ratio      = min( $max_logo_size / $logo_width, $max_logo_size / $logo_height );
+		$new_width  = (int) ( $logo_width * $ratio );
+		$new_height = (int) ( $logo_height * $ratio );
 
 		// Calculate position
-		$x = 40;
-		$y = 40;
+		$padding = 40;
+		$x       = $padding;
+		$y       = $padding;
 
 		switch ( $position ) {
 			case 'top-left':
-				$x = 40;
-				$y = 40;
+				$x = $padding;
+				$y = $padding;
 				break;
 			case 'top-right':
-				$x = $width - $new_width - 40;
-				$y = 40;
+				$x = $width - $new_width - $padding;
+				$y = $padding;
 				break;
 			case 'bottom-left':
-				$x = 40;
-				$y = $height - $new_height - 40;
+				$x = $padding;
+				$y = $height - $new_height - $padding;
 				break;
 			case 'bottom-right':
-				$x = $width - $new_width - 40;
-				$y = $height - $new_height - 40;
+				$x = $width - $new_width - $padding;
+				$y = $height - $new_height - $padding;
 				break;
 			case 'center':
-				$x = ( $width - $new_width ) / 2;
-				$y = ( $height - $new_height ) / 2;
+				// For center position, make logo larger and semi-transparent (watermark style)
+				$center_size = min( $width, $height ) * 0.4;
+				$ratio       = min( $center_size / $logo_width, $center_size / $logo_height );
+				$new_width   = (int) ( $logo_width * $ratio );
+				$new_height  = (int) ( $logo_height * $ratio );
+				$x           = (int) ( ( $width - $new_width ) / 2 );
+				$y           = (int) ( ( $height - $new_height ) / 2 );
 				break;
+		}
+
+		// Handle PNG transparency
+		if ( $logo_info[2] === IMAGETYPE_PNG ) {
+			imagealphablending( $img, true );
+			imagesavealpha( $logo, true );
 		}
 
 		imagecopyresampled( $img, $logo, $x, $y, 0, 0, $new_width, $new_height, $logo_width, $logo_height );
