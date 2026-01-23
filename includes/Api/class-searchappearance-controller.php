@@ -274,6 +274,7 @@ class SearchAppearance_Controller extends REST_Controller {
             'post_type_social_defaults'  => $this->get_post_type_social_defaults_data(),
             'card_design'                => $this->get_card_design_data(),
             'card_module_enabled'        => (bool) get_option( 'SAMAN_SEO_module_social_cards', true ),
+            'preview_posts'              => $this->get_preview_posts(),
         ] );
     }
 
@@ -1095,12 +1096,39 @@ class SearchAppearance_Controller extends REST_Controller {
             'background_color' => '#1a1a36',
             'accent_color'     => '#5a84ff',
             'text_color'       => '#ffffff',
-            'title_font_size'  => 48,
-            'site_font_size'   => 24,
+            'title_font_size'  => 42,
+            'site_font_size'   => 18,
+            'title_weight'     => 600,
             'logo_url'         => '',
             'logo_position'    => 'bottom-left',
+            'logo_size'        => 48,
             'layout'           => 'default',
         ] );
+    }
+
+    /**
+     * Get preview posts for social card preview.
+     *
+     * @return array
+     */
+    private function get_preview_posts() {
+        $posts = get_posts( [
+            'post_type'      => 'post',
+            'post_status'    => 'publish',
+            'posts_per_page' => 10,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        ] );
+
+        $preview_posts = [];
+        foreach ( $posts as $post ) {
+            $preview_posts[] = [
+                'id'    => $post->ID,
+                'title' => $post->post_title,
+            ];
+        }
+
+        return $preview_posts;
     }
 
     /**
@@ -1112,15 +1140,31 @@ class SearchAppearance_Controller extends REST_Controller {
     public function save_card_design( $request ) {
         $params = $request->get_json_params();
 
+        // Validate title weight
+        $allowed_weights = [ 400, 500, 600, 700 ];
+        $title_weight    = isset( $params['title_weight'] ) ? absint( $params['title_weight'] ) : 600;
+        if ( ! in_array( $title_weight, $allowed_weights, true ) ) {
+            $title_weight = 600;
+        }
+
+        // Validate layout
+        $allowed_layouts = [ 'default', 'centered', 'minimal', 'magazine', 'gradient', 'corner' ];
+        $layout          = isset( $params['layout'] ) ? sanitize_key( $params['layout'] ) : 'default';
+        if ( ! in_array( $layout, $allowed_layouts, true ) ) {
+            $layout = 'default';
+        }
+
         $design = [
             'background_color' => isset( $params['background_color'] ) ? sanitize_hex_color( $params['background_color'] ) : '#1a1a36',
             'accent_color'     => isset( $params['accent_color'] ) ? sanitize_hex_color( $params['accent_color'] ) : '#5a84ff',
             'text_color'       => isset( $params['text_color'] ) ? sanitize_hex_color( $params['text_color'] ) : '#ffffff',
-            'title_font_size'  => isset( $params['title_font_size'] ) ? absint( $params['title_font_size'] ) : 48,
-            'site_font_size'   => isset( $params['site_font_size'] ) ? absint( $params['site_font_size'] ) : 24,
+            'title_font_size'  => isset( $params['title_font_size'] ) ? min( 72, max( 24, absint( $params['title_font_size'] ) ) ) : 42,
+            'site_font_size'   => isset( $params['site_font_size'] ) ? min( 32, max( 12, absint( $params['site_font_size'] ) ) ) : 18,
+            'title_weight'     => $title_weight,
             'logo_url'         => isset( $params['logo_url'] ) ? esc_url_raw( $params['logo_url'] ) : '',
             'logo_position'    => isset( $params['logo_position'] ) ? sanitize_key( $params['logo_position'] ) : 'bottom-left',
-            'layout'           => isset( $params['layout'] ) ? sanitize_key( $params['layout'] ) : 'default',
+            'logo_size'        => isset( $params['logo_size'] ) ? min( 120, max( 24, absint( $params['logo_size'] ) ) ) : 48,
+            'layout'           => $layout,
         ];
 
         update_option( 'SAMAN_SEO_card_design', $design );
