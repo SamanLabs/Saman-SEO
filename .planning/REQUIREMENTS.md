@@ -16,10 +16,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### High-Impact Schema Types
 
-- [ ] **FAQ-01**: FAQPage schema type with mainEntity containing Question/Answer pairs
-- [ ] **FAQ-02**: Integration with existing FAQ Gutenberg block to auto-generate schema
-- [ ] **HOW-01**: HowTo schema type with step, tool, supply, totalTime properties
-- [ ] **HOW-02**: Integration with existing HowTo Gutenberg block to auto-generate schema
+- [x] **FAQ-01**: FAQPage schema type with mainEntity containing Question/Answer pairs
+- [x] **FAQ-02**: Integration with existing FAQ Gutenberg block to auto-generate schema
+- [x] **HOW-01**: HowTo schema type with step, tool, supply, totalTime properties
+- [x] **HOW-02**: Integration with existing HowTo Gutenberg block to auto-generate schema
 - [ ] **LOC-01**: LocalBusiness schema type with full property support
 - [ ] **LOC-02**: OpeningHoursSpecification for business hours
 - [ ] **LOC-03**: GeoCoordinates for location data
@@ -93,10 +93,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENG-02 | Phase 1 | Complete |
 | ENG-03 | Phase 1 | Complete |
 | ENG-04 | Phase 1 | Complete |
-| FAQ-01 | Phase 3 | Pending |
-| FAQ-02 | Phase 3 | Pending |
-| HOW-01 | Phase 3 | Pending |
-| HOW-02 | Phase 3 | Pending |
+| FAQ-01 | Phase 3 | Complete |
+| FAQ-02 | Phase 3 | Complete |
+| HOW-01 | Phase 3 | Complete |
+| HOW-02 | Phase 3 | Complete |
 | LOC-01 | Phase 4 | Pending |
 | LOC-02 | Phase 4 | Pending |
 | LOC-03 | Phase 4 | Pending |
@@ -124,4 +124,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 2 requirements complete (ART-01 through ART-05)*
+*Last updated: 2026-01-23 - Phase 3 requirements complete (FAQ-01, FAQ-02, HOW-01, HOW-02)*
