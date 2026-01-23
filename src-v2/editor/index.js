@@ -1,11 +1,12 @@
 /**
- * Saman SEO V2 - Gutenberg Editor Sidebar
+ * Saman SEO V2 - Gutenberg Editor Modal
  *
- * Registers a sidebar panel in the block editor for SEO settings.
+ * Registers a toolbar button that opens an SEO settings modal in the block editor.
  */
 
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { PluginBlockEditorToolbarItem } from '@wordpress/edit-post';
+import { Modal, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -53,9 +54,10 @@ const PluginIcon = () => {
 };
 
 /**
- * Main SEO Sidebar Component
+ * Main SEO Modal Component
  */
-const SEOSidebar = () => {
+const SEOModal = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const [seoMeta, setSeoMeta] = useState({
         title: '',
         description: '',
@@ -201,40 +203,51 @@ const SEOSidebar = () => {
 
     return (
         <>
-            <PluginSidebarMoreMenuItem target="saman-seo-sidebar" icon={<PluginIcon />}>
-                Saman SEO
-            </PluginSidebarMoreMenuItem>
-            <PluginSidebar
-                name="saman-seo-sidebar"
-                title="Saman SEO"
-                icon={<PluginIcon />}
-            >
-                <SEOPanel
-                    postId={postId}
-                    postType={postType}
-                    seoMeta={seoMeta}
-                    updateMeta={updateMeta}
-                    seoScore={seoScore}
-                    effectiveTitle={effectiveTitle}
-                    effectiveDescription={effectiveDescription}
-                    postUrl={postUrl}
-                    postTitle={postTitle}
-                    postContent={postContent}
-                    featuredImage={featuredImage}
-                    hasChanges={hasChanges}
-                    variables={variables}
-                    variableValues={variableValues}
-                    aiEnabled={aiEnabled}
-                    aiProvider={aiProvider}
-                    aiPilot={aiPilot}
-                />
-            </PluginSidebar>
+            <PluginBlockEditorToolbarItem>
+                <Button
+                    className="saman-seo-toolbar-btn"
+                    onClick={() => setIsOpen(true)}
+                    icon={<PluginIcon />}
+                >
+                    SEO
+                </Button>
+            </PluginBlockEditorToolbarItem>
+            {isOpen && (
+                <Modal
+                    title="Saman SEO"
+                    onRequestClose={() => setIsOpen(false)}
+                    className="saman-seo-modal-wrapper"
+                    isDismissible={true}
+                    shouldCloseOnClickOutside={true}
+                    shouldCloseOnEsc={true}
+                >
+                    <SEOPanel
+                        postId={postId}
+                        postType={postType}
+                        seoMeta={seoMeta}
+                        updateMeta={updateMeta}
+                        seoScore={seoScore}
+                        effectiveTitle={effectiveTitle}
+                        effectiveDescription={effectiveDescription}
+                        postUrl={postUrl}
+                        postTitle={postTitle}
+                        postContent={postContent}
+                        featuredImage={featuredImage}
+                        hasChanges={hasChanges}
+                        variables={variables}
+                        variableValues={variableValues}
+                        aiEnabled={aiEnabled}
+                        aiProvider={aiProvider}
+                        aiPilot={aiPilot}
+                    />
+                </Modal>
+            )}
         </>
     );
 };
 
 // Register the plugin
 registerPlugin('saman-seo', {
-    render: SEOSidebar,
+    render: SEOModal,
     icon: <PluginIcon />,
 });
