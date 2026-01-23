@@ -75,7 +75,7 @@ class Plugin {
 			'localbusiness',
 			LocalBusiness_Schema::class,
 			[
-				'label'    => __( 'Local Business', 'saman-seo' ),
+				'label'    => 'Local Business',
 				'priority' => 5,
 			]
 		);
@@ -118,7 +118,7 @@ class Plugin {
 			'faqpage',
 			FAQPage_Schema::class,
 			[
-				'label'    => __( 'FAQ Page', 'saman-seo' ),
+				'label'    => 'FAQ Page',
 				'priority' => 18,
 			]
 		);
@@ -127,7 +127,7 @@ class Plugin {
 			'howto',
 			HowTo_Schema::class,
 			[
-				'label'    => __( 'How To', 'saman-seo' ),
+				'label'    => 'How To',
 				'priority' => 18,
 			]
 		);
