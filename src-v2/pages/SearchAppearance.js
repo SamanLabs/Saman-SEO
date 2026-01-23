@@ -4,6 +4,7 @@ import SubTabs from '../components/SubTabs';
 import SearchPreview from '../components/SearchPreview';
 import TemplateInput from '../components/TemplateInput';
 import AiGenerateModal from '../components/AiGenerateModal';
+import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
 import useUrlTab from '../hooks/useUrlTab';
 
 // Get AI status from global settings
@@ -917,17 +918,68 @@ const SearchAppearance = () => {
 
                             <div className="settings-row compact">
                                 <div className="settings-label">
-                                    <label>Image URL</label>
+                                    <label>Fallback Image</label>
                                     <p className="settings-help">Fallback image for social sharing.</p>
                                 </div>
                                 <div className="settings-control">
-                                    <input
-                                        type="url"
-                                        className="input"
-                                        value={editingPostTypeSocial.image_source || ''}
-                                        onChange={(e) => setEditingPostTypeSocial({ ...editingPostTypeSocial, image_source: e.target.value })}
-                                        placeholder="https://example.com/image.jpg"
-                                    />
+                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                        {editingPostTypeSocial.image_source ? (
+                                            <div style={{ position: 'relative', width: '120px', height: '63px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                                <img
+                                                    src={editingPostTypeSocial.image_source}
+                                                    alt="Social fallback"
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setEditingPostTypeSocial({ ...editingPostTypeSocial, image_source: '' })}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '4px',
+                                                        right: '4px',
+                                                        width: '20px',
+                                                        height: '20px',
+                                                        borderRadius: '50%',
+                                                        background: 'rgba(0,0,0,0.6)',
+                                                        color: '#fff',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '14px',
+                                                        lineHeight: 1,
+                                                    }}
+                                                    title="Remove image"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div style={{ width: '120px', height: '63px', borderRadius: '4px', border: '2px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                                                No image
+                                            </div>
+                                        )}
+                                        <button
+                                            type="button"
+                                            className="button"
+                                            onClick={() => {
+                                                const frame = wp.media({
+                                                    title: 'Select Fallback Image',
+                                                    button: { text: 'Use Image' },
+                                                    multiple: false,
+                                                    library: { type: 'image' },
+                                                });
+                                                frame.on('select', () => {
+                                                    const attachment = frame.state().get('selection').first().toJSON();
+                                                    setEditingPostTypeSocial({ ...editingPostTypeSocial, image_source: attachment.url });
+                                                });
+                                                frame.open();
+                                            }}
+                                        >
+                                            {editingPostTypeSocial.image_source ? 'Change Image' : 'Select Image'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -969,6 +1021,29 @@ const SearchAppearance = () => {
                         </div>
                     ) : (
                         <>
+                            {/* Social Preview Cards */}
+                            <div style={{ marginBottom: '32px', padding: '24px', background: '#f8f9fa', borderRadius: '8px' }}>
+                                <h4 style={{ marginBottom: '16px' }}>Social Preview</h4>
+                                <p className="muted" style={{ marginBottom: '24px' }}>
+                                    Preview how your content will appear when shared on social media.
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                                    <FacebookPreview
+                                        image={socialDefaults.image_source}
+                                        title={renderTemplatePreview(socialDefaults.og_title) || siteInfo.name}
+                                        description={renderTemplatePreview(socialDefaults.og_description) || siteInfo.description}
+                                        domain={siteInfo.domain}
+                                    />
+                                    <TwitterPreview
+                                        image={socialDefaults.image_source}
+                                        title={renderTemplatePreview(socialDefaults.twitter_title || socialDefaults.og_title) || siteInfo.name}
+                                        description={renderTemplatePreview(socialDefaults.twitter_description || socialDefaults.og_description) || siteInfo.description}
+                                        domain={siteInfo.domain}
+                                        cardType="summary_large_image"
+                                    />
+                                </div>
+                            </div>
+
                             {/* Global Social Defaults */}
                             <div className="settings-form" style={{ marginBottom: '32px' }}>
                                 <h4 style={{ marginBottom: '16px' }}>Global Social Defaults</h4>
@@ -1056,17 +1131,68 @@ const SearchAppearance = () => {
 
                                 <div className="settings-row compact">
                                     <div className="settings-label">
-                                        <label>Fallback Image URL</label>
+                                        <label>Fallback Image</label>
                                         <p className="settings-help">Used when posts don't have a featured image (1200x630px recommended).</p>
                                     </div>
                                     <div className="settings-control">
-                                        <input
-                                            type="url"
-                                            className="input"
-                                            value={socialDefaults.image_source || ''}
-                                            onChange={(e) => setSocialDefaults({ ...socialDefaults, image_source: e.target.value })}
-                                            placeholder="https://example.com/default-social.jpg"
-                                        />
+                                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                            {socialDefaults.image_source ? (
+                                                <div style={{ position: 'relative', width: '120px', height: '63px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                                    <img
+                                                        src={socialDefaults.image_source}
+                                                        alt="Social fallback"
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSocialDefaults({ ...socialDefaults, image_source: '' })}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '4px',
+                                                            right: '4px',
+                                                            width: '20px',
+                                                            height: '20px',
+                                                            borderRadius: '50%',
+                                                            background: 'rgba(0,0,0,0.6)',
+                                                            color: '#fff',
+                                                            border: 'none',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '14px',
+                                                            lineHeight: 1,
+                                                        }}
+                                                        title="Remove image"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div style={{ width: '120px', height: '63px', borderRadius: '4px', border: '2px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                                                    No image
+                                                </div>
+                                            )}
+                                            <button
+                                                type="button"
+                                                className="button"
+                                                onClick={() => {
+                                                    const frame = wp.media({
+                                                        title: 'Select Fallback Image',
+                                                        button: { text: 'Use Image' },
+                                                        multiple: false,
+                                                        library: { type: 'image' },
+                                                    });
+                                                    frame.on('select', () => {
+                                                        const attachment = frame.state().get('selection').first().toJSON();
+                                                        setSocialDefaults({ ...socialDefaults, image_source: attachment.url });
+                                                    });
+                                                    frame.open();
+                                                }}
+                                            >
+                                                {socialDefaults.image_source ? 'Change Image' : 'Select Image'}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 

@@ -298,8 +298,9 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: @spacing-sm;
-    height: 100px;
+    gap: 6px;
+    height: 80px;
+    padding: @spacing-sm 0;
 }
 
 .spark-bar-wrapper {
@@ -312,22 +313,33 @@
 
     span:first-child {
         width: 100%;
-        max-width: 28px;
-        background: linear-gradient(to top, @color-primary, @color-primary-hover);
-        border-radius: @radius-sm @radius-sm 0 0;
+        max-width: 24px;
+        min-height: 4px;
+        background: linear-gradient(180deg, #60a5fa 0%, @color-primary 100%);
+        border-radius: 4px 4px 2px 2px;
         margin-top: auto;
-        transition: height @transition-normal, background @transition-fast;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(34, 113, 177, 0.2);
     }
 
     &:hover span:first-child {
-        background: linear-gradient(to top, @color-primary-hover, darken(@color-primary-hover, 5%));
+        background: linear-gradient(180deg, #3b82f6 0%, @color-primary-hover 100%);
+        box-shadow: 0 4px 8px rgba(34, 113, 177, 0.3);
+        transform: scaleY(1.05);
+        transform-origin: bottom;
     }
 
     .spark-label {
-        font-size: @font-size-xs;
-        color: @color-muted;
-        margin-top: @spacing-xs;
+        display: inline-block;
+        background: none;
+        border-radius: 0;
+        box-shadow: none;
+        font-size: 11px;
+        font-weight: 600;
+        color: @color-text;
+        margin-top: 8px;
         text-align: center;
+        letter-spacing: 0.01em;
     }
 }
 

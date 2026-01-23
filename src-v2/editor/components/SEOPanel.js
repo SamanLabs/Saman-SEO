@@ -595,15 +595,56 @@ const SEOPanel = ({
                     {/* OG Image */}
                     <div className="saman-seo-field">
                         <div className="saman-seo-field-header">
-                            <label>Social Image URL</label>
+                            <label>Social Image</label>
                         </div>
-                        <input
-                            type="url"
-                            className="saman-seo-field-input"
-                            value={seoMeta.og_image || ''}
-                            onChange={(e) => updateMeta('og_image', e.target.value)}
-                            placeholder="https://..."
-                        />
+                        <div className="saman-seo-image-picker">
+                            {seoMeta.og_image ? (
+                                <div className="saman-seo-image-preview">
+                                    <img src={seoMeta.og_image} alt="" />
+                                    <button
+                                        type="button"
+                                        className="saman-seo-image-remove"
+                                        onClick={() => updateMeta('og_image', '')}
+                                        aria-label="Remove image"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="saman-seo-image-placeholder">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                        <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                                        <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
+                                    </svg>
+                                    <span>No image</span>
+                                </div>
+                            )}
+                        </div>
+                        <Button
+                            variant="secondary"
+                            className="saman-seo-media-button"
+                            onClick={() => {
+                                const frame = wp.media({
+                                    title: 'Select Social Image',
+                                    button: { text: 'Use Image' },
+                                    multiple: false,
+                                    library: { type: 'image' },
+                                });
+                                frame.on('select', () => {
+                                    const attachment = frame.state().get('selection').first().toJSON();
+                                    updateMeta('og_image', attachment.url);
+                                });
+                                frame.open();
+                            }}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ marginRight: '6px' }}>
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                                <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            {seoMeta.og_image ? 'Change Image' : 'Select Image'}
+                        </Button>
                         <p className="saman-seo-field-help">1200x630 recommended. Leave empty to use featured image.</p>
                         {!seoMeta.og_image && featuredImage && (
                             <p className="saman-seo-field-note">
@@ -611,31 +652,6 @@ const SEOPanel = ({
                             </p>
                         )}
                     </div>
-
-                    {/* Media Library Button */}
-                    <Button
-                        variant="secondary"
-                        className="saman-seo-media-button"
-                        onClick={() => {
-                            const frame = wp.media({
-                                title: 'Select Social Image',
-                                button: { text: 'Use Image' },
-                                multiple: false,
-                            });
-                            frame.on('select', () => {
-                                const attachment = frame.state().get('selection').first().toJSON();
-                                updateMeta('og_image', attachment.url);
-                            });
-                            frame.open();
-                        }}
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ marginRight: '6px' }}>
-                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-                            <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
-                        </svg>
-                        Select Image
-                    </Button>
                 </div>
             )}
 
