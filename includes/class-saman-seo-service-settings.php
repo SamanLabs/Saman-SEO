@@ -152,6 +152,9 @@ class Settings {
 		register_setting( $group, 'SAMAN_SEO_post_type_social_defaults', [ $this, 'sanitize_post_type_social_defaults' ] );
 		register_setting( $group, 'SAMAN_SEO_social_card_design', [ $this, 'sanitize_social_card_design' ] );
 
+		// Editor sidebar customization
+		register_setting( $group, 'SAMAN_SEO_sidebar_logo', 'esc_url_raw' );
+
 		// AI prompt customization (model selection and API keys handled by Saman Labs AI)
 		register_setting( 'SAMAN_SEO_ai_tuning', 'SAMAN_SEO_ai_prompt_system', 'sanitize_textarea_field' );
 		register_setting( 'SAMAN_SEO_ai_tuning', 'SAMAN_SEO_ai_prompt_title', 'sanitize_textarea_field' );
@@ -901,14 +904,14 @@ class Settings {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'dist/css/admin.css',
+			SAMAN_SEO_URL . 'build/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'dist/css/plugin.css',
+			SAMAN_SEO_URL . 'build/css/plugin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
@@ -936,14 +939,14 @@ class Settings {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'dist/css/admin.css',
+			SAMAN_SEO_URL . 'build/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'dist/css/plugin.css',
+			SAMAN_SEO_URL . 'build/css/plugin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);

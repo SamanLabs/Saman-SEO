@@ -1,8 +1,8 @@
 # Dependencies
 /node_modules
 
-# Generated/Build output (all created by npm run build)
-/dist
+# Build output (all created by npm run build)
+# Contains: css/, v2/, editor/, admin-list/
 /build
 /src-v2/index.css
 

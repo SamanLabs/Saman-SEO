@@ -21,6 +21,7 @@ const defaultSettings = {
     organization_name: '',
     organization_logo: '',
     person_name: '',
+    sidebar_logo: '',
     // Webmaster tools
     google_verification: '',
     bing_verification: '',
@@ -404,6 +405,32 @@ const GeneralTab = ({ settings, updateSetting }) => {
                         <div className="settings-control">
                             <input id="yandex-verify" type="text" value={settings.yandex_verification} onChange={(e) => updateSetting('yandex_verification', e.target.value)} placeholder="abc123..." />
                         </div>
+                    </div>
+                </section>
+
+                <section className="panel">
+                    <h3>Editor Sidebar</h3>
+                    <p className="panel-desc">Customize how Saman SEO appears in the block editor.</p>
+
+                    <div className="settings-row">
+                        <div className="settings-label">
+                            <label htmlFor="sidebar-logo">Custom Logo</label>
+                            <p className="settings-help">Optional. Replace "SEO" text with your own logo. Recommended: 20x20px.</p>
+                        </div>
+                        <div className="settings-control">
+                            <input id="sidebar-logo" type="url" value={settings.sidebar_logo} onChange={(e) => updateSetting('sidebar_logo', e.target.value)} placeholder="https://example.com/icon.png" />
+                            {settings.sidebar_logo && (
+                                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ fontSize: '12px', color: '#757575' }}>Preview:</span>
+                                    <img src={settings.sidebar_logo} alt="Logo preview" style={{ width: '20px', height: '20px', objectFit: 'contain', border: '1px solid #e0e0e0', borderRadius: '3px', padding: '2px' }} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="settings-info-box">
+                        <strong>Default Appearance</strong>
+                        <p>Leave empty to show "SEO" text in the editor sidebar button.</p>
                     </div>
                 </section>
             </div>

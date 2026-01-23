@@ -271,7 +271,7 @@ class Admin_UI {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'dist/css/admin.css',
+			SAMAN_SEO_URL . 'build/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
@@ -411,21 +411,22 @@ class Admin_UI {
 		// Localize data for the React editor
 		wp_localize_script(
 			'saman-seo-editor-v2',
-			'saman-seoEditor',
+			'SamanSEOEditor',
 			[
-				'variables'  => $variables,
-				'aiEnabled'  => $ai_enabled,
-				'aiProvider' => $ai_provider, // 'Saman-ai', 'native', or 'none'
-				'aiPilot'    => [
+				'variables'   => $variables,
+				'aiEnabled'   => $ai_enabled,
+				'aiProvider'  => $ai_provider, // 'Saman-ai', 'native', or 'none'
+				'aiPilot'     => [
 					'installed'   => $ai_status['installed'],
 					'active'      => $ai_status['active'],
 					'ready'       => $ai_status['ready'],
 					'version'     => $ai_status['version'] ?? null,
 					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
 				],
-				'siteTitle'  => get_bloginfo( 'name' ),
-				'tagline'    => get_bloginfo( 'description' ),
-				'separator'  => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'siteTitle'   => get_bloginfo( 'name' ),
+				'tagline'     => get_bloginfo( 'description' ),
+				'separator'   => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'sidebarLogo' => get_option( 'SAMAN_SEO_sidebar_logo', '' ),
 			]
 		);
 
