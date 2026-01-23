@@ -77,10 +77,11 @@ Plans:
   2. Business hours from Local SEO settings appear as OpeningHoursSpecification
   3. Location coordinates appear as GeoCoordinates in schema
   4. Existing Local SEO settings (address, phone, email) populate LocalBusiness fields without re-entry
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md - LocalBusiness_Schema class with Schema_IDs method
+- [ ] 04-02-PLAN.md - Registry integration and legacy filter removal
 
 ### Phase 5: Admin UI
 **Goal**: Users can configure and preview schemas through the WordPress admin
@@ -125,10 +126,10 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 | 1. Schema Engine Foundation | 3/3 | Complete | 2026-01-23 |
 | 2. Content Schemas | 2/2 | Complete | 2026-01-23 |
 | 3. Interactive Schemas | 2/2 | Complete | 2026-01-23 |
-| 4. LocalBusiness Schema | 0/? | Not started | - |
+| 4. LocalBusiness Schema | 0/2 | Planned | - |
 | 5. Admin UI | 0/? | Not started | - |
 | 6. Developer API | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 3 complete (verified)*
+*Last updated: 2026-01-23 - Phase 4 planned (2 plans)*
