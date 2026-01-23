@@ -20,10 +20,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **FAQ-02**: Integration with existing FAQ Gutenberg block to auto-generate schema
 - [x] **HOW-01**: HowTo schema type with step, tool, supply, totalTime properties
 - [x] **HOW-02**: Integration with existing HowTo Gutenberg block to auto-generate schema
-- [ ] **LOC-01**: LocalBusiness schema type with full property support
-- [ ] **LOC-02**: OpeningHoursSpecification for business hours
-- [ ] **LOC-03**: GeoCoordinates for location data
-- [ ] **LOC-04**: Integration with existing Local SEO settings as data source
+- [x] **LOC-01**: LocalBusiness schema type with full property support
+- [x] **LOC-02**: OpeningHoursSpecification for business hours
+- [x] **LOC-03**: GeoCoordinates for location data
+- [x] **LOC-04**: Integration with existing Local SEO settings as data source
 
 ### Content Schema Types
 
@@ -43,11 +43,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Developer API
 
-- [ ] **DEV-01**: `saman_seo_register_schema_type` action for registering custom types
-- [ ] **DEV-02**: `saman_seo_schema_{type}_fields` filter for modifying schema fields
-- [ ] **DEV-03**: `saman_seo_schema_{type}_output` filter for modifying final output
-- [ ] **DEV-04**: `saman_seo_schema_types` filter for filtering available types
-- [ ] **DEV-05**: Documentation for extending schema system
+- [x] **DEV-01**: `saman_seo_register_schema_type` action for registering custom types
+- [x] **DEV-02**: `saman_seo_schema_{type}_fields` filter for modifying schema fields
+- [x] **DEV-03**: `saman_seo_schema_{type}_output` filter for modifying final output
+- [x] **DEV-04**: `saman_seo_schema_types` filter for filtering available types
+- [x] **DEV-05**: Documentation for extending schema system
 
 ## v2 Requirements
 
@@ -97,10 +97,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FAQ-02 | Phase 3 | Complete |
 | HOW-01 | Phase 3 | Complete |
 | HOW-02 | Phase 3 | Complete |
-| LOC-01 | Phase 4 | Pending |
-| LOC-02 | Phase 4 | Pending |
-| LOC-03 | Phase 4 | Pending |
-| LOC-04 | Phase 4 | Pending |
+| LOC-01 | Phase 4 | Complete |
+| LOC-02 | Phase 4 | Complete |
+| LOC-03 | Phase 4 | Complete |
+| LOC-04 | Phase 4 | Complete |
 | ART-01 | Phase 2 | Complete |
 | ART-02 | Phase 2 | Complete |
 | ART-03 | Phase 2 | Complete |
@@ -111,11 +111,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-03 | Phase 5 | Complete |
 | UI-04 | Phase 5 | Complete |
 | UI-05 | Phase 5 | Complete |
-| DEV-01 | Phase 6 | Pending |
-| DEV-02 | Phase 6 | Pending |
-| DEV-03 | Phase 6 | Pending |
-| DEV-04 | Phase 6 | Pending |
-| DEV-05 | Phase 6 | Pending |
+| DEV-01 | Phase 6 | Complete |
+| DEV-02 | Phase 6 | Complete |
+| DEV-03 | Phase 6 | Complete |
+| DEV-04 | Phase 6 | Complete |
+| DEV-05 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 27 total
@@ -124,4 +124,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 3 requirements complete (FAQ-01, FAQ-02, HOW-01, HOW-02)*
+*Last updated: 2026-01-23 - All v1 requirements complete (27/27)*
