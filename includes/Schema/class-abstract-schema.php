@@ -97,4 +97,39 @@ abstract class Abstract_Schema {
 
 		return $this->context->canonical . '#' . strtolower( $type );
 	}
+
+	/**
+	 * Apply the fields filter to allow modification of schema data.
+	 *
+	 * Call this method in generate() after building the base schema array
+	 * but before returning. Allows developers to add or modify fields.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $data The schema data array to filter.
+	 * @return array The filtered schema data.
+	 */
+	protected function apply_fields_filter( array $data ): array {
+		$type = $this->get_type();
+
+		// Handle array types (use first element for filter name).
+		if ( is_array( $type ) ) {
+			$type = reset( $type );
+		}
+
+		$slug = strtolower( $type );
+
+		/**
+		 * Filters the schema fields before final output.
+		 *
+		 * Allows modification of the schema data array before it's added
+		 * to the graph. Use this to add custom fields or modify existing ones.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array          $data    The schema data array.
+		 * @param Schema_Context $context The current schema context.
+		 */
+		return apply_filters( "saman_seo_schema_{$slug}_fields", $data, $this->context );
+	}
 }
