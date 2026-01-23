@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** Phase 4 - LocalBusiness Schema COMPLETE (verified)
+**Current focus:** Phase 5 - Admin UI (in progress)
 
 ## Current Position
 
-Phase: 4 of 6 (LocalBusiness Schema) COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase complete, verified (4/4 must-haves)
-Last activity: 2026-01-23 - Phase 4 verified
+Phase: 5 of 6 (Admin UI)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-23 - Completed 05-01-PLAN.md
 
-Progress: [#######...] ~70%
+Progress: [########..] ~77%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 3 min
-- Total execution time: 24 min
+- Total execution time: 26 min
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [#######...] ~70%
 | 02-content-schemas | 2 | 5 min | 2.5 min |
 | 03-interactive-schemas | 2 | 6 min | 3 min |
 | 04-localbusiness-schema | 2 | 4 min | 2 min |
+| 05-admin-ui | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (3 min), 03-01 (3 min), 03-02 (3 min), 04-01 (2 min), 04-02 (2 min)
+- Last 5 plans: 03-01 (3 min), 03-02 (3 min), 04-01 (2 min), 04-02 (2 min), 05-01 (2 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -72,6 +73,7 @@ Recent decisions affecting current work:
 - Opening hours grouped by identical times for compact output
 - LocalBusiness priority 5 positions it after Organization (subtype relationship) and before WebPage
 - Legacy filters commented out (not deleted) when migrating to Schema Registry
+- Schema_Preview_Controller uses edit_post permission (not manage_options) for editor access
 
 ### Pending Todos
 
@@ -84,6 +86,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Phase 4 complete and verified
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
-Next action: /gsd:discuss-phase 5 or /gsd:plan-phase 5
+Next action: Execute 05-02-PLAN.md (Editor Sidebar UI)
