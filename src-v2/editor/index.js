@@ -1,12 +1,12 @@
 /**
  * Saman SEO V2 - Gutenberg Editor Modal
  *
- * Registers a toolbar button that opens an SEO settings modal in the block editor.
+ * Registers a menu item that opens an SEO settings modal in the block editor.
  */
 
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginBlockEditorToolbarItem } from '@wordpress/edit-post';
-import { Modal, Button } from '@wordpress/components';
+import { PluginMoreMenuItem } from '@wordpress/edit-post';
+import { Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -203,15 +203,12 @@ const SEOModal = () => {
 
     return (
         <>
-            <PluginBlockEditorToolbarItem>
-                <Button
-                    className="saman-seo-toolbar-btn"
-                    onClick={() => setIsOpen(true)}
-                    icon={<PluginIcon />}
-                >
-                    SEO
-                </Button>
-            </PluginBlockEditorToolbarItem>
+            <PluginMoreMenuItem
+                icon={<PluginIcon />}
+                onClick={() => setIsOpen(true)}
+            >
+                SEO Settings
+            </PluginMoreMenuItem>
             {isOpen && (
                 <Modal
                     title="Saman SEO"
