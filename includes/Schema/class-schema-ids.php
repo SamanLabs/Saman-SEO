@@ -109,4 +109,13 @@ class Schema_IDs {
 	public static function howto( string $url ): string {
 		return $url . '#howto';
 	}
+
+	/**
+	 * Get the LocalBusiness schema @id.
+	 *
+	 * @return string URL#localbusiness identifier.
+	 */
+	public static function localbusiness(): string {
+		return home_url( '/' ) . '#localbusiness';
+	}
 }
