@@ -126,7 +126,7 @@ class Sitemap_Settings {
 		// Enqueue new modern plugin styles
 		wp_enqueue_style(
 			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'assets/css/plugin.css',
+			SAMAN_SEO_URL . 'build/css/plugin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);

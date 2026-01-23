@@ -26,12 +26,12 @@ class SearchAppearance_Controller extends REST_Controller {
         '-'  => 'Dash (-)',
         '|'  => 'Pipe (|)',
         '~'  => 'Tilde (~)',
-        'ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢'  => 'Bullet (ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢)',
-        'Ãƒâ€šÃ‚Â»'  => 'Double Arrow (Ãƒâ€šÃ‚Â»)',
+        '•'  => 'Bullet (•)',
+        '»'  => 'Double Arrow (»)',
         '>'  => 'Greater Than (>)',
-        'ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹'  => 'Single Guillemet (ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹)',
-        'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â'  => 'Em Dash (ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â)',
-        'Ãƒâ€šÃ‚Â·'  => 'Middle Dot (Ãƒâ€šÃ‚Â·)',
+        '›'  => 'Single Guillemet (›)',
+        '—'  => 'Em Dash (—)',
+        '·'  => 'Middle Dot (·)',
         '/'  => 'Slash (/)',
     ];
 

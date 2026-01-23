@@ -144,15 +144,15 @@ $taxonomies = get_taxonomies(
 									$current_separator = get_option( 'SAMAN_SEO_title_separator', '-' );
 									$separators = [
 										'-'  => [ 'label' => 'Hyphen', 'preview' => '-' ],
-										'Ã¢â‚¬â€œ'  => [ 'label' => 'En Dash', 'preview' => 'Ã¢â‚¬â€œ' ],
-										'Ã¢â‚¬â€'  => [ 'label' => 'Em Dash', 'preview' => 'Ã¢â‚¬â€' ],
+										'–'  => [ 'label' => 'En Dash', 'preview' => '–' ],
+										'—'  => [ 'label' => 'Em Dash', 'preview' => '—' ],
 										'|'  => [ 'label' => 'Pipe', 'preview' => '|' ],
 										'/'  => [ 'label' => 'Slash', 'preview' => '/' ],
-										'Ã‚Â»'  => [ 'label' => 'Guillemet', 'preview' => 'Ã‚Â»' ],
-										'Ã¢â‚¬Âº'  => [ 'label' => 'Angle', 'preview' => 'Ã¢â‚¬Âº' ],
-										'Ã‚Â·'  => [ 'label' => 'Dot', 'preview' => 'Ã‚Â·' ],
-										'Ã¢â‚¬Â¢'  => [ 'label' => 'Bullet', 'preview' => 'Ã¢â‚¬Â¢' ],
-										'Ã¢â€ â€™'  => [ 'label' => 'Arrow', 'preview' => 'Ã¢â€ â€™' ],
+										'»'  => [ 'label' => 'Guillemet', 'preview' => '»' ],
+										'›'  => [ 'label' => 'Angle', 'preview' => '›' ],
+										'·'  => [ 'label' => 'Dot', 'preview' => '·' ],
+										'•'  => [ 'label' => 'Bullet', 'preview' => '•' ],
+										'→'  => [ 'label' => 'Arrow', 'preview' => '→' ],
 									];
 									?>
 									<div class="saman-seo-separator-selector" data-component="separator-selector">

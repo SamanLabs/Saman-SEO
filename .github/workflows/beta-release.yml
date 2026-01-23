@@ -105,6 +105,9 @@ jobs:
           cp readme.txt saman-seo/ 2>/dev/null || true
           cp LICENSE saman-seo/ 2>/dev/null || true
 
+          # Remove source/dev files from assets (LESS sources)
+          rm -rf saman-seo/assets/less 2>/dev/null || true
+
           # Remove any dev/config files that might have snuck in
           find saman-seo -name "*.md" ! -name "readme.txt" -type f -delete 2>/dev/null || true
           find saman-seo -name ".git*" -delete 2>/dev/null || true

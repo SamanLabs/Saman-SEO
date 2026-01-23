@@ -3,7 +3,7 @@
  */
 
 /* Badge container */
-.samanseo-list-badge {
+.saman-seo-list-badge {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -11,19 +11,19 @@
 }
 
 /* Ring container */
-.samanseo-badge-ring {
+.saman-seo-badge-ring {
     position: relative;
     width: 44px;
     height: 44px;
     flex-shrink: 0;
 }
 
-.samanseo-badge-ring svg {
+.saman-seo-badge-ring svg {
     display: block;
 }
 
 /* Score number in center */
-.samanseo-badge-score {
+.saman-seo-badge-score {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -35,7 +35,7 @@
 }
 
 /* Info section */
-.samanseo-badge-info {
+.saman-seo-badge-info {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -44,7 +44,7 @@
 }
 
 /* Label (Good, Fair, Needs Work) */
-.samanseo-badge-label {
+.saman-seo-badge-label {
     font-size: 12px;
     font-weight: 600;
     line-height: 1.3;
@@ -54,23 +54,23 @@
     width: fit-content;
 }
 
-.samanseo-badge-label.samanseo-badge--good {
+.saman-seo-badge-label.saman-seo-badge--good {
     background: #dcfce7;
     color: #166534;
 }
 
-.samanseo-badge-label.samanseo-badge--fair {
+.saman-seo-badge-label.saman-seo-badge--fair {
     background: #fef9c3;
     color: #92400e;
 }
 
-.samanseo-badge-label.samanseo-badge--poor {
+.saman-seo-badge-label.saman-seo-badge--poor {
     background: #fee2e2;
     color: #991b1b;
 }
 
 /* Issues summary */
-.samanseo-badge-issues {
+.saman-seo-badge-issues {
     font-size: 11px;
     color: #6b7280;
     line-height: 1.4;
@@ -81,7 +81,7 @@
 }
 
 /* Flags (noindex, nofollow) */
-.samanseo-badge-flags {
+.saman-seo-badge-flags {
     font-size: 10px;
     font-weight: 500;
     color: #dc2626;
@@ -95,23 +95,23 @@
 }
 
 /* Placeholder loading state */
-.samanseo-badge-placeholder:not(.samanseo-badge-initialized) {
+.saman-seo-badge-placeholder:not(.saman-seo-badge-initialized) {
     min-height: 44px;
     display: flex;
     align-items: center;
 }
 
-.samanseo-badge-placeholder:not(.samanseo-badge-initialized)::before {
+.saman-seo-badge-placeholder:not(.saman-seo-badge-initialized)::before {
     content: '';
     width: 44px;
     height: 44px;
     border-radius: 50%;
     background: linear-gradient(90deg, #f0f0f1 25%, #e8e8e9 50%, #f0f0f1 75%);
     background-size: 200% 100%;
-    animation: samanseo-shimmer 1.5s infinite;
+    animation: saman-seo-shimmer 1.5s infinite;
 }
 
-@keyframes samanseo-shimmer {
+@keyframes saman-seo-shimmer {
     0% {
         background-position: 200% 0;
     }
@@ -121,18 +121,18 @@
 }
 
 /* Column width adjustment */
-.column-samanseo {
+.column-saman-seo {
     width: 180px;
 }
 
 /* Responsive adjustments */
 @media screen and (max-width: 782px) {
-    .samanseo-list-badge {
+    .saman-seo-list-badge {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .samanseo-badge-issues {
+    .saman-seo-badge-issues {
         max-width: 100%;
     }
 }

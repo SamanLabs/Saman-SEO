@@ -271,10 +271,15 @@ class Admin_UI {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/css/admin.css',
+			SAMAN_SEO_URL . 'build/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
+
+		// Enqueue WordPress media library for settings pages that need image pickers.
+		if ( false !== strpos( $hook, 'saman-seo' ) ) {
+			wp_enqueue_media();
+		}
 
 		wp_enqueue_script(
 			'saman-seo-admin',
@@ -314,7 +319,7 @@ class Admin_UI {
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
 					'strings' => [
 						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-seo' ),
-						'running'  => __( 'Asking AI for ideasÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦', 'saman-seo' ),
+						'running'  => __( 'Asking AI for ideas…', 'saman-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-seo' ),
 					],
@@ -406,21 +411,22 @@ class Admin_UI {
 		// Localize data for the React editor
 		wp_localize_script(
 			'saman-seo-editor-v2',
-			'saman-seoEditor',
+			'SamanSEOEditor',
 			[
-				'variables'  => $variables,
-				'aiEnabled'  => $ai_enabled,
-				'aiProvider' => $ai_provider, // 'Saman-ai', 'native', or 'none'
-				'aiPilot'    => [
+				'variables'   => $variables,
+				'aiEnabled'   => $ai_enabled,
+				'aiProvider'  => $ai_provider, // 'Saman-ai', 'native', or 'none'
+				'aiPilot'     => [
 					'installed'   => $ai_status['installed'],
 					'active'      => $ai_status['active'],
 					'ready'       => $ai_status['ready'],
 					'version'     => $ai_status['version'] ?? null,
 					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
 				],
-				'siteTitle'  => get_bloginfo( 'name' ),
-				'tagline'    => get_bloginfo( 'description' ),
-				'separator'  => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'siteTitle'   => get_bloginfo( 'name' ),
+				'tagline'     => get_bloginfo( 'description' ),
+				'separator'   => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'sidebarLogo' => get_option( 'SAMAN_SEO_sidebar_logo', '' ),
 			]
 		);
 
@@ -465,7 +471,7 @@ class Admin_UI {
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
 					'strings' => [
 						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-seo' ),
-						'running'  => __( 'Asking AI for ideasÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦', 'saman-seo' ),
+						'running'  => __( 'Asking AI for ideas…', 'saman-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-seo' ),
 					],

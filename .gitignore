@@ -1,9 +1,24 @@
+# Dependencies
 /node_modules
+
+# Build output (all created by npm run build)
+# Contains: css/, v2/, editor/, admin-list/
+/build
+/src-v2/index.css
+
+# Dev/planning files
 ARCHITECTURE.md
 SEARCH-APPEARANCE-UPDATE.md
+BUGFIXES.md
 .claude*
-/WP-Security-Pilot-main
 tmpclaude-*
 .planning_old
+
+# OS/IDE files
 nul
-/build
+.DS_Store
+.vscode
+*.log
+
+# Legacy/temp
+/WP-Security-Pilot-main

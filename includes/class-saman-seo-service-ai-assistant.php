@@ -53,7 +53,7 @@ class AI_Assistant {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/css/admin.css',
+			SAMAN_SEO_URL . 'build/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);

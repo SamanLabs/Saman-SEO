@@ -49,10 +49,52 @@
 	gap: 24px;
 }
 
-.saman-seo-media-field {
+// Media Picker Styles
+.saman-seo-media-field,
+.saman-seo-media-upload {
 	display: flex;
 	gap: 8px;
-	align-items: center;
+	align-items: flex-start;
+	flex-wrap: wrap;
+
+	input[type="url"],
+	input[type="text"] {
+		flex: 1;
+		min-width: 200px;
+	}
+}
+
+.saman-seo-media-preview {
+	width: 100%;
+	max-width: 200px;
+	margin-top: 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	overflow: hidden;
+	background: #f6f7f7;
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+}
+
+.saman-seo-media-upload-btn,
+.saman-seo-media-trigger {
+	flex-shrink: 0;
+}
+
+.saman-seo-media-remove-btn {
+	flex-shrink: 0;
+	color: #b32d2e;
+	border-color: #b32d2e;
+
+	&:hover {
+		background: #b32d2e;
+		color: #fff;
+		border-color: #b32d2e;
+	}
 }
 
 .saman-seo-fields input[type='text'],
