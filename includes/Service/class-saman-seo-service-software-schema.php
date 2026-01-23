@@ -31,8 +31,8 @@ class Software_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_software_schema_to_graph( $graph, $post ) {
-		// This is just a placeholder for the logic to identify a software post.
-		if ( 'software' !== get_post_type( $post->ID ) ) {
+		
+		if ( ! $post || 'software' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 

@@ -31,8 +31,8 @@ class Book_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_book_schema_to_graph( $graph, $post ) {
-		// This is just a placeholder for the logic to identify a book post.
-		if ( 'book' !== get_post_type( $post->ID ) ) {
+		
+		if ( ! $post || 'book' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 

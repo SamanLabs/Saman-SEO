@@ -510,6 +510,7 @@
     border-radius: 4px;
     background: #fff;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    overflow: hidden;
 }
 
 .saman-seo-template-input.is-focused .saman-seo-template-input__container {
@@ -536,6 +537,8 @@
 .saman-seo-template-input__highlight.multiline {
     padding-right: 10px;
     padding-top: 8px;
+    max-height: 120px;
+    overflow: hidden;
 }
 
 .saman-seo-template-input__field {
@@ -555,7 +558,10 @@
 
 .saman-seo-template-input__field.multiline {
     min-height: 72px;
+    max-height: 120px;
     padding-right: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .saman-seo-template-input__placeholder {
