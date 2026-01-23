@@ -62,11 +62,11 @@ Plans:
   2. Adding FAQ block to post automatically generates FAQPage schema from block content
   3. HowTo schema outputs with step, tool, supply, and totalTime properties
   4. Adding HowTo block to post automatically generates HowTo schema from block content
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md - FAQPage schema with block parsing and registry integration
+- [ ] 03-02-PLAN.md - HowTo schema with block parsing and registry integration
 
 ### Phase 4: LocalBusiness Schema
 **Goal**: LocalBusiness schema pulls from existing Local SEO settings automatically
@@ -124,11 +124,11 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 |-------|----------------|--------|-----------|
 | 1. Schema Engine Foundation | 3/3 | Complete | 2026-01-23 |
 | 2. Content Schemas | 2/2 | Complete | 2026-01-23 |
-| 3. Interactive Schemas | 0/? | Not started | - |
+| 3. Interactive Schemas | 0/2 | Planned | - |
 | 4. LocalBusiness Schema | 0/? | Not started | - |
 | 5. Admin UI | 0/? | Not started | - |
 | 6. Developer API | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 2 complete (backend, UI in Phase 5)*
+*Last updated: 2026-01-23 - Phase 3 planned (2 plans in 2 waves)*
