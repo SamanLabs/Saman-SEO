@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 1 of 6 (Schema Engine Foundation)
-Plan: 2 of ? in current phase
+Plan: 3 of ? in current phase
 Status: In progress
-Last activity: 2026-01-23 - Completed 01-02-PLAN.md
+Last activity: 2026-01-23 - Completed 01-03-PLAN.md
 
-Progress: [##........] ~10%
+Progress: [###.......] ~15%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 2 min
-- Total execution time: 4 min
+- Total plans completed: 3
+- Average duration: 3 min
+- Total execution time: 9 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-schema-engine-foundation | 2 | 4 min | 2 min |
+| 01-schema-engine-foundation | 3 | 9 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 01-02 (2 min)
+- Last 5 plans: 01-01 (2 min), 01-02 (2 min), 01-03 (5 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 - Graph_Manager receives registry via constructor injection for testability
 - Legacy SAMAN_SEO_jsonld_graph filter maintained for backward compatibility
 - @context added ONLY in Graph_Manager root, never in individual pieces
+- Legacy JsonLD methods marked @deprecated but kept for third-party compatibility
+- Priority ordering: WebSite(1), Org/Person(2), WebPage(10), Breadcrumb(20)
+- Schema Types in includes/Schema/Types/ with Saman\SEO\Schema\Types namespace
 
 ### Pending Todos
 
@@ -60,6 +63,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23T18:22:00Z
-Stopped at: Completed 01-02-PLAN.md (Schema Registry and Graph Manager)
+Last session: 2026-01-23T18:28:00Z
+Stopped at: Completed 01-03-PLAN.md (Core Schema Types Migration)
 Resume file: None
