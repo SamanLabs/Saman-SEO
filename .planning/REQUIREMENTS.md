@@ -27,11 +27,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Content Schema Types
 
-- [ ] **ART-01**: Article schema with full author Person schema
-- [ ] **ART-02**: Article schema with wordCount and articleBody excerpt
-- [ ] **ART-03**: BlogPosting schema type extending Article
-- [ ] **ART-04**: NewsArticle schema type with dateline and print section
-- [ ] **ART-05**: Automatic schema type selection based on post type settings
+- [x] **ART-01**: Article schema with full author Person schema
+- [x] **ART-02**: Article schema with wordCount and articleBody excerpt
+- [x] **ART-03**: BlogPosting schema type extending Article
+- [x] **ART-04**: NewsArticle schema type with dateline and print section
+- [x] **ART-05**: Automatic schema type selection based on post type settings
 
 ### Admin UI
 
@@ -101,11 +101,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOC-02 | Phase 4 | Pending |
 | LOC-03 | Phase 4 | Pending |
 | LOC-04 | Phase 4 | Pending |
-| ART-01 | Phase 2 | Pending |
-| ART-02 | Phase 2 | Pending |
-| ART-03 | Phase 2 | Pending |
-| ART-04 | Phase 2 | Pending |
-| ART-05 | Phase 2 | Pending |
+| ART-01 | Phase 2 | Complete |
+| ART-02 | Phase 2 | Complete |
+| ART-03 | Phase 2 | Complete |
+| ART-04 | Phase 2 | Complete |
+| ART-05 | Phase 2 | Complete |
 | UI-01 | Phase 5 | Pending |
 | UI-02 | Phase 5 | Pending |
 | UI-03 | Phase 5 | Pending |
@@ -124,4 +124,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 1 requirements complete (ENG-01 through ENG-04)*
+*Last updated: 2026-01-23 - Phase 2 requirements complete (ART-01 through ART-05)*

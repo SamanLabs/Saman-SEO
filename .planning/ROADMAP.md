@@ -13,7 +13,7 @@ This roadmap transforms the Saman SEO plugin's hardcoded JSON-LD implementation 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Schema Engine Foundation** - Registry, base class, graph manager, migration
-- [ ] **Phase 2: Content Schemas** - Article, BlogPosting, NewsArticle with full properties
+- [x] **Phase 2: Content Schemas** - Article, BlogPosting, NewsArticle with full properties
 - [ ] **Phase 3: Interactive Schemas** - FAQ and HowTo with Gutenberg block integration
 - [ ] **Phase 4: LocalBusiness Schema** - Full LocalBusiness with Local SEO integration
 - [ ] **Phase 5: Admin UI** - Post type defaults, editor sidebar, live preview
@@ -50,8 +50,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md - Article_Schema base class with author Person, wordCount, articleBody
-- [ ] 02-02-PLAN.md - BlogPosting and NewsArticle extensions + registry
+- [x] 02-01-PLAN.md - Article_Schema base class with author Person, wordCount, articleBody
+- [x] 02-02-PLAN.md - BlogPosting and NewsArticle extensions + registry
 
 ### Phase 3: Interactive Schemas
 **Goal**: FAQ and HowTo blocks generate valid, complete schemas automatically
@@ -123,7 +123,7 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Schema Engine Foundation | 3/3 | Complete | 2026-01-23 |
-| 2. Content Schemas | 0/2 | Planned | - |
+| 2. Content Schemas | 2/2 | Complete | 2026-01-23 |
 | 3. Interactive Schemas | 0/? | Not started | - |
 | 4. LocalBusiness Schema | 0/? | Not started | - |
 | 5. Admin UI | 0/? | Not started | - |
@@ -131,4 +131,4 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 2 planned*
+*Last updated: 2026-01-23 - Phase 2 complete (backend, UI in Phase 5)*
