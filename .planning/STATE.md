@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 5 of 6 (Admin UI)
-Plan: 3 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-23 - Completed 05-03-PLAN.md
+Last activity: 2026-01-23 - Completed 05-02-PLAN.md
 
-Progress: [########..] ~85%
+Progress: [########..] ~92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 11
 - Average duration: 3 min
-- Total execution time: 32 min
+- Total execution time: 37 min
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [########..] ~85%
 | 02-content-schemas | 2 | 5 min | 2.5 min |
 | 03-interactive-schemas | 2 | 6 min | 3 min |
 | 04-localbusiness-schema | 2 | 4 min | 2 min |
-| 05-admin-ui | 3 | 8 min | 2.7 min |
+| 05-admin-ui | 2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2 min), 04-02 (2 min), 05-01 (2 min), 05-02 (3 min), 05-03 (3 min)
+- Last 5 plans: 04-01 (2 min), 04-02 (2 min), 05-01 (3 min), 05-02 (5 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -75,6 +75,8 @@ Recent decisions affecting current work:
 - Legacy filters commented out (not deleted) when migrating to Schema Registry
 - Schema_Preview_Controller uses edit_post permission (not manage_options) for editor access
 - Post type schema_type settings use SAMAN_SEO_post_type_settings option (fixed from incorrect SAMAN_SEO_post_type_seo_settings)
+- Schema preview uses 500ms debounce to avoid API spam during content editing
+- Preview refreshes on both schema_type changes and content changes (title/body)
 
 ### Pending Todos
 
@@ -87,6 +89,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 05-03-PLAN.md
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
-Next action: Phase 5 complete, verify all plans then proceed to Phase 6
+Next action: Continue to 05-03 (Schema Type Defaults UI)
