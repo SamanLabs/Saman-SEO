@@ -67,6 +67,9 @@ class Post_Meta {
 				'og_image'        => [
 					'type' => 'string',
 				],
+				'schema_type'     => [
+					'type' => 'string',
+				],
 			],
 		];
 
@@ -126,6 +129,7 @@ class Post_Meta {
 		$clean['noindex']         = ! empty( $value['noindex'] ) ? '1' : '';
 		$clean['nofollow']        = ! empty( $value['nofollow'] ) ? '1' : '';
 		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
+		$clean['schema_type']     = isset( $value['schema_type'] ) ? sanitize_text_field( $value['schema_type'] ) : '';
 
 		// Handle secondary keyphrases (max 4 additional keywords).
 		$clean['secondary_keyphrases'] = [];
@@ -170,6 +174,7 @@ class Post_Meta {
 			'noindex'     => ! empty( $_POST['SAMAN_SEO_noindex'] ) ? '1' : '',
 			'nofollow'    => ! empty( $_POST['SAMAN_SEO_nofollow'] ) ? '1' : '',
 			'og_image'    => isset( $_POST['SAMAN_SEO_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_og_image'] ) ) : '',
+			'schema_type' => isset( $_POST['SAMAN_SEO_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_schema_type'] ) ) : '',
 		];
 
 		update_post_meta( $post_id, self::META_KEY, $data );
