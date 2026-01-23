@@ -110,11 +110,11 @@ Plans:
   3. Developer can modify final output via saman_seo_schema_{type}_output filter
   4. Developer can filter available types via saman_seo_schema_types filter
   5. Documentation exists explaining how to extend the schema system
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md - Add registration action hook and fields filter
+- [ ] 06-02-PLAN.md - Create Schema Developer API documentation
 
 ## Progress
 
@@ -129,8 +129,8 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 | 3. Interactive Schemas | 2/2 | Complete | 2026-01-23 |
 | 4. LocalBusiness Schema | 2/2 | Complete | 2026-01-23 |
 | 5. Admin UI | 3/3 | Complete | 2026-01-23 |
-| 6. Developer API | 0/? | Not started | - |
+| 6. Developer API | 0/2 | Planned | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 5 complete (verified)*
+*Last updated: 2026-01-23 - Phase 6 planned (2 plans)*
