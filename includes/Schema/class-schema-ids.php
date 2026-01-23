@@ -89,4 +89,14 @@ class Schema_IDs {
 	public static function author( int $user_id ): string {
 		return get_author_posts_url( $user_id ) . '#author';
 	}
+
+	/**
+	 * Get FAQPage schema @id for a specific URL.
+	 *
+	 * @param string $url The canonical URL of the page.
+	 * @return string URL#faqpage identifier.
+	 */
+	public static function faqpage( string $url ): string {
+		return $url . '#faqpage';
+	}
 }
