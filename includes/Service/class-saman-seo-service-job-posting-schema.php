@@ -31,7 +31,7 @@ class Job_Posting_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_job_posting_schema_to_graph( $graph, $post ) {
-		// This is just a placeholder for the logic to identify a job_posting post.
+		
 		if ( 'job_posting' !== get_post_type( $post->ID ) ) {
 			return $graph;
 		}

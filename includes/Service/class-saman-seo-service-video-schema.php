@@ -37,7 +37,6 @@ class Video_Schema {
 		}
 
 		// For now, let's assume we identify a video post by a custom field or post format.
-		// This is just a placeholder for the logic to identify a video post.
 		if ( 'video' !== get_post_format( $post->ID ) ) {
 			return $graph;
 		}

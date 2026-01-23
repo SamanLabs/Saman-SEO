@@ -31,8 +31,8 @@ class Music_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_music_schema_to_graph( $graph, $post ) {
-		// This is just a placeholder for the logic to identify a music post.
-		if ( 'music' !== get_post_type( $post->ID ) ) {
+
+		if ( ! $post || 'music' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 

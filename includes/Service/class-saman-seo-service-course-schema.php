@@ -31,8 +31,8 @@ class Course_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_course_schema_to_graph( $graph, $post ) {
-		// This is just a placeholder for the logic to identify a course post.
-		if ( 'course' !== get_post_type( $post->ID ) ) {
+		
+		if ( ! $post || 'course' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 

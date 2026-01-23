@@ -31,8 +31,8 @@ class Movie_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_movie_schema_to_graph( $graph, $post ) {
-		// This is just a placeholder for the logic to identify a movie post.
-		if ( 'movie' !== get_post_type( $post->ID ) ) {
+		
+		if ( ! $post || 'movie' !== get_post_type( $post ) ) {
 			return $graph;
 		}
 
