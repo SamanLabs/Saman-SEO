@@ -16,6 +16,7 @@ use Saman\SEO\Schema\Types\Person_Schema;
 use Saman\SEO\Schema\Types\Article_Schema;
 use Saman\SEO\Schema\Types\BlogPosting_Schema;
 use Saman\SEO\Schema\Types\NewsArticle_Schema;
+use Saman\SEO\Schema\Types\FAQPage_Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -96,6 +97,16 @@ class Plugin {
 				'label'      => 'NewsArticle',
 				'post_types' => [ 'post' ],
 				'priority'   => 15,
+			]
+		);
+
+		// Interactive schemas (priority 18 - after content schemas 15, before Breadcrumb 20).
+		$registry->register(
+			'faqpage',
+			FAQPage_Schema::class,
+			[
+				'label'    => __( 'FAQ Page', 'saman-seo' ),
+				'priority' => 18,
 			]
 		);
 
