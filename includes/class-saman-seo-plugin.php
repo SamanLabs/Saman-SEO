@@ -13,6 +13,9 @@ use Saman\SEO\Schema\Types\WebPage_Schema;
 use Saman\SEO\Schema\Types\Breadcrumb_Schema;
 use Saman\SEO\Schema\Types\Organization_Schema;
 use Saman\SEO\Schema\Types\Person_Schema;
+use Saman\SEO\Schema\Types\Article_Schema;
+use Saman\SEO\Schema\Types\BlogPosting_Schema;
+use Saman\SEO\Schema\Types\NewsArticle_Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -64,6 +67,38 @@ class Plugin {
 		$registry->register( 'organization', Organization_Schema::class, [ 'priority' => 2 ] );
 		$registry->register( 'person', Person_Schema::class, [ 'priority' => 2 ] );
 		$registry->register( 'webpage', WebPage_Schema::class, [ 'priority' => 10 ] );
+
+		// Content schemas (priority 15 - after WebPage 10, before Breadcrumb 20).
+		$registry->register(
+			'article',
+			Article_Schema::class,
+			[
+				'label'      => 'Article',
+				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
+		$registry->register(
+			'blogposting',
+			BlogPosting_Schema::class,
+			[
+				'label'      => 'BlogPosting',
+				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
+		$registry->register(
+			'newsarticle',
+			NewsArticle_Schema::class,
+			[
+				'label'      => 'NewsArticle',
+				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
 		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, [ 'priority' => 20 ] );
 
 		$this->register( 'compatibility', new Service\Compatibility() );
