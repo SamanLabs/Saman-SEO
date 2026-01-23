@@ -1,17 +1,21 @@
 /**
  * Saman SEO V2 - Gutenberg Editor Modal
  *
- * Registers a menu item that opens an SEO settings modal in the block editor.
+ * Registers a pinned sidebar button that opens a modal for SEO settings.
+ * Uses PluginSidebar for the button, but intercepts to show a modal instead.
  */
 
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginMoreMenuItem } from '@wordpress/edit-post';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
 import { Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SEOPanel from './components/SEOPanel';
 import './editor.css';
+
+// Sidebar name constant
+const SIDEBAR_NAME = 'saman-seo/seo-sidebar';
 
 // Get localized data
 const editorData = window.SamanSEOEditor || {};
@@ -56,8 +60,8 @@ const PluginIcon = () => {
 /**
  * Main SEO Modal Component
  */
-const SEOModal = () => {
-    const [isOpen, setIsOpen] = useState(false);
+const SEOModalPlugin = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [seoMeta, setSeoMeta] = useState({
         title: '',
         description: '',
@@ -72,6 +76,26 @@ const SEOModal = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
     const [variableValues, setVariableValues] = useState({});
+    const wasOpenRef = useRef(false);
+
+    // Check if our sidebar is active
+    const isSidebarActive = useSelect((select) => {
+        const activeGeneralSidebar = select('core/edit-post').getActiveGeneralSidebarName();
+        return activeGeneralSidebar === SIDEBAR_NAME;
+    }, []);
+
+    // Get sidebar controls
+    const { closeGeneralSidebar } = useDispatch('core/edit-post');
+
+    // When sidebar becomes active, close it and open modal instead
+    useEffect(() => {
+        if (isSidebarActive && !wasOpenRef.current) {
+            // Sidebar was just activated - close it and open modal
+            closeGeneralSidebar();
+            setIsModalOpen(true);
+        }
+        wasOpenRef.current = isSidebarActive;
+    }, [isSidebarActive, closeGeneralSidebar]);
 
     // Get post data from editor
     const { postId, postTitle, postExcerpt, postContent, postType, postSlug, featuredImage } = useSelect((select) => {
@@ -203,16 +227,31 @@ const SEOModal = () => {
 
     return (
         <>
-            <PluginMoreMenuItem
+            {/* PluginSidebar creates the pinned icon button in the header */}
+            <PluginSidebar
+                name="seo-sidebar"
+                title="Saman SEO"
                 icon={<PluginIcon />}
-                onClick={() => setIsOpen(true)}
+            >
+                {/* Empty - we intercept and show modal instead */}
+                <div style={{ padding: '16px', textAlign: 'center', color: '#757575' }}>
+                    Opening SEO settings...
+                </div>
+            </PluginSidebar>
+
+            {/* Also add to the Options menu for discoverability */}
+            <PluginSidebarMoreMenuItem
+                target="seo-sidebar"
+                icon={<PluginIcon />}
             >
                 SEO Settings
-            </PluginMoreMenuItem>
-            {isOpen && (
+            </PluginSidebarMoreMenuItem>
+
+            {/* The actual modal with SEO content */}
+            {isModalOpen && (
                 <Modal
                     title="Saman SEO"
-                    onRequestClose={() => setIsOpen(false)}
+                    onRequestClose={() => setIsModalOpen(false)}
                     className="saman-seo-modal-wrapper"
                     isDismissible={true}
                     shouldCloseOnClickOutside={true}
@@ -245,6 +284,6 @@ const SEOModal = () => {
 
 // Register the plugin
 registerPlugin('saman-seo', {
-    render: SEOModal,
+    render: SEOModalPlugin,
     icon: <PluginIcon />,
 });
