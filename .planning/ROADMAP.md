@@ -93,11 +93,12 @@ Plans:
   3. Post editor displays live JSON-LD preview panel showing rendered schema
   4. Preview updates automatically as user edits post content
   5. REST API endpoint returns schema preview data for current post
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md - REST API endpoint and post meta schema_type persistence
+- [ ] 05-02-PLAN.md - Editor sidebar Schema tab with type selector and live preview
+- [ ] 05-03-PLAN.md - Search Appearance post type schema defaults
 
 ### Phase 6: Developer API
 **Goal**: Developers can extend the schema system with custom types and modifications
@@ -127,9 +128,9 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 | 2. Content Schemas | 2/2 | Complete | 2026-01-23 |
 | 3. Interactive Schemas | 2/2 | Complete | 2026-01-23 |
 | 4. LocalBusiness Schema | 2/2 | Complete | 2026-01-23 |
-| 5. Admin UI | 0/? | Not started | - |
+| 5. Admin UI | 0/3 | Planned | - |
 | 6. Developer API | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 - Phase 4 complete (verified)*
+*Last updated: 2026-01-23 - Phase 5 planned (3 plans)*
