@@ -12,6 +12,9 @@ import ScoreGauge from './ScoreGauge';
 import TemplateInput from './TemplateInput';
 import AiGenerateModal from './AiGenerateModal';
 import MetricsBreakdown from './MetricsBreakdown';
+import SchemaTypeSelector from './SchemaTypeSelector';
+import SchemaPreview from './SchemaPreview';
+import useSchemaPreview from '../hooks/useSchemaPreview';
 
 // Quick template presets for the editor
 const quickTemplates = [
@@ -23,6 +26,7 @@ const quickTemplates = [
 
 const SEOPanel = ({
     postId,
+    postType,
     seoMeta,
     updateMeta,
     seoScore,
@@ -51,6 +55,13 @@ const SEOPanel = ({
     const [indexingStatus, setIndexingStatus] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [indexError, setIndexError] = useState(null);
+
+    // Fetch schema preview with debounce
+    const { preview: schemaPreview, loading: schemaLoading, error: schemaError } = useSchemaPreview(
+        postId,
+        seoMeta.schema_type,
+        [postTitle, postContent]  // Refresh when content changes
+    );
 
     // Fetch indexing status
     useEffect(() => {
@@ -204,6 +215,13 @@ const SEOPanel = ({
                     onClick={() => setActiveTab('social')}
                 >
                     Social
+                </button>
+                <button
+                    type="button"
+                    className={`saman-seo-tab ${activeTab === 'schema' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('schema')}
+                >
+                    Schema
                 </button>
             </div>
 
@@ -652,6 +670,22 @@ const SEOPanel = ({
                             </p>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Schema Tab */}
+            {activeTab === 'schema' && (
+                <div className="saman-seo-tab-content">
+                    <SchemaTypeSelector
+                        value={seoMeta.schema_type || ''}
+                        onChange={(value) => updateMeta('schema_type', value)}
+                        postType={postType}
+                    />
+                    <SchemaPreview
+                        jsonLd={schemaPreview}
+                        loading={schemaLoading}
+                        error={schemaError}
+                    />
                 </div>
             )}
 

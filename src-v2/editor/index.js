@@ -64,6 +64,7 @@ const SEOSidebar = () => {
         nofollow: false,
         og_image: '',
         focus_keyphrase: '',
+        schema_type: '',
     });
     const [seoScore, setSeoScore] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -125,6 +126,7 @@ const SEOSidebar = () => {
                         nofollow: meta.nofollow === '1',
                         og_image: meta.og_image || '',
                         focus_keyphrase: meta.focus_keyphrase || '',
+                        schema_type: meta.schema_type || '',
                     });
                 }
             })
@@ -185,6 +187,7 @@ const SEOSidebar = () => {
             nofollow: newMeta.nofollow ? '1' : '',
             og_image: newMeta.og_image,
             focus_keyphrase: newMeta.focus_keyphrase,
+            schema_type: newMeta.schema_type || '',
         };
 
         editPost({ meta: { _SAMAN_SEO_meta: metaForSave } });
@@ -208,6 +211,7 @@ const SEOSidebar = () => {
             >
                 <SEOPanel
                     postId={postId}
+                    postType={postType}
                     seoMeta={seoMeta}
                     updateMeta={updateMeta}
                     seoScore={seoScore}

@@ -1964,3 +1964,65 @@
 .saman-seo-image-placeholder span {
     font-size: 12px;
 }
+
+/* ========================================
+   Schema Preview Styles
+   ======================================== */
+
+.saman-seo-schema-preview {
+    margin-top: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+.saman-seo-schema-preview--loading,
+.saman-seo-schema-preview--empty {
+    padding: 24px;
+    text-align: center;
+    color: #757575;
+}
+
+.saman-seo-schema-preview--loading .components-spinner {
+    margin-bottom: 8px;
+}
+
+.saman-seo-schema-preview--error {
+    padding: 16px;
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.saman-seo-schema-preview-error {
+    color: #b91c1c;
+}
+
+.saman-seo-schema-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fff;
+}
+
+.saman-seo-schema-preview-copy {
+    font-size: 12px;
+}
+
+.saman-seo-schema-preview-code {
+    margin: 0;
+    padding: 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    max-height: 300px;
+    overflow: auto;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 0 0 4px 4px;
+}
+
+.saman-seo-schema-preview-code code {
+    white-space: pre;
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+}
