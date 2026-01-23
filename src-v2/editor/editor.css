@@ -2026,3 +2026,73 @@
     white-space: pre;
     font-family: 'SF Mono', Monaco, 'Consolas', monospace;
 }
+
+/* ========================================
+   SEO Modal Styles
+   ======================================== */
+
+/* Modal wrapper - override WordPress defaults for larger size */
+.saman-seo-modal-wrapper {
+    max-width: 540px;
+    width: 100%;
+}
+
+.saman-seo-modal-wrapper .components-modal__content {
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.saman-seo-modal-wrapper .components-modal__header {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 16px 20px;
+    margin: 0;
+}
+
+.saman-seo-modal-wrapper .components-modal__header-heading {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Ensure panel fills modal width */
+.saman-seo-modal-wrapper .saman-seo-editor-panel {
+    width: 100%;
+}
+
+/* Toolbar button styles */
+.saman-seo-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e1e1e;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.saman-seo-toolbar-btn:hover {
+    background: #f0f0f1;
+    color: #2271b1;
+}
+
+.saman-seo-toolbar-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #2271b1;
+}
+
+/* Responsive - smaller screens */
+@media screen and (max-width: 600px) {
+    .saman-seo-modal-wrapper {
+        max-width: calc(100% - 32px);
+        margin: 16px;
+    }
+
+    .saman-seo-modal-wrapper .components-modal__content {
+        max-height: calc(100vh - 100px);
+    }
+}
