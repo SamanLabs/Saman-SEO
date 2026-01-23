@@ -35,11 +35,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Admin UI
 
-- [ ] **UI-01**: Post type schema defaults in Search Appearance settings
-- [ ] **UI-02**: Schema type dropdown selector in post editor sidebar
-- [ ] **UI-03**: Live JSON-LD preview panel showing rendered schema
-- [ ] **UI-04**: Preview updates in real-time as post content changes
-- [ ] **UI-05**: REST API endpoint for fetching schema preview data
+- [x] **UI-01**: Post type schema defaults in Search Appearance settings
+- [x] **UI-02**: Schema type dropdown selector in post editor sidebar
+- [x] **UI-03**: Live JSON-LD preview panel showing rendered schema
+- [x] **UI-04**: Preview updates in real-time as post content changes
+- [x] **UI-05**: REST API endpoint for fetching schema preview data
 
 ### Developer API
 
@@ -106,11 +106,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ART-03 | Phase 2 | Complete |
 | ART-04 | Phase 2 | Complete |
 | ART-05 | Phase 2 | Complete |
-| UI-01 | Phase 5 | Pending |
-| UI-02 | Phase 5 | Pending |
-| UI-03 | Phase 5 | Pending |
-| UI-04 | Phase 5 | Pending |
-| UI-05 | Phase 5 | Pending |
+| UI-01 | Phase 5 | Complete |
+| UI-02 | Phase 5 | Complete |
+| UI-03 | Phase 5 | Complete |
+| UI-04 | Phase 5 | Complete |
+| UI-05 | Phase 5 | Complete |
 | DEV-01 | Phase 6 | Pending |
 | DEV-02 | Phase 6 | Pending |
 | DEV-03 | Phase 6 | Pending |
