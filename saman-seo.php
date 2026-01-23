@@ -63,6 +63,30 @@ spl_autoload_register(
 			return;
 		}
 
+		// Handle Schema\Types namespace (in includes/Schema/Types/ directory)
+		if ( 0 === strpos( $class, 'Saman\SEO\\Schema\\Types\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Schema\\Types\\', '', $class );
+			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
+			$file       = SAMAN_SEO_PATH . 'includes/Schema/Types/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+			return;
+		}
+
+		// Handle Schema namespace (in includes/Schema/ directory)
+		if ( 0 === strpos( $class, 'Saman\SEO\\Schema\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Schema\\', '', $class );
+			$file_name  = 'class-' . strtolower( str_replace( [ '_' ], '-', $class_name ) ) . '.php';
+			$file       = SAMAN_SEO_PATH . 'includes/Schema/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+			return;
+		}
+
 	// Handle Service namespace (in includes/Service/ directory)
 	if ( 0 === strpos( $class, 'Saman\SEO\\Service\\' ) ) {
 		$class_name = str_replace( 'Saman\SEO\\Service\\', '', $class );
