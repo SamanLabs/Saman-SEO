@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** Phase 3 - Interactive Schemas (in progress)
+**Current focus:** Phase 3 - Interactive Schemas COMPLETE
 
 ## Current Position
 
-Phase: 3 of 6 (Interactive Schemas)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-23 - Completed 03-01-PLAN.md (FAQPage Schema)
+Phase: 3 of 6 (Interactive Schemas) COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-23 - Completed 03-02-PLAN.md (HowTo Schema)
 
-Progress: [####......] ~40%
+Progress: [#####.....] ~50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 3 min
-- Total execution time: 17 min
+- Total execution time: 20 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [####......] ~40%
 |-------|-------|-------|----------|
 | 01-schema-engine-foundation | 3 | 9 min | 3 min |
 | 02-content-schemas | 2 | 5 min | 2.5 min |
-| 03-interactive-schemas | 1 | 3 min | 3 min |
+| 03-interactive-schemas | 2 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (2 min), 01-03 (5 min), 02-01 (2 min), 02-02 (3 min), 03-01 (3 min)
+- Last 5 plans: 01-03 (5 min), 02-01 (2 min), 02-02 (3 min), 03-01 (3 min), 03-02 (3 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -60,9 +60,12 @@ Recent decisions affecting current work:
 - NewsArticle dateline auto-generates from SAMAN_SEO_local_city if meta not set
 - printSection has no auto-generation (meta only)
 - FAQPage_Schema parses blocks from post_content via parse_blocks()
-- showSchema attribute on FAQ block controls inclusion in registry output
+- showSchema attribute on FAQ/HowTo blocks controls inclusion in registry output
 - Multiple FAQ blocks combine into single mainEntity array
-- Recursive extraction handles FAQ blocks nested in columns/groups
+- HowTo_Schema uses first block only (multiple HowTo schemas semantically unclear)
+- Recursive extraction handles blocks nested in columns/groups
+- Time parsing supports minutes and hours (covers 95%+ of use cases)
+- Inline schema removed from HowTo block (registry is sole source)
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Phase 3 complete
 Resume file: None
-Next action: Execute 03-02-PLAN.md (HowTo Schema)
+Next action: /gsd:plan-phase 4 or /gsd:discuss-phase 4
