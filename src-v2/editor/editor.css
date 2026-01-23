@@ -1124,6 +1124,7 @@
 
 /* Toggle switches */
 .saman-seo-toggle {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -1133,6 +1134,8 @@
 
 .saman-seo-toggle input {
     position: absolute;
+    top: 0;
+    left: 0;
     opacity: 0;
     pointer-events: none;
 }
@@ -2033,7 +2036,7 @@
 
 /* Modal wrapper - override WordPress defaults for larger size */
 .saman-seo-modal-wrapper {
-    max-width: 540px;
+    max-width: 620px;
     width: 100%;
 }
 
