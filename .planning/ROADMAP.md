@@ -30,11 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. A schema object renders valid JSON-LD with @context, @id, and @type properties
   3. Multiple schema objects combine into a single @graph array in page output
   4. Existing WebSite, WebPage, and Breadcrumb schemas still output correctly (migration complete)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md - Core schema infrastructure (Abstract_Schema, Schema_Context, Schema_IDs)
+- [ ] 01-02-PLAN.md - Registry and Graph Manager (Schema_Registry, Schema_Graph_Manager)
+- [ ] 01-03-PLAN.md - Migration (WebSite, WebPage, Breadcrumb, Organization, Person schemas + wiring)
 
 ### Phase 2: Content Schemas
 **Goal**: Users get enhanced Article schemas that improve Google rich results eligibility
@@ -121,7 +122,7 @@ Note: Phases 2, 3, 4 can potentially run in parallel after Phase 1 completes.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Schema Engine Foundation | 0/? | Not started | - |
+| 1. Schema Engine Foundation | 0/3 | Planning complete | - |
 | 2. Content Schemas | 0/? | Not started | - |
 | 3. Interactive Schemas | 0/? | Not started | - |
 | 4. LocalBusiness Schema | 0/? | Not started | - |
