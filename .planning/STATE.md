@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** Phase 3 - Interactive Schemas COMPLETE
+**Current focus:** Phase 4 - LocalBusiness Schema IN PROGRESS
 
 ## Current Position
 
-Phase: 3 of 6 (Interactive Schemas) COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase complete, verified (4/4 must-haves)
-Last activity: 2026-01-23 - Phase 3 verified
+Phase: 4 of 6 (LocalBusiness Schema)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-23 - Completed 04-01-PLAN.md
 
-Progress: [#####.....] ~50%
+Progress: [######....] ~60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 3 min
-- Total execution time: 20 min
+- Total execution time: 22 min
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [#####.....] ~50%
 | 01-schema-engine-foundation | 3 | 9 min | 3 min |
 | 02-content-schemas | 2 | 5 min | 2.5 min |
 | 03-interactive-schemas | 2 | 6 min | 3 min |
+| 04-localbusiness-schema | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (5 min), 02-01 (2 min), 02-02 (3 min), 03-01 (3 min), 03-02 (3 min)
+- Last 5 plans: 02-01 (2 min), 02-02 (3 min), 03-01 (3 min), 03-02 (3 min), 04-01 (2 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -66,6 +67,9 @@ Recent decisions affecting current work:
 - Recursive extraction handles blocks nested in columns/groups
 - Time parsing supports minutes and hours (covers 95%+ of use cases)
 - Inline schema removed from HowTo block (registry is sole source)
+- LocalBusiness_Schema outputs only on homepage (matches Organization pattern)
+- Address requires street + city for PostalAddress output
+- Opening hours grouped by identical times for compact output
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Phase 3 complete and verified
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
-Next action: /gsd:discuss-phase 4 or /gsd:plan-phase 4
+Next action: Execute 04-02-PLAN.md (Registration & Conflict Resolution)
