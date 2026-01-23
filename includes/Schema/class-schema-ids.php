@@ -99,4 +99,14 @@ class Schema_IDs {
 	public static function faqpage( string $url ): string {
 		return $url . '#faqpage';
 	}
+
+	/**
+	 * Get HowTo schema @id for a specific URL.
+	 *
+	 * @param string $url The canonical URL of the page.
+	 * @return string URL#howto identifier.
+	 */
+	public static function howto( string $url ): string {
+		return $url . '#howto';
+	}
 }
