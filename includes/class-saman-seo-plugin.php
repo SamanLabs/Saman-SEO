@@ -134,6 +134,29 @@ class Plugin {
 
 		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, [ 'priority' => 20 ] );
 
+		/**
+		 * Fires after core schema types are registered.
+		 *
+		 * Third-party developers use this hook to register custom schema types
+		 * that will be included in the JSON-LD @graph output. Custom schemas must
+		 * extend Abstract_Schema and implement the required methods.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param Schema_Registry $registry The schema registry singleton instance.
+		 *                                  Use $registry->register() to add types.
+		 *
+		 * @example
+		 * // Register a custom schema type
+		 * add_action( 'saman_seo_register_schema_type', function( $registry ) {
+		 *     $registry->register( 'myslug', MySchema::class, [
+		 *         'label'    => 'My Schema',
+		 *         'priority' => 15,
+		 *     ]);
+		 * });
+		 */
+		do_action( 'saman_seo_register_schema_type', $registry );
+
 		$this->register( 'compatibility', new Service\Compatibility() );
 		$this->register( 'settings', new Service\Settings() );
 		$this->register( 'meta', new Service\Post_Meta() );
