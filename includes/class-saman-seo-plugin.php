@@ -18,6 +18,7 @@ use Saman\SEO\Schema\Types\BlogPosting_Schema;
 use Saman\SEO\Schema\Types\NewsArticle_Schema;
 use Saman\SEO\Schema\Types\FAQPage_Schema;
 use Saman\SEO\Schema\Types\HowTo_Schema;
+use Saman\SEO\Schema\Types\LocalBusiness_Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -68,6 +69,17 @@ class Plugin {
 		$registry->register( 'website', WebSite_Schema::class, [ 'priority' => 1 ] );
 		$registry->register( 'organization', Organization_Schema::class, [ 'priority' => 2 ] );
 		$registry->register( 'person', Person_Schema::class, [ 'priority' => 2 ] );
+
+		// LocalBusiness schema (priority 5 - after Organization 2, before WebPage 10).
+		$registry->register(
+			'localbusiness',
+			LocalBusiness_Schema::class,
+			[
+				'label'    => __( 'Local Business', 'saman-seo' ),
+				'priority' => 5,
+			]
+		);
+
 		$registry->register( 'webpage', WebPage_Schema::class, [ 'priority' => 10 ] );
 
 		// Content schemas (priority 15 - after WebPage 10, before Breadcrumb 20).
