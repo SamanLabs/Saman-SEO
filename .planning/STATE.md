@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 2 of 6 (Content Schemas)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-23 - Completed 02-01-PLAN.md
+Last activity: 2026-01-23 - Completed 02-02-PLAN.md
 
-Progress: [###.......] ~22%
+Progress: [####......] ~33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 3 min
-- Total execution time: 11 min
+- Total execution time: 14 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-schema-engine-foundation | 3 | 9 min | 3 min |
-| 02-content-schemas | 1 | 2 min | 2 min |
+| 02-content-schemas | 2 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 01-02 (2 min), 01-03 (5 min), 02-01 (2 min)
+- Last 5 plans: 01-01 (2 min), 01-02 (2 min), 01-03 (5 min), 02-01 (2 min), 02-02 (3 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -51,10 +51,13 @@ Recent decisions affecting current work:
 - Legacy SAMAN_SEO_jsonld_graph filter maintained for backward compatibility
 - @context added ONLY in Graph_Manager root, never in individual pieces
 - Legacy JsonLD methods marked @deprecated but kept for third-party compatibility
-- Priority ordering: WebSite(1), Org/Person(2), WebPage(10), Breadcrumb(20)
+- Priority ordering: WebSite(1), Org/Person(2), WebPage(10), Content(15), Breadcrumb(20)
 - Schema Types in includes/Schema/Types/ with Saman\SEO\Schema\Types namespace
 - Author is full Person object (not name string) for Google rich results eligibility
 - Article_Schema helpers are protected for subclass override capability
+- BlogPosting is minimal subclass (inherits everything, changes only @type)
+- NewsArticle dateline auto-generates from SAMAN_SEO_local_city if meta not set
+- printSection has no auto-generation (meta only)
 
 ### Pending Todos
 
@@ -67,6 +70,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 02-01-PLAN.md
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
-Next action: Execute 02-02-PLAN.md (BlogPosting_Schema)
+Next action: Execute 02-03-PLAN.md (Schema Selection)
