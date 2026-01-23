@@ -28,7 +28,9 @@ class Local_SEO {
 		// Register menu for PHP template rendering
 		add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
+		// Removed: LocalBusiness schema now handled by Schema Registry (LocalBusiness_Schema class).
+		// Legacy filter disabled to prevent duplicate output with incorrect @context.
+		// add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
 	}
 
 	/**
