@@ -320,7 +320,7 @@ class Request_Monitor {
 
 		wp_enqueue_style(
 			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'assets/css/plugin.css',
+			SAMAN_SEO_URL . 'dist/css/plugin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);

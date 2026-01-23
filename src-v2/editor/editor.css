@@ -1830,3 +1830,57 @@
 @keyframes samanseo-spin {
     to { transform: rotate(360deg); }
 }
+
+/* Media Picker Styles for Editor Sidebar */
+.saman-seo-media-field,
+.saman-seo-media-upload {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.saman-seo-media-field input[type="url"],
+.saman-seo-media-field input[type="text"],
+.saman-seo-media-upload input[type="url"],
+.saman-seo-media-upload input[type="text"] {
+    flex: 1;
+    min-width: 150px;
+}
+
+.saman-seo-media-preview {
+    width: 100%;
+    max-width: 150px;
+    margin-top: 8px;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f6f7f7;
+}
+
+.saman-seo-media-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.saman-seo-media-upload-btn,
+.saman-seo-media-trigger {
+    flex-shrink: 0;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+}
+
+.saman-seo-media-remove-btn {
+    flex-shrink: 0;
+    color: #b32d2e;
+    border-color: #b32d2e;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+}
+
+.saman-seo-media-remove-btn:hover {
+    background: #b32d2e;
+    color: #fff;
+    border-color: #b32d2e;
+}

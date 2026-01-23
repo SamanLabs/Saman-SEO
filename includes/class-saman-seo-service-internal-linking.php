@@ -149,21 +149,21 @@ class Internal_Linking {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/css/admin.css',
+			SAMAN_SEO_URL . 'dist/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'assets/css/plugin.css',
+			SAMAN_SEO_URL . 'dist/css/plugin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
 
 		wp_enqueue_style(
 			'saman-seo-internal-linking',
-			SAMAN_SEO_URL . 'assets/css/internal-linking.css',
+			SAMAN_SEO_URL . 'dist/css/internal-linking.css',
 			[ 'saman-seo-admin' ],
 			SAMAN_SEO_VERSION
 		);

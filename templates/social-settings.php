@@ -41,7 +41,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 				</option>
 			<?php endforeach; ?>
 			<option value="__custom" <?php selected( $select_value, '__custom' ); ?>>
-				<?php esc_html_e( 'Custom valueÃ¢â‚¬Â¦', 'saman-seo' ); ?>
+				<?php esc_html_e( 'Custom value…', 'saman-seo' ); ?>
 			</option>
 		</select>
 		<input
@@ -133,7 +133,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 								</div>
 								<div class="saman-seo-form-control">
 									<input type="url" class="regular-text" id="SAMAN_SEO_social_defaults_image_source" name="SAMAN_SEO_social_defaults[image_source]" value="<?php echo esc_url( $social_defaults['image_source'] ); ?>" />
-									<span class="saman-seo-helper-text"><?php esc_html_e( 'Used when posts don\'t have a featured image (1200x630px recommended)', 'saman-seo' ); ?></span>
+									<span class="saman-seo-helper-text"><?php esc_html_e( 'Used when posts don\'t have a featured image (1200×630px recommended)', 'saman-seo' ); ?></span>
 								</div>
 							</div>
 						</div>
@@ -279,7 +279,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 					</div>
 					<div class="saman-seo-card-body">
 						<ul class="saman-seo-info-list">
-							<li><strong><?php esc_html_e( 'Image Size:', 'saman-seo' ); ?></strong> <?php esc_html_e( '1200Ãƒâ€”630px for best results', 'saman-seo' ); ?></li>
+							<li><strong><?php esc_html_e( 'Image Size:', 'saman-seo' ); ?></strong> <?php esc_html_e( '1200×630px for best results', 'saman-seo' ); ?></li>
 							<li><strong><?php esc_html_e( 'Title Length:', 'saman-seo' ); ?></strong> <?php esc_html_e( '60 characters or less', 'saman-seo' ); ?></li>
 							<li><strong><?php esc_html_e( 'Description:', 'saman-seo' ); ?></strong> <?php esc_html_e( '155 characters or less', 'saman-seo' ); ?></li>
 						</ul>

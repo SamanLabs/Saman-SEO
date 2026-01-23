@@ -73,7 +73,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 				</option>
 			<?php endforeach; ?>
 			<option value="__custom" <?php selected( $select_value, '__custom' ); ?>>
-				<?php esc_html_e( 'Custom valueÃ¢â‚¬Â¦', 'saman-seo' ); ?>
+				<?php esc_html_e( 'Custom value…', 'saman-seo' ); ?>
 			</option>
 		</select>
 		<input
@@ -220,7 +220,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 							<?php esc_html_e( 'Add image, video, and news data to WordPress core sitemaps for better search engine indexing.', 'saman-seo' ); ?>
 						</p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-sitemap' ) ); ?>" class="saman-seo-module-link">
-							<?php esc_html_e( 'Configure Sitemap Ã¢â€ â€™', 'saman-seo' ); ?>
+							<?php esc_html_e( 'Configure Sitemap →', 'saman-seo' ); ?>
 						</a>
 					</div>
 				</div>
@@ -242,7 +242,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 							<?php esc_html_e( 'Manage 301/302 redirects with an intuitive interface and WP-CLI commands.', 'saman-seo' ); ?>
 						</p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-redirects' ) ); ?>" class="saman-seo-module-link">
-							<?php esc_html_e( 'Manage Redirects Ã¢â€ â€™', 'saman-seo' ); ?>
+							<?php esc_html_e( 'Manage Redirects →', 'saman-seo' ); ?>
 						</a>
 					</div>
 				</div>
@@ -264,7 +264,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 							<?php esc_html_e( 'Monitor and track 404 errors with anonymized referrer data to fix broken links.', 'saman-seo' ); ?>
 						</p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-404' ) ); ?>" class="saman-seo-module-link">
-							<?php esc_html_e( 'View 404 Log Ã¢â€ â€™', 'saman-seo' ); ?>
+							<?php esc_html_e( 'View 404 Log →', 'saman-seo' ); ?>
 						</a>
 					</div>
 				</div>
@@ -287,20 +287,20 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						</p>
 					<?php if ( '1' === get_option( 'SAMAN_SEO_enable_og_preview', '1' ) ) : ?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-types#social-cards' ) ); ?>" class="saman-seo-module-link">
-							<?php esc_html_e( 'Customize Social Cards Ã¢â€ â€™', 'saman-seo' ); ?>
+							<?php esc_html_e( 'Customize Social Cards →', 'saman-seo' ); ?>
 						</a>
 					<?php endif; ?>
 					</div>
 				</div>
 
-				<!-- LLM.txt Generator Module -->
+				<!-- LLM.txt Module -->
 				<div class="saman-seo-module-card">
 					<div class="saman-seo-module-icon">
 						<span class="dashicons dashicons-media-code"></span>
 					</div>
 					<div class="saman-seo-module-content">
 						<div class="saman-seo-module-header">
-							<h3><?php esc_html_e( 'LLM.txt Generator', 'saman-seo' ); ?></h3>
+							<h3><?php esc_html_e( 'LLM.txt', 'saman-seo' ); ?></h3>
 							<label class="saman-seo-toggle-switch">
 								<input type="checkbox" name="SAMAN_SEO_enable_llm_txt" value="1" <?php checked( get_option( 'SAMAN_SEO_enable_llm_txt', '1' ), '1' ); ?> />
 								<span class="saman-seo-toggle-slider"></span>
@@ -310,7 +310,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 							<?php esc_html_e( 'Help AI engines discover your content with a standardized llm.txt file for better AI indexing.', 'saman-seo' ); ?>
 						</p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-sitemap#llm' ) ); ?>" class="saman-seo-module-link">
-							<?php esc_html_e( 'Configure LLM.txt Ã¢â€ â€™', 'saman-seo' ); ?>
+							<?php esc_html_e( 'Configure LLM.txt →', 'saman-seo' ); ?>
 						</a>
 					</div>
 				</div>
@@ -333,7 +333,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 						</p>
 						<?php if ( '1' === get_option( 'SAMAN_SEO_enable_local_seo', '0' ) ) : ?>
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=saman-seo-local-seo' ) ); ?>" class="saman-seo-module-link">
-								<?php esc_html_e( 'Configure Local SEO Ã¢â€ â€™', 'saman-seo' ); ?>
+								<?php esc_html_e( 'Configure Local SEO →', 'saman-seo' ); ?>
 							</a>
 						<?php endif; ?>
 					</div>
@@ -373,7 +373,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 		>
 			<section class="saman-seo-card">
 				<h2><?php esc_html_e( 'Knowledge Graph & Schema.org', 'saman-seo' ); ?></h2>
-				<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in GoogleÃ¢â‚¬â„¢s Knowledge Graph and other rich results.', 'saman-seo' ); ?></p>
+				<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google's Knowledge Graph and other rich results.', 'saman-seo' ); ?></p>
 					<form action="options.php" method="post">
 						<?php settings_fields( 'SAMAN_SEO_knowledge' ); ?>
 					<table class="form-table" role="presentation">
@@ -408,7 +408,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 									<input type="url" class="regular-text" id="SAMAN_SEO_homepage_organization_logo" name="SAMAN_SEO_homepage_organization_logo" value="<?php echo esc_url( get_option( 'SAMAN_SEO_homepage_organization_logo' ) ); ?>" />
 									<button type="button" class="button saman-seo-media-trigger"><?php esc_html_e( 'Select image', 'saman-seo' ); ?></button>
 								</div>
-								<p class="description"><?php esc_html_e( 'Recommended: square logo at least 112Ãƒâ€”112 px. Used in structured data and social previews.', 'saman-seo' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Recommended: square logo at least 112×112 px. Used in structured data and social previews.', 'saman-seo' ); ?></p>
 							</td>
 						</tr>
 					</table>

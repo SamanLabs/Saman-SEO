@@ -271,10 +271,15 @@ class Admin_UI {
 
 		wp_enqueue_style(
 			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/css/admin.css',
+			SAMAN_SEO_URL . 'dist/css/admin.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
+
+		// Enqueue WordPress media library for settings pages that need image pickers.
+		if ( false !== strpos( $hook, 'saman-seo' ) ) {
+			wp_enqueue_media();
+		}
 
 		wp_enqueue_script(
 			'saman-seo-admin',
@@ -314,7 +319,7 @@ class Admin_UI {
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
 					'strings' => [
 						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-seo' ),
-						'running'  => __( 'Asking AI for ideasÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦', 'saman-seo' ),
+						'running'  => __( 'Asking AI for ideas…', 'saman-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-seo' ),
 					],
@@ -465,7 +470,7 @@ class Admin_UI {
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
 					'strings' => [
 						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-seo' ),
-						'running'  => __( 'Asking AI for ideasÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦', 'saman-seo' ),
+						'running'  => __( 'Asking AI for ideas…', 'saman-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-seo' ),
 					],

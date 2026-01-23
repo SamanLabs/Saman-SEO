@@ -883,7 +883,7 @@ class Breadcrumbs {
 
 		wp_enqueue_style(
 			'saman-seo-breadcrumbs',
-			SAMAN_SEO_URL . 'assets/css/breadcrumbs.css',
+			SAMAN_SEO_URL . 'dist/css/breadcrumbs.css',
 			[],
 			SAMAN_SEO_VERSION
 		);
