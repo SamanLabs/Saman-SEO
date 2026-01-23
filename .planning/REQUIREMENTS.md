@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Schema Engine Core
 
-- [ ] **ENG-01**: Schema type registry that stores and retrieves registered schema types
-- [ ] **ENG-02**: Base schema class with @context, @id, @type properties and render method
-- [ ] **ENG-03**: Graph manager that combines multiple schema objects into single JSON-LD output
-- [ ] **ENG-04**: Migration from existing hardcoded JsonLD service to new engine
+- [x] **ENG-01**: Schema type registry that stores and retrieves registered schema types
+- [x] **ENG-02**: Base schema class with @context, @id, @type properties and render method
+- [x] **ENG-03**: Graph manager that combines multiple schema objects into single JSON-LD output
+- [x] **ENG-04**: Migration from existing hardcoded JsonLD service to new engine
 
 ### High-Impact Schema Types
 
@@ -89,10 +89,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENG-01 | Phase 1 | Pending |
-| ENG-02 | Phase 1 | Pending |
-| ENG-03 | Phase 1 | Pending |
-| ENG-04 | Phase 1 | Pending |
+| ENG-01 | Phase 1 | Complete |
+| ENG-02 | Phase 1 | Complete |
+| ENG-03 | Phase 1 | Complete |
+| ENG-04 | Phase 1 | Complete |
 | FAQ-01 | Phase 3 | Pending |
 | FAQ-02 | Phase 3 | Pending |
 | HOW-01 | Phase 3 | Pending |
@@ -124,4 +124,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 - Traceability updated after roadmap creation*
+*Last updated: 2026-01-23 - Phase 1 requirements complete (ENG-01 through ENG-04)*
