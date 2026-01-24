@@ -2146,7 +2146,6 @@
 /* Score header - elevated card design */
 .saman-seo-modal-wrapper .saman-seo-score-header {
     background: #fff;
-    border-bottom: 1px solid #e2e8f0;
     padding: 16px 24px;
     flex-shrink: 0;
 }
@@ -2154,7 +2153,6 @@
 /* Tab bar - prominent pill-style tabs */
 .saman-seo-modal-wrapper .saman-seo-tabs {
     background: #fff;
-    border-bottom: 1px solid #e2e8f0;
     padding: 0 24px;
     gap: 4px;
     flex-shrink: 0;
@@ -2186,10 +2184,10 @@
 
 /* Tab content - scrollable with padding */
 .saman-seo-modal-wrapper .saman-seo-tab-content {
-    flex: 1 1 0;
+    flex: 1 1 auto;
     overflow-y: auto;
     overflow-x: hidden;
-    min-height: 0;
+    min-height: 100px;
     padding: 24px;
     padding-bottom: 32px;
     background: #f8fafc;
