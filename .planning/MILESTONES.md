@@ -1,5 +1,30 @@
 # Project Milestones: Saman SEO Schema Engine
 
+## v1.1 WooCommerce Product Schemas (Shipped: 2026-01-24)
+
+**Delivered:** Complete Product rich results for WooCommerce stores with offers, reviews, and ratings.
+
+**Phases completed:** 7-10 (5 plans total)
+
+**Key accomplishments:**
+- WooCommerce schema conflict prevention — disabled native WC JSON-LD at init priority 0
+- Complete Product schema — name, description, images, SKU, brand (3-level fallback), identifiers
+- Offer schema for simple products — price, currency, availability, priceValidUntil, seller
+- AggregateOffer for variable products — lowPrice/highPrice with offerCount
+- Review system — AggregateRating + individual Review objects from WC reviews
+
+**Stats:**
+- 21 files created/modified
+- 750 lines of PHP in core v1.1 files
+- 4 phases, 5 plans
+- 2 days from v1.0 to ship
+
+**Git range:** `feat(07-01)` → `feat(10-01)`
+
+**What's next:** TBD — planning next milestone
+
+---
+
 ## v1.0 Schema Engine (Shipped: 2026-01-23)
 
 **Delivered:** Extensible, registry-based JSON-LD Schema Engine with 8 schema types, live preview UI, and full developer API for third-party extension.
@@ -22,6 +47,6 @@
 
 **Git range:** `feat(01-01)` → `docs(phase-6)`
 
-**What's next:** v1.1 may include VideoObject, Recipe schemas, WooCommerce Product integration, or built-in schema validation.
+**What's next:** v1.1 WooCommerce Product Schemas ✓
 
 ---

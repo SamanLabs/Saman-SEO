@@ -3,7 +3,7 @@
 ## Milestones
 
 - [x] **v1.0 Schema Engine** - Phases 1-6 (shipped 2026-01-23)
-- [ ] **v1.1 WooCommerce Product Schemas** - Phases 7-10 (in progress)
+- [x] **v1.1 WooCommerce Product Schemas** - Phases 7-10 (shipped 2026-01-24)
 
 ## Phases
 
@@ -36,77 +36,30 @@
 
 </details>
 
-### v1.1 WooCommerce Product Schemas (In Progress)
-
-**Milestone Goal:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
-
-- [x] **Phase 7: Foundation** - Disable WC schema, create Product_Schema skeleton, integrate with registry
-- [x] **Phase 8: Simple Products** - Core properties and single Offer for simple products
-- [x] **Phase 9: Variable Products** - AggregateOffer for products with variations
-- [x] **Phase 10: Reviews & Ratings** - AggregateRating and Review objects
-
-## Phase Details
+<details>
+<summary>v1.1 WooCommerce Product Schemas (Phases 7-10) - SHIPPED 2026-01-24</summary>
 
 ### Phase 7: Foundation
 **Goal**: Establish WooCommerce integration foundation with proper schema conflict prevention
-**Depends on**: Phase 6 (v1.0 complete)
-**Requirements**: INTG-01, INTG-02, INTG-03, INTG-04
-**Success Criteria** (what must be TRUE):
-  1. WooCommerce native JSON-LD schema is disabled when plugin is active
-  2. Product schema only appears on single product pages, not on shop/category archives
-  3. Product schema auto-registers in Schema_Registry when WooCommerce is detected
-  4. Product_Schema class extends Abstract_Schema and integrates with Schema_Graph_Manager
-**Plans**: 1 plan
-
-Plans:
-- [x] 07-01-PLAN.md - Disable WC native schema, create Product_Schema skeleton, extend Schema_IDs
+**Plans**: 1 plan (complete)
 
 ### Phase 8: Simple Products
 **Goal**: Complete Product schema output for simple products with single Offer
-**Depends on**: Phase 7
-**Requirements**: PROD-01, PROD-02, PROD-03, PROD-04, PROD-05, PROD-06, PROD-07, PROD-08, OFFR-01, OFFR-02, OFFR-03, OFFR-06
-**Success Criteria** (what must be TRUE):
-  1. Simple product pages output valid Product schema with name, description, image, sku, url
-  2. Product schema includes brand from product attribute or global fallback setting
-  3. Product schema includes gtin/mpn when custom fields are populated
-  4. Simple products output single Offer with price, priceCurrency, availability, and seller
-  5. Offer availability correctly reflects WooCommerce stock status (InStock/OutOfStock/PreOrder)
-**Plans**: 2 plans
-
-Plans:
-- [x] 08-01-PLAN.md - Product core properties (description, images, sku, brand, identifiers, condition)
-- [x] 08-02-PLAN.md - Offer building (price, availability, priceValidUntil, seller)
+**Plans**: 2 plans (complete)
 
 ### Phase 9: Variable Products
 **Goal**: AggregateOffer support for variable products with price ranges
-**Depends on**: Phase 8
-**Requirements**: OFFR-04, OFFR-05
-**Success Criteria** (what must be TRUE):
-  1. Variable products output AggregateOffer instead of single Offer
-  2. AggregateOffer includes lowPrice/highPrice from variation price range
-  3. AggregateOffer availability shows InStock if ANY variation is in stock
-**Plans**: 1 plan
-
-Plans:
-- [x] 09-01-PLAN.md - AggregateOffer with lowPrice/highPrice and child_is_in_stock availability
+**Plans**: 1 plan (complete)
 
 ### Phase 10: Reviews & Ratings
 **Goal**: AggregateRating and Review schema from WooCommerce reviews
-**Depends on**: Phase 8
-**Requirements**: REVW-01, REVW-02, REVW-03, REVW-04, REVW-05, REVW-06
-**Success Criteria** (what must be TRUE):
-  1. Products with reviews output AggregateRating with correct ratingValue and reviewCount
-  2. Products with zero reviews do NOT output AggregateRating property
-  3. Product schema outputs Review array with individual customer reviews
-  4. Each Review includes author, reviewRating, reviewBody, and datePublished
-**Plans**: 1 plan
+**Plans**: 1 plan (complete)
 
-Plans:
-- [x] 10-01-PLAN.md - AggregateRating and Review schema from WooCommerce reviews
+</details>
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 7 -> 8 -> 9 -> 10
+**Execution Order:** Phases execute in numeric order
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -123,4 +76,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 10 execution — v1.1 COMPLETE*
+*Last updated: 2026-01-24 — v1.1 SHIPPED*
