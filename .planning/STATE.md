@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
-**Current focus:** Phase 9 - Variable Products
+**Current focus:** v1.1 Complete - All phases finished
 
 ## Current Position
 
-Phase: 9 of 10 (Variable Products)
+Phase: 10 of 10 (Reviews & Ratings)
 Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-01-24 - Completed 09-01-PLAN.md
+Status: v1.1 Complete
+Last activity: 2026-01-24 - Completed 10-01-PLAN.md
 
-Progress: [||||||||||..........] v1.0 100% | [||||||..............] v1.1 60%
+Progress: [||||||||||||||||||||] v1.0 100% | [||||||||||||||||||||] v1.1 100%
 
 ## Performance Metrics
 
@@ -35,15 +35,16 @@ Progress: [||||||||||..........] v1.0 100% | [||||||..............] v1.1 60%
 | 06-developer-api | 2 | 7 min | 3.5 min |
 
 **v1.1 Velocity:**
-- Plans completed: 4
-- Total execution time: 11 min
-- Estimated remaining: 1-2 plans (Phase 10)
+- Plans completed: 5
+- Total execution time: 14 min
+- Average duration: 2.8 min
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 07-foundation | 1 | 2 min | 2 min |
 | 08-simple-products | 2 | 6 min | 3 min |
 | 09-variable-products | 1 | 3 min | 3 min |
+| 10-reviews-ratings | 1 | 3 min | 3 min |
 
 ## Accumulated Context
 
@@ -67,6 +68,10 @@ v1.1 decisions:
 - Omit priceValidUntil from AggregateOffer (variations have different dates)
 - Omit seller from AggregateOffer (not standard practice)
 - offerCount uses count(get_children()) for variation count
+- reviewCount over ratingCount (Google preference when reviews exist)
+- Limit to 10 reviews for performance
+- Skip reviews with invalid rating or missing author
+- reviewBody optional, only when comment content exists
 
 ### Pending Todos
 
@@ -79,6 +84,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 09-01-PLAN.md (Phase 9 complete)
+Stopped at: Completed 10-01-PLAN.md (v1.1 Complete)
 Resume file: None
-Next action: Plan and execute Phase 10 (Reviews with AggregateRating)
+Next action: v1.1 development complete - ready for release
+
