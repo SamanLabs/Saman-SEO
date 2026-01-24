@@ -255,4 +255,22 @@ class Product_Schema extends Abstract_Schema {
 			$schema['itemCondition'] = 'https://schema.org/' . $condition;
 		}
 	}
+
+	/**
+	 * Get schema.org availability URL from WooCommerce stock status.
+	 *
+	 * @param \WC_Product $product The product object.
+	 * @return string Schema.org availability URL.
+	 */
+	protected function get_availability_url( \WC_Product $product ): string {
+		$status = $product->get_stock_status();
+
+		$map = [
+			'instock'     => 'https://schema.org/InStock',
+			'outofstock'  => 'https://schema.org/OutOfStock',
+			'onbackorder' => 'https://schema.org/PreOrder',
+		];
+
+		return $map[ $status ] ?? 'https://schema.org/InStock';
+	}
 }
