@@ -41,7 +41,7 @@
 **Milestone Goal:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
 
 - [x] **Phase 7: Foundation** - Disable WC schema, create Product_Schema skeleton, integrate with registry
-- [ ] **Phase 8: Simple Products** - Core properties and single Offer for simple products
+- [x] **Phase 8: Simple Products** - Core properties and single Offer for simple products
 - [ ] **Phase 9: Variable Products** - AggregateOffer for products with variations
 - [ ] **Phase 10: Reviews & Ratings** - AggregateRating and Review objects
 
@@ -74,8 +74,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md - Product core properties (description, images, sku, brand, identifiers, condition)
-- [ ] 08-02-PLAN.md - Offer building (price, availability, priceValidUntil, seller)
+- [x] 08-01-PLAN.md - Product core properties (description, images, sku, brand, identifiers, condition)
+- [x] 08-02-PLAN.md - Offer building (price, availability, priceValidUntil, seller)
 
 ### Phase 9: Variable Products
 **Goal**: AggregateOffer support for variable products with price ranges
@@ -117,10 +117,10 @@ Plans:
 | 5. Admin UI | v1.0 | 3/3 | Complete | 2026-01-23 |
 | 6. Developer API | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 7. Foundation | v1.1 | 1/1 | Complete | 2026-01-23 |
-| 8. Simple Products | v1.1 | 0/2 | Planned | - |
+| 8. Simple Products | v1.1 | 2/2 | Complete | 2026-01-24 |
 | 9. Variable Products | v1.1 | 0/? | Not started | - |
 | 10. Reviews & Ratings | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 8 planning*
+*Last updated: 2026-01-24 after Phase 8 execution*
