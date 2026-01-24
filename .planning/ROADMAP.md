@@ -71,11 +71,11 @@ Plans:
   3. Product schema includes gtin/mpn when custom fields are populated
   4. Simple products output single Offer with price, priceCurrency, availability, and seller
   5. Offer availability correctly reflects WooCommerce stock status (InStock/OutOfStock/PreOrder)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md - Product core properties (description, images, sku, brand, identifiers, condition)
+- [ ] 08-02-PLAN.md - Offer building (price, availability, priceValidUntil, seller)
 
 ### Phase 9: Variable Products
 **Goal**: AggregateOffer support for variable products with price ranges
@@ -117,10 +117,10 @@ Plans:
 | 5. Admin UI | v1.0 | 3/3 | Complete | 2026-01-23 |
 | 6. Developer API | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 7. Foundation | v1.1 | 1/1 | Complete | 2026-01-23 |
-| 8. Simple Products | v1.1 | 0/? | Not started | - |
+| 8. Simple Products | v1.1 | 0/2 | Planned | - |
 | 9. Variable Products | v1.1 | 0/? | Not started | - |
 | 10. Reviews & Ratings | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 after Phase 7 execution*
+*Last updated: 2026-01-24 after Phase 8 planning*
