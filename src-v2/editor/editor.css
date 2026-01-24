@@ -15,7 +15,6 @@
     gap: 16px;
     padding: 16px 20px;
     background: #fff;
-    border-bottom: 1px solid #e2e8f0;
 }
 
 .saman-seo-score-info {
@@ -2187,11 +2186,18 @@
 
 /* Tab content - scrollable with padding */
 .saman-seo-modal-wrapper .saman-seo-tab-content {
-    flex: 1;
+    flex: 1 1 0;
     overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
     padding: 24px;
+    padding-bottom: 32px;
     background: #f8fafc;
+}
+
+/* Ensure last element in tab content doesn't have extra margin */
+.saman-seo-modal-wrapper .saman-seo-tab-content > *:last-child {
+    margin-bottom: 0;
 }
 
 /* Clean up nested backgrounds in modal */
