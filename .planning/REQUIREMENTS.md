@@ -36,12 +36,12 @@ Requirements for WooCommerce Product schema support. Each maps to roadmap phases
 
 ### Reviews
 
-- [ ] **REVW-01**: Product schema outputs AggregateRating when product has reviews
-- [ ] **REVW-02**: AggregateRating outputs ratingValue from WooCommerce average
-- [ ] **REVW-03**: AggregateRating outputs reviewCount from WooCommerce count
-- [ ] **REVW-04**: Products with zero reviews do NOT output AggregateRating
-- [ ] **REVW-05**: Product schema outputs Review array with individual reviews
-- [ ] **REVW-06**: Each Review outputs author, reviewRating, reviewBody, datePublished
+- [x] **REVW-01**: Product schema outputs AggregateRating when product has reviews
+- [x] **REVW-02**: AggregateRating outputs ratingValue from WooCommerce average
+- [x] **REVW-03**: AggregateRating outputs reviewCount from WooCommerce count
+- [x] **REVW-04**: Products with zero reviews do NOT output AggregateRating
+- [x] **REVW-05**: Product schema outputs Review array with individual reviews
+- [x] **REVW-06**: Each Review outputs author, reviewRating, reviewBody, datePublished
 
 ## Future Requirements
 
@@ -97,12 +97,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OFFR-04 | Phase 9 | Complete |
 | OFFR-05 | Phase 9 | Complete |
 | OFFR-06 | Phase 8 | Complete |
-| REVW-01 | Phase 10 | Pending |
-| REVW-02 | Phase 10 | Pending |
-| REVW-03 | Phase 10 | Pending |
-| REVW-04 | Phase 10 | Pending |
-| REVW-05 | Phase 10 | Pending |
-| REVW-06 | Phase 10 | Pending |
+| REVW-01 | Phase 10 | Complete |
+| REVW-02 | Phase 10 | Complete |
+| REVW-03 | Phase 10 | Complete |
+| REVW-04 | Phase 10 | Complete |
+| REVW-05 | Phase 10 | Complete |
+| REVW-06 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 24 total
@@ -111,4 +111,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 9 execution*
+*Last updated: 2026-01-24 after Phase 10 execution*

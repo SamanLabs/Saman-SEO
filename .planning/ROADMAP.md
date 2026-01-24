@@ -43,7 +43,7 @@
 - [x] **Phase 7: Foundation** - Disable WC schema, create Product_Schema skeleton, integrate with registry
 - [x] **Phase 8: Simple Products** - Core properties and single Offer for simple products
 - [x] **Phase 9: Variable Products** - AggregateOffer for products with variations
-- [ ] **Phase 10: Reviews & Ratings** - AggregateRating and Review objects
+- [x] **Phase 10: Reviews & Ratings** - AggregateRating and Review objects
 
 ## Phase Details
 
@@ -102,7 +102,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md - AggregateRating and Review schema from WooCommerce reviews
+- [x] 10-01-PLAN.md - AggregateRating and Review schema from WooCommerce reviews
 
 ## Progress
 
@@ -119,8 +119,8 @@ Plans:
 | 7. Foundation | v1.1 | 1/1 | Complete | 2026-01-23 |
 | 8. Simple Products | v1.1 | 2/2 | Complete | 2026-01-24 |
 | 9. Variable Products | v1.1 | 1/1 | Complete | 2026-01-24 |
-| 10. Reviews & Ratings | v1.1 | 0/1 | Not started | - |
+| 10. Reviews & Ratings | v1.1 | 1/1 | Complete | 2026-01-24 |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 9 execution*
+*Last updated: 2026-01-24 after Phase 10 execution — v1.1 COMPLETE*
