@@ -30,8 +30,8 @@ Requirements for WooCommerce Product schema support. Each maps to roadmap phases
 - [x] **OFFR-01**: Simple products output single Offer with price and priceCurrency
 - [x] **OFFR-02**: Offer outputs availability based on stock status
 - [x] **OFFR-03**: Offer outputs priceValidUntil from sale end date or default
-- [ ] **OFFR-04**: Variable products output AggregateOffer with lowPrice/highPrice
-- [ ] **OFFR-05**: AggregateOffer availability reflects any variation in stock
+- [x] **OFFR-04**: Variable products output AggregateOffer with lowPrice/highPrice
+- [x] **OFFR-05**: AggregateOffer availability reflects any variation in stock
 - [x] **OFFR-06**: Offer outputs seller referencing Organization schema
 
 ### Reviews
@@ -94,8 +94,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OFFR-01 | Phase 8 | Complete |
 | OFFR-02 | Phase 8 | Complete |
 | OFFR-03 | Phase 8 | Complete |
-| OFFR-04 | Phase 9 | Pending |
-| OFFR-05 | Phase 9 | Pending |
+| OFFR-04 | Phase 9 | Complete |
+| OFFR-05 | Phase 9 | Complete |
 | OFFR-06 | Phase 8 | Complete |
 | REVW-01 | Phase 10 | Pending |
 | REVW-02 | Phase 10 | Pending |
@@ -111,4 +111,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 8 execution*
+*Last updated: 2026-01-24 after Phase 9 execution*
