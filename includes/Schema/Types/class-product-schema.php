@@ -79,6 +79,7 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_sku( $schema, $product );
 		$this->add_brand( $schema, $product );
 		$this->add_identifiers( $schema, $product );
+		$this->add_condition( $schema, $product );
 
 		return $this->apply_fields_filter( $schema );
 	}
@@ -222,6 +223,36 @@ class Product_Schema extends Abstract_Schema {
 		$mpn = get_post_meta( $product->get_id(), '_SAMAN_SEO_mpn', true );
 		if ( ! empty( $mpn ) ) {
 			$schema['mpn'] = $mpn;
+		}
+	}
+
+	/**
+	 * Add itemCondition with full schema.org URL format.
+	 *
+	 * Defaults to NewCondition if not specified.
+	 * Uses full URL format per Google requirements.
+	 *
+	 * @param array      $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_condition( array &$schema, \WC_Product $product ): void {
+		$condition = get_post_meta( $product->get_id(), '_SAMAN_SEO_condition', true );
+
+		// Default to NewCondition.
+		if ( empty( $condition ) ) {
+			$condition = 'NewCondition';
+		}
+
+		// Valid conditions per schema.org.
+		$valid = [
+			'NewCondition',
+			'UsedCondition',
+			'RefurbishedCondition',
+			'DamagedCondition',
+		];
+
+		if ( in_array( $condition, $valid, true ) ) {
+			$schema['itemCondition'] = 'https://schema.org/' . $condition;
 		}
 	}
 }
