@@ -12,10 +12,9 @@
 .saman-seo-score-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-    border-bottom: 1px solid #e0e0e0;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #fff;
 }
 
 .saman-seo-score-info {
@@ -23,22 +22,23 @@
 }
 
 .saman-seo-score-label {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
-    color: #1e1e1e;
+    color: #0f172a;
+    letter-spacing: -0.01em;
 }
 
 .saman-seo-score-status {
-    font-size: 12px;
-    color: #757575;
-    margin-top: 2px;
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 3px;
 }
 
 /* Score Gauge */
 .saman-seo-gauge {
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     flex-shrink: 0;
 }
 
@@ -49,11 +49,11 @@
 }
 
 .saman-seo-gauge__bg {
-    stroke: #e0e0e0;
+    stroke: #e2e8f0;
 }
 
 .saman-seo-gauge__progress {
-    transition: stroke-dashoffset 0.3s ease;
+    transition: stroke-dashoffset 0.4s ease;
 }
 
 .saman-seo-gauge__value {
@@ -61,23 +61,26 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
+    color: #0f172a;
 }
 
 /* Tabs */
 .saman-seo-tabs {
     display: flex;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e2e8f0;
     background: #fff;
+    padding: 0 16px;
+    gap: 0;
 }
 
 .saman-seo-tab {
-    flex: 1;
-    padding: 10px 12px;
-    font-size: 12px;
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    font-size: 13px;
     font-weight: 500;
-    color: #757575;
+    color: #64748b;
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
@@ -86,18 +89,20 @@
 }
 
 .saman-seo-tab:hover {
-    color: #1e1e1e;
-    background: #f6f7f7;
+    color: #0f172a;
+    background: transparent;
 }
 
 .saman-seo-tab.active {
-    color: #2271b1;
-    border-bottom-color: #2271b1;
+    color: #0f172a;
+    font-weight: 600;
+    border-bottom-color: #3b82f6;
 }
 
 /* Tab Content */
 .saman-seo-tab-content {
-    padding: 16px;
+    padding: 20px;
+    background: #f8fafc;
 }
 
 /* Section Label */
@@ -107,21 +112,22 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #757575;
-    margin-bottom: 8px;
+    color: #64748b;
+    margin-bottom: 10px;
 }
 
 /* Search Preview */
 .saman-seo-preview-section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .saman-seo-search-preview {
     background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
     font-family: Arial, sans-serif;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .saman-seo-search-preview__breadcrumb {
@@ -207,51 +213,51 @@
 
 /* Fields */
 .saman-seo-field {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .saman-seo-field-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .saman-seo-field-header label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #1e1e1e;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
 }
 
 .saman-seo-char-count {
     font-size: 11px;
-    font-weight: 500;
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
 }
 
 .saman-seo-char-count.good {
-    background: #edfaef;
-    color: #00a32a;
+    background: #dcfce7;
+    color: #15803d;
 }
 
 .saman-seo-char-count.short,
 .saman-seo-char-count.empty {
-    background: #fcf9e8;
-    color: #996800;
+    background: #fef3c7;
+    color: #b45309;
 }
 
 .saman-seo-char-count.long {
-    background: #fcf0f1;
-    color: #d63638;
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 /* Progress Bar */
 .saman-seo-progress-bar {
-    height: 3px;
-    background: #e0e0e0;
+    height: 4px;
+    background: #e2e8f0;
     border-radius: 2px;
-    margin-top: 6px;
+    margin-top: 8px;
     overflow: hidden;
 }
 
@@ -262,16 +268,16 @@
 }
 
 .saman-seo-progress-fill.good {
-    background: #00a32a;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
 }
 
 .saman-seo-progress-fill.short,
 .saman-seo-progress-fill.empty {
-    background: #dba617;
+    background: linear-gradient(90deg, #f59e0b, #d97706);
 }
 
 .saman-seo-progress-fill.long {
-    background: #d63638;
+    background: linear-gradient(90deg, #ef4444, #dc2626);
 }
 
 /* Issues List */
@@ -335,7 +341,14 @@
 
 /* Robots Section */
 .saman-seo-robots-section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+}
+
+.saman-seo-robots-section .saman-seo-section-label {
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
 }
 
 .saman-seo-robots-section .components-toggle-control {
@@ -343,25 +356,43 @@
 }
 
 .saman-seo-robots-preview {
-    padding: 12px;
-    background: #f6f7f7;
-    border-radius: 6px;
+    padding: 16px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin-top: 16px;
 }
 
 .saman-seo-robots-code {
     display: block;
-    padding: 8px 10px;
+    padding: 10px 14px;
     background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-family: Consolas, Monaco, monospace;
-    font-size: 12px;
-    color: #1e1e1e;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 13px;
+    color: #0f172a;
+}
+
+/* Social Tab - 2 Column Grid */
+.saman-seo-social-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.saman-seo-social-col {
+    min-width: 0;
+}
+
+@media screen and (max-width: 700px) {
+    .saman-seo-social-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Social Preview */
 .saman-seo-social-preview {
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .saman-seo-social-card {
@@ -711,13 +742,13 @@
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
-    width: 260px;
-    max-height: 320px;
+    width: 280px;
+    max-height: 360px;
     background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100000;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    z-index: 1000001;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1103,82 +1134,112 @@
 
 .saman-seo-field-input {
     width: 100%;
-    padding: 8px 10px;
-    font-size: 13px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    transition: border-color 0.15s ease;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.15s ease;
+    color: #0f172a;
+}
+
+.saman-seo-field-input::placeholder {
+    color: #94a3b8;
 }
 
 .saman-seo-field-input:focus {
-    border-color: #2271b1;
+    border-color: #3b82f6;
     outline: none;
-    box-shadow: 0 0 0 1px #2271b1;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .saman-seo-field-help {
-    font-size: 11px;
-    color: #757575;
-    margin: 4px 0 0;
+    font-size: 12px;
+    color: #64748b;
+    margin: 6px 0 0;
 }
 
-/* Toggle switches */
-.saman-seo-toggle {
+/* Toggle switches - Modern style (scoped to editor panel to avoid admin.less conflicts) */
+.saman-seo-editor-panel .saman-seo-toggle {
+    position: relative;
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
     cursor: pointer;
+    transition: border-color 0.15s ease;
 }
 
-.saman-seo-toggle input {
+.saman-seo-editor-panel .saman-seo-toggle:hover {
+    border-color: #cbd5e1;
+}
+
+.saman-seo-editor-panel .saman-seo-toggle input {
     position: absolute;
+    width: 1px;
+    height: 1px;
     opacity: 0;
     pointer-events: none;
 }
 
-.saman-seo-toggle-slider {
-    position: relative;
-    width: 36px;
-    height: 20px;
-    background: #c5c5c5;
-    border-radius: 10px;
+.saman-seo-editor-panel .saman-seo-toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f172a;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.saman-seo-editor-panel .saman-seo-toggle-label small {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.saman-seo-editor-panel .saman-seo-toggle-slider {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 44px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 12px;
     flex-shrink: 0;
     transition: background 0.2s ease;
 }
 
-.saman-seo-toggle-slider::after {
+.saman-seo-editor-panel .saman-seo-toggle-slider::before {
+    display: none !important;
+}
+
+.saman-seo-editor-panel .saman-seo-toggle-slider::after {
     content: '';
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     background: #fff;
     border-radius: 50%;
     transition: transform 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.saman-seo-toggle input:checked + .saman-seo-toggle-slider {
-    background: #2271b1;
+.saman-seo-editor-panel .saman-seo-toggle input:checked + .saman-seo-toggle-slider {
+    background: #3b82f6;
 }
 
-.saman-seo-toggle input:checked + .saman-seo-toggle-slider::after {
-    transform: translateX(16px);
-}
-
-.saman-seo-toggle-label {
-    font-size: 13px;
-    color: #1e1e1e;
-    line-height: 1.4;
-}
-
-.saman-seo-toggle-label small {
-    display: block;
-    font-size: 11px;
-    color: #757575;
-    margin-top: 2px;
+.saman-seo-editor-panel .saman-seo-toggle input:checked + .saman-seo-toggle-slider::after {
+    transform: translateX(20px);
 }
 
 /* ========================================
@@ -1963,4 +2024,314 @@
 
 .saman-seo-image-placeholder span {
     font-size: 12px;
+}
+
+/* ========================================
+   Schema Preview Styles
+   ======================================== */
+
+.saman-seo-schema-preview {
+    margin-top: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+.saman-seo-schema-preview--loading,
+.saman-seo-schema-preview--empty {
+    padding: 24px;
+    text-align: center;
+    color: #757575;
+}
+
+.saman-seo-schema-preview--loading .components-spinner {
+    margin-bottom: 8px;
+}
+
+.saman-seo-schema-preview--error {
+    padding: 16px;
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.saman-seo-schema-preview-error {
+    color: #b91c1c;
+}
+
+.saman-seo-schema-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fff;
+}
+
+.saman-seo-schema-preview-copy {
+    font-size: 12px;
+}
+
+.saman-seo-schema-preview-code {
+    margin: 0;
+    padding: 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    max-height: 300px;
+    overflow: auto;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 0 0 4px 4px;
+}
+
+.saman-seo-schema-preview-code code {
+    white-space: pre;
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+}
+
+/* ========================================
+   SEO Modal Styles - Professional Design
+   ======================================== */
+
+/* Modal wrapper - large and prominent for modern screens */
+.saman-seo-modal-wrapper {
+    max-width: 820px;
+    width: 90vw;
+}
+
+/* Override WordPress modal frame for clean look */
+.saman-seo-modal-wrapper.components-modal__frame {
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: none;
+    overflow: hidden;
+}
+
+/* Modal content - fixed height, clean background */
+.saman-seo-modal-wrapper .components-modal__content {
+    padding: 0;
+    height: 75vh;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+
+/* Modal header - clean and minimal */
+.saman-seo-modal-wrapper .components-modal__header {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 24px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.saman-seo-modal-wrapper .components-modal__header-heading {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+/* Panel fills modal with flex layout */
+.saman-seo-modal-wrapper .saman-seo-editor-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+/* Score header - elevated card design */
+.saman-seo-modal-wrapper .saman-seo-score-header {
+    background: #fff;
+    padding: 16px 24px;
+    flex-shrink: 0;
+}
+
+/* Tab bar - prominent pill-style tabs */
+.saman-seo-modal-wrapper .saman-seo-tabs {
+    background: #fff;
+    padding: 0 24px;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.saman-seo-modal-wrapper .saman-seo-tab {
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: -1px;
+    border: 1px solid transparent;
+    border-bottom: none;
+}
+
+.saman-seo-modal-wrapper .saman-seo-tab:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.saman-seo-modal-wrapper .saman-seo-tab.active {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #e2e8f0;
+    border-bottom-color: #f8fafc;
+    font-weight: 600;
+}
+
+/* Tab content - scrollable with padding */
+.saman-seo-modal-wrapper .saman-seo-tab-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 100px;
+    max-height: 450px;
+    padding: 24px;
+    padding-bottom: 32px;
+    background: #f8fafc;
+}
+
+/* Larger tab content for bigger screens */
+@media screen and (min-height: 800px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 500px;
+    }
+}
+
+@media screen and (min-height: 900px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 550px;
+    }
+}
+
+@media screen and (min-height: 1000px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 600px;
+    }
+}
+
+/* 4K and large displays */
+@media screen and (min-height: 1200px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 700px;
+    }
+}
+
+@media screen and (min-height: 1600px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 850px;
+    }
+}
+
+/* Ensure last element in tab content doesn't have extra margin */
+.saman-seo-modal-wrapper .saman-seo-tab-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Clean up nested backgrounds in modal */
+.saman-seo-modal-wrapper .saman-seo-preview-section,
+.saman-seo-modal-wrapper .saman-seo-field,
+.saman-seo-modal-wrapper .saman-seo-robots-section {
+    background: transparent;
+}
+
+/* Search preview card in modal */
+.saman-seo-modal-wrapper .saman-seo-search-preview {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Field inputs in modal - clean card style */
+.saman-seo-modal-wrapper .saman-seo-field-input,
+.saman-seo-modal-wrapper .saman-seo-template-input__container {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.saman-seo-modal-wrapper .saman-seo-field-input:focus,
+.saman-seo-modal-wrapper .saman-seo-template-input.is-focused .saman-seo-template-input__container {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Robots preview card */
+.saman-seo-modal-wrapper .saman-seo-robots-preview {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+/* Toolbar button styles */
+.saman-seo-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e1e1e;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.saman-seo-toolbar-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.saman-seo-toolbar-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f6;
+}
+
+/* Large screens - even wider modal */
+@media screen and (min-width: 1400px) {
+    .saman-seo-modal-wrapper {
+        max-width: 900px;
+    }
+
+    .saman-seo-modal-wrapper .components-modal__content {
+        max-height: 750px;
+    }
+}
+
+/* 4K screens */
+@media screen and (min-width: 2000px) {
+    .saman-seo-modal-wrapper {
+        max-width: 1000px;
+    }
+}
+
+/* Responsive - smaller screens */
+@media screen and (max-width: 900px) {
+    .saman-seo-modal-wrapper {
+        max-width: calc(100% - 32px);
+        width: calc(100% - 32px);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .saman-seo-modal-wrapper {
+        max-width: calc(100% - 16px);
+        width: calc(100% - 16px);
+    }
+
+    .saman-seo-modal-wrapper .components-modal__content {
+        height: calc(100vh - 80px);
+        max-height: none;
+    }
+
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        padding: 16px;
+    }
 }

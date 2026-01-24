@@ -436,6 +436,7 @@ class SearchAppearance_Controller extends REST_Controller {
                 'description_template' => $description_template,
                 'schema_page'          => isset( $pt_settings['schema_page'] ) ? $pt_settings['schema_page'] : 'WebPage',
                 'schema_article'       => isset( $pt_settings['schema_article'] ) ? $pt_settings['schema_article'] : 'Article',
+                'schema_type'          => isset( $pt_settings['schema_type'] ) ? $pt_settings['schema_type'] : '',
                 'analysis_fields'      => isset( $pt_settings['analysis_fields'] ) ? $pt_settings['analysis_fields'] : '',
                 'sample_title'         => $sample_title,
             ];
@@ -478,6 +479,7 @@ class SearchAppearance_Controller extends REST_Controller {
                 'show_seo'        => ! empty( $pt_data['show_seo_controls'] ) ? '1' : '0',
                 'schema_page'     => isset( $pt_data['schema_page'] ) ? sanitize_text_field( $pt_data['schema_page'] ) : 'WebPage',
                 'schema_article'  => isset( $pt_data['schema_article'] ) ? sanitize_text_field( $pt_data['schema_article'] ) : 'Article',
+                'schema_type'     => isset( $pt_data['schema_type'] ) ? sanitize_text_field( $pt_data['schema_type'] ) : '',
                 'analysis_fields' => isset( $pt_data['analysis_fields'] ) ? sanitize_text_field( $pt_data['analysis_fields'] ) : '',
             ];
         }
@@ -512,6 +514,7 @@ class SearchAppearance_Controller extends REST_Controller {
             'show_seo'        => ! empty( $params['show_seo_controls'] ) ? '1' : '0',
             'schema_page'     => isset( $params['schema_page'] ) ? sanitize_text_field( $params['schema_page'] ) : 'WebPage',
             'schema_article'  => isset( $params['schema_article'] ) ? sanitize_text_field( $params['schema_article'] ) : 'Article',
+            'schema_type'     => isset( $params['schema_type'] ) ? sanitize_text_field( $params['schema_type'] ) : '',
             'analysis_fields' => isset( $params['analysis_fields'] ) ? sanitize_text_field( $params['analysis_fields'] ) : '',
         ];
 

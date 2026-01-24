@@ -302,7 +302,7 @@
 				return null;
 			}
 
-			// Parse time to ISO 8601 duration
+			// Parse time to ISO 8601 duration (for microdata only).
 			const parseTime = ( timeStr ) => {
 				if ( ! timeStr ) return null;
 				const match = timeStr.match( /(\d+)\s*(min|hour|h|m)/i );
@@ -317,43 +317,12 @@
 				return null;
 			};
 
-			// Build schema
-			const schema = showSchema ? {
-				'@context': 'https://schema.org',
-				'@type': 'HowTo',
-				'name': title.replace( /<[^>]*>/g, '' ),
-				'description': description.replace( /<[^>]*>/g, '' ),
-				...( parseTime( totalTime ) && { 'totalTime': parseTime( totalTime ) } ),
-				...( estimatedCost && {
-					'estimatedCost': {
-						'@type': 'MonetaryAmount',
-						'currency': currency,
-						'value': estimatedCost,
-					}
-				} ),
-				...( tools.length > 0 && {
-					'tool': tools.map( t => ( { '@type': 'HowToTool', 'name': t } ) )
-				} ),
-				...( supplies.length > 0 && {
-					'supply': supplies.map( s => ( { '@type': 'HowToSupply', 'name': s } ) )
-				} ),
-				'step': validSteps.map( ( step, index ) => ( {
-					'@type': 'HowToStep',
-					'position': index + 1,
-					'name': step.title.replace( /<[^>]*>/g, '' ),
-					'text': step.description.replace( /<[^>]*>/g, '' ),
-					...( step.image && { 'image': step.image } ),
-				} ) )
-			} : null;
+			// Schema JSON-LD output removed - handled by PHP registry.
+			// showSchema attribute still controls whether registry includes this block.
 
 			return el(
 				'div',
 				blockProps,
-				showSchema && el(
-					'script',
-					{ type: 'application/ld+json' },
-					JSON.stringify( schema )
-				),
 				el(
 					'div',
 					{ className: 'samanseo-howto-content', itemScope: true, itemType: 'https://schema.org/HowTo' },

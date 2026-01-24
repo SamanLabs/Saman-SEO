@@ -12,6 +12,9 @@ import ScoreGauge from './ScoreGauge';
 import TemplateInput from './TemplateInput';
 import AiGenerateModal from './AiGenerateModal';
 import MetricsBreakdown from './MetricsBreakdown';
+import SchemaTypeSelector from './SchemaTypeSelector';
+import SchemaPreview from './SchemaPreview';
+import useSchemaPreview from '../hooks/useSchemaPreview';
 
 // Quick template presets for the editor
 const quickTemplates = [
@@ -23,6 +26,7 @@ const quickTemplates = [
 
 const SEOPanel = ({
     postId,
+    postType,
     seoMeta,
     updateMeta,
     seoScore,
@@ -51,6 +55,13 @@ const SEOPanel = ({
     const [indexingStatus, setIndexingStatus] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [indexError, setIndexError] = useState(null);
+
+    // Fetch schema preview with debounce
+    const { preview: schemaPreview, loading: schemaLoading, error: schemaError } = useSchemaPreview(
+        postId,
+        seoMeta.schema_type,
+        [postTitle, postContent]  // Refresh when content changes
+    );
 
     // Fetch indexing status
     useEffect(() => {
@@ -204,6 +215,13 @@ const SEOPanel = ({
                     onClick={() => setActiveTab('social')}
                 >
                     Social
+                </button>
+                <button
+                    type="button"
+                    className={`saman-seo-tab ${activeTab === 'schema' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('schema')}
+                >
+                    Schema
                 </button>
             </div>
 
@@ -431,29 +449,29 @@ const SEOPanel = ({
                         <label className="saman-seo-section-label">Search Engine Visibility</label>
 
                         <label className="saman-seo-toggle">
+                            <span className="saman-seo-toggle-label">
+                                Hide from search results
+                                <small>Add noindex meta tag</small>
+                            </span>
                             <input
                                 type="checkbox"
                                 checked={seoMeta.noindex || false}
                                 onChange={(e) => updateMeta('noindex', e.target.checked)}
                             />
                             <span className="saman-seo-toggle-slider"></span>
-                            <span className="saman-seo-toggle-label">
-                                Hide from search results
-                                <small>Add noindex meta tag</small>
-                            </span>
                         </label>
 
                         <label className="saman-seo-toggle">
+                            <span className="saman-seo-toggle-label">
+                                Don't follow links
+                                <small>Add nofollow meta tag</small>
+                            </span>
                             <input
                                 type="checkbox"
                                 checked={seoMeta.nofollow || false}
                                 onChange={(e) => updateMeta('nofollow', e.target.checked)}
                             />
                             <span className="saman-seo-toggle-slider"></span>
-                            <span className="saman-seo-toggle-label">
-                                Don't follow links
-                                <small>Add nofollow meta tag</small>
-                            </span>
                         </label>
                     </div>
 
@@ -566,92 +584,114 @@ const SEOPanel = ({
             {/* Social Tab */}
             {activeTab === 'social' && (
                 <div className="saman-seo-tab-content">
-                    {/* Social Preview */}
-                    <div className="saman-seo-social-preview">
-                        <label className="saman-seo-section-label">Social Preview</label>
-                        <div className="saman-seo-social-card">
-                            <div className="saman-seo-social-image">
-                                {seoMeta.og_image || featuredImage ? (
-                                    <img src={seoMeta.og_image || featuredImage} alt="" />
-                                ) : (
-                                    <div className="saman-seo-social-placeholder">
-                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-                                            <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                        <span>No image set</span>
+                    <div className="saman-seo-social-grid">
+                        {/* Left Column - Preview */}
+                        <div className="saman-seo-social-col">
+                            <div className="saman-seo-social-preview">
+                                <label className="saman-seo-section-label">Social Preview</label>
+                                <div className="saman-seo-social-card">
+                                    <div className="saman-seo-social-image">
+                                        {seoMeta.og_image || featuredImage ? (
+                                            <img src={seoMeta.og_image || featuredImage} alt="" />
+                                        ) : (
+                                            <div className="saman-seo-social-placeholder">
+                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                                                    <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </svg>
+                                                <span>No image set</span>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                            <div className="saman-seo-social-content">
-                                <div className="saman-seo-social-url">{new URL(postUrl).hostname}</div>
-                                <div className="saman-seo-social-title">{effectiveTitle}</div>
-                                <div className="saman-seo-social-desc">{effectiveDescription || 'No description available'}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* OG Image */}
-                    <div className="saman-seo-field">
-                        <div className="saman-seo-field-header">
-                            <label>Social Image</label>
-                        </div>
-                        <div className="saman-seo-image-picker">
-                            {seoMeta.og_image ? (
-                                <div className="saman-seo-image-preview">
-                                    <img src={seoMeta.og_image} alt="" />
-                                    <button
-                                        type="button"
-                                        className="saman-seo-image-remove"
-                                        onClick={() => updateMeta('og_image', '')}
-                                        aria-label="Remove image"
-                                    >
-                                        ×
-                                    </button>
+                                    <div className="saman-seo-social-content">
+                                        <div className="saman-seo-social-url">{new URL(postUrl).hostname}</div>
+                                        <div className="saman-seo-social-title">{effectiveTitle}</div>
+                                        <div className="saman-seo-social-desc">{effectiveDescription || 'No description available'}</div>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="saman-seo-image-placeholder">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            </div>
+                        </div>
+
+                        {/* Right Column - Image Upload */}
+                        <div className="saman-seo-social-col">
+                            <div className="saman-seo-field">
+                                <div className="saman-seo-field-header">
+                                    <label>Social Image</label>
+                                </div>
+                                <div className="saman-seo-image-picker">
+                                    {seoMeta.og_image ? (
+                                        <div className="saman-seo-image-preview">
+                                            <img src={seoMeta.og_image} alt="" />
+                                            <button
+                                                type="button"
+                                                className="saman-seo-image-remove"
+                                                onClick={() => updateMeta('og_image', '')}
+                                                aria-label="Remove image"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="saman-seo-image-placeholder">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                                                <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            <span>No image</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <Button
+                                    variant="secondary"
+                                    className="saman-seo-media-button"
+                                    onClick={() => {
+                                        const frame = wp.media({
+                                            title: 'Select Social Image',
+                                            button: { text: 'Use Image' },
+                                            multiple: false,
+                                            library: { type: 'image' },
+                                        });
+                                        frame.on('select', () => {
+                                            const attachment = frame.state().get('selection').first().toJSON();
+                                            updateMeta('og_image', attachment.url);
+                                        });
+                                        frame.open();
+                                    }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ marginRight: '6px' }}>
                                         <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
                                         <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
                                         <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
                                     </svg>
-                                    <span>No image</span>
-                                </div>
-                            )}
+                                    {seoMeta.og_image ? 'Change Image' : 'Select Image'}
+                                </Button>
+                                <p className="saman-seo-field-help">1200x630 recommended. Leave empty to use featured image.</p>
+                                {!seoMeta.og_image && featuredImage && (
+                                    <p className="saman-seo-field-note">
+                                        Using featured image as fallback
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                        <Button
-                            variant="secondary"
-                            className="saman-seo-media-button"
-                            onClick={() => {
-                                const frame = wp.media({
-                                    title: 'Select Social Image',
-                                    button: { text: 'Use Image' },
-                                    multiple: false,
-                                    library: { type: 'image' },
-                                });
-                                frame.on('select', () => {
-                                    const attachment = frame.state().get('selection').first().toJSON();
-                                    updateMeta('og_image', attachment.url);
-                                });
-                                frame.open();
-                            }}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ marginRight: '6px' }}>
-                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-                                <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                            {seoMeta.og_image ? 'Change Image' : 'Select Image'}
-                        </Button>
-                        <p className="saman-seo-field-help">1200x630 recommended. Leave empty to use featured image.</p>
-                        {!seoMeta.og_image && featuredImage && (
-                            <p className="saman-seo-field-note">
-                                Using featured image as fallback
-                            </p>
-                        )}
                     </div>
+                </div>
+            )}
+
+            {/* Schema Tab */}
+            {activeTab === 'schema' && (
+                <div className="saman-seo-tab-content">
+                    <SchemaTypeSelector
+                        value={seoMeta.schema_type || ''}
+                        onChange={(value) => updateMeta('schema_type', value)}
+                        postType={postType}
+                    />
+                    <SchemaPreview
+                        jsonLd={schemaPreview}
+                        loading={schemaLoading}
+                        error={schemaError}
+                    />
                 </div>
             )}
 

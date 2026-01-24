@@ -2006,6 +2006,23 @@ const PostTypeEditor = ({
 
                 <div className="settings-row compact">
                     <div className="settings-label">
+                        <label>Default Schema Type</label>
+                        <p className="settings-help">Schema type used for posts of this type unless overridden per-post.</p>
+                    </div>
+                    <div className="settings-control">
+                        <select
+                            value={data.schema_type || ''}
+                            onChange={(e) => setData({ ...data, schema_type: e.target.value })}
+                        >
+                            {schemaTypeOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="settings-row compact">
+                    <div className="settings-label">
                         <label>Schema Page Type</label>
                         <p className="settings-help">Default structured data page type.</p>
                     </div>

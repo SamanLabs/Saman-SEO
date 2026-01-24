@@ -397,6 +397,7 @@ class Admin_V2 {
             'Schema_Validator' => 'class-schema-validator-controller.php',
             'Htaccess'         => 'class-htaccess-controller.php',
             'Mobile_Test'      => 'class-mobile-test-controller.php',
+            'Schema_Preview'   => 'class-schema-preview-controller.php',
         ];
 
         foreach ( $controllers as $controller => $file ) {

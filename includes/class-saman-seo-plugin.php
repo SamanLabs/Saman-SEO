@@ -7,6 +7,19 @@
 
 namespace Saman\SEO;
 
+use Saman\SEO\Schema\Schema_Registry;
+use Saman\SEO\Schema\Types\WebSite_Schema;
+use Saman\SEO\Schema\Types\WebPage_Schema;
+use Saman\SEO\Schema\Types\Breadcrumb_Schema;
+use Saman\SEO\Schema\Types\Organization_Schema;
+use Saman\SEO\Schema\Types\Person_Schema;
+use Saman\SEO\Schema\Types\Article_Schema;
+use Saman\SEO\Schema\Types\BlogPosting_Schema;
+use Saman\SEO\Schema\Types\NewsArticle_Schema;
+use Saman\SEO\Schema\Types\FAQPage_Schema;
+use Saman\SEO\Schema\Types\HowTo_Schema;
+use Saman\SEO\Schema\Types\LocalBusiness_Schema;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -50,6 +63,99 @@ class Plugin {
 		if ( did_action( 'SAMAN_SEO_booted' ) ) {
 			return;
 		}
+
+		// Register core schema types before services.
+		$registry = Schema_Registry::instance();
+		$registry->register( 'website', WebSite_Schema::class, [ 'priority' => 1 ] );
+		$registry->register( 'organization', Organization_Schema::class, [ 'priority' => 2 ] );
+		$registry->register( 'person', Person_Schema::class, [ 'priority' => 2 ] );
+
+		// LocalBusiness schema (priority 5 - after Organization 2, before WebPage 10).
+		$registry->register(
+			'localbusiness',
+			LocalBusiness_Schema::class,
+			[
+				'label'    => 'Local Business',
+				'priority' => 5,
+			]
+		);
+
+		$registry->register( 'webpage', WebPage_Schema::class, [ 'priority' => 10 ] );
+
+		// Content schemas (priority 15 - after WebPage 10, before Breadcrumb 20).
+		$registry->register(
+			'article',
+			Article_Schema::class,
+			[
+				'label'      => 'Article',
+				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
+		$registry->register(
+			'blogposting',
+			BlogPosting_Schema::class,
+			[
+				'label'      => 'BlogPosting',
+				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
+		$registry->register(
+			'newsarticle',
+			NewsArticle_Schema::class,
+			[
+				'label'      => 'NewsArticle',
+				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
+		// Interactive schemas (priority 18 - after content schemas 15, before Breadcrumb 20).
+		$registry->register(
+			'faqpage',
+			FAQPage_Schema::class,
+			[
+				'label'    => 'FAQ Page',
+				'priority' => 18,
+			]
+		);
+
+		$registry->register(
+			'howto',
+			HowTo_Schema::class,
+			[
+				'label'    => 'How To',
+				'priority' => 18,
+			]
+		);
+
+		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, [ 'priority' => 20 ] );
+
+		/**
+		 * Fires after core schema types are registered.
+		 *
+		 * Third-party developers use this hook to register custom schema types
+		 * that will be included in the JSON-LD @graph output. Custom schemas must
+		 * extend Abstract_Schema and implement the required methods.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param Schema_Registry $registry The schema registry singleton instance.
+		 *                                  Use $registry->register() to add types.
+		 *
+		 * @example
+		 * // Register a custom schema type
+		 * add_action( 'saman_seo_register_schema_type', function( $registry ) {
+		 *     $registry->register( 'myslug', MySchema::class, [
+		 *         'label'    => 'My Schema',
+		 *         'priority' => 15,
+		 *     ]);
+		 * });
+		 */
+		do_action( 'saman_seo_register_schema_type', $registry );
 
 		$this->register( 'compatibility', new Service\Compatibility() );
 		$this->register( 'settings', new Service\Settings() );
