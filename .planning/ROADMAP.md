@@ -85,10 +85,10 @@ Plans:
   1. Variable products output AggregateOffer instead of single Offer
   2. AggregateOffer includes lowPrice/highPrice from variation price range
   3. AggregateOffer availability shows InStock if ANY variation is in stock
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md - AggregateOffer with lowPrice/highPrice and child_is_in_stock availability
 
 ### Phase 10: Reviews & Ratings
 **Goal**: AggregateRating and Review schema from WooCommerce reviews
@@ -118,9 +118,9 @@ Plans:
 | 6. Developer API | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 7. Foundation | v1.1 | 1/1 | Complete | 2026-01-23 |
 | 8. Simple Products | v1.1 | 2/2 | Complete | 2026-01-24 |
-| 9. Variable Products | v1.1 | 0/? | Not started | - |
+| 9. Variable Products | v1.1 | 0/1 | Planned | - |
 | 10. Reviews & Ratings | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 8 execution*
+*Last updated: 2026-01-24 after Phase 9 planning*
