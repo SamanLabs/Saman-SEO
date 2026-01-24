@@ -81,11 +81,16 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_identifiers( $schema, $product );
 		$this->add_condition( $schema, $product );
 
-		// Offers (only for simple products in this phase).
+		// Offers - handle both simple and variable products.
 		if ( $product->is_type( 'simple' ) ) {
 			$offer = $this->build_offer( $product );
 			if ( ! empty( $offer ) ) {
 				$schema['offers'] = $offer;
+			}
+		} elseif ( $product->is_type( 'variable' ) ) {
+			$aggregate_offer = $this->build_aggregate_offer( $product );
+			if ( ! empty( $aggregate_offer ) ) {
+				$schema['offers'] = $aggregate_offer;
 			}
 		}
 
@@ -317,5 +322,48 @@ class Product_Schema extends Abstract_Schema {
 		}
 
 		return $offer;
+	}
+
+	/**
+	 * Build AggregateOffer schema for variable products.
+	 *
+	 * Uses price range (lowPrice/highPrice) from variation prices.
+	 * Availability shows InStock if ANY variation is in stock.
+	 *
+	 * @param \WC_Product_Variable $product Variable product object.
+	 * @return array AggregateOffer schema array, empty if prices invalid.
+	 */
+	protected function build_aggregate_offer( \WC_Product_Variable $product ): array {
+		$min_price = $product->get_variation_price( 'min' );
+		$max_price = $product->get_variation_price( 'max' );
+
+		// Both prices required for valid AggregateOffer.
+		if ( empty( $min_price ) || (float) $min_price <= 0 ) {
+			return [];
+		}
+		if ( empty( $max_price ) || (float) $max_price <= 0 ) {
+			return [];
+		}
+
+		$aggregate = [
+			'@type'         => 'AggregateOffer',
+			'lowPrice'      => $min_price,
+			'highPrice'     => $max_price,
+			'priceCurrency' => get_woocommerce_currency(),
+			'url'           => $this->context->canonical,
+		];
+
+		// Availability: InStock if ANY variation is purchasable (OFFR-05).
+		$aggregate['availability'] = $product->child_is_in_stock()
+			? 'https://schema.org/InStock'
+			: 'https://schema.org/OutOfStock';
+
+		// Optional: count of variations.
+		$variation_ids = $product->get_children();
+		if ( ! empty( $variation_ids ) ) {
+			$aggregate['offerCount'] = count( $variation_ids );
+		}
+
+		return $aggregate;
 	}
 }
