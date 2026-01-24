@@ -81,6 +81,10 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_identifiers( $schema, $product );
 		$this->add_condition( $schema, $product );
 
+		// Reviews and ratings (REVW-01 through REVW-06).
+		$this->add_aggregate_rating( $schema, $product );
+		$this->add_reviews( $schema, $product );
+
 		// Offers - handle both simple and variable products.
 		if ( $product->is_type( 'simple' ) ) {
 			$offer = $this->build_offer( $product );
