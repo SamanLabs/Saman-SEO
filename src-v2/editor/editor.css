@@ -2188,10 +2188,42 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 100px;
+    max-height: 450px;
     padding: 24px;
-    padding-bottom: 0px;
+    padding-bottom: 32px;
     background: #f8fafc;
-    max-height: 525px;
+}
+
+/* Larger tab content for bigger screens */
+@media screen and (min-height: 800px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 500px;
+    }
+}
+
+@media screen and (min-height: 900px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 550px;
+    }
+}
+
+@media screen and (min-height: 1000px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 600px;
+    }
+}
+
+/* 4K and large displays */
+@media screen and (min-height: 1200px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 700px;
+    }
+}
+
+@media screen and (min-height: 1600px) {
+    .saman-seo-modal-wrapper .saman-seo-tab-content {
+        max-height: 850px;
+    }
 }
 
 /* Ensure last element in tab content doesn't have extra margin */
