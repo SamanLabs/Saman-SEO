@@ -56,10 +56,10 @@
   2. Product schema only appears on single product pages, not on shop/category archives
   3. Product schema auto-registers in Schema_Registry when WooCommerce is detected
   4. Product_Schema class extends Abstract_Schema and integrates with Schema_Graph_Manager
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md - Disable WC native schema, create Product_Schema skeleton, extend Schema_IDs
 
 ### Phase 8: Simple Products
 **Goal**: Complete Product schema output for simple products with single Offer
@@ -116,7 +116,7 @@ Plans:
 | 4. LocalBusiness | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 5. Admin UI | v1.0 | 3/3 | Complete | 2026-01-23 |
 | 6. Developer API | v1.0 | 2/2 | Complete | 2026-01-23 |
-| 7. Foundation | v1.1 | 0/? | Not started | - |
+| 7. Foundation | v1.1 | 0/1 | Planned | - |
 | 8. Simple Products | v1.1 | 0/? | Not started | - |
 | 9. Variable Products | v1.1 | 0/? | Not started | - |
 | 10. Reviews & Ratings | v1.1 | 0/? | Not started | - |
