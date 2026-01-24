@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
-**Current focus:** Phase 7 - Foundation (WooCommerce integration)
+**Current focus:** Phase 8 - Simple Products
 
 ## Current Position
 
-Phase: 7 of 10 (Foundation)
-Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-01-24 - Completed 07-01-PLAN.md
+Phase: 8 of 10 (Simple Products)
+Plan: 1 of ? in current phase
+Status: In progress
+Last activity: 2026-01-24 - Completed 08-01-PLAN.md
 
-Progress: [||||||||||..........] v1.0 100% | [||..................] v1.1 25%
+Progress: [||||||||||..........] v1.0 100% | [|||.................] v1.1 30%
 
 ## Performance Metrics
 
@@ -35,13 +35,14 @@ Progress: [||||||||||..........] v1.0 100% | [||..................] v1.1 25%
 | 06-developer-api | 2 | 7 min | 3.5 min |
 
 **v1.1 Velocity:**
-- Plans completed: 1
-- Total execution time: 2 min
-- Estimated remaining: 3-5 plans across 3 phases
+- Plans completed: 2
+- Total execution time: 5 min
+- Estimated remaining: 2-4 plans across 2 phases
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 07-foundation | 1 | 2 min | 2 min |
+| 08-simple-products | 1 | 3 min | 3 min |
 
 ## Accumulated Context
 
@@ -55,6 +56,9 @@ v1.1 decisions:
 - Only output on is_singular('product')
 - WC schema disable at init priority 0 (earliest reliable hook)
 - Product schema priority 16 (after Article at 15)
+- itemCondition uses full URL format (https://schema.org/NewCondition)
+- Default condition is NewCondition (most WC products are new)
+- Brand fallback: meta > attribute > global option
 
 ### Pending Todos
 
@@ -67,6 +71,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 07-01-PLAN.md (Phase 7 complete)
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
-Next action: Execute Phase 8 (Simple Products)
+Next action: Execute 08-02-PLAN.md (Offers for simple products)
