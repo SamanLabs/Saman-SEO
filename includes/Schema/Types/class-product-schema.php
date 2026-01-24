@@ -77,6 +77,8 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_description( $schema, $product );
 		$this->add_images( $schema, $product );
 		$this->add_sku( $schema, $product );
+		$this->add_brand( $schema, $product );
+		$this->add_identifiers( $schema, $product );
 
 		return $this->apply_fields_filter( $schema );
 	}
@@ -161,6 +163,65 @@ class Product_Schema extends Abstract_Schema {
 		$sku = $product->get_sku();
 		if ( ! empty( $sku ) ) {
 			$schema['sku'] = $sku;
+		}
+	}
+
+	/**
+	 * Get brand with 3-level fallback chain.
+	 *
+	 * Priority: 1. Custom meta field, 2. Product attribute, 3. Global setting.
+	 *
+	 * @param \WC_Product $product WooCommerce product.
+	 * @return string Brand name or empty string.
+	 */
+	protected function get_brand( \WC_Product $product ): string {
+		// 1. Custom meta field (highest priority).
+		$brand = get_post_meta( $product->get_id(), '_SAMAN_SEO_brand', true );
+		if ( ! empty( $brand ) ) {
+			return $brand;
+		}
+
+		// 2. Product attribute 'brand'.
+		$brand = $product->get_attribute( 'brand' );
+		if ( ! empty( $brand ) ) {
+			return $brand;
+		}
+
+		// 3. Global fallback setting.
+		return get_option( 'SAMAN_SEO_product_default_brand', '' );
+	}
+
+	/**
+	 * Add brand to schema as Brand object.
+	 *
+	 * @param array      $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_brand( array &$schema, \WC_Product $product ): void {
+		$brand = $this->get_brand( $product );
+		if ( ! empty( $brand ) ) {
+			$schema['brand'] = [
+				'@type' => 'Brand',
+				'name'  => $brand,
+			];
+		}
+	}
+
+	/**
+	 * Add GTIN and MPN identifiers from custom fields.
+	 *
+	 * @param array      $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_identifiers( array &$schema, \WC_Product $product ): void {
+		$gtin = get_post_meta( $product->get_id(), '_SAMAN_SEO_gtin', true );
+		if ( ! empty( $gtin ) ) {
+			$schema['gtin'] = $gtin;
+		}
+
+		$mpn = get_post_meta( $product->get_id(), '_SAMAN_SEO_mpn', true );
+		if ( ! empty( $mpn ) ) {
+			$schema['mpn'] = $mpn;
 		}
 	}
 }
