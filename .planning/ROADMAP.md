@@ -99,10 +99,10 @@ Plans:
   2. Products with zero reviews do NOT output AggregateRating property
   3. Product schema outputs Review array with individual customer reviews
   4. Each Review includes author, reviewRating, reviewBody, and datePublished
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md - AggregateRating and Review schema from WooCommerce reviews
 
 ## Progress
 
@@ -119,7 +119,7 @@ Plans:
 | 7. Foundation | v1.1 | 1/1 | Complete | 2026-01-23 |
 | 8. Simple Products | v1.1 | 2/2 | Complete | 2026-01-24 |
 | 9. Variable Products | v1.1 | 1/1 | Complete | 2026-01-24 |
-| 10. Reviews & Ratings | v1.1 | 0/? | Not started | - |
+| 10. Reviews & Ratings | v1.1 | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
