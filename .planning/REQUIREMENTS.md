@@ -79,36 +79,36 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INTG-01 | — | Pending |
-| INTG-02 | — | Pending |
-| INTG-03 | — | Pending |
-| INTG-04 | — | Pending |
-| PROD-01 | — | Pending |
-| PROD-02 | — | Pending |
-| PROD-03 | — | Pending |
-| PROD-04 | — | Pending |
-| PROD-05 | — | Pending |
-| PROD-06 | — | Pending |
-| PROD-07 | — | Pending |
-| PROD-08 | — | Pending |
-| OFFR-01 | — | Pending |
-| OFFR-02 | — | Pending |
-| OFFR-03 | — | Pending |
-| OFFR-04 | — | Pending |
-| OFFR-05 | — | Pending |
-| OFFR-06 | — | Pending |
-| REVW-01 | — | Pending |
-| REVW-02 | — | Pending |
-| REVW-03 | — | Pending |
-| REVW-04 | — | Pending |
-| REVW-05 | — | Pending |
-| REVW-06 | — | Pending |
+| INTG-01 | Phase 7 | Pending |
+| INTG-02 | Phase 7 | Pending |
+| INTG-03 | Phase 7 | Pending |
+| INTG-04 | Phase 7 | Pending |
+| PROD-01 | Phase 8 | Pending |
+| PROD-02 | Phase 8 | Pending |
+| PROD-03 | Phase 8 | Pending |
+| PROD-04 | Phase 8 | Pending |
+| PROD-05 | Phase 8 | Pending |
+| PROD-06 | Phase 8 | Pending |
+| PROD-07 | Phase 8 | Pending |
+| PROD-08 | Phase 8 | Pending |
+| OFFR-01 | Phase 8 | Pending |
+| OFFR-02 | Phase 8 | Pending |
+| OFFR-03 | Phase 8 | Pending |
+| OFFR-04 | Phase 9 | Pending |
+| OFFR-05 | Phase 9 | Pending |
+| OFFR-06 | Phase 8 | Pending |
+| REVW-01 | Phase 10 | Pending |
+| REVW-02 | Phase 10 | Pending |
+| REVW-03 | Phase 10 | Pending |
+| REVW-04 | Phase 10 | Pending |
+| REVW-05 | Phase 10 | Pending |
+| REVW-06 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 24 total
-- Mapped to phases: 0
-- Unmapped: 24 (pending roadmap)
+- Mapped to phases: 24
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after initial definition*
+*Last updated: 2026-01-23 after roadmap creation*

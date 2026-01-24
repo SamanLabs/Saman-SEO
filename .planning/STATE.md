@@ -4,17 +4,17 @@
 
 See: .planning/PROJECT.md (updated 2026-01-23)
 
-**Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** v1.1 WooCommerce Product Schemas
+**Core value:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
+**Current focus:** Phase 7 - Foundation (WooCommerce integration)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-01-23 — Milestone v1.1 started
+Phase: 7 of 10 (Foundation)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-01-23 — Roadmap created for v1.1 milestone
 
-Progress: [░░░░░░░░░░] v1.1 0%
+Progress: [||||||||||..........] v1.0 100% | [....................] v1.1 0%
 
 ## Performance Metrics
 
@@ -34,12 +34,20 @@ Progress: [░░░░░░░░░░] v1.1 0%
 | 05-admin-ui | 3 | 11 min | 3.7 min |
 | 06-developer-api | 2 | 7 min | 3.5 min |
 
+**v1.1 Velocity:**
+- Plans completed: 0
+- Estimated: 4-6 plans across 4 phases
+
 ## Accumulated Context
 
 ### Decisions
 
 v1.0 decisions archived in PROJECT.md Key Decisions table.
-New milestone will start fresh.
+
+v1.1 decisions (pending):
+- AggregateOffer approach for variable products (not ProductGroup)
+- Disable WC native schema first (duplicate schema is #1 failure cause)
+- Only output on is_singular('product')
 
 ### Pending Todos
 
@@ -52,14 +60,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Defining v1.1 requirements
+Stopped at: Roadmap created, ready to plan Phase 7
 Resume file: None
-Next action: Continue requirements → roadmap
-
-## Quick Tasks
-
-| ID | Name | Status | Duration |
-|----|------|--------|----------|
-| 001 | SEO Metabox Popup Modal | Complete | 2 min |
-| 002 | Fix Textdomain Timing | Complete | 1 min |
-| 003 | Fix SEO Modal Tab UX and Styling | Complete | 2 min |
+Next action: /gsd:plan-phase 7
