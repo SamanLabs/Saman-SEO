@@ -270,6 +270,39 @@ class Product_Schema extends Abstract_Schema {
 	}
 
 	/**
+	 * Add AggregateRating from WooCommerce product reviews.
+	 *
+	 * Only adds rating when product has at least one review.
+	 * Uses reviewCount (not ratingCount) per Google preference.
+	 *
+	 * @param array       $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_aggregate_rating( array &$schema, \WC_Product $product ): void {
+		$review_count = $product->get_review_count();
+
+		// CRITICAL: Products with zero reviews must NOT output AggregateRating (REVW-04).
+		if ( $review_count < 1 ) {
+			return;
+		}
+
+		$average_rating = $product->get_average_rating();
+
+		// Validate rating exists and is positive.
+		if ( empty( $average_rating ) || (float) $average_rating <= 0 ) {
+			return;
+		}
+
+		$schema['aggregateRating'] = [
+			'@type'       => 'AggregateRating',
+			'ratingValue' => round( (float) $average_rating, 1 ),
+			'reviewCount' => (int) $review_count,
+			'bestRating'  => 5,
+			'worstRating' => 1,
+		];
+	}
+
+	/**
 	 * Get schema.org availability URL from WooCommerce stock status.
 	 *
 	 * @param \WC_Product $product The product object.
