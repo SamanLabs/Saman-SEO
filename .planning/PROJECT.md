@@ -42,11 +42,26 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 
 ### Active
 
-(None — ready for next milestone planning)
+- [ ] Product schema with name, description, image, sku, brand properties
+- [ ] Offer schema with price, priceCurrency, availability, url
+- [ ] Variable product support with per-variation Offers
+- [ ] AggregateRating schema from WooCommerce product reviews
+- [ ] Review schema for individual product reviews
+- [ ] Automatic Product schema on WooCommerce product pages
+- [ ] Integration with existing schema engine architecture
+
+## Current Milestone: v1.1 WooCommerce Product Schemas
+
+**Goal:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
+
+**Target features:**
+- Product schema with full property support (name, description, image, SKU, brand)
+- Offer schema with price, currency, availability status
+- Variable products with each variation as separate Offer
+- AggregateRating from WooCommerce reviews
+- Seamless integration with existing schema engine
 
 ### Out of Scope
-
-- WooCommerce Product schema — dedicated e-commerce milestone, different complexity
 - VideoObject schema — requires media detection complexity (v2 candidate)
 - Recipe schema — requires ingredient/instruction parsing (v2 candidate)
 - Built-in schema.org validation — live preview sufficient, users can use Google's validator
@@ -96,4 +111,4 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 | Fields filter is optional | Concrete classes decide if they need it, reduces coupling | ✓ Good |
 
 ---
-*Last updated: 2026-01-23 after v1.0 milestone*
+*Last updated: 2026-01-23 after starting v1.1 milestone*

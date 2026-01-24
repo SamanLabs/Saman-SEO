@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** Planning next milestone
+**Current focus:** v1.1 WooCommerce Product Schemas
 
 ## Current Position
 
-Phase: Ready for next milestone
-Plan: N/A
-Status: v1.0 SHIPPED — ready for /gsd:new-milestone
-Last activity: 2026-01-23 — v1.0 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-23 — Milestone v1.1 started
 
-Progress: [##########] v1.0 COMPLETE
+Progress: [░░░░░░░░░░] v1.1 0%
 
 ## Performance Metrics
 
@@ -52,9 +52,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: v1.0 milestone complete
+Stopped at: Defining v1.1 requirements
 Resume file: None
-Next action: /gsd:new-milestone (after /clear)
+Next action: Continue requirements → roadmap
 
 ## Quick Tasks
 
