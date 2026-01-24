@@ -2189,8 +2189,9 @@
     overflow-x: hidden;
     min-height: 100px;
     padding: 24px;
-    padding-bottom: 32px;
+    padding-bottom: 0px;
     background: #f8fafc;
+    max-height: 525px;
 }
 
 /* Ensure last element in tab content doesn't have extra margin */
