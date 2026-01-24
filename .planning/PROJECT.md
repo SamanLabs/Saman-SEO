@@ -1,8 +1,8 @@
-# Saman SEO - Schema Engine Overhaul
+# Saman SEO - Schema Engine
 
 ## What This Is
 
-A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Replaces the current hardcoded schema implementation with an extensible, registry-based architecture that supports multiple schema types, per-post configuration, live preview, and a full developer API for third-party extension.
+A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provides an extensible, registry-based architecture supporting 8 schema types (WebSite, WebPage, Breadcrumb, Organization, Person, Article variants, FAQPage, HowTo, LocalBusiness), per-post configuration with live preview, and a full developer API for third-party extension.
 
 ## Core Value
 
@@ -12,77 +12,63 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Replac
 
 ### Validated
 
-<!-- Existing capabilities from current codebase -->
-
-- ✓ Basic JSON-LD graph output (WebSite, WebPage, Breadcrumb) — existing
-- ✓ Organization/Person publisher schema with social profiles — existing
-- ✓ Article schema for posts with author/dates — existing
-- ✓ Local SEO data integration (address, phone, email) — existing
-- ✓ Filter hooks for schema modification (`SAMAN_SEO_jsonld`, `SAMAN_SEO_jsonld_graph`) — existing
-- ✓ Post type schema type setting in Search Appearance — existing
-- ✓ FAQ and HowTo Gutenberg blocks (UI exists, schema weak) — existing
+- ✓ Schema type registry that stores and retrieves registered schema types — v1.0
+- ✓ Base schema class with @context, @id, @type properties and render method — v1.0
+- ✓ Graph manager that combines multiple schema objects into single JSON-LD output — v1.0
+- ✓ Migration from existing hardcoded JsonLD service to new engine — v1.0
+- ✓ FAQPage schema type with mainEntity containing Question/Answer pairs — v1.0
+- ✓ Integration with existing FAQ Gutenberg block to auto-generate schema — v1.0
+- ✓ HowTo schema type with step, tool, supply, totalTime properties — v1.0
+- ✓ Integration with existing HowTo Gutenberg block to auto-generate schema — v1.0
+- ✓ LocalBusiness schema type with full property support — v1.0
+- ✓ OpeningHoursSpecification for business hours — v1.0
+- ✓ GeoCoordinates for location data — v1.0
+- ✓ Integration with existing Local SEO settings as data source — v1.0
+- ✓ Article schema with full author Person schema — v1.0
+- ✓ Article schema with wordCount and articleBody excerpt — v1.0
+- ✓ BlogPosting schema type extending Article — v1.0
+- ✓ NewsArticle schema type with dateline and print section — v1.0
+- ✓ Automatic schema type selection based on post type settings — v1.0
+- ✓ Post type schema defaults in Search Appearance settings — v1.0
+- ✓ Schema type dropdown selector in post editor sidebar — v1.0
+- ✓ Live JSON-LD preview panel showing rendered schema — v1.0
+- ✓ Preview updates in real-time as post content changes — v1.0
+- ✓ REST API endpoint for fetching schema preview data — v1.0
+- ✓ `saman_seo_register_schema_type` action for registering custom types — v1.0
+- ✓ `saman_seo_schema_{type}_fields` filter for modifying schema fields — v1.0
+- ✓ `saman_seo_schema_{type}_output` filter for modifying final output — v1.0
+- ✓ `saman_seo_schema_types` filter for filtering available types — v1.0
+- ✓ Documentation for extending schema system — v1.0
 
 ### Active
 
-<!-- Current scope for this milestone -->
-
-**Schema Engine Architecture:**
-- [ ] Type registry system for registering/managing schema types
-- [ ] Base schema class with common properties (@context, @id, @type)
-- [ ] Field definition system (required, optional, nested types)
-- [ ] Schema builder that assembles JSON-LD from field values
-- [ ] Graph manager for combining multiple schemas on a page
-
-**High-Impact Schema Types:**
-- [ ] FAQPage schema (mainEntity with Question/Answer pairs)
-- [ ] HowTo schema (steps, tools, supplies, total time)
-- [ ] Article schema improvements (wordCount, speakable, full author)
-- [ ] BlogPosting schema (distinct from Article)
-- [ ] NewsArticle schema (dateline, print metadata)
-- [ ] Event schema (startDate, endDate, location, offers, performer)
-- [ ] LocalBusiness schema (openingHours, geo, priceRange, aggregateRating)
-
-**Admin UI Integration:**
-- [ ] Post type defaults in Search Appearance settings
-- [ ] Per-post schema type selector in editor sidebar
-- [ ] Live JSON-LD preview panel in post editor
-- [ ] Schema field editor for type-specific properties
-
-**Developer API:**
-- [ ] `saman_seo_register_schema_type` action for custom types
-- [ ] `saman_seo_schema_{type}_fields` filter for modifying fields
-- [ ] `saman_seo_schema_{type}_output` filter for final output
-- [ ] `saman_seo_schema_types` filter for type registry
-- [ ] PHP API for programmatic schema generation
+(None — ready for next milestone planning)
 
 ### Out of Scope
 
-- WooCommerce Product schema — defer to dedicated e-commerce milestone
-- Video schema — defer to v2 (requires media detection complexity)
-- Recipe schema — defer to v2 (requires ingredient/instruction parsing)
-- Built-in schema.org validation — live preview sufficient for v1
-- Carousel/ItemList schemas — defer to v2
-- Profile page schema — defer to v2
+- WooCommerce Product schema — dedicated e-commerce milestone, different complexity
+- VideoObject schema — requires media detection complexity (v2 candidate)
+- Recipe schema — requires ingredient/instruction parsing (v2 candidate)
+- Built-in schema.org validation — live preview sufficient, users can use Google's validator
+- Carousel/ItemList schemas — low priority, complex implementation
+- Profile page schema — niche use case
 
 ## Context
 
-**Existing Architecture:**
-- `includes/class-saman-seo-service-jsonld.php` - Main JSON-LD service, builds graph
-- `includes/Service/class-saman-seo-service-*-schema.php` - Individual schema stubs (mostly placeholder)
-- Filter-based extension via `SAMAN_SEO_jsonld_graph`
-- React admin in `src-v2/` with REST API controllers
+**Current State (v1.0 shipped):**
+- 37,578 lines of PHP + 21,382 lines of JavaScript
+- Tech stack: PHP 7.4+, WordPress 5.0+, React (Gutenberg editor)
+- 8 schema types in registry with priority ordering
+- 4 public hooks for developer extension
+- 1,368-line SCHEMA_DEVELOPER_API.md
 
-**Reference Documentation:**
-- `jsonld_examples/` folder contains 27 documented schema types with real-world examples
-- High-impact types: `faq-json-ld-snippet.md`, `event.md`, `local-business.md`, `article.md`
-- Foundation types: `breadcrumb.md`, `organization.md`, `person.md`, `website.md`
-
-**Current Pain Points:**
-- Schema types are hardcoded, not extensible
-- Individual schema services have dummy data
-- No unified field system or validation
-- No per-post schema configuration UI
-- Developers can't register custom schema types
+**Architecture:**
+- `includes/Schema/` — Core schema engine (Abstract_Schema, Schema_Context, Schema_IDs, Schema_Registry, Schema_Graph_Manager)
+- `includes/Schema/Types/` — Schema type implementations (WebSite, WebPage, Breadcrumb, Organization, Person, Article, BlogPosting, NewsArticle, FAQPage, HowTo, LocalBusiness)
+- `includes/Api/class-schema-preview-controller.php` — REST endpoint for live preview
+- `src-v2/editor/components/` — React components (SchemaTypeSelector, SchemaPreview)
+- `src-v2/editor/hooks/useSchemaPreview.js` — Preview hook with debounce
+- `docs/SCHEMA_DEVELOPER_API.md` — Developer documentation
 
 ## Constraints
 
@@ -96,11 +82,18 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Replac
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Registry-based architecture | Enables extensibility without modifying core code | — Pending |
-| Post type defaults + per-post override | Balances convenience (defaults) with flexibility (override) | — Pending |
-| Live preview over built-in validation | Simpler implementation, users can use Google's validator | — Pending |
-| Skip WooCommerce for this milestone | Focus on content schemas, e-commerce has unique complexity | — Pending |
-| FAQ/HowTo/Article/Event/LocalBusiness first | Highest Google rich results impact, most requested | — Pending |
+| Registry-based architecture | Enables extensibility without modifying core code | ✓ Good |
+| Post type defaults + per-post override | Balances convenience (defaults) with flexibility (override) | ✓ Good |
+| Live preview over built-in validation | Simpler implementation, users can use Google's validator | ✓ Good |
+| Skip WooCommerce for v1.0 | Focus on content schemas, e-commerce has unique complexity | ✓ Good |
+| FAQ/HowTo/Article/LocalBusiness first | Highest Google rich results impact, most requested | ✓ Good |
+| @context only at graph root | Prevents duplicate @context in individual schemas | ✓ Good |
+| Author as full Person object | Required for Google rich results eligibility | ✓ Good |
+| FAQPage combines multiple blocks | Single mainEntity per page is cleaner for search engines | ✓ Good |
+| HowTo uses first block only | Multiple HowTo schemas per page is semantically unclear | ✓ Good |
+| LocalBusiness on homepage only | Matches Organization pattern, avoids per-page business data | ✓ Good |
+| 500ms debounce for preview | Balances responsiveness with API efficiency | ✓ Good |
+| Fields filter is optional | Concrete classes decide if they need it, reduces coupling | ✓ Good |
 
 ---
-*Last updated: 2026-01-23 after initialization*
+*Last updated: 2026-01-23 after v1.0 milestone*
