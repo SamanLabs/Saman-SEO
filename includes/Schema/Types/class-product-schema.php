@@ -73,8 +73,10 @@ class Product_Schema extends Abstract_Schema {
 			'url'   => $this->context->canonical,
 		];
 
-		// Additional properties (description, image, sku, offers, etc.)
-		// will be added in Phase 8: Simple Products.
+		// Add optional properties conditionally.
+		$this->add_description( $schema, $product );
+		$this->add_images( $schema, $product );
+		$this->add_sku( $schema, $product );
 
 		return $this->apply_fields_filter( $schema );
 	}
@@ -86,5 +88,79 @@ class Product_Schema extends Abstract_Schema {
 	 */
 	protected function get_id(): string {
 		return Schema_IDs::product( $this->context->canonical );
+	}
+
+	/**
+	 * Add description from short description.
+	 *
+	 * Strips HTML tags for clean schema output.
+	 *
+	 * @param array      $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_description( array &$schema, \WC_Product $product ): void {
+		$description = $product->get_short_description();
+		if ( ! empty( $description ) ) {
+			$schema['description'] = wp_strip_all_tags( $description );
+		}
+	}
+
+	/**
+	 * Add images (featured + gallery).
+	 *
+	 * Featured image is first, followed by gallery images.
+	 * Uses 'full' size for maximum quality.
+	 *
+	 * @param array      $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_images( array &$schema, \WC_Product $product ): void {
+		$images = $this->get_images( $product );
+		if ( ! empty( $images ) ) {
+			$schema['image'] = $images;
+		}
+	}
+
+	/**
+	 * Get product images as URL array.
+	 *
+	 * @param \WC_Product $product WooCommerce product.
+	 * @return array Array of image URLs.
+	 */
+	protected function get_images( \WC_Product $product ): array {
+		$images = [];
+
+		// Featured image first.
+		$featured_id = $product->get_image_id();
+		if ( $featured_id ) {
+			$url = wp_get_attachment_image_url( $featured_id, 'full' );
+			if ( $url ) {
+				$images[] = $url;
+			}
+		}
+
+		// Gallery images.
+		$gallery_ids = $product->get_gallery_image_ids();
+		foreach ( $gallery_ids as $attachment_id ) {
+			$url = wp_get_attachment_image_url( $attachment_id, 'full' );
+			if ( $url ) {
+				$images[] = $url;
+			}
+		}
+
+		return $images;
+	}
+
+	/**
+	 * Add SKU to schema.
+	 *
+	 * @param array      $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_sku( array &$schema, \WC_Product $product ): void {
+		$sku = $product->get_sku();
+		if ( ! empty( $sku ) ) {
+			$schema['sku'] = $sku;
+		}
 	}
 }
