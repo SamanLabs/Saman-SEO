@@ -303,6 +303,96 @@ class Product_Schema extends Abstract_Schema {
 	}
 
 	/**
+	 * Add individual Review objects from WooCommerce product reviews.
+	 *
+	 * Queries approved reviews via WordPress comments API.
+	 * Limits to 10 most recent reviews for performance.
+	 *
+	 * @param array       $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_reviews( array &$schema, \WC_Product $product ): void {
+		// Skip if no reviews exist.
+		if ( $product->get_review_count() < 1 ) {
+			return;
+		}
+
+		// Query approved WooCommerce reviews.
+		$comments = get_comments( [
+			'post_id' => $product->get_id(),
+			'status'  => 'approve',
+			'type'    => 'review',
+			'number'  => 10,
+			'orderby' => 'comment_date_gmt',
+			'order'   => 'DESC',
+		] );
+
+		if ( empty( $comments ) ) {
+			return;
+		}
+
+		// Build review array from comments.
+		$reviews = [];
+		foreach ( $comments as $comment ) {
+			$review = $this->build_review( $comment );
+			if ( ! empty( $review ) ) {
+				$reviews[] = $review;
+			}
+		}
+
+		// Only add if we have valid reviews.
+		if ( ! empty( $reviews ) ) {
+			$schema['review'] = $reviews;
+		}
+	}
+
+	/**
+	 * Build a single Review schema from a WP_Comment.
+	 *
+	 * Validates that review has required author and rating (1-5).
+	 * Optionally includes reviewBody if comment content exists.
+	 *
+	 * @param \WP_Comment $comment WordPress comment object.
+	 * @return array Review schema array, empty if invalid.
+	 */
+	protected function build_review( \WP_Comment $comment ): array {
+		// Author is required by Google.
+		$author_name = trim( $comment->comment_author );
+		if ( empty( $author_name ) ) {
+			return [];
+		}
+
+		// Rating must be valid 1-5 range.
+		$rating = (int) get_comment_meta( $comment->comment_ID, 'rating', true );
+		if ( $rating < 1 || $rating > 5 ) {
+			return [];
+		}
+
+		$review = [
+			'@type'         => 'Review',
+			'author'        => [
+				'@type' => 'Person',
+				'name'  => $author_name,
+			],
+			'reviewRating'  => [
+				'@type'       => 'Rating',
+				'ratingValue' => $rating,
+				'bestRating'  => 5,
+				'worstRating' => 1,
+			],
+			'datePublished' => gmdate( 'Y-m-d', strtotime( $comment->comment_date_gmt ) ),
+		];
+
+		// Optionally add review body if content exists.
+		$review_body = trim( $comment->comment_content );
+		if ( ! empty( $review_body ) ) {
+			$review['reviewBody'] = wp_strip_all_tags( $review_body );
+		}
+
+		return $review;
+	}
+
+	/**
 	 * Get schema.org availability URL from WooCommerce stock status.
 	 *
 	 * @param \WC_Product $product The product object.
