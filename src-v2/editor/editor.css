@@ -743,13 +743,13 @@
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
-    width: 260px;
-    max-height: 320px;
+    width: 280px;
+    max-height: 360px;
     background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100000;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    z-index: 1000001;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1160,8 +1160,8 @@
     margin: 6px 0 0;
 }
 
-/* Toggle switches - Modern style */
-.saman-seo-toggle {
+/* Toggle switches - Modern style (scoped to editor panel to avoid admin.less conflicts) */
+.saman-seo-editor-panel .saman-seo-toggle {
     position: relative;
     display: flex;
     align-items: center;
@@ -1176,11 +1176,11 @@
     transition: border-color 0.15s ease;
 }
 
-.saman-seo-toggle:hover {
+.saman-seo-editor-panel .saman-seo-toggle:hover {
     border-color: #cbd5e1;
 }
 
-.saman-seo-toggle input {
+.saman-seo-editor-panel .saman-seo-toggle input {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -1188,7 +1188,7 @@
     pointer-events: none;
 }
 
-.saman-seo-toggle-label {
+.saman-seo-editor-panel .saman-seo-toggle-label {
     font-size: 14px;
     font-weight: 500;
     color: #0f172a;
@@ -1196,7 +1196,7 @@
     flex: 1;
 }
 
-.saman-seo-toggle-label small {
+.saman-seo-editor-panel .saman-seo-toggle-label small {
     display: block;
     font-size: 12px;
     font-weight: 400;
@@ -1204,8 +1204,12 @@
     margin-top: 2px;
 }
 
-.saman-seo-toggle-slider {
-    position: relative;
+.saman-seo-editor-panel .saman-seo-toggle-slider {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     width: 44px;
     height: 24px;
     background: #cbd5e1;
@@ -1214,7 +1218,11 @@
     transition: background 0.2s ease;
 }
 
-.saman-seo-toggle-slider::after {
+.saman-seo-editor-panel .saman-seo-toggle-slider::before {
+    display: none !important;
+}
+
+.saman-seo-editor-panel .saman-seo-toggle-slider::after {
     content: '';
     position: absolute;
     top: 2px;
@@ -1227,11 +1235,11 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.saman-seo-toggle input:checked + .saman-seo-toggle-slider {
+.saman-seo-editor-panel .saman-seo-toggle input:checked + .saman-seo-toggle-slider {
     background: #3b82f6;
 }
 
-.saman-seo-toggle input:checked + .saman-seo-toggle-slider::after {
+.saman-seo-editor-panel .saman-seo-toggle input:checked + .saman-seo-toggle-slider::after {
     transform: translateX(20px);
 }
 
