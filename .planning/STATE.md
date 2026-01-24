@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 8 of 10 (Simple Products)
-Plan: 1 of ? in current phase
-Status: In progress
-Last activity: 2026-01-24 - Completed 08-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-24 - Completed 08-02-PLAN.md
 
-Progress: [||||||||||..........] v1.0 100% | [|||.................] v1.1 30%
+Progress: [||||||||||..........] v1.0 100% | [||||................] v1.1 40%
 
 ## Performance Metrics
 
@@ -35,14 +35,14 @@ Progress: [||||||||||..........] v1.0 100% | [|||.................] v1.1 30%
 | 06-developer-api | 2 | 7 min | 3.5 min |
 
 **v1.1 Velocity:**
-- Plans completed: 2
-- Total execution time: 5 min
-- Estimated remaining: 2-4 plans across 2 phases
+- Plans completed: 3
+- Total execution time: 8 min
+- Estimated remaining: 1-3 plans (Phase 9)
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 07-foundation | 1 | 2 min | 2 min |
-| 08-simple-products | 1 | 3 min | 3 min |
+| 08-simple-products | 2 | 6 min | 3 min |
 
 ## Accumulated Context
 
@@ -59,6 +59,10 @@ v1.1 decisions:
 - itemCondition uses full URL format (https://schema.org/NewCondition)
 - Default condition is NewCondition (most WC products are new)
 - Brand fallback: meta > attribute > global option
+- Use get_price() for active price (handles sale price automatically)
+- Skip offers entirely if price is zero/empty
+- onbackorder maps to PreOrder (Google-recommended)
+- Seller only added when Organization type is active
 
 ### Pending Todos
 
@@ -71,6 +75,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 08-01-PLAN.md
+Stopped at: Completed 08-02-PLAN.md (Phase 8 complete)
 Resume file: None
-Next action: Execute 08-02-PLAN.md (Offers for simple products)
+Next action: Plan and execute Phase 9 (Variable Products with AggregateOffer)
