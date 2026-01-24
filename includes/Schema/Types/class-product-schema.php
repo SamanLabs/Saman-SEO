@@ -81,6 +81,14 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_identifiers( $schema, $product );
 		$this->add_condition( $schema, $product );
 
+		// Offers (only for simple products in this phase).
+		if ( $product->is_type( 'simple' ) ) {
+			$offer = $this->build_offer( $product );
+			if ( ! empty( $offer ) ) {
+				$schema['offers'] = $offer;
+			}
+		}
+
 		return $this->apply_fields_filter( $schema );
 	}
 
@@ -272,5 +280,42 @@ class Product_Schema extends Abstract_Schema {
 		];
 
 		return $map[ $status ] ?? 'https://schema.org/InStock';
+	}
+
+	/**
+	 * Build Offer schema for simple products.
+	 *
+	 * @param \WC_Product $product The product object.
+	 * @return array Offer schema array, empty if price is invalid.
+	 */
+	protected function build_offer( \WC_Product $product ): array {
+		$price = $product->get_price();
+
+		// Price is required for merchant listings - skip if zero/empty.
+		if ( empty( $price ) || (float) $price <= 0 ) {
+			return [];
+		}
+
+		$offer = [
+			'@type'         => 'Offer',
+			'price'         => $price,
+			'priceCurrency' => get_woocommerce_currency(),
+			'availability'  => $this->get_availability_url( $product ),
+			'url'           => $this->context->canonical,
+		];
+
+		// priceValidUntil from sale end date (OFFR-03).
+		$sale_end = $product->get_date_on_sale_to();
+		if ( $sale_end instanceof \WC_DateTime ) {
+			$offer['priceValidUntil'] = $sale_end->format( 'Y-m-d' );
+		}
+
+		// Seller reference to Organization (OFFR-06).
+		// Only add when Organization type is active (most stores).
+		if ( get_option( 'SAMAN_SEO_homepage_knowledge_type', 'organization' ) === 'organization' ) {
+			$offer['seller'] = [ '@id' => Schema_IDs::organization() ];
+		}
+
+		return $offer;
 	}
 }
