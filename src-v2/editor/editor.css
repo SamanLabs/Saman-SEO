@@ -374,9 +374,26 @@
     color: #0f172a;
 }
 
+/* Social Tab - 2 Column Grid */
+.saman-seo-social-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.saman-seo-social-col {
+    min-width: 0;
+}
+
+@media screen and (max-width: 700px) {
+    .saman-seo-social-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Social Preview */
 .saman-seo-social-preview {
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .saman-seo-social-card {
@@ -1150,8 +1167,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 12px 0;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
     cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+.saman-seo-toggle:hover {
+    border-color: #cbd5e1;
 }
 
 .saman-seo-toggle input {
@@ -1162,6 +1188,22 @@
     pointer-events: none;
 }
 
+.saman-seo-toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f172a;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.saman-seo-toggle-label small {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 2px;
+}
+
 .saman-seo-toggle-slider {
     position: relative;
     width: 44px;
@@ -1170,7 +1212,6 @@
     border-radius: 12px;
     flex-shrink: 0;
     transition: background 0.2s ease;
-    order: 2;
 }
 
 .saman-seo-toggle-slider::after {
@@ -1192,23 +1233,6 @@
 
 .saman-seo-toggle input:checked + .saman-seo-toggle-slider::after {
     transform: translateX(20px);
-}
-
-.saman-seo-toggle-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #0f172a;
-    line-height: 1.4;
-    order: 1;
-    flex: 1;
-}
-
-.saman-seo-toggle-label small {
-    display: block;
-    font-size: 12px;
-    font-weight: 400;
-    color: #64748b;
-    margin-top: 2px;
 }
 
 /* ========================================
@@ -2197,30 +2221,6 @@
     border: 1px solid #e2e8f0;
     border-radius: 10px;
     padding: 16px;
-}
-
-/* Toggle items in modal - card style with label left, switch right */
-.saman-seo-modal-wrapper .saman-seo-toggle {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    gap: 16px;
-}
-
-.saman-seo-modal-wrapper .saman-seo-toggle-label {
-    order: -1;
-    flex: 1;
-}
-
-.saman-seo-modal-wrapper .saman-seo-toggle-slider {
-    order: 1;
-    flex-shrink: 0;
 }
 
 /* Toolbar button styles */
