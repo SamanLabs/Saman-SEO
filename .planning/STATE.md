@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-24)
+See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Legacy Cleanup & Hardening
 
 ## Current Position
 
-Phase: 10 of 10 complete
-Plan: All complete
-Status: v1.1 shipped, ready for next milestone
-Last activity: 2026-01-24 — v1.1 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-25 — Milestone v1.2 started
 
-Progress: [||||||||||||||||||||] v1.0 100% | [||||||||||||||||||||] v1.1 100%
+Progress: [||||||||||||||||||||] v1.0 100% | [||||||||||||||||||||] v1.1 100% | [                    ] v1.2 0%
 
 ## Performance Metrics
 
@@ -44,7 +44,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-24
-Stopped at: v1.1 milestone complete and archived
+Last session: 2026-01-25
+Stopped at: Defining v1.2 requirements
 Resume file: None
-Next action: `/gsd:new-milestone` to plan next version
+Next action: Complete requirements and roadmap definition

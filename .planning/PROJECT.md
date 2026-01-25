@@ -50,9 +50,22 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 
 ### Active
 
-(Planning next milestone)
+- [ ] Remove legacy schema dropdowns from Search Appearances UI
+- [ ] Clean up backend handling of unused schema settings
+- [ ] Simplify Schema_Context determination logic
+- [ ] Critical fragility fixes (null safety, error handling)
 
-## Latest Milestone: v1.1 WooCommerce Product Schemas ✓
+## Current Milestone: v1.2 Legacy Cleanup & Hardening
+
+**Goal:** Remove redundant legacy schema selectors and harden critical code paths.
+
+**Target features:**
+- Remove 3 legacy schema dropdowns from Search Appearances (schema_type, schema_page, schema_article)
+- Clean up SearchAppearance controller (stop saving/reading unused settings)
+- Simplify Schema_Context schema type determination
+- Critical null safety and error handling fixes
+
+## Previous Milestone: v1.1 WooCommerce Product Schemas ✓
 
 **Goal:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
 
@@ -120,4 +133,4 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 | reviewCount over ratingCount | Google preference when actual reviews exist | ✓ Good |
 
 ---
-*Last updated: 2026-01-24 after v1.1 milestone*
+*Last updated: 2026-01-25 after v1.2 milestone started*
