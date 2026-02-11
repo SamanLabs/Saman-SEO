@@ -142,19 +142,18 @@ class Admin_UI {
 			wp_kses_post( $message )
 		);
 
-		// Add inline script to handle dismiss
-		?>
-		<script>
-		jQuery(function($) {
-			$(document).on('click', '#saman-seo-ai-notice .notice-dismiss', function() {
-				$.post(ajaxurl, {
-					action: 'SAMAN_SEO_dismiss_ai_notice',
-					nonce: $('#saman-seo-ai-notice').data('nonce')
+		// Add inline script to handle dismiss using proper enqueue method.
+		$dismiss_script = "
+			jQuery(function($) {
+				$(document).on('click', '#saman-seo-ai-notice .notice-dismiss', function() {
+					$.post(ajaxurl, {
+						action: 'SAMAN_SEO_dismiss_ai_notice',
+						nonce: $('#saman-seo-ai-notice').data('nonce')
+					});
 				});
 			});
-		});
-		</script>
-		<?php
+		";
+		wp_add_inline_script( 'jquery', $dismiss_script );
 	}
 
 	/**
@@ -689,17 +688,20 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function print_pointer() {
-		?>
-		<script>
+		$title       = esc_js( __( 'SEO fields live here', 'saman-seo' ) );
+		$description = esc_js( __( 'Update title, description, and previews without scrolling.', 'saman-seo' ) );
+
+		$pointer_script = "
 			jQuery(function ($) {
 				$('#saman-seo-meta .hndle').pointer({
-					content: '<h3><?php echo esc_js( __( 'SEO fields live here', 'saman-seo' ) ); ?></h3><p><?php echo esc_js( __( 'Update title, description, and previews without scrolling.', 'saman-seo' ) ); ?></p>',
+					content: '<h3>{$title}</h3><p>{$description}</p>',
 					position: { edge: 'left', align: 'center' },
 					close: function () {}
 				}).pointer('open');
 			});
-		</script>
-		<?php
+		";
+
+		wp_add_inline_script( 'wp-pointer', $pointer_script );
 	}
 
 	/**

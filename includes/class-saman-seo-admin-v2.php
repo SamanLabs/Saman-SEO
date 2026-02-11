@@ -331,7 +331,7 @@ class Admin_V2 {
         ];
 
         // Pass configuration to React app
-        wp_localize_script( 'saman-seo-admin-v2', 'saman-seoV2Settings', [
+        wp_localize_script( 'saman-seo-admin-v2', 'samanSeoV2Settings', [
             'initialView' => $initial_view,
             'restUrl'     => rest_url( 'saman-seo/v1/' ),
             'nonce'       => wp_create_nonce( 'wp_rest' ),

@@ -1243,6 +1243,8 @@ class Sitemap_Enhancer {
 		nocache_headers();
 		header( 'Content-Type: application/xml; charset=UTF-8' );
 
+		$css_url = esc_url( plugins_url( 'assets/css/sitemap.css', dirname( __FILE__ ) ) );
+
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		?>
 <xsl:stylesheet version="1.0"
@@ -1255,20 +1257,7 @@ class Sitemap_Enhancer {
 			<head>
 				<meta charset="utf-8" />
 				<title>Saman SEO Sitemap</title>
-				<style>
-					body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f5f6fa;margin:0;padding:2rem;color:#1f2933;}
-					h1{margin-top:0;font-size:1.8rem;}
-					p.description{color:#4b5563;margin-bottom:1.5rem;}
-					table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 15px 35px rgba(31,45,61,.08);}
-					th,td{padding:1rem;text-align:left;}
-					th{background:#0f172a;color:#f8fafc;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em;}
-					tbody tr:nth-child(even){background:#fff;}
-					tbody tr:nth-child(odd){background:#f8fafc;}
-					tbody tr:hover{background:#e0f2fe;}
-					.loc{word-break:break-all;color:#0f62fe;font-weight:500;text-decoration:none;}
-					.badge{display:inline-flex;align-items:center;background:#0f172a;color:#fff;border-radius:999px;padding:0 .65rem;font-size:.72rem;font-weight:600;margin-left:.5rem;}
-					.meta{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:#475569;margin-bottom:.5rem;}
-				</style>
+				<link rel="stylesheet" href="<?php echo $css_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>" />
 			</head>
 			<body>
 				<main>

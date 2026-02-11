@@ -58,7 +58,7 @@ class Internal_Linking {
 	 *
 	 * @param Repository|null $repository Optional custom repository for testing.
 	 */
-	public function __construct( Repository $repository = null ) {
+	public function __construct( ?Repository $repository = null ) {
 		$this->repository = $repository ?: new Repository();
 		$this->engine     = new Linking_Engine( $this->repository );
 	}

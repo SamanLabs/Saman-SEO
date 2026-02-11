@@ -32,8 +32,8 @@ class Admin_Bar {
 		}
 
 		add_action( 'admin_bar_menu', [ $this, 'add_seo_menu' ], 100 );
-		add_action( 'wp_head', [ $this, 'render_admin_bar_styles' ], 100 );
-		add_action( 'admin_head', [ $this, 'render_admin_bar_styles' ], 100 );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_admin_bar_styles' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_bar_styles' ] );
 
 		// Enqueue dashicons on frontend for admin bar icons
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_dashicons' ] );
@@ -404,21 +404,21 @@ class Admin_Bar {
 	}
 
 	/**
-	 * Render admin bar styles.
+	 * Enqueue admin bar styles.
 	 *
 	 * @return void
 	 */
-	public function render_admin_bar_styles() {
+	public function enqueue_admin_bar_styles() {
 		if ( ! is_admin_bar_showing() ) {
 			return;
 		}
 
-		// Only show for users who can edit posts
+		// Only show for users who can edit posts.
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return;
 		}
-		?>
-		<style id="saman-seo-admin-bar-css">
+
+		$css = '
 			/* Admin Bar SEO Menu */
 			#wpadminbar .saman-seo-admin-bar-item > .ab-item {
 				display: flex !important;
@@ -597,7 +597,8 @@ class Admin_Bar {
 			#wpadminbar .saman-seo-admin-bar-item:hover > .ab-item {
 				background: rgba(255,255,255,0.1) !important;
 			}
-		</style>
-		<?php
+		';
+
+		wp_add_inline_style( 'admin-bar', $css );
 	}
 }

@@ -25,14 +25,16 @@ class Plugin_Registry {
 	 * @return array List of plugins with their info.
 	 */
 	public static function get_plugins() {
+		$base_url = plugins_url( 'assets/images/', dirname( __DIR__, 2 ) . '/saman-seo.php' );
+
 		return [
 			'saman-seo' => [
 				'name'        => 'Saman SEO',
 				'slug'        => 'saman-seo',
 				'repo'        => 'SamanLabs/Saman-SEO',
 				'description' => __( 'The Open Standard for WordPress SEO. A comprehensive, transparent SEO solution.', 'saman-seo' ),
-				'icon'        => 'https://raw.githubusercontent.com/SamanLabs/Saman-SEO/main/assets/images/icon-128.png',
-				'banner'      => 'https://raw.githubusercontent.com/SamanLabs/Saman-SEO/main/assets/images/banner-772x250.png',
+				'icon'        => $base_url . 'icon-128.png',
+				'banner'      => $base_url . 'banner-772x250.png',
 				'type'        => 'seo',
 				'coming_soon' => false,
 			],
@@ -41,8 +43,8 @@ class Plugin_Registry {
 				'slug'        => 'saman-ai',
 				'repo'        => 'SamanLabs/Saman-AI',
 				'description' => __( 'Centralized AI management for WordPress.', 'saman-seo' ),
-				'icon'        => 'https://raw.githubusercontent.com/SamanLabs/Saman-AI/main/assets/images/icon-128.png',
-				'banner'      => 'https://raw.githubusercontent.com/SamanLabs/Saman-AI/main/assets/images/banner-772x250.png',
+				'icon'        => $base_url . 'icon-128.png',
+				'banner'      => $base_url . 'banner-772x250.png',
 				'type'        => 'ai',
 				'coming_soon' => true,
 			],
@@ -51,8 +53,8 @@ class Plugin_Registry {
 				'slug'        => 'saman-security',
 				'repo'        => 'SamanLabs/Saman-Security',
 				'description' => __( 'Core security suite with firewall, malware scans, and hardening.', 'saman-seo' ),
-				'icon'        => 'https://raw.githubusercontent.com/SamanLabs/Saman-Security/main/assets/images/icon-128.png',
-				'banner'      => 'https://raw.githubusercontent.com/SamanLabs/Saman-Security/main/assets/images/banner-772x250.png',
+				'icon'        => $base_url . 'icon-128.png',
+				'banner'      => $base_url . 'banner-772x250.png',
 				'type'        => 'security',
 				'coming_soon' => true,
 			],

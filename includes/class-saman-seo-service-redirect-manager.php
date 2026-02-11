@@ -826,6 +826,12 @@ class Redirect_Manager {
 		);
 
 		$target = esc_url_raw( $target );
+
+		// Bail if output has already started (e.g. PHP deprecation notices on 8.4+).
+		if ( headers_sent() ) {
+			return;
+		}
+
 		add_filter(
 			'allowed_redirect_hosts',
 			static function ( $hosts ) use ( $target ) {
