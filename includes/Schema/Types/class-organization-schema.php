@@ -74,10 +74,7 @@ class Organization_Schema extends Abstract_Schema {
 		];
 
 		if ( ! empty( $org_logo ) ) {
-			$schema['logo'] = [
-				'@type' => 'ImageObject',
-				'url'   => $org_logo,
-			];
+			$schema['logo'] = $org_logo;
 		}
 
 		// Add Local SEO data if available.

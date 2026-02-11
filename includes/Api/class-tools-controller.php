@@ -692,14 +692,18 @@ class Tools_Controller extends REST_Controller {
             ];
             $schema['datePublished'] = $date_published;
             $schema['dateModified'] = $date_modified;
-            $schema['publisher'] = [
+            $logo_url = get_option( 'SAMAN_SEO_homepage_organization_logo', '' );
+            if ( empty( $logo_url ) ) {
+                $logo_url = get_site_icon_url();
+            }
+            $publisher = [
                 '@type' => 'Organization',
                 'name'  => get_bloginfo( 'name' ),
-                'logo'  => [
-                    '@type' => 'ImageObject',
-                    'url'   => get_site_icon_url(),
-                ],
             ];
+            if ( ! empty( $logo_url ) ) {
+                $publisher['logo'] = $logo_url;
+            }
+            $schema['publisher'] = $publisher;
         }
 
         // For other types, use AI to fill in

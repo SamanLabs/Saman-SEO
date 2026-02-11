@@ -109,10 +109,7 @@ class LocalBusiness_Schema extends Abstract_Schema {
 	private function add_logo( array &$schema ): void {
 		$logo = get_option( 'SAMAN_SEO_local_logo', '' );
 		if ( ! empty( $logo ) ) {
-			$schema['logo'] = [
-				'@type' => 'ImageObject',
-				'url'   => $logo,
-			];
+			$schema['logo'] = $logo;
 		}
 	}
 

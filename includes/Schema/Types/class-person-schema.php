@@ -71,10 +71,7 @@ class Person_Schema extends Abstract_Schema {
 		];
 
 		if ( ! empty( $person_image ) ) {
-			$schema['image'] = [
-				'@type' => 'ImageObject',
-				'url'   => $person_image,
-			];
+			$schema['image'] = $person_image;
 		}
 
 		if ( ! empty( $person_job ) ) {
