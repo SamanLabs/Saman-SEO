@@ -118,12 +118,12 @@ const SchemaValidator = ({ onNavigate }) => {
     // Get validation status badge
     const StatusBadge = ({ status, count }) => {
         const config = {
-            valid: { label: 'Valid', className: 'badge--success' },
-            warnings: { label: `${count} Warning${count !== 1 ? 's' : ''}`, className: 'badge--warning' },
-            errors: { label: `${count} Error${count !== 1 ? 's' : ''}`, className: 'badge--error' },
+            valid: { label: 'Valid', className: 'success' },
+            warnings: { label: `${count} Warning${count !== 1 ? 's' : ''}`, className: 'warning' },
+            errors: { label: `${count} Error${count !== 1 ? 's' : ''}`, className: 'danger' },
         };
         const c = config[status] || config.valid;
-        return <span className={`badge ${c.className}`}>{c.label}</span>;
+        return <span className={`pill ${c.className}`}>{c.label}</span>;
     };
 
     return (
@@ -141,7 +141,7 @@ const SchemaValidator = ({ onNavigate }) => {
                     <div className="input-group">
                         <input
                             type="url"
-                            className="form-input form-input--large"
+                            className="tool-input"
                             placeholder="Enter URL to validate (e.g., https://example.com/page)"
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
@@ -150,13 +150,13 @@ const SchemaValidator = ({ onNavigate }) => {
                         <button
                             id="validate-btn"
                             type="button"
-                            className="btn btn--primary btn--large"
+                            className="button primary large"
                             onClick={handleValidate}
                             disabled={loading}
                         >
                             {loading ? (
                                 <>
-                                    <span className="btn-spinner" />
+                                    <span className="spinner" />
                                     Validating...
                                 </>
                             ) : (
@@ -173,7 +173,7 @@ const SchemaValidator = ({ onNavigate }) => {
                     <div className="quick-actions">
                         <button
                             type="button"
-                            className="btn btn--small btn--secondary"
+                            className="button ghost small"
                             onClick={handleValidateSite}
                         >
                             Test Homepage
@@ -187,7 +187,7 @@ const SchemaValidator = ({ onNavigate }) => {
 
             {/* Error */}
             {error && (
-                <div className="notice notice--error">
+                <div className="alert-banner alert-banner--error">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 8v4m0 4h.01"/>

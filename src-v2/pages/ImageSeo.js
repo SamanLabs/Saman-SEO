@@ -203,7 +203,7 @@ const ImageSeo = () => {
 
             {/* Message Toast */}
             {message && (
-                <div className={`toast toast--${message.type}`}>
+                <div className={`alert-banner alert-banner--${message.type}`}>
                     {message.text}
                 </div>
             )}
@@ -214,21 +214,21 @@ const ImageSeo = () => {
                     <div className="image-seo-filters">
                         <button
                             type="button"
-                            className={`filter-btn ${filter === 'all' ? 'filter-btn--active' : ''}`}
+                            className={`sub-tab ${filter === 'all' ? 'is-active' : ''}`}
                             onClick={() => { setFilter('all'); setPage(1); }}
                         >
                             All ({stats.total})
                         </button>
                         <button
                             type="button"
-                            className={`filter-btn ${filter === 'missing' ? 'filter-btn--active' : ''}`}
+                            className={`sub-tab ${filter === 'missing' ? 'is-active' : ''}`}
                             onClick={() => { setFilter('missing'); setPage(1); }}
                         >
                             Missing Alt ({stats.missingAlt})
                         </button>
                         <button
                             type="button"
-                            className={`filter-btn ${filter === 'has-alt' ? 'filter-btn--active' : ''}`}
+                            className={`sub-tab ${filter === 'has-alt' ? 'is-active' : ''}`}
                             onClick={() => { setFilter('has-alt'); setPage(1); }}
                         >
                             Has Alt ({stats.withAlt})
@@ -267,7 +267,7 @@ const ImageSeo = () => {
                         </p>
                     </div>
                 ) : (
-                    <table className="image-seo-table">
+                    <table className="data-table">
                         <thead>
                             <tr>
                                 <th style={{ width: '80px' }}>Preview</th>
@@ -306,7 +306,7 @@ const ImageSeo = () => {
                                                 <div className="inline-edit-actions">
                                                     <button
                                                         type="button"
-                                                        className="btn btn--small btn--primary"
+                                                        className="button primary small"
                                                         onClick={() => handleSaveAlt(image.id, editValue)}
                                                         disabled={saving[image.id]}
                                                     >
@@ -314,7 +314,7 @@ const ImageSeo = () => {
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        className="btn btn--small"
+                                                        className="button ghost small"
                                                         onClick={cancelEditing}
                                                     >
                                                         Cancel
@@ -335,7 +335,7 @@ const ImageSeo = () => {
                                         <div className="action-buttons">
                                             <button
                                                 type="button"
-                                                className="btn btn--small"
+                                                className="button ghost small"
                                                 onClick={() => startEditing(image)}
                                                 title="Edit alt text"
                                             >
@@ -348,7 +348,7 @@ const ImageSeo = () => {
                                             {!image.alt && (
                                                 <button
                                                     type="button"
-                                                    className="btn btn--small btn--secondary"
+                                                    className="button ghost small"
                                                     onClick={() => handleGenerateAlt(image.id)}
                                                     disabled={saving[image.id]}
                                                     title="Generate from filename"
@@ -372,7 +372,7 @@ const ImageSeo = () => {
                     <div className="pagination">
                         <button
                             type="button"
-                            className="pagination-btn"
+                            className="button ghost small"
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
                         >
@@ -383,7 +383,7 @@ const ImageSeo = () => {
                         </span>
                         <button
                             type="button"
-                            className="pagination-btn"
+                            className="button ghost small"
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
                         >

@@ -440,7 +440,7 @@ const Redirects = () => {
                 </div>
             </div>
 
-            <section className="panel">
+            <section>
                 {/* Slug Change Suggestions */}
                 {!suggestionsLoading && suggestions.length > 0 && (
                     <div className="alert-card warning" style={{ marginBottom: '24px' }}>
