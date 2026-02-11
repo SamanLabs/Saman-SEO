@@ -162,12 +162,6 @@ class Setup_Controller extends REST_Controller {
 
         update_option( 'SAMAN_SEO_setup_data', $setup_data );
 
-        // AI settings are now managed by Saman Labs AI plugin
-        // Only save provider preference for compatibility
-        if ( ! empty( $params['ai_provider'] ) ) {
-            update_option( 'SAMAN_SEO_ai_active_provider', sanitize_text_field( $params['ai_provider'] ) );
-        }
-
         // Save module settings
         $modules_to_toggle = [
             'enable_sitemap'   => 'SAMAN_SEO_module_sitemap',

@@ -132,10 +132,7 @@ class JsonLD {
 		];
 
 		if ( ! empty( $org_logo ) ) {
-			$schema['logo'] = [
-				'@type' => 'ImageObject',
-				'url'   => $org_logo,
-			];
+			$schema['logo'] = $org_logo;
 		}
 
 		// Add Local SEO data if available.
@@ -214,10 +211,7 @@ class JsonLD {
 		];
 
 		if ( ! empty( $person_image ) ) {
-			$schema['image'] = [
-				'@type' => 'ImageObject',
-				'url'   => $person_image,
-			];
+			$schema['image'] = $person_image;
 		}
 
 		if ( ! empty( $person_job ) ) {

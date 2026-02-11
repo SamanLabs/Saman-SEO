@@ -7,8 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 const Setup = ({ onComplete, onSkip }) => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [testingApi, setTestingApi] = useState(false);
-    const [apiTestResult, setApiTestResult] = useState(null);
+    const [aiStatus, setAiStatus] = useState(null);
 
     // Form data across all steps
     const [data, setData] = useState({
@@ -16,10 +15,6 @@ const Setup = ({ onComplete, onSkip }) => {
         site_type: '',
         primary_goal: '',
         industry: '',
-        // Step 3: AI Config
-        ai_provider: 'openai',
-        ai_api_key: '',
-        ai_model: 'gpt-4o-mini',
         // Step 4: Quick Wins
         enable_sitemap: true,
         enable_404_log: true,
@@ -29,7 +24,26 @@ const Setup = ({ onComplete, onSkip }) => {
 
     const updateData = (key, value) => {
         setData((prev) => ({ ...prev, [key]: value }));
-        setApiTestResult(null);
+    };
+
+    // Check AI plugin status when entering step 3
+    useEffect(() => {
+        if (step === 3 && !aiStatus) {
+            checkAiStatus();
+        }
+    }, [step]);
+
+    const checkAiStatus = async () => {
+        setAiStatus({ status: 'loading' });
+        try {
+            const response = await apiFetch({
+                path: '/saman-seo/v1/setup/test-api',
+                method: 'POST',
+            });
+            setAiStatus(response.data || response);
+        } catch (err) {
+            setAiStatus({ status: 'error', message: 'Could not check AI status.' });
+        }
     };
 
     const handleNext = () => {
@@ -38,31 +52,6 @@ const Setup = ({ onComplete, onSkip }) => {
 
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
-    };
-
-    const handleTestApi = async () => {
-        if (!data.ai_api_key) return;
-
-        setTestingApi(true);
-        setApiTestResult(null);
-
-        try {
-            const response = await apiFetch({
-                path: '/saman-seo/v1/setup/test-api',
-                method: 'POST',
-                data: {
-                    provider: data.ai_provider,
-                    api_key: data.ai_api_key,
-                    model: data.ai_model,
-                },
-            });
-
-            setApiTestResult(response.success ? 'success' : 'error');
-        } catch (err) {
-            setApiTestResult('error');
-        } finally {
-            setTestingApi(false);
-        }
     };
 
     const handleComplete = async () => {
@@ -110,12 +99,6 @@ const Setup = ({ onComplete, onSkip }) => {
         { value: 'leads', label: 'Generate leads', icon: '📋' },
         { value: 'sales', label: 'Increase sales', icon: '💰' },
         { value: 'brand', label: 'Build brand awareness', icon: '🌟' },
-    ];
-
-    const providers = [
-        { value: 'openai', label: 'OpenAI', desc: 'GPT-4, GPT-3.5' },
-        { value: 'anthropic', label: 'Anthropic', desc: 'Claude models' },
-        { value: 'ollama', label: 'Ollama (Local)', desc: 'Run locally, free' },
     ];
 
     return (
@@ -236,79 +219,54 @@ const Setup = ({ onComplete, onSkip }) => {
                     </div>
                 )}
 
-                {/* Step 3: Connect AI */}
+                {/* Step 3: AI Status */}
                 {step === 3 && (
                     <div className="setup-step">
                         <span className="setup-step__number">Step 2 of 4</span>
-                        <h2>Connect AI (Optional)</h2>
+                        <h2>AI Features</h2>
                         <p className="setup-step__subtitle">
-                            Enable AI-powered features like content suggestions and meta generation.
+                            AI-powered features are provided by the Saman Labs AI plugin.
                         </p>
 
-                        <div className="setup-section">
-                            <label className="setup-label">Choose a provider</label>
-                            <div className="setup-providers">
-                                {providers.map((provider) => (
-                                    <button
-                                        key={provider.value}
-                                        type="button"
-                                        className={`setup-provider ${data.ai_provider === provider.value ? 'active' : ''}`}
-                                        onClick={() => updateData('ai_provider', provider.value)}
-                                    >
-                                        <strong>{provider.label}</strong>
-                                        <span>{provider.desc}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {data.ai_provider !== 'ollama' && (
-                            <div className="setup-section">
-                                <label className="setup-label" htmlFor="api-key">API Key</label>
-                                <div className="setup-input-group">
-                                    <input
-                                        id="api-key"
-                                        type="password"
-                                        className="setup-input"
-                                        value={data.ai_api_key}
-                                        onChange={(e) => updateData('ai_api_key', e.target.value)}
-                                        placeholder={data.ai_provider === 'openai' ? 'sk-...' : 'sk-ant-...'}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="button"
-                                        onClick={handleTestApi}
-                                        disabled={!data.ai_api_key || testingApi}
-                                    >
-                                        {testingApi ? 'Testing...' : 'Test'}
-                                    </button>
-                                </div>
-                                {apiTestResult === 'success' && (
-                                    <div className="setup-test-result setup-test-result--success">
-                                        Connection successful!
-                                    </div>
-                                )}
-                                {apiTestResult === 'error' && (
-                                    <div className="setup-test-result setup-test-result--error">
-                                        Connection failed. Check your API key.
-                                    </div>
-                                )}
-                                <p className="setup-help">
-                                    {data.ai_provider === 'openai' && (
-                                        <>Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI Dashboard</a></>
-                                    )}
-                                    {data.ai_provider === 'anthropic' && (
-                                        <>Get your API key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer">Anthropic Console</a></>
-                                    )}
-                                </p>
+                        {aiStatus?.status === 'loading' && (
+                            <div className="setup-info-box">
+                                <p>Checking AI status...</p>
                             </div>
                         )}
 
-                        {data.ai_provider === 'ollama' && (
+                        {aiStatus?.status === 'ready' && (
+                            <div className="setup-test-result setup-test-result--success">
+                                Saman Labs AI is ready! AI features are available.
+                            </div>
+                        )}
+
+                        {aiStatus?.status === 'not_installed' && (
                             <div className="setup-info-box">
-                                <h4>Ollama Setup</h4>
-                                <p>Make sure Ollama is running locally on port 11434. No API key required.</p>
-                                <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer">Download Ollama</a>
+                                <h4>Saman Labs AI Not Installed</h4>
+                                <p>Install the Saman Labs AI plugin to enable AI-powered features like content suggestions and meta generation.</p>
+                                <a href={aiStatus.install_url} className="button" target="_blank" rel="noopener noreferrer">Install Plugin</a>
+                            </div>
+                        )}
+
+                        {aiStatus?.status === 'not_active' && (
+                            <div className="setup-info-box">
+                                <h4>Saman Labs AI Not Active</h4>
+                                <p>The plugin is installed but needs to be activated.</p>
+                                <a href={aiStatus.plugins_url} className="button" target="_blank" rel="noopener noreferrer">Activate Plugin</a>
+                            </div>
+                        )}
+
+                        {aiStatus?.status === 'not_configured' && (
+                            <div className="setup-info-box">
+                                <h4>Saman Labs AI Not Configured</h4>
+                                <p>The plugin is active but needs to be configured with your AI provider.</p>
+                                <a href={aiStatus.settings_url} className="button" target="_blank" rel="noopener noreferrer">Configure AI</a>
+                            </div>
+                        )}
+
+                        {aiStatus?.status === 'error' && (
+                            <div className="setup-test-result setup-test-result--error">
+                                Could not check AI status. You can configure this later in Settings.
                             </div>
                         )}
 
@@ -316,15 +274,7 @@ const Setup = ({ onComplete, onSkip }) => {
                             <button type="button" className="button ghost" onClick={handleBack}>
                                 Back
                             </button>
-                            <button type="button" className="button ghost" onClick={handleNext}>
-                                Skip AI Setup
-                            </button>
-                            <button
-                                type="button"
-                                className="button primary"
-                                onClick={handleNext}
-                                disabled={data.ai_provider !== 'ollama' && !data.ai_api_key}
-                            >
+                            <button type="button" className="button primary" onClick={handleNext}>
                                 Continue
                             </button>
                         </div>
@@ -428,11 +378,9 @@ const Setup = ({ onComplete, onSkip }) => {
                                 </span>
                             </div>
                             <div className="setup-summary__item">
-                                <span className="setup-summary__label">AI Provider</span>
+                                <span className="setup-summary__label">AI Features</span>
                                 <span className="setup-summary__value">
-                                    {data.ai_api_key || data.ai_provider === 'ollama'
-                                        ? providers.find((p) => p.value === data.ai_provider)?.label
-                                        : 'Not configured'}
+                                    {aiStatus?.status === 'ready' ? 'Enabled' : 'Not configured'}
                                 </span>
                             </div>
                             <div className="setup-summary__item">

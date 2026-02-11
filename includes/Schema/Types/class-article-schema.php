@@ -135,29 +135,57 @@ class Article_Schema extends Abstract_Schema {
 		// Optional image from Gravatar.
 		$avatar = get_avatar_url( $author_id, [ 'size' => 96 ] );
 		if ( $avatar ) {
-			$author['image'] = [
-				'@type' => 'ImageObject',
-				'url'   => $avatar,
-			];
+			$author['image'] = $avatar;
 		}
 
 		return $author;
 	}
 
 	/**
-	 * Get publisher reference as @id link.
+	 * Get publisher with inline name and logo.
 	 *
-	 * Returns a reference to the Organization or Person schema
-	 * based on the Knowledge Graph type setting.
+	 * Includes both @id reference (for @graph linking) and inline
+	 * name/logo (for validators that don't resolve @id references).
 	 *
-	 * @return array Publisher @id reference.
+	 * @return array Publisher object with @id, name, and logo.
 	 */
 	protected function get_publisher_reference(): array {
 		$type = get_option( 'SAMAN_SEO_homepage_knowledge_type', 'organization' );
+
 		if ( 'person' === $type ) {
-			return [ '@id' => Schema_IDs::person() ];
+			$name = get_option( 'SAMAN_SEO_homepage_person_name', '' );
+			if ( empty( $name ) ) {
+				$name = get_bloginfo( 'name' );
+			}
+			$publisher = [
+				'@type' => 'Person',
+				'@id'   => Schema_IDs::person(),
+				'name'  => $name,
+			];
+			$image = get_option( 'SAMAN_SEO_homepage_person_image', '' );
+			if ( ! empty( $image ) ) {
+				$publisher['logo'] = $image;
+			}
+			return $publisher;
 		}
-		return [ '@id' => Schema_IDs::organization() ];
+
+		$name = get_option( 'SAMAN_SEO_homepage_organization_name', '' );
+		if ( empty( $name ) ) {
+			$name = get_bloginfo( 'name' );
+		}
+		$publisher = [
+			'@type' => 'Organization',
+			'@id'   => Schema_IDs::organization(),
+			'name'  => $name,
+		];
+		$logo = get_option( 'SAMAN_SEO_homepage_organization_logo', '' );
+		if ( empty( $logo ) ) {
+			$logo = get_site_icon_url();
+		}
+		if ( ! empty( $logo ) ) {
+			$publisher['logo'] = $logo;
+		}
+		return $publisher;
 	}
 
 	/**
@@ -189,23 +217,21 @@ class Article_Schema extends Abstract_Schema {
 	}
 
 	/**
-	 * Get featured image as ImageObject.
+	 * Get featured image URL.
 	 *
 	 * Falls back to default OG image if no featured image is set.
+	 * Returns a plain URL string per Google's schema requirements.
 	 *
-	 * @return array ImageObject schema, or empty array if no image.
+	 * @return string Image URL, or empty string if no image.
 	 */
-	protected function get_images(): array {
+	protected function get_images(): string {
 		$image_url = get_the_post_thumbnail_url( $this->context->post, 'full' );
 		if ( empty( $image_url ) ) {
 			$image_url = get_option( 'SAMAN_SEO_default_og_image', '' );
 		}
 		if ( empty( $image_url ) ) {
-			return [];
+			return '';
 		}
-		return [
-			'@type' => 'ImageObject',
-			'url'   => $image_url,
-		];
+		return $image_url;
 	}
 }
