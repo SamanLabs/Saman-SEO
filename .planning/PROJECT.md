@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provides an extensible, registry-based architecture supporting 8 schema types (WebSite, WebPage, Breadcrumb, Organization, Person, Article variants, FAQPage, HowTo, LocalBusiness), per-post configuration with live preview, and a full developer API for third-party extension.
+A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provides an extensible, registry-based architecture supporting 9 schema types (WebSite, WebPage, Breadcrumb, Organization, Person, Article variants, FAQPage, HowTo, LocalBusiness, Product), per-post configuration with live preview, WooCommerce Product rich results integration, and a full developer API for third-party extension.
 
 ## Core Value
 
@@ -40,13 +40,43 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 - ✓ `saman_seo_schema_types` filter for filtering available types — v1.0
 - ✓ Documentation for extending schema system — v1.0
 
+- ✓ Product schema with name, description, image, sku, brand properties — v1.1
+- ✓ Offer schema with price, priceCurrency, availability, url — v1.1
+- ✓ Variable product support with AggregateOffer — v1.1
+- ✓ AggregateRating schema from WooCommerce product reviews — v1.1
+- ✓ Review schema for individual product reviews — v1.1
+- ✓ Automatic Product schema on WooCommerce product pages — v1.1
+- ✓ Integration with existing schema engine architecture — v1.1
+
 ### Active
 
-(None — ready for next milestone planning)
+- [ ] Remove legacy schema dropdowns from Search Appearances UI
+- [ ] Clean up backend handling of unused schema settings
+- [ ] Simplify Schema_Context determination logic
+- [ ] Critical fragility fixes (null safety, error handling)
+
+## Current Milestone: v1.2 Legacy Cleanup & Hardening
+
+**Goal:** Remove redundant legacy schema selectors and harden critical code paths.
+
+**Target features:**
+- Remove 3 legacy schema dropdowns from Search Appearances (schema_type, schema_page, schema_article)
+- Clean up SearchAppearance controller (stop saving/reading unused settings)
+- Simplify Schema_Context schema type determination
+- Critical null safety and error handling fixes
+
+## Previous Milestone: v1.1 WooCommerce Product Schemas ✓
+
+**Goal:** Enable Product rich results in Google search for WooCommerce stores with price, availability, images, and review ratings.
+
+**Shipped features:**
+- Product schema with full property support (name, description, image, SKU, brand)
+- Offer schema with price, currency, availability status
+- Variable products with AggregateOffer (lowPrice/highPrice)
+- AggregateRating from WooCommerce reviews
+- Individual Review objects with author, rating, date
 
 ### Out of Scope
-
-- WooCommerce Product schema — dedicated e-commerce milestone, different complexity
 - VideoObject schema — requires media detection complexity (v2 candidate)
 - Recipe schema — requires ingredient/instruction parsing (v2 candidate)
 - Built-in schema.org validation — live preview sufficient, users can use Google's validator
@@ -55,16 +85,18 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 
 ## Context
 
-**Current State (v1.0 shipped):**
+**Current State (v1.1 shipped):**
 - 37,578 lines of PHP + 21,382 lines of JavaScript
-- Tech stack: PHP 7.4+, WordPress 5.0+, React (Gutenberg editor)
-- 8 schema types in registry with priority ordering
+- Tech stack: PHP 7.4+, WordPress 5.0+, WooCommerce 3.0+, React (Gutenberg editor)
+- 9 schema types in registry with priority ordering
 - 4 public hooks for developer extension
 - 1,368-line SCHEMA_DEVELOPER_API.md
+- Full WooCommerce Product rich results support
 
 **Architecture:**
 - `includes/Schema/` — Core schema engine (Abstract_Schema, Schema_Context, Schema_IDs, Schema_Registry, Schema_Graph_Manager)
-- `includes/Schema/Types/` — Schema type implementations (WebSite, WebPage, Breadcrumb, Organization, Person, Article, BlogPosting, NewsArticle, FAQPage, HowTo, LocalBusiness)
+- `includes/Schema/Types/` — Schema type implementations (WebSite, WebPage, Breadcrumb, Organization, Person, Article, BlogPosting, NewsArticle, FAQPage, HowTo, LocalBusiness, Product)
+- `includes/Integration/class-woocommerce.php` — WooCommerce integration (schema disable, Product registration)
 - `includes/Api/class-schema-preview-controller.php` — REST endpoint for live preview
 - `src-v2/editor/components/` — React components (SchemaTypeSelector, SchemaPreview)
 - `src-v2/editor/hooks/useSchemaPreview.js` — Preview hook with debounce
@@ -94,6 +126,11 @@ A comprehensive JSON-LD Schema Engine for the Saman SEO WordPress plugin. Provid
 | LocalBusiness on homepage only | Matches Organization pattern, avoids per-page business data | ✓ Good |
 | 500ms debounce for preview | Balances responsiveness with API efficiency | ✓ Good |
 | Fields filter is optional | Concrete classes decide if they need it, reduces coupling | ✓ Good |
+| WC schema disable at init priority 0 | Earliest hook to prevent duplicate schemas | ✓ Good |
+| AggregateOffer for variable products | Simpler than ProductGroup, Google accepts both | ✓ Good |
+| Brand 3-level fallback | Meta > attribute > global gives flexibility without forcing UI | ✓ Good |
+| Limit reviews to 10 | Performance optimization, prevents excessive schema size | ✓ Good |
+| reviewCount over ratingCount | Google preference when actual reviews exist | ✓ Good |
 
 ---
-*Last updated: 2026-01-23 after v1.0 milestone*
+*Last updated: 2026-01-25 after v1.2 milestone started*

@@ -54,7 +54,7 @@ class Htaccess_Controller extends REST_Controller {
             [
                 'methods'             => \WP_REST_Server::READABLE,
                 'callback'            => [ $this, 'get_content' ],
-                'permission_callback' => [ $this, 'check_permission' ],
+                'permission_callback' => [ $this, 'permission_check' ],
             ]
         );
 
@@ -65,7 +65,7 @@ class Htaccess_Controller extends REST_Controller {
             [
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => [ $this, 'save_content' ],
-                'permission_callback' => [ $this, 'check_permission' ],
+                'permission_callback' => [ $this, 'permission_check' ],
                 'args'                => [
                     'content' => [
                         'required' => true,
@@ -82,7 +82,7 @@ class Htaccess_Controller extends REST_Controller {
             [
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => [ $this, 'restore_backup' ],
-                'permission_callback' => [ $this, 'check_permission' ],
+                'permission_callback' => [ $this, 'permission_check' ],
                 'args'                => [
                     'backup' => [
                         'required'          => true,

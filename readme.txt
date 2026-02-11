@@ -120,3 +120,45 @@ add_filter( 'saman_seo_title', function( $title, $post ) {
 `
 
 For complete developer documentation, visit our GitHub repository.
+
+== External Services ==
+
+This plugin connects to the following external services:
+
+= YouTube oEmbed API =
+
+**What it does:** Retrieves video metadata (title, thumbnail URL, duration) for YouTube videos embedded in your content.
+
+**When it's called:** Only when your post content contains a YouTube video embed and the Video Schema feature is enabled.
+
+**Data sent:** The YouTube video ID (which is already public as part of the embed URL in your content).
+
+**Service links:**
+- [YouTube Terms of Service](https://www.youtube.com/t/terms)
+- [Google Privacy Policy](https://policies.google.com/privacy)
+
+= Vimeo oEmbed API =
+
+**What it does:** Retrieves video metadata (title, thumbnail URL, duration, author) for Vimeo videos embedded in your content.
+
+**When it's called:** Only when your post content contains a Vimeo video embed and the Video Schema feature is enabled.
+
+**Data sent:** The Vimeo video ID (which is already public as part of the embed URL in your content).
+
+**Service links:**
+- [Vimeo Terms of Service](https://vimeo.com/terms)
+- [Vimeo Privacy Policy](https://vimeo.com/privacy)
+
+= IndexNow API (Optional) =
+
+**What it does:** Notifies search engines when your content is published or updated, enabling faster indexing.
+
+**When it's called:** Only when you explicitly enable the IndexNow feature in plugin settings and publish/update content.
+
+**Data sent:** Your site's domain, the IndexNow API key you configure, and the URLs of pages that were changed.
+
+**Service links:**
+- [IndexNow Protocol](https://www.indexnow.org/)
+- [Microsoft Bing Privacy Policy](https://privacy.microsoft.com/privacystatement) (default endpoint)
+
+Note: The IndexNow feature is entirely opt-in and disabled by default. You can choose which search engine endpoint to use (Bing, Yandex, or the generic IndexNow API).

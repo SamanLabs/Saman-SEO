@@ -118,4 +118,14 @@ class Schema_IDs {
 	public static function localbusiness(): string {
 		return home_url( '/' ) . '#localbusiness';
 	}
+
+	/**
+	 * Get the Product schema @id for a specific URL.
+	 *
+	 * @param string $url The canonical URL of the product.
+	 * @return string URL#product identifier.
+	 */
+	public static function product( string $url ): string {
+		return $url . '#product';
+	}
 }

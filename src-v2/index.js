@@ -39,7 +39,7 @@ const getInitialView = () => {
         return pageToView[page];
     }
     // Fallback to settings if URL doesn't have page param
-    const settings = window['saman-seoV2Settings'] || {};
+    const settings = window.samanSeoV2Settings || {};
     return settings.initialView || 'dashboard';
 };
 

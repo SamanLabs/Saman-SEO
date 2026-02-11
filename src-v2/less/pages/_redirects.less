@@ -7,7 +7,502 @@
     margin-bottom: @spacing-xl;
 }
 
-// Responsive adjustments already in _forms.less
+// ==========================================================================
+// Page Header Actions (Import / Export / Add Redirect buttons)
+// ==========================================================================
+
+.page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+    flex-wrap: wrap;
+}
+
+// ==========================================================================
+// Export Dropdown
+// ==========================================================================
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 4px;
+        min-width: 160px;
+        background: @color-surface;
+        border: 1px solid @color-border;
+        border-radius: @radius-md;
+        box-shadow: @shadow-xl;
+        z-index: @z-dropdown;
+        overflow: hidden;
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-family: inherit;
+            font-size: @font-size-base;
+            color: @color-text;
+            cursor: pointer;
+            .transition(background);
+
+            &:hover {
+                background: @color-surface-muted;
+                color: @color-primary;
+            }
+
+            & + button {
+                border-top: 1px solid @color-border-light;
+            }
+        }
+    }
+
+    &:hover .dropdown-menu,
+    &:focus-within .dropdown-menu {
+        display: block;
+    }
+}
+
+// ==========================================================================
+// Table Toolbar (filters, search, info)
+// ==========================================================================
+
+.table-toolbar {
+    padding: @spacing-md @spacing-lg;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    margin-bottom: @spacing-lg;
+}
+
+.table-toolbar-filters {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    flex-wrap: wrap;
+
+    select {
+        padding: 9px 12px;
+        border: 1px solid @color-border;
+        border-radius: @radius-sm;
+        background: @color-surface-muted;
+        font-family: inherit;
+        font-size: @font-size-base;
+        color: @color-text;
+        min-width: 140px;
+        .transition(border-color);
+
+        &:focus {
+            outline: none;
+            border-color: @color-primary;
+            .shadow-focus();
+            background: @color-surface;
+        }
+    }
+}
+
+.table-toolbar-info {
+    flex-shrink: 0;
+
+    .muted {
+        font-size: @font-size-sm;
+        background: @color-surface-muted;
+        padding: 4px 10px;
+        border-radius: @radius-full;
+    }
+}
+
+input[type="search"].search-input {
+    .input-base();
+    flex: 1;
+    min-width: 180px;
+    max-width: 320px;
+    background: @color-surface-muted;
+    appearance: none;
+    -webkit-appearance: none;
+    line-height: normal;
+    min-height: 0;
+
+    &:focus {
+        background: @color-surface;
+    }
+}
+
+// ==========================================================================
+// Bulk Actions Bar
+// ==========================================================================
+
+.bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    padding: @spacing-md @spacing-lg;
+    background: @color-primary-lighter;
+    border: 1px solid rgba(34, 113, 177, 0.2);
+    border-radius: @radius-md;
+
+    span {
+        font-weight: @font-weight-semibold;
+        font-size: @font-size-sm;
+        color: @color-primary;
+    }
+}
+
+// ==========================================================================
+// Table Enhancements
+// ==========================================================================
+
+.checkbox-col {
+    width: 40px;
+    text-align: center;
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: @color-primary;
+    }
+}
+
+.truncate-link {
+    display: inline-block;
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    color: @color-primary;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.inactive-row {
+    opacity: 0.55;
+}
+
+.text-muted {
+    color: @color-muted;
+}
+
+.text-small {
+    font-size: @font-size-xs;
+}
+
+// Pill variants
+.pill {
+    &.info {
+        background: rgba(34, 113, 177, 0.12);
+        color: @color-primary;
+    }
+
+    &.muted {
+        background: rgba(95, 107, 122, 0.1);
+        color: @color-muted;
+    }
+
+    &.small {
+        padding: 2px 7px;
+        font-size: @font-size-xs;
+    }
+}
+
+// ==========================================================================
+// Empty State
+// ==========================================================================
+
+.empty-state__icon {
+    margin-bottom: @spacing-md;
+    color: @color-muted;
+    opacity: 0.5;
+
+    svg {
+        display: block;
+        margin: 0 auto;
+    }
+}
+
+.empty-state {
+    h3 {
+        margin: 0 0 @spacing-sm;
+        font-size: @font-size-lg;
+    }
+
+    p {
+        margin: 0 0 @spacing-lg;
+        color: @color-muted;
+    }
+}
+
+// ==========================================================================
+// Modal Overlay & Modal (generic, hyphenated class names)
+// ==========================================================================
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: @z-modal-backdrop;
+    padding: @spacing-2xl;
+    animation: modal-fade-in 0.15s ease-out;
+}
+
+@keyframes modal-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes modal-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal {
+    background: @color-surface;
+    border-radius: @radius-lg;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    z-index: @z-modal;
+    overflow: hidden;
+    animation: modal-slide-in 0.2s ease-out;
+
+    &.modal-wide {
+        max-width: 640px;
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: @spacing-lg @spacing-xl;
+    border-bottom: 1px solid @color-border-light;
+    flex-shrink: 0;
+
+    h2 {
+        margin: 0;
+        font-size: @font-size-xl;
+        font-weight: @font-weight-semibold;
+    }
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    font-size: 22px;
+    line-height: 1;
+    color: @color-muted;
+    cursor: pointer;
+    border-radius: @radius-sm;
+    .transition(background);
+
+    &:hover {
+        background: @color-surface-muted;
+        color: @color-text;
+    }
+}
+
+.modal-body {
+    padding: @spacing-xl;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: @spacing-md;
+    padding: @spacing-lg @spacing-xl;
+    border-top: 1px solid @color-border-light;
+    flex-shrink: 0;
+}
+
+// ==========================================================================
+// Form Group (modal form layout)
+// ==========================================================================
+
+.modal-body .form-row {
+    align-items: flex-start;
+
+    .form-group {
+        margin-bottom: 0;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: @spacing-lg;
+    flex: 1;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        font-size: @font-size-sm;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+        .input-base();
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 60px;
+    }
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: @spacing-sm;
+    font-size: @font-size-sm;
+    font-weight: @font-weight-normal;
+    color: @color-muted;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: @color-primary;
+        cursor: pointer;
+    }
+}
+
+.field-hint {
+    margin: 2px 0 0;
+    font-size: @font-size-xs;
+    color: @color-muted;
+    line-height: @line-height-normal;
+}
+
+// ==========================================================================
+// Advanced Options Toggle
+// ==========================================================================
+
+.advanced-toggle {
+    font-size: @font-size-sm;
+    padding: 0;
+    margin-bottom: @spacing-md;
+}
+
+.advanced-options {
+    padding-top: @spacing-md;
+    border-top: 1px solid @color-border-light;
+}
+
+// ==========================================================================
+// Chain / Loop Warnings
+// ==========================================================================
+
+.chain-warnings {
+    margin-bottom: @spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-sm;
+}
+
+.alert-inline {
+    padding: @spacing-sm @spacing-md;
+    border-radius: @radius-sm;
+    font-size: @font-size-sm;
+    line-height: @line-height-normal;
+
+    &.warning {
+        background: @color-warning-bg;
+        color: #92400e;
+        border-left: 3px solid @color-warning;
+    }
+
+    &.danger {
+        background: @color-danger-bg;
+        color: @color-danger;
+        border-left: 3px solid @color-danger;
+    }
+}
+
+// ==========================================================================
+// Import Modal Extras
+// ==========================================================================
+
+.code-textarea {
+    font-family: @font-family-mono;
+    font-size: @font-size-sm;
+    line-height: @line-height-relaxed;
+    tab-size: 2;
+}
+
+.import-result {
+    padding: @spacing-md;
+    border-radius: @radius-md;
+    font-size: @font-size-sm;
+    margin-top: @spacing-md;
+
+    &.success {
+        background: @color-success-bg;
+        color: @color-success;
+        border: 1px solid rgba(0, 163, 42, 0.2);
+    }
+
+    &.error {
+        background: @color-danger-bg;
+        color: @color-danger;
+        border: 1px solid rgba(214, 54, 56, 0.2);
+    }
+
+    p {
+        margin: 0;
+    }
+}
+
+.import-errors {
+    margin: @spacing-sm 0 0;
+    padding-left: @spacing-lg;
+    list-style: disc;
+
+    li {
+        margin-bottom: 2px;
+    }
+}
 
 // ==========================================================================
 // Create Redirect Modal (from 404 page)
@@ -221,5 +716,48 @@
     &:hover {
         background: fade(@color-danger, 8%);
         color: @color-danger;
+    }
+}
+
+// ==========================================================================
+// Responsive
+// ==========================================================================
+
+@media (max-width: @breakpoint-lg) {
+    .page-header-actions {
+        width: 100%;
+    }
+
+    .table-toolbar-filters {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+
+        select {
+            width: 100%;
+        }
+    }
+
+    .search-input {
+        max-width: none;
+    }
+
+    .truncate-link {
+        max-width: 180px;
+    }
+}
+
+@media (max-width: @breakpoint-md) {
+    .modal {
+        max-width: none;
+        margin: @spacing-md;
+        max-height: calc(100vh - 24px);
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding-left: @spacing-lg;
+        padding-right: @spacing-lg;
     }
 }

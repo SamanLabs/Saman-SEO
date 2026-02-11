@@ -180,12 +180,12 @@ const InstantIndexing = ({ onNavigate }) => {
     // Status badge component
     const StatusBadge = ({ status }) => {
         const statusConfig = {
-            success: { label: 'Indexed', className: 'badge--success' },
-            failed: { label: 'Failed', className: 'badge--error' },
-            never: { label: 'Not Submitted', className: 'badge--neutral' },
+            success: { label: 'Indexed', className: 'success' },
+            failed: { label: 'Failed', className: 'danger' },
+            never: { label: 'Not Submitted', className: '' },
         };
         const config = statusConfig[status] || statusConfig.never;
-        return <span className={`badge ${config.className}`}>{config.label}</span>;
+        return <span className={`pill ${config.className}`}>{config.label}</span>;
     };
 
     // Not enabled state
@@ -199,10 +199,10 @@ const InstantIndexing = ({ onNavigate }) => {
                     </div>
                 </div>
 
-                <div className="card">
+                <div className="panel">
                     <div className="empty-state">
                         <div className="empty-state__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="48" height="48">
                                 <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                             </svg>
                         </div>
@@ -210,7 +210,7 @@ const InstantIndexing = ({ onNavigate }) => {
                         <p>Enable IndexNow in Settings to use instant indexing features.</p>
                         <button
                             type="button"
-                            className="btn btn--primary"
+                            className="button primary"
                             onClick={() => onNavigate && onNavigate('settings')}
                         >
                             Go to Settings
@@ -231,7 +231,7 @@ const InstantIndexing = ({ onNavigate }) => {
                 {selectedPosts.length > 0 && (
                     <button
                         type="button"
-                        className="btn btn--primary"
+                        className="button primary"
                         onClick={handleBulkSubmit}
                         disabled={submitting}
                     >
@@ -242,38 +242,38 @@ const InstantIndexing = ({ onNavigate }) => {
 
             {/* Stats Cards */}
             {stats && (
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-card__value">{stats.total || 0}</div>
-                        <div className="stat-card__label">Total Submissions</div>
+                <div className="indexing-stats">
+                    <div className="indexing-stat">
+                        <div className="indexing-stat__value">{stats.total || 0}</div>
+                        <div className="indexing-stat__label">Total Submissions</div>
                     </div>
-                    <div className="stat-card stat-card--success">
-                        <div className="stat-card__value">{stats.success || 0}</div>
-                        <div className="stat-card__label">Successful</div>
+                    <div className="indexing-stat indexing-stat--success">
+                        <div className="indexing-stat__value">{stats.success || 0}</div>
+                        <div className="indexing-stat__label">Successful</div>
                     </div>
-                    <div className="stat-card stat-card--error">
-                        <div className="stat-card__value">{stats.failed || 0}</div>
-                        <div className="stat-card__label">Failed</div>
+                    <div className="indexing-stat indexing-stat--danger">
+                        <div className="indexing-stat__value">{stats.failed || 0}</div>
+                        <div className="indexing-stat__label">Failed</div>
                     </div>
-                    <div className="stat-card">
-                        <div className="stat-card__value">{stats.today || 0}</div>
-                        <div className="stat-card__label">Today</div>
+                    <div className="indexing-stat">
+                        <div className="indexing-stat__value">{stats.today || 0}</div>
+                        <div className="indexing-stat__label">Today</div>
                     </div>
                 </div>
             )}
 
             {/* Tabs */}
-            <div className="tabs-bar">
+            <div className="sub-tabs">
                 <button
                     type="button"
-                    className={`tab-btn ${activeTab === 'posts' ? 'tab-btn--active' : ''}`}
+                    className={`sub-tab ${activeTab === 'posts' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('posts')}
                 >
                     Posts
                 </button>
                 <button
                     type="button"
-                    className={`tab-btn ${activeTab === 'logs' ? 'tab-btn--active' : ''}`}
+                    className={`sub-tab ${activeTab === 'logs' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('logs')}
                 >
                     Submission Logs
@@ -282,12 +282,11 @@ const InstantIndexing = ({ onNavigate }) => {
 
             {/* Posts Tab */}
             {activeTab === 'posts' && (
-                <div className="card">
+                <>
                     {/* Filters */}
-                    <div className="table-filters">
-                        <div className="table-filters__left">
+                    <div className="table-toolbar">
+                        <div className="table-toolbar-filters">
                             <select
-                                className="form-select"
                                 value={postType}
                                 onChange={(e) => { setPostType(e.target.value); setPage(1); }}
                             >
@@ -296,7 +295,6 @@ const InstantIndexing = ({ onNavigate }) => {
                                 ))}
                             </select>
                             <select
-                                className="form-select"
                                 value={statusFilter}
                                 onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
                             >
@@ -305,11 +303,9 @@ const InstantIndexing = ({ onNavigate }) => {
                                 <option value="indexed">Indexed</option>
                                 <option value="failed">Failed</option>
                             </select>
-                        </div>
-                        <div className="table-filters__right">
                             <input
-                                type="text"
-                                className="form-input"
+                                type="search"
+                                className="search-input"
                                 placeholder="Search posts..."
                                 value={search}
                                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
@@ -321,7 +317,7 @@ const InstantIndexing = ({ onNavigate }) => {
                     <table className="data-table">
                         <thead>
                             <tr>
-                                <th className="data-table__check">
+                                <th className="checkbox-col">
                                     <input
                                         type="checkbox"
                                         checked={posts.length > 0 && selectedPosts.length === posts.length}
@@ -331,22 +327,22 @@ const InstantIndexing = ({ onNavigate }) => {
                                 <th>Title</th>
                                 <th>Status</th>
                                 <th>Last Indexed</th>
-                                <th className="data-table__actions">Actions</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="data-table__loading">Loading...</td>
+                                    <td colSpan="5" className="loading-cell">Loading...</td>
                                 </tr>
                             ) : posts.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="data-table__empty">No posts found.</td>
+                                    <td colSpan="5" className="empty-cell">No posts found.</td>
                                 </tr>
                             ) : (
                                 posts.map(post => (
                                     <tr key={post.id}>
-                                        <td className="data-table__check">
+                                        <td className="checkbox-col">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedPosts.includes(post.id)}
@@ -354,13 +350,13 @@ const InstantIndexing = ({ onNavigate }) => {
                                             />
                                         </td>
                                         <td>
-                                            <div className="post-title">
+                                            <div className="post-cell">
                                                 <strong>{post.title || '(no title)'}</strong>
                                                 <a
                                                     href={post.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="post-url"
+                                                    className="post-cell__url"
                                                 >
                                                     {post.url}
                                                 </a>
@@ -372,16 +368,17 @@ const InstantIndexing = ({ onNavigate }) => {
                                         <td>
                                             {post.last_indexed_ago || '-'}
                                         </td>
-                                        <td className="data-table__actions">
+                                        <td>
                                             <button
                                                 type="button"
-                                                className="btn btn--small btn--secondary"
+                                                className="button ghost small"
                                                 onClick={() => handleSubmitSingle(post.id)}
                                                 title="Submit for indexing"
                                             >
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                                                 </svg>
+                                                Submit
                                             </button>
                                         </td>
                                     </tr>
@@ -392,10 +389,10 @@ const InstantIndexing = ({ onNavigate }) => {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="table-pagination">
+                        <div className="pagination">
                             <button
                                 type="button"
-                                className="btn btn--small"
+                                className="button ghost small"
                                 disabled={page === 1}
                                 onClick={() => setPage(p => p - 1)}
                             >
@@ -406,7 +403,7 @@ const InstantIndexing = ({ onNavigate }) => {
                             </span>
                             <button
                                 type="button"
-                                className="btn btn--small"
+                                className="button ghost small"
                                 disabled={page === totalPages}
                                 onClick={() => setPage(p => p + 1)}
                             >
@@ -414,52 +411,50 @@ const InstantIndexing = ({ onNavigate }) => {
                             </button>
                         </div>
                     )}
-                </div>
+                </>
             )}
 
             {/* Logs Tab */}
             {activeTab === 'logs' && (
-                <div className="card">
-                    <table className="data-table">
-                        <thead>
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Status</th>
+                            <th>Response</th>
+                            <th>Search Engine</th>
+                            <th>Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {logs.length === 0 ? (
                             <tr>
-                                <th>URL</th>
-                                <th>Status</th>
-                                <th>Response</th>
-                                <th>Search Engine</th>
-                                <th>Submitted</th>
+                                <td colSpan="5" className="empty-cell">No submission logs yet.</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {logs.length === 0 ? (
-                                <tr>
-                                    <td colSpan="5" className="data-table__empty">No submission logs yet.</td>
+                        ) : (
+                            logs.map(log => (
+                                <tr key={log.id}>
+                                    <td>
+                                        <a
+                                            href={log.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="truncate-link"
+                                        >
+                                            {log.url}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <StatusBadge status={log.status} />
+                                    </td>
+                                    <td>{log.response_code || '-'}</td>
+                                    <td>{log.search_engine}</td>
+                                    <td>{log.submitted_at}</td>
                                 </tr>
-                            ) : (
-                                logs.map(log => (
-                                    <tr key={log.id}>
-                                        <td>
-                                            <a
-                                                href={log.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="post-url"
-                                            >
-                                                {log.url.length > 50 ? log.url.substring(0, 50) + '...' : log.url}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <StatusBadge status={log.status} />
-                                        </td>
-                                        <td>{log.response_code || '-'}</td>
-                                        <td>{log.search_engine}</td>
-                                        <td>{log.submitted_at}</td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            ))
+                        )}
+                    </tbody>
+                </table>
             )}
         </div>
     );

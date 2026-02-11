@@ -44,78 +44,24 @@ class Dashboard_Widget {
         }
 
         add_action( 'wp_dashboard_setup', [ $this, 'register_widget' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_widget_styles' ] );
     }
 
     /**
-     * Register the dashboard widget.
+     * Enqueue widget styles on the dashboard.
+     *
+     * @param string $hook_suffix The current admin page.
      */
-    public function register_widget() {
-        // Only for users who can manage options
+    public function enqueue_widget_styles( $hook_suffix ) {
+        if ( 'index.php' !== $hook_suffix ) {
+            return;
+        }
+
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
         }
 
-        wp_add_dashboard_widget(
-            'SAMAN_SEO_404_widget',
-            __( '404 Monitor - Saman SEO', 'saman-seo' ),
-            [ $this, 'render_widget' ]
-        );
-    }
-
-    /**
-     * Render the widget content.
-     */
-    public function render_widget() {
-        $stats = $this->get_summary_stats();
-        $recent = $this->get_recent_404s( 5 );
-        $admin_url = admin_url( 'admin.php?page=saman-seo-v2#/404-log' );
-        ?>
-        <div class="saman-seo-dashboard-widget">
-            <div class="saman-seo-widget-stats">
-                <div class="saman-seo-widget-stat">
-                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['total'] ) ); ?></span>
-                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Total 404s', 'saman-seo' ); ?></span>
-                </div>
-                <div class="saman-seo-widget-stat">
-                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['need_redirect'] ) ); ?></span>
-                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Need Redirect', 'saman-seo' ); ?></span>
-                </div>
-                <div class="saman-seo-widget-stat">
-                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['last_24h'] ) ); ?></span>
-                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Last 24h', 'saman-seo' ); ?></span>
-                </div>
-                <div class="saman-seo-widget-stat">
-                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['bots'] ) ); ?></span>
-                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Bots', 'saman-seo' ); ?></span>
-                </div>
-            </div>
-
-            <?php if ( ! empty( $recent ) ) : ?>
-                <div class="saman-seo-widget-recent">
-                    <h4><?php esc_html_e( 'Recent 404s', 'saman-seo' ); ?></h4>
-                    <ul>
-                        <?php foreach ( $recent as $entry ) : ?>
-                            <li>
-                                <code><?php echo esc_html( $this->truncate_url( $entry->request_uri, 40 ) ); ?></code>
-                                <span class="saman-seo-widget-hits"><?php echo esc_html( number_format_i18n( $entry->hits ) ); ?> <?php esc_html_e( 'hits', 'saman-seo' ); ?></span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php elseif ( 0 === $stats['total'] ) : ?>
-                <div class="saman-seo-widget-empty">
-                    <p><?php esc_html_e( 'No 404 errors recorded yet. Great!', 'saman-seo' ); ?></p>
-                </div>
-            <?php endif; ?>
-
-            <p class="saman-seo-widget-footer">
-                <a href="<?php echo esc_url( $admin_url ); ?>" class="button button-primary">
-                    <?php esc_html_e( 'View All 404s', 'saman-seo' ); ?>
-                </a>
-            </p>
-        </div>
-
-        <style>
+        $css = '
             .saman-seo-dashboard-widget {
                 margin: -12px;
             }
@@ -203,7 +149,79 @@ class Dashboard_Widget {
                 border-top: 1px solid #c3c4c7;
                 text-align: center;
             }
-        </style>
+        ';
+
+        wp_add_inline_style( 'dashboard', $css );
+    }
+
+    /**
+     * Register the dashboard widget.
+     */
+    public function register_widget() {
+        // Only for users who can manage options
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        wp_add_dashboard_widget(
+            'SAMAN_SEO_404_widget',
+            __( '404 Monitor - Saman SEO', 'saman-seo' ),
+            [ $this, 'render_widget' ]
+        );
+    }
+
+    /**
+     * Render the widget content.
+     */
+    public function render_widget() {
+        $stats = $this->get_summary_stats();
+        $recent = $this->get_recent_404s( 5 );
+        $admin_url = admin_url( 'admin.php?page=saman-seo-v2#/404-log' );
+        ?>
+        <div class="saman-seo-dashboard-widget">
+            <div class="saman-seo-widget-stats">
+                <div class="saman-seo-widget-stat">
+                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['total'] ) ); ?></span>
+                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Total 404s', 'saman-seo' ); ?></span>
+                </div>
+                <div class="saman-seo-widget-stat">
+                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['need_redirect'] ) ); ?></span>
+                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Need Redirect', 'saman-seo' ); ?></span>
+                </div>
+                <div class="saman-seo-widget-stat">
+                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['last_24h'] ) ); ?></span>
+                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Last 24h', 'saman-seo' ); ?></span>
+                </div>
+                <div class="saman-seo-widget-stat">
+                    <span class="saman-seo-widget-stat__value"><?php echo esc_html( number_format_i18n( $stats['bots'] ) ); ?></span>
+                    <span class="saman-seo-widget-stat__label"><?php esc_html_e( 'Bots', 'saman-seo' ); ?></span>
+                </div>
+            </div>
+
+            <?php if ( ! empty( $recent ) ) : ?>
+                <div class="saman-seo-widget-recent">
+                    <h4><?php esc_html_e( 'Recent 404s', 'saman-seo' ); ?></h4>
+                    <ul>
+                        <?php foreach ( $recent as $entry ) : ?>
+                            <li>
+                                <code><?php echo esc_html( $this->truncate_url( $entry->request_uri, 40 ) ); ?></code>
+                                <span class="saman-seo-widget-hits"><?php echo esc_html( number_format_i18n( $entry->hits ) ); ?> <?php esc_html_e( 'hits', 'saman-seo' ); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php elseif ( 0 === $stats['total'] ) : ?>
+                <div class="saman-seo-widget-empty">
+                    <p><?php esc_html_e( 'No 404 errors recorded yet. Great!', 'saman-seo' ); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <p class="saman-seo-widget-footer">
+                <a href="<?php echo esc_url( $admin_url ); ?>" class="button button-primary">
+                    <?php esc_html_e( 'View All 404s', 'saman-seo' ); ?>
+                </a>
+            </p>
+        </div>
         <?php
     }
 

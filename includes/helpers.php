@@ -189,7 +189,7 @@ namespace Saman\SEO\Helpers {
 			$vars['author_bio']  = get_the_author_meta( 'description' );
 		} elseif ( is_404() ) {
 			// 404 page variables
-			$vars['request_url'] = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( home_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) : '';
+			$vars['request_url'] = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( home_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) ) : '';
 		} elseif ( is_search() ) {
 			// Search results variables
 			$vars['search_term'] = get_search_query();

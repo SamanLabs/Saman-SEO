@@ -124,7 +124,7 @@ const MobileFriendly = ({ onNavigate }) => {
                     <div className="input-group">
                         <input
                             type="url"
-                            className="form-input form-input--large"
+                            className="tool-input"
                             placeholder="Enter URL to test (e.g., https://example.com)"
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
@@ -133,13 +133,13 @@ const MobileFriendly = ({ onNavigate }) => {
                         <button
                             id="test-btn"
                             type="button"
-                            className="btn btn--primary btn--large"
+                            className="button primary large"
                             onClick={handleTest}
                             disabled={loading}
                         >
                             {loading ? (
                                 <>
-                                    <span className="btn-spinner" />
+                                    <span className="spinner" />
                                     Testing...
                                 </>
                             ) : (
@@ -156,7 +156,7 @@ const MobileFriendly = ({ onNavigate }) => {
                     <div className="quick-actions">
                         <button
                             type="button"
-                            className="btn btn--small btn--secondary"
+                            className="button ghost small"
                             onClick={handleTestHomepage}
                         >
                             Test Homepage
@@ -170,7 +170,7 @@ const MobileFriendly = ({ onNavigate }) => {
 
             {/* Error */}
             {error && (
-                <div className="notice notice--error">
+                <div className="alert-banner alert-banner--error">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 8v4m0 4h.01"/>
@@ -277,7 +277,7 @@ const MobileFriendly = ({ onNavigate }) => {
                                 href={`https://search.google.com/test/mobile-friendly?url=${encodeURIComponent(results.url)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn btn--secondary"
+                                className="button ghost"
                             >
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -291,7 +291,7 @@ const MobileFriendly = ({ onNavigate }) => {
                                 href={`https://pagespeed.web.dev/report?url=${encodeURIComponent(results.url)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn btn--secondary"
+                                className="button ghost"
                             >
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                                     <circle cx="12" cy="12" r="10"/>

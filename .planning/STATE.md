@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-23)
+See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Enable Google rich results through properly structured JSON-LD schemas that users can configure per post type and developers can extend.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Legacy Cleanup & Hardening
 
 ## Current Position
 
-Phase: Ready for next milestone
-Plan: N/A
-Status: v1.0 SHIPPED — ready for /gsd:new-milestone
-Last activity: 2026-01-23 — v1.0 milestone complete
+Phase: 11 - Legacy Removal
+Plan: —
+Status: Ready for planning
+Last activity: 2026-01-25 — Roadmap created for v1.2
 
-Progress: [##########] v1.0 COMPLETE
+Progress: [||||||||||||||||||||] v1.0 100% | [||||||||||||||||||||] v1.1 100% | [          ] v1.2 0%
 
 ## Performance Metrics
 
@@ -23,23 +23,21 @@ Progress: [##########] v1.0 COMPLETE
 - Average duration: 3 min
 - Total execution time: 47 min
 
-**By Phase:**
+**v1.1 Velocity:**
+- Plans completed: 5
+- Total execution time: 14 min
+- Average duration: 2.8 min
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-schema-engine-foundation | 3 | 9 min | 3 min |
-| 02-content-schemas | 2 | 5 min | 2.5 min |
-| 03-interactive-schemas | 2 | 6 min | 3 min |
-| 04-localbusiness-schema | 2 | 4 min | 2 min |
-| 05-admin-ui | 3 | 11 min | 3.7 min |
-| 06-developer-api | 2 | 7 min | 3.5 min |
+**v1.2 Velocity:**
+- Plans completed: 0
+- Total execution time: 0 min
+- Average duration: —
 
 ## Accumulated Context
 
 ### Decisions
 
-v1.0 decisions archived in PROJECT.md Key Decisions table.
-New milestone will start fresh.
+All v1.0 and v1.1 decisions archived in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -51,15 +49,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23
-Stopped at: v1.0 milestone complete
+Last session: 2026-01-25
+Stopped at: Roadmap created, ready for Phase 11 planning
 Resume file: None
-Next action: /gsd:new-milestone (after /clear)
-
-## Quick Tasks
-
-| ID | Name | Status | Duration |
-|----|------|--------|----------|
-| 001 | SEO Metabox Popup Modal | Complete | 2 min |
-| 002 | Fix Textdomain Timing | Complete | 1 min |
-| 003 | Fix SEO Modal Tab UX and Styling | Complete | 2 min |
+Next action: `/gsd:plan-phase 11`
