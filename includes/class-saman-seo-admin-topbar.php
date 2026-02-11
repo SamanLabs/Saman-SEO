@@ -121,7 +121,7 @@ class Admin_Topbar {
 		];
 
 		// Only show Local SEO if module is enabled.
-		if ( '1' === get_option( 'SAMAN_SEO_enable_local_seo', '0' ) ) {
+		if ( \Saman\SEO\Helpers\module_enabled( 'local_seo' ) ) {
 			$items['local-seo'] = [
 				'label' => __( 'Local SEO', 'saman-seo' ),
 				'url'   => admin_url( 'admin.php?page=saman-seo-local-seo' ),

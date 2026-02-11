@@ -25,28 +25,12 @@ class Local_SEO {
 			return;
 		}
 
-		// Register menu for PHP template rendering
-		add_action( 'admin_menu', [ $this, 'register_menu' ], 100 );
+		// Page rendering handled by Admin_V2 React app (saman-seo-local-seo slug).
+		// Only register settings here for sanitization and Options API support.
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		// Removed: LocalBusiness schema now handled by Schema Registry (LocalBusiness_Schema class).
 		// Legacy filter disabled to prevent duplicate output with incorrect @context.
 		// add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_local_business_to_graph' ], 20, 1 );
-	}
-
-	/**
-	 * Register submenu page.
-	 *
-	 * @return void
-	 */
-	public function register_menu() {
-		add_submenu_page(
-			'saman-seo',
-			__( 'Local SEO', 'saman-seo' ),
-			__( 'Local SEO', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-local-seo',
-			[ $this, 'render_page' ]
-		);
 	}
 
 	/**
@@ -607,42 +591,4 @@ class Local_SEO {
 		return $specifications;
 	}
 
-	/**
-	 * Render settings page.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		wp_enqueue_media();
-
-		wp_enqueue_style(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'build/css/admin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		wp_enqueue_script(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/js/admin.js',
-			[ 'jquery' ],
-			SAMAN_SEO_VERSION,
-			true
-		);
-
-		$business_types = $this->get_business_types();
-
-		include SAMAN_SEO_PATH . 'templates/local-seo.php';
-	}
 }

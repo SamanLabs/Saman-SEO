@@ -212,38 +212,28 @@ class Admin_V2 {
             );
         }
 
-        // Hidden subpages - accessible via React navigation but not shown in WP menu
+        // Hidden subpages - accessible via React navigation but not shown in WP menu.
+        // All pages registered unconditionally so direct URL access (refresh) always works.
+        // The React app handles module-disabled states in the UI.
         $hidden_subpages = [
-            'audit'            => __( 'Site Audit', 'saman-seo' ),
-            'bulk-editor'      => __( 'Bulk Editor', 'saman-seo' ),
-            'content-gaps'     => __( 'Content Gaps', 'saman-seo' ),
-            'schema-builder'   => __( 'Schema Builder', 'saman-seo' ),
-            'link-health'      => __( 'Link Health', 'saman-seo' ),
+            'audit'             => __( 'Site Audit', 'saman-seo' ),
+            'bulk-editor'       => __( 'Bulk Editor', 'saman-seo' ),
+            'content-gaps'      => __( 'Content Gaps', 'saman-seo' ),
+            'schema-builder'    => __( 'Schema Builder', 'saman-seo' ),
+            'link-health'       => __( 'Link Health', 'saman-seo' ),
             'robots-txt'        => __( 'robots.txt Editor', 'saman-seo' ),
             'image-seo'         => __( 'Image SEO', 'saman-seo' ),
             'instant-indexing'  => __( 'Instant Indexing', 'saman-seo' ),
             'schema-validator'  => __( 'Schema Validator', 'saman-seo' ),
             'htaccess-editor'   => __( '.htaccess Editor', 'saman-seo' ),
             'mobile-friendly'   => __( 'Mobile Friendly Test', 'saman-seo' ),
+            'redirects'         => __( 'Redirects', 'saman-seo' ),
+            '404-log'           => __( '404 Log', 'saman-seo' ),
+            'internal-linking'  => __( 'Internal Linking', 'saman-seo' ),
+            'local-seo'         => __( 'Local SEO', 'saman-seo' ),
+            'ai-assistant'      => __( 'AI Assistant', 'saman-seo' ),
+            'assistants'        => __( 'AI Assistants', 'saman-seo' ),
         ];
-
-        // Conditionally add module-dependent hidden pages.
-        if ( \Saman\SEO\Helpers\module_enabled( 'redirects' ) ) {
-            $hidden_subpages['redirects'] = __( 'Redirects', 'saman-seo' );
-        }
-        if ( \Saman\SEO\Helpers\module_enabled( '404_log' ) ) {
-            $hidden_subpages['404-log'] = __( '404 Log', 'saman-seo' );
-        }
-        if ( \Saman\SEO\Helpers\module_enabled( 'internal_links' ) ) {
-            $hidden_subpages['internal-linking'] = __( 'Internal Linking', 'saman-seo' );
-        }
-        if ( \Saman\SEO\Helpers\module_enabled( 'local_seo' ) ) {
-            $hidden_subpages['local-seo'] = __( 'Local SEO', 'saman-seo' );
-        }
-        if ( \Saman\SEO\Helpers\module_enabled( 'ai_assistant' ) ) {
-            $hidden_subpages['ai-assistant'] = __( 'AI Assistant', 'saman-seo' );
-            $hidden_subpages['assistants'] = __( 'AI Assistants', 'saman-seo' );
-        }
 
         foreach ( $hidden_subpages as $slug => $title ) {
             add_submenu_page(
