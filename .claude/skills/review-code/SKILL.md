@@ -45,6 +45,7 @@ Check adherence to project patterns:
 - [ ] **Meta Keys**: Use `_SAMAN_SEO_` prefix for post meta
 - [ ] **Text Domain**: All strings use `'saman-seo'` text domain
 - [ ] **Helper Usage**: Uses `\Saman\SEO\Helpers\` functions where appropriate
+- [ ] **Routing**: Services must NOT call `add_submenu_page()` or `add_menu_page()` — only `Admin_V2` registers pages. Check for duplicate slug registrations that would break the React SPA.
 
 ### 4. JavaScript/React Standards
 

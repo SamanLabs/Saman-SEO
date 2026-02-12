@@ -59,7 +59,7 @@ class Service_{Service_Name} {
         // Register hooks
         add_action( 'init', array( $this, 'init' ) );
 
-        // Admin-only hooks
+        // Admin-only hooks (NOT admin_menu — page registration belongs to Admin_V2)
         if ( is_admin() ) {
             add_action( 'admin_init', array( $this, 'admin_init' ) );
         }
@@ -91,6 +91,7 @@ class Service_{Service_Name} {
 
 ## Patterns to Follow
 
+- **No Page Registration**: Services MUST NOT call `add_submenu_page()` or `add_menu_page()`. All admin pages are handled by the Admin_V2 React SPA. Use `/react-page` to create UI.
 - **Namespace**: Always use `namespace Saman\SEO;`
 - **Hooks**: Register in `boot()`, implement in separate methods
 - **Feature Toggle**: Use `\Saman\SEO\Helpers\module_enabled( 'key' )` for toggleable features
