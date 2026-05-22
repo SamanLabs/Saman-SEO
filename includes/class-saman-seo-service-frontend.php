@@ -738,7 +738,15 @@ class Frontend {
 			$title = $homepage_title;
 		}
 		if ( empty( $title ) && $post instanceof WP_Post ) {
+			// generate_title_from_template() already calls the replacer.
 			$title = generate_title_from_template( $post );
+		} elseif ( ! empty( $title ) ) {
+			// Per-post `$meta['title']` and the homepage option can both
+			// contain {{tokens}} or %tokens% — without this call they
+			// would leak literally into the <title> tag. The replacer
+			// is a no-op on already-substituted text, so it is also
+			// safe to run on output of generate_title_from_template().
+			$title = replace_template_variables( $title, $post );
 		}
 		if ( empty( $title ) ) {
 			$title = get_bloginfo( 'name' );

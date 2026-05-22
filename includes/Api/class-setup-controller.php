@@ -175,9 +175,13 @@ class Setup_Controller extends REST_Controller {
             }
         }
 
-        // Save title template
+        // Save title template. The rest of the plugin reads
+        // SAMAN_SEO_default_title_template; earlier versions of this
+        // controller wrote to SAMAN_SEO_title_template, which was silently
+        // ignored. Clear the dead key so two values can't drift apart.
         if ( ! empty( $params['title_template'] ) ) {
-            update_option( 'SAMAN_SEO_title_template', sanitize_text_field( $params['title_template'] ) );
+            update_option( 'SAMAN_SEO_default_title_template', sanitize_text_field( $params['title_template'] ) );
+            delete_option( 'SAMAN_SEO_title_template' );
         }
 
         // Mark setup as completed

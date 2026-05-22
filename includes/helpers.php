@@ -140,6 +140,9 @@ namespace Saman\SEO\Helpers {
 		// Context Specific
 		if ( $context instanceof WP_Post ) {
 			$vars['post_title']   = \wp_strip_all_tags( $context->post_title );
+			// Legacy alias so %title% (the Setup wizard's historical default)
+			// resolves to the post title alongside {{post_title}}.
+			$vars['title']        = $vars['post_title'];
 			$vars['post_excerpt'] = \wp_strip_all_tags( \get_the_excerpt( $context ) );
 			$vars['post_date']    = get_the_date( '', $context );
 			$vars['post_author']  = get_the_author_meta( 'display_name', $context->post_author );
@@ -195,8 +198,65 @@ namespace Saman\SEO\Helpers {
 			$vars['search_term'] = get_search_query();
 		}
 
-		$twiglet = new \Twiglet\Twiglet();
-		return $twiglet->render_string( $template, $vars );
+		$twiglet  = new \Twiglet\Twiglet();
+		$rendered = $twiglet->render_string( $template, $vars );
+
+		return tidy_rendered_template( $rendered, $vars['separator'] ?? '' );
+	}
+
+	/**
+	 * Clean up artefacts left behind when a template token resolves to an
+	 * empty string — typically dangling or doubled separators like
+	 *
+	 *   "{{post_title}} | {{site_title}}"  →  " | My Site"
+	 *
+	 * Collapses runs of whitespace, removes duplicated separator runs, and
+	 * trims leading/trailing separator characters. Conservative: only the
+	 * configured separator and a small set of common defaults (`|`, `-`,
+	 * `–`, `—`, `·`) are stripped, so legitimate punctuation inside a title
+	 * is preserved.
+	 *
+	 * @param string $value     Rendered template output.
+	 * @param string $separator Configured title separator.
+	 *
+	 * @return string
+	 */
+	function tidy_rendered_template( $value, $separator = '' ) {
+		$value = (string) $value;
+		if ( '' === $value ) {
+			return '';
+		}
+
+		// Normalize internal whitespace (Twiglet may leave double spaces where
+		// a token was substituted with '').
+		$value = preg_replace( '/[ \t]+/u', ' ', $value );
+
+		$candidates = array_values( array_unique( array_filter(
+			[ $separator, '|', '-', '–', '—', '·' ],
+			'strlen'
+		) ) );
+
+		// Collapse runs of the SAME separator character (so " |  | " → " | "
+		// but a mixed " | - " stays untouched — that's likely intentional).
+		foreach ( $candidates as $sep ) {
+			$q       = preg_quote( $sep, '/' );
+			$pattern = '/(' . $q . ')\s*(?:' . $q . '\s*)+/u';
+			$value   = preg_replace( $pattern, '$1 ', $value );
+		}
+
+		// Strip leading/trailing separator + whitespace runs. Conservative:
+		// only trims the configured + well-known SEO separators, leaving any
+		// punctuation a theme might legitimately use inside a title alone.
+		$class = '';
+		foreach ( $candidates as $sep ) {
+			$class .= preg_quote( $sep, '/' );
+		}
+		if ( '' !== $class ) {
+			$trim_pattern = '/^[\s' . $class . ']+|[\s' . $class . ']+$/u';
+			$value        = preg_replace( $trim_pattern, '', $value );
+		}
+
+		return trim( $value );
 	}
 
 	/**
