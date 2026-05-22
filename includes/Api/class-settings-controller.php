@@ -102,7 +102,45 @@ class Settings_Controller extends REST_Controller {
         // Add system info.
         $settings['system_info'] = $this->get_system_info();
 
+        // Expose theme-config overrides so the UI can render a "from theme"
+        // badge per field and warn before letting the user save over them.
+        $settings['theme_config'] = $this->get_theme_config_payload();
+
         return $this->success( $settings );
+    }
+
+    /**
+     * Build the payload describing the active theme's saman-seo.config.php
+     * (if any). Keys are stripped of the SAMAN_SEO_ prefix to match the rest
+     * of the settings payload the React app already consumes.
+     *
+     * @return array
+     */
+    private function get_theme_config_payload() {
+        $service = \Saman\SEO\Plugin::instance()->get( 'theme_config' );
+
+        if ( ! $service ) {
+            return [
+                'loaded'    => false,
+                'path'      => '',
+                'overrides' => (object) [],
+            ];
+        }
+
+        $raw   = $service->get_overrides();
+        $short = [];
+        foreach ( $raw as $key => $value ) {
+            $short_key           = ( 0 === strpos( $key, 'SAMAN_SEO_' ) ) ? substr( $key, 10 ) : $key;
+            $short[ $short_key ] = $value;
+        }
+
+        $path = $service->get_loaded_path();
+
+        return [
+            'loaded'    => '' !== $path,
+            'path'      => $path,
+            'overrides' => empty( $short ) ? (object) [] : $short,
+        ];
     }
 
     /**

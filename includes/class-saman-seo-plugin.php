@@ -159,6 +159,10 @@ class Plugin {
 
 		$this->register( 'compatibility', new Service\Compatibility() );
 		$this->register( 'settings', new Service\Settings() );
+		// Theme_Config must boot *after* Settings (it reads plugin compile-time
+		// defaults from the Settings service) and *before* any service that
+		// reads SAMAN_SEO_* options at boot — so it sits here.
+		$this->register( 'theme_config', new Service\Theme_Config() );
 		$this->register( 'meta', new Service\Post_Meta() );
 		$this->register( 'frontend', new Service\Frontend() );
 		$this->register( 'jsonld', new Service\JsonLD() );
