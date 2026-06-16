@@ -1239,4 +1239,16 @@ namespace {
 
 		return $svc->create_redirect( $source, $target, $status_code );
 	}
+
+	/**
+	 * Backward-compatible breadcrumb renderer for the previous WP SEO Pilot API.
+	 *
+	 * @param array|null $args Optional arguments to override settings.
+	 * @param bool       $echo Whether to echo (default true).
+	 *
+	 * @return string|null
+	 */
+	function wpseopilot_breadcrumbs( $args = null, $echo = true ) {
+		return \Saman\SEO\Helpers\breadcrumbs( $args, $echo );
+	}
 }

@@ -22,6 +22,13 @@ defined( 'ABSPATH' ) || exit;
 class Breadcrumbs {
 
 	/**
+	 * Whether breadcrumbs have already been rendered on the current request.
+	 *
+	 * @var bool
+	 */
+	private $rendered = false;
+
+	/**
 	 * Default settings.
 	 *
 	 * @var array
@@ -65,8 +72,15 @@ class Breadcrumbs {
 		// Add JSON-LD schema to head.
 		add_filter( 'SAMAN_SEO_jsonld', [ $this, 'add_breadcrumb_schema' ], 15 );
 
-		// Register shortcode (replaces existing one).
+		// Register shortcodes.
 		add_shortcode( 'SAMAN_SEO_breadcrumbs', [ $this, 'shortcode' ] );
+		add_shortcode( 'wpseopilot_breadcrumbs', [ $this, 'shortcode' ] );
+
+		// Auto-prepend breadcrumbs to the main content on supported views.
+		add_filter( 'the_content', [ $this, 'maybe_prepend_breadcrumbs' ], 9 );
+
+		// Fallback for themes that do not apply the_content filter.
+		add_action( 'wp_footer', [ $this, 'maybe_footer_breadcrumbs' ], 20 );
 
 		// Register Gutenberg block.
 		add_action( 'init', [ $this, 'register_block' ] );
@@ -641,6 +655,8 @@ class Breadcrumbs {
 			return '';
 		}
 
+		$this->rendered = true;
+
 		$settings  = $this->get_settings();
 		$args      = wp_parse_args( $args, $settings );
 		$separator = $this->get_separator( $args );
@@ -649,26 +665,26 @@ class Breadcrumbs {
 
 		ob_start();
 		?>
-		<nav class="saman-seo-breadcrumbs saman-seo-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'saman-seo' ); ?>">
-			<ol class="saman-seo-breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
+		<nav class="saman-seo-breadcrumbs wp-seo-pilot-breadcrumbs saman-seo-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'saman-seo' ); ?>">
+			<ol class="saman-seo-breadcrumbs__list wp-seo-pilot-breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
 				<?php foreach ( $crumbs as $index => $crumb ) : ?>
 					<?php
 					$is_last  = ( $index === $total - 1 );
 					$position = $index + 1;
 					?>
-					<li class="saman-seo-breadcrumbs__item<?php echo $is_last ? ' saman-seo-breadcrumbs__item--current' : ''; ?>" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+					<li class="saman-seo-breadcrumbs__item wp-seo-pilot-breadcrumbs__item<?php echo $is_last ? ' saman-seo-breadcrumbs__item--current wp-seo-pilot-breadcrumbs__item--current' : ''; ?>" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
 						<?php if ( ! empty( $crumb['url'] ) && ! $is_last ) : ?>
-							<a class="saman-seo-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>" itemprop="item">
+							<a class="saman-seo-breadcrumbs__link wp-seo-pilot-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>" itemprop="item">
 								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
 							</a>
 						<?php else : ?>
-							<span class="saman-seo-breadcrumbs__current" itemprop="item">
+							<span class="saman-seo-breadcrumbs__current wp-seo-pilot-breadcrumbs__current" itemprop="item">
 								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
 							</span>
 						<?php endif; ?>
 						<meta itemprop="position" content="<?php echo esc_attr( $position ); ?>" />
 						<?php if ( ! $is_last ) : ?>
-							<span class="saman-seo-breadcrumbs__separator" aria-hidden="true"><?php echo $separator; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+							<span class="saman-seo-breadcrumbs__separator wp-seo-pilot-breadcrumbs__separator" aria-hidden="true"><?php echo $separator; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<?php endif; ?>
 					</li>
 				<?php endforeach; ?>
@@ -677,6 +693,56 @@ class Breadcrumbs {
 		<?php
 
 		return trim( ob_get_clean() );
+	}
+
+	/**
+	 * Automatically prepend breadcrumbs to the main content area.
+	 *
+	 * @param string $content Post content.
+	 * @return string
+	 */
+	public function maybe_prepend_breadcrumbs( $content ) {
+		if ( $this->rendered || \is_admin() || ! \is_main_query() || ! \in_the_loop() || \is_feed() ) {
+			return $content;
+		}
+
+		if ( ! apply_filters( 'SAMAN_SEO_auto_breadcrumbs', true ) ) {
+			return $content;
+		}
+
+		// Avoid double output when the shortcode/block is already in the content.
+		if ( false !== strpos( $content, 'saman-seo-breadcrumbs' ) || false !== strpos( $content, 'wp-seo-pilot-breadcrumbs' ) ) {
+			return $content;
+		}
+
+		$crumbs = $this->render();
+		if ( empty( $crumbs ) ) {
+			return $content;
+		}
+
+		return $crumbs . "\n" . $content;
+	}
+
+	/**
+	 * Fallback breadcrumb output for themes that bypass the_content filter.
+	 *
+	 * @return void
+	 */
+	public function maybe_footer_breadcrumbs() {
+		if ( $this->rendered || \is_admin() || \is_feed() || \is_front_page() ) {
+			return;
+		}
+
+		if ( ! apply_filters( 'SAMAN_SEO_auto_breadcrumbs', true ) ) {
+			return;
+		}
+
+		$crumbs = $this->render();
+		if ( empty( $crumbs ) ) {
+			return;
+		}
+
+		echo $crumbs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

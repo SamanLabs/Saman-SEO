@@ -91,10 +91,19 @@ class Schema_Context {
 		$context->canonical = $context->post instanceof \WP_Post ? get_permalink( $context->post ) : $context->site_url;
 
 		// Get post meta, ensure array.
-		$raw_meta       = $context->post instanceof \WP_Post
-			? get_post_meta( $context->post->ID, '_SAMAN_SEO_meta', true )
-			: [];
-		$context->meta  = is_array( $raw_meta ) ? $raw_meta : [];
+		$raw_meta = [];
+		if ( $context->post instanceof \WP_Post ) {
+			$raw_meta = get_post_meta( $context->post->ID, '_SAMAN_SEO_meta', true );
+
+			// Backward compatibility with the previous WP SEO Pilot meta key.
+			if ( empty( $raw_meta ) ) {
+				$legacy = get_post_meta( $context->post->ID, '_wpseopilot_meta', true );
+				if ( ! empty( $legacy ) && is_array( $legacy ) ) {
+					$raw_meta = $legacy;
+				}
+			}
+		}
+		$context->meta = is_array( $raw_meta ) ? $raw_meta : [];
 
 		// Determine schema type: post meta > post type settings > default.
 		$context->schema_type = self::determine_schema_type( $context );
@@ -121,8 +130,17 @@ class Schema_Context {
 		$context->canonical = get_permalink( $post );
 
 		// Get post meta, ensure array.
-		$raw_meta       = get_post_meta( $post->ID, '_SAMAN_SEO_meta', true );
-		$context->meta  = is_array( $raw_meta ) ? $raw_meta : [];
+		$raw_meta = get_post_meta( $post->ID, '_SAMAN_SEO_meta', true );
+
+		// Backward compatibility with the previous WP SEO Pilot meta key.
+		if ( empty( $raw_meta ) ) {
+			$legacy = get_post_meta( $post->ID, '_wpseopilot_meta', true );
+			if ( ! empty( $legacy ) && is_array( $legacy ) ) {
+				$raw_meta = $legacy;
+			}
+		}
+
+		$context->meta = is_array( $raw_meta ) ? $raw_meta : [];
 
 		// Determine schema type: post meta > post type settings > default.
 		$context->schema_type = self::determine_schema_type( $context );
@@ -150,8 +168,16 @@ class Schema_Context {
 		// Check post type defaults.
 		if ( ! empty( $context->post_type ) ) {
 			$type_settings = get_option( 'SAMAN_SEO_post_type_settings', [] );
-			if ( ! empty( $type_settings[ $context->post_type ]['schema_type'] ) ) {
-				return $type_settings[ $context->post_type ]['schema_type'];
+			if ( is_array( $type_settings ) && ! empty( $type_settings[ $context->post_type ] ) ) {
+				$settings = $type_settings[ $context->post_type ];
+
+				// Pages default to the page schema type; posts/CPTs default to the article type.
+				if ( 'page' === $context->post_type && ! empty( $settings['schema_page'] ) ) {
+					return $settings['schema_page'];
+				}
+				if ( ! empty( $settings['schema_article'] ) ) {
+					return $settings['schema_article'];
+				}
 			}
 		}
 

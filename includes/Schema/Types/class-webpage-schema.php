@@ -32,6 +32,10 @@ class WebPage_Schema extends Abstract_Schema {
 	 * @return string The @type value.
 	 */
 	public function get_type() {
+		if ( \is_category() || \is_tag() || \is_tax() ) {
+			return 'CollectionPage';
+		}
+
 		return 'WebPage';
 	}
 

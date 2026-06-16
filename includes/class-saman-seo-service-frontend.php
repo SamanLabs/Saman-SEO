@@ -53,6 +53,10 @@ class Frontend {
 		// with duplicate <title> tags when our own renderer fires.
 		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
 
+		// Remove WordPress default robots tag so we can emit a single,
+		// feature-complete robots directive set.
+		remove_action( 'wp_head', 'wp_robots', 1 );
+
 		// Supply the real SEO title to WordPress's document-title API.
 		// Themes and plugins that call wp_get_document_title() will now
 		// receive the optimized title instead of the default one.
@@ -99,6 +103,12 @@ class Frontend {
 
 		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title, false );
 
+		// Default homepage title when no override is saved.
+		if ( $is_home_view && empty( $title ) ) {
+			$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+			$title     = __( 'Home', 'saman-seo' ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		}
+
 		// Handle archive pages (404, search, author, date).
 		$archive_defaults = $this->get_archive_defaults();
 		$archive_type     = null;
@@ -135,11 +145,30 @@ class Frontend {
 			}
 		}
 
+		// Handle taxonomy and post-type archives not covered above.
+		if ( empty( $title ) && ( is_category() || is_tag() || is_tax() || is_post_type_archive() ) ) {
+			$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+
+			if ( is_post_type_archive() ) {
+				$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			} else {
+				$term = get_queried_object();
+				$term_name = ( $term instanceof \WP_Term ) ? $term->name : get_the_archive_title();
+				$title = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			}
+		}
+
 		if ( empty( $title ) ) {
 			$title = get_bloginfo( 'name' );
 		}
 
 		$title = strip_unreplaced_variables( $title );
+
+		// Truncate overly long titles to keep them search-engine friendly.
+		$max_length = absint( apply_filters( 'SAMAN_SEO_title_max_length', 60 ) );
+		if ( $max_length > 0 && function_exists( 'mb_strlen' ) && mb_strlen( $title ) > $max_length ) {
+			$title = mb_strimwidth( $title, 0, $max_length, '...' );
+		}
 
 		return apply_filters( 'SAMAN_SEO_title', $title, $post );
 	}
@@ -736,6 +765,24 @@ class Frontend {
 
 		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
 
+		// Add default advanced directives (can be filtered or disabled via global option).
+		$advanced = apply_filters(
+			'SAMAN_SEO_robots_advanced',
+			[
+				'max-snippet:-1',
+				'max-image-preview:large',
+				'max-video-preview:-1',
+			]
+		);
+		if ( is_array( $advanced ) ) {
+			foreach ( $advanced as $directive ) {
+				$directive = trim( (string) $directive );
+				if ( '' !== $directive && ! in_array( $directive, $directives, true ) ) {
+					$directives[] = $directive;
+				}
+			}
+		}
+
 		// Filter the array of directives (e.g. ['noindex', 'nofollow']).
 		$directives = apply_filters( 'SAMAN_SEO_robots_array', $directives );
 
@@ -743,10 +790,31 @@ class Frontend {
 			$directives = [];
 		}
 
+		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
+
+		// Default to index, follow when no negative directive is present.
+		if ( ! in_array( 'noindex', $directives, true ) && ! in_array( 'index', $directives, true ) ) {
+			$directives[] = 'index';
+		}
+		if ( ! in_array( 'nofollow', $directives, true ) && ! in_array( 'follow', $directives, true ) ) {
+			$directives[] = 'follow';
+		}
+
 		$robots_string = implode( ', ', $directives );
 
 		// Filter the final string (e.g. 'noindex, nofollow').
-		return apply_filters( 'SAMAN_SEO_robots', $robots_string );
+		$robots_string = apply_filters( 'SAMAN_SEO_robots', $robots_string );
+
+		// Sanitize the final directive list: remove duplicates and conflicting pairs.
+		$final_directives = array_filter( array_unique( array_map( 'trim', explode( ',', $robots_string ) ) ) );
+		if ( in_array( 'noindex', $final_directives, true ) ) {
+			$final_directives = array_diff( $final_directives, [ 'index' ] );
+		}
+		if ( in_array( 'nofollow', $final_directives, true ) ) {
+			$final_directives = array_diff( $final_directives, [ 'follow' ] );
+		}
+
+		return implode( ', ', array_values( $final_directives ) );
 	}
 
 	/**
@@ -891,9 +959,6 @@ class Frontend {
 			// contain {{tokens}} or %tokens% — render safely to prevent leaks.
 			$title = render_template_safely( $title, $post );
 		}
-		if ( empty( $title ) ) {
-			$title = get_bloginfo( 'name' );
-		}
 
 		if ( $apply_filter ) {
 			return apply_filters( 'SAMAN_SEO_title', $title, $post );
@@ -1032,10 +1097,18 @@ class Frontend {
 	 * @return array
 	 */
 	private function get_meta( $post ) {
+		$meta = [];
+
 		if ( $post instanceof WP_Post ) {
 			$meta = get_post_meta( $post->ID, Post_Meta::META_KEY, true );
-		} else {
-			$meta = [];
+
+			// Backward compatibility with the previous WP SEO Pilot meta key.
+			if ( empty( $meta ) ) {
+				$legacy = get_post_meta( $post->ID, '_wpseopilot_meta', true );
+				if ( ! empty( $legacy ) && is_array( $legacy ) ) {
+					$meta = $legacy;
+				}
+			}
 		}
 
 		if ( ! is_array( $meta ) ) {
