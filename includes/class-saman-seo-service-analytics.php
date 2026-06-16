@@ -89,7 +89,7 @@ class Analytics {
 	 * Determine which interface is being used
 	 */
 	private function get_interface_type( $page ) {
-		if ( strpos( $page, 'saman-seo-v2' ) !== false ) {
+		if ( strpos( $page, 'saman-seo' ) !== false ) {
 			return 'React';
 		}
 		return 'Legacy';

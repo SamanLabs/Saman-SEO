@@ -176,7 +176,7 @@ class Dashboard_Widget {
     public function render_widget() {
         $stats = $this->get_summary_stats();
         $recent = $this->get_recent_404s( 5 );
-        $admin_url = admin_url( 'admin.php?page=saman-seo-v2#/404-log' );
+        $admin_url = admin_url( 'admin.php?page=saman-seo-404-log' );
         ?>
         <div class="saman-seo-dashboard-widget">
             <div class="saman-seo-widget-stats">

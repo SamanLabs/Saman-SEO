@@ -53,9 +53,6 @@ class Request_Monitor {
 		}
 
 		add_action( 'template_redirect', [ $this, 'maybe_log_404' ] );
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_page' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
 		// Setup scheduled cleanup
 		add_action( 'SAMAN_SEO_404_cleanup', [ $this, 'run_scheduled_cleanup' ] );
@@ -177,7 +174,7 @@ class Request_Monitor {
 
 		$site_name = get_bloginfo( 'name' );
 		$site_url  = home_url();
-		$admin_url = admin_url( 'admin.php?page=saman-seo-v2#/404-log' );
+		$admin_url = admin_url( 'admin.php?page=saman-seo-404-log' );
 
 		$subject = sprintf(
 			/* translators: %s: Site name */
@@ -305,116 +302,6 @@ class Request_Monitor {
 				)
 			);
 		}
-	}
-
-	/**
-	 * Enqueue admin assets.
-	 *
-	 * @param string $hook Hook suffix.
-	 * @return void
-	 */
-	public function enqueue_assets( $hook ) {
-		if ( 'wp-seo-pilot_page_saman-seo-404' !== $hook ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-	}
-
-	/**
-	 * Register admin report page.
-	 *
-	 * @return void
-	 */
-	public function register_page() {
-		add_submenu_page(
-			'saman-seo',
-			__( '404 Log', 'saman-seo' ),
-			__( '404 Log', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-404',
-			[ $this, 'render_page' ],
-			12
-		);
-	}
-
-	/**
-	 * Render 404 report.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		$sort     = isset( $_GET['sort'] ) ? sanitize_key( wp_unslash( $_GET['sort'] ) ) : 'recent';
-		$per_page = isset( $_GET['per_page'] ) ? max( 1, min( 200, absint( $_GET['per_page'] ) ) ) : 50;
-		$page     = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-		$hide_spam   = isset( $_GET['hide_spam'] ) ? (bool) absint( $_GET['hide_spam'] ) : true;
-		$hide_images = isset( $_GET['hide_images'] ) ? (bool) absint( $_GET['hide_images'] ) : false;
-
-		if ( ! in_array( $sort, [ 'recent', 'top' ], true ) ) {
-			$sort = 'recent';
-		}
-
-		$order_by = ( 'top' === $sort ) ? 'hits' : 'last_seen';
-
-		$offset = ( $page - 1 ) * $per_page;
-
-		global $wpdb;
-		$filters = [];
-		$params  = [];
-
-		if ( $hide_spam ) {
-			foreach ( $this->get_spam_url_patterns() as $pattern ) {
-				$filters[] = 'request_uri NOT LIKE %s';
-				$params[]  = $pattern;
-			}
-		}
-
-		if ( $hide_images ) {
-			foreach ( $this->get_image_url_patterns() as $pattern ) {
-				$filters[] = 'request_uri NOT LIKE %s';
-				$params[]  = $pattern;
-			}
-		}
-
-		$where_sql = $filters ? ' WHERE ' . implode( ' AND ', $filters ) : '';
-
-		$count_sql = "SELECT COUNT(*) FROM {$this->table}{$where_sql}";
-		if ( $params ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
-			$count_sql = $wpdb->prepare( $count_sql, $params );
-		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, custom pagination requires direct queries.
-		$total_count = (int) $wpdb->get_var( $count_sql );
-
-		$order_by_sql = ( 'hits' === $order_by ) ? 'hits' : 'last_seen';
-		$sql = "SELECT * FROM {$this->table}{$where_sql} ORDER BY {$order_by_sql} DESC LIMIT %d OFFSET %d";
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
-		$sql = $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, custom pagination requires direct queries.
-		$rows = $wpdb->get_results( $sql );
-
-		if ( $rows ) {
-			$rows = $this->hydrate_device_labels( $rows );
-			$rows = $this->annotate_redirect_status( $rows );
-		}
-
-		$total_pages = max( 1, (int) ceil( $total_count / $per_page ) );
-		$base_url    = menu_page_url( 'saman-seo-404-log', false );
-		// Fallback if menu page not registered yet.
-		if ( empty( $base_url ) ) {
-			$base_url = admin_url( 'admin.php?page=saman-seo-404-log' );
-		}
-
-		include SAMAN_SEO_PATH . 'templates/404-log.php';
 	}
 
 	/**

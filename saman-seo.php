@@ -162,7 +162,7 @@ add_action(
 			( new \Saman\SEO\Integration\WooCommerce() )->boot();
 		}
 
-		// Initialize V2 React Admin (runs alongside V1)
+		// Initialize the React admin interface.
 		// Also load for REST API requests so endpoints are registered
 		$is_rest_request = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
 			( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], '/wp-json/' ) !== false );

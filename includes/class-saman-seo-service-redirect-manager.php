@@ -76,8 +76,6 @@ class Redirect_Manager {
 		}
 
 		add_action( 'template_redirect', [ $this, 'maybe_redirect' ], 0 );
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_post_SAMAN_SEO_save_redirect', [ $this, 'handle_save' ] );
 		add_action( 'admin_post_SAMAN_SEO_delete_redirect', [ $this, 'handle_delete' ] );
 		add_action( 'admin_post_SAMAN_SEO_dismiss_slug', [ $this, 'handle_dismiss_slug' ] );
@@ -611,58 +609,6 @@ class Redirect_Manager {
 		}
 
 		update_option( 'SAMAN_SEO_redirects_schema_version', self::SCHEMA_VERSION );
-	}
-
-	/**
-	 * Register admin UI.
-	 *
-	 * @return void
-	 */
-	public function register_menu() {
-		add_submenu_page(
-			'saman-seo',
-			__( 'Redirect Manager', 'saman-seo' ),
-			__( 'Redirects', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-redirects',
-			[ $this, 'render_page' ],
-			11
-		);
-	}
-
-	/**
-	 * Render redirects list + form.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		global $wpdb;
-		$redirects = wp_cache_get( self::CACHE_KEY_ADMIN, self::CACHE_GROUP );
-
-		if ( false === $redirects ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom redirect table listing requires a direct query. Results are cached just below.
-			$redirects = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT * FROM {$this->table} ORDER BY id DESC LIMIT %d",
-					200
-				)
-			);
-
-			wp_cache_set( self::CACHE_KEY_ADMIN, $redirects, self::CACHE_GROUP, self::CACHE_TTL );
-		}
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		include SAMAN_SEO_PATH . 'templates/redirects.php';
 	}
 
 	/**

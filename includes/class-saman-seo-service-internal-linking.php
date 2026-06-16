@@ -33,13 +33,6 @@ class Internal_Linking {
 	private const NOTICE_TRANSIENT = 'SAMAN_SEO_links_notices';
 
 	/**
-	 * Admin page hook suffix.
-	 *
-	 * @var string|null
-	 */
-	private $page_hook = null;
-
-	/**
 	 * Data repository.
 	 *
 	 * @var Repository
@@ -97,9 +90,6 @@ class Internal_Linking {
 		}
 
 		add_action( 'admin_init', [ $this, 'ensure_role_capabilities' ] );
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_post_SAMAN_SEO_save_link_rule', [ $this, 'handle_save_rule' ] );
 		add_action( 'admin_post_SAMAN_SEO_delete_link_rule', [ $this, 'handle_delete_rule' ] );
 		add_action( 'admin_post_SAMAN_SEO_bulk_link_rules', [ $this, 'handle_bulk_rules' ] );
@@ -116,88 +106,6 @@ class Internal_Linking {
 		add_filter( 'widget_text', [ $this, 'filter_widget_content' ], 20, 3 );
 		add_filter( 'widget_text_content', [ $this, 'filter_widget_content' ], 20, 2 );
 		add_filter( 'widget_block_content', [ $this, 'filter_widget_content' ], 20, 2 );
-	}
-
-	/**
-	 * Add submenu entry.
-	 *
-	 * @return void
-	 */
-	public function register_menu() {
-		$this->page_hook = add_submenu_page(
-			'saman-seo',
-			__( 'Internal Linking', 'saman-seo' ),
-			__( 'Internal Linking', 'saman-seo' ),
-			self::CAPABILITY,
-			self::PAGE_SLUG,
-			[ $this, 'render_page' ],
-			10
-		);
-	}
-
-	/**
-	 * Enqueue scripts/styles for module page.
-	 *
-	 * @param string $hook Current admin hook.
-	 *
-	 * @return void
-	 */
-	public function enqueue_assets( $hook ) {
-		if ( empty( $this->page_hook ) || $this->page_hook !== $hook ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'build/css/admin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		wp_enqueue_style(
-			'saman-seo-internal-linking',
-			SAMAN_SEO_URL . 'build/css/internal-linking.css',
-			[ 'saman-seo-admin' ],
-			SAMAN_SEO_VERSION
-		);
-
-		wp_enqueue_script(
-			'saman-seo-internal-linking',
-			SAMAN_SEO_URL . 'assets/js/internal-linking.js',
-			[ 'jquery', 'wp-util' ],
-			SAMAN_SEO_VERSION,
-			true
-		);
-
-		wp_localize_script(
-			'saman-seo-internal-linking',
-			'SamanSEOLinks',
-			[
-				'ajax'   => admin_url( 'admin-ajax.php' ),
-				'nonce'  => wp_create_nonce( 'SAMAN_SEO_link_admin' ),
-				'labels' => [
-					'empty'           => __( 'No rules yet. Create your first internal link rule.', 'saman-seo' ),
-					'keyword_hint'    => __( 'Use Enter to add each keyword. Exact phrase match; word boundaries recommended.', 'saman-seo' ),
-					'preview_note'    => __( 'Preview simulates replacements without saving changes.', 'saman-seo' ),
-					'previewSelect'   => __( 'Select a post or enter a URL to preview.', 'saman-seo' ),
-					'previewRunning'  => __( 'Generating previewÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦', 'saman-seo' ),
-					'previewEmpty'    => __( 'No replacements found.', 'saman-seo' ),
-					'previewError'    => __( 'Unable to run preview.', 'saman-seo' ),
-					// translators: Placeholder values
-					'previewSuccess'  => __( 'Preview complete: %d replacement(s).', 'saman-seo' ),
-					'save_success'    => __( 'Rule saved.', 'saman-seo' ),
-					'category_prompt' => __( 'Provide a category name to continue.', 'saman-seo' ),
-					'remove'          => __( 'Remove keyword', 'saman-seo' ),
-				],
-			]
-		);
 	}
 
 	/**
@@ -240,93 +148,6 @@ class Internal_Linking {
 				'context' => 'widget',
 			]
 		);
-	}
-
-	/**
-	 * Render the Internal Linking admin screen.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( self::CAPABILITY ) ) {
-			return;
-		}
-
-		foreach ( $this->consume_notices() as $notice ) {
-			add_settings_error( 'SAMAN_SEO_links', $notice['code'], $notice['message'], $notice['type'] );
-		}
-
-		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'rules';
-		$filters    = $this->parse_rule_filters();
-
-		$rules            = $this->repository->get_rules( $filters );
-		$all_rules        = $this->repository->get_rules();
-		$categories       = $this->repository->get_categories();
-		$templates        = $this->repository->get_templates();
-		$settings         = $this->repository->get_settings();
-		$rule_defaults    = $this->repository->get_rule_defaults();
-		$category_default = $this->repository->get_category_defaults();
-		$template_default = $this->repository->get_template_defaults();
-
-		$rule_to_edit = null;
-		if ( isset( $_GET['rule'] ) ) {
-			$rule_to_edit = $this->repository->get_rule( sanitize_key( wp_unslash( $_GET['rule'] ) ) );
-		}
-
-		if ( ! $rule_to_edit ) {
-			$rule_defaults = $this->apply_rule_settings_defaults( $rule_defaults, $settings );
-		}
-
-		if ( 'edit' === $active_tab && ! $rule_to_edit ) {
-			$active_tab = 'new';
-		}
-
-		$category_to_edit = null;
-		if ( isset( $_GET['category'] ) ) {
-			$category_to_edit = $this->repository->get_category( sanitize_key( wp_unslash( $_GET['category'] ) ) );
-		}
-
-		$template_to_edit = null;
-		if ( isset( $_GET['template'] ) ) {
-			$template_to_edit = $this->repository->get_template( sanitize_key( wp_unslash( $_GET['template'] ) ) );
-		}
-
-		$post_types = $this->get_supported_post_types();
-
-		$category_usage = [];
-		foreach ( $categories as $category ) {
-			$count = 0;
-			foreach ( $all_rules as $rule ) {
-				if ( ( $rule['category'] ?? '' ) === $category['id'] ) {
-					++$count;
-				}
-			}
-			$category_usage[ $category['id'] ] = $count;
-		}
-
-		$context = [
-			'rules'             => $rules,
-			'all_rules'         => $all_rules,
-			'categories'        => $categories,
-			'category_usage'    => $category_usage,
-			'category_to_edit'  => $category_to_edit,
-			'utm_templates'     => $templates,
-			'template_to_edit'  => $template_to_edit,
-			'settings'          => $settings,
-			'post_types'        => $post_types,
-			'filters'           => $filters,
-			'active_tab'        => $active_tab,
-			'rule_to_edit'      => $rule_to_edit,
-			'rule_defaults'     => $rule_defaults,
-			'category_default'  => $category_default,
-			'template_default'  => $template_default,
-			'page_slug'         => self::PAGE_SLUG,
-			'page_url'          => $this->get_admin_url(),
-			'capability'        => self::CAPABILITY,
-		];
-
-		extract( $context ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract -- Template convenience.
-		include SAMAN_SEO_PATH . 'templates/internal-linking.php';
 	}
 
 	/**

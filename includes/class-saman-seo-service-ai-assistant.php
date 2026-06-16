@@ -33,30 +33,7 @@ class AI_Assistant {
 			return;
 		}
 
-		// V1 menu disabled - React UI handles AI via REST API
-		// All AI operations now delegate to Saman Labs AI via Integration\AI_Pilot
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_post_SAMAN_SEO_ai_reset', [ $this, 'handle_reset' ] );
-	}
-
-	/**
-	 * Load assets only on AI page (kept for backwards compatibility).
-	 *
-	 * @param string $hook Current admin hook.
-	 *
-	 * @return void
-	 */
-	public function enqueue_assets( $hook ) {
-		if ( 'SAMAN_SEO_page_saman-seo-ai' !== $hook ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'build/css/admin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
 	}
 
 	/**

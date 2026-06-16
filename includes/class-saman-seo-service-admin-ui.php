@@ -275,57 +275,6 @@ class Admin_UI {
 			SAMAN_SEO_VERSION
 		);
 
-		// Enqueue WordPress media library for settings pages that need image pickers.
-		if ( false !== strpos( $hook, 'saman-seo' ) ) {
-			wp_enqueue_media();
-		}
-
-		wp_enqueue_script(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/js/admin.js',
-			[ 'jquery' ],
-			SAMAN_SEO_VERSION,
-			true
-		);
-
-		wp_enqueue_script(
-			'saman-seo-seo-tags',
-			SAMAN_SEO_URL . 'assets/js/seo-tags.js',
-			[ 'jquery', 'saman-seo-admin' ],
-			SAMAN_SEO_VERSION,
-			true
-		);
-
-		if ( '1' === get_option( 'SAMAN_SEO_show_tour', '0' ) && ( false !== strpos( $hook, 'post.php' ) || false !== strpos( $hook, 'post-new.php' ) ) && apply_filters( 'SAMAN_SEO_feature_toggle', true, 'metabox' ) ) {
-			wp_enqueue_style( 'wp-pointer' );
-			wp_enqueue_script( 'wp-pointer' );
-			add_action( 'admin_print_footer_scripts', [ $this, 'print_pointer' ] );
-			update_option( 'SAMAN_SEO_show_tour', '0' );
-		}
-
-		$ai_enabled = AI_Pilot::is_ready();
-		$settings_svc = new Settings();
-		wp_localize_script(
-			'saman-seo-admin',
-			'SamanSEOAdmin',
-			[
-				'mediaTitle'  => __( 'Select image', 'saman-seo' ),
-				'mediaButton' => __( 'Use image', 'saman-seo' ),
-				'variables'   => $settings_svc->get_context_variables(),
-				'ai'          => [
-					'enabled' => $ai_enabled,
-					'ajax'    => admin_url( 'admin-ajax.php' ),
-					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
-					'strings' => [
-						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-seo' ),
-						'running'  => __( 'Asking AI for ideas…', 'saman-seo' ),
-						'success'  => __( 'AI suggestion inserted.', 'saman-seo' ),
-						'error'    => __( 'Unable to fetch suggestion.', 'saman-seo' ),
-					],
-				],
-			]
-		);
-
 		// Enqueue React admin list badge for edit.php (posts list).
 		if ( 'edit.php' === $hook || false !== strpos( $hook, 'edit.php' ) ) {
 			$this->enqueue_admin_list_assets();

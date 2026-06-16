@@ -23,59 +23,7 @@ class Audit {
 	 * @return void
 	 */
 	public function boot() {
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_page' ] );
 		add_filter( 'SAMAN_SEO_link_suggestions', [ $this, 'link_suggestions' ], 10, 2 );
-	}
-
-	/**
-	 * Add submenu.
-	 *
-	 * @return void
-	 */
-	public function register_page() {
-		add_submenu_page(
-			'saman-seo',
-			__( 'Audit', 'saman-seo' ),
-			__( 'Audit', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-audit',
-			[ $this, 'render_page' ],
-			13
-		);
-	}
-
-	/**
-	 * Render audit table.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'build/css/admin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		$results = $this->collect_issues();
-		$issues  = $results['issues'];
-		$stats   = $results['stats'];
-		$scanned = $results['scanned'];
-		$recommendations = $results['recommendations'];
-
-		include SAMAN_SEO_PATH . 'templates/audit.php';
 	}
 
 	/**
