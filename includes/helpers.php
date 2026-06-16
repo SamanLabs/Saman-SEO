@@ -186,9 +186,11 @@ namespace Saman\SEO\Helpers {
 			$vars['archive_title'] = post_type_archive_title( '', false );
 		} elseif ( is_date() ) {
 			$vars['archive_date']  = get_the_date();
+			$vars['date']          = $vars['archive_date']; // Alias used in archive defaults.
 			$vars['archive_title'] = get_the_archive_title();
 		} elseif ( is_author() ) {
 			$vars['author_name'] = get_the_author();
+			$vars['author']      = $vars['author_name']; // Alias used in archive defaults.
 			$vars['author_bio']  = get_the_author_meta( 'description' );
 		} elseif ( is_404() ) {
 			// 404 page variables
@@ -260,6 +262,71 @@ namespace Saman\SEO\Helpers {
 	}
 
 	/**
+	 * Check whether a string still contains unreplaced template variables.
+	 *
+	 * Supports both {{var}} and %var% syntax.
+	 *
+	 * @param string $value Rendered output.
+	 * @return bool
+	 */
+	function has_unreplaced_variables( $value ) {
+		$value = (string) $value;
+
+		if ( preg_match( '/\{\{[^}]+\}\}/', $value ) ) {
+			return true;
+		}
+
+		if ( preg_match( '/%[a-zA-Z0-9_\-]+%/', $value ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Strip unreplaced template variables from a rendered string.
+	 *
+	 * @param string $value Rendered output.
+	 * @return string
+	 */
+	function strip_unreplaced_variables( $value ) {
+		$value = (string) $value;
+
+		// Remove {{variable}} tokens.
+		$value = preg_replace( '/\{\{[^}]+\}\}/', '', $value );
+
+		// Remove %variable% tokens.
+		$value = preg_replace( '/%[a-zA-Z0-9_\-]+%/', '', $value );
+
+		return tidy_rendered_template( $value );
+	}
+
+	/**
+	 * Render a template safely, ensuring unreplaced variables never leak.
+	 *
+	 * If the rendered output is empty or still contains template variables,
+	 * the fallback value is returned instead.
+	 *
+	 * @param string      $template Template string.
+	 * @param mixed       $context  Context (Post, Term, or null).
+	 * @param string      $fallback Value to return if rendering fails or is empty.
+	 * @return string
+	 */
+	function render_template_safely( $template, $context = null, $fallback = '' ) {
+		$rendered = replace_template_variables( $template, $context );
+
+		if ( has_unreplaced_variables( $rendered ) ) {
+			$rendered = strip_unreplaced_variables( $rendered );
+		}
+
+		if ( '' === trim( $rendered ) ) {
+			return $fallback;
+		}
+
+		return $rendered;
+	}
+
+	/**
 	 * Determine default title using template tags.
 	 *
 	 * @param WP_Post|int $post Post object or ID.
@@ -284,7 +351,7 @@ namespace Saman\SEO\Helpers {
 			$template = get_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' );
 		}
 
-		return replace_template_variables( $template, $post );
+		return render_template_safely( $template, $post, $post->post_title );
 	}
 
 	/**

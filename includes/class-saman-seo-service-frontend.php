@@ -11,7 +11,9 @@ use WP_Post;
 use function Saman\SEO\Helpers\breadcrumbs;
 use function Saman\SEO\Helpers\generate_content_snippet;
 use function Saman\SEO\Helpers\generate_title_from_template;
+use function Saman\SEO\Helpers\render_template_safely;
 use function Saman\SEO\Helpers\replace_template_variables;
+use function Saman\SEO\Helpers\strip_unreplaced_variables;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -131,8 +133,8 @@ class Frontend {
 			$description = get_bloginfo( 'description' );
 		}
 		
-		// Run Variable Replacer
-		$description = replace_template_variables( $description, $post );
+		// Run Variable Replacer with safety gate so raw tokens never leak.
+		$description = render_template_safely( $description, $post );
 		$description = apply_filters( 'SAMAN_SEO_description', $description, $post );
 
 		$canonical = $this->get_canonical( $post, $meta );
@@ -163,8 +165,8 @@ class Frontend {
 			}
 		}
 
-		// Run Replacer on Keywords too
-		$keywords = replace_template_variables( $keywords, $post );
+		// Run Replacer on Keywords too with safety gate.
+		$keywords = render_template_safely( $keywords, $post );
 		$keywords = apply_filters( 'SAMAN_SEO_keywords', $keywords, $post );
 
 
@@ -223,8 +225,8 @@ class Frontend {
 			$raw_title = get_bloginfo( 'name' );
 		}
 		
-		// Run Replacer
-		$raw_title = replace_template_variables( $raw_title, $post );
+		// Run Replacer with safety gate.
+		$raw_title = render_template_safely( $raw_title, $post );
 		$title = apply_filters( 'SAMAN_SEO_og_title', $raw_title, $post );
 
 		$description = $meta['description'] ?? '';
@@ -247,8 +249,8 @@ class Frontend {
 			$description = get_bloginfo( 'description' );
 		}
 		
-		// Run Replacer
-		$description = replace_template_variables( $description, $post );
+		// Run Replacer with safety gate.
+		$description = render_template_safely( $description, $post );
 		$description = apply_filters( 'SAMAN_SEO_og_description', $description, $post );
 		$image = $this->get_social_image( $post, $meta, $social_defaults );
 
@@ -257,14 +259,14 @@ class Frontend {
 
 		if ( $is_home_view ) {
 			if ( ! empty( $social_defaults['twitter_title'] ) ) {
-				$twitter_title = $social_defaults['twitter_title'];
+				$twitter_title = render_template_safely( $social_defaults['twitter_title'], $post );
 			}
 			if ( ! empty( $social_defaults['twitter_description'] ) ) {
-				$twitter_description = $social_defaults['twitter_description'];
+				$twitter_description = render_template_safely( $social_defaults['twitter_description'], $post );
 			}
 		} else {
 			if ( empty( $twitter_title ) && ! empty( $social_defaults['twitter_title'] ) ) {
-				$twitter_title = $social_defaults['twitter_title'];
+				$twitter_title = render_template_safely( $social_defaults['twitter_title'], $post );
 			}
 
 		}
@@ -361,9 +363,11 @@ class Frontend {
 			$title_template = $archive_defaults[ $archive_type ]['title_template'] ?? '';
 
 			if ( ! empty( $title_template ) ) {
-				$title = replace_template_variables( $title_template, null );
-			} else {
-				// Fallback defaults if template is empty
+				$title = render_template_safely( $title_template, null );
+			}
+
+			if ( empty( $title ) ) {
+				// Fallback defaults if template is empty or rendered unsafe.
 				$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
 				if ( '404' === $archive_type ) {
 					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
@@ -383,7 +387,7 @@ class Frontend {
 			$title = get_bloginfo( 'name' );
 		}
 
-		echo '<title>' . esc_html( $title ) . "</title>\n";
+		echo '<title>' . esc_html( strip_unreplaced_variables( $title ) ) . "</title>\n";
 	}
 
 	/**
@@ -738,15 +742,12 @@ class Frontend {
 			$title = $homepage_title;
 		}
 		if ( empty( $title ) && $post instanceof WP_Post ) {
-			// generate_title_from_template() already calls the replacer.
+			// generate_title_from_template() already calls the safe replacer.
 			$title = generate_title_from_template( $post );
 		} elseif ( ! empty( $title ) ) {
 			// Per-post `$meta['title']` and the homepage option can both
-			// contain {{tokens}} or %tokens% — without this call they
-			// would leak literally into the <title> tag. The replacer
-			// is a no-op on already-substituted text, so it is also
-			// safe to run on output of generate_title_from_template().
-			$title = replace_template_variables( $title, $post );
+			// contain {{tokens}} or %tokens% — render safely to prevent leaks.
+			$title = render_template_safely( $title, $post );
 		}
 		if ( empty( $title ) ) {
 			$title = get_bloginfo( 'name' );
@@ -773,7 +774,7 @@ class Frontend {
 			if ( is_int( $key ) && is_array( $value ) ) {
 				$property = isset( $value['property'] ) ? (string) $value['property'] : '';
 				$name     = isset( $value['name'] ) ? (string) $value['name'] : '';
-				$content  = isset( $value['content'] ) ? (string) $value['content'] : '';
+				$content  = isset( $value['content'] ) ? strip_unreplaced_variables( (string) $value['content'] ) : '';
 
 				if ( '' === $content ) {
 					continue;
@@ -802,7 +803,7 @@ class Frontend {
 						continue;
 					}
 
-					$normalized[] = $this->format_social_tag( (string) $key, (string) $entry );
+					$normalized[] = $this->format_social_tag( (string) $key, strip_unreplaced_variables( (string) $entry ) );
 				}
 				continue;
 			}
@@ -811,7 +812,7 @@ class Frontend {
 				continue;
 			}
 
-			$normalized[] = $this->format_social_tag( (string) $key, (string) $value );
+			$normalized[] = $this->format_social_tag( (string) $key, strip_unreplaced_variables( (string) $value ) );
 		}
 
 		return $normalized;

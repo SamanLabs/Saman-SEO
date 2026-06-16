@@ -12,7 +12,7 @@
 	const ServerSideRender = serverSideRender;
 	const { __ } = i18n;
 
-	registerBlockType( 'samanseo/breadcrumbs', {
+	registerBlockType( 'saman-seo/breadcrumbs', {
 		edit: function( props ) {
 			const { attributes, setAttributes } = props;
 			const { showHome, homeLabel, separator, showCurrent, linkCurrent, stylePreset } = attributes;

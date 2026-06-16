@@ -203,17 +203,135 @@ class Settings_Controller extends REST_Controller {
     public function update_settings( $request ) {
         $settings = $request->get_json_params();
 
+        if ( ! is_array( $settings ) ) {
+            return $this->error( __( 'Invalid settings payload.', 'saman-seo' ), 'invalid_payload', 400 );
+        }
+
+        $allowed   = $this->get_allowed_settings();
+        $sanitized = [];
+        $rejected  = [];
+
         foreach ( $settings as $key => $value ) {
-            update_option( 'SAMAN_SEO_' . $key, $value );
+            if ( ! isset( $allowed[ $key ] ) ) {
+                $rejected[] = $key;
+                continue;
+            }
+
+            $sanitized[ $key ] = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
+            update_option( 'SAMAN_SEO_' . $key, $sanitized[ $key ] );
         }
 
         // Sync breadcrumb settings to consolidated option for the service.
-        $this->sync_breadcrumb_settings( $settings );
+        $this->sync_breadcrumb_settings( $sanitized );
 
         // Sync IndexNow settings to consolidated option for the service.
-        $this->sync_indexnow_settings( $settings );
+        $this->sync_indexnow_settings( $sanitized );
 
-        return $this->success( null, __( 'Settings saved successfully.', 'saman-seo' ) );
+        $response = [ 'saved' => array_keys( $sanitized ) ];
+        if ( ! empty( $rejected ) ) {
+            $response['rejected'] = $rejected;
+        }
+
+        return $this->success( $response, __( 'Settings saved successfully.', 'saman-seo' ) );
+    }
+
+    /**
+     * Allowed setting keys and their expected data types.
+     *
+     * The list is intentionally explicit. Use the
+     * `saman_seo_allowed_settings` filter to extend it for custom modules.
+     *
+     * @return array<string,string>
+     */
+    private function get_allowed_settings() {
+        $settings = [
+            // Core title / meta.
+            'title_separator'              => 'text',
+            'default_title_template'       => 'text',
+            'default_meta_description'     => 'textarea',
+            'default_og_image'             => 'url',
+            'homepage_title'               => 'text',
+            'homepage_description'         => 'textarea',
+            'homepage_keywords'            => 'textarea',
+            'homepage_social_profiles'     => 'textarea',
+            'local_social_profiles'        => 'textarea',
+
+            // Per-post-type options.
+            'post_type_title_templates'    => 'array',
+            'post_type_meta_descriptions'  => 'array',
+            'post_type_keywords'           => 'array',
+            'post_type_social_defaults'    => 'array',
+
+            // Archives.
+            'archive_defaults'             => 'array',
+
+            // Breadcrumbs.
+            'breadcrumb_separator'         => 'text',
+            'breadcrumb_separator_custom'  => 'text',
+            'breadcrumb_show_home'         => 'bool',
+            'breadcrumb_home_label'        => 'text',
+            'breadcrumb_show_current'      => 'bool',
+            'breadcrumb_link_current'      => 'bool',
+            'breadcrumb_truncate_length'   => 'int',
+            'breadcrumb_show_on_front'     => 'bool',
+            'breadcrumb_style_preset'      => 'text',
+
+            // Modules.
+            'module_breadcrumbs'           => 'bool',
+            'module_sitemap'               => 'bool',
+            'module_redirects'             => 'bool',
+            'module_404_log'               => 'bool',
+            'module_indexnow'              => 'bool',
+            'module_local_seo'             => 'bool',
+            'module_social_cards'          => 'bool',
+            'module_analytics'             => 'bool',
+            'module_admin_bar'             => 'bool',
+            'module_internal_links'        => 'bool',
+            'module_ai_assistant'          => 'bool',
+            'module_llm_txt'               => 'bool',
+
+            // IndexNow.
+            'indexnow_submit_on_publish'   => 'bool',
+            'indexnow_submit_on_update'    => 'bool',
+
+            // Misc.
+            'llm_txt'                      => 'textarea',
+            'hreflang_map'                 => 'textarea',
+            'sidebar_logo'                 => 'url',
+        ];
+
+        return apply_filters( 'saman_seo_allowed_settings', $settings );
+    }
+
+    /**
+     * Sanitize a setting value based on its registered type.
+     *
+     * @param string $key     Setting key (without SAMAN_SEO_ prefix).
+     * @param mixed  $value   Raw value.
+     * @param string $type    Registered type.
+     * @return mixed
+     */
+    private function sanitize_setting_value( $key, $value, $type ) {
+        switch ( $type ) {
+            case 'bool':
+                return rest_sanitize_boolean( $value );
+
+            case 'int':
+                return (int) $value;
+
+            case 'url':
+                return '' === $value ? '' : esc_url_raw( $value );
+
+            case 'textarea':
+                return sanitize_textarea_field( $value );
+
+            case 'array':
+                return is_array( $value ) ? $value : [];
+
+            case 'text':
+            default:
+                return sanitize_text_field( $value );
+        }
     }
 
     /**
@@ -292,12 +410,24 @@ class Settings_Controller extends REST_Controller {
      * Update a single setting.
      *
      * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
+     * @return \WP_REST_Response|\WP_Error
      */
     public function update_setting( $request ) {
         $key   = $request->get_param( 'key' );
         $body  = $request->get_json_params();
         $value = isset( $body['value'] ) ? $body['value'] : null;
+
+        $allowed = $this->get_allowed_settings();
+
+        if ( ! isset( $allowed[ $key ] ) ) {
+            return $this->error(
+                __( 'This setting is not allowed.', 'saman-seo' ),
+                'setting_not_allowed',
+                403
+            );
+        }
+
+        $value = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
 
         update_option( 'SAMAN_SEO_' . $key, $value );
 

@@ -2,7 +2,7 @@
 /**
  * HowTo Schema class.
  *
- * Generates HowTo schema from samanseo/howto Gutenberg blocks.
+ * Generates HowTo schema from saman-seo/howto Gutenberg blocks.
  * Uses the first HowTo block found in the post.
  *
  * @package Saman\SEO\Schema\Types
@@ -45,7 +45,7 @@ class HowTo_Schema extends Abstract_Schema {
 	 */
 	public function is_needed(): bool {
 		return $this->context->post instanceof \WP_Post
-			&& has_block( 'samanseo/howto', $this->context->post );
+			&& has_block( 'saman-seo/howto', $this->context->post );
 	}
 
 	/**
@@ -151,7 +151,7 @@ class HowTo_Schema extends Abstract_Schema {
 	 */
 	private function find_howto_block( array $blocks ): ?array {
 		foreach ( $blocks as $block ) {
-			if ( 'samanseo/howto' === $block['blockName'] ) {
+			if ( 'saman-seo/howto' === $block['blockName'] ) {
 				$attrs = $block['attrs'] ?? [];
 
 				// Respect showSchema toggle.

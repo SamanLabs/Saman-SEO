@@ -95,12 +95,37 @@ class Htaccess_Controller extends REST_Controller {
     }
 
     /**
+     * Initialise WordPress filesystem access.
+     *
+     * @return \WP_Filesystem_Base|\WP_Error
+     */
+    private function init_filesystem() {
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        global $wp_filesystem;
+
+        $status = WP_Filesystem();
+        if ( true !== $status || ! $wp_filesystem ) {
+            return new \WP_Error( 'filesystem_error', __( 'Unable to initialise filesystem access.', 'saman-seo' ) );
+        }
+
+        return $wp_filesystem;
+    }
+
+    /**
      * Get .htaccess content.
      *
      * @return \WP_REST_Response
      */
     public function get_content() {
-        if ( ! file_exists( $this->htaccess_path ) ) {
+        $wp_filesystem = $this->init_filesystem();
+        if ( is_wp_error( $wp_filesystem ) ) {
+            return $this->error( $wp_filesystem->get_error_message() );
+        }
+
+        if ( ! $wp_filesystem->exists( $this->htaccess_path ) ) {
             return $this->success( [
                 'content' => '',
                 'backups' => [],
@@ -108,11 +133,10 @@ class Htaccess_Controller extends REST_Controller {
             ] );
         }
 
-        if ( ! is_readable( $this->htaccess_path ) ) {
+        $content = $wp_filesystem->get_contents( $this->htaccess_path );
+        if ( false === $content ) {
             return $this->error( 'Unable to read .htaccess file. Check file permissions.' );
         }
-
-        $content = file_get_contents( $this->htaccess_path );
 
         return $this->success( [
             'content' => $content,
@@ -128,23 +152,28 @@ class Htaccess_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function save_content( $request ) {
+        $wp_filesystem = $this->init_filesystem();
+        if ( is_wp_error( $wp_filesystem ) ) {
+            return $this->error( $wp_filesystem->get_error_message() );
+        }
+
         $content = $request->get_param( 'content' );
 
-        // Create backup first
-        $backup_result = $this->create_backup();
+        // Create backup first.
+        $backup_result = $this->create_backup( $wp_filesystem );
         if ( is_wp_error( $backup_result ) ) {
             return $this->error( 'Failed to create backup: ' . $backup_result->get_error_message() );
         }
 
-        // Validate content (basic syntax check)
+        // Validate content.
         $validation = $this->validate_content( $content );
         if ( is_wp_error( $validation ) ) {
             return $this->error( $validation->get_error_message() );
         }
 
-        // Write to file
-        $result = file_put_contents( $this->htaccess_path, $content );
-        if ( $result === false ) {
+        // Write to file.
+        $result = $wp_filesystem->put_contents( $this->htaccess_path, $content, FS_CHMOD_FILE );
+        if ( false === $result ) {
             return $this->error( 'Failed to write to .htaccess file. Check file permissions.' );
         }
 
@@ -161,25 +190,43 @@ class Htaccess_Controller extends REST_Controller {
      * @return \WP_REST_Response
      */
     public function restore_backup( $request ) {
-        $backup_file = $request->get_param( 'backup' );
+        $wp_filesystem = $this->init_filesystem();
+        if ( is_wp_error( $wp_filesystem ) ) {
+            return $this->error( $wp_filesystem->get_error_message() );
+        }
+
+        $backup_file = sanitize_file_name( $request->get_param( 'backup' ) );
         $backup_path = $this->backup_dir . $backup_file;
 
-        if ( ! file_exists( $backup_path ) ) {
+        // Ensure the resolved path is still inside the backup directory.
+        $real_backup = realpath( $backup_path );
+        $real_dir    = realpath( $this->backup_dir );
+        if ( false === $real_backup || false === $real_dir || 0 !== strpos( $real_backup, $real_dir . DIRECTORY_SEPARATOR ) ) {
             return $this->error( 'Backup file not found' );
         }
 
-        // Create backup of current state before restore
-        $this->create_backup();
+        if ( ! $wp_filesystem->exists( $backup_path ) ) {
+            return $this->error( 'Backup file not found' );
+        }
 
-        // Read backup content
-        $content = file_get_contents( $backup_path );
-        if ( $content === false ) {
+        // Create backup of current state before restore.
+        $this->create_backup( $wp_filesystem );
+
+        // Read backup content.
+        $content = $wp_filesystem->get_contents( $backup_path );
+        if ( false === $content ) {
             return $this->error( 'Failed to read backup file' );
         }
 
-        // Restore
-        $result = file_put_contents( $this->htaccess_path, $content );
-        if ( $result === false ) {
+        // Validate backup content before restoring.
+        $validation = $this->validate_content( $content );
+        if ( is_wp_error( $validation ) ) {
+            return $this->error( 'Backup content failed validation: ' . $validation->get_error_message() );
+        }
+
+        // Restore.
+        $result = $wp_filesystem->put_contents( $this->htaccess_path, $content, FS_CHMOD_FILE );
+        if ( false === $result ) {
             return $this->error( 'Failed to restore backup' );
         }
 
@@ -192,29 +239,35 @@ class Htaccess_Controller extends REST_Controller {
     /**
      * Create a backup of the current .htaccess file.
      *
+     * @param \WP_Filesystem_Base $wp_filesystem Filesystem object.
      * @return true|\WP_Error
      */
-    private function create_backup() {
-        if ( ! file_exists( $this->htaccess_path ) ) {
-            return true; // Nothing to backup
+    private function create_backup( $wp_filesystem ) {
+        if ( ! $wp_filesystem->exists( $this->htaccess_path ) ) {
+            return true; // Nothing to backup.
         }
 
-        // Ensure backup directory exists
-        if ( ! file_exists( $this->backup_dir ) ) {
+        // Ensure backup directory exists.
+        if ( ! $wp_filesystem->exists( $this->backup_dir ) ) {
             wp_mkdir_p( $this->backup_dir );
         }
 
-        // Create backup filename with timestamp
+        // Create backup filename with timestamp.
         $timestamp   = current_time( 'Y-m-d-His' );
         $backup_file = $this->backup_dir . "htaccess-{$timestamp}.bak";
 
-        $result = copy( $this->htaccess_path, $backup_file );
-        if ( ! $result ) {
+        $content = $wp_filesystem->get_contents( $this->htaccess_path );
+        if ( false === $content ) {
+            return new \WP_Error( 'backup_failed', 'Failed to read .htaccess file for backup' );
+        }
+
+        $result = $wp_filesystem->put_contents( $backup_file, $content, FS_CHMOD_FILE );
+        if ( false === $result ) {
             return new \WP_Error( 'backup_failed', 'Failed to create backup file' );
         }
 
-        // Clean up old backups (keep last 10)
-        $this->cleanup_old_backups();
+        // Clean up old backups (keep last 10).
+        $this->cleanup_old_backups( $wp_filesystem );
 
         return true;
     }
@@ -233,7 +286,7 @@ class Htaccess_Controller extends REST_Controller {
         $backups = [];
 
         if ( ! empty( $files ) ) {
-            // Sort by modification time (newest first)
+            // Sort by modification time (newest first).
             usort( $files, function ( $a, $b ) {
                 return filemtime( $b ) - filemtime( $a );
             } );
@@ -252,53 +305,92 @@ class Htaccess_Controller extends REST_Controller {
 
     /**
      * Clean up old backups.
+     *
+     * @param \WP_Filesystem_Base $wp_filesystem Filesystem object.
      */
-    private function cleanup_old_backups() {
+    private function cleanup_old_backups( $wp_filesystem ) {
         $files = glob( $this->backup_dir . 'htaccess-*.bak' );
         if ( empty( $files ) || count( $files ) <= 10 ) {
             return;
         }
 
-        // Sort by modification time (oldest first)
+        // Sort by modification time (oldest first).
         usort( $files, function ( $a, $b ) {
             return filemtime( $a ) - filemtime( $b );
         } );
 
-        // Delete oldest files
+        // Delete oldest files.
         $to_delete = array_slice( $files, 0, count( $files ) - 10 );
         foreach ( $to_delete as $file ) {
-            wp_delete_file( $file );
+            $wp_filesystem->delete( $file );
         }
     }
 
     /**
      * Validate .htaccess content.
      *
+     * Rejects dangerous directives and unbalanced block tags.
+     *
      * @param string $content Content to validate.
      * @return true|\WP_Error
      */
     private function validate_content( $content ) {
-        // Check for obvious syntax errors
+        // Reject directives that can change PHP execution or handlers.
+        $dangerous = [
+            'php_value',
+            'php_flag',
+            'php_admin_value',
+            'php_admin_flag',
+            'addhandler',
+            'sethandler',
+            'action',
+        ];
 
-        // Unclosed IfModule
-        $if_count    = preg_match_all( '/<IfModule\s/i', $content );
-        $endif_count = preg_match_all( '/<\/IfModule>/i', $content );
-        if ( $if_count !== $endif_count ) {
-            return new \WP_Error( 'syntax_error', 'Unclosed <IfModule> directive detected' );
+        $lines = preg_split( '/\r\n|\r|\n/', $content );
+        foreach ( $lines as $line ) {
+            $trimmed = trim( $line );
+
+            // Skip comments and blank lines.
+            if ( '' === $trimmed || '#' === $trimmed[0] ) {
+                continue;
+            }
+
+            $lower = strtolower( $trimmed );
+            foreach ( $dangerous as $directive ) {
+                if ( 0 === strpos( $lower, $directive ) ) {
+                    return new \WP_Error(
+                        'unsafe_directive',
+                        sprintf(
+                            /* translators: %s: Apache directive name */
+                            __( 'Unsafe directive detected: %s', 'saman-seo' ),
+                            esc_html( $directive )
+                        )
+                    );
+                }
+            }
         }
 
-        // Unclosed Directory
-        $dir_count    = preg_match_all( '/<Directory\s/i', $content );
-        $enddir_count = preg_match_all( '/<\/Directory>/i', $content );
-        if ( $dir_count !== $enddir_count ) {
-            return new \WP_Error( 'syntax_error', 'Unclosed <Directory> directive detected' );
-        }
+        // Check for balanced block tags.
+        $pairs = [
+            [ '/<IfModule\s/i', '/<\/IfModule>/i', 'IfModule' ],
+            [ '/<If\b/i', '/<\/If>/i', 'If' ],
+            [ '/<Directory\b/i', '/<\/Directory>/i', 'Directory' ],
+            [ '/<Files\b/i', '/<\/Files>/i', 'Files' ],
+        ];
 
-        // Unclosed Files
-        $files_count    = preg_match_all( '/<Files\s/i', $content );
-        $endfiles_count = preg_match_all( '/<\/Files>/i', $content );
-        if ( $files_count !== $endfiles_count ) {
-            return new \WP_Error( 'syntax_error', 'Unclosed <Files> directive detected' );
+        foreach ( $pairs as [ $open, $close, $name ] ) {
+            $open_count  = preg_match_all( $open, $content );
+            $close_count = preg_match_all( $close, $content );
+            if ( $open_count !== $close_count ) {
+                return new \WP_Error(
+                    'syntax_error',
+                    sprintf(
+                        /* translators: %s: Block tag name */
+                        __( 'Unclosed <%s> directive detected', 'saman-seo' ),
+                        esc_html( $name )
+                    )
+                );
+            }
         }
 
         return true;

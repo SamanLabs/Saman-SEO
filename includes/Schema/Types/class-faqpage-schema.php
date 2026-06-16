@@ -2,7 +2,7 @@
 /**
  * FAQPage Schema class.
  *
- * Generates FAQPage schema from samanseo/faq Gutenberg blocks.
+ * Generates FAQPage schema from saman-seo/faq Gutenberg blocks.
  * Combines questions from all FAQ blocks in the post.
  *
  * @package Saman\SEO\Schema\Types
@@ -45,7 +45,7 @@ class FAQPage_Schema extends Abstract_Schema {
 	 */
 	public function is_needed(): bool {
 		return $this->context->post instanceof \WP_Post
-			&& has_block( 'samanseo/faq', $this->context->post );
+			&& has_block( 'saman-seo/faq', $this->context->post );
 	}
 
 	/**
@@ -70,7 +70,7 @@ class FAQPage_Schema extends Abstract_Schema {
 	/**
 	 * Collect all FAQ questions from FAQ blocks in post content.
 	 *
-	 * Iterates through all samanseo/faq blocks, respects showSchema
+	 * Iterates through all saman-seo/faq blocks, respects showSchema
 	 * attribute, and combines all valid Q&A pairs.
 	 *
 	 * @return array Array of Question objects for mainEntity.
@@ -92,7 +92,7 @@ class FAQPage_Schema extends Abstract_Schema {
 	 */
 	private function extract_faq_blocks( array $blocks, array &$questions ): void {
 		foreach ( $blocks as $block ) {
-			if ( 'samanseo/faq' === $block['blockName'] ) {
+			if ( 'saman-seo/faq' === $block['blockName'] ) {
 				$attrs = $block['attrs'] ?? [];
 
 				// Respect showSchema toggle - only include if true.

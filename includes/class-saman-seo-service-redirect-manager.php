@@ -810,7 +810,16 @@ class Redirect_Manager {
 			}
 		}
 
-		if ( ! $row || ! $target ) {
+		if ( ! $row ) {
+			return;
+		}
+
+		$status_code = (int) $row->status_code;
+
+		// Target-less status codes (410 Gone, 451 Unavailable For Legal Reasons).
+		$targetless_statuses = [ 410, 451 ];
+
+		if ( ! $target && ! in_array( $status_code, $targetless_statuses, true ) ) {
 			return;
 		}
 
@@ -825,12 +834,18 @@ class Redirect_Manager {
 			[ 'id' => $row->id ]
 		);
 
-		$target = esc_url_raw( $target );
-
 		// Bail if output has already started (e.g. PHP deprecation notices on 8.4+).
 		if ( headers_sent() ) {
 			return;
 		}
+
+		// Handle target-less statuses.
+		if ( ! $target && in_array( $status_code, $targetless_statuses, true ) ) {
+			status_header( $status_code );
+			exit;
+		}
+
+		$target = esc_url_raw( $target );
 
 		add_filter(
 			'allowed_redirect_hosts',
@@ -843,7 +858,7 @@ class Redirect_Manager {
 			}
 		);
 
-		wp_safe_redirect( $target, (int) $row->status_code );
+		wp_safe_redirect( $target, $status_code );
 		exit;
 	}
 

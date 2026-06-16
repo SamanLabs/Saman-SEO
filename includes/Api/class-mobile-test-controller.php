@@ -38,7 +38,7 @@ class Mobile_Test_Controller extends REST_Controller {
             [
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => [ $this, 'analyze_url' ],
-                'permission_callback' => [ $this, 'check_permission' ],
+                'permission_callback' => [ $this, 'permission_check' ],
                 'args'                => [
                     'url' => [
                         'required'          => true,
@@ -56,7 +56,7 @@ class Mobile_Test_Controller extends REST_Controller {
             [
                 'methods'             => \WP_REST_Server::READABLE,
                 'callback'            => [ $this, 'get_recent' ],
-                'permission_callback' => [ $this, 'check_permission' ],
+                'permission_callback' => [ $this, 'permission_check' ],
             ]
         );
     }

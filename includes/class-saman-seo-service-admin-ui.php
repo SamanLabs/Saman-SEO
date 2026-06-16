@@ -398,36 +398,14 @@ class Admin_UI {
 			$asset['version']
 		);
 
-		// Get variables for the editor
+		// Get variables for the editor.
 		$settings_svc = new Settings();
 		$variables    = $settings_svc->get_context_variables();
 
-		// Get AI status from integration
+		// Get AI status from integration.
 		$ai_status   = AI_Pilot::get_status();
 		$ai_enabled  = AI_Pilot::ai_enabled();
 		$ai_provider = AI_Pilot::get_provider();
-
-		// Localize data for the React editor
-		wp_localize_script(
-			'saman-seo-editor-v2',
-			'SamanSEOEditor',
-			[
-				'variables'   => $variables,
-				'aiEnabled'   => $ai_enabled,
-				'aiProvider'  => $ai_provider, // 'Saman-ai', 'native', or 'none'
-				'aiPilot'     => [
-					'installed'   => $ai_status['installed'],
-					'active'      => $ai_status['active'],
-					'ready'       => $ai_status['ready'],
-					'version'     => $ai_status['version'] ?? null,
-					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
-				],
-				'siteTitle'   => get_bloginfo( 'name' ),
-				'tagline'     => get_bloginfo( 'description' ),
-				'separator'   => get_option( 'SAMAN_SEO_title_separator', '|' ),
-				'sidebarLogo' => get_option( 'SAMAN_SEO_sidebar_logo', '' ),
-			]
-		);
 
 		$post_type_templates    = get_option( 'SAMAN_SEO_post_type_title_templates', [] );
 		$post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
@@ -440,8 +418,6 @@ class Admin_UI {
 			$post_type_descriptions = [];
 		}
 
-		// AI enabled status is already set above via AI_Pilot integration
-
 		// Check for pending slug change redirect for this user.
 		$user_id     = get_current_user_id();
 		$slug_change = get_transient( 'SAMAN_SEO_slug_changed_' . $user_id );
@@ -452,19 +428,33 @@ class Admin_UI {
 			$slug_change['nonce'] = wp_create_nonce( 'SAMAN_SEO_create_redirect' );
 		}
 
+		// Localize data for the React editor.
 		wp_localize_script(
-			'saman-seo-editor',
+			'saman-seo-editor-v2',
 			'SamanSEOEditor',
 			[
-				'defaultTitle'       => get_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' ),
-				'defaultDescription' => get_option( 'SAMAN_SEO_default_meta_description', '' ),
-				'defaultOg'          => get_option( 'SAMAN_SEO_default_og_image', '' ),
-				'postTypeTemplates'  => $post_type_templates,
+				'variables'            => $variables,
+				'aiEnabled'            => $ai_enabled,
+				'aiProvider'           => $ai_provider, // 'Saman-ai', 'native', or 'none'.
+				'aiPilot'              => [
+					'installed'   => $ai_status['installed'],
+					'active'      => $ai_status['active'],
+					'ready'       => $ai_status['ready'],
+					'version'     => $ai_status['version'] ?? null,
+					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
+				],
+				'siteTitle'            => get_bloginfo( 'name' ),
+				'tagline'              => get_bloginfo( 'description' ),
+				'separator'            => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'sidebarLogo'          => get_option( 'SAMAN_SEO_sidebar_logo', '' ),
+				'defaultTitle'         => get_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' ),
+				'defaultDescription'   => get_option( 'SAMAN_SEO_default_meta_description', '' ),
+				'defaultOg'            => get_option( 'SAMAN_SEO_default_og_image', '' ),
+				'postTypeTemplates'    => $post_type_templates,
 				'postTypeDescriptions' => $post_type_descriptions,
-				'postTypeDescriptions' => $post_type_descriptions,
-				'slugChange'         => $slug_change,
-				'redirectNonce'      => wp_create_nonce( 'SAMAN_SEO_create_redirect' ),
-				'ai'                 => [
+				'slugChange'           => $slug_change,
+				'redirectNonce'        => wp_create_nonce( 'SAMAN_SEO_create_redirect' ),
+				'ai'                   => [
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),

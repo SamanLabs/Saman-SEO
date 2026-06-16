@@ -270,10 +270,10 @@ class Tools_Controller extends REST_Controller {
      */
     public function get_posts_for_bulk_edit( $request ) {
         $post_type = sanitize_text_field( $request->get_param( 'post_type' ) ?? 'post' );
-        $per_page = intval( $request->get_param( 'per_page' ) ?? 50 );
-        $page = intval( $request->get_param( 'page' ) ?? 1 );
-        $filter = sanitize_text_field( $request->get_param( 'filter' ) ?? 'all' );
-        $search = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+        $per_page  = intval( $request->get_param( 'per_page' ) ?? 50 );
+        $page      = intval( $request->get_param( 'page' ) ?? 1 );
+        $filter    = sanitize_text_field( $request->get_param( 'filter' ) ?? 'all' );
+        $search    = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
 
         $args = [
             'post_type'      => $post_type,
@@ -288,41 +288,21 @@ class Tools_Controller extends REST_Controller {
             $args['s'] = $search;
         }
 
-        // Apply filters
-        if ( $filter === 'missing_title' ) {
-            $args['meta_query'] = [
-                'relation' => 'OR',
-                [
-                    'key'     => '_SAMAN_SEO_title',
-                    'compare' => 'NOT EXISTS',
-                ],
-                [
-                    'key'     => '_SAMAN_SEO_title',
-                    'value'   => '',
-                    'compare' => '=',
-                ],
-            ];
-        } elseif ( $filter === 'missing_description' ) {
-            $args['meta_query'] = [
-                'relation' => 'OR',
-                [
-                    'key'     => '_SAMAN_SEO_description',
-                    'compare' => 'NOT EXISTS',
-                ],
-                [
-                    'key'     => '_SAMAN_SEO_description',
-                    'value'   => '',
-                    'compare' => '=',
-                ],
-            ];
-        }
-
         $query = new \WP_Query( $args );
         $posts = [];
 
         foreach ( $query->posts as $post ) {
-            $seo_title = get_post_meta( $post->ID, '_SAMAN_SEO_title', true );
-            $seo_desc = get_post_meta( $post->ID, '_SAMAN_SEO_description', true );
+            $meta      = $this->get_canonical_seo_meta( $post->ID );
+            $seo_title = $meta['title'];
+            $seo_desc  = $meta['description'];
+
+            // Apply filters after reading canonical meta.
+            if ( 'missing_title' === $filter && ! empty( $seo_title ) ) {
+                continue;
+            }
+            if ( 'missing_description' === $filter && ! empty( $seo_desc ) ) {
+                continue;
+            }
 
             $posts[] = [
                 'id'               => $post->ID,
@@ -331,8 +311,8 @@ class Tools_Controller extends REST_Controller {
                 'status'           => $post->post_status,
                 'date'             => $post->post_date,
                 'modified'         => $post->post_modified,
-                'seo_title'        => $seo_title ?: '',
-                'seo_description'  => $seo_desc ?: '',
+                'seo_title'        => $seo_title,
+                'seo_description'  => $seo_desc,
                 'has_seo_title'    => ! empty( $seo_title ),
                 'has_seo_desc'     => ! empty( $seo_desc ),
                 'edit_url'         => get_edit_post_link( $post->ID, 'raw' ),
@@ -341,10 +321,10 @@ class Tools_Controller extends REST_Controller {
         }
 
         return $this->success( [
-            'posts'       => $posts,
-            'total'       => $query->found_posts,
-            'pages'       => $query->max_num_pages,
-            'current_page'=> $page,
+            'posts'        => $posts,
+            'total'        => $query->found_posts,
+            'pages'        => $query->max_num_pages,
+            'current_page' => $page,
         ] );
     }
 
@@ -425,19 +405,71 @@ class Tools_Controller extends REST_Controller {
                 continue;
             }
 
+            $meta = $this->get_canonical_seo_meta( $post_id );
+            $updated = false;
+
             if ( isset( $change['seo_title'] ) ) {
-                update_post_meta( $post_id, '_SAMAN_SEO_title', sanitize_text_field( $change['seo_title'] ) );
+                $meta['title'] = sanitize_text_field( $change['seo_title'] );
+                $updated = true;
             }
 
             if ( isset( $change['seo_description'] ) ) {
-                update_post_meta( $post_id, '_SAMAN_SEO_description', sanitize_textarea_field( $change['seo_description'] ) );
+                $meta['description'] = sanitize_textarea_field( $change['seo_description'] );
+                $updated = true;
             }
 
-            $saved++;
+            if ( $updated ) {
+                $this->update_canonical_seo_meta( $post_id, $meta );
+                $saved++;
+            }
         }
 
         // translators: Placeholder values
         return $this->success( [ 'saved' => $saved ], sprintf( __( '%d posts updated.', 'saman-seo' ), $saved ) );
+    }
+
+    /**
+     * Read canonical SEO meta for bulk editor operations.
+     *
+     * @param int $post_id Post ID.
+     * @return array{title:string,description:string}
+     */
+    private function get_canonical_seo_meta( $post_id ) {
+        $meta = get_post_meta( $post_id, '_SAMAN_SEO_meta', true );
+
+        if ( ! is_array( $meta ) ) {
+            $meta = [];
+        }
+
+        return [
+            'title'       => isset( $meta['title'] ) ? sanitize_text_field( $meta['title'] ) : '',
+            'description' => isset( $meta['description'] ) ? sanitize_textarea_field( $meta['description'] ) : '',
+        ];
+    }
+
+    /**
+     * Update canonical SEO meta while preserving other keys.
+     *
+     * @param int   $post_id Post ID.
+     * @param array $data    Title/description data to merge.
+     * @return void
+     */
+    private function update_canonical_seo_meta( $post_id, $data ) {
+        $meta = get_post_meta( $post_id, '_SAMAN_SEO_meta', true );
+
+        if ( ! is_array( $meta ) ) {
+            $meta = [];
+        }
+
+        if ( isset( $data['title'] ) ) {
+            $meta['title'] = sanitize_text_field( $data['title'] );
+        }
+
+        if ( isset( $data['description'] ) ) {
+            $meta['description'] = sanitize_textarea_field( $data['description'] );
+        }
+
+        update_post_meta( $post_id, '_SAMAN_SEO_meta', $meta );
     }
 
     // =========================================================================
