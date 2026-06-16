@@ -741,6 +741,8 @@ class Breadcrumbs {
 			return;
 		}
 
+		$block_json = SAMAN_SEO_PATH . 'blocks/breadcrumbs/block.json';
+
 		// Register the editor script.
 		wp_register_script(
 			'saman-seo-breadcrumbs-block',
@@ -750,39 +752,17 @@ class Breadcrumbs {
 			true
 		);
 
-		register_block_type(
-			'saman-seo/breadcrumbs',
-			[
-				'editor_script'   => 'saman-seo-breadcrumbs-block',
-				'render_callback' => [ $this, 'render_block' ],
-				'attributes'      => [
-					'separator'   => [
-						'type'    => 'string',
-						'default' => '',
-					],
-					'showHome'    => [
-						'type'    => 'boolean',
-						'default' => true,
-					],
-					'homeLabel'   => [
-						'type'    => 'string',
-						'default' => '',
-					],
-					'showCurrent' => [
-						'type'    => 'boolean',
-						'default' => true,
-					],
-					'linkCurrent' => [
-						'type'    => 'boolean',
-						'default' => false,
-					],
-					'stylePreset' => [
-						'type'    => 'string',
-						'default' => '',
-					],
-				],
-			]
-		);
+		$args = [
+			'editor_script'   => 'saman-seo-breadcrumbs-block',
+			'render_callback' => [ $this, 'render_block' ],
+		];
+
+		if ( file_exists( $block_json ) ) {
+			register_block_type( $block_json, $args );
+		} else {
+			// Fallback for installs where block.json is missing.
+			register_block_type( 'saman-seo/breadcrumbs', $args );
+		}
 	}
 
 	/**

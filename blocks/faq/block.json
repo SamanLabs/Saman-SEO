@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "saman-seo/faq",
+  "version": "2.0.0",
+  "title": "FAQ",
+  "category": "widgets",
+  "icon": "editor-help",
+  "description": "Add frequently asked questions with automatic schema markup for rich results.",
+  "keywords": [ "faq", "questions", "answers", "schema", "seo" ],
+  "textdomain": "saman-seo",
+  "supports": {
+    "html": false
+  },
+  "attributes": {
+    "faqs": {
+      "type": "array",
+      "default": [
+        {
+          "question": "",
+          "answer": ""
+        }
+      ]
+    },
+    "showSchema": {
+      "type": "boolean",
+      "default": true
+    },
+    "style": {
+      "type": "string",
+      "default": "accordion"
+    }
+  }
+}

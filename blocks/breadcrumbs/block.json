@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "saman-seo/breadcrumbs",
+  "version": "2.0.0",
+  "title": "SEO Breadcrumbs",
+  "category": "saman-seo",
+  "icon": "admin-links",
+  "description": "Display breadcrumb navigation with structured data support.",
+  "keywords": [ "breadcrumbs", "navigation", "seo", "schema" ],
+  "textdomain": "saman-seo",
+  "supports": {
+    "html": false,
+    "align": [ "wide", "full" ],
+    "anchor": true,
+    "className": true
+  },
+  "attributes": {
+    "separator": {
+      "type": "string",
+      "default": ""
+    },
+    "showHome": {
+      "type": "boolean",
+      "default": true
+    },
+    "homeLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "showCurrent": {
+      "type": "boolean",
+      "default": true
+    },
+    "linkCurrent": {
+      "type": "boolean",
+      "default": false
+    },
+    "stylePreset": {
+      "type": "string",
+      "default": ""
+    }
+  }
+}

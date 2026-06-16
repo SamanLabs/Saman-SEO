@@ -17,7 +17,9 @@
     "dev": "concurrently \"npm run watch:less\" \"npm run start\"",
     "dev:editor": "npm run start:editor",
     "lint:js": "wp-scripts lint-js src-v2/",
-    "format:js": "wp-scripts format src-v2/"
+    "format:js": "wp-scripts format src-v2/",
+    "lint:css": "wp-scripts lint-style '**/*.css'",
+    "test:unit": "wp-scripts test-unit-js --passWithNoTests"
   },
   "keywords": [
     "wordpress",
@@ -28,15 +30,18 @@
   ],
   "author": "Juan Denis",
   "license": "GPL-2.0-or-later",
+  "browserslist": [
+    "extends @wordpress/browserslist-config"
+  ],
   "devDependencies": {
-    "@wordpress/scripts": "^27.6.0",
-    "concurrently": "^8.2.2",
-    "less": "^4.2.0",
+    "@wordpress/scripts": "^32.4.1",
+    "concurrently": "^9.1.2",
+    "less": "^4.2.2",
     "less-watch-compiler": "^1.16.3",
-    "rimraf": "^5.0.5"
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
-    "@wordpress/api-fetch": "^6.50.0",
-    "@wordpress/element": "^5.30.0"
+    "@wordpress/api-fetch": "^7.48.1",
+    "@wordpress/element": "^8.0.1"
   }
 }
