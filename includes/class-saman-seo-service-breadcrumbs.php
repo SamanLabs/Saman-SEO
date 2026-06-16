@@ -649,6 +649,10 @@ class Breadcrumbs {
 	 * @return string
 	 */
 	public function render( $args = [] ) {
+		if ( $this->rendered ) {
+			return '';
+		}
+
 		$crumbs = $this->get_breadcrumbs( $args );
 
 		if ( empty( $crumbs ) ) {

@@ -70,6 +70,9 @@ class Post_Meta {
 				'schema_type'     => [
 					'type' => 'string',
 				],
+				'custom_schema'   => [
+					'type' => 'string',
+				],
 			],
 		];
 
@@ -130,6 +133,7 @@ class Post_Meta {
 		$clean['nofollow']        = ! empty( $value['nofollow'] ) ? '1' : '';
 		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
 		$clean['schema_type']     = isset( $value['schema_type'] ) ? sanitize_text_field( $value['schema_type'] ) : '';
+		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? wp_kses_post( wp_unslash( $value['custom_schema'] ) ) : '';
 
 		// Handle secondary keyphrases (max 4 additional keywords).
 		$clean['secondary_keyphrases'] = [];
@@ -174,7 +178,8 @@ class Post_Meta {
 			'noindex'     => ! empty( $_POST['SAMAN_SEO_noindex'] ) ? '1' : '',
 			'nofollow'    => ! empty( $_POST['SAMAN_SEO_nofollow'] ) ? '1' : '',
 			'og_image'    => isset( $_POST['SAMAN_SEO_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_og_image'] ) ) : '',
-			'schema_type' => isset( $_POST['SAMAN_SEO_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_schema_type'] ) ) : '',
+			'schema_type'   => isset( $_POST['SAMAN_SEO_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_schema_type'] ) ) : '',
+			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? wp_kses_post( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '',
 		];
 
 		update_post_meta( $post_id, self::META_KEY, $data );

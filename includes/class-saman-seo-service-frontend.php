@@ -105,7 +105,7 @@ class Frontend {
 
 		// Default homepage title when no override is saved.
 		if ( $is_home_view && empty( $title ) ) {
-			$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+			$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 			$title     = __( 'Home', 'saman-seo' ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		}
 
@@ -131,12 +131,12 @@ class Frontend {
 			}
 
 			if ( empty( $title ) ) {
-				$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+				$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 
 				if ( '404' === $archive_type ) {
 					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
 				} elseif ( 'search' === $archive_type ) {
-					$title = 'Search: ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+					$title = __( 'Search Results', 'saman-seo' ) . ': ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 				} elseif ( 'author' === $archive_type ) {
 					$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 				} elseif ( 'date' === $archive_type ) {
@@ -147,7 +147,7 @@ class Frontend {
 
 		// Handle taxonomy and post-type archives not covered above.
 		if ( empty( $title ) && ( is_category() || is_tag() || is_tax() || is_post_type_archive() ) ) {
-			$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+			$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 
 			if ( is_post_type_archive() ) {
 				$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
@@ -491,10 +491,10 @@ class Frontend {
 			}
 		}
 
-		$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+		$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 
 		if ( is_search() ) {
-			$title = 'Search: ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title = __( 'Search Results', 'saman-seo' ) . ': ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		} elseif ( is_author() ) {
 			$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		} elseif ( is_date() ) {
@@ -1152,7 +1152,7 @@ class Frontend {
 			],
 			'search' => [
 				'noindex'              => '1',
-				'title_template'       => 'Search: {{search_term}} {{separator}} {{sitename}}',
+				'title_template'       => 'Search Results: {{search_term}} {{separator}} {{sitename}}',
 				'description_template' => 'Search results for "{{search_term}}" on {{sitename}}.',
 			],
 			'404'    => [

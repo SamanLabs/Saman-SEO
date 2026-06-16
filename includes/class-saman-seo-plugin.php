@@ -16,6 +16,7 @@ use Saman\SEO\Schema\Types\Person_Schema;
 use Saman\SEO\Schema\Types\Article_Schema;
 use Saman\SEO\Schema\Types\BlogPosting_Schema;
 use Saman\SEO\Schema\Types\NewsArticle_Schema;
+use Saman\SEO\Schema\Types\Product_Schema;
 use Saman\SEO\Schema\Types\FAQPage_Schema;
 use Saman\SEO\Schema\Types\HowTo_Schema;
 use Saman\SEO\Schema\Types\LocalBusiness_Schema;
@@ -109,6 +110,17 @@ class Plugin {
 			[
 				'label'      => 'NewsArticle',
 				'post_types' => [ 'post' ],
+				'priority'   => 15,
+			]
+		);
+
+		// Generic product CPT support (separate from WooCommerce integration).
+		$registry->register(
+			'product',
+			Product_Schema::class,
+			[
+				'label'      => 'Product',
+				'post_types' => [ 'seo_pilot_product' ],
 				'priority'   => 15,
 			]
 		);

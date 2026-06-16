@@ -43,14 +43,21 @@ class Product_Schema extends Abstract_Schema {
 	 * @return bool True if on singular product page with valid product.
 	 */
 	public function is_needed(): bool {
+		$needed = false;
+
 		// CRITICAL: Never output on archives/shop pages per Google guidelines.
-		if ( ! is_singular( 'product' ) ) {
-			return false;
+		if ( \is_singular() ) {
+			// Native WooCommerce products.
+			if ( \is_singular( 'product' ) && \function_exists( 'wc_get_product' ) ) {
+				$product = \wc_get_product( $this->context->post );
+				$needed   = $product instanceof \WC_Product;
+			} elseif ( \is_singular( 'seo_pilot_product' ) ) {
+				// Generic product CPTs (e.g. custom product post types).
+				$needed = $this->context->post instanceof \WP_Post;
+			}
 		}
 
-		// Require valid WC_Product object.
-		$product = wc_get_product( $this->context->post );
-		return $product instanceof \WC_Product;
+		return $needed;
 	}
 
 	/**
@@ -59,7 +66,20 @@ class Product_Schema extends Abstract_Schema {
 	 * @return array Product schema data (without @context).
 	 */
 	public function generate(): array {
-		$product = wc_get_product( $this->context->post );
+		if ( \is_singular( 'product' ) ) {
+			return $this->generate_wc_product();
+		}
+
+		return $this->generate_generic_product();
+	}
+
+	/**
+	 * Generate schema for a WooCommerce product.
+	 *
+	 * @return array
+	 */
+	private function generate_wc_product(): array {
+		$product = \wc_get_product( $this->context->post );
 
 		// Validate required fields exist.
 		if ( ! $product || empty( $product->get_name() ) ) {
@@ -96,6 +116,55 @@ class Product_Schema extends Abstract_Schema {
 			if ( ! empty( $aggregate_offer ) ) {
 				$schema['offers'] = $aggregate_offer;
 			}
+		}
+
+		return $this->apply_fields_filter( $schema );
+	}
+
+	/**
+	 * Generate a minimal Product schema for non-WooCommerce product CPTs.
+	 *
+	 * @return array
+	 */
+	private function generate_generic_product(): array {
+		$post = $this->context->post;
+		if ( ! $post instanceof \WP_Post ) {
+			return [];
+		}
+
+		$schema = [
+			'@type' => $this->get_type(),
+			'@id'   => $this->get_id(),
+			'name'  => get_the_title( $post ),
+			'url'   => $this->context->canonical,
+		];
+
+		if ( ! empty( $this->context->meta['description'] ) ) {
+			$schema['description'] = wp_strip_all_tags( $this->context->meta['description'] );
+		} elseif ( ! empty( $post->post_excerpt ) ) {
+			$schema['description'] = wp_strip_all_tags( $post->post_excerpt );
+		}
+
+		$price = get_post_meta( $post->ID, '_seo_pilot_product_price', true );
+		if ( '' === $price ) {
+			$price = get_post_meta( $post->ID, 'price', true );
+		}
+		$currency = get_post_meta( $post->ID, '_seo_pilot_product_currency', true );
+		if ( '' === $currency ) {
+			$currency = get_post_meta( $post->ID, 'currency', true );
+		}
+		if ( '' === $currency ) {
+			$currency = 'USD';
+		}
+
+		if ( '' !== $price && is_numeric( $price ) ) {
+			$schema['offers'] = [
+				'@type'         => 'Offer',
+				'price'         => $price,
+				'priceCurrency' => $currency,
+				'url'           => $this->context->canonical,
+				'availability'  => 'https://schema.org/InStock',
+			];
 		}
 
 		return $this->apply_fields_filter( $schema );
