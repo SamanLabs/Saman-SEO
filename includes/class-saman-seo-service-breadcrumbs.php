@@ -693,6 +693,7 @@ class Breadcrumbs {
 				'home_label'   => '',
 				'show_current' => '',
 				'style'        => '',
+				'echo'         => 'false',
 			],
 			$atts,
 			'SAMAN_SEO_breadcrumbs'
@@ -718,6 +719,13 @@ class Breadcrumbs {
 
 		if ( '' !== $atts['style'] ) {
 			$args['style_preset'] = $atts['style'];
+		}
+
+		$echo = filter_var( $atts['echo'], FILTER_VALIDATE_BOOLEAN );
+
+		if ( $echo ) {
+			echo $this->render( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			return '';
 		}
 
 		return $this->render( $args );
@@ -900,8 +908,8 @@ class Breadcrumbs {
 			'/'       => __( 'Slash (/)', 'saman-seo' ),
 			'|'       => __( 'Pipe (|)', 'saman-seo' ),
 			'-'       => __( 'Dash (-)', 'saman-seo' ),
-			'arrow'   => __( 'Arrow (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢)', 'saman-seo' ),
-			'chevron' => __( 'Chevron (ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âº)', 'saman-seo' ),
+			'arrow'   => __( 'Arrow (→)', 'saman-seo' ),
+			'chevron' => __( 'Chevron (›)', 'saman-seo' ),
 			'custom'  => __( 'Custom', 'saman-seo' ),
 		];
 	}

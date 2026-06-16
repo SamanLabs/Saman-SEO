@@ -49,17 +49,99 @@ class Frontend {
 	 * @return void
 	 */
 	public function init_title_handling() {
-		// Remove WordPress default title tag generation.
+		// Remove WordPress default title tag generation so we don't end up
+		// with duplicate <title> tags when our own renderer fires.
 		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
 
-		// Remove theme support for title-tag to prevent conflicts
-		remove_theme_support( 'title-tag' );
+		// Supply the real SEO title to WordPress's document-title API.
+		// Themes and plugins that call wp_get_document_title() will now
+		// receive the optimized title instead of the default one.
+		add_filter( 'pre_get_document_title', [ $this, 'filter_document_title' ], 1 );
 
-		// Add our own title tag rendering at the highest priority
+		// Render our own <title> tag as a fallback for themes that do not
+		// declare title-tag support or that render it too late.
 		add_action( 'wp_head', [ $this, 'render_plugin_title_tag' ], 0 );
+	}
 
-		// Prevent WordPress from generating document title via pre_get_document_title
-		add_filter( 'pre_get_document_title', '__return_empty_string', 1 );
+	/**
+	 * Filter the document title returned by WordPress.
+	 *
+	 * @param string $title Current title.
+	 * @return string
+	 */
+	public function filter_document_title( $title ) {
+		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
+			return $title;
+		}
+
+		$post = $this->get_context_post();
+		$meta = $this->get_meta( $post );
+
+		$computed = $this->build_document_title( $post, $meta );
+
+		if ( '' === trim( $computed ) ) {
+			return $title;
+		}
+
+		return $computed;
+	}
+
+	/**
+	 * Build the final SEO document title for the current request.
+	 *
+	 * @param WP_Post|null $post Post.
+	 * @param array        $meta Meta.
+	 * @return string
+	 */
+	private function build_document_title( $post, $meta ) {
+		$is_home_view   = is_front_page() || is_home();
+		$homepage_title = $is_home_view ? get_option( 'SAMAN_SEO_homepage_title', '' ) : '';
+
+		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title, false );
+
+		// Handle archive pages (404, search, author, date).
+		$archive_defaults = $this->get_archive_defaults();
+		$archive_type     = null;
+
+		if ( is_404() ) {
+			$archive_type = '404';
+		} elseif ( is_search() ) {
+			$archive_type = 'search';
+		} elseif ( is_author() ) {
+			$archive_type = 'author';
+		} elseif ( is_date() ) {
+			$archive_type = 'date';
+		}
+
+		if ( $archive_type ) {
+			$title_template = $archive_defaults[ $archive_type ]['title_template'] ?? '';
+
+			if ( ! empty( $title_template ) ) {
+				$title = render_template_safely( $title_template, null );
+			}
+
+			if ( empty( $title ) ) {
+				$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+
+				if ( '404' === $archive_type ) {
+					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
+				} elseif ( 'search' === $archive_type ) {
+					$title = 'Search: ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				} elseif ( 'author' === $archive_type ) {
+					$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				} elseif ( 'date' === $archive_type ) {
+					$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				}
+			}
+		}
+
+		if ( empty( $title ) ) {
+			$title = get_bloginfo( 'name' );
+		}
+
+		$title = strip_unreplaced_variables( $title );
+
+		return apply_filters( 'SAMAN_SEO_title', $title, $post );
 	}
 
 	/**
@@ -195,8 +277,9 @@ class Frontend {
 	 */
 	public function render_social_tags() {
 		$is_home_view = is_front_page() || is_home();
+		$is_archive   = is_archive() || is_search();
 
-		if ( ! is_singular() && ! $is_home_view ) {
+		if ( ! is_singular() && ! $is_home_view && ! $is_archive ) {
 			return;
 		}
 
@@ -205,94 +288,97 @@ class Frontend {
 		$canonical_url = $this->get_canonical( $post, $meta );
 		$canonical_url = apply_filters( 'SAMAN_SEO_canonical', $canonical_url, $post );
 
-		// OG URL should match canonical URL by default
+		// OG URL should match canonical URL by default.
 		$url = apply_filters( 'SAMAN_SEO_og_url', $canonical_url, $post );
 		$post_type_descriptions = $this->get_post_type_option( 'SAMAN_SEO_post_type_meta_descriptions' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 		$social_defaults        = $this->get_social_defaults( $post );
 
-		$raw_title = $meta['title'] ?? '';
-		if ( $is_home_view && empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
-			$raw_title = $social_defaults['og_title'];
-		}
-		if ( empty( $raw_title ) && $post instanceof WP_Post ) {
-			$raw_title = get_the_title( $post );
-		}
-		if ( empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
-			$raw_title = $social_defaults['og_title'];
-		}
-		if ( empty( $raw_title ) ) {
-			$raw_title = get_bloginfo( 'name' );
-		}
-		
-		// Run Replacer with safety gate.
-		$raw_title = render_template_safely( $raw_title, $post );
-		$title = apply_filters( 'SAMAN_SEO_og_title', $raw_title, $post );
-
-		$description = $meta['description'] ?? '';
-		if ( $is_home_view && empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
-			$description = $social_defaults['og_description'];
-		}
-		if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
-			$description = $post_type_descriptions[ $post->post_type ];
-		}
-		if ( empty( $description ) && ! empty( $content_snippet ) ) {
-			$description = $content_snippet;
-		}
-		if ( empty( $description ) ) {
-			$description = get_option( 'SAMAN_SEO_default_meta_description', '' );
-		}
-		if ( empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
-			$description = $social_defaults['og_description'];
-		}
-		if ( empty( $description ) ) {
-			$description = get_bloginfo( 'description' );
-		}
-		
-		// Run Replacer with safety gate.
-		$description = render_template_safely( $description, $post );
-		$description = apply_filters( 'SAMAN_SEO_og_description', $description, $post );
-		$image = $this->get_social_image( $post, $meta, $social_defaults );
-
-		$twitter_title = $title;
-		$twitter_description = $description;
-
-		if ( $is_home_view ) {
-			if ( ! empty( $social_defaults['twitter_title'] ) ) {
-				$twitter_title = render_template_safely( $social_defaults['twitter_title'], $post );
-			}
-			if ( ! empty( $social_defaults['twitter_description'] ) ) {
-				$twitter_description = render_template_safely( $social_defaults['twitter_description'], $post );
-			}
+		if ( $is_archive ) {
+			$title               = $this->get_archive_social_title();
+			$description         = $this->get_archive_social_description();
+			$twitter_title       = $title;
+			$twitter_description = $description;
+			$og_type             = 'website';
 		} else {
-			if ( empty( $twitter_title ) && ! empty( $social_defaults['twitter_title'] ) ) {
+			$raw_title = $meta['title'] ?? '';
+			if ( $is_home_view && empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
+				$raw_title = $social_defaults['og_title'];
+			}
+			if ( empty( $raw_title ) && $post instanceof WP_Post ) {
+				$raw_title = get_the_title( $post );
+			}
+			if ( empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
+				$raw_title = $social_defaults['og_title'];
+			}
+			if ( empty( $raw_title ) ) {
+				$raw_title = get_bloginfo( 'name' );
+			}
+
+			// Run Replacer with safety gate.
+			$raw_title = render_template_safely( $raw_title, $post );
+			$title     = apply_filters( 'SAMAN_SEO_og_title', $raw_title, $post );
+
+			$description = $meta['description'] ?? '';
+			if ( $is_home_view && empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
+				$description = $social_defaults['og_description'];
+			}
+			if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
+				$description = $post_type_descriptions[ $post->post_type ];
+			}
+			if ( empty( $description ) && ! empty( $content_snippet ) ) {
+				$description = $content_snippet;
+			}
+			if ( empty( $description ) ) {
+				$description = get_option( 'SAMAN_SEO_default_meta_description', '' );
+			}
+			if ( empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
+				$description = $social_defaults['og_description'];
+			}
+			if ( empty( $description ) ) {
+				$description = get_bloginfo( 'description' );
+			}
+
+			// Run Replacer with safety gate.
+			$description = render_template_safely( $description, $post );
+			$description = apply_filters( 'SAMAN_SEO_og_description', $description, $post );
+
+			$twitter_title       = $title;
+			$twitter_description = $description;
+
+			if ( $is_home_view ) {
+				if ( ! empty( $social_defaults['twitter_title'] ) ) {
+					$twitter_title = render_template_safely( $social_defaults['twitter_title'], $post );
+				}
+				if ( ! empty( $social_defaults['twitter_description'] ) ) {
+					$twitter_description = render_template_safely( $social_defaults['twitter_description'], $post );
+				}
+			} elseif ( empty( $twitter_title ) && ! empty( $social_defaults['twitter_title'] ) ) {
 				$twitter_title = render_template_safely( $social_defaults['twitter_title'], $post );
 			}
 
+			// Determine OG type based on context.
+			// Homepage and pages should use 'website', only blog posts should use 'article'.
+			if ( $is_home_view ) {
+				$og_type = 'website';
+			} elseif ( $post instanceof WP_Post && 'page' === $post->post_type ) {
+				$og_type = 'website';
+			} elseif ( $post instanceof WP_Post && 'post' === $post->post_type ) {
+				$og_type = 'article';
+			} else {
+				// For other post types, check schema_itemtype from defaults.
+				$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? 'website' );
+			}
+
+			// Allow override via filter.
+			$og_type = apply_filters( 'SAMAN_SEO_og_type', $og_type, $post );
 		}
 
 		$twitter_title       = apply_filters( 'SAMAN_SEO_twitter_title', $twitter_title, $post );
 		$twitter_description = apply_filters( 'SAMAN_SEO_twitter_description', $twitter_description, $post );
-		
-		// Twitter image is same as OG by default unless overridden here, or if the user wants separate filter content.
-		// We use $image for both initially.
+
+		$image         = $this->get_social_image( $post, $meta, $social_defaults );
 		$twitter_image = apply_filters( 'SAMAN_SEO_twitter_image', $image, $post );
-
-		// Determine OG type based on context
-		// Homepage and pages should use 'website', only blog posts should use 'article'
-		if ( $is_home_view ) {
-			$og_type = 'website';
-		} elseif ( $post instanceof WP_Post && 'page' === $post->post_type ) {
-			$og_type = 'website';
-		} elseif ( $post instanceof WP_Post && 'post' === $post->post_type ) {
-			$og_type = 'article';
-		} else {
-			// For other post types, check schema_itemtype from defaults
-			$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? 'website' );
-		}
-
-		// Allow override via filter
-		$og_type = apply_filters( 'SAMAN_SEO_og_type', $og_type, $post );
 
 		$tags = [
 			'og:title'       => $title,
@@ -300,11 +386,13 @@ class Frontend {
 			'og:url'         => $url,
 			'og:type'        => $og_type,
 			'og:site_name'   => get_bloginfo( 'name' ),
+			'og:locale'      => get_locale(),
 			'og:image'       => $image,
 			'twitter:card'   => 'summary_large_image',
 			'twitter:title'       => $twitter_title,
 			'twitter:description' => $twitter_description,
 			'twitter:image'       => $twitter_image,
+			'twitter:image:alt'   => $twitter_title,
 		];
 
 		$tags = apply_filters( 'SAMAN_SEO_social_tags', $tags, $post, $meta, $social_defaults );
@@ -338,20 +426,28 @@ class Frontend {
 			return;
 		}
 
-		$post = $this->get_context_post();
-		$meta = $this->get_meta( $post );
-		$is_home_view   = is_front_page() || is_home();
-		$homepage_title = $is_home_view ? get_option( 'SAMAN_SEO_homepage_title', '' ) : '';
+		$post  = $this->get_context_post();
+		$meta  = $this->get_meta( $post );
+		$title = $this->build_document_title( $post, $meta );
 
-		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title );
+		// Avoid outputting an empty title tag.
+		if ( '' === trim( $title ) ) {
+			$title = get_bloginfo( 'name' );
+		}
 
-		// Handle archive pages (404, search, author, date)
+		echo '<title>' . esc_html( $title ) . "</title>\n";
+	}
+
+	/**
+	 * Build a social title for archive pages.
+	 *
+	 * @return string
+	 */
+	private function get_archive_social_title() {
 		$archive_defaults = $this->get_archive_defaults();
-		$archive_type = null;
+		$archive_type     = null;
 
-		if ( is_404() ) {
-			$archive_type = '404';
-		} elseif ( is_search() ) {
+		if ( is_search() ) {
 			$archive_type = 'search';
 		} elseif ( is_author() ) {
 			$archive_type = 'author';
@@ -359,35 +455,74 @@ class Frontend {
 			$archive_type = 'date';
 		}
 
-		if ( $archive_type ) {
-			$title_template = $archive_defaults[ $archive_type ]['title_template'] ?? '';
-
-			if ( ! empty( $title_template ) ) {
-				$title = render_template_safely( $title_template, null );
+		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['title_template'] ) ) {
+			$title = render_template_safely( $archive_defaults[ $archive_type ]['title_template'], null );
+			if ( ! empty( $title ) ) {
+				return apply_filters( 'SAMAN_SEO_og_title', $title, null );
 			}
+		}
 
-			if ( empty( $title ) ) {
-				// Fallback defaults if template is empty or rendered unsafe.
-				$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
-				if ( '404' === $archive_type ) {
-					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
-				} elseif ( 'search' === $archive_type ) {
-					$title = 'Search: ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
-				} elseif ( 'author' === $archive_type ) {
-					$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
-				} elseif ( 'date' === $archive_type ) {
-					$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		$separator = get_option( 'SAMAN_SEO_title_separator', '-' );
+
+		if ( is_search() ) {
+			$title = 'Search: ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		} elseif ( is_author() ) {
+			$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		} elseif ( is_date() ) {
+			$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		} elseif ( is_category() || is_tag() || is_tax() ) {
+			$term = get_queried_object();
+			$term_name = ( $term instanceof \WP_Term ) ? $term->name : get_the_archive_title();
+			$title = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		} elseif ( is_post_type_archive() ) {
+			$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		} else {
+			$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+		}
+
+		return apply_filters( 'SAMAN_SEO_og_title', $title, null );
+	}
+
+	/**
+	 * Build a social description for archive pages.
+	 *
+	 * @return string
+	 */
+	private function get_archive_social_description() {
+		$archive_defaults = $this->get_archive_defaults();
+		$archive_type     = null;
+
+		if ( is_search() ) {
+			$archive_type = 'search';
+		} elseif ( is_author() ) {
+			$archive_type = 'author';
+		} elseif ( is_date() ) {
+			$archive_type = 'date';
+		}
+
+		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['description_template'] ) ) {
+			$description = render_template_safely( $archive_defaults[ $archive_type ]['description_template'], null );
+			if ( ! empty( $description ) ) {
+				return apply_filters( 'SAMAN_SEO_og_description', $description, null );
+			}
+		}
+
+		if ( is_category() || is_tag() || is_tax() ) {
+			$term = get_queried_object();
+			if ( $term instanceof \WP_Term ) {
+				$term_desc = term_description( $term->term_id );
+				if ( ! empty( $term_desc ) ) {
+					return apply_filters( 'SAMAN_SEO_og_description', wp_strip_all_tags( $term_desc ), null );
 				}
 			}
-
-			$title = apply_filters( 'SAMAN_SEO_title', $title, null );
 		}
 
-		if ( empty( $title ) ) {
-			$title = get_bloginfo( 'name' );
+		$description = get_option( 'SAMAN_SEO_default_meta_description', '' );
+		if ( empty( $description ) ) {
+			$description = get_bloginfo( 'description' );
 		}
 
-		echo '<title>' . esc_html( strip_unreplaced_variables( $title ) ) . "</title>\n";
+		return apply_filters( 'SAMAN_SEO_og_description', $description, null );
 	}
 
 	/**
@@ -500,6 +635,13 @@ class Frontend {
 			],
 			$atts
 		);
+
+		$echo = filter_var( $atts['echo'], FILTER_VALIDATE_BOOLEAN );
+
+		if ( $echo ) {
+			breadcrumbs( null, true );
+			return '';
+		}
 
 		return breadcrumbs( null, false );
 	}
@@ -656,7 +798,7 @@ class Frontend {
 			$image = add_query_arg(
 				[
 					'SAMAN_SEO_social_card' => 1,
-					'title'                  => get_the_title( $post ),
+					'title'                  => rawurlencode( get_the_title( $post ) ),
 				],
 				home_url( '/' )
 			);
@@ -736,7 +878,7 @@ class Frontend {
 	 *
 	 * @return string
 	 */
-	private function resolve_title( $post, $meta, $is_home_view, $homepage_title ) {
+	private function resolve_title( $post, $meta, $is_home_view, $homepage_title, $apply_filter = true ) {
 		$title = $meta['title'];
 		if ( empty( $title ) && $is_home_view && ! empty( $homepage_title ) ) {
 			$title = $homepage_title;
@@ -753,7 +895,11 @@ class Frontend {
 			$title = get_bloginfo( 'name' );
 		}
 
-		return apply_filters( 'SAMAN_SEO_title', $title, $post );
+		if ( $apply_filter ) {
+			return apply_filters( 'SAMAN_SEO_title', $title, $post );
+		}
+
+		return $title;
 	}
 
 	/**

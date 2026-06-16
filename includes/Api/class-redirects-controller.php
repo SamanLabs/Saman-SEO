@@ -8,9 +8,7 @@
 
 namespace Saman\SEO\Api;
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * REST API controller for redirects and 404 logs.
@@ -1733,7 +1731,15 @@ class Redirects_Controller extends REST_Controller {
         $reason   = $request->get_param( 'reason' );
 
         $monitor = new \Saman\SEO\Service\Request_Monitor();
-        $id      = $monitor->add_ignore_pattern( $pattern, $is_regex, $reason );
+
+        if ( $is_regex ) {
+            $validation = $monitor->validate_regex_pattern( $pattern );
+            if ( is_wp_error( $validation ) ) {
+                return $this->error( $validation->get_error_message(), 'invalid_regex', 400 );
+            }
+        }
+
+        $id = $monitor->add_ignore_pattern( $pattern, $is_regex, $reason );
 
         if ( false === $id ) {
             return $this->error( __( 'Failed to create pattern.', 'saman-seo' ), 'create_failed', 400 );

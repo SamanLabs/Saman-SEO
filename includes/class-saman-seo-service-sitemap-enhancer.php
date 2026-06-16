@@ -143,17 +143,6 @@ class Sitemap_Enhancer {
 			}
 		}
 
-		if ( 'post' === $post_type ) {
-			$entry['news:news'] = [
-				'news:publication'      => [
-					'news:name'     => get_bloginfo( 'name' ),
-					'news:language' => get_locale(),
-				],
-				'news:publication_date' => get_post_time( DATE_W3C, true, $post_id ),
-				'news:title'            => get_the_title( $post_id ),
-			];
-		}
-
 		$first_video = $this->detect_video( get_post_field( 'post_content', $post_id ) );
 		if ( $first_video ) {
 			$entry['video:video'] = [
@@ -222,9 +211,22 @@ class Sitemap_Enhancer {
 			$content = get_post_field( 'post_content', $post_id );
 		}
 
-		if ( $content && preg_match_all( '#<img[^>]+src=["\']([^"\']+)["\'][^>]*>#i', $content, $matches ) ) {
-			foreach ( $matches[1] as $src ) {
-				$add_image( $src );
+		if ( $content ) {
+			if ( preg_match_all( '#<img[^>]+?(?:data-src|data-lazy-src|src)=["\']([^"\'\s]+)["\'][^>]*>#i', $content, $matches ) ) {
+				foreach ( $matches[1] as $src ) {
+					$add_image( $src );
+				}
+			}
+
+			if ( preg_match_all( '#<img[^>]+srcset=["\']([^"\']+)["\'][^>]*>#i', $content, $matches ) ) {
+				foreach ( $matches[1] as $srcset ) {
+					foreach ( explode( ',', $srcset ) as $candidate ) {
+						$parts = preg_split( '/\s+/', trim( $candidate ) );
+						if ( ! empty( $parts[0] ) ) {
+							$add_image( $parts[0] );
+						}
+					}
+				}
 			}
 		}
 
@@ -1136,6 +1138,10 @@ class Sitemap_Enhancer {
 	 * @return string
 	 */
 	public function filter_stylesheet_url( $url ) {
+		if ( $this->is_wp_core_sitemap_request() ) {
+			return $url;
+		}
+
 		return $this->get_stylesheet_url();
 	}
 
@@ -1166,6 +1172,46 @@ class Sitemap_Enhancer {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Get the best available YouTube thumbnail URL with a lightweight fallback.
+	 *
+	 * Caches the reachable thumbnail choice per video ID to avoid repeated
+	 * remote requests on every sitemap render.
+	 *
+	 * @param string $video_id YouTube video ID.
+	 * @return string
+	 */
+	private function get_youtube_thumbnail_url( $video_id ) {
+		$video_id = sanitize_text_field( (string) $video_id );
+		$maxres   = 'https://img.youtube.com/vi/' . $video_id . '/maxresdefault.jpg';
+		$fallback = 'https://img.youtube.com/vi/' . $video_id . '/hqdefault.jpg';
+
+		$cache_key = 'saman_seo_yt_thumb_' . md5( $video_id );
+		$cached    = get_transient( $cache_key );
+
+		if ( 'maxres' === $cached ) {
+			return $maxres;
+		}
+		if ( 'hqdefault' === $cached ) {
+			return $fallback;
+		}
+
+		$response = wp_remote_head(
+			$maxres,
+			[
+				'timeout' => 3,
+			]
+		);
+
+		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+			set_transient( $cache_key, 'maxres', DAY_IN_SECONDS );
+			return $maxres;
+		}
+
+		set_transient( $cache_key, 'hqdefault', DAY_IN_SECONDS );
+		return $fallback;
 	}
 
 	/**
@@ -1294,7 +1340,7 @@ class Sitemap_Enhancer {
 													<xsl:when test="sitemap:lastmod">
 														<xsl:value-of select="sitemap:lastmod" />
 													</xsl:when>
-													<xsl:otherwise>ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</xsl:otherwise>
+													<xsl:otherwise>—</xsl:otherwise>
 												</xsl:choose>
 											</td>
 										</tr>
@@ -1330,7 +1376,7 @@ class Sitemap_Enhancer {
 													<xsl:when test="sitemap:lastmod">
 														<xsl:value-of select="sitemap:lastmod" />
 													</xsl:when>
-													<xsl:otherwise>ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</xsl:otherwise>
+													<xsl:otherwise>—</xsl:otherwise>
 												</xsl:choose>
 											</td>
 										</tr>
@@ -1358,6 +1404,18 @@ class Sitemap_Enhancer {
 	 */
 	private function get_stylesheet_url() {
 		return apply_filters( 'SAMAN_SEO_sitemap_stylesheet', home_url( '/sitemap-style.xsl' ) );
+	}
+
+	/**
+	 * Escape content so it can safely live inside a CDATA block.
+	 *
+	 * @param string $content Raw content.
+	 * @return string
+	 */
+	private function escape_cdata_content( $content ) {
+		$content = wp_kses_post( $content );
+
+		return str_replace( ']]>', ']]]]><![CDATA[>', $content );
 	}
 
 	/**
@@ -1402,8 +1460,8 @@ class Sitemap_Enhancer {
 			<link><?php echo esc_url( get_permalink( $post ) ); ?></link>
 			<guid><?php echo esc_url( get_permalink( $post ) ); ?></guid>
 			<pubDate><?php echo esc_html( get_post_time( 'r', true, $post ) ); ?></pubDate>
-			<description><![CDATA[<?php echo wp_kses_post( get_the_excerpt( $post ) ); ?>]]></description>
-			<content:encoded><![CDATA[<?php echo wp_kses_post( $post->post_content ); ?>]]></content:encoded>
+			<description><![CDATA[<?php echo $this->escape_cdata_content( get_the_excerpt( $post ) ); ?>]]></description>
+			<content:encoded><![CDATA[<?php echo $this->escape_cdata_content( $post->post_content ); ?>]]></content:encoded>
 		</item>
 		<?php endforeach; ?>
 	</channel>
@@ -1513,7 +1571,7 @@ class Sitemap_Enhancer {
 			$description = wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 );
 
 			if ( 'youtube' === $video['platform'] ) {
-				$thumbnail = 'https://img.youtube.com/vi/' . $video['id'] . '/maxresdefault.jpg';
+				$thumbnail = $this->get_youtube_thumbnail_url( $video['id'] );
 				$content_loc = 'https://www.youtube.com/watch?v=' . $video['id'];
 				$player_loc = 'https://www.youtube.com/embed/' . $video['id'];
 			} elseif ( 'vimeo' === $video['platform'] ) {

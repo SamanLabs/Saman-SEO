@@ -447,6 +447,11 @@ class Request_Monitor {
 		$is_bot     = $this->detect_is_bot( $user_agent ) ? 1 : 0;
 		$now        = current_time( 'mysql' );
 
+		// Do not log URLs that match an ignore pattern.
+		if ( $this->is_url_ignored( $request ) ) {
+			return;
+		}
+
 		global $wpdb;
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Each request URI must be checked against the custom 404 log table directly, table name is safe.
 		$row = $wpdb->get_row(
@@ -878,29 +883,115 @@ class Request_Monitor {
 		}
 
 		foreach ( $patterns as $p ) {
-			if ( $p->is_regex ) {
-				// Regex pattern
-				$regex = '/' . str_replace( '/', '\\/', $p->pattern ) . '/i';
-				if ( @preg_match( $regex, $request_uri ) ) {
+			$pattern = isset( $p->pattern ) ? (string) $p->pattern : '';
+
+			if ( '' === $pattern ) {
+				continue;
+			}
+
+			if ( ! empty( $p->is_regex ) ) {
+				// Regex pattern.
+				$regex = '/' . str_replace( '/', '\\/', $pattern ) . '/i';
+				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
 					return true;
 				}
 			} else {
-				// Simple wildcard pattern - convert * to regex
-				if ( false !== strpos( $p->pattern, '*' ) ) {
-					$regex = '/^' . str_replace( [ '\\*', '/' ], [ '.*', '\\/' ], preg_quote( $p->pattern, '/' ) ) . '$/i';
-					if ( @preg_match( $regex, $request_uri ) ) {
+				// Simple wildcard pattern - convert * to regex.
+				if ( false !== strpos( $pattern, '*' ) ) {
+					$regex = '/^' . str_replace( [ '\\*', '/' ], [ '.*', '\\/' ], preg_quote( $pattern, '/' ) ) . '$/i';
+					if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
 						return true;
 					}
-				} else {
-					// Exact match
-					if ( $request_uri === $p->pattern ) {
-						return true;
-					}
+				} elseif ( $request_uri === $pattern ) {
+					// Exact match.
+					return true;
 				}
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Safely test whether a regex matches a subject.
+	 *
+	 * Invalid regex patterns are treated as "no match" instead of raising
+	 * a fatal error or warning.
+	 *
+	 * @param string $regex   Full regex including delimiters and flags.
+	 * @param string $subject Subject string.
+	 * @return bool
+	 */
+	private function regex_matches_safely( $regex, $subject ) {
+		$message  = '';
+		$previous = set_error_handler(
+			static function ( $severity, $err_message ) use ( &$message ) {
+				$message = $err_message;
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( $regex, $subject );
+		} catch ( \Throwable $e ) {
+			$result  = false;
+			$message = $e->getMessage();
+		} finally {
+			if ( false !== $previous ) {
+				restore_error_handler();
+			}
+		}
+
+		if ( false === $result ) {
+			return false;
+		}
+
+		return 1 === $result;
+	}
+
+	/**
+	 * Validate a regex pattern intended for ignore matching.
+	 *
+	 * @param string $pattern Regex pattern without delimiters.
+	 * @return true|\WP_Error True if valid, WP_Error if invalid.
+	 */
+	public function validate_regex_pattern( $pattern ) {
+		if ( empty( $pattern ) ) {
+			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'saman-seo' ) );
+		}
+
+		$regex   = '/' . str_replace( '/', '\\/', (string) $pattern ) . '/i';
+		$message = '';
+
+		$previous = set_error_handler(
+			static function ( $severity, $err_message ) use ( &$message ) {
+				$message = $err_message;
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( $regex, '' );
+		} catch ( \Throwable $e ) {
+			$result  = false;
+			$message = $e->getMessage();
+		} finally {
+			if ( false !== $previous ) {
+				restore_error_handler();
+			}
+		}
+
+		if ( false === $result ) {
+			if ( empty( $message ) ) {
+				$message = preg_last_error_msg();
+			}
+			if ( empty( $message ) ) {
+				$message = __( 'Invalid regex pattern. Please check the syntax.', 'saman-seo' );
+			}
+			return new \WP_Error( 'invalid_regex', $message );
+		}
+
+		return true;
 	}
 
 	/**

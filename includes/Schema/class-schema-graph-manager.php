@@ -43,6 +43,25 @@ class Schema_Graph_Manager {
 	}
 
 	/**
+	 * Check whether a generated schema value is a list of schema pieces.
+	 *
+	 * @param array $piece Schema piece or list of pieces.
+	 * @return bool True when the value is a sequential list of arrays.
+	 */
+	private function is_schema_list( array $piece ): bool {
+		if ( empty( $piece ) ) {
+			return false;
+		}
+
+		$keys = array_keys( $piece );
+		if ( $keys !== range( 0, count( $piece ) - 1 ) ) {
+			return false;
+		}
+
+		return isset( $piece[0] ) && is_array( $piece[0] );
+	}
+
+	/**
 	 * Build complete JSON-LD graph for the current context.
 	 *
 	 * Collects all applicable schemas (where is_needed() returns true),
@@ -62,20 +81,33 @@ class Schema_Graph_Manager {
 		foreach ( $types as $slug => $config ) {
 			$schema = $this->registry->make( $slug, $context );
 
-			if ( $schema && $schema->is_needed() ) {
-				$piece = $schema->generate();
+			if ( ! $schema || ! $schema->is_needed() ) {
+				continue;
+			}
 
-				/**
-				 * Filter the output of a specific schema type.
-				 *
-				 * @param array          $piece   The schema piece array.
-				 * @param Schema_Context $context The current context.
-				 */
-				$piece = apply_filters( "saman_seo_schema_{$slug}_output", $piece, $context );
+			$piece = $schema->generate();
 
-				if ( ! empty( $piece ) ) {
-					$graph[] = $piece;
+			/**
+			 * Filter the output of a specific schema type.
+			 *
+			 * @param array          $piece   The schema piece array, or a list of pieces.
+			 * @param Schema_Context $context The current context.
+			 */
+			$piece = apply_filters( "saman_seo_schema_{$slug}_output", $piece, $context );
+
+			if ( empty( $piece ) ) {
+				continue;
+			}
+
+			// Allow a schema type to output multiple graph entries (e.g. multi-location LocalBusiness).
+			if ( $this->is_schema_list( $piece ) ) {
+				foreach ( $piece as $sub_piece ) {
+					if ( ! empty( $sub_piece ) ) {
+						$graph[] = $sub_piece;
+					}
 				}
+			} else {
+				$graph[] = $piece;
 			}
 		}
 
