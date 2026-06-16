@@ -7,7 +7,6 @@
 
 namespace Saman\SEO\Api;
 
-use WP_REST_Controller;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -19,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Link Health REST API Controller.
  */
-class Link_Health_Controller extends WP_REST_Controller {
+class Link_Health_Controller extends REST_Controller {
 
 	/**
 	 * Namespace.
@@ -61,7 +60,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_summary' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 				],
 			]
 		);
@@ -74,7 +73,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_broken_links' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 					'args'                => [
 						'page'     => [
 							'type'    => 'integer',
@@ -102,7 +101,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_orphan_pages' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 					'args'                => [
 						'page'     => [
 							'type'    => 'integer',
@@ -125,7 +124,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'start_scan' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 					'args'                => [
 						'type'    => [
 							'type'    => 'string',
@@ -149,7 +148,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_scan_status' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 				],
 			]
 		);
@@ -162,7 +161,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_scan_history' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 				],
 			]
 		);
@@ -175,7 +174,7 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_link' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 				],
 			]
 		);
@@ -188,19 +187,10 @@ class Link_Health_Controller extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'recheck_link' ],
-					'permission_callback' => [ $this, 'check_permission' ],
+					'permission_callback' => [ $this, 'permission_check' ],
 				],
 			]
 		);
-	}
-
-	/**
-	 * Check if user has permission.
-	 *
-	 * @return bool
-	 */
-	public function check_permission() {
-		return current_user_can( 'manage_options' );
 	}
 
 	/**

@@ -417,7 +417,6 @@ class Link_Health {
 		$response = wp_remote_head( $url, [
 			'timeout'     => 10,
 			'redirection' => 0,
-			'sslverify'   => false,
 		] );
 
 		if ( is_wp_error( $response ) ) {

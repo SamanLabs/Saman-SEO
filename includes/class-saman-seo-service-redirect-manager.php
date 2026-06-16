@@ -455,13 +455,38 @@ class Redirect_Manager {
 			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'saman-seo' ) );
 		}
 
-		// Test the pattern by trying to use it.
-		// Using @ to suppress warnings for invalid patterns.
-		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		$result = @preg_match( '#' . $pattern . '#', '' );
+		$pattern = (string) $pattern;
+		$message = '';
+
+		// Temporarily silence warnings without using @ so we can surface a
+		// clean error. PHP 8 throws ValueError for invalid patterns, PHP 7
+		// emits warnings and returns false.
+		$previous = set_error_handler(
+			static function ( $severity, $err_message ) use ( &$message ) {
+				$message = $err_message;
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( '#' . $pattern . '#', '' );
+		} catch ( \Throwable $e ) {
+			$result  = false;
+			$message = $e->getMessage();
+		} finally {
+			if ( false !== $previous ) {
+				restore_error_handler();
+			}
+		}
 
 		if ( false === $result ) {
-			return new \WP_Error( 'invalid_regex', __( 'Invalid regex pattern. Please check the syntax.', 'saman-seo' ) );
+			if ( empty( $message ) ) {
+				$message = preg_last_error_msg();
+			}
+			if ( empty( $message ) ) {
+				$message = __( 'Invalid regex pattern. Please check the syntax.', 'saman-seo' );
+			}
+			return new \WP_Error( 'invalid_regex', $message );
 		}
 
 		return true;
@@ -791,9 +816,19 @@ class Redirect_Manager {
 						continue;
 					}
 
-					// Test regex pattern.
-					// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-					if ( @preg_match( '#' . $regex_row->source . '#', $request, $matches ) ) {
+					// Test regex pattern without suppressing errors.
+					$matched = false;
+					$matches = [];
+					set_error_handler( static function () { return true; } );
+					try {
+						$matched = (bool) preg_match( '#' . $regex_row->source . '#', $request, $matches );
+					} catch ( \Throwable $e ) {
+						$matched = false;
+					} finally {
+						restore_error_handler();
+					}
+
+					if ( $matched ) {
 						$row            = $regex_row;
 						$matched_source = $request;
 

@@ -915,13 +915,24 @@ class Redirects_Controller extends REST_Controller {
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
         // Check for reverse redirect (B ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ A when creating A ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ B)
         if ( $target_path ) {
-            $exclude_sql = $exclude_id ? $wpdb->prepare( ' AND id != %d', $exclude_id ) : '';
-            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, chain validation requires direct query.
-            $reverse = $wpdb->get_row( $wpdb->prepare(
-                "SELECT * FROM {$this->redirects_table} WHERE source = %s{$exclude_sql} LIMIT 1",
-                $target_path
-            ) );
+            if ( $exclude_id ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
+                $reverse = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT * FROM {$this->redirects_table} WHERE source = %s AND id != %d LIMIT 1",
+                        $target_path,
+                        $exclude_id
+                    )
+                );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
+                $reverse = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT * FROM {$this->redirects_table} WHERE source = %s LIMIT 1",
+                        $target_path
+                    )
+                );
+            }
 
             if ( $reverse ) {
                 // Check if reverse target points back to our source (loop)
@@ -1049,6 +1060,8 @@ class Redirects_Controller extends REST_Controller {
         $skipped  = 0;
         $errors   = [];
 
+        $max_rows = apply_filters( 'saman_seo_redirect_import_max_rows', 1000 );
+
         if ( 'csv' === $format ) {
             $lines = explode( "\n", $data );
             $header = null;
@@ -1079,6 +1092,11 @@ class Redirects_Controller extends REST_Controller {
                     }
                 }
 
+                if ( $imported + $skipped >= $max_rows ) {
+                    $errors[] = sprintf( 'Line %d: %s', $i + 1, __( 'Import row limit reached.', 'saman-seo' ) );
+                    break;
+                }
+
                 $result = $this->import_single_redirect( $redirect_data, $manager, $overwrite );
                 if ( true === $result ) {
                     $imported++;
@@ -1097,6 +1115,11 @@ class Redirects_Controller extends REST_Controller {
             }
 
             foreach ( $json_data as $i => $redirect_data ) {
+                if ( $imported + $skipped >= $max_rows ) {
+                    $errors[] = sprintf( 'Item %d: %s', $i + 1, __( 'Import row limit reached.', 'saman-seo' ) );
+                    break;
+                }
+
                 $result = $this->import_single_redirect( $redirect_data, $manager, $overwrite );
                 if ( true === $result ) {
                     $imported++;
@@ -1125,33 +1148,56 @@ class Redirects_Controller extends REST_Controller {
      * @return bool|string True on success, 'skipped' if skipped, error message on failure.
      */
     private function import_single_redirect( $data, $manager, $overwrite ) {
-        $source = isset( $data['source'] ) ? $data['source'] : '';
-        $target = isset( $data['target'] ) ? $data['target'] : '';
+        $allowed_keys = [ 'source', 'target', 'status_code', 'is_regex', 'group_name', 'start_date', 'end_date', 'notes' ];
+        $data         = array_intersect_key( (array) $data, array_flip( $allowed_keys ) );
 
-        if ( empty( $source ) || empty( $target ) ) {
-            return __( 'Missing source or target.', 'saman-seo' );
+        $source = isset( $data['source'] ) ? sanitize_text_field( $data['source'] ) : '';
+        $target = isset( $data['target'] ) ? esc_url_raw( $data['target'] ) : '';
+
+        if ( empty( $source ) ) {
+            return __( 'Missing source.', 'saman-seo' );
+        }
+
+        $is_regex = ! empty( $data['is_regex'] );
+
+        // Regex redirects may legitimately have no target (410/451).
+        if ( empty( $target ) && ! $is_regex ) {
+            return __( 'Missing target.', 'saman-seo' );
         }
 
         $status_code = isset( $data['status_code'] ) ? (int) $data['status_code'] : 301;
+        if ( ! in_array( $status_code, [ 301, 302, 307, 308, 410, 451 ], true ) ) {
+            return __( 'Invalid status code.', 'saman-seo' );
+        }
+
+        // Validate regex pattern before storing.
+        if ( $is_regex ) {
+            $validation = $manager->validate_regex( $source );
+            if ( is_wp_error( $validation ) ) {
+                return $validation->get_error_message();
+            }
+        }
 
         $extra = [
-            'is_regex'   => isset( $data['is_regex'] ) ? (bool) $data['is_regex'] : false,
-            'group_name' => isset( $data['group_name'] ) ? $data['group_name'] : '',
-            'start_date' => isset( $data['start_date'] ) ? $data['start_date'] : null,
-            'end_date'   => isset( $data['end_date'] ) ? $data['end_date'] : null,
-            'notes'      => isset( $data['notes'] ) ? $data['notes'] : '',
+            'is_regex'   => $is_regex,
+            'group_name' => isset( $data['group_name'] ) ? sanitize_text_field( $data['group_name'] ) : '',
+            'start_date' => ! empty( $data['start_date'] ) ? sanitize_text_field( $data['start_date'] ) : null,
+            'end_date'   => ! empty( $data['end_date'] ) ? sanitize_text_field( $data['end_date'] ) : null,
+            'notes'      => isset( $data['notes'] ) ? sanitize_textarea_field( $data['notes'] ) : '',
         ];
 
         $result = $manager->create_redirect( $source, $target, $status_code, $extra );
 
         if ( is_wp_error( $result ) ) {
             if ( 'redirect_exists' === $result->get_error_code() && $overwrite ) {
-                // Find existing and update
+                // Find existing and update.
                 global $wpdb;
                 $table = $manager->get_table();
 
-                $normalized = '/' . ltrim( $source, '/' );
-                $normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+                $normalized = $is_regex ? $source : ( '/' . ltrim( $source, '/' ) );
+                if ( ! $is_regex ) {
+                    $normalized = '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+                }
 
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, import requires direct query.
                 $existing_id = $wpdb->get_var( $wpdb->prepare(
@@ -1178,7 +1224,6 @@ class Redirects_Controller extends REST_Controller {
         }
 
         return true;
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
     }
 
     /**

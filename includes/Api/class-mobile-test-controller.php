@@ -74,11 +74,14 @@ class Mobile_Test_Controller extends REST_Controller {
             return $this->error( 'Please provide a valid URL' );
         }
 
-        // Fetch the page content
+        if ( ! wp_http_validate_url( $url ) ) {
+            return $this->error( 'Invalid or unsafe URL' );
+        }
+
+        // Fetch the page content.
         $response = wp_remote_get( $url, [
             'timeout'    => 15,
             'user-agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
-            'sslverify'  => false,
         ] );
 
         if ( is_wp_error( $response ) ) {

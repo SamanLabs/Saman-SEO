@@ -7,6 +7,8 @@
  * @package Saman\SEO
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $social_defaults = get_option( 'SAMAN_SEO_social_defaults', [] );
 if ( ! is_array( $social_defaults ) ) {
 	$social_defaults = [];
@@ -373,7 +375,7 @@ $render_schema_control = static function ( $field_name, $current_value, $input_i
 		>
 			<section class="saman-seo-card">
 				<h2><?php esc_html_e( 'Knowledge Graph & Schema.org', 'saman-seo' ); ?></h2>
-				<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google's Knowledge Graph and other rich results.', 'saman-seo' ); ?></p>
+				<p><?php esc_html_e( 'Help search engines understand who runs this site. This data is used in Google\'s Knowledge Graph and other rich results.', 'saman-seo' ); ?></p>
 					<form action="options.php" method="post">
 						<?php settings_fields( 'SAMAN_SEO_knowledge' ); ?>
 					<table class="form-table" role="presentation">

@@ -39,18 +39,9 @@ class More_Controller extends REST_Controller {
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'get_plugins' ],
-				'permission_callback' => [ $this, 'admin_permission_check' ],
+				'permission_callback' => [ $this, 'permission_check' ],
 			]
 		);
-	}
-
-	/**
-	 * Check if user has admin permissions.
-	 *
-	 * @return bool True if user can manage options.
-	 */
-	public function admin_permission_check() {
-		return current_user_can( 'manage_options' );
 	}
 
 	/**

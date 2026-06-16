@@ -209,10 +209,77 @@ class Tools_Controller extends REST_Controller {
 	 */
 	public function save_schema_template( $request ) {
 		$params = $request->get_json_params();
+
+		$name = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
+		$type = isset( $params['type'] ) ? sanitize_text_field( $params['type'] ) : '';
+
+		if ( empty( $name ) ) {
+			return $this->error( __( 'Template name is required.', 'saman-seo' ), 'missing_name', 400 );
+		}
+
+		if ( empty( $type ) ) {
+			return $this->error( __( 'Schema type is required.', 'saman-seo' ), 'missing_type', 400 );
+		}
+
 		$templates = get_option( 'SAMAN_SEO_schema_templates', [] );
-		$templates[] = $params;
+		if ( ! is_array( $templates ) ) {
+			$templates = [];
+		}
+
+		// Limit total stored templates to prevent option bloat.
+		$max_templates = apply_filters( 'saman_seo_max_schema_templates', 100 );
+		if ( count( $templates ) >= $max_templates ) {
+			return $this->error(
+				__( 'Maximum number of schema templates reached.', 'saman-seo' ),
+				'template_limit_reached',
+				400
+			);
+		}
+
+		$template = [
+			'id'          => 'template_' . time() . '_' . wp_rand( 1000, 9999 ),
+			'name'        => $name,
+			'type'        => $type,
+			'description' => isset( $params['description'] ) ? sanitize_textarea_field( $params['description'] ) : '',
+			'data'        => $this->sanitize_schema_template_data( $params['data'] ?? [] ),
+			'created_at'  => current_time( 'mysql' ),
+		];
+
+		$templates[] = $template;
 		update_option( 'SAMAN_SEO_schema_templates', $templates );
+
 		return $this->success( $templates );
+	}
+
+	/**
+	 * Recursively sanitize schema template data.
+	 *
+	 * @param mixed $data Raw data.
+	 * @return mixed
+	 */
+	private function sanitize_schema_template_data( $data ) {
+		if ( is_string( $data ) ) {
+			return wp_kses_post( $data );
+		}
+
+		if ( is_numeric( $data ) ) {
+			return $data;
+		}
+
+		if ( is_bool( $data ) ) {
+			return $data;
+		}
+
+		if ( is_array( $data ) ) {
+			$clean = [];
+			foreach ( $data as $key => $value ) {
+				$clean_key = is_string( $key ) ? sanitize_text_field( $key ) : $key;
+				$clean[ $clean_key ] = $this->sanitize_schema_template_data( $value );
+			}
+			return $clean;
+		}
+
+		return null;
 	}
 
 	/**
@@ -227,6 +294,10 @@ class Tools_Controller extends REST_Controller {
 
 		if ( empty( $url ) ) {
 			return $this->error( __( 'URL is required.', 'saman-seo' ), 'missing_url', 400 );
+		}
+
+		if ( ! wp_http_validate_url( $url ) ) {
+			return $this->error( __( 'Invalid or unsafe URL.', 'saman-seo' ), 'invalid_url', 400 );
 		}
 
 		$response = wp_remote_get( $url );
