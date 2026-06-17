@@ -27,20 +27,23 @@ if ( ! defined( 'SAMAN_SEO_URL' ) ) {
 }
 
 /**
- * Load Composer autoloader if available; otherwise fall back to the legacy
- * custom autoloader so the plugin does not fatal on installs where vendor/
- * is missing.
+ * Load Composer autoloader if available.
  */
 if ( file_exists( SAMAN_SEO_PATH . 'vendor/autoload.php' ) ) {
 	require_once SAMAN_SEO_PATH . 'vendor/autoload.php';
-} else {
-	/**
-	 * Legacy PSR-4-ish autoloader for plugin classes.
-	 *
-	 * @param string $class The requested class.
-	 */
-	spl_autoload_register(
-		static function ( $class ) {
+}
+
+/**
+ * Legacy PSR-4-ish autoloader for plugin classes.
+ *
+ * Registered as a fallback for any plugin class Composer does not know about
+ * (for example after vendor/ was generated without scanning the includes/
+ * directories).
+ *
+ * @param string $class The requested class.
+ */
+spl_autoload_register(
+	static function ( $class ) {
 			$class = ltrim( $class, '\\' );
 
 			if ( 0 !== strpos( $class, 'Saman\SEO\\' ) ) {
@@ -136,7 +139,6 @@ if ( file_exists( SAMAN_SEO_PATH . 'vendor/autoload.php' ) ) {
 			}
 		}
 	);
-}
 
 require_once SAMAN_SEO_PATH . 'includes/helpers.php';
 
