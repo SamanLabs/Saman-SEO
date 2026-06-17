@@ -174,7 +174,7 @@ https://yoursite.com/additional-sitemap.xml   # If custom pages configured
 ### Exclude Specific Posts from Sitemaps
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     if ( 'post' === $post_type ) {
         // Exclude specific post IDs
         $args['post__not_in'] = [ 123, 456, 789 ];
@@ -186,7 +186,7 @@ add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
 ### Exclude Posts by Custom Field
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     // Exclude posts marked as "hidden from search"
     $args['meta_query'] = [
         [
@@ -201,7 +201,7 @@ add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
 ### Remove Entire Post Type from Sitemap
 
 ```php
-add_filter( 'samanseo_sitemap_map', function( $map ) {
+add_filter( 'saman_seo_sitemap_map', function( $map ) {
     foreach ( $map as $key => $group ) {
         if ( 'private_docs' === $group['subtype'] ) {
             unset( $map[ $key ] );
@@ -214,7 +214,7 @@ add_filter( 'samanseo_sitemap_map', function( $map ) {
 ### Customize Individual Entry Data
 
 ```php
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // High priority for featured posts
     if ( get_post_meta( $post_id, 'featured', true ) ) {
         $entry['priority'] = 1.0;
@@ -235,7 +235,7 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
 ### Add Custom Images to Sitemap
 
 ```php
-add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
+add_filter( 'saman_seo_sitemap_images', function( $images, $post_id ) {
     // Add gallery images
     $gallery = get_post_meta( $post_id, 'product_gallery', true );
     if ( ! empty( $gallery ) ) {
@@ -260,7 +260,7 @@ add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
 ### Add News Schema to Specific Posts
 
 ```php
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // Only add news schema to posts in "Breaking News" category
     if ( has_category( 'breaking-news', $post_id ) ) {
         $entry['news:news'] = [
@@ -280,7 +280,7 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
 ### Add Video Schema
 
 ```php
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     $video_url = get_post_meta( $post_id, 'video_url', true );
     if ( ! empty( $video_url ) ) {
         $entry['video:video'] = [
@@ -324,7 +324,7 @@ function samanseo_get_quote_row( $post_id ) {
 }
 
 // Add quote image to sitemap
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     if ( 'page' !== $post_type ) {
         return $entry;
     }
@@ -345,7 +345,7 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
 }, 10, 3 );
 
 // Use same data for Open Graph
-add_filter( 'samanseo_og_title', function( $title, $post ) {
+add_filter( 'saman_seo_og_title', function( $title, $post ) {
     if ( ! $post instanceof WP_Post ) {
         return $title;
     }
@@ -358,7 +358,7 @@ add_filter( 'samanseo_og_title', function( $title, $post ) {
     return wp_strip_all_tags( $quote['author'] . ' Quote' );
 }, 10, 2 );
 
-add_filter( 'samanseo_og_description', function( $description, $post ) {
+add_filter( 'saman_seo_og_description', function( $description, $post ) {
     if ( ! $post instanceof WP_Post ) {
         return $description;
     }
@@ -371,7 +371,7 @@ add_filter( 'samanseo_og_description', function( $description, $post ) {
     return wp_strip_all_tags( $quote['quote_text'] );
 }, 10, 2 );
 
-add_filter( 'samanseo_og_image', function( $image, $post ) {
+add_filter( 'saman_seo_og_image', function( $image, $post ) {
     if ( ! $post instanceof WP_Post ) {
         return $image;
     }

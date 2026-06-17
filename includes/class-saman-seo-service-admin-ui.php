@@ -25,7 +25,7 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function boot() {
-		$metabox_enabled = apply_filters( 'SAMAN_SEO_feature_toggle', true, 'metabox' );
+		$metabox_enabled = saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'metabox' );
 
 		if ( $metabox_enabled ) {
 			add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
@@ -178,7 +178,7 @@ class Admin_UI {
 			unset( $post_types['attachment'] );
 		}
 
-		$post_types = apply_filters( 'SAMAN_SEO_score_post_types', array_values( $post_types ) );
+		$post_types = saman_seo_apply_filters( 'saman_seo_score_post_types', array_values( $post_types ) );
 
 		foreach ( $post_types as $post_type ) {
 			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_posts_column' ) );

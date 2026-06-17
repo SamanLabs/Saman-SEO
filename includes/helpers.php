@@ -1157,7 +1157,7 @@ namespace Saman\SEO\Helpers {
 			'secondary_keyphrases' => $secondary_analysis,
 		);
 
-		return \apply_filters( 'SAMAN_SEO_seo_score', $result, $post );
+		return \saman_seo_apply_filters( 'saman_seo_seo_score', $result, $post );
 	}
 
 	/**
@@ -1196,6 +1196,78 @@ namespace Saman\SEO\Helpers {
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Get all backward-compatible hook aliases for a canonical hook name.
+	 *
+	 * Canonical hooks use the `saman_seo_` prefix. This function also returns
+	 * the legacy `SAMAN_SEO_` (all caps) and documented `samanseo_` (no
+	 * underscore) variants so existing code keeps working.
+	 *
+	 * @param string $tag Canonical hook name.
+	 * @return array<string> List of alias hook names (excluding the canonical tag).
+	 */
+	function saman_seo_get_hook_aliases( $tag ) {
+		$aliases = array();
+
+		if ( 0 === strpos( $tag, 'saman_seo_' ) ) {
+			$suffix    = substr( $tag, 10 );
+			$aliases[] = 'SAMAN_SEO_' . $suffix;
+			$aliases[] = 'samanseo_' . $suffix;
+		} elseif ( 0 === strpos( $tag, 'samanseo_' ) ) {
+			$suffix    = substr( $tag, 9 );
+			$aliases[] = 'SAMAN_SEO_' . $suffix;
+			$aliases[] = 'saman_seo_' . $suffix;
+		} elseif ( 0 === strpos( $tag, 'SAMAN_SEO_' ) ) {
+			$suffix    = substr( $tag, 10 );
+			$aliases[] = 'saman_seo_' . $suffix;
+			$aliases[] = 'samanseo_' . $suffix;
+		}
+
+		return array_values( array_unique( $aliases ) );
+	}
+
+	/**
+	 * Apply filters using the canonical hook name plus all backward-compatible aliases.
+	 *
+	 * Callbacks registered on `saman_seo_*`, `SAMAN_SEO_*`, or `samanseo_*`
+	 * variants will all run. The canonical `saman_seo_*` filter runs last so
+	 * it has the final word.
+	 *
+	 * @param string $tag   Canonical filter name.
+	 * @param mixed  $value Value to filter.
+	 * @param mixed  ...$args Additional arguments passed to callbacks.
+	 * @return mixed
+	 */
+	function saman_seo_apply_filters( $tag, $value, ...$args ) {
+		foreach ( saman_seo_get_hook_aliases( $tag ) as $alias ) {
+			if ( \has_filter( $alias ) ) {
+				$value = \apply_filters( $alias, $value, ...$args );
+			}
+		}
+
+		return \apply_filters( $tag, $value, ...$args );
+	}
+
+	/**
+	 * Execute an action using the canonical hook name plus all backward-compatible aliases.
+	 *
+	 * Callbacks registered on `saman_seo_*`, `SAMAN_SEO_*`, or `samanseo_*`
+	 * variants will all run. The canonical `saman_seo_*` action runs last.
+	 *
+	 * @param string $tag Canonical action name.
+	 * @param mixed  ...$args Arguments passed to callbacks.
+	 * @return void
+	 */
+	function saman_seo_do_action( $tag, ...$args ) {
+		foreach ( saman_seo_get_hook_aliases( $tag ) as $alias ) {
+			if ( \has_action( $alias ) ) {
+				\do_action( $alias, ...$args );
+			}
+		}
+
+		\do_action( $tag, ...$args );
 	}
 }
 
@@ -1241,6 +1313,39 @@ namespace {
 		}
 
 		return $svc->create_redirect( $source, $target, $status_code );
+	}
+
+	/**
+	 * Get backward-compatible hook aliases for a canonical Saman SEO hook.
+	 *
+	 * @param string $tag Canonical hook name.
+	 * @return array<string> Alias hook names.
+	 */
+	function saman_seo_get_hook_aliases( $tag ) {
+		return \Saman\SEO\Helpers\saman_seo_get_hook_aliases( $tag );
+	}
+
+	/**
+	 * Apply filters using the canonical hook name plus legacy aliases.
+	 *
+	 * @param string $tag   Canonical filter name.
+	 * @param mixed  $value Value to filter.
+	 * @param mixed  ...$args Additional arguments passed to callbacks.
+	 * @return mixed
+	 */
+	function saman_seo_apply_filters( $tag, $value, ...$args ) {
+		return \Saman\SEO\Helpers\saman_seo_apply_filters( $tag, $value, ...$args );
+	}
+
+	/**
+	 * Execute an action using the canonical hook name plus legacy aliases.
+	 *
+	 * @param string $tag Canonical action name.
+	 * @param mixed  ...$args Arguments passed to callbacks.
+	 * @return void
+	 */
+	function saman_seo_do_action( $tag, ...$args ) {
+		\Saman\SEO\Helpers\saman_seo_do_action( $tag, ...$args );
 	}
 
 	/**

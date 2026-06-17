@@ -88,7 +88,7 @@ class Schema_Registry {
 		 * @param string $class_name The schema class name.
 		 * @param array  $args       The registration arguments.
 		 */
-		do_action( 'saman_seo_schema_type_registered', $slug, $class_name, $args );
+		saman_seo_do_action( 'saman_seo_schema_type_registered', $slug, $class_name, $args );
 	}
 
 	/**
@@ -102,7 +102,7 @@ class Schema_Registry {
 		 *
 		 * @param array $types All registered schema types.
 		 */
-		return apply_filters( 'saman_seo_schema_types', $this->types );
+		return saman_seo_apply_filters( 'saman_seo_schema_types', $this->types );
 	}
 
 	/**

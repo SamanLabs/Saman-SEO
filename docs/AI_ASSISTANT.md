@@ -585,7 +585,7 @@ $api_key = defined( 'SAMANSEO_OPENAI_KEY' ) ? SAMANSEO_OPENAI_KEY : get_option( 
 Only allow trusted users to access AI features:
 
 ```php
-add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'saman_seo_feature_toggle', function( $enabled, $feature ) {
     if ( $feature === 'ai_assistant' && ! current_user_can( 'manage_options' ) ) {
         return false;
     }

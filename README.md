@@ -155,7 +155,7 @@ if ( is_wp_error( $result ) ) {
 
 ```php
 // Modify SEO title dynamically
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( is_singular( 'product' ) ) {
         return $title . ' | Buy Now';
     }
@@ -163,7 +163,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Override Open Graph image
-add_filter( 'samanseo_og_image', function( $image, $post ) {
+add_filter( 'saman_seo_og_image', function( $image, $post ) {
     if ( $post && $post->ID === 42 ) {
         return 'https://cdn.example.com/special-image.jpg';
     }

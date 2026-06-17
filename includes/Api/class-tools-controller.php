@@ -316,7 +316,7 @@ class Tools_Controller extends REST_Controller {
 		}
 
 		// Limit total stored templates to prevent option bloat.
-		$max_templates = apply_filters( 'saman_seo_max_schema_templates', 100 );
+		$max_templates = saman_seo_apply_filters( 'saman_seo_max_schema_templates', 100 );
 		if ( count( $templates ) >= $max_templates ) {
 			return $this->error(
 				__( 'Maximum number of schema templates reached.', 'saman-seo' ),

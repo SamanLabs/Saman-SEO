@@ -24,7 +24,7 @@ class LLM_TXT_Generator {
 			return;
 		}
 
-		if ( ! apply_filters( 'SAMAN_SEO_feature_toggle', true, 'llm_txt' ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'llm_txt' ) ) {
 			return;
 		}
 
@@ -173,7 +173,7 @@ class LLM_TXT_Generator {
 		 *
 		 * @param array $output Array of lines to be joined.
 		 */
-		$output = apply_filters( 'SAMAN_SEO_llm_txt_content', $output );
+		$output = saman_seo_apply_filters( 'saman_seo_llm_txt_content', $output );
 
 		return implode( "\n", $output );
 	}

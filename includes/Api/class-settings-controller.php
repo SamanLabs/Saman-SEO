@@ -318,7 +318,7 @@ class Settings_Controller extends REST_Controller {
 			'sidebar_logo'                => 'url',
 		);
 
-		return apply_filters( 'saman_seo_allowed_settings', $settings );
+		return saman_seo_apply_filters( 'saman_seo_allowed_settings', $settings );
 	}
 
 	/**

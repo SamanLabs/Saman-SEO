@@ -75,7 +75,7 @@ class IndexNow {
 			return;
 		}
 
-		if ( ! apply_filters( 'SAMAN_SEO_feature_toggle', true, 'indexnow' ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'indexnow' ) ) {
 			return;
 		}
 
@@ -296,7 +296,7 @@ class IndexNow {
 		}
 
 		// Allow filtering.
-		if ( ! apply_filters( 'SAMAN_SEO_indexnow_should_submit', true, $post ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_indexnow_should_submit', true, $post ) ) {
 			return false;
 		}
 
@@ -378,7 +378,7 @@ class IndexNow {
 			$this->log_submission( $url, $post_id, $status, $response_code, $response_message, $search_engine );
 		}
 
-		do_action( 'SAMAN_SEO_indexnow_submitted', $urls, $success, $response_code );
+		saman_seo_do_action( 'saman_seo_indexnow_submitted', $urls, $success, $response_code );
 
 		return $success;
 	}

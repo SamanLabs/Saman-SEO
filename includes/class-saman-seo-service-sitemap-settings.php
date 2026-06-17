@@ -210,7 +210,7 @@ class Sitemap_Settings {
 	 */
 	public function regenerate_sitemap() {
 		// Clear any sitemap cache if we implement caching
-		do_action( 'SAMAN_SEO_sitemap_regenerated' );
+		saman_seo_do_action( 'saman_seo_sitemap_regenerated' );
 
 		// Flush rewrite rules to ensure sitemap URLs work
 		flush_rewrite_rules();

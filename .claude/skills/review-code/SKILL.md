@@ -40,7 +40,7 @@ Check for vulnerabilities:
 Check adherence to project patterns:
 - [ ] **Namespace**: Uses `Saman\SEO` namespace hierarchy
 - [ ] **Service Pattern**: New features use service classes with `boot()` method
-- [ ] **Filter Hooks**: Extensibility points use `SAMAN_SEO_` prefix
+- [ ] **Filter Hooks**: Extensibility points use `saman_seo_` prefix
 - [ ] **Options**: Use `SAMAN_SEO_` prefix for options
 - [ ] **Meta Keys**: Use `_SAMAN_SEO_` prefix for post meta
 - [ ] **Text Domain**: All strings use `'saman-seo'` text domain

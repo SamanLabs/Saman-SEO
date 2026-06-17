@@ -93,7 +93,7 @@ class Schema_Graph_Manager {
 			 * @param array          $piece   The schema piece array, or a list of pieces.
 			 * @param Schema_Context $context The current context.
 			 */
-			$piece = apply_filters( "saman_seo_schema_{$slug}_output", $piece, $context );
+			$piece = saman_seo_apply_filters( "saman_seo_schema_{$slug}_output", $piece, $context );
 
 			if ( empty( $piece ) ) {
 				continue;
@@ -117,7 +117,7 @@ class Schema_Graph_Manager {
 		 * @param array          $graph   All schema pieces.
 		 * @param Schema_Context $context The current context.
 		 */
-		$graph = apply_filters( 'saman_seo_schema_graph', $graph, $context );
+		$graph = saman_seo_apply_filters( 'saman_seo_schema_graph', $graph, $context );
 
 		/**
 		 * Legacy filter for backward compatibility.
@@ -129,7 +129,7 @@ class Schema_Graph_Manager {
 		 * @param array         $graph All schema pieces.
 		 * @param \WP_Post|null $post  The current post or null.
 		 */
-		$graph = apply_filters( 'SAMAN_SEO_jsonld_graph', $graph, $context->post );
+		$graph = saman_seo_apply_filters( 'saman_seo_jsonld_graph', $graph, $context->post );
 
 		// Return complete JSON-LD structure.
 		// @context is ONLY added here at root level - never in individual pieces.

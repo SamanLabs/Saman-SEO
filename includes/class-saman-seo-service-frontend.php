@@ -28,7 +28,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function boot() {
-		if ( ! apply_filters( 'SAMAN_SEO_feature_toggle', true, 'frontend_head' ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'frontend_head' ) ) {
 			return;
 		}
 
@@ -165,12 +165,12 @@ class Frontend {
 		$title = strip_unreplaced_variables( $title );
 
 		// Truncate overly long titles to keep them search-engine friendly.
-		$max_length = absint( apply_filters( 'SAMAN_SEO_title_max_length', 60 ) );
+		$max_length = absint( saman_seo_apply_filters( 'saman_seo_title_max_length', 60 ) );
 		if ( $max_length > 0 && function_exists( 'mb_strlen' ) && mb_strlen( $title ) > $max_length ) {
 			$title = mb_strimwidth( $title, 0, $max_length, '...' );
 		}
 
-		return apply_filters( 'SAMAN_SEO_title', $title, $post );
+		return saman_seo_apply_filters( 'saman_seo_title', $title, $post );
 	}
 
 	/**
@@ -242,10 +242,10 @@ class Frontend {
 
 		// Run Variable Replacer with safety gate so raw tokens never leak.
 		$description = render_template_safely( $description, $post );
-		$description = apply_filters( 'SAMAN_SEO_description', $description, $post );
+		$description = saman_seo_apply_filters( 'saman_seo_description', $description, $post );
 
 		$canonical = $this->get_canonical( $post, $meta );
-		$canonical = apply_filters( 'SAMAN_SEO_canonical', $canonical, $post );
+		$canonical = saman_seo_apply_filters( 'saman_seo_canonical', $canonical, $post );
 
 		$robots   = $this->get_robots( $meta );
 		$keywords = $homepage_keywords;
@@ -274,7 +274,7 @@ class Frontend {
 
 		// Run Replacer on Keywords too with safety gate.
 		$keywords = render_template_safely( $keywords, $post );
-		$keywords = apply_filters( 'SAMAN_SEO_keywords', $keywords, $post );
+		$keywords = saman_seo_apply_filters( 'saman_seo_keywords', $keywords, $post );
 
 		if ( ! empty( $description ) ) {
 			printf( "<meta name=\"description\" content=\"%s\" />\n", esc_attr( $description ) );
@@ -309,10 +309,10 @@ class Frontend {
 		$post          = $this->get_context_post();
 		$meta          = $this->get_meta( $post );
 		$canonical_url = $this->get_canonical( $post, $meta );
-		$canonical_url = apply_filters( 'SAMAN_SEO_canonical', $canonical_url, $post );
+		$canonical_url = saman_seo_apply_filters( 'saman_seo_canonical', $canonical_url, $post );
 
 		// OG URL should match canonical URL by default.
-		$url                    = apply_filters( 'SAMAN_SEO_og_url', $canonical_url, $post );
+		$url                    = saman_seo_apply_filters( 'saman_seo_og_url', $canonical_url, $post );
 		$post_type_descriptions = $this->get_post_type_option( 'SAMAN_SEO_post_type_meta_descriptions' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 		$social_defaults        = $this->get_social_defaults( $post );
@@ -340,7 +340,7 @@ class Frontend {
 
 			// Run Replacer with safety gate.
 			$raw_title = render_template_safely( $raw_title, $post );
-			$title     = apply_filters( 'SAMAN_SEO_og_title', $raw_title, $post );
+			$title     = saman_seo_apply_filters( 'saman_seo_og_title', $raw_title, $post );
 
 			$description = $meta['description'] ?? '';
 			if ( $is_home_view && empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
@@ -364,7 +364,7 @@ class Frontend {
 
 			// Run Replacer with safety gate.
 			$description = render_template_safely( $description, $post );
-			$description = apply_filters( 'SAMAN_SEO_og_description', $description, $post );
+			$description = saman_seo_apply_filters( 'saman_seo_og_description', $description, $post );
 
 			$twitter_title       = $title;
 			$twitter_description = $description;
@@ -394,14 +394,14 @@ class Frontend {
 			}
 
 			// Allow override via filter.
-			$og_type = apply_filters( 'SAMAN_SEO_og_type', $og_type, $post );
+			$og_type = saman_seo_apply_filters( 'saman_seo_og_type', $og_type, $post );
 		}
 
-		$twitter_title       = apply_filters( 'SAMAN_SEO_twitter_title', $twitter_title, $post );
-		$twitter_description = apply_filters( 'SAMAN_SEO_twitter_description', $twitter_description, $post );
+		$twitter_title       = saman_seo_apply_filters( 'saman_seo_twitter_title', $twitter_title, $post );
+		$twitter_description = saman_seo_apply_filters( 'saman_seo_twitter_description', $twitter_description, $post );
 
 		$image         = $this->get_social_image( $post, $meta, $social_defaults );
-		$twitter_image = apply_filters( 'SAMAN_SEO_twitter_image', $image, $post );
+		$twitter_image = saman_seo_apply_filters( 'saman_seo_twitter_image', $image, $post );
 
 		$tags = array(
 			'og:title'            => $title,
@@ -418,7 +418,7 @@ class Frontend {
 			'twitter:image:alt'   => $twitter_title,
 		);
 
-		$tags = apply_filters( 'SAMAN_SEO_social_tags', $tags, $post, $meta, $social_defaults );
+		$tags = saman_seo_apply_filters( 'saman_seo_social_tags', $tags, $post, $meta, $social_defaults );
 		$tags = $this->normalize_social_tags( $tags );
 		$tags = $this->dedupe_social_tags( $tags );
 
@@ -481,7 +481,7 @@ class Frontend {
 		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['title_template'] ) ) {
 			$title = render_template_safely( $archive_defaults[ $archive_type ]['title_template'], null );
 			if ( ! empty( $title ) ) {
-				return apply_filters( 'SAMAN_SEO_og_title', $title, null );
+				return saman_seo_apply_filters( 'saman_seo_og_title', $title, null );
 			}
 		}
 
@@ -503,7 +503,7 @@ class Frontend {
 			$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		}
 
-		return apply_filters( 'SAMAN_SEO_og_title', $title, null );
+		return saman_seo_apply_filters( 'saman_seo_og_title', $title, null );
 	}
 
 	/**
@@ -526,7 +526,7 @@ class Frontend {
 		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['description_template'] ) ) {
 			$description = render_template_safely( $archive_defaults[ $archive_type ]['description_template'], null );
 			if ( ! empty( $description ) ) {
-				return apply_filters( 'SAMAN_SEO_og_description', $description, null );
+				return saman_seo_apply_filters( 'saman_seo_og_description', $description, null );
 			}
 		}
 
@@ -535,7 +535,7 @@ class Frontend {
 			if ( $term instanceof \WP_Term ) {
 				$term_desc = term_description( $term->term_id );
 				if ( ! empty( $term_desc ) ) {
-					return apply_filters( 'SAMAN_SEO_og_description', wp_strip_all_tags( $term_desc ), null );
+					return saman_seo_apply_filters( 'saman_seo_og_description', wp_strip_all_tags( $term_desc ), null );
 				}
 			}
 		}
@@ -545,7 +545,7 @@ class Frontend {
 			$description = get_bloginfo( 'description' );
 		}
 
-		return apply_filters( 'SAMAN_SEO_og_description', $description, null );
+		return saman_seo_apply_filters( 'saman_seo_og_description', $description, null );
 	}
 
 	/**
@@ -556,7 +556,7 @@ class Frontend {
 	public function render_json_ld() {
 		$post = get_post();
 
-		$payload = apply_filters( 'SAMAN_SEO_jsonld', array(), $post );
+		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post );
 
 		if ( empty( $payload ) ) {
 			return;
@@ -760,8 +760,7 @@ class Frontend {
 		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
 
 		// Add default advanced directives (can be filtered or disabled via global option).
-		$advanced = apply_filters(
-			'SAMAN_SEO_robots_advanced',
+		$advanced = saman_seo_apply_filters( 'saman_seo_robots_advanced',
 			array(
 				'max-snippet:-1',
 				'max-image-preview:large',
@@ -778,7 +777,7 @@ class Frontend {
 		}
 
 		// Filter the array of directives (e.g. ['noindex', 'nofollow']).
-		$directives = apply_filters( 'SAMAN_SEO_robots_array', $directives );
+		$directives = saman_seo_apply_filters( 'saman_seo_robots_array', $directives );
 
 		if ( ! is_array( $directives ) ) {
 			$directives = array();
@@ -797,7 +796,7 @@ class Frontend {
 		$robots_string = implode( ', ', $directives );
 
 		// Filter the final string (e.g. 'noindex, nofollow').
-		$robots_string = apply_filters( 'SAMAN_SEO_robots', $robots_string );
+		$robots_string = saman_seo_apply_filters( 'saman_seo_robots', $robots_string );
 
 		// Sanitize the final directive list: remove duplicates and conflicting pairs.
 		$final_directives = array_filter( array_unique( array_map( 'trim', explode( ',', $robots_string ) ) ) );
@@ -874,7 +873,7 @@ class Frontend {
 		 * @param array   $meta            The custom SEO meta for this post.
 		 * @param array   $social_defaults Social default settings.
 		 */
-		return apply_filters( 'SAMAN_SEO_og_image', $image, $post, $meta, $social_defaults );
+		return saman_seo_apply_filters( 'saman_seo_og_image', $image, $post, $meta, $social_defaults );
 	}
 
 	/**
@@ -955,7 +954,7 @@ class Frontend {
 		}
 
 		if ( $apply_filter ) {
-			return apply_filters( 'SAMAN_SEO_title', $title, $post );
+			return saman_seo_apply_filters( 'saman_seo_title', $title, $post );
 		}
 
 		return $title;
@@ -1040,7 +1039,7 @@ class Frontend {
 			'twitter:image',
 		);
 
-		$multi = apply_filters( 'SAMAN_SEO_social_multi_tags', $multi );
+		$multi = saman_seo_apply_filters( 'saman_seo_social_multi_tags', $multi );
 		$multi = array_map( 'strtolower', array_filter( array_map( 'strval', (array) $multi ) ) );
 
 		$deduped      = array();

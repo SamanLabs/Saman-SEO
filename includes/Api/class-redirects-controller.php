@@ -1058,7 +1058,7 @@ class Redirects_Controller extends REST_Controller {
         $skipped  = 0;
         $errors   = [];
 
-        $max_rows = apply_filters( 'saman_seo_redirect_import_max_rows', 1000 );
+        $max_rows = saman_seo_apply_filters( 'saman_seo_redirect_import_max_rows', 1000 );
 
         if ( 'csv' === $format ) {
             $lines = explode( "\n", $data );

@@ -91,7 +91,7 @@ class Theme_Config {
 		 *
 		 * @param string[] $candidates Absolute file paths, in priority order.
 		 */
-		$candidates = (array) apply_filters( 'saman_seo_config_path', $candidates );
+		$candidates = (array) saman_seo_apply_filters( 'saman_seo_config_path', $candidates );
 
 		foreach ( $candidates as $path ) {
 			$path = (string) $path;

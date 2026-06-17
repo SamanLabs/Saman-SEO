@@ -33,7 +33,7 @@ class Social_Card_Generator {
 		}
 
 		// Allow further filtering.
-		if ( ! apply_filters( 'SAMAN_SEO_feature_toggle', true, 'social_card_generator' ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'social_card_generator' ) ) {
 			return;
 		}
 

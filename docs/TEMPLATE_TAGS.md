@@ -164,10 +164,10 @@ Add custom CSS to your theme:
 
 ### Filtering Breadcrumbs
 
-Customize breadcrumb output using the `samanseo_breadcrumb_links` filter:
+Customize breadcrumb output using the `saman_seo_breadcrumb_links` filter:
 
 ```php
-add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'saman_seo_breadcrumb_links', function( $crumbs, $post ) {
     // Add custom breadcrumb for products
     if ( get_post_type( $post ) === 'product' ) {
         array_splice( $crumbs, 1, 0, [
@@ -687,7 +687,7 @@ use function SamanSEO\Helpers\generate_title_from_template;
 use function SamanSEO\Helpers\replace_template_variables;
 
 // Custom title for product archive
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( is_post_type_archive( 'product' ) ) {
         return 'Shop Our Products | ' . get_bloginfo( 'name' );
     }
@@ -696,7 +696,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add pricing to product titles
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( $post && get_post_type( $post ) === 'product' ) {
         $price = get_post_meta( $post->ID, '_price', true );
 
