@@ -13,7 +13,7 @@
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     gap: @spacing-lg;
     padding-bottom: @spacing-lg;
-    border-bottom: 1px solid rgba(214, 217, 224, 0.6);
+    border-bottom: 1px solid @color-border;
 
     &.compact {
         grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
@@ -41,7 +41,7 @@
         padding: 2px 5px;
         font-size: @font-size-xs;
         background: @color-primary-lighter;
-        border-radius: 4px;
+        border-radius: @radius-sm;
     }
 }
 
@@ -95,6 +95,14 @@
     color: @color-danger;
     font-size: @font-size-sm;
     margin: @spacing-sm 0 0;
+}
+
+.input--narrow {
+    width: 80px !important;
+}
+
+.input--medium {
+    width: 220px !important;
 }
 
 // Radio Group

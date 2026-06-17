@@ -235,7 +235,7 @@ class Theme_Config {
 
 		// Loose equality is intentional: '1' === 1 should count as a match,
 		// and false === '' should not (so we explicitly handled '' above).
-		return $stored == $plugin_default; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+		return $stored == $plugin_default; // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 	}
 
 	/**

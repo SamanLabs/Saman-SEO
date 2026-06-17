@@ -2,13 +2,13 @@
 // Template Input V2 - Syntax Highlighted Variable Input
 // ==========================================================================
 
-// Variable colors by type
-@var-global: #2271b1;       // Blue - site/global vars
-@var-separator: #8b5cf6;    // Purple - separator
-@var-post: #7c3aed;         // Violet - post vars
-@var-taxonomy: #059669;     // Green - taxonomy vars
-@var-author: #ea580c;       // Orange - author vars
-@var-archive: #0891b2;      // Teal - archive vars
+// Variable colors by type (consistent WordPress palette)
+@var-global: @color-primary;   // Blue - site/global vars
+@var-separator: @color-muted;  // Gray - separator
+@var-post: @color-primary;     // Blue - post vars
+@var-taxonomy: @color-success; // Green - taxonomy vars
+@var-author: @color-warning;   // Yellow - author vars
+@var-archive: @color-primary;  // Blue - archive vars
 
 .template-input-v2 {
     .flex-column();

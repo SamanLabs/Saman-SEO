@@ -98,11 +98,10 @@ The score is filterable for third-party customization:
 /**
  * Filter the SEO score calculation.
  *
- * @param array $score_data The score data including score, passed, failed checks.
- * @param int   $post_id    The post ID.
- * @param array $meta       The post SEO meta.
+ * @param array   $result The score data including score, passed, failed checks.
+ * @param WP_Post $post   The current post object.
  */
-$score_data = apply_filters( 'saman_seo_seo_score', $score_data, $post_id, $meta );
+$result = saman_seo_apply_filters( 'saman_seo_seo_score', $result, $post );
 ```
 
 ## Example Usage

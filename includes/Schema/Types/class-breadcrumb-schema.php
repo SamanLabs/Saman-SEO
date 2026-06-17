@@ -42,7 +42,19 @@ class Breadcrumb_Schema extends Abstract_Schema {
 	 * @return bool True if we have a post.
 	 */
 	public function is_needed(): bool {
-		return $this->context->post instanceof \WP_Post;
+		if ( ! $this->context->post instanceof \WP_Post ) {
+			return false;
+		}
+
+		$plugin  = \Saman\SEO\Plugin::instance();
+		$service = $plugin->get( 'breadcrumbs' );
+
+		if ( ! $service ) {
+			return true; // Keep previous behavior if service is unavailable.
+		}
+
+		$settings = $service->get_settings();
+		return ! empty( $settings['enabled'] );
 	}
 
 	/**

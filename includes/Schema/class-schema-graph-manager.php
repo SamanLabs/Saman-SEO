@@ -120,11 +120,11 @@ class Schema_Graph_Manager {
 		$graph = saman_seo_apply_filters( 'saman_seo_schema_graph', $graph, $context );
 
 		/**
-		 * Legacy filter for backward compatibility.
+		 * Filter the complete JSON-LD @graph array.
 		 *
-		 * CRITICAL: Maintain this filter for existing code that hooks into
-		 * the old JSON-LD service. Pass the post object as second parameter
-		 * to match original signature.
+		 * Emitted as the canonical `saman_seo_jsonld_graph` hook. Legacy
+		 * `SAMAN_SEO_jsonld_graph` and `samanseo_jsonld_graph` aliases are
+		 * handled automatically by saman_seo_apply_filters().
 		 *
 		 * @param array         $graph All schema pieces.
 		 * @param \WP_Post|null $post  The current post or null.

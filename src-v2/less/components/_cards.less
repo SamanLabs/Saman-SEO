@@ -6,7 +6,7 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: @spacing-xl;
+    gap: @spacing-lg;
 }
 
 .card {
@@ -23,12 +23,14 @@
     h3 {
         margin: 0;
         font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
     }
 }
 
 .card-note {
     margin: 0;
     color: @color-muted;
+    font-size: @font-size-sm;
 }
 
 // Pilot Card (Feature Cards)
@@ -41,25 +43,30 @@
 
 .pilot-card {
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    padding: 22px;
-    min-height: 240px;
+    border-radius: @radius-md;
+    padding: @spacing-lg;
+    min-height: 220px;
     width: 100%;
     background: @color-surface;
     .flex-column();
     gap: @spacing-md;
-    .shadow-card();
+    box-shadow: @shadow-sm;
     overflow: hidden;
     transition: border-color @transition-fast, box-shadow @transition-fast;
 
+    &:hover {
+        border-color: @color-primary;
+        box-shadow: @shadow-md;
+    }
+
     &.active {
-        border-color: rgba(34, 113, 177, 0.45);
-        box-shadow: 0 18px 32px rgba(34, 113, 177, 0.12);
+        border-color: @color-primary;
+        box-shadow: 0 0 0 1px @color-primary;
     }
 
     &.has-update {
-        border-color: rgba(219, 166, 23, 0.5);
-        background: linear-gradient(135deg, rgba(219, 166, 23, 0.05) 0%, @color-surface 100%);
+        border-color: @color-warning;
+        background: @color-warning-bg;
     }
 }
 
@@ -70,6 +77,8 @@
 
     h3 {
         margin: 0 0 4px;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
     }
 
     .toggle {
@@ -86,9 +95,9 @@
 }
 
 .pilot-card-mark {
-    width: 44px;
-    height: 44px;
-    border-radius: @radius-lg;
+    width: 40px;
+    height: 40px;
+    border-radius: @radius-md;
     .flex-center();
     color: #fff;
     flex-shrink: 0;
@@ -102,12 +111,12 @@
     }
 
     &.ai {
-        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        background: @color-primary;
     }
 
     svg {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         fill: currentColor;
         display: block;
     }
@@ -129,6 +138,8 @@
 .pilot-card-desc {
     margin: 0;
     color: @color-muted;
+    font-size: @font-size-sm;
+    line-height: @line-height-normal;
 }
 
 .pilot-card-meta {
@@ -143,7 +154,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: @color-muted;
+    color: @color-primary;
     text-decoration: none;
     font-size: @font-size-sm;
     font-weight: @font-weight-medium;
@@ -151,7 +162,8 @@
     margin-left: auto;
 
     &:hover {
-        color: @color-text;
+        color: @color-primary-hover;
+        text-decoration: underline;
     }
 
     svg {
@@ -225,6 +237,7 @@
     h3 {
         margin: 0;
         font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
     }
 }
 
@@ -237,18 +250,19 @@
 .side-card {
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
+    border-radius: @radius-md;
     padding: @spacing-lg;
     .flex-column();
     gap: @spacing-md;
 
     h3 {
         margin: 0;
-        font-size: 15px;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
     }
 
     &.highlight {
-        background: linear-gradient(135deg, @color-primary-lighter, rgba(46, 125, 50, 0.08));
+        background: @color-primary-lighter;
     }
 }
 
@@ -256,21 +270,21 @@
 .badge {
     display: inline-flex;
     align-items: center;
-    padding: 3px 8px;
+    padding: 2px 8px;
     border-radius: @radius-full;
     font-size: @font-size-xs;
     font-weight: @font-weight-semibold;
-    background: rgba(95, 107, 122, 0.14);
+    background: rgba(100, 105, 112, 0.12);
     color: @color-muted;
 
     &.success {
-        background: rgba(47, 143, 91, 0.16);
+        background: @color-success-bg;
         color: @color-success;
     }
 
     &.warning {
-        background: rgba(219, 166, 23, 0.16);
-        color: @color-warning;
+        background: @color-warning-bg;
+        color: darken(@color-warning, 10%);
     }
 
     &.redirect-exists {
@@ -286,25 +300,25 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: @radius-full;
-    font-size: @font-size-sm;
+    font-size: @font-size-xs;
     font-weight: @font-weight-semibold;
-    background: rgba(95, 107, 122, 0.12);
+    background: rgba(100, 105, 112, 0.1);
     color: @color-muted;
 
     &.success {
-        background: rgba(47, 143, 91, 0.14);
+        background: @color-success-bg;
         color: @color-success;
     }
 
     &.warning {
-        background: rgba(192, 124, 26, 0.16);
-        color: @color-warning;
+        background: @color-warning-bg;
+        color: darken(@color-warning, 10%);
     }
 
     &.danger {
-        background: rgba(192, 57, 43, 0.16);
+        background: @color-danger-bg;
         color: @color-danger;
     }
 }

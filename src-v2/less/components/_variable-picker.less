@@ -2,12 +2,12 @@
 // Variable Picker - Template Variable Selection Component
 // ==========================================================================
 
-// Tag colors
-@tag-global: #2271b1;
-@tag-post: #7c3aed;
-@tag-taxonomy: #059669;
-@tag-author: #ea580c;
-@tag-archive: #0891b2;
+// Tag colors (consistent WordPress palette)
+@tag-global: @color-primary;
+@tag-post: @color-primary;
+@tag-taxonomy: @color-success;
+@tag-author: @color-warning;
+@tag-archive: @color-primary;
 
 // Base container
 .variable-picker {
@@ -58,7 +58,7 @@
     background: @color-surface;
     border: 1px solid @color-border;
     border-radius: @radius-lg;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: @shadow-xl;
     z-index: 9999; // Very high to be above everything
     display: flex;
     flex-direction: column;

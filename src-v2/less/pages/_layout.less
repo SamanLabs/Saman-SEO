@@ -4,12 +4,12 @@
 
 // Content Area
 .content-area {
-    margin-top: @spacing-xl;
-    padding: @spacing-2xl;
+    margin-top: @spacing-lg;
+    padding: @spacing-xl;
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-xl;
-    box-shadow: @shadow-md;
+    border-radius: 0;
+    box-shadow: @shadow-sm;
 }
 
 // Page Container
@@ -26,11 +26,14 @@
     h1 {
         margin: 0 0 6px;
         font-size: @font-size-2xl;
+        text-wrap: balance;
+        font-weight: @font-weight-semibold;
     }
 
     p {
         margin: 0;
         color: @color-muted;
+        text-wrap: balance;
     }
 }
 
