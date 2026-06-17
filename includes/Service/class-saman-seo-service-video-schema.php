@@ -220,7 +220,7 @@ class Video_Schema {
 
 		$url = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json';
 
-		$response = wp_remote_get( $url, [ 'timeout' => 5 ] );
+		$response = wp_remote_get( $url, [ 'timeout' => 2 ] );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return null;
@@ -251,7 +251,7 @@ class Video_Schema {
 
 		$url = 'https://vimeo.com/api/oembed.json?url=https://vimeo.com/' . $video_id;
 
-		$response = wp_remote_get( $url, [ 'timeout' => 5 ] );
+		$response = wp_remote_get( $url, [ 'timeout' => 2 ] );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return null;
