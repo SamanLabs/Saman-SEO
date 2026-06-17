@@ -71,7 +71,7 @@ class Redirect_Manager {
 			return;
 		}
 
-		if ( ! apply_filters( 'SAMAN_SEO_feature_toggle', true, 'redirects' ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'redirects' ) ) {
 			return;
 		}
 

@@ -33,6 +33,10 @@ They must never render pages or register menu items.
 
 Use `\Saman\SEO\Helpers\module_enabled( 'key' )` to check whether a feature is enabled.
 
+## Filter & Action Hooks
+
+Canonical hook names use the `saman_seo_*` prefix (e.g., `saman_seo_title`). When emitting a plugin hook, use `saman_seo_apply_filters()` or `saman_seo_do_action()` from `includes/helpers.php`; these helpers keep the legacy `SAMAN_SEO_*` and documented `samanseo_*` variants working as aliases.
+
 ## Build
 
 React app lives in `src-v2/` and builds to `build/v2/` via `@wordpress/scripts`.

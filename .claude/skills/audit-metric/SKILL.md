@@ -102,7 +102,7 @@ The score is filterable for third-party customization:
  * @param int   $post_id    The post ID.
  * @param array $meta       The post SEO meta.
  */
-$score_data = apply_filters( 'samanseo_seo_score', $score_data, $post_id, $meta );
+$score_data = apply_filters( 'saman_seo_seo_score', $score_data, $post_id, $meta );
 ```
 
 ## Example Usage

@@ -61,7 +61,7 @@ class Plugin {
 	 * @return void
 	 */
 	public function boot() {
-		if ( did_action( 'SAMAN_SEO_booted' ) ) {
+		if ( did_action( 'saman_seo_booted' ) ) {
 			return;
 		}
 
@@ -167,7 +167,7 @@ class Plugin {
 		 *     ]);
 		 * });
 		 */
-		do_action( 'saman_seo_register_schema_type', $registry );
+		saman_seo_do_action( 'saman_seo_register_schema_type', $registry );
 
 		$this->register( 'compatibility', new Service\Compatibility() );
 		$this->register( 'settings', new Service\Settings() );
@@ -213,7 +213,7 @@ class Plugin {
 
 		// Note: AI Pilot integration is handled in saman-seo.php via AI_Pilot::init()
 
-		do_action( 'SAMAN_SEO_booted', $this );
+		saman_seo_do_action( 'saman_seo_booted', $this );
 	}
 
 	/**

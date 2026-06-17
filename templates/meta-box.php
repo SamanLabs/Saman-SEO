@@ -123,7 +123,7 @@ $SAMAN_SEO_score_summary = isset( $SAMAN_SEO_score['summary'] ) ? $SAMAN_SEO_sco
 	</div>
 </div>
 
-<?php $SAMAN_SEO_suggestions = apply_filters( 'SAMAN_SEO_link_suggestions', array(), $post->ID ); ?>
+<?php $SAMAN_SEO_suggestions = saman_seo_apply_filters( 'saman_seo_link_suggestions', array(), $post->ID ); ?>
 <?php if ( $SAMAN_SEO_suggestions ) : ?>
 	<div class="saman-seo-links">
 		<h4><?php esc_html_e( 'Internal link suggestions', 'saman-seo' ); ?></h4>

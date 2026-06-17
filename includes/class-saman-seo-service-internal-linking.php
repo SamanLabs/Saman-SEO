@@ -582,7 +582,7 @@ class Internal_Linking {
 	 * @return void
 	 */
 	public function ensure_role_capabilities() {
-		$roles = apply_filters( 'SAMAN_SEO_internal_link_roles', array( 'administrator' ) );
+		$roles = saman_seo_apply_filters( 'saman_seo_internal_link_roles', array( 'administrator' ) );
 		$roles = array_unique( array_filter( (array) $roles ) );
 
 		foreach ( $roles as $role_name ) {

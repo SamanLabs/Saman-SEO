@@ -49,14 +49,14 @@ class {Type}_Schema {
      *
      * @var string
      */
-    const META_KEY = '_SAMAN_SEO_{type}_schema';
+    const META_KEY = '_saman_seo_{type}_schema';
 
     /**
      * Boot the service.
      */
     public function boot() {
         // Add schema to JSON-LD output
-        add_filter( 'SAMAN_SEO_jsonld_data', array( $this, 'add_schema' ), 10, 2 );
+        add_filter( 'saman_seo_jsonld_data', array( $this, 'add_schema' ), 10, 2 );
 
         // Register meta box for editor
         add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
@@ -111,7 +111,7 @@ class {Type}_Schema {
          * @param int   $post_id The post ID.
          * @param array $data    The raw meta data.
          */
-        $schema = apply_filters( 'SAMAN_SEO_{type}_schema', $schema, $post_id, $data );
+        $schema = apply_filters( 'saman_seo_{type}_schema', $schema, $post_id, $data );
 
         $schemas[] = $schema;
 
@@ -123,7 +123,7 @@ class {Type}_Schema {
      */
     public function register_meta_box() {
         $post_types = apply_filters(
-            'SAMAN_SEO_{type}_schema_post_types',
+            'saman_seo_{type}_schema_post_types',
             array( 'post', 'page' )
         );
 

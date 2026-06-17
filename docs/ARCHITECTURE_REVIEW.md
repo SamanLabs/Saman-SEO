@@ -164,9 +164,9 @@ private function register( $key, $service ) {
 50+ filters and 2 action hooks provide extensive customization.
 
 **Examples:**
-- `samanseo_title` - Modify page titles
-- `samanseo_sitemap_entry` - Customize sitemap entries
-- `samanseo_jsonld` - Alter structured data
+- `saman_seo_title` - Modify page titles
+- `saman_seo_sitemap_entry` - Customize sitemap entries
+- `saman_seo_jsonld` - Alter structured data
 
 **Impact:** Developers can extend without modifying core code.
 
@@ -208,7 +208,7 @@ Services can be enabled/disabled via filters.
 
 **Example:**
 ```php
-apply_filters( 'samanseo_feature_toggle', true, 'redirects' );
+apply_filters( 'saman_seo_feature_toggle', true, 'redirects' );
 ```
 
 **Impact:** Easy A/B testing, gradual rollouts.
@@ -716,7 +716,7 @@ class Test_Redirect_Repository extends \WP_UnitTestCase {
 
 **Current:**
 ```php
-do_action( 'samanseo_sitemap_regenerated' );
+do_action( 'saman_seo_sitemap_regenerated' );
 ```
 
 **Benefit of Event System:**

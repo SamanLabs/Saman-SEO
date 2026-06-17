@@ -222,29 +222,29 @@ if ( function_exists( 'samanseo_breadcrumbs' ) ) {
 
 ### Action Hooks
 
-#### `samanseo_before_head_output`
+#### `saman_seo_before_head_output`
 
 Fires before Saman SEO outputs any `<head>` tags.
 
 ```php
-add_action( 'samanseo_before_head_output', function() {
+add_action( 'saman_seo_before_head_output', function() {
     // Add custom meta tags
     echo '<meta name="custom-tag" content="value">';
 });
 ```
 
-#### `samanseo_after_head_output`
+#### `saman_seo_after_head_output`
 
 Fires after Saman SEO outputs all `<head>` tags.
 
 ```php
-add_action( 'samanseo_after_head_output', function() {
+add_action( 'saman_seo_after_head_output', function() {
     // Add verification codes
     echo '<meta name="google-site-verification" content="your-code">';
 });
 ```
 
-#### `samanseo_sitemap_generated`
+#### `saman_seo_sitemap_generated`
 
 Fires after a sitemap is generated.
 
@@ -252,7 +252,7 @@ Fires after a sitemap is generated.
 - `$sitemap_type` (string) - Type of sitemap ('post', 'page', 'category', etc.)
 
 ```php
-add_action( 'samanseo_sitemap_generated', function( $sitemap_type ) {
+add_action( 'saman_seo_sitemap_generated', function( $sitemap_type ) {
     // Log sitemap generation
     error_log( "Sitemap generated: {$sitemap_type}" );
     
@@ -268,12 +268,12 @@ add_action( 'samanseo_sitemap_generated', function( $sitemap_type ) {
 See the **[Filter Reference](FILTERS.md)** for comprehensive filter documentation.
 
 **Most Common Filters:**
-- `samanseo_title` - Modify SEO title
-- `samanseo_description` - Modify meta description
-- `samanseo_canonical` - Modify canonical URL
-- `samanseo_og_image` - Modify Open Graph image
-- `samanseo_jsonld` - Modify structured data
-- `samanseo_sitemap_entry` - Modify sitemap entries
+- `saman_seo_title` - Modify SEO title
+- `saman_seo_description` - Modify meta description
+- `saman_seo_canonical` - Modify canonical URL
+- `saman_seo_og_image` - Modify Open Graph image
+- `saman_seo_jsonld` - Modify structured data
+- `saman_seo_sitemap_entry` - Modify sitemap entries
 
 ---
 
@@ -362,7 +362,7 @@ Add product-specific SEO enhancements:
 
 ```php
 // Add price to product titles in search results
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( is_singular( 'product' ) && function_exists( 'wc_get_product' ) ) {
         $product = wc_get_product( $post->ID );
         if ( $product ) {
@@ -374,7 +374,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add product schema to structured data
-add_filter( 'samanseo_jsonld', function( $graph ) {
+add_filter( 'saman_seo_jsonld', function( $graph ) {
     if ( is_singular( 'product' ) && function_exists( 'wc_get_product' ) ) {
         $product = wc_get_product( get_queried_object_id() );
         
@@ -416,7 +416,7 @@ register_post_type( 'portfolio', [
 ]);
 
 // Set default SEO template for portfolio items
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( is_singular( 'portfolio' ) ) {
         $client = get_post_meta( $post->ID, 'client_name', true );
         if ( $client ) {
@@ -427,7 +427,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Add portfolio items to sitemap with high priority
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     if ( 'portfolio' === $post_type ) {
         $entry['priority'] = 0.9;
         $entry['changefreq'] = 'monthly';
@@ -440,7 +440,7 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
 
 ```php
 // Add language-specific title suffix
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( function_exists( 'pll_current_language' ) ) {
         $lang = pll_current_language();
         $suffixes = [
@@ -457,7 +457,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Set canonical to default language version
-add_filter( 'samanseo_canonical', function( $url ) {
+add_filter( 'saman_seo_canonical', function( $url ) {
     if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post' ) ) {
         $lang = pll_current_language();
         if ( $lang !== pll_default_language() ) {
@@ -472,7 +472,7 @@ add_filter( 'samanseo_canonical', function( $url ) {
 });
 
 // Add hreflang tags
-add_action( 'samanseo_after_head_output', function() {
+add_action( 'saman_seo_after_head_output', function() {
     if ( function_exists( 'pll_the_languages' ) && is_singular() ) {
         $post = get_queried_object();
         $translations = pll_the_languages([
@@ -516,21 +516,21 @@ return $cached;
 ```php
 // Only add filters when needed
 if ( is_singular( 'product' ) ) {
-    add_filter( 'samanseo_title', 'my_product_title_filter', 10, 2 );
-    add_filter( 'samanseo_jsonld', 'my_product_schema_filter' );
+    add_filter( 'saman_seo_title', 'my_product_title_filter', 10, 2 );
+    add_filter( 'saman_seo_jsonld', 'my_product_schema_filter' );
 }
 ```
 
 **3. Database Query Optimization**
 ```php
 // Bad: N+1 query problem
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id ) {
     $custom_data = get_post_meta( $post_id, 'custom_field', true ); // Runs for EVERY post
     // ...
 }, 10, 2 );
 
 // Good: Batch query
-add_action( 'samanseo_sitemap_before_generate', function( $post_ids ) {
+add_action( 'saman_seo_sitemap_before_generate', function( $post_ids ) {
     global $custom_data_cache;
     $custom_data_cache = [];
     
@@ -539,7 +539,7 @@ add_action( 'samanseo_sitemap_before_generate', function( $post_ids ) {
     }
 });
 
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id ) {
     global $custom_data_cache;
     $custom_data = $custom_data_cache[ $post_id ] ?? '';
     // ...
@@ -550,7 +550,7 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id ) {
 
 **1. Sanitize Output**
 ```php
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     $custom_title = get_post_meta( $post->ID, 'custom_title', true );
     
     // Always sanitize user input
@@ -560,7 +560,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 
 **2. Validate URLs**
 ```php
-add_filter( 'samanseo_canonical', function( $url ) {
+add_filter( 'saman_seo_canonical', function( $url ) {
     $custom_canonical = get_option( 'custom_canonical' );
     
     // Validate URL before using
@@ -611,8 +611,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class My_SEO_Customizations {
     
     public function __construct() {
-        add_filter( 'samanseo_title', [ $this, 'custom_title' ], 10, 2 );
-        add_filter( 'samanseo_jsonld', [ $this, 'custom_schema' ] );
+        add_filter( 'saman_seo_title', [ $this, 'custom_title' ], 10, 2 );
+        add_filter( 'saman_seo_jsonld', [ $this, 'custom_schema' ] );
     }
     
     public function custom_title( $title, $post ) {
@@ -645,7 +645,7 @@ define( 'WP_DEBUG_DISPLAY', false );
 ### Log Filter Output
 
 ```php
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     error_log( sprintf(
         'SEO Title for post %d: %s',
         $post ? $post->ID : 0,
@@ -691,11 +691,11 @@ class Test_SamanSEO_Filters extends WP_UnitTestCase {
             'post_title' => 'Test Post',
         ]);
         
-        add_filter( 'samanseo_title', function( $title ) {
+        add_filter( 'saman_seo_title', function( $title ) {
             return $title . ' | Custom Suffix';
         });
         
-        $title = apply_filters( 'samanseo_title', get_the_title( $post_id ), get_post( $post_id ) );
+        $title = apply_filters( 'saman_seo_title', get_the_title( $post_id ), get_post( $post_id ) );
         
         $this->assertEquals( 'Test Post | Custom Suffix', $title );
     }

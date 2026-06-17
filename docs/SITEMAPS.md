@@ -320,10 +320,10 @@ update_option( 'samanseo_sitemap_additional_pages', json_encode( $custom_pages )
 
 ### Filter Individual Sitemap Entries
 
-**Filter:** `samanseo_sitemap_entry`
+**Filter:** `saman_seo_sitemap_entry`
 
 ```php
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // Set high priority for featured posts
     if ( get_post_meta( $post_id, '_is_featured', true ) ) {
         $entry['priority'] = 1.0;
@@ -358,10 +358,10 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
 
 ### Filter Sitemap Images
 
-**Filter:** `samanseo_sitemap_images`
+**Filter:** `saman_seo_sitemap_images`
 
 ```php
-add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
+add_filter( 'saman_seo_sitemap_images', function( $images, $post_id ) {
     // Add product gallery images
     $gallery = get_post_meta( $post_id, '_product_gallery', true );
 
@@ -379,10 +379,10 @@ add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
 
 ### Filter Post Query Arguments
 
-**Filter:** `samanseo_sitemap_post_query_args`
+**Filter:** `saman_seo_sitemap_post_query_args`
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     // Only include in-stock products
     if ( $post_type === 'product' ) {
         $args['meta_query'] = [
@@ -404,10 +404,10 @@ add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
 
 ### Filter Sitemap Index Items
 
-**Filter:** `samanseo_sitemap_index_items`
+**Filter:** `saman_seo_sitemap_index_items`
 
 ```php
-add_filter( 'samanseo_sitemap_index_items', function( $items ) {
+add_filter( 'saman_seo_sitemap_index_items', function( $items ) {
     // Add external sitemap to index
     $items[] = [
         'loc' => 'https://example.com/external-sitemap.xml',
@@ -422,10 +422,10 @@ add_filter( 'samanseo_sitemap_index_items', function( $items ) {
 
 ### Modify Last Modified Timestamp
 
-**Filter:** `samanseo_sitemap_lastmod`
+**Filter:** `saman_seo_sitemap_lastmod`
 
 ```php
-add_filter( 'samanseo_sitemap_lastmod', function( $lastmod, $group, $page ) {
+add_filter( 'saman_seo_sitemap_lastmod', function( $lastmod, $group, $page ) {
     // Force current timestamp for posts
     if ( $group === 'post' ) {
         return gmdate( 'c' );
@@ -439,21 +439,21 @@ add_filter( 'samanseo_sitemap_lastmod', function( $lastmod, $group, $page ) {
 
 ### Disable Core WordPress Sitemaps
 
-**Filter:** `samanseo_disable_core_sitemaps`
+**Filter:** `saman_seo_disable_core_sitemaps`
 
 ```php
 // Keep core sitemaps enabled alongside Saman SEO
-add_filter( 'samanseo_disable_core_sitemaps', '__return_false' );
+add_filter( 'saman_seo_disable_core_sitemaps', '__return_false' );
 ```
 
 ---
 
 ### Custom Sitemap Stylesheet
 
-**Filter:** `samanseo_sitemap_stylesheet`
+**Filter:** `saman_seo_sitemap_stylesheet`
 
 ```php
-add_filter( 'samanseo_sitemap_stylesheet', function( $url ) {
+add_filter( 'saman_seo_sitemap_stylesheet', function( $url ) {
     return get_stylesheet_directory_uri() . '/sitemap.xsl';
 });
 ```
@@ -499,7 +499,7 @@ update_option( 'samanseo_sitemap_exclude_images', '1' );
 ### 5. Cache Sitemap Queries
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     $args['cache_results'] = true;
     $args['update_post_meta_cache'] = false;
     $args['update_post_term_cache'] = false;
@@ -532,7 +532,7 @@ Navigate to **Saman SEO → Sitemaps** and click **Regenerate Sitemap**.
 
 ```php
 // Trigger manual regeneration
-do_action( 'samanseo_sitemap_regenerated' );
+do_action( 'saman_seo_sitemap_regenerated' );
 ```
 
 ---
@@ -574,7 +574,7 @@ wp eval 'do_action( "samanseo_sitemap_regenerated" );'
 Automatically ping search engines when sitemap updates:
 
 ```php
-add_action( 'samanseo_sitemap_regenerated', function() {
+add_action( 'saman_seo_sitemap_regenerated', function() {
     $sitemap_url = home_url( '/wp-sitemap.xml' );
 
     // Ping Google
@@ -619,7 +619,7 @@ wp rewrite flush
 **Debug:**
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     error_log( 'Sitemap Query Args: ' . print_r( $args, true ) );
     return $args;
 }, 10, 2 );
@@ -658,7 +658,7 @@ add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
 **Add custom images:**
 
 ```php
-add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
+add_filter( 'saman_seo_sitemap_images', function( $images, $post_id ) {
     // Add first gallery image
     $gallery = get_post_gallery_images( $post_id );
     if ( ! empty( $gallery ) ) {

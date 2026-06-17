@@ -130,6 +130,6 @@ abstract class Abstract_Schema {
 		 * @param array          $data    The schema data array.
 		 * @param Schema_Context $context The current schema context.
 		 */
-		return apply_filters( "saman_seo_schema_{$slug}_fields", $data, $this->context );
+		return saman_seo_apply_filters( "saman_seo_schema_{$slug}_fields", $data, $this->context );
 	}
 }

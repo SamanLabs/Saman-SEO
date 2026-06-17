@@ -55,7 +55,7 @@ All services are registered and initialized in `Plugin::init()` (line 60).
 
 ## Action Hooks
 
-### `samanseo_booted`
+### `saman_seo_booted`
 
 Fires when the plugin has fully initialized all services.
 
@@ -65,7 +65,7 @@ Fires when the plugin has fully initialized all services.
 **Usage:**
 
 ```php
-add_action( 'samanseo_booted', function( $plugin ) {
+add_action( 'saman_seo_booted', function( $plugin ) {
     // Plugin is fully loaded, all services available
     error_log( 'Saman SEO initialized!' );
 }, 10, 1 );
@@ -75,7 +75,7 @@ add_action( 'samanseo_booted', function( $plugin ) {
 
 ---
 
-### `samanseo_sitemap_regenerated`
+### `saman_seo_sitemap_regenerated`
 
 Fires after the sitemap has been regenerated (manual or scheduled).
 
@@ -84,7 +84,7 @@ Fires after the sitemap has been regenerated (manual or scheduled).
 **Usage:**
 
 ```php
-add_action( 'samanseo_sitemap_regenerated', function() {
+add_action( 'saman_seo_sitemap_regenerated', function() {
     // Notify external service that sitemap updated
     wp_remote_post( 'https://api.example.com/sitemap-update', [
         'body' => [ 'sitemap_url' => home_url( '/wp-sitemap.xml' ) ]
@@ -102,7 +102,7 @@ For complete filter documentation with examples, see **[Filter Reference](FILTER
 
 ### Meta Tag Filters
 
-#### `samanseo_title`
+#### `saman_seo_title`
 
 Filter the page title before output.
 
@@ -113,7 +113,7 @@ Filter the page title before output.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     // Add store name to all product titles
     if ( $post && get_post_type( $post ) === 'product' ) {
         return $title . ' | MyStore';
@@ -126,7 +126,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 
 ---
 
-#### `samanseo_description`
+#### `saman_seo_description`
 
 Filter the meta description before output.
 
@@ -137,7 +137,7 @@ Filter the meta description before output.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_description', function( $description, $post ) {
+add_filter( 'saman_seo_description', function( $description, $post ) {
     // Append CTA to all descriptions
     if ( is_singular( 'product' ) ) {
         return $description . ' Order now for free shipping!';
@@ -150,7 +150,7 @@ add_filter( 'samanseo_description', function( $description, $post ) {
 
 ---
 
-#### `samanseo_canonical`
+#### `saman_seo_canonical`
 
 Filter the canonical URL before output.
 
@@ -161,7 +161,7 @@ Filter the canonical URL before output.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_canonical', function( $canonical, $post ) {
+add_filter( 'saman_seo_canonical', function( $canonical, $post ) {
     // Force HTTPS on all canonical URLs
     return str_replace( 'http://', 'https://', $canonical );
 }, 10, 2 );
@@ -171,7 +171,7 @@ add_filter( 'samanseo_canonical', function( $canonical, $post ) {
 
 ---
 
-#### `samanseo_robots`
+#### `saman_seo_robots`
 
 Filter the robots meta tag content.
 
@@ -181,7 +181,7 @@ Filter the robots meta tag content.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_robots', function( $robots ) {
+add_filter( 'saman_seo_robots', function( $robots ) {
     // Force noindex on staging environment
     if ( wp_get_environment_type() === 'staging' ) {
         return 'noindex, nofollow';
@@ -196,7 +196,7 @@ add_filter( 'samanseo_robots', function( $robots ) {
 
 ### Social Media Filters
 
-#### `samanseo_og_image`
+#### `saman_seo_og_image`
 
 Filter the Open Graph image URL.
 
@@ -209,7 +209,7 @@ Filter the Open Graph image URL.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
+add_filter( 'saman_seo_og_image', function( $image, $post, $meta, $defaults ) {
     // Use CDN URL for all OG images
     if ( $post && $post->ID === 42 ) {
         return 'https://cdn.example.com/special-promo.jpg';
@@ -222,7 +222,7 @@ add_filter( 'samanseo_og_image', function( $image, $post, $meta, $defaults ) {
 
 ---
 
-#### `samanseo_og_title`
+#### `saman_seo_og_title`
 
 Filter the Open Graph title tag.
 
@@ -233,7 +233,7 @@ Filter the Open Graph title tag.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_og_title', function( $title, $post ) {
+add_filter( 'saman_seo_og_title', function( $title, $post ) {
     // Customize OG title for products
     if ( get_post_type( $post ) === 'product' ) {
         return 'Shop: ' . $title;
@@ -246,7 +246,7 @@ add_filter( 'samanseo_og_title', function( $title, $post ) {
 
 ---
 
-#### `samanseo_social_tags`
+#### `saman_seo_social_tags`
 
 Filter all social meta tags at once.
 
@@ -259,7 +259,7 @@ Filter all social meta tags at once.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_social_tags', function( $tags, $post, $meta, $defaults ) {
+add_filter( 'saman_seo_social_tags', function( $tags, $post, $meta, $defaults ) {
     // Add custom OG tag
     $tags['og:custom'] = 'custom-value';
 
@@ -276,7 +276,7 @@ add_filter( 'samanseo_social_tags', function( $tags, $post, $meta, $defaults ) {
 
 ### Structured Data Filters
 
-#### `samanseo_jsonld`
+#### `saman_seo_jsonld`
 
 Filter the complete JSON-LD output before rendering.
 
@@ -287,7 +287,7 @@ Filter the complete JSON-LD output before rendering.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_jsonld', function( $payload, $post ) {
+add_filter( 'saman_seo_jsonld', function( $payload, $post ) {
     // Add custom schema
     $payload['@graph'][] = [
         '@type' => 'Product',
@@ -307,7 +307,7 @@ add_filter( 'samanseo_jsonld', function( $payload, $post ) {
 
 ---
 
-#### `samanseo_schema_webpage`
+#### `saman_seo_schema_webpage`
 
 Filter the WebPage schema specifically.
 
@@ -318,7 +318,7 @@ Filter the WebPage schema specifically.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_schema_webpage', function( $schema, $post ) {
+add_filter( 'saman_seo_schema_webpage', function( $schema, $post ) {
     // Add breadcrumb to schema
     $schema['breadcrumb'] = [
         '@type' => 'BreadcrumbList',
@@ -335,7 +335,7 @@ add_filter( 'samanseo_schema_webpage', function( $schema, $post ) {
 
 ---
 
-#### `samanseo_schema_article`
+#### `saman_seo_schema_article`
 
 Filter the Article schema for posts.
 
@@ -346,7 +346,7 @@ Filter the Article schema for posts.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_schema_article', function( $schema, $post ) {
+add_filter( 'saman_seo_schema_article', function( $schema, $post ) {
     // Add author information
     $author = get_userdata( $post->post_author );
     $schema['author'] = [
@@ -365,7 +365,7 @@ add_filter( 'samanseo_schema_article', function( $schema, $post ) {
 
 ### Sitemap Filters
 
-#### `samanseo_sitemap_entry`
+#### `saman_seo_sitemap_entry`
 
 Filter individual sitemap entries.
 
@@ -377,7 +377,7 @@ Filter individual sitemap entries.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
+add_filter( 'saman_seo_sitemap_entry', function( $entry, $post_id, $post_type ) {
     // Set high priority for featured posts
     if ( get_post_meta( $post_id, '_is_featured', true ) ) {
         $entry['priority'] = 1.0;
@@ -392,7 +392,7 @@ add_filter( 'samanseo_sitemap_entry', function( $entry, $post_id, $post_type ) {
 
 ---
 
-#### `samanseo_sitemap_images`
+#### `saman_seo_sitemap_images`
 
 Filter images included in sitemap for a post.
 
@@ -403,7 +403,7 @@ Filter images included in sitemap for a post.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
+add_filter( 'saman_seo_sitemap_images', function( $images, $post_id ) {
     // Add gallery images to sitemap
     $gallery = get_post_meta( $post_id, '_product_gallery', true );
     if ( $gallery ) {
@@ -418,7 +418,7 @@ add_filter( 'samanseo_sitemap_images', function( $images, $post_id ) {
 
 ---
 
-#### `samanseo_sitemap_post_query_args`
+#### `saman_seo_sitemap_post_query_args`
 
 Filter WP_Query arguments for sitemap generation.
 
@@ -429,7 +429,7 @@ Filter WP_Query arguments for sitemap generation.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     // Only include published products in stock
     if ( $post_type === 'product' ) {
         $args['meta_query'] = [
@@ -450,7 +450,7 @@ add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
 
 ### Breadcrumb Filters
 
-#### `samanseo_breadcrumb_links`
+#### `saman_seo_breadcrumb_links`
 
 Filter the breadcrumb trail array.
 
@@ -470,7 +470,7 @@ Filter the breadcrumb trail array.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
+add_filter( 'saman_seo_breadcrumb_links', function( $crumbs, $post ) {
     // Insert custom breadcrumb for products
     if ( get_post_type( $post ) === 'product' ) {
         array_splice( $crumbs, 1, 0, [
@@ -488,7 +488,7 @@ add_filter( 'samanseo_breadcrumb_links', function( $crumbs, $post ) {
 
 ### Score & Analysis Filters
 
-#### `samanseo_seo_score`
+#### `saman_seo_seo_score`
 
 Filter the calculated SEO score for a post.
 
@@ -499,7 +499,7 @@ Filter the calculated SEO score for a post.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_seo_score', function( $result, $post ) {
+add_filter( 'saman_seo_seo_score', function( $result, $post ) {
     // Adjust scoring for products
     if ( get_post_type( $post ) === 'product' ) {
         // Penalize if missing price
@@ -519,7 +519,7 @@ add_filter( 'samanseo_seo_score', function( $result, $post ) {
 
 ### Feature Toggle Filters
 
-#### `samanseo_feature_toggle`
+#### `saman_seo_feature_toggle`
 
 Enable or disable specific plugin features.
 
@@ -537,7 +537,7 @@ Enable or disable specific plugin features.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'saman_seo_feature_toggle', function( $enabled, $feature ) {
     // Disable redirects on development
     if ( $feature === 'redirects' && wp_get_environment_type() === 'local' ) {
         return false;
@@ -551,7 +551,7 @@ add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
 
 ---
 
-#### `samanseo_score_post_types`
+#### `saman_seo_score_post_types`
 
 Filter which post types show SEO score in admin.
 
@@ -561,7 +561,7 @@ Filter which post types show SEO score in admin.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_score_post_types', function( $post_types ) {
+add_filter( 'saman_seo_score_post_types', function( $post_types ) {
     // Add 'product' post type to scored types
     $post_types[] = 'product';
 
@@ -578,7 +578,7 @@ add_filter( 'samanseo_score_post_types', function( $post_types ) {
 
 ### Internal Linking Filters
 
-#### `samanseo_link_suggestions`
+#### `saman_seo_link_suggestions`
 
 Filter the internal link suggestions shown in post editor.
 
@@ -589,7 +589,7 @@ Filter the internal link suggestions shown in post editor.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
+add_filter( 'saman_seo_link_suggestions', function( $suggestions, $post_id ) {
     // Add custom link suggestion
     $suggestions[] = [
         'url' => '/custom-page',
@@ -606,7 +606,7 @@ add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
 
 ---
 
-#### `samanseo_internal_link_roles`
+#### `saman_seo_internal_link_roles`
 
 Filter which user roles can manage internal linking.
 
@@ -616,7 +616,7 @@ Filter which user roles can manage internal linking.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_internal_link_roles', function( $roles ) {
+add_filter( 'saman_seo_internal_link_roles', function( $roles ) {
     // Allow editors to manage internal links
     $roles[] = 'editor';
 
@@ -630,7 +630,7 @@ add_filter( 'samanseo_internal_link_roles', function( $roles ) {
 
 ### LLM.txt Filters
 
-#### `samanseo_llm_txt_content`
+#### `saman_seo_llm_txt_content`
 
 Filter the complete llm.txt file content.
 
@@ -640,7 +640,7 @@ Filter the complete llm.txt file content.
 **Usage:**
 
 ```php
-add_filter( 'samanseo_llm_txt_content', function( $content ) {
+add_filter( 'saman_seo_llm_txt_content', function( $content ) {
     // Append custom instructions for AI
     $content .= "\n\n# Custom Instructions\n";
     $content .= "This site specializes in WordPress SEO solutions.\n";
@@ -657,7 +657,7 @@ add_filter( 'samanseo_llm_txt_content', function( $content ) {
 
 ### Creating Redirects
 
-**Function:** `samanseo_create_redirect()`
+**Function:** `saman_seo_create_redirect()`
 
 ```php
 /**
@@ -683,7 +683,7 @@ if ( is_wp_error( $result ) ) {
 
 ### Rendering Breadcrumbs
 
-**Function:** `samanseo_breadcrumbs()`
+**Function:** `saman_seo_breadcrumbs()`
 
 ```php
 /**
@@ -937,7 +937,7 @@ if ( current_user_can( 'manage_seopilot_links' ) ) {
 
 ## Feature Toggles
 
-Control which features are enabled using the `samanseo_feature_toggle` filter.
+Control which features are enabled using the `saman_seo_feature_toggle` filter.
 
 ### Available Features
 
@@ -952,7 +952,7 @@ Control which features are enabled using the `samanseo_feature_toggle` filter.
 ### Example: Disable on Staging
 
 ```php
-add_filter( 'samanseo_feature_toggle', function( $enabled, $feature ) {
+add_filter( 'saman_seo_feature_toggle', function( $enabled, $feature ) {
     if ( wp_get_environment_type() !== 'production' ) {
         // Disable certain features on non-production
         if ( in_array( $feature, [ 'redirects', 'llm_txt' ], true ) ) {
@@ -992,7 +992,7 @@ if ( function_exists( 'samanseo_breadcrumbs' ) ) {
 Always return the original value if you don't modify it:
 
 ```php
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( some_condition() ) {
         return modified_title();
     }
@@ -1007,10 +1007,10 @@ Be mindful of filter priorities:
 
 ```php
 // Run early (before default processing)
-add_filter( 'samanseo_title', 'my_function', 5, 2 );
+add_filter( 'saman_seo_title', 'my_function', 5, 2 );
 
 // Run late (after other modifications)
-add_filter( 'samanseo_title', 'my_function', 20, 2 );
+add_filter( 'saman_seo_title', 'my_function', 20, 2 );
 ```
 
 ### 5. Cache Expensive Operations
@@ -1018,7 +1018,7 @@ add_filter( 'samanseo_title', 'my_function', 20, 2 );
 If your filter does heavy processing, cache the result:
 
 ```php
-add_filter( 'samanseo_og_image', function( $image, $post ) {
+add_filter( 'saman_seo_og_image', function( $image, $post ) {
     $cache_key = 'custom_og_image_' . $post->ID;
     $cached = wp_cache_get( $cache_key, 'samanseo' );
 
@@ -1073,7 +1073,7 @@ add_action( 'init', function() {
 });
 
 // Set custom title template for portfolio
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( get_post_type( $post ) === 'portfolio' ) {
         $client = get_post_meta( $post->ID, 'client_name', true );
         return $title . ' - Client: ' . $client . ' | ' . get_bloginfo( 'name' );
@@ -1083,7 +1083,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 }, 10, 2 );
 
 // Custom schema for portfolio items
-add_filter( 'samanseo_jsonld', function( $payload, $post ) {
+add_filter( 'saman_seo_jsonld', function( $payload, $post ) {
     if ( get_post_type( $post ) === 'portfolio' ) {
         $payload['@graph'][] = [
             '@type' => 'CreativeWork',
@@ -1104,7 +1104,7 @@ add_filter( 'samanseo_jsonld', function( $payload, $post ) {
 
 ```php
 // Apply different settings per site in multisite
-add_filter( 'samanseo_title', function( $title, $post ) {
+add_filter( 'saman_seo_title', function( $title, $post ) {
     if ( is_multisite() ) {
         $site_id = get_current_blog_id();
 
@@ -1122,7 +1122,7 @@ add_filter( 'samanseo_title', function( $title, $post ) {
 
 ```php
 // Automatically noindex old posts
-add_filter( 'samanseo_robots_array', function( $directives ) {
+add_filter( 'saman_seo_robots_array', function( $directives ) {
     global $post;
 
     if ( $post && is_singular( 'post' ) ) {

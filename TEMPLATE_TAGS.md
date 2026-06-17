@@ -106,7 +106,7 @@ if ( function_exists( 'samanseo_breadcrumbs' ) ) {
 **Filter the Output:**
 ```php
 // Customize breadcrumb links
-add_filter( 'samanseo_breadcrumb_links', function( $links ) {
+add_filter( 'saman_seo_breadcrumb_links', function( $links ) {
     // Add custom breadcrumb after home
     array_splice( $links, 1, 0, [
         [
@@ -119,7 +119,7 @@ add_filter( 'samanseo_breadcrumb_links', function( $links ) {
 });
 
 // Change separator
-add_filter( 'samanseo_breadcrumb_separator', function( $separator ) {
+add_filter( 'saman_seo_breadcrumb_separator', function( $separator ) {
     return ' / '; // Change from » to /
 });
 ```

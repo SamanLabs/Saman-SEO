@@ -183,7 +183,7 @@ class Breadcrumbs {
 		$crumbs = $this->build_trail( $crumbs, $args );
 
 		// Apply filter for customization.
-		$crumbs = apply_filters( 'SAMAN_SEO_breadcrumb_items', $crumbs, $args );
+		$crumbs = saman_seo_apply_filters( 'saman_seo_breadcrumb_items', $crumbs, $args );
 
 		// Truncate titles if needed.
 		if ( ! empty( $args['truncate_length'] ) && $args['truncate_length'] > 0 ) {
@@ -710,7 +710,7 @@ class Breadcrumbs {
 			return $content;
 		}
 
-		if ( ! apply_filters( 'SAMAN_SEO_auto_breadcrumbs', true ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_auto_breadcrumbs', true ) ) {
 			return $content;
 		}
 
@@ -737,7 +737,7 @@ class Breadcrumbs {
 			return;
 		}
 
-		if ( ! apply_filters( 'SAMAN_SEO_auto_breadcrumbs', true ) ) {
+		if ( ! saman_seo_apply_filters( 'saman_seo_auto_breadcrumbs', true ) ) {
 			return;
 		}
 

@@ -53,7 +53,7 @@ class Analytics {
 	public function is_enabled() {
 		$enabled = \Saman\SEO\Helpers\module_enabled( 'analytics' );
 
-		return apply_filters( 'SAMAN_SEO_analytics_enabled', $enabled );
+		return saman_seo_apply_filters( 'saman_seo_analytics_enabled', $enabled );
 	}
 
 	/**

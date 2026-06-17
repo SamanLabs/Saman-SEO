@@ -590,7 +590,7 @@ $repository->bulk_update_rules( $updates );
 ### Filter Link Suggestions
 
 ```php
-add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
+add_filter( 'saman_seo_link_suggestions', function( $suggestions, $post_id ) {
     // Add custom suggestion
     $suggestions[] = [
         'url' => '/custom-page/',
@@ -608,7 +608,7 @@ add_filter( 'samanseo_link_suggestions', function( $suggestions, $post_id ) {
 ### Filter User Roles
 
 ```php
-add_filter( 'samanseo_internal_link_roles', function( $roles ) {
+add_filter( 'saman_seo_internal_link_roles', function( $roles ) {
     $roles[] = 'editor';
     $roles[] = 'author';
 
@@ -677,7 +677,7 @@ Enable caching in settings to avoid re-processing content on every page load.
 For very long posts (10,000+ words), consider excluding from automatic linking:
 
 ```php
-add_filter( 'samanseo_sitemap_post_query_args', function( $args, $post_type ) {
+add_filter( 'saman_seo_sitemap_post_query_args', function( $args, $post_type ) {
     // Exclude posts over 5000 words
     $args['meta_query'][] = [
         'key' => '_word_count',
