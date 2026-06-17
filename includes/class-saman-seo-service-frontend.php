@@ -40,7 +40,10 @@ class Frontend {
 		add_action( 'wp_head', array( $this, 'render_json_ld' ), 20 );
 		add_action( 'wp_head', array( $this, 'render_hreflang' ), 8 );
 		add_action( 'wp_head', array( $this, 'render_pagination_links' ), 9 );
-		add_shortcode( 'SAMAN_SEO_breadcrumbs', array( $this, 'breadcrumbs_shortcode' ) );
+
+		if ( \Saman\SEO\Helpers\module_enabled( 'breadcrumbs' ) ) {
+			add_shortcode( 'SAMAN_SEO_breadcrumbs', array( $this, 'breadcrumbs_shortcode' ) );
+		}
 	}
 
 	/**

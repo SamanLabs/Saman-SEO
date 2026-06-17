@@ -83,6 +83,21 @@ class Settings {
 		'SAMAN_SEO_module_admin_bar'            => '1',
 		'SAMAN_SEO_module_internal_links'       => '1',
 		'SAMAN_SEO_module_ai_assistant'         => '1',
+		'SAMAN_SEO_module_breadcrumbs'          => '0',
+		'SAMAN_SEO_breadcrumb_settings'         => array(
+			'enabled'          => false,
+			'separator'        => '>',
+			'separator_custom' => '',
+			'show_home'        => true,
+			'home_label'       => '',
+			'show_current'     => true,
+			'link_current'     => false,
+			'truncate_length'  => 0,
+			'show_on_front'    => false,
+			'style_preset'     => 'default',
+			'post_type_labels' => array(),
+			'taxonomy_labels'  => array(),
+		),
 
 		'SAMAN_SEO_social_card_design'          => array(
 			'background_color' => '#1a1a36',
@@ -202,6 +217,8 @@ class Settings {
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_admin_bar', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_internal_links', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_ai_assistant', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_breadcrumbs', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_breadcrumb_settings', array( $this, 'sanitize_breadcrumb_settings' ) );
 	}
 
 	/**
@@ -880,6 +897,50 @@ class Settings {
 			'layout'           => in_array( $value['layout'] ?? '', array( 'default', 'centered', 'minimal', 'bold' ), true )
 									? $value['layout']
 									: 'default',
+		);
+	}
+
+	/**
+	 * Sanitize consolidated breadcrumb settings.
+	 *
+	 * @param array|string $value Values.
+	 *
+	 * @return array
+	 */
+	public function sanitize_breadcrumb_settings( $value ) {
+		$defaults = $this->defaults['SAMAN_SEO_breadcrumb_settings'];
+
+		if ( ! is_array( $value ) ) {
+			return $defaults;
+		}
+
+		$value = wp_parse_args( $value, $defaults );
+
+		$sanitize_labels = function ( $labels ) {
+			if ( ! is_array( $labels ) ) {
+				return array();
+			}
+
+			$clean = array();
+			foreach ( $labels as $key => $label ) {
+				$clean[ sanitize_key( $key ) ] = sanitize_text_field( $label );
+			}
+			return $clean;
+		};
+
+		return array(
+			'enabled'          => ! empty( $value['enabled'] ),
+			'separator'        => sanitize_text_field( $value['separator'] ?? $defaults['separator'] ),
+			'separator_custom' => sanitize_text_field( $value['separator_custom'] ?? $defaults['separator_custom'] ),
+			'show_home'        => ! empty( $value['show_home'] ),
+			'home_label'       => sanitize_text_field( $value['home_label'] ?? $defaults['home_label'] ),
+			'show_current'     => ! empty( $value['show_current'] ),
+			'link_current'     => ! empty( $value['link_current'] ),
+			'truncate_length'  => absint( $value['truncate_length'] ?? $defaults['truncate_length'] ),
+			'show_on_front'    => ! empty( $value['show_on_front'] ),
+			'style_preset'     => sanitize_text_field( $value['style_preset'] ?? $defaults['style_preset'] ),
+			'post_type_labels' => $sanitize_labels( $value['post_type_labels'] ?? array() ),
+			'taxonomy_labels'  => $sanitize_labels( $value['taxonomy_labels'] ?? array() ),
 		);
 	}
 

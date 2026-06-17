@@ -295,6 +295,26 @@ class Plugin {
 		add_option( 'SAMAN_SEO_module_admin_bar', '1' );
 		add_option( 'SAMAN_SEO_module_internal_links', '1' );
 		add_option( 'SAMAN_SEO_module_ai_assistant', '1' );
+		add_option( 'SAMAN_SEO_module_breadcrumbs', '0' );
+
+		// Breadcrumb settings defaults.
+		add_option(
+			'SAMAN_SEO_breadcrumb_settings',
+			array(
+				'enabled'          => false,
+				'separator'        => '>',
+				'separator_custom' => '',
+				'show_home'        => true,
+				'home_label'       => '',
+				'show_current'     => true,
+				'link_current'     => false,
+				'truncate_length'  => 0,
+				'show_on_front'    => false,
+				'style_preset'     => 'default',
+				'post_type_labels' => array(),
+				'taxonomy_labels'  => array(),
+			)
+		);
 
 		// Sitemap settings defaults
 		add_option( 'SAMAN_SEO_sitemap_enabled', '1' );
