@@ -17,6 +17,7 @@ BUGFIXES.md
 .claude/settings.local.json
 tmpclaude-*
 .planning_old
+.pr/
 
 # OS/IDE files
 nul
