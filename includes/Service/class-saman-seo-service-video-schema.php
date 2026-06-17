@@ -21,7 +21,7 @@ class Video_Schema {
 	 *
 	 * @var array
 	 */
-	private $youtube_patterns = [
+	private $youtube_patterns = array(
 		// iframe embeds
 		'#<iframe[^>]+src=["\'](?:https?:)?//(?:www\.)?youtube\.com/embed/([a-zA-Z0-9_-]{11})[^"\']*["\'][^>]*>#i',
 		// youtube.com/watch links
@@ -31,21 +31,21 @@ class Video_Schema {
 		// WordPress embedded video blocks
 		'#wp:embed.*?url":"https?://(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})#i',
 		'#wp:embed.*?url":"https?://youtu\.be/([a-zA-Z0-9_-]{11})#i',
-	];
+	);
 
 	/**
 	 * Vimeo embed patterns.
 	 *
 	 * @var array
 	 */
-	private $vimeo_patterns = [
+	private $vimeo_patterns = array(
 		// iframe embeds
 		'#<iframe[^>]+src=["\'](?:https?:)?//(?:player\.)?vimeo\.com/video/(\d+)[^"\']*["\'][^>]*>#i',
 		// vimeo.com links
 		'#(?:https?:)?//(?:www\.)?vimeo\.com/(\d+)#i',
 		// WordPress embedded video blocks
 		'#wp:embed.*?url":"https?://(?:www\.)?vimeo\.com/(\d+)#i',
-	];
+	);
 
 	/**
 	 * Boot hooks.
@@ -53,7 +53,7 @@ class Video_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_video_schema_to_graph' ], 25, 1 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_video_schema_to_graph' ), 25, 1 );
 	}
 
 	/**
@@ -97,17 +97,17 @@ class Video_Schema {
 	 * @return array Array of detected videos with platform and ID.
 	 */
 	public function detect_videos( $post ) {
-		$videos  = [];
+		$videos  = array();
 		$content = $post->post_content;
 
 		// Detect YouTube videos.
 		foreach ( $this->youtube_patterns as $pattern ) {
 			if ( preg_match_all( $pattern, $content, $matches ) ) {
 				foreach ( $matches[1] as $video_id ) {
-					$videos[] = [
+					$videos[] = array(
 						'platform' => 'youtube',
 						'id'       => $video_id,
-					];
+					);
 				}
 			}
 		}
@@ -116,21 +116,21 @@ class Video_Schema {
 		foreach ( $this->vimeo_patterns as $pattern ) {
 			if ( preg_match_all( $pattern, $content, $matches ) ) {
 				foreach ( $matches[1] as $video_id ) {
-					$videos[] = [
+					$videos[] = array(
 						'platform' => 'vimeo',
 						'id'       => $video_id,
-					];
+					);
 				}
 			}
 		}
 
 		// Remove duplicates.
-		$unique = [];
-		$seen   = [];
+		$unique = array();
+		$seen   = array();
 		foreach ( $videos as $video ) {
 			$key = $video['platform'] . '_' . $video['id'];
 			if ( ! isset( $seen[ $key ] ) ) {
-				$unique[] = $video;
+				$unique[]     = $video;
 				$seen[ $key ] = true;
 			}
 		}
@@ -146,12 +146,12 @@ class Video_Schema {
 	 * @return array|null
 	 */
 	private function build_schema( $video, $post ) {
-		$schema = [
+		$schema = array(
 			'@type'       => 'VideoObject',
 			'name'        => get_the_title( $post ),
 			'description' => wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 ),
 			'uploadDate'  => get_the_date( 'c', $post ),
-		];
+		);
 
 		if ( 'youtube' === $video['platform'] ) {
 			$schema['@id']          = get_permalink( $post ) . '#video-youtube-' . $video['id'];
@@ -166,10 +166,10 @@ class Video_Schema {
 					$schema['name'] = $oembed['title'];
 				}
 				if ( ! empty( $oembed['author_name'] ) ) {
-					$schema['author'] = [
+					$schema['author'] = array(
 						'@type' => 'Person',
 						'name'  => $oembed['author_name'],
-					];
+					);
 				}
 			}
 		} elseif ( 'vimeo' === $video['platform'] ) {
@@ -190,10 +190,10 @@ class Video_Schema {
 					$schema['thumbnailUrl'] = $oembed['thumbnail_url'];
 				}
 				if ( ! empty( $oembed['author_name'] ) ) {
-					$schema['author'] = [
+					$schema['author'] = array(
 						'@type' => 'Person',
 						'name'  => $oembed['author_name'],
-					];
+					);
 				}
 				if ( ! empty( $oembed['duration'] ) ) {
 					$schema['duration'] = 'PT' . $oembed['duration'] . 'S';
@@ -220,7 +220,7 @@ class Video_Schema {
 
 		$url = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json';
 
-		$response = wp_remote_get( $url, [ 'timeout' => 2 ] );
+		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return null;
@@ -251,7 +251,7 @@ class Video_Schema {
 
 		$url = 'https://vimeo.com/api/oembed.json?url=https://vimeo.com/' . $video_id;
 
-		$response = wp_remote_get( $url, [ 'timeout' => 2 ] );
+		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return null;
@@ -273,15 +273,15 @@ class Video_Schema {
 	 * @return array Array of posts with video data.
 	 */
 	public function get_posts_with_videos( $limit = 1000 ) {
-		$posts_with_videos = [];
+		$posts_with_videos = array();
 
-		$args = [
+		$args = array(
 			'post_type'      => 'post',
 			'post_status'    => 'publish',
 			'posts_per_page' => $limit,
 			'orderby'        => 'modified',
 			'order'          => 'DESC',
-		];
+		);
 
 		$query = new \WP_Query( $args );
 
@@ -293,10 +293,10 @@ class Video_Schema {
 				$videos = $this->detect_videos( $post );
 
 				if ( ! empty( $videos ) ) {
-					$posts_with_videos[] = [
+					$posts_with_videos[] = array(
 						'post'   => $post,
 						'videos' => $videos,
-					];
+					);
 				}
 			}
 			wp_reset_postdata();

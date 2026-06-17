@@ -35,27 +35,27 @@ class IndexNow {
 	 *
 	 * @var array
 	 */
-	private $defaults = [
+	private $defaults = array(
 		'enabled'           => false,
 		'api_key'           => '',
 		'submit_on_publish' => true,
 		'submit_on_update'  => true,
-		'post_types'        => [ 'post', 'page' ],
+		'post_types'        => array( 'post', 'page' ),
 		'search_engine'     => 'api.indexnow.org',
-	];
+	);
 
 	/**
 	 * Available search engine endpoints.
 	 *
 	 * @var array
 	 */
-	private $search_engines = [
-		'api.indexnow.org'     => 'IndexNow (Bing, Yandex, Seznam)',
-		'www.bing.com'         => 'Bing',
-		'yandex.com'           => 'Yandex',
-		'search.seznam.cz'     => 'Seznam',
+	private $search_engines = array(
+		'api.indexnow.org'        => 'IndexNow (Bing, Yandex, Seznam)',
+		'www.bing.com'            => 'Bing',
+		'yandex.com'              => 'Yandex',
+		'search.seznam.cz'        => 'Seznam',
 		'searchadvisor.naver.com' => 'Naver',
-	];
+	);
 
 	/**
 	 * Boot the service.
@@ -66,9 +66,9 @@ class IndexNow {
 		$settings = $this->get_settings();
 
 		// Register rewrite rule for key file verification.
-		add_action( 'init', [ $this, 'register_rewrite_rules' ] );
-		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
-		add_action( 'template_redirect', [ $this, 'serve_key_file' ] );
+		add_action( 'init', array( $this, 'register_rewrite_rules' ) );
+		add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
+		add_action( 'template_redirect', array( $this, 'serve_key_file' ) );
 
 		// Only register submission hooks if enabled.
 		if ( empty( $settings['enabled'] ) ) {
@@ -81,11 +81,11 @@ class IndexNow {
 
 		// Auto-submission hooks.
 		if ( ! empty( $settings['submit_on_publish'] ) ) {
-			add_action( 'transition_post_status', [ $this, 'maybe_submit_on_status_change' ], 10, 3 );
+			add_action( 'transition_post_status', array( $this, 'maybe_submit_on_status_change' ), 10, 3 );
 		}
 
 		if ( ! empty( $settings['submit_on_update'] ) ) {
-			add_action( 'post_updated', [ $this, 'maybe_submit_on_update' ], 10, 3 );
+			add_action( 'post_updated', array( $this, 'maybe_submit_on_update' ), 10, 3 );
 		}
 	}
 
@@ -95,10 +95,10 @@ class IndexNow {
 	 * @return array
 	 */
 	public function get_settings() {
-		$settings = get_option( 'SAMAN_SEO_indexnow_settings', [] );
+		$settings = get_option( 'SAMAN_SEO_indexnow_settings', array() );
 
 		if ( ! is_array( $settings ) ) {
-			$settings = [];
+			$settings = array();
 		}
 
 		return wp_parse_args( $settings, $this->defaults );
@@ -113,14 +113,14 @@ class IndexNow {
 	public function save_settings( $settings ) {
 		$current = $this->get_settings();
 
-		$sanitized = [
+		$sanitized = array(
 			'enabled'           => ! empty( $settings['enabled'] ),
 			'api_key'           => sanitize_text_field( $settings['api_key'] ?? $current['api_key'] ),
 			'submit_on_publish' => ! empty( $settings['submit_on_publish'] ),
 			'submit_on_update'  => ! empty( $settings['submit_on_update'] ),
 			'post_types'        => $this->sanitize_post_types( $settings['post_types'] ?? $current['post_types'] ),
 			'search_engine'     => sanitize_text_field( $settings['search_engine'] ?? $current['search_engine'] ),
-		];
+		);
 
 		// Generate API key if enabled and none exists.
 		if ( $sanitized['enabled'] && empty( $sanitized['api_key'] ) ) {
@@ -145,10 +145,10 @@ class IndexNow {
 	 */
 	private function sanitize_post_types( $post_types ) {
 		if ( ! is_array( $post_types ) ) {
-			return [ 'post', 'page' ];
+			return array( 'post', 'page' );
 		}
 
-		$valid_types = get_post_types( [ 'public' => true ] );
+		$valid_types = get_post_types( array( 'public' => true ) );
 
 		return array_values( array_intersect( $post_types, $valid_types ) );
 	}
@@ -285,7 +285,7 @@ class IndexNow {
 		}
 
 		// Check if post type is allowed.
-		$allowed_types = $settings['post_types'] ?? [ 'post', 'page' ];
+		$allowed_types = $settings['post_types'] ?? array( 'post', 'page' );
 		if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
 			return false;
 		}
@@ -313,7 +313,7 @@ class IndexNow {
 	 * @return bool
 	 */
 	public function submit_url( $url, $post_id = null ) {
-		return $this->submit_urls( [ $url ], $post_id );
+		return $this->submit_urls( array( $url ), $post_id );
 	}
 
 	/**
@@ -337,28 +337,28 @@ class IndexNow {
 		// Limit to 10,000 URLs per request (IndexNow limit).
 		$urls = array_slice( $urls, 0, 10000 );
 
-		$host         = wp_parse_url( home_url(), PHP_URL_HOST );
-		$api_key      = $settings['api_key'];
+		$host          = wp_parse_url( home_url(), PHP_URL_HOST );
+		$api_key       = $settings['api_key'];
 		$search_engine = $settings['search_engine'] ?? 'api.indexnow.org';
 
 		$endpoint = sprintf( 'https://%s/indexnow', $search_engine );
 
-		$body = [
+		$body = array(
 			'host'        => $host,
 			'key'         => $api_key,
 			'keyLocation' => home_url( $api_key . '.txt' ),
 			'urlList'     => array_values( $urls ),
-		];
+		);
 
 		$response = wp_remote_post(
 			$endpoint,
-			[
-				'headers' => [
+			array(
+				'headers' => array(
 					'Content-Type' => 'application/json; charset=utf-8',
-				],
+				),
 				'body'    => wp_json_encode( $body ),
 				'timeout' => 15,
-			]
+			)
 		);
 
 		$response_code    = wp_remote_retrieve_response_code( $response );
@@ -370,7 +370,7 @@ class IndexNow {
 		}
 
 		// 200 = OK, 202 = Accepted.
-		$success = in_array( $response_code, [ 200, 202 ], true );
+		$success = in_array( $response_code, array( 200, 202 ), true );
 		$status  = $success ? 'success' : 'failed';
 
 		// Log each URL.
@@ -403,7 +403,7 @@ class IndexNow {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct DB access intentional.
 		return $wpdb->insert(
 			$table,
-			[
+			array(
 				'url'              => $url,
 				'post_id'          => $post_id,
 				'status'           => $status,
@@ -411,8 +411,8 @@ class IndexNow {
 				'response_message' => substr( $response_message, 0, 255 ),
 				'search_engine'    => $search_engine ?: 'api.indexnow.org',
 				'submitted_at'     => current_time( 'mysql' ),
-			],
-			[ '%s', '%d', '%s', '%d', '%s', '%s', '%s' ]
+			),
+			array( '%s', '%d', '%s', '%d', '%s', '%s', '%s' )
 		);
 	}
 
@@ -422,23 +422,23 @@ class IndexNow {
 	 * @param array $args Query arguments.
 	 * @return array
 	 */
-	public function get_logs( $args = [] ) {
+	public function get_logs( $args = array() ) {
 		global $wpdb;
 
-		$defaults = [
+		$defaults = array(
 			'per_page' => 50,
 			'page'     => 1,
 			'status'   => '',
 			'search'   => '',
 			'orderby'  => 'submitted_at',
 			'order'    => 'DESC',
-		];
+		);
 
 		$args  = wp_parse_args( $args, $defaults );
 		$table = $wpdb->prefix . $this->table_name;
 
-		$where = [];
-		$params = [];
+		$where  = array();
+		$params = array();
 
 		if ( ! empty( $args['status'] ) ) {
 			$where[]  = 'status = %s';
@@ -462,24 +462,24 @@ class IndexNow {
 		$total = (int) $wpdb->get_var( $count_sql );
 
 		// Get items.
-		$orderby   = in_array( $args['orderby'], [ 'submitted_at', 'url', 'status', 'response_code' ], true ) ? $args['orderby'] : 'submitted_at';
-		$order     = 'ASC' === strtoupper( $args['order'] ) ? 'ASC' : 'DESC';
-		$per_page  = absint( $args['per_page'] );
-		$offset    = ( absint( $args['page'] ) - 1 ) * $per_page;
+		$orderby  = in_array( $args['orderby'], array( 'submitted_at', 'url', 'status', 'response_code' ), true ) ? $args['orderby'] : 'submitted_at';
+		$order    = 'ASC' === strtoupper( $args['order'] ) ? 'ASC' : 'DESC';
+		$per_page = absint( $args['per_page'] );
+		$offset   = ( absint( $args['page'] ) - 1 ) * $per_page;
 
 		$query = "SELECT * FROM {$table} {$where_sql} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d";
 
-		$query_params = array_merge( $params, [ $per_page, $offset ] );
+		$query_params = array_merge( $params, array( $per_page, $offset ) );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, pagination requires direct query.
-		$items        = $wpdb->get_results( $wpdb->prepare( $query, $query_params ) );
+		$items = $wpdb->get_results( $wpdb->prepare( $query, $query_params ) );
 
-		return [
-			'items'      => $items,
-			'total'      => $total,
-			'pages'      => ceil( $total / $per_page ),
-			'page'       => absint( $args['page'] ),
-			'per_page'   => $per_page,
-		];
+		return array(
+			'items'    => $items,
+			'total'    => $total,
+			'pages'    => ceil( $total / $per_page ),
+			'page'     => absint( $args['page'] ),
+			'per_page' => $per_page,
+		);
 	}
 
 	/**
@@ -493,26 +493,28 @@ class IndexNow {
 		$table = $wpdb->prefix . $this->table_name;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct queries.
-		$total   = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct queries.
 		$success = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", 'success' ) );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct queries.
-		$failed  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", 'failed' ) );
+		$failed = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", 'failed' ) );
 
 		// Today's submissions.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, real-time stats require direct queries.
-		$today = (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT COUNT(*) FROM {$table} WHERE DATE(submitted_at) = %s",
-			current_time( 'Y-m-d' )
-		) );
+		$today = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE DATE(submitted_at) = %s",
+				current_time( 'Y-m-d' )
+			)
+		);
 
-		return [
+		return array(
 			'total'        => $total,
 			'success'      => $success,
 			'failed'       => $failed,
 			'today'        => $today,
 			'success_rate' => $total > 0 ? round( ( $success / $total ) * 100, 1 ) : 0,
-		];
+		);
 	}
 
 	/**
@@ -586,22 +588,22 @@ class IndexNow {
 		$settings = $this->get_settings();
 
 		if ( empty( $settings['api_key'] ) ) {
-			return [
+			return array(
 				'valid'   => false,
 				'message' => __( 'No API key configured.', 'saman-seo' ),
 				'url'     => '',
-			];
+			);
 		}
 
 		$key_url  = home_url( $settings['api_key'] . '.txt' );
-		$response = wp_remote_get( $key_url, [ 'timeout' => 5 ] );
+		$response = wp_remote_get( $key_url, array( 'timeout' => 5 ) );
 
 		if ( is_wp_error( $response ) ) {
-			return [
+			return array(
 				'valid'   => false,
 				'message' => $response->get_error_message(),
 				'url'     => $key_url,
-			];
+			);
 		}
 
 		$code = wp_remote_retrieve_response_code( $response );
@@ -609,12 +611,12 @@ class IndexNow {
 
 		$valid = 200 === $code && trim( $body ) === $settings['api_key'];
 
-		return [
+		return array(
 			'valid'   => $valid,
 			'message' => $valid
 				? __( 'Key file is accessible and valid.', 'saman-seo' )
 				: __( 'Key file not accessible or content mismatch.', 'saman-seo' ),
 			'url'     => $key_url,
-		];
+		);
 	}
 }

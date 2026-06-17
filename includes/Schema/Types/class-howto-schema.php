@@ -57,13 +57,13 @@ class HowTo_Schema extends Abstract_Schema {
 		$howto_data = $this->get_first_howto_block();
 
 		if ( empty( $howto_data ) ) {
-			return [];
+			return array();
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => Schema_IDs::howto( $this->context->canonical ),
-		];
+		);
 
 		// Add name (required).
 		$name = trim( wp_strip_all_tags( $howto_data['title'] ?? '' ) );
@@ -87,39 +87,39 @@ class HowTo_Schema extends Abstract_Schema {
 
 		// Add estimatedCost as MonetaryAmount.
 		if ( ! empty( $howto_data['estimatedCost'] ) ) {
-			$schema['estimatedCost'] = [
+			$schema['estimatedCost'] = array(
 				'@type'    => 'MonetaryAmount',
 				'currency' => $howto_data['currency'] ?? 'USD',
 				'value'    => $howto_data['estimatedCost'],
-			];
+			);
 		}
 
 		// Add tools as HowToTool array.
-		$tools = $howto_data['tools'] ?? [];
+		$tools = $howto_data['tools'] ?? array();
 		if ( ! empty( $tools ) && is_array( $tools ) ) {
 			$schema['tool'] = array_map(
-				fn( $t ) => [
+				fn( $t ) => array(
 					'@type' => 'HowToTool',
 					'name'  => $t,
-				],
+				),
 				array_filter( $tools )
 			);
 		}
 
 		// Add supplies as HowToSupply array.
-		$supplies = $howto_data['supplies'] ?? [];
+		$supplies = $howto_data['supplies'] ?? array();
 		if ( ! empty( $supplies ) && is_array( $supplies ) ) {
 			$schema['supply'] = array_map(
-				fn( $s ) => [
+				fn( $s ) => array(
 					'@type' => 'HowToSupply',
 					'name'  => $s,
-				],
+				),
 				array_filter( $supplies )
 			);
 		}
 
 		// Add steps as HowToStep array.
-		$steps = $howto_data['steps'] ?? [];
+		$steps = $howto_data['steps'] ?? array();
 		if ( ! empty( $steps ) ) {
 			$built_steps = $this->build_steps( $steps );
 			if ( ! empty( $built_steps ) ) {
@@ -152,7 +152,7 @@ class HowTo_Schema extends Abstract_Schema {
 	private function find_howto_block( array $blocks ): ?array {
 		foreach ( $blocks as $block ) {
 			if ( 'saman-seo/howto' === $block['blockName'] ) {
-				$attrs = $block['attrs'] ?? [];
+				$attrs = $block['attrs'] ?? array();
 
 				// Respect showSchema toggle.
 				if ( ! empty( $attrs['showSchema'] ) ) {
@@ -179,7 +179,7 @@ class HowTo_Schema extends Abstract_Schema {
 	 * @return array Array of HowToStep objects.
 	 */
 	private function build_steps( array $steps ): array {
-		$result   = [];
+		$result   = array();
 		$position = 1;
 
 		foreach ( $steps as $step ) {
@@ -191,10 +191,10 @@ class HowTo_Schema extends Abstract_Schema {
 				continue;
 			}
 
-			$step_schema = [
+			$step_schema = array(
 				'@type'    => 'HowToStep',
 				'position' => $position,
-			];
+			);
 
 			if ( ! empty( $title ) ) {
 				$step_schema['name'] = $title;
@@ -209,7 +209,7 @@ class HowTo_Schema extends Abstract_Schema {
 			}
 
 			$result[] = $step_schema;
-			$position++;
+			++$position;
 		}
 
 		return $result;

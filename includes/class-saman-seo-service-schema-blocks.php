@@ -22,9 +22,9 @@ class Schema_Blocks {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'init', [ $this, 'register_blocks' ] );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_assets' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_styles' ] );
+		add_action( 'init', array( $this, 'register_blocks' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_styles' ) );
 	}
 
 	/**
@@ -40,17 +40,17 @@ class Schema_Blocks {
 		$faq_json   = SAMAN_SEO_PATH . 'blocks/faq/block.json';
 		$howto_json = SAMAN_SEO_PATH . 'blocks/howto/block.json';
 
-		$faq_args = [
+		$faq_args = array(
 			'editor_script' => 'saman-seo-faq-block',
 			'editor_style'  => 'saman-seo-schema-blocks-editor',
 			'style'         => 'saman-seo-schema-blocks',
-		];
+		);
 
-		$howto_args = [
+		$howto_args = array(
 			'editor_script' => 'saman-seo-howto-block',
 			'editor_style'  => 'saman-seo-schema-blocks-editor',
 			'style'         => 'saman-seo-schema-blocks',
-		];
+		);
 
 		// Register FAQ block from block.json metadata when available.
 		if ( file_exists( $faq_json ) ) {
@@ -77,7 +77,7 @@ class Schema_Blocks {
 		wp_register_script(
 			'saman-seo-faq-block',
 			SAMAN_SEO_URL . 'blocks/faq/index.js',
-			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
 			SAMAN_SEO_VERSION,
 			true
 		);
@@ -86,7 +86,7 @@ class Schema_Blocks {
 		wp_register_script(
 			'saman-seo-howto-block',
 			SAMAN_SEO_URL . 'blocks/howto/index.js',
-			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
 			SAMAN_SEO_VERSION,
 			true
 		);
@@ -95,7 +95,7 @@ class Schema_Blocks {
 		wp_register_style(
 			'saman-seo-schema-blocks-editor',
 			SAMAN_SEO_URL . 'assets/css/schema-blocks-editor.css',
-			[],
+			array(),
 			SAMAN_SEO_VERSION
 		);
 
@@ -128,7 +128,7 @@ class Schema_Blocks {
 			wp_register_style(
 				'saman-seo-schema-blocks',
 				SAMAN_SEO_URL . 'assets/css/schema-blocks.css',
-				[],
+				array(),
 				SAMAN_SEO_VERSION
 			);
 

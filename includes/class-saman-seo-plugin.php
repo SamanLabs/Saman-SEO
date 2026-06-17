@@ -40,7 +40,7 @@ class Plugin {
 	 *
 	 * @var array<string,object>
 	 */
-	private $services = [];
+	private $services = array();
 
 	/**
 	 * Retrieve singleton instance.
@@ -67,84 +67,84 @@ class Plugin {
 
 		// Register core schema types before services.
 		$registry = Schema_Registry::instance();
-		$registry->register( 'website', WebSite_Schema::class, [ 'priority' => 1 ] );
-		$registry->register( 'organization', Organization_Schema::class, [ 'priority' => 2 ] );
-		$registry->register( 'person', Person_Schema::class, [ 'priority' => 2 ] );
+		$registry->register( 'website', WebSite_Schema::class, array( 'priority' => 1 ) );
+		$registry->register( 'organization', Organization_Schema::class, array( 'priority' => 2 ) );
+		$registry->register( 'person', Person_Schema::class, array( 'priority' => 2 ) );
 
 		// LocalBusiness schema (priority 5 - after Organization 2, before WebPage 10).
 		$registry->register(
 			'localbusiness',
 			LocalBusiness_Schema::class,
-			[
+			array(
 				'label'    => 'Local Business',
 				'priority' => 5,
-			]
+			)
 		);
 
-		$registry->register( 'webpage', WebPage_Schema::class, [ 'priority' => 10 ] );
+		$registry->register( 'webpage', WebPage_Schema::class, array( 'priority' => 10 ) );
 
 		// Content schemas (priority 15 - after WebPage 10, before Breadcrumb 20).
 		$registry->register(
 			'article',
 			Article_Schema::class,
-			[
+			array(
 				'label'      => 'Article',
-				'post_types' => [ 'post' ],
+				'post_types' => array( 'post' ),
 				'priority'   => 15,
-			]
+			)
 		);
 
 		$registry->register(
 			'blogposting',
 			BlogPosting_Schema::class,
-			[
+			array(
 				'label'      => 'BlogPosting',
-				'post_types' => [ 'post' ],
+				'post_types' => array( 'post' ),
 				'priority'   => 15,
-			]
+			)
 		);
 
 		$registry->register(
 			'newsarticle',
 			NewsArticle_Schema::class,
-			[
+			array(
 				'label'      => 'NewsArticle',
-				'post_types' => [ 'post' ],
+				'post_types' => array( 'post' ),
 				'priority'   => 15,
-			]
+			)
 		);
 
 		// Generic product CPT support (separate from WooCommerce integration).
 		$registry->register(
 			'product',
 			Product_Schema::class,
-			[
+			array(
 				'label'      => 'Product',
-				'post_types' => [ 'seo_pilot_product' ],
+				'post_types' => array( 'seo_pilot_product' ),
 				'priority'   => 15,
-			]
+			)
 		);
 
 		// Interactive schemas (priority 18 - after content schemas 15, before Breadcrumb 20).
 		$registry->register(
 			'faqpage',
 			FAQPage_Schema::class,
-			[
+			array(
 				'label'    => 'FAQ Page',
 				'priority' => 18,
-			]
+			)
 		);
 
 		$registry->register(
 			'howto',
 			HowTo_Schema::class,
-			[
+			array(
 				'label'    => 'How To',
 				'priority' => 18,
-			]
+			)
 		);
 
-		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, [ 'priority' => 20 ] );
+		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, array( 'priority' => 20 ) );
 
 		/**
 		 * Fires after core schema types are registered.
@@ -258,9 +258,9 @@ class Plugin {
 		Service\Internal_Linking::activate();
 
 		add_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' );
-		add_option( 'SAMAN_SEO_post_type_title_templates', [] );
-		add_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
-		add_option( 'SAMAN_SEO_post_type_keywords', [] );
+		add_option( 'SAMAN_SEO_post_type_title_templates', array() );
+		add_option( 'SAMAN_SEO_post_type_meta_descriptions', array() );
+		add_option( 'SAMAN_SEO_post_type_keywords', array() );
 		// AI prompt customization (API keys and model selection handled by Saman Labs AI plugin)
 		add_option( 'SAMAN_SEO_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' );
 		add_option( 'SAMAN_SEO_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' );
@@ -298,16 +298,16 @@ class Plugin {
 		add_option( 'SAMAN_SEO_sitemap_enable_index', '1' );
 		add_option( 'SAMAN_SEO_sitemap_dynamic_generation', '1' );
 		add_option( 'SAMAN_SEO_sitemap_schedule_updates', '' );
-		add_option( 'SAMAN_SEO_sitemap_post_types', [] );
-		add_option( 'SAMAN_SEO_sitemap_taxonomies', [] );
+		add_option( 'SAMAN_SEO_sitemap_post_types', array() );
+		add_option( 'SAMAN_SEO_sitemap_taxonomies', array() );
 		add_option( 'SAMAN_SEO_sitemap_include_author_pages', '0' );
 		add_option( 'SAMAN_SEO_sitemap_include_date_archives', '0' );
 		add_option( 'SAMAN_SEO_sitemap_exclude_images', '0' );
 		add_option( 'SAMAN_SEO_sitemap_enable_rss', '0' );
 		add_option( 'SAMAN_SEO_sitemap_enable_google_news', '0' );
 		add_option( 'SAMAN_SEO_sitemap_google_news_name', get_bloginfo( 'name' ) );
-		add_option( 'SAMAN_SEO_sitemap_google_news_post_types', [] );
-		add_option( 'SAMAN_SEO_sitemap_additional_pages', [] );
+		add_option( 'SAMAN_SEO_sitemap_google_news_post_types', array() );
+		add_option( 'SAMAN_SEO_sitemap_additional_pages', array() );
 
 		if ( \Saman\SEO\Helpers\module_enabled( 'sitemap' ) ) {
 			( new Service\Sitemap_Enhancer() )->register_custom_sitemap();

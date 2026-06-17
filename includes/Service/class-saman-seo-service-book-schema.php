@@ -20,7 +20,7 @@ class Book_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_book_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_book_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -31,7 +31,7 @@ class Book_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_book_schema_to_graph( $graph, $post ) {
-		
+
 		if ( ! $post || 'book' !== get_post_type( $post ) ) {
 			return $graph;
 		}
@@ -52,28 +52,28 @@ class Book_Schema {
 	 * @return array|null
 	 */
 	private function build_schema( $post ) {
-		$book_name = get_the_title( $post );
+		$book_name   = get_the_title( $post );
 		$author_name = get_the_author_meta( 'display_name', $post->post_author );
 
 		// In a real implementation, these would come from post meta.
-		$isbn = '978-3-16-148410-0';
+		$isbn         = '978-3-16-148410-0';
 		$book_edition = '1st Edition';
 
 		if ( empty( $book_name ) ) {
 			return null;
 		}
 
-		$schema = [
+		$schema = array(
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Book',
 			'name'        => $book_name,
-			'author'      => [
+			'author'      => array(
 				'@type' => 'Person',
 				'name'  => $author_name,
-			],
+			),
 			'isbn'        => $isbn,
 			'bookEdition' => $book_edition,
-		];
+		);
 
 		return $schema;
 	}

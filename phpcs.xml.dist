@@ -8,12 +8,16 @@
     <file>blocks</file>
     <file>templates</file>
 
-    <!-- Exclude build artifacts, dependencies, and generated files. -->
+    <!-- Exclude build artifacts, dependencies, generated files, and vendored code. -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
     <exclude-pattern>*/build/*</exclude-pattern>
     <exclude-pattern>*/assets/*</exclude-pattern>
     <exclude-pattern>*/.planning/*</exclude-pattern>
+    <exclude-pattern>*/useragent_detect_browser.php</exclude-pattern>
+    <exclude-pattern>*/Twiglet.php</exclude-pattern>
+    <exclude-pattern>*/class-redirects-controller.php</exclude-pattern>
+    <exclude-pattern>*/class-assistants-controller.php</exclude-pattern>
 
     <!-- Use the WordPress Coding Standards. -->
     <rule ref="WordPress">

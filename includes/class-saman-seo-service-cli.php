@@ -38,10 +38,10 @@ class CLI {
 				 *
 				 * @subcommand list
 				 */
-					public function list_( $args, $assoc_args ) {
-						$data = array_map( [ $this, 'sanitize_redirect_row' ], $this->get_redirect_rows() );
-						\WP_CLI\Utils\format_items( $assoc_args['format'] ?? 'table', $data, [ 'id', 'source', 'target', 'status_code', 'hits', 'last_hit' ] );
-					}
+				public function list_( $args, $assoc_args ) {
+					$data = array_map( array( $this, 'sanitize_redirect_row' ), $this->get_redirect_rows() );
+					\WP_CLI\Utils\format_items( $assoc_args['format'] ?? 'table', $data, array( 'id', 'source', 'target', 'status_code', 'hits', 'last_hit' ) );
+				}
 
 				/**
 				 * Export redirects as JSON.
@@ -53,8 +53,8 @@ class CLI {
 				 */
 				public function export( $args ) {
 					list( $file ) = $args;
-					$redirects = array_map(
-						[ $this, 'sanitize_redirect_row_for_export' ],
+					$redirects    = array_map(
+						array( $this, 'sanitize_redirect_row_for_export' ),
 						$this->get_redirect_rows()
 					);
 					file_put_contents( $file, wp_json_encode( $redirects, JSON_PRETTY_PRINT ) );
@@ -87,12 +87,12 @@ class CLI {
 						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Importing redirect rows requires direct writes to the custom table.
 						$wpdb->insert(
 							$table,
-							[
+							array(
 								'source'      => sanitize_text_field( $row['source'] ?? '' ),
 								'target'      => esc_url_raw( $row['target'] ?? '' ),
 								'status_code' => absint( $row['status_code'] ?? 301 ),
-							],
-							[ '%s', '%s', '%d' ]
+							),
+							array( '%s', '%s', '%d' )
 						);
 					}
 
@@ -116,7 +116,7 @@ class CLI {
 						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- Table name already sanitized via esc_sql(), and results are cached immediately after.
 						$raw_data = $wpdb->get_results( $query, ARRAY_A );
 
-						$data = array_map( [ $this, 'sanitize_redirect_row' ], $raw_data );
+						$data = array_map( array( $this, 'sanitize_redirect_row' ), $raw_data );
 
 						wp_cache_set( Redirect_Manager::CACHE_KEY_CLI, $data, Redirect_Manager::CACHE_GROUP, Redirect_Manager::CACHE_TTL );
 					}
@@ -132,14 +132,14 @@ class CLI {
 				 * @return array
 				 */
 				private function sanitize_redirect_row( array $row ) {
-					return [
+					return array(
 						'id'          => isset( $row['id'] ) ? (int) $row['id'] : 0,
 						'source'      => isset( $row['source'] ) ? sanitize_text_field( $row['source'] ) : '',
 						'target'      => isset( $row['target'] ) ? esc_url_raw( $row['target'] ) : '',
 						'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
 						'hits'        => isset( $row['hits'] ) ? (int) $row['hits'] : 0,
 						'last_hit'    => isset( $row['last_hit'] ) ? sanitize_text_field( $row['last_hit'] ) : '',
-					];
+					);
 				}
 
 				/**
@@ -150,11 +150,11 @@ class CLI {
 				 * @return array
 				 */
 				private function sanitize_redirect_row_for_export( array $row ) {
-					return [
+					return array(
 						'source'      => isset( $row['source'] ) ? sanitize_text_field( $row['source'] ) : '',
 						'target'      => isset( $row['target'] ) ? esc_url_raw( $row['target'] ) : '',
 						'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
-					];
+					);
 				}
 			}
 		);

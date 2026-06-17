@@ -50,7 +50,7 @@ class Product_Schema extends Abstract_Schema {
 			// Native WooCommerce products.
 			if ( \is_singular( 'product' ) && \function_exists( 'wc_get_product' ) ) {
 				$product = \wc_get_product( $this->context->post );
-				$needed   = $product instanceof \WC_Product;
+				$needed  = $product instanceof \WC_Product;
 			} elseif ( \is_singular( 'seo_pilot_product' ) ) {
 				// Generic product CPTs (e.g. custom product post types).
 				$needed = $this->context->post instanceof \WP_Post;
@@ -83,15 +83,15 @@ class Product_Schema extends Abstract_Schema {
 
 		// Validate required fields exist.
 		if ( ! $product || empty( $product->get_name() ) ) {
-			return [];
+			return array();
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => $this->get_id(),
 			'name'  => $product->get_name(),
 			'url'   => $this->context->canonical,
-		];
+		);
 
 		// Add optional properties conditionally.
 		$this->add_description( $schema, $product );
@@ -129,15 +129,15 @@ class Product_Schema extends Abstract_Schema {
 	private function generate_generic_product(): array {
 		$post = $this->context->post;
 		if ( ! $post instanceof \WP_Post ) {
-			return [];
+			return array();
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => $this->get_id(),
 			'name'  => get_the_title( $post ),
 			'url'   => $this->context->canonical,
-		];
+		);
 
 		if ( ! empty( $this->context->meta['description'] ) ) {
 			$schema['description'] = wp_strip_all_tags( $this->context->meta['description'] );
@@ -158,13 +158,13 @@ class Product_Schema extends Abstract_Schema {
 		}
 
 		if ( '' !== $price && is_numeric( $price ) ) {
-			$schema['offers'] = [
+			$schema['offers'] = array(
 				'@type'         => 'Offer',
 				'price'         => $price,
 				'priceCurrency' => $currency,
 				'url'           => $this->context->canonical,
 				'availability'  => 'https://schema.org/InStock',
-			];
+			);
 		}
 
 		return $this->apply_fields_filter( $schema );
@@ -184,7 +184,7 @@ class Product_Schema extends Abstract_Schema {
 	 *
 	 * Strips HTML tags for clean schema output.
 	 *
-	 * @param array      $schema  Schema array by reference.
+	 * @param array       $schema  Schema array by reference.
 	 * @param \WC_Product $product WooCommerce product.
 	 */
 	protected function add_description( array &$schema, \WC_Product $product ): void {
@@ -200,7 +200,7 @@ class Product_Schema extends Abstract_Schema {
 	 * Featured image is first, followed by gallery images.
 	 * Uses 'full' size for maximum quality.
 	 *
-	 * @param array      $schema  Schema array by reference.
+	 * @param array       $schema  Schema array by reference.
 	 * @param \WC_Product $product WooCommerce product.
 	 */
 	protected function add_images( array &$schema, \WC_Product $product ): void {
@@ -217,7 +217,7 @@ class Product_Schema extends Abstract_Schema {
 	 * @return array Array of image URLs.
 	 */
 	protected function get_images( \WC_Product $product ): array {
-		$images = [];
+		$images = array();
 
 		// Featured image first.
 		$featured_id = $product->get_image_id();
@@ -243,7 +243,7 @@ class Product_Schema extends Abstract_Schema {
 	/**
 	 * Add SKU to schema.
 	 *
-	 * @param array      $schema  Schema array by reference.
+	 * @param array       $schema  Schema array by reference.
 	 * @param \WC_Product $product WooCommerce product.
 	 */
 	protected function add_sku( array &$schema, \WC_Product $product ): void {
@@ -281,23 +281,23 @@ class Product_Schema extends Abstract_Schema {
 	/**
 	 * Add brand to schema as Brand object.
 	 *
-	 * @param array      $schema  Schema array by reference.
+	 * @param array       $schema  Schema array by reference.
 	 * @param \WC_Product $product WooCommerce product.
 	 */
 	protected function add_brand( array &$schema, \WC_Product $product ): void {
 		$brand = $this->get_brand( $product );
 		if ( ! empty( $brand ) ) {
-			$schema['brand'] = [
+			$schema['brand'] = array(
 				'@type' => 'Brand',
 				'name'  => $brand,
-			];
+			);
 		}
 	}
 
 	/**
 	 * Add GTIN and MPN identifiers from custom fields.
 	 *
-	 * @param array      $schema  Schema array by reference.
+	 * @param array       $schema  Schema array by reference.
 	 * @param \WC_Product $product WooCommerce product.
 	 */
 	protected function add_identifiers( array &$schema, \WC_Product $product ): void {
@@ -318,7 +318,7 @@ class Product_Schema extends Abstract_Schema {
 	 * Defaults to NewCondition if not specified.
 	 * Uses full URL format per Google requirements.
 	 *
-	 * @param array      $schema  Schema array by reference.
+	 * @param array       $schema  Schema array by reference.
 	 * @param \WC_Product $product WooCommerce product.
 	 */
 	protected function add_condition( array &$schema, \WC_Product $product ): void {
@@ -330,12 +330,12 @@ class Product_Schema extends Abstract_Schema {
 		}
 
 		// Valid conditions per schema.org.
-		$valid = [
+		$valid = array(
 			'NewCondition',
 			'UsedCondition',
 			'RefurbishedCondition',
 			'DamagedCondition',
-		];
+		);
 
 		if ( in_array( $condition, $valid, true ) ) {
 			$schema['itemCondition'] = 'https://schema.org/' . $condition;
@@ -366,13 +366,13 @@ class Product_Schema extends Abstract_Schema {
 			return;
 		}
 
-		$schema['aggregateRating'] = [
+		$schema['aggregateRating'] = array(
 			'@type'       => 'AggregateRating',
 			'ratingValue' => round( (float) $average_rating, 1 ),
 			'reviewCount' => (int) $review_count,
 			'bestRating'  => 5,
 			'worstRating' => 1,
-		];
+		);
 	}
 
 	/**
@@ -391,21 +391,23 @@ class Product_Schema extends Abstract_Schema {
 		}
 
 		// Query approved WooCommerce reviews.
-		$comments = get_comments( [
-			'post_id' => $product->get_id(),
-			'status'  => 'approve',
-			'type'    => 'review',
-			'number'  => 10,
-			'orderby' => 'comment_date_gmt',
-			'order'   => 'DESC',
-		] );
+		$comments = get_comments(
+			array(
+				'post_id' => $product->get_id(),
+				'status'  => 'approve',
+				'type'    => 'review',
+				'number'  => 10,
+				'orderby' => 'comment_date_gmt',
+				'order'   => 'DESC',
+			)
+		);
 
 		if ( empty( $comments ) ) {
 			return;
 		}
 
 		// Build review array from comments.
-		$reviews = [];
+		$reviews = array();
 		foreach ( $comments as $comment ) {
 			$review = $this->build_review( $comment );
 			if ( ! empty( $review ) ) {
@@ -432,29 +434,29 @@ class Product_Schema extends Abstract_Schema {
 		// Author is required by Google.
 		$author_name = trim( $comment->comment_author );
 		if ( empty( $author_name ) ) {
-			return [];
+			return array();
 		}
 
 		// Rating must be valid 1-5 range.
 		$rating = (int) get_comment_meta( $comment->comment_ID, 'rating', true );
 		if ( $rating < 1 || $rating > 5 ) {
-			return [];
+			return array();
 		}
 
-		$review = [
+		$review = array(
 			'@type'         => 'Review',
-			'author'        => [
+			'author'        => array(
 				'@type' => 'Person',
 				'name'  => $author_name,
-			],
-			'reviewRating'  => [
+			),
+			'reviewRating'  => array(
 				'@type'       => 'Rating',
 				'ratingValue' => $rating,
 				'bestRating'  => 5,
 				'worstRating' => 1,
-			],
+			),
 			'datePublished' => gmdate( 'Y-m-d', strtotime( $comment->comment_date_gmt ) ),
-		];
+		);
 
 		// Optionally add review body if content exists.
 		$review_body = trim( $comment->comment_content );
@@ -474,11 +476,11 @@ class Product_Schema extends Abstract_Schema {
 	protected function get_availability_url( \WC_Product $product ): string {
 		$status = $product->get_stock_status();
 
-		$map = [
+		$map = array(
 			'instock'     => 'https://schema.org/InStock',
 			'outofstock'  => 'https://schema.org/OutOfStock',
 			'onbackorder' => 'https://schema.org/PreOrder',
-		];
+		);
 
 		return $map[ $status ] ?? 'https://schema.org/InStock';
 	}
@@ -494,16 +496,16 @@ class Product_Schema extends Abstract_Schema {
 
 		// Price is required for merchant listings - skip if zero/empty.
 		if ( empty( $price ) || (float) $price <= 0 ) {
-			return [];
+			return array();
 		}
 
-		$offer = [
+		$offer = array(
 			'@type'         => 'Offer',
 			'price'         => $price,
 			'priceCurrency' => get_woocommerce_currency(),
 			'availability'  => $this->get_availability_url( $product ),
 			'url'           => $this->context->canonical,
-		];
+		);
 
 		// priceValidUntil from sale end date (OFFR-03).
 		$sale_end = $product->get_date_on_sale_to();
@@ -514,7 +516,7 @@ class Product_Schema extends Abstract_Schema {
 		// Seller reference to Organization (OFFR-06).
 		// Only add when Organization type is active (most stores).
 		if ( get_option( 'SAMAN_SEO_homepage_knowledge_type', 'organization' ) === 'organization' ) {
-			$offer['seller'] = [ '@id' => Schema_IDs::organization() ];
+			$offer['seller'] = array( '@id' => Schema_IDs::organization() );
 		}
 
 		return $offer;
@@ -535,19 +537,19 @@ class Product_Schema extends Abstract_Schema {
 
 		// Both prices required for valid AggregateOffer.
 		if ( empty( $min_price ) || (float) $min_price <= 0 ) {
-			return [];
+			return array();
 		}
 		if ( empty( $max_price ) || (float) $max_price <= 0 ) {
-			return [];
+			return array();
 		}
 
-		$aggregate = [
+		$aggregate = array(
 			'@type'         => 'AggregateOffer',
 			'lowPrice'      => $min_price,
 			'highPrice'     => $max_price,
 			'priceCurrency' => get_woocommerce_currency(),
 			'url'           => $this->context->canonical,
-		];
+		);
 
 		// Availability: InStock if ANY variation is purchasable (OFFR-05).
 		$aggregate['availability'] = $product->child_is_in_stock()

@@ -91,7 +91,7 @@ class Schema_Context {
 		$context->canonical = $context->post instanceof \WP_Post ? get_permalink( $context->post ) : $context->site_url;
 
 		// Get post meta, ensure array.
-		$raw_meta = [];
+		$raw_meta = array();
 		if ( $context->post instanceof \WP_Post ) {
 			$raw_meta = get_post_meta( $context->post->ID, '_SAMAN_SEO_meta', true );
 
@@ -103,7 +103,7 @@ class Schema_Context {
 				}
 			}
 		}
-		$context->meta = is_array( $raw_meta ) ? $raw_meta : [];
+		$context->meta = is_array( $raw_meta ) ? $raw_meta : array();
 
 		// Determine schema type: post meta > post type settings > default.
 		$context->schema_type = self::determine_schema_type( $context );
@@ -140,7 +140,7 @@ class Schema_Context {
 			}
 		}
 
-		$context->meta = is_array( $raw_meta ) ? $raw_meta : [];
+		$context->meta = is_array( $raw_meta ) ? $raw_meta : array();
 
 		// Determine schema type: post meta > post type settings > default.
 		$context->schema_type = self::determine_schema_type( $context );
@@ -167,7 +167,7 @@ class Schema_Context {
 
 		// Check post type defaults.
 		if ( ! empty( $context->post_type ) ) {
-			$type_settings = get_option( 'SAMAN_SEO_post_type_settings', [] );
+			$type_settings = get_option( 'SAMAN_SEO_post_type_settings', array() );
 			if ( is_array( $type_settings ) && ! empty( $type_settings[ $context->post_type ] ) ) {
 				$settings = $type_settings[ $context->post_type ];
 

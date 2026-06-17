@@ -20,7 +20,7 @@ class Importers {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'admin_post_SAMAN_SEO_export', [ $this, 'handle_export' ] );
+		add_action( 'admin_post_SAMAN_SEO_export', array( $this, 'handle_export' ) );
 	}
 
 	/**
@@ -35,7 +35,7 @@ class Importers {
 
 		check_admin_referer( 'SAMAN_SEO_export' );
 
-		$options = [
+		$options = array(
 			'SAMAN_SEO_default_title_template',
 			'SAMAN_SEO_post_type_title_templates',
 			'SAMAN_SEO_post_type_meta_descriptions',
@@ -66,20 +66,20 @@ class Importers {
 			'SAMAN_SEO_global_robots',
 			'SAMAN_SEO_hreflang_map',
 			'SAMAN_SEO_robots_txt',
-		];
+		);
 
-		$data = [
+		$data = array(
 			'options' => array_map(
 				static function ( $key ) {
-					return [
+					return array(
 						'key'   => $key,
 						'value' => get_option( $key ),
-					];
+					);
 				},
 				$options
 			),
 			'meta'    => $this->export_meta(),
-		];
+		);
 
 		nocache_headers();
 		header( 'Content-Type: application/json' );
@@ -95,15 +95,15 @@ class Importers {
 	 */
 	private function export_meta() {
 		$posts = get_posts(
-			[
+			array(
 				'post_type'      => 'any',
 				'post_status'    => 'any',
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
-			]
+			)
 		);
 
-		$meta = [];
+		$meta = array();
 
 		foreach ( $posts as $post_id ) {
 			$value = get_post_meta( $post_id, Post_Meta::META_KEY, true );
@@ -114,5 +114,4 @@ class Importers {
 
 		return $meta;
 	}
-
 }

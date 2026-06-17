@@ -20,7 +20,7 @@ class Music_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_music_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_music_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -52,7 +52,7 @@ class Music_Schema {
 	 * @return array|null
 	 */
 	private function build_schema( $post ) {
-		$album_name = get_the_title( $post );
+		$album_name  = get_the_title( $post );
 		$artist_name = get_the_author_meta( 'display_name', $post->post_author );
 
 		// In a real implementation, these would come from post meta.
@@ -62,16 +62,16 @@ class Music_Schema {
 			return null;
 		}
 
-		$schema = [
-			'@context'    => 'https://schema.org',
-			'@type'       => 'MusicAlbum',
-			'name'        => $album_name,
-			'byArtist'    => [
+		$schema = array(
+			'@context'  => 'https://schema.org',
+			'@type'     => 'MusicAlbum',
+			'name'      => $album_name,
+			'byArtist'  => array(
 				'@type' => 'MusicGroup',
 				'name'  => $artist_name,
-			],
-			'numTracks'   => $num_tracks,
-		];
+			),
+			'numTracks' => $num_tracks,
+		);
 
 		return $schema;
 	}

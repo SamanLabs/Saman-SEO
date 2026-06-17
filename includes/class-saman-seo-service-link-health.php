@@ -50,12 +50,12 @@ class Link_Health {
 		$this->maybe_upgrade_schema();
 
 		// Schedule periodic scans if enabled.
-		add_action( 'SAMAN_SEO_link_health_scan', [ $this, 'run_scheduled_scan' ] );
+		add_action( 'SAMAN_SEO_link_health_scan', array( $this, 'run_scheduled_scan' ) );
 		$this->maybe_schedule_scan();
 
 		// Update link data when posts are saved.
-		add_action( 'save_post', [ $this, 'on_post_save' ], 20, 2 );
-		add_action( 'delete_post', [ $this, 'on_post_delete' ] );
+		add_action( 'save_post', array( $this, 'on_post_save' ), 20, 2 );
+		add_action( 'delete_post', array( $this, 'on_post_delete' ) );
 	}
 
 	/**
@@ -126,7 +126,7 @@ class Link_Health {
 	 * Schedule or unschedule scan based on settings.
 	 */
 	public function maybe_schedule_scan() {
-		$settings = get_option( 'SAMAN_SEO_settings', [] );
+		$settings = get_option( 'SAMAN_SEO_settings', array() );
 		$enabled  = isset( $settings['enable_link_health_scan'] ) ? $settings['enable_link_health_scan'] : false;
 
 		if ( $enabled ) {
@@ -185,7 +185,7 @@ class Link_Health {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->insert(
 			$this->scans_table,
-			[
+			array(
 				'scan_type'     => $type,
 				'status'        => 'running',
 				'total_posts'   => count( $posts ),
@@ -193,8 +193,8 @@ class Link_Health {
 				'total_links'   => 0,
 				'broken_links'  => 0,
 				'started_at'    => current_time( 'mysql' ),
-			],
-			[ '%s', '%s', '%d', '%d', '%d', '%d', '%s' ]
+			),
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%s' )
 		);
 
 		$scan_id = $wpdb->insert_id;
@@ -213,15 +213,15 @@ class Link_Health {
 	 * @return array Post IDs.
 	 */
 	private function get_posts_to_scan( $type, $post_id = 0 ) {
-		$args = [
-			'post_type'      => [ 'post', 'page' ],
+		$args = array(
+			'post_type'      => array( 'post', 'page' ),
 			'post_status'    => 'publish',
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
-		];
+		);
 
 		if ( 'single' === $type && $post_id > 0 ) {
-			return [ $post_id ];
+			return array( $post_id );
 		}
 
 		return get_posts( $args );
@@ -240,36 +240,38 @@ class Link_Health {
 		$broken_links = 0;
 
 		foreach ( $posts as $post_id ) {
-			$links = $this->scan_post_links( $post_id );
+			$links        = $this->scan_post_links( $post_id );
 			$total_links += count( $links );
 
 			foreach ( $links as $link ) {
 				if ( 'broken' === $link['status'] ) {
-					$broken_links++;
+					++$broken_links;
 				}
 			}
 
 			// Update progress.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->query( $wpdb->prepare(
-				"UPDATE {$this->scans_table} SET scanned_posts = scanned_posts + 1, total_links = %d, broken_links = %d WHERE id = %d",
-				$total_links,
-				$broken_links,
-				$scan_id
-			) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$this->scans_table} SET scanned_posts = scanned_posts + 1, total_links = %d, broken_links = %d WHERE id = %d",
+					$total_links,
+					$broken_links,
+					$scan_id
+				)
+			);
 		}
 
 		// Mark scan as completed.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->update(
 			$this->scans_table,
-			[
+			array(
 				'status'       => 'completed',
 				'completed_at' => current_time( 'mysql' ),
-			],
-			[ 'id' => $scan_id ],
-			[ '%s', '%s' ],
-			[ '%d' ]
+			),
+			array( 'id' => $scan_id ),
+			array( '%s', '%s' ),
+			array( '%d' )
 		);
 	}
 
@@ -284,7 +286,7 @@ class Link_Health {
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
-			return [];
+			return array();
 		}
 
 		// Extract links from content.
@@ -292,13 +294,13 @@ class Link_Health {
 
 		// Delete old links for this post.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$wpdb->delete( $this->links_table, [ 'source_post_id' => $post_id ], [ '%d' ] );
+		$wpdb->delete( $this->links_table, array( 'source_post_id' => $post_id ), array( '%d' ) );
 
-		$results = [];
+		$results = array();
 		$now     = current_time( 'mysql' );
 
 		foreach ( $links as $link ) {
-			$link_data = $this->check_link( $link['url'] );
+			$link_data                   = $this->check_link( $link['url'] );
 			$link_data['source_post_id'] = $post_id;
 			$link_data['link_text']      = $link['text'];
 			$link_data['created_at']     = $now;
@@ -309,7 +311,7 @@ class Link_Health {
 			$wpdb->insert(
 				$this->links_table,
 				$link_data,
-				[ '%d', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s' ]
+				array( '%d', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s' )
 			);
 
 			$link_data['id'] = $wpdb->insert_id;
@@ -326,7 +328,7 @@ class Link_Health {
 	 * @return array Links with URL and text.
 	 */
 	private function extract_links_from_content( $content ) {
-		$links = [];
+		$links = array();
 
 		// Match all <a> tags.
 		if ( preg_match_all( '/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', $content, $matches, PREG_SET_ORDER ) ) {
@@ -339,10 +341,10 @@ class Link_Health {
 					continue;
 				}
 
-				$links[] = [
+				$links[] = array(
 					'url'  => $url,
 					'text' => mb_substr( $text, 0, 255 ),
-				];
+				);
 			}
 		}
 
@@ -356,10 +358,10 @@ class Link_Health {
 	 * @return array Link data.
 	 */
 	private function check_link( $url ) {
-		$site_url = home_url();
+		$site_url    = home_url();
 		$is_internal = strpos( $url, $site_url ) === 0 || strpos( $url, '/' ) === 0;
 
-		$data = [
+		$data = array(
 			'target_url'     => $url,
 			'target_post_id' => null,
 			'link_type'      => $is_internal ? 'internal' : 'external',
@@ -367,7 +369,7 @@ class Link_Health {
 			'http_code'      => null,
 			'redirect_url'   => null,
 			'error_message'  => null,
-		];
+		);
 
 		// For internal links, try to find the post.
 		if ( $is_internal ) {
@@ -407,17 +409,20 @@ class Link_Health {
 	 * @return array Status data.
 	 */
 	private function check_url_status( $url ) {
-		$result = [
+		$result = array(
 			'code'         => null,
 			'status'       => 'unknown',
 			'redirect_url' => null,
 			'error'        => null,
-		];
+		);
 
-		$response = wp_remote_head( $url, [
-			'timeout'     => 10,
-			'redirection' => 0,
-		] );
+		$response = wp_remote_head(
+			$url,
+			array(
+				'timeout'     => 10,
+				'redirection' => 0,
+			)
+		);
 
 		if ( is_wp_error( $response ) ) {
 			$result['status'] = 'broken';
@@ -425,7 +430,7 @@ class Link_Health {
 			return $result;
 		}
 
-		$code = wp_remote_retrieve_response_code( $response );
+		$code           = wp_remote_retrieve_response_code( $response );
 		$result['code'] = $code;
 
 		if ( $code >= 200 && $code < 300 ) {
@@ -453,7 +458,7 @@ class Link_Health {
 		}
 
 		// Skip non-public post types.
-		if ( ! in_array( $post->post_type, [ 'post', 'page' ], true ) ) {
+		if ( ! in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
 			return;
 		}
 
@@ -476,16 +481,19 @@ class Link_Health {
 
 		// Delete links from this post.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$wpdb->delete( $this->links_table, [ 'source_post_id' => $post_id ], [ '%d' ] );
+		$wpdb->delete( $this->links_table, array( 'source_post_id' => $post_id ), array( '%d' ) );
 
 		// Update links pointing to this post.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->update(
 			$this->links_table,
-			[ 'status' => 'broken', 'target_post_id' => null ],
-			[ 'target_post_id' => $post_id ],
-			[ '%s', '%d' ],
-			[ '%d' ]
+			array(
+				'status'         => 'broken',
+				'target_post_id' => null,
+			),
+			array( 'target_post_id' => $post_id ),
+			array( '%s', '%d' ),
+			array( '%d' )
 		);
 	}
 
@@ -521,16 +529,16 @@ class Link_Health {
 			"SELECT * FROM {$this->scans_table} WHERE status = 'completed' ORDER BY completed_at DESC LIMIT 1"
 		);
 
-		return [
-			'total_links'   => $total,
-			'broken_links'  => $broken,
-			'redirects'     => $redirects,
-			'internal'      => $internal,
-			'external'      => $external,
-			'orphan_pages'  => $orphans,
-			'last_scan'     => $last_scan ? $last_scan->completed_at : null,
-			'health_score'  => $total > 0 ? round( ( ( $total - $broken ) / $total ) * 100 ) : 100,
-		];
+		return array(
+			'total_links'  => $total,
+			'broken_links' => $broken,
+			'redirects'    => $redirects,
+			'internal'     => $internal,
+			'external'     => $external,
+			'orphan_pages' => $orphans,
+			'last_scan'    => $last_scan ? $last_scan->completed_at : null,
+			'health_score' => $total > 0 ? round( ( ( $total - $broken ) / $total ) * 100 ) : 100,
+		);
 	}
 
 	/**
@@ -539,15 +547,15 @@ class Link_Health {
 	 * @param array $args Query arguments.
 	 * @return array Links data.
 	 */
-	public function get_broken_links( $args = [] ) {
+	public function get_broken_links( $args = array() ) {
 		global $wpdb;
 
-		$defaults = [
+		$defaults = array(
 			'per_page' => 50,
 			'page'     => 1,
 			'type'     => '', // internal, external, or empty for all.
-		];
-		$args = wp_parse_args( $args, $defaults );
+		);
+		$args     = wp_parse_args( $args, $defaults );
 
 		$where = "WHERE status = 'broken'";
 		if ( ! empty( $args['type'] ) ) {
@@ -560,24 +568,26 @@ class Link_Health {
 		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->links_table} {$where}" );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$links = $wpdb->get_results( $wpdb->prepare(
-			"SELECT l.*, p.post_title as source_title
+		$links = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT l.*, p.post_title as source_title
 			FROM {$this->links_table} l
 			LEFT JOIN {$wpdb->posts} p ON l.source_post_id = p.ID
 			{$where}
 			ORDER BY l.last_checked DESC
 			LIMIT %d OFFSET %d",
-			$args['per_page'],
-			$offset
-		) );
+				$args['per_page'],
+				$offset
+			)
+		);
 
-		return [
+		return array(
 			'items'       => $links,
 			'total'       => $total,
 			'page'        => $args['page'],
 			'per_page'    => $args['per_page'],
 			'total_pages' => max( 1, ceil( $total / $args['per_page'] ) ),
-		];
+		);
 	}
 
 	/**
@@ -586,14 +596,14 @@ class Link_Health {
 	 * @param array $args Query arguments.
 	 * @return array Orphan pages.
 	 */
-	public function get_orphan_pages( $args = [] ) {
+	public function get_orphan_pages( $args = array() ) {
 		global $wpdb;
 
-		$defaults = [
+		$defaults = array(
 			'per_page' => 50,
 			'page'     => 1,
-		];
-		$args = wp_parse_args( $args, $defaults );
+		);
+		$args     = wp_parse_args( $args, $defaults );
 
 		$offset = ( $args['page'] - 1 ) * $args['per_page'];
 
@@ -602,8 +612,9 @@ class Link_Health {
 
 		// Find posts that have no incoming internal links.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$orphans = $wpdb->get_results( $wpdb->prepare(
-			"SELECT p.ID, p.post_title, p.post_type, p.post_date
+		$orphans = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT p.ID, p.post_title, p.post_type, p.post_date
 			FROM {$wpdb->posts} p
 			WHERE p.post_status = 'publish'
 			AND p.post_type IN ({$post_types})
@@ -618,19 +629,20 @@ class Link_Health {
 			)
 			ORDER BY p.post_date DESC
 			LIMIT %d OFFSET %d",
-			$args['per_page'],
-			$offset
-		) );
+				$args['per_page'],
+				$offset
+			)
+		);
 
 		$total = $this->get_orphan_pages_count();
 
-		return [
+		return array(
 			'items'       => $orphans,
 			'total'       => $total,
 			'page'        => $args['page'],
 			'per_page'    => $args['per_page'],
 			'total_pages' => max( 1, ceil( $total / $args['per_page'] ) ),
-		];
+		);
 	}
 
 	/**
@@ -671,7 +683,7 @@ class Link_Health {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return (bool) $wpdb->delete( $this->links_table, [ 'id' => $link_id ], [ '%d' ] );
+		return (bool) $wpdb->delete( $this->links_table, array( 'id' => $link_id ), array( '%d' ) );
 	}
 
 	/**
@@ -684,10 +696,12 @@ class Link_Health {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$link = $wpdb->get_row( $wpdb->prepare(
-			"SELECT * FROM {$this->links_table} WHERE id = %d",
-			$link_id
-		) );
+		$link = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$this->links_table} WHERE id = %d",
+				$link_id
+			)
+		);
 
 		if ( ! $link ) {
 			return false;
@@ -698,16 +712,16 @@ class Link_Health {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->update(
 			$this->links_table,
-			[
+			array(
 				'status'        => $check['status'],
 				'http_code'     => $check['http_code'],
 				'redirect_url'  => $check['redirect_url'],
 				'error_message' => $check['error_message'],
 				'last_checked'  => current_time( 'mysql' ),
-			],
-			[ 'id' => $link_id ],
-			[ '%s', '%d', '%s', '%s', '%s' ],
-			[ '%d' ]
+			),
+			array( 'id' => $link_id ),
+			array( '%s', '%d', '%s', '%s', '%s' ),
+			array( '%d' )
 		);
 
 		return array_merge( (array) $link, $check );
@@ -738,9 +752,12 @@ class Link_Health {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM {$this->scans_table} ORDER BY id DESC LIMIT %d",
-			$limit
-		), ARRAY_A );
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$this->scans_table} ORDER BY id DESC LIMIT %d",
+				$limit
+			),
+			ARRAY_A
+		);
 	}
 }

@@ -12,7 +12,7 @@ use Saman\SEO\Service\Post_Meta;
 use function Saman\SEO\Helpers\calculate_seo_score;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -20,347 +20,379 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Dashboard_Controller extends REST_Controller {
 
-    /**
-     * Redirects table name.
-     *
-     * @var string
-     */
-    private $redirects_table;
+	/**
+	 * Redirects table name.
+	 *
+	 * @var string
+	 */
+	private $redirects_table;
 
-    /**
-     * 404 log table name.
-     *
-     * @var string
-     */
-    private $log_table;
+	/**
+	 * 404 log table name.
+	 *
+	 * @var string
+	 */
+	private $log_table;
 
-    /**
-     * Constructor.
-     */
-    public function __construct() {
-        global $wpdb;
-        $this->redirects_table = $wpdb->prefix . 'SAMAN_SEO_redirects';
-        $this->log_table       = $wpdb->prefix . 'SAMAN_SEO_404_log';
-    }
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		global $wpdb;
+		$this->redirects_table = $wpdb->prefix . 'SAMAN_SEO_redirects';
+		$this->log_table       = $wpdb->prefix . 'SAMAN_SEO_404_log';
+	}
 
-    /**
-     * Register routes.
-     */
-    public function register_routes() {
-        // Get full dashboard data
-        register_rest_route( $this->namespace, '/dashboard', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_dashboard' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+	/**
+	 * Register routes.
+	 */
+	public function register_routes() {
+		// Get full dashboard data
+		register_rest_route(
+			$this->namespace,
+			'/dashboard',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_dashboard' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Get SEO score data
-        register_rest_route( $this->namespace, '/dashboard/seo-score', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_seo_score' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Get SEO score data
+		register_rest_route(
+			$this->namespace,
+			'/dashboard/seo-score',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_seo_score' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Get notifications
-        register_rest_route( $this->namespace, '/dashboard/notifications', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_notifications' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Get notifications
+		register_rest_route(
+			$this->namespace,
+			'/dashboard/notifications',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_notifications' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Dismiss notification
-        register_rest_route( $this->namespace, '/dashboard/notifications/(?P<id>[a-zA-Z0-9_-]+)/dismiss', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'dismiss_notification' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Dismiss notification
+		register_rest_route(
+			$this->namespace,
+			'/dashboard/notifications/(?P<id>[a-zA-Z0-9_-]+)/dismiss',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'dismiss_notification' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Get content coverage stats
-        register_rest_route( $this->namespace, '/dashboard/content-coverage', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_content_coverage' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
-    }
+		// Get content coverage stats
+		register_rest_route(
+			$this->namespace,
+			'/dashboard/content-coverage',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_content_coverage' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
+	}
 
-    /**
-     * Get full dashboard data.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_dashboard( $request ) {
-        // Check cache first (2 minute cache for dashboard overview)
-        $cached = get_transient( 'SAMAN_SEO_dashboard_data' );
-        if ( $cached !== false ) {
-            return $this->success( $cached );
-        }
+	/**
+	 * Get full dashboard data.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_dashboard( $request ) {
+		// Check cache first (2 minute cache for dashboard overview)
+		$cached = get_transient( 'SAMAN_SEO_dashboard_data' );
+		if ( $cached !== false ) {
+			return $this->success( $cached );
+		}
 
-        $data = [
-            'seo_score'        => $this->calculate_overall_seo_score(),
-            'content_coverage' => $this->get_content_coverage_data(),
-            'sitemap'          => $this->get_sitemap_data(),
-            'redirects'        => $this->get_redirects_data(),
-            'errors_404'       => $this->get_404_data(),
-            'schema'           => $this->get_schema_data(),
-            'notifications'    => $this->get_notifications_data(),
-        ];
+		$data = array(
+			'seo_score'        => $this->calculate_overall_seo_score(),
+			'content_coverage' => $this->get_content_coverage_data(),
+			'sitemap'          => $this->get_sitemap_data(),
+			'redirects'        => $this->get_redirects_data(),
+			'errors_404'       => $this->get_404_data(),
+			'schema'           => $this->get_schema_data(),
+			'notifications'    => $this->get_notifications_data(),
+		);
 
-        // Cache for 2 minutes
-        set_transient( 'SAMAN_SEO_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
+		// Cache for 2 minutes
+		set_transient( 'SAMAN_SEO_dashboard_data', $data, 2 * MINUTE_IN_SECONDS );
 
-        return $this->success( $data );
-    }
+		return $this->success( $data );
+	}
 
-    /**
-     * Get SEO score data.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_seo_score( $request ) {
-        return $this->success( $this->calculate_overall_seo_score() );
-    }
+	/**
+	 * Get SEO score data.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_seo_score( $request ) {
+		return $this->success( $this->calculate_overall_seo_score() );
+	}
 
-    /**
-     * Get notifications.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_notifications( $request ) {
-        return $this->success( $this->get_notifications_data() );
-    }
+	/**
+	 * Get notifications.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_notifications( $request ) {
+		return $this->success( $this->get_notifications_data() );
+	}
 
-    /**
-     * Dismiss a notification.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function dismiss_notification( $request ) {
-        $id = $request->get_param( 'id' );
+	/**
+	 * Dismiss a notification.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function dismiss_notification( $request ) {
+		$id = $request->get_param( 'id' );
 
-        $dismissed = get_option( 'SAMAN_SEO_dismissed_notifications', [] );
-        if ( ! is_array( $dismissed ) ) {
-            $dismissed = [];
-        }
+		$dismissed = get_option( 'SAMAN_SEO_dismissed_notifications', array() );
+		if ( ! is_array( $dismissed ) ) {
+			$dismissed = array();
+		}
 
-        $dismissed[ $id ] = time();
-        update_option( 'SAMAN_SEO_dismissed_notifications', $dismissed );
+		$dismissed[ $id ] = time();
+		update_option( 'SAMAN_SEO_dismissed_notifications', $dismissed );
 
-        return $this->success( null, __( 'Notification dismissed.', 'saman-seo' ) );
-    }
+		return $this->success( null, __( 'Notification dismissed.', 'saman-seo' ) );
+	}
 
-    /**
-     * Get content coverage data.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_content_coverage( $request ) {
-        return $this->success( $this->get_content_coverage_data() );
-    }
+	/**
+	 * Get content coverage data.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_content_coverage( $request ) {
+		return $this->success( $this->get_content_coverage_data() );
+	}
 
-    /**
-     * Calculate overall SEO score from published posts.
-     *
-     * @return array
-     */
-    private function calculate_overall_seo_score() {
-        // Check cache first
-        $cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
-        if ( $cached ) {
-            return $cached;
-        }
+	/**
+	 * Calculate overall SEO score from published posts.
+	 *
+	 * @return array
+	 */
+	private function calculate_overall_seo_score() {
+		// Check cache first
+		$cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
+		if ( $cached ) {
+			return $cached;
+		}
 
-        $scores     = [];
-        $score_dist = [ 'excellent' => 0, 'good' => 0, 'fair' => 0, 'poor' => 0 ];
-        $issues     = 0;
+		$scores     = array();
+		$score_dist = array(
+			'excellent' => 0,
+			'good'      => 0,
+			'fair'      => 0,
+			'poor'      => 0,
+		);
+		$issues     = 0;
 
-        // Get recent published posts
-        $posts = get_posts( [
-            'post_type'      => [ 'post', 'page' ],
-            'post_status'    => 'publish',
-            'posts_per_page' => 50,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
-        ] );
+		// Get recent published posts
+		$posts = get_posts(
+			array(
+				'post_type'      => array( 'post', 'page' ),
+				'post_status'    => 'publish',
+				'posts_per_page' => 50,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+			)
+		);
 
-        foreach ( $posts as $post ) {
-            $score_data = null;
-            if ( function_exists( 'Saman\SEO\Helpers\calculate_seo_score' ) ) {
-                $score_data = calculate_seo_score( $post );
-            }
+		foreach ( $posts as $post ) {
+			$score_data = null;
+			if ( function_exists( 'Saman\SEO\Helpers\calculate_seo_score' ) ) {
+				$score_data = calculate_seo_score( $post );
+			}
 
-            if ( $score_data && isset( $score_data['score'] ) ) {
-                $score = $score_data['score'];
-                $scores[] = $score;
+			if ( $score_data && isset( $score_data['score'] ) ) {
+				$score    = $score_data['score'];
+				$scores[] = $score;
 
-                if ( $score >= 80 ) {
-                    $score_dist['excellent']++;
-                } elseif ( $score >= 60 ) {
-                    $score_dist['good']++;
-                } elseif ( $score >= 40 ) {
-                    $score_dist['fair']++;
-                } else {
-                    $score_dist['poor']++;
-                }
+				if ( $score >= 80 ) {
+					++$score_dist['excellent'];
+				} elseif ( $score >= 60 ) {
+					++$score_dist['good'];
+				} elseif ( $score >= 40 ) {
+					++$score_dist['fair'];
+				} else {
+					++$score_dist['poor'];
+				}
 
-                // Count issues
-                if ( $score < 80 ) {
-                    $issues++;
-                }
-            }
-        }
+				// Count issues
+				if ( $score < 80 ) {
+					++$issues;
+				}
+			}
+		}
 
-        $average = count( $scores ) > 0 ? round( array_sum( $scores ) / count( $scores ) ) : 0;
+		$average = count( $scores ) > 0 ? round( array_sum( $scores ) / count( $scores ) ) : 0;
 
-        // Determine level
-        $level = 'poor';
-        $label = 'Needs Work';
-        if ( $average >= 80 ) {
-            $level = 'excellent';
-            $label = 'Excellent';
-        } elseif ( $average >= 60 ) {
-            $level = 'good';
-            $label = 'Good';
-        } elseif ( $average >= 40 ) {
-            $level = 'fair';
-            $label = 'Fair';
-        }
+		// Determine level
+		$level = 'poor';
+		$label = 'Needs Work';
+		if ( $average >= 80 ) {
+			$level = 'excellent';
+			$label = 'Excellent';
+		} elseif ( $average >= 60 ) {
+			$level = 'good';
+			$label = 'Good';
+		} elseif ( $average >= 40 ) {
+			$level = 'fair';
+			$label = 'Fair';
+		}
 
-        $result = [
-            'score'        => $average,
-            'level'        => $level,
-            'label'        => $label,
-            'distribution' => $score_dist,
-            'posts_scored' => count( $scores ),
-            'issues'       => $issues,
-            'trend'        => $this->get_score_trend(),
-        ];
+		$result = array(
+			'score'        => $average,
+			'level'        => $level,
+			'label'        => $label,
+			'distribution' => $score_dist,
+			'posts_scored' => count( $scores ),
+			'issues'       => $issues,
+			'trend'        => $this->get_score_trend(),
+		);
 
-        // Cache for 30 minutes
-        set_transient( 'SAMAN_SEO_dashboard_seo_score', $result, 30 * MINUTE_IN_SECONDS );
+		// Cache for 30 minutes
+		set_transient( 'SAMAN_SEO_dashboard_seo_score', $result, 30 * MINUTE_IN_SECONDS );
 
-        return $result;
-    }
+		return $result;
+	}
 
-    /**
-     * Get SEO score trend (compare to last week).
-     *
-     * @return array
-     */
-    private function get_score_trend() {
-        $history = get_option( 'SAMAN_SEO_score_history', [] );
-        if ( ! is_array( $history ) ) {
-            $history = [];
-        }
+	/**
+	 * Get SEO score trend (compare to last week).
+	 *
+	 * @return array
+	 */
+	private function get_score_trend() {
+		$history = get_option( 'SAMAN_SEO_score_history', array() );
+		if ( ! is_array( $history ) ) {
+			$history = array();
+		}
 
-        // Get current week average
-        $current = $this->get_current_week_score();
+		// Get current week average
+		$current = $this->get_current_week_score();
 
-        // Store current score
-        $today = gmdate( 'Y-m-d' );
-        $history[ $today ] = $current;
+		// Store current score
+		$today             = gmdate( 'Y-m-d' );
+		$history[ $today ] = $current;
 
-        // Keep only last 30 days
-        $cutoff = strtotime( '-30 days' );
-        foreach ( $history as $date => $score ) {
-            if ( strtotime( $date ) < $cutoff ) {
-                unset( $history[ $date ] );
-            }
-        }
-        update_option( 'SAMAN_SEO_score_history', $history );
+		// Keep only last 30 days
+		$cutoff = strtotime( '-30 days' );
+		foreach ( $history as $date => $score ) {
+			if ( strtotime( $date ) < $cutoff ) {
+				unset( $history[ $date ] );
+			}
+		}
+		update_option( 'SAMAN_SEO_score_history', $history );
 
-        // Calculate trend
-        $last_week = array_filter( $history, function( $date ) {
-            return strtotime( $date ) >= strtotime( '-7 days' ) && strtotime( $date ) < strtotime( '-1 day' );
-        }, ARRAY_FILTER_USE_KEY );
+		// Calculate trend
+		$last_week = array_filter(
+			$history,
+			function ( $date ) {
+				return strtotime( $date ) >= strtotime( '-7 days' ) && strtotime( $date ) < strtotime( '-1 day' );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
 
-        $previous_avg = count( $last_week ) > 0 ? array_sum( $last_week ) / count( $last_week ) : $current;
-        $change       = $current - $previous_avg;
+		$previous_avg = count( $last_week ) > 0 ? array_sum( $last_week ) / count( $last_week ) : $current;
+		$change       = $current - $previous_avg;
 
-        return [
-            'direction' => $change > 0 ? 'up' : ( $change < 0 ? 'down' : 'stable' ),
-            'change'    => round( abs( $change ) ),
-            'history'   => array_slice( $history, -7, 7, true ),
-        ];
-    }
+		return array(
+			'direction' => $change > 0 ? 'up' : ( $change < 0 ? 'down' : 'stable' ),
+			'change'    => round( abs( $change ) ),
+			'history'   => array_slice( $history, -7, 7, true ),
+		);
+	}
 
-    /**
-     * Get current week's average score.
-     *
-     * @return int
-     */
-    private function get_current_week_score() {
-        $cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
-        return $cached['score'] ?? 0;
-    }
+	/**
+	 * Get current week's average score.
+	 *
+	 * @return int
+	 */
+	private function get_current_week_score() {
+		$cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
+		return $cached['score'] ?? 0;
+	}
 
-    /**
-     * Get content coverage data.
-     *
-     * @return array
-     */
-    private function get_content_coverage_data() {
-        // Check cache first (5 minute cache for coverage data)
-        $cached = get_transient( 'SAMAN_SEO_content_coverage' );
-        if ( $cached !== false ) {
-            return $cached;
-        }
+	/**
+	 * Get content coverage data.
+	 *
+	 * @return array
+	 */
+	private function get_content_coverage_data() {
+		// Check cache first (5 minute cache for coverage data)
+		$cached = get_transient( 'SAMAN_SEO_content_coverage' );
+		if ( $cached !== false ) {
+			return $cached;
+		}
 
-        global $wpdb;
+		global $wpdb;
 
-        // Count posts with SEO meta vs without
-        $total_posts = wp_count_posts( 'post' )->publish + wp_count_posts( 'page' )->publish;
+		// Count posts with SEO meta vs without
+		$total_posts = wp_count_posts( 'post' )->publish + wp_count_posts( 'page' )->publish;
 
-        // Count posts with meta title
+		// Count posts with meta title
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        $with_title = $wpdb->get_var(
-            "SELECT COUNT(DISTINCT pm.post_id)
+		$with_title = $wpdb->get_var(
+			"SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
              WHERE pm.meta_key = '_SAMAN_SEO_meta'
              AND p.post_status = 'publish'
              AND pm.meta_value LIKE '%\"title\"%'
              AND pm.meta_value NOT LIKE '%\"title\":\"\"%'"
-        );
+		);
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        // Count posts with meta description
+		// Count posts with meta description
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery -- Literal JSON pattern matching, not user input.
-        $with_desc = $wpdb->get_var(
-            "SELECT COUNT(DISTINCT pm.post_id)
+		$with_desc = $wpdb->get_var(
+			"SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
              WHERE pm.meta_key = '_SAMAN_SEO_meta'
              AND p.post_status = 'publish'
              AND pm.meta_value LIKE '%\"description\"%'
              AND pm.meta_value NOT LIKE '%\"description\":\"\"%'"
-        );
+		);
 
-        // Get posts by day for the last 7 days
-        $daily_stats = [];
-        for ( $i = 6; $i >= 0; $i-- ) {
-            $date = gmdate( 'Y-m-d', strtotime( "-{$i} days" ) );
+		// Get posts by day for the last 7 days
+		$daily_stats = array();
+		for ( $i = 6; $i >= 0; $i-- ) {
+			$date = gmdate( 'Y-m-d', strtotime( "-{$i} days" ) );
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-            $day_label = gmdate( 'D', strtotime( $date ) );
+			$day_label = gmdate( 'D', strtotime( $date ) );
 
             // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery -- Literal JSON pattern matching, not user input.
-            $optimized = $wpdb->get_var( $wpdb->prepare(
-                "SELECT COUNT(DISTINCT pm.post_id)
+			$optimized = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(DISTINCT pm.post_id)
                  FROM {$wpdb->postmeta} pm
                  JOIN {$wpdb->posts} p ON pm.post_id = p.ID
                  WHERE pm.meta_key = '_SAMAN_SEO_meta'
@@ -368,406 +400,430 @@ class Dashboard_Controller extends REST_Controller {
                  AND DATE(p.post_date) <= %s
                  AND pm.meta_value LIKE '%\"title\"%'
                  AND pm.meta_value NOT LIKE '%\"title\":\"\"%'",
-                $date
-            ) );
+					$date
+				)
+			);
             // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery
 
-            $daily_stats[] = [
-                'date'      => $date,
-                'label'     => $day_label,
-                'optimized' => (int) $optimized,
-                'total'     => $total_posts,
-            ];
-        }
+			$daily_stats[] = array(
+				'date'      => $date,
+				'label'     => $day_label,
+				'optimized' => (int) $optimized,
+				'total'     => $total_posts,
+			);
+		}
 
-        $result = [
-            'total'           => (int) $total_posts,
-            'with_title'      => (int) $with_title,
-            'with_description'=> (int) $with_desc,
-            'optimized'       => (int) min( $with_title, $with_desc ),
-            'pending'         => (int) ( $total_posts - min( $with_title, $with_desc ) ),
-            'coverage_pct'    => $total_posts > 0 ? round( ( min( $with_title, $with_desc ) / $total_posts ) * 100 ) : 0,
-            'daily_stats'     => $daily_stats,
-        ];
+		$result = array(
+			'total'            => (int) $total_posts,
+			'with_title'       => (int) $with_title,
+			'with_description' => (int) $with_desc,
+			'optimized'        => (int) min( $with_title, $with_desc ),
+			'pending'          => (int) ( $total_posts - min( $with_title, $with_desc ) ),
+			'coverage_pct'     => $total_posts > 0 ? round( ( min( $with_title, $with_desc ) / $total_posts ) * 100 ) : 0,
+			'daily_stats'      => $daily_stats,
+		);
 
-        // Cache for 5 minutes
-        set_transient( 'SAMAN_SEO_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
+		// Cache for 5 minutes
+		set_transient( 'SAMAN_SEO_content_coverage', $result, 5 * MINUTE_IN_SECONDS );
 
-        return $result;
-    }
+		return $result;
+	}
 
-    /**
-     * Get sitemap data.
-     *
-     * @return array
-     */
-    private function get_sitemap_data() {
-        $enabled = get_option( 'SAMAN_SEO_sitemap_enabled', '1' ) === '1';
-        $last_regen = get_option( 'SAMAN_SEO_sitemap_last_regenerated', 0 );
+	/**
+	 * Get sitemap data.
+	 *
+	 * @return array
+	 */
+	private function get_sitemap_data() {
+		$enabled    = get_option( 'SAMAN_SEO_sitemap_enabled', '1' ) === '1';
+		$last_regen = get_option( 'SAMAN_SEO_sitemap_last_regenerated', 0 );
 
-        // Count URLs
-        $post_types = get_option( 'SAMAN_SEO_sitemap_post_types', [ 'post', 'page' ] );
-        if ( ! is_array( $post_types ) ) {
-            $post_types = [ 'post', 'page' ];
-        }
+		// Count URLs
+		$post_types = get_option( 'SAMAN_SEO_sitemap_post_types', array( 'post', 'page' ) );
+		if ( ! is_array( $post_types ) ) {
+			$post_types = array( 'post', 'page' );
+		}
 
-        $total_urls = 0;
-        foreach ( $post_types as $pt ) {
-            $count = wp_count_posts( $pt );
-            if ( $count ) {
-                $total_urls += $count->publish;
-            }
-        }
+		$total_urls = 0;
+		foreach ( $post_types as $pt ) {
+			$count = wp_count_posts( $pt );
+			if ( $count ) {
+				$total_urls += $count->publish;
+			}
+		}
 
-        // Add taxonomy URLs
-        $taxonomies = get_option( 'SAMAN_SEO_sitemap_taxonomies', [ 'category' ] );
-        if ( is_array( $taxonomies ) ) {
-            foreach ( $taxonomies as $tax ) {
-                $terms = wp_count_terms( [ 'taxonomy' => $tax, 'hide_empty' => true ] );
-                if ( ! is_wp_error( $terms ) ) {
-                    $total_urls += $terms;
-                }
-            }
-        }
+		// Add taxonomy URLs
+		$taxonomies = get_option( 'SAMAN_SEO_sitemap_taxonomies', array( 'category' ) );
+		if ( is_array( $taxonomies ) ) {
+			foreach ( $taxonomies as $tax ) {
+				$terms = wp_count_terms(
+					array(
+						'taxonomy'   => $tax,
+						'hide_empty' => true,
+					)
+				);
+				if ( ! is_wp_error( $terms ) ) {
+					$total_urls += $terms;
+				}
+			}
+		}
 
-        // Check for validation errors (placeholder - could add actual validation)
-        $errors = 0;
+		// Check for validation errors (placeholder - could add actual validation)
+		$errors = 0;
 
-        return [
-            'enabled'        => $enabled,
-            'status'         => $enabled ? ( $errors > 0 ? 'warning' : 'active' ) : 'disabled',
-            'status_label'   => $enabled ? ( $errors > 0 ? 'Has Issues' : 'Active' ) : 'Disabled',
-            'total_urls'     => $total_urls,
-            'last_generated' => $last_regen ? human_time_diff( $last_regen ) . ' ago' : 'Never',
-            'last_timestamp' => $last_regen,
-            'errors'         => $errors,
-            'types_enabled'  => [
-                'main'   => $enabled,
-                'rss'    => get_option( 'SAMAN_SEO_sitemap_enable_rss', '0' ) === '1',
-                'news'   => get_option( 'SAMAN_SEO_sitemap_enable_google_news', '0' ) === '1',
-                'llm'    => \Saman\SEO\Helpers\module_enabled( 'llm_txt' ),
-            ],
-        ];
-    }
+		return array(
+			'enabled'        => $enabled,
+			'status'         => $enabled ? ( $errors > 0 ? 'warning' : 'active' ) : 'disabled',
+			'status_label'   => $enabled ? ( $errors > 0 ? 'Has Issues' : 'Active' ) : 'Disabled',
+			'total_urls'     => $total_urls,
+			'last_generated' => $last_regen ? human_time_diff( $last_regen ) . ' ago' : 'Never',
+			'last_timestamp' => $last_regen,
+			'errors'         => $errors,
+			'types_enabled'  => array(
+				'main' => $enabled,
+				'rss'  => get_option( 'SAMAN_SEO_sitemap_enable_rss', '0' ) === '1',
+				'news' => get_option( 'SAMAN_SEO_sitemap_enable_google_news', '0' ) === '1',
+				'llm'  => \Saman\SEO\Helpers\module_enabled( 'llm_txt' ),
+			),
+		);
+	}
 
-    /**
-     * Get redirects data.
-     *
-     * @return array
-     */
-    private function get_redirects_data() {
+	/**
+	 * Get redirects data.
+	 *
+	 * @return array
+	 */
+	private function get_redirects_data() {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        global $wpdb;
+		global $wpdb;
 
-        // Check if table exists
+		// Check if table exists
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        $table_exists = $wpdb->get_var( $wpdb->prepare(
-            "SHOW TABLES LIKE %s",
-            $this->redirects_table
-        ) );
+		$table_exists = $wpdb->get_var(
+			$wpdb->prepare(
+				'SHOW TABLES LIKE %s',
+				$this->redirects_table
+			)
+		);
 
-        if ( ! $table_exists ) {
-            return [
-                'total'          => 0,
-                'active'         => 0,
-                'hits_today'     => 0,
-                'hits_week'      => 0,
-                'broken'         => 0,
-                'suggestions'    => 0,
-                'status'         => 'inactive',
+		if ( ! $table_exists ) {
+			return array(
+				'total'         => 0,
+				'active'        => 0,
+				'hits_today'    => 0,
+				'hits_week'     => 0,
+				'broken'        => 0,
+				'suggestions'   => 0,
+				'status'        => 'inactive',
                 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-                'top_redirects'  => [],
+				'top_redirects' => array(),
             // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-            ];
-        }
+			);
+		}
 
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->redirects_table}" );
+		$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->redirects_table}" );
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $active = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->redirects_table} WHERE status_code IN (301, 302, 307)" );
+		$active = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->redirects_table} WHERE status_code IN (301, 302, 307)" );
 
-        // Hits today
-        $today = gmdate( 'Y-m-d' );
+		// Hits today
+		$today = gmdate( 'Y-m-d' );
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $hits_today = $wpdb->get_var( $wpdb->prepare(
-            "SELECT SUM(hits) FROM {$this->redirects_table} WHERE DATE(last_hit) = %s",
-            $today
-        ) );
+		$hits_today = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT SUM(hits) FROM {$this->redirects_table} WHERE DATE(last_hit) = %s",
+				$today
+			)
+		);
 
-        // Hits this week
-        $week_start = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
+		// Hits this week
+		$week_start = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $hits_week = $wpdb->get_var( $wpdb->prepare(
-            "SELECT SUM(hits) FROM {$this->redirects_table} WHERE last_hit >= %s",
+		$hits_week = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT SUM(hits) FROM {$this->redirects_table} WHERE last_hit >= %s",
             // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-            $week_start
-        ) );
+				$week_start
+			)
+		);
 
-        // Get pending suggestions
-        $suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
-        $suggestions_count = is_array( $suggestions ) ? count( $suggestions ) : 0;
+		// Get pending suggestions
+		$suggestions       = get_option( 'SAMAN_SEO_monitor_slugs', array() );
+		$suggestions_count = is_array( $suggestions ) ? count( $suggestions ) : 0;
 
-        // Top redirects by hits
+		// Top redirects by hits
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $top_redirects = $wpdb->get_results(
-            "SELECT source, target, hits, last_hit
+		$top_redirects = $wpdb->get_results(
+			"SELECT source, target, hits, last_hit
              FROM {$this->redirects_table}
              ORDER BY hits DESC
              LIMIT 5",
-            ARRAY_A
-        );
+			ARRAY_A
+		);
 
-        return [
-            'total'          => (int) $total,
-            'active'         => (int) $active,
-            'hits_today'     => (int) $hits_today,
-            'hits_week'      => (int) $hits_week,
-            'broken'         => 0, // Placeholder for broken redirect detection
-            'suggestions'    => $suggestions_count,
-            'status'         => $active > 0 ? 'active' : 'inactive',
-            'top_redirects'  => $top_redirects ?: [],
-        ];
-    }
+		return array(
+			'total'         => (int) $total,
+			'active'        => (int) $active,
+			'hits_today'    => (int) $hits_today,
+			'hits_week'     => (int) $hits_week,
+			'broken'        => 0, // Placeholder for broken redirect detection
+			'suggestions'   => $suggestions_count,
+			'status'        => $active > 0 ? 'active' : 'inactive',
+			'top_redirects' => $top_redirects ?: array(),
+		);
+	}
 
-    /**
-     * Get 404 error data.
+	/**
+	 * Get 404 error data.
      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-     *
-     * @return array
-     */
-    private function get_404_data() {
-        global $wpdb;
+	 *
+	 * @return array
+	 */
+	private function get_404_data() {
+		global $wpdb;
 
-        $logging_enabled = \Saman\SEO\Helpers\module_enabled( '404_log' );
+		$logging_enabled = \Saman\SEO\Helpers\module_enabled( '404_log' );
 
-        // Check if table exists
+		// Check if table exists
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        $table_exists = $wpdb->get_var( $wpdb->prepare(
-            "SHOW TABLES LIKE %s",
-            $this->log_table
-        ) );
+		$table_exists = $wpdb->get_var(
+			$wpdb->prepare(
+				'SHOW TABLES LIKE %s',
+				$this->log_table
+			)
+		);
 
-        if ( ! $table_exists || ! $logging_enabled ) {
+		if ( ! $table_exists || ! $logging_enabled ) {
             // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-            return [
-                'enabled'      => $logging_enabled,
-                'total'        => 0,
-                'last_30_days' => 0,
+			return array(
+				'enabled'      => $logging_enabled,
+				'total'        => 0,
+				'last_30_days' => 0,
                 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-                'last_7_days'  => 0,
-                'status'       => 'inactive',
-                'top_errors'   => [],
-            ];
-        }
+				'last_7_days'  => 0,
+				'status'       => 'inactive',
+				'top_errors'   => array(),
+			);
+		}
 
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table}" );
+		$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table}" );
 
-        // Last 30 days
-        $thirty_days_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
+		// Last 30 days
+		$thirty_days_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $last_30 = $wpdb->get_var( $wpdb->prepare(
+		$last_30 = $wpdb->get_var(
+			$wpdb->prepare(
             // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-            "SELECT COUNT(*) FROM {$this->log_table} WHERE last_seen >= %s",
-            $thirty_days_ago
-        ) );
+				"SELECT COUNT(*) FROM {$this->log_table} WHERE last_seen >= %s",
+				$thirty_days_ago
+			)
+		);
 
-        // Last 7 days
-        $seven_days_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		// Last 7 days
+		$seven_days_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $last_7 = $wpdb->get_var( $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$this->log_table} WHERE last_seen >= %s",
-            $seven_days_ago
-        ) );
+		$last_7 = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$this->log_table} WHERE last_seen >= %s",
+				$seven_days_ago
+			)
+		);
 
-        // Top 404s
+		// Top 404s
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-        $top_errors = $wpdb->get_results(
-            "SELECT request_uri, hits, last_seen, device_label
+		$top_errors = $wpdb->get_results(
+			"SELECT request_uri, hits, last_seen, device_label
              FROM {$this->log_table}
              ORDER BY hits DESC
              LIMIT 5",
-            ARRAY_A
-        );
+			ARRAY_A
+		);
 
-        return [
-            'enabled'      => $logging_enabled,
-            'total'        => (int) $total,
-            'last_30_days' => (int) $last_30,
-            'last_7_days'  => (int) $last_7,
-            'status'       => $total > 0 ? 'warning' : 'good',
-            'top_errors'   => $top_errors ?: [],
-        ];
-    }
+		return array(
+			'enabled'      => $logging_enabled,
+			'total'        => (int) $total,
+			'last_30_days' => (int) $last_30,
+			'last_7_days'  => (int) $last_7,
+			'status'       => $total > 0 ? 'warning' : 'good',
+			'top_errors'   => $top_errors ?: array(),
+		);
+	}
 
-    /**
-     * Get schema markup data.
-     *
-     * @return array
-     */
-    private function get_schema_data() {
-        $org_name = get_option( 'SAMAN_SEO_homepage_organization_name', '' );
-        $local_enabled = \Saman\SEO\Helpers\module_enabled( 'local_seo' );
+	/**
+	 * Get schema markup data.
+	 *
+	 * @return array
+	 */
+	private function get_schema_data() {
+		$org_name      = get_option( 'SAMAN_SEO_homepage_organization_name', '' );
+		$local_enabled = \Saman\SEO\Helpers\module_enabled( 'local_seo' );
 
-        $schema_types = [ 'Website', 'WebPage' ];
-        if ( ! empty( $org_name ) ) {
-            $schema_types[] = 'Organization';
-        }
-        if ( $local_enabled ) {
-            $schema_types[] = 'LocalBusiness';
-        }
+		$schema_types = array( 'Website', 'WebPage' );
+		if ( ! empty( $org_name ) ) {
+			$schema_types[] = 'Organization';
+		}
+		if ( $local_enabled ) {
+			$schema_types[] = 'LocalBusiness';
+		}
 
-        // Check for posts (Articles schema)
-        $has_posts = wp_count_posts( 'post' )->publish > 0;
-        if ( $has_posts ) {
-            $schema_types[] = 'Article';
-        }
+		// Check for posts (Articles schema)
+		$has_posts = wp_count_posts( 'post' )->publish > 0;
+		if ( $has_posts ) {
+			$schema_types[] = 'Article';
+		}
 
-        return [
-            'status'       => ! empty( $org_name ) || $local_enabled ? 'valid' : 'partial',
-            'status_label' => ! empty( $org_name ) || $local_enabled ? 'Valid' : 'Basic',
-            'types'        => $schema_types,
-            'errors'       => 0, // Placeholder for validation errors
-            'local_seo'    => $local_enabled,
-        ];
-    }
+		return array(
+			'status'       => ! empty( $org_name ) || $local_enabled ? 'valid' : 'partial',
+			'status_label' => ! empty( $org_name ) || $local_enabled ? 'Valid' : 'Basic',
+			'types'        => $schema_types,
+			'errors'       => 0, // Placeholder for validation errors
+			'local_seo'    => $local_enabled,
+		);
+	}
 
-    /**
-     * Get notifications data.
-     *
-     * Priority levels: 1 = critical (error), 2 = important (warning), 3 = informational (info)
-     *
-     * @return array
-     */
-    private function get_notifications_data() {
-        $notifications = [];
-        $dismissed = get_option( 'SAMAN_SEO_dismissed_notifications', [] );
-        if ( ! is_array( $dismissed ) ) {
-            $dismissed = [];
-        }
+	/**
+	 * Get notifications data.
+	 *
+	 * Priority levels: 1 = critical (error), 2 = important (warning), 3 = informational (info)
+	 *
+	 * @return array
+	 */
+	private function get_notifications_data() {
+		$notifications = array();
+		$dismissed     = get_option( 'SAMAN_SEO_dismissed_notifications', array() );
+		if ( ! is_array( $dismissed ) ) {
+			$dismissed = array();
+		}
 
-        // Clean up old dismissed notifications (older than 30 days)
-        $cutoff = time() - ( 30 * DAY_IN_SECONDS );
-        $dismissed = array_filter( $dismissed, function( $timestamp ) use ( $cutoff ) {
-            return $timestamp > $cutoff;
-        } );
-        update_option( 'SAMAN_SEO_dismissed_notifications', $dismissed );
+		// Clean up old dismissed notifications (older than 30 days)
+		$cutoff    = time() - ( 30 * DAY_IN_SECONDS );
+		$dismissed = array_filter(
+			$dismissed,
+			function ( $timestamp ) use ( $cutoff ) {
+				return $timestamp > $cutoff;
+			}
+		);
+		update_option( 'SAMAN_SEO_dismissed_notifications', $dismissed );
 
-        // Priority 1: Check for slug change suggestions (redirects needed)
-        $slug_suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
-        if ( is_array( $slug_suggestions ) && count( $slug_suggestions ) > 0 ) {
-            // Only show one notification for multiple slug changes
-            $count = count( $slug_suggestions );
-            $notif_id = 'slug_changes_pending';
-            if ( ! isset( $dismissed[ $notif_id ] ) ) {
-                $first_suggestion = reset( $slug_suggestions );
-                $notifications[] = [
-                    'id'       => $notif_id,
-                    'type'     => 'warning',
-                    'priority' => 1,
-                    'category' => 'redirects',
-                    'title'    => __( 'URL Changes Detected', 'saman-seo' ),
-                    'message'  => $count === 1
-                        ? sprintf(
-                            // translators: %s is the value
-                            __( '"%s" has a new URL. Create a redirect to avoid broken links.', 'saman-seo' ),
-                            get_the_title( $first_suggestion['post_id'] ?? 0 )
-                        )
-                        : sprintf(
-                            // translators: %d is the number of pages
-                            __( '%d pages have new URLs. Create redirects to avoid broken links.', 'saman-seo' ),
-                            $count
-                        ),
-                    'action'   => [
-                        'label' => __( 'Review Changes', 'saman-seo' ),
-                    ],
-                ];
-            }
-        }
+		// Priority 1: Check for slug change suggestions (redirects needed)
+		$slug_suggestions = get_option( 'SAMAN_SEO_monitor_slugs', array() );
+		if ( is_array( $slug_suggestions ) && count( $slug_suggestions ) > 0 ) {
+			// Only show one notification for multiple slug changes
+			$count    = count( $slug_suggestions );
+			$notif_id = 'slug_changes_pending';
+			if ( ! isset( $dismissed[ $notif_id ] ) ) {
+				$first_suggestion = reset( $slug_suggestions );
+				$notifications[]  = array(
+					'id'       => $notif_id,
+					'type'     => 'warning',
+					'priority' => 1,
+					'category' => 'redirects',
+					'title'    => __( 'URL Changes Detected', 'saman-seo' ),
+					'message'  => $count === 1
+						? sprintf(
+							// translators: %s is the value
+							__( '"%s" has a new URL. Create a redirect to avoid broken links.', 'saman-seo' ),
+							get_the_title( $first_suggestion['post_id'] ?? 0 )
+						)
+						: sprintf(
+							// translators: %d is the number of pages
+							__( '%d pages have new URLs. Create redirects to avoid broken links.', 'saman-seo' ),
+							$count
+						),
+					'action'   => array(
+						'label' => __( 'Review Changes', 'saman-seo' ),
+					),
+				);
+			}
+		}
 
-        // Priority 2: Check for high 404 count (only if significant)
-        $errors_404 = $this->get_404_data();
-        if ( $errors_404['last_7_days'] >= 5 && ! isset( $dismissed['high_404_count'] ) ) {
-            $notifications[] = [
-                'id'       => 'high_404_count',
-                'type'     => $errors_404['last_7_days'] >= 20 ? 'error' : 'warning',
-                'priority' => $errors_404['last_7_days'] >= 20 ? 1 : 2,
-                'category' => '404',
-                'title'    => __( '404 Errors Detected', 'saman-seo' ),
-                'message'  => sprintf(
-                    // translators: %d is the count
-                    __( '%d broken links found this week. Fix them to improve user experience.', 'saman-seo' ),
-                    $errors_404['last_7_days']
-                ),
-                'action'   => [
-                    'label' => __( 'View Errors', 'saman-seo' ),
-                ],
-            ];
-        }
+		// Priority 2: Check for high 404 count (only if significant)
+		$errors_404 = $this->get_404_data();
+		if ( $errors_404['last_7_days'] >= 5 && ! isset( $dismissed['high_404_count'] ) ) {
+			$notifications[] = array(
+				'id'       => 'high_404_count',
+				'type'     => $errors_404['last_7_days'] >= 20 ? 'error' : 'warning',
+				'priority' => $errors_404['last_7_days'] >= 20 ? 1 : 2,
+				'category' => '404',
+				'title'    => __( '404 Errors Detected', 'saman-seo' ),
+				'message'  => sprintf(
+					// translators: %d is the count
+					__( '%d broken links found this week. Fix them to improve user experience.', 'saman-seo' ),
+					$errors_404['last_7_days']
+				),
+				'action'   => array(
+					'label' => __( 'View Errors', 'saman-seo' ),
+				),
+			);
+		}
 
-        // Priority 3: Check for very low SEO score (only if really bad)
-        $seo_score = $this->calculate_overall_seo_score();
-        if ( $seo_score['score'] > 0 && $seo_score['score'] < 40 && $seo_score['posts_scored'] >= 3 && ! isset( $dismissed['low_seo_score'] ) ) {
-            $notifications[] = [
-                'id'       => 'low_seo_score',
-                'type'     => 'error',
-                'priority' => 1,
-                'category' => 'seo',
-                'title'    => __( 'Low SEO Score', 'saman-seo' ),
-                'message'  => sprintf(
-                    // translators: %d is the count
-                    __( 'Average score is %d%%. Run an audit to find quick wins.', 'saman-seo' ),
-                    $seo_score['score']
-                ),
-                'action'   => [
-                    'label' => __( 'Run Audit', 'saman-seo' ),
-                ],
-            ];
-        }
+		// Priority 3: Check for very low SEO score (only if really bad)
+		$seo_score = $this->calculate_overall_seo_score();
+		if ( $seo_score['score'] > 0 && $seo_score['score'] < 40 && $seo_score['posts_scored'] >= 3 && ! isset( $dismissed['low_seo_score'] ) ) {
+			$notifications[] = array(
+				'id'       => 'low_seo_score',
+				'type'     => 'error',
+				'priority' => 1,
+				'category' => 'seo',
+				'title'    => __( 'Low SEO Score', 'saman-seo' ),
+				'message'  => sprintf(
+					// translators: %d is the count
+					__( 'Average score is %d%%. Run an audit to find quick wins.', 'saman-seo' ),
+					$seo_score['score']
+				),
+				'action'   => array(
+					'label' => __( 'Run Audit', 'saman-seo' ),
+				),
+			);
+		}
 
-        // Priority 4: Sitemap disabled (info only)
-        $sitemap = $this->get_sitemap_data();
-        if ( ! $sitemap['enabled'] && ! isset( $dismissed['sitemap_disabled'] ) ) {
-            $notifications[] = [
-                'id'       => 'sitemap_disabled',
-                'type'     => 'info',
-                'priority' => 3,
-                'category' => 'sitemap',
-                'title'    => __( 'Sitemap Not Active', 'saman-seo' ),
-                'message'  => __( 'Enable your XML sitemap to help search engines discover content.', 'saman-seo' ),
-                'action'   => [
-                    'label' => __( 'Enable', 'saman-seo' ),
-                ],
-            ];
-        }
+		// Priority 4: Sitemap disabled (info only)
+		$sitemap = $this->get_sitemap_data();
+		if ( ! $sitemap['enabled'] && ! isset( $dismissed['sitemap_disabled'] ) ) {
+			$notifications[] = array(
+				'id'       => 'sitemap_disabled',
+				'type'     => 'info',
+				'priority' => 3,
+				'category' => 'sitemap',
+				'title'    => __( 'Sitemap Not Active', 'saman-seo' ),
+				'message'  => __( 'Enable your XML sitemap to help search engines discover content.', 'saman-seo' ),
+				'action'   => array(
+					'label' => __( 'Enable', 'saman-seo' ),
+				),
+			);
+		}
 
-        // Priority 5: Low coverage (only if really low and have enough content)
-        $coverage = $this->get_content_coverage_data();
-        $pending_pct = $coverage['total'] > 0 ? ( $coverage['pending'] / $coverage['total'] ) * 100 : 0;
-        if ( $coverage['total'] >= 5 && $pending_pct > 70 && ! isset( $dismissed['low_coverage'] ) ) {
-            $notifications[] = [
-                'id'       => 'low_coverage',
-                'type'     => 'warning',
-                'priority' => 2,
-                'category' => 'content',
-                'title'    => __( 'Missing SEO Data', 'saman-seo' ),
-                'message'  => sprintf(
-                    /* translators: 1: number of pages needing optimization, 2: total number of pages */
-                    __( '%1$d of %2$d pages need SEO optimization.', 'saman-seo' ),
-                    $coverage['pending'],
-                    $coverage['total']
-                ),
-                'action'   => [
-                    'label' => __( 'View Audit', 'saman-seo' ),
-                ],
-            ];
-        }
+		// Priority 5: Low coverage (only if really low and have enough content)
+		$coverage    = $this->get_content_coverage_data();
+		$pending_pct = $coverage['total'] > 0 ? ( $coverage['pending'] / $coverage['total'] ) * 100 : 0;
+		if ( $coverage['total'] >= 5 && $pending_pct > 70 && ! isset( $dismissed['low_coverage'] ) ) {
+			$notifications[] = array(
+				'id'       => 'low_coverage',
+				'type'     => 'warning',
+				'priority' => 2,
+				'category' => 'content',
+				'title'    => __( 'Missing SEO Data', 'saman-seo' ),
+				'message'  => sprintf(
+					/* translators: 1: number of pages needing optimization, 2: total number of pages */
+					__( '%1$d of %2$d pages need SEO optimization.', 'saman-seo' ),
+					$coverage['pending'],
+					$coverage['total']
+				),
+				'action'   => array(
+					'label' => __( 'View Audit', 'saman-seo' ),
+				),
+			);
+		}
 
-        // Sort by priority
-        usort( $notifications, function( $a, $b ) {
-            return ( $a['priority'] ?? 99 ) - ( $b['priority'] ?? 99 );
-        } );
+		// Sort by priority
+		usort(
+			$notifications,
+			function ( $a, $b ) {
+				return ( $a['priority'] ?? 99 ) - ( $b['priority'] ?? 99 );
+			}
+		);
 
-        return $notifications;
-    }
+		return $notifications;
+	}
 }

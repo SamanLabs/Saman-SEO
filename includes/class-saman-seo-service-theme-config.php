@@ -29,7 +29,7 @@ class Theme_Config {
 	 *
 	 * @var array<string,mixed>
 	 */
-	private $overrides = [];
+	private $overrides = array();
 
 	/**
 	 * Absolute path of the loaded config file, or empty string if none.
@@ -57,8 +57,8 @@ class Theme_Config {
 		$this->load();
 
 		foreach ( array_keys( $this->overrides ) as $key ) {
-			add_filter( 'option_' . $key, [ $this, 'apply_override' ], 10, 2 );
-			add_filter( 'default_option_' . $key, [ $this, 'apply_default' ], 10, 3 );
+			add_filter( 'option_' . $key, array( $this, 'apply_override' ), 10, 2 );
+			add_filter( 'default_option_' . $key, array( $this, 'apply_default' ), 10, 3 );
 		}
 	}
 
@@ -73,7 +73,7 @@ class Theme_Config {
 	 * @return void
 	 */
 	private function load() {
-		$candidates = [];
+		$candidates = array();
 
 		if ( function_exists( 'get_stylesheet_directory' ) ) {
 			$candidates[] = get_stylesheet_directory() . '/saman-seo.config.php';
@@ -140,7 +140,7 @@ class Theme_Config {
 	 * @return array<string,mixed>
 	 */
 	private function normalize_keys( array $data ) {
-		$out = [];
+		$out = array();
 		foreach ( $data as $key => $value ) {
 			if ( ! is_string( $key ) || '' === $key ) {
 				continue;
@@ -173,7 +173,7 @@ class Theme_Config {
 			return $value;
 		}
 
-		$theme_value  = $this->overrides[ $option ];
+		$theme_value    = $this->overrides[ $option ];
 		$plugin_default = $this->plugin_default( $option );
 
 		if ( is_array( $theme_value ) && is_array( $value ) ) {
@@ -252,7 +252,7 @@ class Theme_Config {
 	 * @return array<string,mixed>
 	 */
 	private function merge_array_value( array $stored, array $theme_value, $plugin_default ) {
-		$plugin_default = is_array( $plugin_default ) ? $plugin_default : [];
+		$plugin_default = is_array( $plugin_default ) ? $plugin_default : array();
 
 		foreach ( $theme_value as $sub_key => $sub_value ) {
 			$current = $stored[ $sub_key ] ?? null;

@@ -25,7 +25,7 @@ class JsonLD {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld', [ $this, 'build_payload' ], 10, 2 );
+		add_filter( 'SAMAN_SEO_jsonld', array( $this, 'build_payload' ), 10, 2 );
 	}
 
 	/**
@@ -100,38 +100,38 @@ class JsonLD {
 	 * @return array
 	 */
 	private function breadcrumb_ld( $post ) {
-		$crumbs = [];
+		$crumbs = array();
 		$rank   = 1;
 
-		$crumbs[] = [
+		$crumbs[] = array(
 			'@type'    => 'ListItem',
 			'position' => $rank++,
 			'name'     => get_bloginfo( 'name' ),
 			'item'     => home_url( '/' ),
-		];
+		);
 
 		$ancestors = array_reverse( get_post_ancestors( $post ) );
 		foreach ( $ancestors as $ancestor_id ) {
-			$crumbs[] = [
+			$crumbs[] = array(
 				'@type'    => 'ListItem',
 				'position' => $rank++,
 				'name'     => get_the_title( $ancestor_id ),
 				'item'     => get_permalink( $ancestor_id ),
-			];
+			);
 		}
 
-		$crumbs[] = [
+		$crumbs[] = array(
 			'@type'    => 'ListItem',
 			'position' => $rank,
 			'name'     => get_the_title( $post ),
 			'item'     => get_permalink( $post ),
-		];
+		);
 
-		return [
-			'@type'    => 'BreadcrumbList',
-			'@id'      => get_permalink( $post ) . '#breadcrumb',
+		return array(
+			'@type'           => 'BreadcrumbList',
+			'@id'             => get_permalink( $post ) . '#breadcrumb',
 			'itemListElement' => $crumbs,
-		];
+		);
 	}
 
 	/**
@@ -168,12 +168,12 @@ class JsonLD {
 			$org_logo = get_site_icon_url();
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => 'Organization',
 			'@id'   => home_url( '/' ) . '#organization',
 			'name'  => $org_name,
 			'url'   => home_url( '/' ),
-		];
+		);
 
 		if ( ! empty( $org_logo ) ) {
 			$schema['logo'] = $org_logo;
@@ -203,7 +203,7 @@ class JsonLD {
 
 		// Build address if we have location data.
 		if ( ! empty( $local_street ) || ! empty( $local_city ) ) {
-			$address = [ '@type' => 'PostalAddress' ];
+			$address = array( '@type' => 'PostalAddress' );
 			if ( ! empty( $local_street ) ) {
 				$address['streetAddress'] = $local_street;
 			}
@@ -248,11 +248,11 @@ class JsonLD {
 			$person_name = get_bloginfo( 'name' );
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => 'Person',
 			'@id'   => home_url( '/' ) . '#person',
 			'name'  => $person_name,
-		];
+		);
 
 		if ( ! empty( $person_image ) ) {
 			$schema['image'] = $person_image;
@@ -284,7 +284,7 @@ class JsonLD {
 	 * @return array
 	 */
 	private function get_social_profiles() {
-		$profiles = [];
+		$profiles = array();
 
 		// Try Local SEO social profiles first.
 		$local_social = get_option( 'SAMAN_SEO_local_social_profiles', '' );

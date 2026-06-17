@@ -57,40 +57,40 @@ class Breadcrumb_Schema extends Abstract_Schema {
 	 */
 	public function generate(): array {
 		$post   = $this->context->post;
-		$crumbs = [];
+		$crumbs = array();
 		$rank   = 1;
 
 		// Home crumb first.
-		$crumbs[] = [
+		$crumbs[] = array(
 			'@type'    => 'ListItem',
 			'position' => $rank++,
 			'name'     => get_bloginfo( 'name' ),
 			'item'     => home_url( '/' ),
-		];
+		);
 
 		// Ancestors in reverse order (parent -> grandparent becomes grandparent -> parent).
 		$ancestors = array_reverse( get_post_ancestors( $post ) );
 		foreach ( $ancestors as $ancestor_id ) {
-			$crumbs[] = [
+			$crumbs[] = array(
 				'@type'    => 'ListItem',
 				'position' => $rank++,
 				'name'     => get_the_title( $ancestor_id ),
 				'item'     => get_permalink( $ancestor_id ),
-			];
+			);
 		}
 
 		// Current page last.
-		$crumbs[] = [
+		$crumbs[] = array(
 			'@type'    => 'ListItem',
 			'position' => $rank,
 			'name'     => get_the_title( $post ),
 			'item'     => get_permalink( $post ),
-		];
+		);
 
-		return [
+		return array(
 			'@type'           => $this->get_type(),
 			'@id'             => Schema_IDs::breadcrumb( $this->context->canonical ),
 			'itemListElement' => $crumbs,
-		];
+		);
 	}
 }

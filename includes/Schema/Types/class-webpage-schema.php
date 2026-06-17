@@ -61,20 +61,20 @@ class WebPage_Schema extends Abstract_Schema {
 	public function generate(): array {
 		$post = $this->context->post;
 
-		$schema = [
+		$schema = array(
 			'@type'         => $this->get_type(),
 			'@id'           => Schema_IDs::webpage( $this->context->canonical ),
 			'url'           => $this->context->canonical,
 			'name'          => get_the_title( $post ),
 			'datePublished' => get_the_date( DATE_W3C, $post ),
 			'dateModified'  => get_the_modified_date( DATE_W3C, $post ),
-			'isPartOf'      => [
+			'isPartOf'      => array(
 				'@id' => Schema_IDs::website(),
-			],
-			'breadcrumb'    => [
+			),
+			'breadcrumb'    => array(
 				'@id' => Schema_IDs::breadcrumb( $this->context->canonical ),
-			],
-		];
+			),
+		);
 
 		// Add primaryImageOfPage.
 		$image_url = get_the_post_thumbnail_url( $post, 'full' );
@@ -83,10 +83,10 @@ class WebPage_Schema extends Abstract_Schema {
 		}
 
 		if ( ! empty( $image_url ) ) {
-			$schema['primaryImageOfPage'] = [
+			$schema['primaryImageOfPage'] = array(
 				'@type' => 'ImageObject',
 				'url'   => $image_url,
-			];
+			);
 		}
 
 		return $schema;

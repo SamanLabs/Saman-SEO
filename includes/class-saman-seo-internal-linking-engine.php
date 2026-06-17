@@ -55,7 +55,7 @@ class Engine {
 	 *
 	 * @var array<int,array>
 	 */
-	private $report = [];
+	private $report = array();
 
 	/**
 	 * Constructor.
@@ -74,7 +74,7 @@ class Engine {
 	 *
 	 * @return string
 	 */
-	public function filter( $content, array $args = [] ) {
+	public function filter( $content, array $args = array() ) {
 		if ( ! is_string( $content ) || '' === trim( $content ) ) {
 			return $content;
 		}
@@ -121,10 +121,10 @@ class Engine {
 		if ( $cache_enabled ) {
 			set_transient(
 				$cache_key,
-				[
+				array(
 					'content' => $output,
 					'version' => $this->repository->get_version(),
-				],
+				),
 				self::CACHE_TTL
 			);
 		}
@@ -148,7 +148,10 @@ class Engine {
 	public function preview( array $rule, array $context ) {
 		$content = $context['content'] ?? '';
 		if ( '' === trim( (string) $content ) ) {
-			return [ 'content' => $content, 'replacements' => [] ];
+			return array(
+				'content'      => $content,
+				'replacements' => array(),
+			);
 		}
 
 		$post = $context['post'] ?? null;
@@ -160,17 +163,20 @@ class Engine {
 		$runtime    = $this->prepare_runtime_rule( $rule, $post, $url, $type, $categories, $templates );
 
 		if ( ! $runtime ) {
-			return [ 'content' => $content, 'replacements' => [] ];
+			return array(
+				'content'      => $content,
+				'replacements' => array(),
+			);
 		}
 
 		$this->reset_report();
-		$state = $this->bootstrap_state( [ $runtime['id'] => $runtime ] );
-		$html  = $this->process_chunk( $content, [ $runtime['id'] => $runtime ], $state, $post, $url, $type );
+		$state = $this->bootstrap_state( array( $runtime['id'] => $runtime ) );
+		$html  = $this->process_chunk( $content, array( $runtime['id'] => $runtime ), $state, $post, $url, $type );
 
-		return [
+		return array(
 			'content'      => $html,
 			'replacements' => $this->summarize_report(),
-		];
+		);
 	}
 
 	/**
@@ -193,7 +199,7 @@ class Engine {
 	 */
 	private function get_site_host() {
 		if ( null === $this->site_host ) {
-			$host = wp_parse_url( home_url(), PHP_URL_HOST );
+			$host            = wp_parse_url( home_url(), PHP_URL_HOST );
 			$this->site_host = strtolower( $host ?? '' );
 		}
 
@@ -212,12 +218,12 @@ class Engine {
 	private function get_prepared_rules( $post, $url, $type ) {
 		$rules = $this->repository->get_rules();
 		if ( empty( $rules ) ) {
-			return [];
+			return array();
 		}
 
 		$categories = $this->repository->get_categories();
 		$templates  = $this->repository->get_templates();
-		$prepared   = [];
+		$prepared   = array();
 		$post_type  = $post instanceof WP_Post ? $post->post_type : null;
 
 		foreach ( $rules as $rule ) {
@@ -264,14 +270,14 @@ class Engine {
 	 * @return array|null
 	 */
 	private function prepare_runtime_rule( array $rule, $post, $url, $type, array $categories, array $templates ) {
-		$keywords = array_values( array_filter( $rule['keywords'] ?? [] ) );
+		$keywords = array_values( array_filter( $rule['keywords'] ?? array() ) );
 		if ( empty( $keywords ) ) {
 			return null;
 		}
 
-		$destination = $rule['destination'] ?? [];
+		$destination  = $rule['destination'] ?? array();
 		$resolved_url = '';
-		$is_internal = true;
+		$is_internal  = true;
 
 		if ( 'post' === ( $destination['type'] ?? 'post' ) ) {
 			$target_post = get_post( $destination['post'] ?? 0 );
@@ -338,45 +344,49 @@ class Engine {
 			$limit_block = 0;
 		}
 
-		$placement          = $rule['placement'] ?? [];
-		$headings_behavior  = $placement['headings'] ?? 'none';
-		$heading_levels     = $placement['heading_levels'] ?? [];
-		$settings_headings  = $settings['default_heading_levels'] ?? [];
+		$placement         = $rule['placement'] ?? array();
+		$headings_behavior = $placement['headings'] ?? 'none';
+		$heading_levels    = $placement['heading_levels'] ?? array();
+		$settings_headings = $settings['default_heading_levels'] ?? array();
 
 		if ( empty( $heading_levels ) && 'selected' === $headings_behavior ) {
 			$heading_levels = $settings_headings;
 		}
 
-		return [
-			'id'        => $rule['id'],
-			'title'     => $rule['title'] ?? '',
-			'keywords'  => $keywords,
-			'destination' => [
+		return array(
+			'id'          => $rule['id'],
+			'title'       => $rule['title'] ?? '',
+			'keywords'    => $keywords,
+			'destination' => array(
 				'url'         => $resolved_url,
 				'is_internal' => $is_internal,
-			],
-			'attributes' => $rule['attributes'] ?? [],
-			'limits'     => [
+			),
+			'attributes'  => $rule['attributes'] ?? array(),
+			'limits'      => array(
 				'page'     => $limit_page,
 				'block'    => $limit_block,
 				'category' => $category_cap,
-			],
-			'placement'  => [
+			),
+			'placement'   => array(
 				'headings'       => $headings_behavior,
 				'heading_levels' => array_map( 'strtolower', (array) $heading_levels ),
 				'paragraphs'     => ! empty( $placement['paragraphs'] ),
 				'lists'          => ! empty( $placement['lists'] ),
 				'captions'       => ! empty( $placement['captions'] ),
 				'widgets'        => ! empty( $placement['widgets'] ),
-			],
-			'scope'      => $rule['scope'] ?? [ 'post_types' => [], 'whitelist' => [], 'blacklist' => [] ],
-			'utm'        => [
+			),
+			'scope'       => $rule['scope'] ?? array(
+				'post_types' => array(),
+				'whitelist'  => array(),
+				'blacklist'  => array(),
+			),
+			'utm'         => array(
 				'apply_to' => $rule['utm_apply_to'] ?? 'both',
 				'template' => $template,
-			],
-			'category'   => $category_id,
-			'priority'   => (int) ( $rule['priority'] ?? 0 ),
-		];
+			),
+			'category'    => $category_id,
+			'priority'    => (int) ( $rule['priority'] ?? 0 ),
+		);
 	}
 
 	/**
@@ -394,8 +404,8 @@ class Engine {
 			return false;
 		}
 
-		$scope      = $rule['scope'] ?? [];
-		$post_types = $scope['post_types'] ?? [];
+		$scope      = $rule['scope'] ?? array();
+		$post_types = $scope['post_types'] ?? array();
 
 		if ( ! empty( $post_types ) ) {
 			if ( $post_type && ! in_array( $post_type, $post_types, true ) ) {
@@ -408,7 +418,7 @@ class Engine {
 		}
 
 		$normalized = $this->normalize_url_for_match( $url );
-		$whitelist  = array_filter( $scope['whitelist'] ?? [] );
+		$whitelist  = array_filter( $scope['whitelist'] ?? array() );
 
 		if ( ! empty( $whitelist ) ) {
 			$allowed = false;
@@ -424,7 +434,7 @@ class Engine {
 			}
 		}
 
-		$blacklist = array_filter( $scope['blacklist'] ?? [] );
+		$blacklist = array_filter( $scope['blacklist'] ?? array() );
 		foreach ( $blacklist as $pattern ) {
 			if ( $this->url_matches_pattern( $normalized, $pattern ) ) {
 				return false;
@@ -447,7 +457,7 @@ class Engine {
 		}
 
 		$parts = wp_parse_url( $url );
-		if ( isset( $parts['scheme'] ) && ! in_array( strtolower( $parts['scheme'] ), [ 'http', 'https' ], true ) ) {
+		if ( isset( $parts['scheme'] ) && ! in_array( strtolower( $parts['scheme'] ), array( 'http', 'https' ), true ) ) {
 			return $url;
 		}
 		$path  = $parts['path'] ?? '';
@@ -498,19 +508,19 @@ class Engine {
 	private function split_content( $content ) {
 		$settings = $this->get_settings();
 		if ( empty( $settings['chunk_long_documents'] ) ) {
-			return [ $content ];
+			return array( $content );
 		}
 
 		if ( mb_strlen( $content, 'UTF-8' ) <= self::CHUNK_THRESHOLD ) {
-			return [ $content ];
+			return array( $content );
 		}
 
 		$pieces = preg_split( '/(<\/p>)/i', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
 		if ( empty( $pieces ) ) {
-			return [ $content ];
+			return array( $content );
 		}
 
-		$chunks = [];
+		$chunks  = array();
 		$current = '';
 
 		foreach ( $pieces as $piece ) {
@@ -536,11 +546,11 @@ class Engine {
 	 * @return array
 	 */
 	private function bootstrap_state( array $rules ) {
-		$state = [
-			'rules'           => [],
-			'category_caps'   => [],
-			'category_counts' => [],
-		];
+		$state = array(
+			'rules'           => array(),
+			'category_caps'   => array(),
+			'category_counts' => array(),
+		);
 
 		foreach ( $rules as $rule ) {
 			$category_id  = $rule['category'] ?? '';
@@ -551,12 +561,12 @@ class Engine {
 				$state['category_counts'][ $category_id ] = 0;
 			}
 
-			$state['rules'][ $rule['id'] ] = [
-				'remaining'   => (int) $rule['limits']['page'],
-				'block_limit' => $rule['limits']['block'],
-				'block_counts'=> [],
-				'category'    => $category_id,
-			];
+			$state['rules'][ $rule['id'] ] = array(
+				'remaining'    => (int) $rule['limits']['page'],
+				'block_limit'  => $rule['limits']['block'],
+				'block_counts' => array(),
+				'category'     => $category_id,
+			);
 		}
 
 		return $state;
@@ -565,18 +575,18 @@ class Engine {
 	/**
 	 * Process one chunk of HTML.
 	 *
-	 * @param string      $chunk   HTML chunk.
-	 * @param array       $rules   Runtime rules.
-	 * @param array       $state   Mutable counters.
+	 * @param string       $chunk   HTML chunk.
+	 * @param array        $rules   Runtime rules.
+	 * @param array        $state   Mutable counters.
 	 * @param WP_Post|null $post   Post context.
-	 * @param string      $url     URL context.
-	 * @param string      $context Context key.
+	 * @param string       $url     URL context.
+	 * @param string       $context Context key.
 	 *
 	 * @return string
 	 */
 	private function process_chunk( $chunk, array $rules, array &$state, $post, $url, $context ) {
 		libxml_use_internal_errors( true );
-		$dom = new DOMDocument();
+		$dom     = new DOMDocument();
 		$wrapper = '<div id="saman-seo-link-root">' . $chunk . '</div>';
 		$dom->loadHTML( '<?xml encoding="utf-8" ?>' . $wrapper, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 		$root = $dom->getElementById( 'saman-seo-link-root' );
@@ -602,12 +612,12 @@ class Engine {
 	/**
 	 * Apply a single rule to DOM tree.
 	 *
-	 * @param DOMNode     $root    Root node.
-	 * @param array       $rule    Runtime rule.
-	 * @param array       $state   Counters.
+	 * @param DOMNode      $root    Root node.
+	 * @param array        $rule    Runtime rule.
+	 * @param array        $state   Counters.
 	 * @param WP_Post|null $post   Post context.
-	 * @param string      $url     URL.
-	 * @param string      $context Context key.
+	 * @param string       $url     URL.
+	 * @param string       $context Context key.
 	 */
 	private function apply_rule_to_dom( DOMNode $root, array $rule, array &$state, $post, $url, $context ) {
 		$rule_state = &$state['rules'][ $rule['id'] ];
@@ -651,7 +661,7 @@ class Engine {
 		$tag = strtolower( $node->nodeName );
 
 		// Skip disallowed containers entirely.
-		if ( in_array( $tag, [ 'a', 'code', 'pre', 'style', 'script' ], true ) ) {
+		if ( in_array( $tag, array( 'a', 'code', 'pre', 'style', 'script' ), true ) ) {
 			return;
 		}
 
@@ -713,7 +723,7 @@ class Engine {
 			}
 		}
 
-		$block_key = $block instanceof DOMNode ? spl_object_hash( $block ) : 'root';
+		$block_key  = $block instanceof DOMNode ? spl_object_hash( $block ) : 'root';
 		$rule_state = &$state['rules'][ $rule['id'] ];
 
 		if ( null !== $rule_state['block_limit'] ) {
@@ -730,7 +740,7 @@ class Engine {
 			}
 		}
 
-		$offset = 0;
+		$offset   = 0;
 		$encoding = 'UTF-8';
 
 		while ( $rule_state['remaining'] > 0 ) {
@@ -749,12 +759,12 @@ class Engine {
 			$link = $this->create_link_node( $node->ownerDocument, $match['text'], $rule, $match['keyword'], $post, $url );
 			$node->parentNode->insertBefore( $link, $node );
 
-			$text = $after;
+			$text            = $after;
 			$node->nodeValue = $text;
 
-			$rule_state['remaining']--;
+			--$rule_state['remaining'];
 			if ( $category_id && isset( $state['category_counts'][ $category_id ] ) ) {
-				$state['category_counts'][ $category_id ]++;
+				++$state['category_counts'][ $category_id ];
 			}
 
 			if ( null !== $rule_state['block_limit'] ) {
@@ -781,11 +791,11 @@ class Engine {
 	 * @return array|null
 	 */
 	private function find_next_match( $text, array $keywords, $start ) {
-		$encoding = 'UTF-8';
-		$settings = $this->get_settings();
-		$subject  = $settings['normalize_accents'] ? remove_accents( $text ) : $text;
+		$encoding      = 'UTF-8';
+		$settings      = $this->get_settings();
+		$subject       = $settings['normalize_accents'] ? remove_accents( $text ) : $text;
 		$subject_lower = mb_strtolower( $subject, $encoding );
-		$best = null;
+		$best          = null;
 
 		foreach ( $keywords as $keyword ) {
 			$needle       = $settings['normalize_accents'] ? remove_accents( $keyword ) : $keyword;
@@ -798,8 +808,8 @@ class Engine {
 					break;
 				}
 
-				$before_char = ( $pos > 0 ) ? mb_substr( $subject, $pos - 1, 1, $encoding ) : '';
-				$after_char  = mb_substr( $subject, $pos + mb_strlen( $needle_lower, $encoding ), 1, $encoding );
+				$before_char   = ( $pos > 0 ) ? mb_substr( $subject, $pos - 1, 1, $encoding ) : '';
+				$after_char    = mb_substr( $subject, $pos + mb_strlen( $needle_lower, $encoding ), 1, $encoding );
 				$boundary_fail = false;
 
 				if ( ! empty( $settings['prefer_word_boundaries'] ) ) {
@@ -819,11 +829,11 @@ class Engine {
 
 				$length = mb_strlen( $keyword, $encoding );
 				if ( ! $best || $pos < $best['start'] || ( $pos === $best['start'] && $length > $best['length'] ) ) {
-					$best = [
+					$best = array(
 						'keyword' => $keyword,
 						'start'   => $pos,
 						'length'  => $length,
-					];
+					);
 
 					if ( 0 === $pos ) {
 						break 2;
@@ -838,23 +848,23 @@ class Engine {
 			return null;
 		}
 
-		return [
+		return array(
 			'keyword' => $best['keyword'],
 			'start'   => $best['start'],
 			'length'  => $best['length'],
 			'text'    => mb_substr( $text, $best['start'], $best['length'], $encoding ),
-		];
+		);
 	}
 
 	/**
 	 * Build link node with applied attributes/UTMs.
 	 *
-	 * @param DOMDocument $dom     Document.
-	 * @param string      $text    Anchor text.
-	 * @param array       $rule    Runtime rule.
-	 * @param string      $keyword Matched keyword.
+	 * @param DOMDocument  $dom     Document.
+	 * @param string       $text    Anchor text.
+	 * @param array        $rule    Runtime rule.
+	 * @param string       $keyword Matched keyword.
 	 * @param WP_Post|null $post   Post context.
-	 * @param string      $url     URL context.
+	 * @param string       $url     URL context.
 	 *
 	 * @return DOMElement
 	 */
@@ -864,13 +874,13 @@ class Engine {
 		$link->setAttribute( 'href', $href );
 		$link->appendChild( $dom->createTextNode( $text ) );
 
-		$attributes = $rule['attributes'] ?? [];
+		$attributes = $rule['attributes'] ?? array();
 
 		if ( ! empty( $attributes['title'] ) ) {
 			$link->setAttribute( 'title', $attributes['title'] );
 		}
 
-		$rel_parts = [];
+		$rel_parts = array();
 		if ( ! empty( $attributes['nofollow'] ) ) {
 			$rel_parts[] = 'nofollow';
 		}
@@ -890,9 +900,9 @@ class Engine {
 	/**
 	 * Apply UTMs (if template exists + matches target).
 	 *
-	 * @param string      $url     Destination.
-	 * @param array       $rule    Rule.
-	 * @param string      $keyword Keyword.
+	 * @param string       $url     Destination.
+	 * @param array        $rule    Rule.
+	 * @param string       $keyword Keyword.
 	 * @param WP_Post|null $post   Post context.
 	 *
 	 * @return string
@@ -909,18 +919,18 @@ class Engine {
 		}
 
 		$parts = wp_parse_url( $url );
-		$query = [];
+		$query = array();
 		if ( ! empty( $parts['query'] ) ) {
 			parse_str( $parts['query'], $query );
 		}
 
-		$params = [
+		$params = array(
 			'utm_source'   => $template['utm_source'] ?? '',
 			'utm_medium'   => $template['utm_medium'] ?? '',
 			'utm_campaign' => $template['utm_campaign'] ?? '',
 			'utm_term'     => $template['utm_term'] ?? '',
 			'utm_content'  => $template['utm_content'] ?? '',
-		];
+		);
 
 		$tokens = $this->build_token_map( $rule, $keyword, $post );
 		foreach ( $params as $key => $value ) {
@@ -978,7 +988,7 @@ class Engine {
 	 * @return bool
 	 */
 	private function should_apply_utms( $rule_target, $template_target, $is_internal ) {
-		$rule_ok = $this->matches_apply_to( $rule_target, $is_internal );
+		$rule_ok     = $this->matches_apply_to( $rule_target, $is_internal );
 		$template_ok = $this->matches_apply_to( $template_target, $is_internal );
 
 		return $rule_ok && $template_ok;
@@ -1006,15 +1016,15 @@ class Engine {
 	/**
 	 * Build token replacements for UTMs.
 	 *
-	 * @param array       $rule    Runtime rule.
-	 * @param string      $keyword Matched keyword.
+	 * @param array        $rule    Runtime rule.
+	 * @param string       $keyword Matched keyword.
 	 * @param WP_Post|null $post   Post context.
 	 *
 	 * @return array<string,string>
 	 */
 	private function build_token_map( array $rule, $keyword, $post ) {
-		$post   = $post instanceof WP_Post ? $post : null;
-		$author = $post ? get_the_author_meta( 'display_name', $post->post_author ) : '';
+		$post        = $post instanceof WP_Post ? $post : null;
+		$author      = $post ? get_the_author_meta( 'display_name', $post->post_author ) : '';
 		$primary_cat = '';
 
 		if ( $post ) {
@@ -1024,7 +1034,7 @@ class Engine {
 			}
 		}
 
-		$tokens = [
+		$tokens = array(
 			'{keyword}'          => $keyword,
 			'{rule_id}'          => $rule['id'],
 			'{site_name}'        => get_bloginfo( 'name' ),
@@ -1033,8 +1043,8 @@ class Engine {
 			'{post_type}'        => $post ? $post->post_type : '',
 			'{post_title}'       => $post ? $post->post_title : '',
 			'{primary_category}' => $primary_cat,
-			'{author}'          => $author,
-		];
+			'{author}'           => $author,
+		);
 
 		// Support {date:format} custom tokens.
 		$tokens = array_merge( $tokens, $this->build_date_tokens() );
@@ -1048,9 +1058,9 @@ class Engine {
 	 * @return array<string,string>
 	 */
 	private function build_date_tokens() {
-		return [
+		return array(
 			'{date:Ymd}' => date_i18n( 'Ymd', current_time( 'timestamp' ) ),
-		];
+		);
 	}
 
 	/**
@@ -1061,19 +1071,19 @@ class Engine {
 	 * @param string $url     Final URL.
 	 */
 	private function record_replacement( array $rule, $keyword, $url ) {
-		$this->report[] = [
+		$this->report[] = array(
 			'rule_id' => $rule['id'],
 			'rule'    => $rule['title'],
 			'keyword' => $keyword,
 			'url'     => $url,
-		];
+		);
 	}
 
 	/**
 	 * Reset report store.
 	 */
 	private function reset_report() {
-		$this->report = [];
+		$this->report = array();
 	}
 
 	/**
@@ -1083,23 +1093,23 @@ class Engine {
 	 */
 	private function summarize_report() {
 		if ( empty( $this->report ) ) {
-			return [];
+			return array();
 		}
 
-		$summary = [];
+		$summary = array();
 		foreach ( $this->report as $entry ) {
 			$key = $entry['rule_id'] . '|' . strtolower( $entry['keyword'] ) . '|' . $entry['url'];
 			if ( ! isset( $summary[ $key ] ) ) {
-				$summary[ $key ] = [
+				$summary[ $key ] = array(
 					'rule_id' => $entry['rule_id'],
 					'rule'    => $entry['rule'],
 					'keyword' => $entry['keyword'],
 					'url'     => $entry['url'],
 					'count'   => 0,
-				];
+				);
 			}
 
-			$summary[ $key ]['count']++;
+			++$summary[ $key ]['count'];
 		}
 
 		return array_values( $summary );
@@ -1130,20 +1140,20 @@ class Engine {
 	 * }
 	 */
 	private function get_node_context( DOMNode $node ) {
-		$context = [
+		$context = array(
 			'is_heading'    => false,
 			'heading_level' => null,
 			'in_paragraph'  => false,
 			'in_list'       => false,
 			'in_caption'    => false,
-		];
+		);
 
 		$parent = $node->parentNode;
 		while ( $parent instanceof DOMNode ) {
 			if ( XML_ELEMENT_NODE === $parent->nodeType ) {
 				$tag = strtolower( $parent->nodeName );
 
-				if ( in_array( $tag, [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ], true ) ) {
+				if ( in_array( $tag, array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ), true ) ) {
 					$context['is_heading']    = true;
 					$context['heading_level'] = $tag;
 					break;
@@ -1153,7 +1163,7 @@ class Engine {
 					$context['in_paragraph'] = true;
 				}
 
-				if ( in_array( $tag, [ 'ul', 'ol', 'li' ], true ) ) {
+				if ( in_array( $tag, array( 'ul', 'ol', 'li' ), true ) ) {
 					$context['in_list'] = true;
 				}
 

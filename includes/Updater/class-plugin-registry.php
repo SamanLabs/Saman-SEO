@@ -27,8 +27,8 @@ class Plugin_Registry {
 	public static function get_plugins() {
 		$base_url = plugins_url( 'assets/images/', dirname( __DIR__, 2 ) . '/saman-seo.php' );
 
-		return [
-			'saman-seo' => [
+		return array(
+			'saman-seo'      => array(
 				'name'        => 'Saman SEO',
 				'slug'        => 'saman-seo',
 				'repo'        => 'SamanLabs/Saman-SEO',
@@ -37,8 +37,8 @@ class Plugin_Registry {
 				'banner'      => $base_url . 'banner-772x250.png',
 				'type'        => 'seo',
 				'coming_soon' => false,
-			],
-			'saman-ai' => [
+			),
+			'saman-ai'       => array(
 				'name'        => 'Saman AI',
 				'slug'        => 'saman-ai',
 				'repo'        => 'SamanLabs/Saman-AI',
@@ -47,8 +47,8 @@ class Plugin_Registry {
 				'banner'      => $base_url . 'banner-772x250.png',
 				'type'        => 'ai',
 				'coming_soon' => true,
-			],
-			'saman-security' => [
+			),
+			'saman-security' => array(
 				'name'        => 'Saman Security',
 				'slug'        => 'saman-security',
 				'repo'        => 'SamanLabs/Saman-Security',
@@ -57,8 +57,8 @@ class Plugin_Registry {
 				'banner'      => $base_url . 'banner-772x250.png',
 				'type'        => 'security',
 				'coming_soon' => true,
-			],
-		];
+			),
+		);
 	}
 
 	/**
@@ -102,7 +102,7 @@ class Plugin_Registry {
 	 */
 	public static function get_plugins_with_status() {
 		$plugins = self::get_plugins();
-		$result  = [];
+		$result  = array();
 
 		foreach ( $plugins as $slug => $plugin ) {
 			$plugin['is_installed'] = self::is_installed( $slug );

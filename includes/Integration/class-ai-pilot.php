@@ -32,10 +32,10 @@ class AI_Pilot {
 	 */
 	public static function init(): void {
 		// Register with Saman Labs AI when it loads.
-		add_action( 'wp_ai_pilot_loaded', [ __CLASS__, 'register_with_ai_pilot' ], 10 );
+		add_action( 'wp_ai_pilot_loaded', array( __CLASS__, 'register_with_ai_pilot' ), 10 );
 
 		// Also try on init in case Saman Labs AI loaded first.
-		add_action( 'init', [ __CLASS__, 'maybe_register' ], 20 );
+		add_action( 'init', array( __CLASS__, 'maybe_register' ), 20 );
 	}
 
 	/**
@@ -114,14 +114,14 @@ class AI_Pilot {
 			return wp_ai_pilot_get_status();
 		}
 
-		return [
+		return array(
 			'installed' => false,
 			'active'    => false,
 			'ready'     => false,
 			'version'   => null,
-			'providers' => [],
-			'models'    => [],
-		];
+			'providers' => array(),
+			'models'    => array(),
+		);
 	}
 
 	/**
@@ -154,12 +154,14 @@ class AI_Pilot {
 			return;
 		}
 
-		wp_ai_pilot()->register_plugin( [
-			'slug'        => 'saman-seo',
-			'file'        => 'saman-seo/saman-seo.php',
-			'name'        => 'Saman SEO',
-			'permissions' => [ 'generate', 'chat', 'assistants' ],
-		] );
+		wp_ai_pilot()->register_plugin(
+			array(
+				'slug'        => 'saman-seo',
+				'file'        => 'saman-seo/saman-seo.php',
+				'name'        => 'Saman SEO',
+				'permissions' => array( 'generate', 'chat', 'assistants' ),
+			)
+		);
 	}
 
 	/**
@@ -171,46 +173,50 @@ class AI_Pilot {
 		}
 
 		// General SEO Assistant
-		wp_ai_pilot()->register_assistant( [
-			'id'                 => 'seo-general',
-			'name'               => __( 'SEO Assistant', 'saman-seo' ),
-			'description'        => __( 'Your helpful SEO buddy for all things search optimization.', 'saman-seo' ),
-			'plugin'             => 'saman-seo/saman-seo.php',
-			'system_prompt'      => self::get_general_seo_prompt(),
-			'icon'               => 'dashicons-search',
-			'color'              => '#3b82f6',
-			'model'              => 'gpt-4o-mini',
-			'temperature'        => 0.7,
-			'max_tokens'         => 1000,
-			'save_conversations' => true,
-			'suggested_prompts'  => [
-				__( 'How do I write a good meta description?', 'saman-seo' ),
-				__( 'What makes a title tag effective?', 'saman-seo' ),
-				__( 'Help me find keywords for my blog post', 'saman-seo' ),
-				__( 'What are internal links and why do they matter?', 'saman-seo' ),
-			],
-		] );
+		wp_ai_pilot()->register_assistant(
+			array(
+				'id'                 => 'seo-general',
+				'name'               => __( 'SEO Assistant', 'saman-seo' ),
+				'description'        => __( 'Your helpful SEO buddy for all things search optimization.', 'saman-seo' ),
+				'plugin'             => 'saman-seo/saman-seo.php',
+				'system_prompt'      => self::get_general_seo_prompt(),
+				'icon'               => 'dashicons-search',
+				'color'              => '#3b82f6',
+				'model'              => 'gpt-4o-mini',
+				'temperature'        => 0.7,
+				'max_tokens'         => 1000,
+				'save_conversations' => true,
+				'suggested_prompts'  => array(
+					__( 'How do I write a good meta description?', 'saman-seo' ),
+					__( 'What makes a title tag effective?', 'saman-seo' ),
+					__( 'Help me find keywords for my blog post', 'saman-seo' ),
+					__( 'What are internal links and why do they matter?', 'saman-seo' ),
+				),
+			)
+		);
 
 		// SEO Reporter Assistant
-		wp_ai_pilot()->register_assistant( [
-			'id'                 => 'seo-reporter',
-			'name'               => __( 'SEO Reporter', 'saman-seo' ),
-			'description'        => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'saman-seo' ),
-			'plugin'             => 'saman-seo/saman-seo.php',
-			'system_prompt'      => self::get_reporter_prompt(),
-			'icon'               => 'dashicons-chart-bar',
-			'color'              => '#8b5cf6',
-			'model'              => 'gpt-4o-mini',
-			'temperature'        => 0.7,
-			'max_tokens'         => 1500,
-			'save_conversations' => true,
-			'suggested_prompts'  => [
-				__( 'Give me a quick SEO report', 'saman-seo' ),
-				__( 'What SEO issues should I fix first?', 'saman-seo' ),
-				__( 'Check my meta titles and descriptions', 'saman-seo' ),
-				__( 'Find posts missing SEO data', 'saman-seo' ),
-			],
-		] );
+		wp_ai_pilot()->register_assistant(
+			array(
+				'id'                 => 'seo-reporter',
+				'name'               => __( 'SEO Reporter', 'saman-seo' ),
+				'description'        => __( 'Your weekly SEO buddy that gives you the rundown on your site.', 'saman-seo' ),
+				'plugin'             => 'saman-seo/saman-seo.php',
+				'system_prompt'      => self::get_reporter_prompt(),
+				'icon'               => 'dashicons-chart-bar',
+				'color'              => '#8b5cf6',
+				'model'              => 'gpt-4o-mini',
+				'temperature'        => 0.7,
+				'max_tokens'         => 1500,
+				'save_conversations' => true,
+				'suggested_prompts'  => array(
+					__( 'Give me a quick SEO report', 'saman-seo' ),
+					__( 'What SEO issues should I fix first?', 'saman-seo' ),
+					__( 'Check my meta titles and descriptions', 'saman-seo' ),
+					__( 'Find posts missing SEO data', 'saman-seo' ),
+				),
+			)
+		);
 	}
 
 	// =========================================================================
@@ -269,8 +275,8 @@ GOOD: 'Three things to fix: [specific list]'";
 		$site_url  = home_url();
 
 		// Gather site stats for context.
-		$post_count = wp_count_posts( 'post' );
-		$page_count = wp_count_posts( 'page' );
+		$post_count  = wp_count_posts( 'post' );
+		$page_count  = wp_count_posts( 'page' );
 		$total_posts = $post_count->publish ?? 0;
 		$total_pages = $page_count->publish ?? 0;
 
@@ -326,7 +332,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	 */
 	public static function get_models(): array {
 		if ( ! self::is_ready() ) {
-			return [];
+			return array();
 		}
 
 		return wp_ai_pilot()->get_models();
@@ -341,7 +347,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	 *
 	 * @return string|\WP_Error Generated text or error.
 	 */
-	public static function generate( string $content, string $type = 'title', array $context = [] ) {
+	public static function generate( string $content, string $type = 'title', array $context = array() ) {
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
@@ -352,12 +358,15 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		$system_prompt = self::get_generation_prompt( $type );
 		$user_prompt   = self::build_generation_prompt( $content, $type, $context );
 
-		return wp_ai_pilot()->generate( $user_prompt, [
-			'source'        => self::SOURCE,
-			'system_prompt' => $system_prompt,
-			'max_tokens'    => 'title' === $type ? 100 : 250,
-			'temperature'   => 0.7,
-		] );
+		return wp_ai_pilot()->generate(
+			$user_prompt,
+			array(
+				'source'        => self::SOURCE,
+				'system_prompt' => $system_prompt,
+				'max_tokens'    => 'title' === $type ? 100 : 250,
+				'temperature'   => 0.7,
+			)
+		);
 	}
 
 	/**
@@ -368,7 +377,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	 *
 	 * @return array|\WP_Error Response array or error.
 	 */
-	public static function chat( array $messages, array $options = [] ) {
+	public static function chat( array $messages, array $options = array() ) {
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
@@ -376,11 +385,11 @@ GOOD: 'Looked at your site. Here's what's up:'";
 			);
 		}
 
-		$defaults = [
+		$defaults = array(
 			'source'      => self::SOURCE,
 			'max_tokens'  => 1000,
 			'temperature' => 0.7,
-		];
+		);
 
 		return wp_ai_pilot()->chat( $messages, array_merge( $defaults, $options ) );
 	}
@@ -394,7 +403,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	 *
 	 * @return array|\WP_Error Response or error.
 	 */
-	public static function assistant_chat( string $assistant_id, string $message, array $context = [] ) {
+	public static function assistant_chat( string $assistant_id, string $message, array $context = array() ) {
 		if ( ! self::is_ready() ) {
 			return new \WP_Error(
 				'ai_not_ready',
@@ -405,10 +414,17 @@ GOOD: 'Looked at your site. Here's what's up:'";
 		// Add SEO-specific context.
 		$seo_context = self::build_seo_context( $context );
 
-		return wp_ai_pilot()->assistant_chat( $assistant_id, $message, array_merge( $context, [
-			'seo_context' => $seo_context,
-			'source'      => self::SOURCE,
-		] ) );
+		return wp_ai_pilot()->assistant_chat(
+			$assistant_id,
+			$message,
+			array_merge(
+				$context,
+				array(
+					'seo_context' => $seo_context,
+					'source'      => self::SOURCE,
+				)
+			)
+		);
 	}
 
 	// =========================================================================
@@ -424,7 +440,7 @@ GOOD: 'Looked at your site. Here's what's up:'";
 	 */
 	private static function get_generation_prompt( string $type ): string {
 		if ( 'title' === $type ) {
-			return "You are an SEO expert specializing in writing compelling page titles.
+			return 'You are an SEO expert specializing in writing compelling page titles.
 
 Requirements:
 - Maximum 60 characters (strict limit)
@@ -433,10 +449,10 @@ Requirements:
 - Use power words when appropriate
 - Match search intent
 
-Return ONLY the title text. No quotes, no explanation, no alternatives.";
+Return ONLY the title text. No quotes, no explanation, no alternatives.';
 		}
 
-		return "You are an SEO expert specializing in writing meta descriptions.
+		return 'You are an SEO expert specializing in writing meta descriptions.
 
 Requirements:
 - Maximum 155 characters (strict limit)
@@ -445,7 +461,7 @@ Requirements:
 - Include the primary keyword naturally
 - Create urgency or curiosity when appropriate
 
-Return ONLY the description text. No quotes, no explanation, no alternatives.";
+Return ONLY the description text. No quotes, no explanation, no alternatives.';
 	}
 
 	/**
@@ -457,7 +473,7 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 	 *
 	 * @return string User prompt.
 	 */
-	private static function build_generation_prompt( string $content, string $type, array $context = [] ): string {
+	private static function build_generation_prompt( string $content, string $type, array $context = array() ): string {
 		$prompt = '';
 
 		if ( ! empty( $context['keyword'] ) ) {
@@ -480,8 +496,8 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 	 *
 	 * @return string Context string.
 	 */
-	private static function build_seo_context( array $context = [] ): string {
-		$parts = [];
+	private static function build_seo_context( array $context = array() ): string {
+		$parts = array();
 
 		// Basic site info.
 		$parts[] = 'Site: ' . get_bloginfo( 'name' );
@@ -511,9 +527,9 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 		// Site stats.
 		$post_count = wp_count_posts( 'post' );
 		$page_count = wp_count_posts( 'page' );
-		$parts[] = "\nSite stats:";
-		$parts[] = '- Published posts: ' . ( $post_count->publish ?? 0 );
-		$parts[] = '- Published pages: ' . ( $page_count->publish ?? 0 );
+		$parts[]    = "\nSite stats:";
+		$parts[]    = '- Published posts: ' . ( $post_count->publish ?? 0 );
+		$parts[]    = '- Published pages: ' . ( $page_count->publish ?? 0 );
 
 		return implode( "\n", $parts );
 	}
@@ -531,7 +547,7 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 	 */
 	public static function get_usage( string $period = '30days' ): array {
 		if ( ! self::is_ready() ) {
-			return [];
+			return array();
 		}
 
 		return wp_ai_pilot()->get_usage( self::SOURCE, $period );
@@ -544,15 +560,18 @@ Return ONLY the description text. No quotes, no explanation, no alternatives.";
 	 */
 	public static function get_seo_assistants(): array {
 		if ( ! self::is_ready() ) {
-			return [];
+			return array();
 		}
 
 		$all = wp_ai_pilot()->get_assistants( true );
 
 		// Filter to Saman SEO assistants.
-		return array_filter( $all, function ( $assistant ) {
-			return isset( $assistant['plugin'] ) &&
-			       $assistant['plugin'] === 'saman-seo/saman-seo.php';
-		} );
+		return array_filter(
+			$all,
+			function ( $assistant ) {
+				return isset( $assistant['plugin'] ) &&
+					$assistant['plugin'] === 'saman-seo/saman-seo.php';
+			}
+		);
 	}
 }

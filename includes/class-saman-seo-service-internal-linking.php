@@ -62,15 +62,15 @@ class Internal_Linking {
 	 * @return void
 	 */
 	public static function activate() {
-		add_option( 'SAMAN_SEO_link_rules', [] );
-		add_option( 'SAMAN_SEO_link_categories', [] );
-		add_option( 'SAMAN_SEO_link_utm_templates', [] );
+		add_option( 'SAMAN_SEO_link_rules', array() );
+		add_option( 'SAMAN_SEO_link_categories', array() );
+		add_option( 'SAMAN_SEO_link_utm_templates', array() );
 
 		$repository = new Repository();
 		add_option( 'SAMAN_SEO_link_settings', $repository->get_default_settings() );
 		$repository->get_version();
 
-		foreach ( [ 'administrator' ] as $role_name ) {
+		foreach ( array( 'administrator' ) as $role_name ) {
 			$role = get_role( $role_name );
 			if ( $role && ! $role->has_cap( self::CAPABILITY ) ) {
 				$role->add_cap( self::CAPABILITY );
@@ -89,23 +89,23 @@ class Internal_Linking {
 			return;
 		}
 
-		add_action( 'admin_init', [ $this, 'ensure_role_capabilities' ] );
-		add_action( 'admin_post_SAMAN_SEO_save_link_rule', [ $this, 'handle_save_rule' ] );
-		add_action( 'admin_post_SAMAN_SEO_delete_link_rule', [ $this, 'handle_delete_rule' ] );
-		add_action( 'admin_post_SAMAN_SEO_bulk_link_rules', [ $this, 'handle_bulk_rules' ] );
-		add_action( 'admin_post_SAMAN_SEO_duplicate_link_rule', [ $this, 'handle_duplicate_rule' ] );
-		add_action( 'admin_post_SAMAN_SEO_toggle_link_rule', [ $this, 'handle_toggle_rule' ] );
-		add_action( 'admin_post_SAMAN_SEO_save_link_category', [ $this, 'handle_save_category' ] );
-		add_action( 'admin_post_SAMAN_SEO_delete_link_category', [ $this, 'handle_delete_category' ] );
-		add_action( 'admin_post_SAMAN_SEO_save_link_template', [ $this, 'handle_save_template' ] );
-		add_action( 'admin_post_SAMAN_SEO_delete_link_template', [ $this, 'handle_delete_template' ] );
-		add_action( 'admin_post_SAMAN_SEO_save_link_settings', [ $this, 'handle_save_settings' ] );
-		add_action( 'wp_ajax_SAMAN_SEO_link_destination_search', [ $this, 'ajax_destination_search' ] );
-		add_action( 'wp_ajax_SAMAN_SEO_link_preview', [ $this, 'handle_preview' ] );
-		add_filter( 'the_content', [ $this, 'filter_frontend_content' ], 20 );
-		add_filter( 'widget_text', [ $this, 'filter_widget_content' ], 20, 3 );
-		add_filter( 'widget_text_content', [ $this, 'filter_widget_content' ], 20, 2 );
-		add_filter( 'widget_block_content', [ $this, 'filter_widget_content' ], 20, 2 );
+		add_action( 'admin_init', array( $this, 'ensure_role_capabilities' ) );
+		add_action( 'admin_post_SAMAN_SEO_save_link_rule', array( $this, 'handle_save_rule' ) );
+		add_action( 'admin_post_SAMAN_SEO_delete_link_rule', array( $this, 'handle_delete_rule' ) );
+		add_action( 'admin_post_SAMAN_SEO_bulk_link_rules', array( $this, 'handle_bulk_rules' ) );
+		add_action( 'admin_post_SAMAN_SEO_duplicate_link_rule', array( $this, 'handle_duplicate_rule' ) );
+		add_action( 'admin_post_SAMAN_SEO_toggle_link_rule', array( $this, 'handle_toggle_rule' ) );
+		add_action( 'admin_post_SAMAN_SEO_save_link_category', array( $this, 'handle_save_category' ) );
+		add_action( 'admin_post_SAMAN_SEO_delete_link_category', array( $this, 'handle_delete_category' ) );
+		add_action( 'admin_post_SAMAN_SEO_save_link_template', array( $this, 'handle_save_template' ) );
+		add_action( 'admin_post_SAMAN_SEO_delete_link_template', array( $this, 'handle_delete_template' ) );
+		add_action( 'admin_post_SAMAN_SEO_save_link_settings', array( $this, 'handle_save_settings' ) );
+		add_action( 'wp_ajax_SAMAN_SEO_link_destination_search', array( $this, 'ajax_destination_search' ) );
+		add_action( 'wp_ajax_SAMAN_SEO_link_preview', array( $this, 'handle_preview' ) );
+		add_filter( 'the_content', array( $this, 'filter_frontend_content' ), 20 );
+		add_filter( 'widget_text', array( $this, 'filter_widget_content' ), 20, 3 );
+		add_filter( 'widget_text_content', array( $this, 'filter_widget_content' ), 20, 2 );
+		add_filter( 'widget_block_content', array( $this, 'filter_widget_content' ), 20, 2 );
 	}
 
 	/**
@@ -122,10 +122,10 @@ class Internal_Linking {
 
 		return $this->engine->filter(
 			$content,
-			[
+			array(
 				'context' => 'content',
 				'post'    => get_post(),
-			]
+			)
 		);
 	}
 
@@ -144,9 +144,9 @@ class Internal_Linking {
 
 		return $this->engine->filter(
 			$content,
-			[
+			array(
 				'context' => 'widget',
-			]
+			)
 		);
 	}
 
@@ -160,11 +160,11 @@ class Internal_Linking {
 		check_admin_referer( 'SAMAN_SEO_save_link_rule' );
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array is sanitized field-by-field in repository->sanitize_rule().
-		$payload = isset( $_POST['rule'] ) ? (array) wp_unslash( $_POST['rule'] ) : [];
+		$payload = isset( $_POST['rule'] ) ? (array) wp_unslash( $_POST['rule'] ) : array();
 
 		if ( isset( $payload['category'] ) && '__new__' === $payload['category'] ) {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array is sanitized field-by-field in repository->sanitize_category().
-			$new_category = isset( $_POST['new_category'] ) ? (array) wp_unslash( $_POST['new_category'] ) : [];
+			$new_category = isset( $_POST['new_category'] ) ? (array) wp_unslash( $_POST['new_category'] ) : array();
 			$category     = $this->repository->save_category( $new_category );
 
 			if ( is_wp_error( $category ) ) {
@@ -184,10 +184,10 @@ class Internal_Linking {
 
 		$this->flash_notice( __( 'Rule saved.', 'saman-seo' ) );
 		$redirect = $this->get_admin_url(
-			[
+			array(
 				'tab'  => 'edit',
 				'rule' => $result['id'],
-			]
+			)
 		);
 		wp_safe_redirect( $redirect );
 		exit;
@@ -221,7 +221,7 @@ class Internal_Linking {
 		$this->guard_capability();
 		check_admin_referer( 'SAMAN_SEO_bulk_link_rules' );
 
-		$rule_ids = isset( $_POST['rule_ids'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['rule_ids'] ) ) : [];
+		$rule_ids = isset( $_POST['rule_ids'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['rule_ids'] ) ) : array();
 		$action   = isset( $_POST['bulk_action'] ) ? sanitize_key( wp_unslash( $_POST['bulk_action'] ) ) : '';
 
 		if ( 'change_category' === $action ) {
@@ -277,7 +277,7 @@ class Internal_Linking {
 		$rule_id = isset( $_GET['rule'] ) ? sanitize_key( wp_unslash( $_GET['rule'] ) ) : '';
 		$status  = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'active';
 
-		if ( $rule_id && in_array( $status, [ 'active', 'inactive' ], true ) ) {
+		if ( $rule_id && in_array( $status, array( 'active', 'inactive' ), true ) ) {
 			$rule = $this->repository->get_rule( $rule_id );
 			if ( $rule ) {
 				$rule['status'] = $status;
@@ -300,7 +300,7 @@ class Internal_Linking {
 		$this->guard_capability();
 		check_admin_referer( 'SAMAN_SEO_save_link_category' );
 
-		$data   = isset( $_POST['category'] ) ? (array) wp_unslash( $_POST['category'] ) : [];
+		$data   = isset( $_POST['category'] ) ? (array) wp_unslash( $_POST['category'] ) : array();
 		$result = $this->repository->save_category( $data );
 
 		if ( is_wp_error( $result ) ) {
@@ -309,7 +309,7 @@ class Internal_Linking {
 			$this->flash_notice( __( 'Category saved.', 'saman-seo' ) );
 		}
 
-		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'categories' ] ) );
+		wp_safe_redirect( $this->get_admin_url( array( 'tab' => 'categories' ) ) );
 		exit;
 	}
 
@@ -334,7 +334,7 @@ class Internal_Linking {
 			}
 		}
 
-		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'categories' ] ) );
+		wp_safe_redirect( $this->get_admin_url( array( 'tab' => 'categories' ) ) );
 		exit;
 	}
 
@@ -347,7 +347,7 @@ class Internal_Linking {
 		$this->guard_capability();
 		check_admin_referer( 'SAMAN_SEO_save_link_template' );
 
-		$data   = isset( $_POST['template'] ) ? (array) wp_unslash( $_POST['template'] ) : [];
+		$data   = isset( $_POST['template'] ) ? (array) wp_unslash( $_POST['template'] ) : array();
 		$result = $this->repository->save_template( $data );
 
 		if ( is_wp_error( $result ) ) {
@@ -356,7 +356,7 @@ class Internal_Linking {
 			$this->flash_notice( __( 'Template saved.', 'saman-seo' ) );
 		}
 
-		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'utms' ] ) );
+		wp_safe_redirect( $this->get_admin_url( array( 'tab' => 'utms' ) ) );
 		exit;
 	}
 
@@ -375,7 +375,7 @@ class Internal_Linking {
 			$this->flash_notice( __( 'Template deleted.', 'saman-seo' ) );
 		}
 
-		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'utms' ] ) );
+		wp_safe_redirect( $this->get_admin_url( array( 'tab' => 'utms' ) ) );
 		exit;
 	}
 
@@ -388,11 +388,11 @@ class Internal_Linking {
 		$this->guard_capability();
 		check_admin_referer( 'SAMAN_SEO_save_link_settings' );
 
-		$data = isset( $_POST['settings'] ) ? (array) wp_unslash( $_POST['settings'] ) : [];
+		$data = isset( $_POST['settings'] ) ? (array) wp_unslash( $_POST['settings'] ) : array();
 		$this->repository->save_settings( $data );
 
 		$this->flash_notice( __( 'Settings updated.', 'saman-seo' ) );
-		wp_safe_redirect( $this->get_admin_url( [ 'tab' => 'settings' ] ) );
+		wp_safe_redirect( $this->get_admin_url( array( 'tab' => 'settings' ) ) );
 		exit;
 	}
 
@@ -405,15 +405,15 @@ class Internal_Linking {
 		$this->guard_capability();
 		check_ajax_referer( 'SAMAN_SEO_link_admin', 'nonce' );
 
-		$payload = isset( $_POST['rule'] ) ? (array) wp_unslash( $_POST['rule'] ) : [];
+		$payload = isset( $_POST['rule'] ) ? (array) wp_unslash( $_POST['rule'] ) : array();
 		$rule    = $this->repository->validate_rule( $payload );
 
 		if ( is_wp_error( $rule ) ) {
 			wp_send_json_error( $rule->get_error_message(), 400 );
 		}
 
-		$preview   = isset( $_POST['preview'] ) ? (array) wp_unslash( $_POST['preview'] ) : [];
-		$post_id   = isset( $preview['post'] ) ? absint( $preview['post'] ) : 0;
+		$preview     = isset( $_POST['preview'] ) ? (array) wp_unslash( $_POST['preview'] ) : array();
+		$post_id     = isset( $preview['post'] ) ? absint( $preview['post'] ) : 0;
 		$preview_url = isset( $preview['url'] ) ? esc_url_raw( $preview['url'] ) : '';
 
 		if ( ! $post_id && '' === $preview_url ) {
@@ -439,12 +439,12 @@ class Internal_Linking {
 
 		$result = $this->engine->preview(
 			$rule,
-			[
+			array(
 				'content' => $content,
 				'post'    => $post,
 				'url'     => $target_url,
 				'context' => 'content',
-			]
+			)
 		);
 
 		wp_send_json_success( $result );
@@ -464,24 +464,24 @@ class Internal_Linking {
 
 		$term       = isset( $_GET['term'] ) ? sanitize_text_field( wp_unslash( $_GET['term'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$post_types = $this->get_supported_post_types();
-		$args       = [
+		$args       = array(
 			'post_type'      => array_keys( $post_types ),
 			'posts_per_page' => 20,
-			'post_status'    => [ 'publish', 'future', 'draft' ],
+			'post_status'    => array( 'publish', 'future', 'draft' ),
 			's'              => $term,
-		];
+		);
 
-		$query = new \WP_Query( $args );
-		$results = [];
+		$query   = new \WP_Query( $args );
+		$results = array();
 
 		while ( $query->have_posts() ) {
 			$query->the_post();
-			$results[] = [
-				'id'     => get_the_ID(),
-				'title'  => get_the_title(),
-				'type'   => get_post_type_object( get_post_type() )->labels->singular_name ?? get_post_type(),
-				'url'    => get_permalink(),
-			];
+			$results[] = array(
+				'id'    => get_the_ID(),
+				'title' => get_the_title(),
+				'type'  => get_post_type_object( get_post_type() )->labels->singular_name ?? get_post_type(),
+				'url'   => get_permalink(),
+			);
 		}
 
 		wp_reset_postdata();
@@ -548,7 +548,7 @@ class Internal_Linking {
 			return new \WP_Error( 'SAMAN_SEO_preview_host', __( 'Preview URLs must be on this site.', 'saman-seo' ) );
 		}
 
-		$response = wp_remote_get( $url, [ 'timeout' => 10 ] );
+		$response = wp_remote_get( $url, array( 'timeout' => 10 ) );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -582,7 +582,7 @@ class Internal_Linking {
 	 * @return void
 	 */
 	public function ensure_role_capabilities() {
-		$roles = apply_filters( 'SAMAN_SEO_internal_link_roles', [ 'administrator' ] );
+		$roles = apply_filters( 'SAMAN_SEO_internal_link_roles', array( 'administrator' ) );
 		$roles = array_unique( array_filter( (array) $roles ) );
 
 		foreach ( $roles as $role_name ) {
@@ -603,11 +603,11 @@ class Internal_Linking {
 	 * @return array
 	 */
 	private function parse_rule_filters() {
-		$filters = [];
+		$filters = array();
 
 		if ( isset( $_GET['status'] ) ) {
 			$status = sanitize_key( wp_unslash( $_GET['status'] ) );
-			if ( in_array( $status, [ 'active', 'inactive' ], true ) ) {
+			if ( in_array( $status, array( 'active', 'inactive' ), true ) ) {
 				$filters['status'] = $status;
 			}
 		}
@@ -619,7 +619,7 @@ class Internal_Linking {
 		if ( isset( $_GET['post_type'] ) ) {
 			$post_type_raw = wp_unslash( $_GET['post_type'] );
 			if ( is_array( $post_type_raw ) ) {
-				$sanitized = [];
+				$sanitized = array();
 				foreach ( $post_type_raw as $value ) {
 					$value = sanitize_key( $value );
 					if ( '__all__' === $value || post_type_exists( $value ) ) {
@@ -632,7 +632,7 @@ class Internal_Linking {
 			} else {
 				$value = sanitize_key( $post_type_raw );
 				if ( '__all__' === $value || post_type_exists( $value ) ) {
-					$filters['post_type'] = [ $value ];
+					$filters['post_type'] = array( $value );
 				}
 			}
 		}
@@ -651,14 +651,14 @@ class Internal_Linking {
 	 */
 	private function get_supported_post_types() {
 		$post_types = get_post_types(
-			[
+			array(
 				'public'  => true,
 				'show_ui' => true,
-			],
+			),
 			'objects'
 		);
 
-		$allowed = [];
+		$allowed = array();
 		foreach ( $post_types as $type => $object ) {
 			if ( 'attachment' === $type ) {
 				continue;
@@ -678,8 +678,8 @@ class Internal_Linking {
 	 * @return void
 	 */
 	private function bulk_assign_category( array $rule_ids, $category ) {
-		$category = sanitize_key( $category );
-		$categories = $this->repository->get_categories();
+		$category     = sanitize_key( $category );
+		$categories   = $this->repository->get_categories();
 		$category_ids = array_column( $categories, 'name', 'id' );
 
 		if ( ! empty( $category ) && ! isset( $category_ids[ $category ] ) && '__none__' !== $category ) {
@@ -715,7 +715,7 @@ class Internal_Linking {
 	private function consume_notices() {
 		$notices = get_transient( self::NOTICE_TRANSIENT );
 		if ( ! is_array( $notices ) ) {
-			return [];
+			return array();
 		}
 
 		delete_transient( self::NOTICE_TRANSIENT );
@@ -737,11 +737,11 @@ class Internal_Linking {
 			$rule['limits']['max_page'] = $default_limit;
 		}
 
-		$heading_behavior = $settings['default_heading_behavior'] ?? 'none';
+		$heading_behavior              = $settings['default_heading_behavior'] ?? 'none';
 		$rule['placement']['headings'] = $heading_behavior;
 
 		if ( 'selected' === $heading_behavior ) {
-			$rule['placement']['heading_levels'] = $settings['default_heading_levels'] ?? [];
+			$rule['placement']['heading_levels'] = $settings['default_heading_levels'] ?? array();
 		}
 
 		return $rule;
@@ -757,12 +757,12 @@ class Internal_Linking {
 	 */
 	private function flash_notice( $message, $type = 'updated' ) {
 		$notices   = get_transient( self::NOTICE_TRANSIENT );
-		$notices   = is_array( $notices ) ? $notices : [];
-		$notices[] = [
+		$notices   = is_array( $notices ) ? $notices : array();
+		$notices[] = array(
 			'code'    => uniqid( 'SAMAN_SEO_links_', true ),
 			'message' => wp_kses_post( $message ),
 			'type'    => ( 'error' === $type ) ? 'error' : 'updated',
-		];
+		);
 
 		set_transient( self::NOTICE_TRANSIENT, $notices, MINUTE_IN_SECONDS );
 	}
@@ -785,7 +785,7 @@ class Internal_Linking {
 	 *
 	 * @return string
 	 */
-	private function get_admin_url( array $args = [] ) {
+	private function get_admin_url( array $args = array() ) {
 		$base = admin_url( 'admin.php?page=' . self::PAGE_SLUG );
 		if ( empty( $args ) ) {
 			return $base;

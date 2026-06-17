@@ -28,21 +28,21 @@ class Admin_UI {
 		$metabox_enabled = apply_filters( 'SAMAN_SEO_feature_toggle', true, 'metabox' );
 
 		if ( $metabox_enabled ) {
-			add_action( 'add_meta_boxes', [ $this, 'register_meta_box' ] );
-			add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_assets' ] );
+			add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
+			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
 		}
 
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
-		add_action( 'init', [ $this, 'register_score_columns' ] );
-		add_filter( 'post_row_actions', [ $this, 'post_row_actions' ], 10, 2 );
-		add_filter( 'bulk_actions-edit-post', [ $this, 'bulk_actions' ] );
-		add_filter( 'handle_bulk_actions-edit-post', [ $this, 'handle_bulk_actions' ], 10, 3 );
-		add_action( 'admin_post_SAMAN_SEO_toggle_noindex', [ $this, 'handle_toggle_noindex' ] );
-		add_action( 'wp_ajax_SAMAN_SEO_render_preview', [ $this, 'ajax_render_preview' ] );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+		add_action( 'init', array( $this, 'register_score_columns' ) );
+		add_filter( 'post_row_actions', array( $this, 'post_row_actions' ), 10, 2 );
+		add_filter( 'bulk_actions-edit-post', array( $this, 'bulk_actions' ) );
+		add_filter( 'handle_bulk_actions-edit-post', array( $this, 'handle_bulk_actions' ), 10, 3 );
+		add_action( 'admin_post_SAMAN_SEO_toggle_noindex', array( $this, 'handle_toggle_noindex' ) );
+		add_action( 'wp_ajax_SAMAN_SEO_render_preview', array( $this, 'ajax_render_preview' ) );
 
 		// Add admin notice for Saman Labs AI installation
-		add_action( 'admin_notices', [ $this, 'ai_installation_notice' ] );
-		add_action( 'wp_ajax_SAMAN_SEO_dismiss_ai_notice', [ $this, 'dismiss_ai_notice' ] );
+		add_action( 'admin_notices', array( $this, 'ai_installation_notice' ) );
+		add_action( 'wp_ajax_SAMAN_SEO_dismiss_ai_notice', array( $this, 'dismiss_ai_notice' ) );
 	}
 
 	/**
@@ -82,11 +82,11 @@ class Admin_UI {
 		}
 
 		// Show on plugin pages and post editor
-		$relevant_pages = [
+		$relevant_pages = array(
 			'saman-seo',
 			'post',
 			'page',
-		];
+		);
 
 		$is_relevant = false;
 		foreach ( $relevant_pages as $page ) {
@@ -167,10 +167,10 @@ class Admin_UI {
 		}
 
 		$post_types = get_post_types(
-			[
+			array(
 				'public'  => true,
 				'show_ui' => true,
-			],
+			),
 			'names'
 		);
 
@@ -181,8 +181,8 @@ class Admin_UI {
 		$post_types = apply_filters( 'SAMAN_SEO_score_post_types', array_values( $post_types ) );
 
 		foreach ( $post_types as $post_type ) {
-			add_filter( "manage_{$post_type}_posts_columns", [ $this, 'add_posts_column' ] );
-			add_action( "manage_{$post_type}_posts_custom_column", [ $this, 'render_posts_column' ], 10, 2 );
+			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_posts_column' ) );
+			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'render_posts_column' ), 10, 2 );
 		}
 	}
 
@@ -204,8 +204,8 @@ class Admin_UI {
 		add_meta_box(
 			'saman-seo-meta',
 			__( 'Saman SEO', 'saman-seo' ),
-			[ $this, 'render_meta_box' ],
-			[ 'post', 'page' ],
+			array( $this, 'render_meta_box' ),
+			array( 'post', 'page' ),
 			'side',
 			'high'
 		);
@@ -222,14 +222,14 @@ class Admin_UI {
 		$meta = get_post_meta( $post->ID, Post_Meta::META_KEY, true );
 		$meta = wp_parse_args(
 			(array) $meta,
-			[
+			array(
 				'title'       => '',
 				'description' => '',
 				'canonical'   => '',
 				'noindex'     => '',
 				'nofollow'    => '',
 				'og_image'    => '',
-			]
+			)
 		);
 
 		wp_nonce_field( 'SAMAN_SEO_meta', 'SAMAN_SEO_meta_nonce' );
@@ -256,7 +256,7 @@ class Admin_UI {
 		$should_enqueue = ( false !== strpos( $hook, 'saman-seo' ) );
 
 		if ( ! $should_enqueue ) {
-			foreach ( [ 'post.php', 'post-new.php', 'edit.php' ] as $needle ) {
+			foreach ( array( 'post.php', 'post-new.php', 'edit.php' ) as $needle ) {
 				if ( false !== strpos( $hook, $needle ) ) {
 					$should_enqueue = true;
 					break;
@@ -271,7 +271,7 @@ class Admin_UI {
 		wp_enqueue_style(
 			'saman-seo-admin',
 			SAMAN_SEO_URL . 'build/css/admin.css',
-			[],
+			array(),
 			SAMAN_SEO_VERSION
 		);
 
@@ -293,10 +293,10 @@ class Admin_UI {
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
-			: [
-				'dependencies' => [ 'wp-element', 'react', 'react-dom' ],
+			: array(
+				'dependencies' => array( 'wp-element', 'react', 'react-dom' ),
 				'version'      => SAMAN_SEO_VERSION,
-			];
+			);
 
 		wp_enqueue_script(
 			'saman-seo-admin-list',
@@ -309,7 +309,7 @@ class Admin_UI {
 		wp_enqueue_style(
 			'saman-seo-admin-list',
 			$build_url . 'index.css',
-			[],
+			array(),
 			$asset['version']
 		);
 	}
@@ -327,10 +327,10 @@ class Admin_UI {
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
-			: [
-				'dependencies' => [ 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch' ],
+			: array(
+				'dependencies' => array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch' ),
 				'version'      => SAMAN_SEO_VERSION,
-			];
+			);
 
 		wp_enqueue_script(
 			'saman-seo-editor-v2',
@@ -343,7 +343,7 @@ class Admin_UI {
 		wp_enqueue_style(
 			'saman-seo-editor-v2',
 			$build_url . 'index.css',
-			[],
+			array(),
 			$asset['version']
 		);
 
@@ -356,15 +356,15 @@ class Admin_UI {
 		$ai_enabled  = AI_Pilot::ai_enabled();
 		$ai_provider = AI_Pilot::get_provider();
 
-		$post_type_templates    = get_option( 'SAMAN_SEO_post_type_title_templates', [] );
-		$post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
+		$post_type_templates    = get_option( 'SAMAN_SEO_post_type_title_templates', array() );
+		$post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', array() );
 
 		if ( ! is_array( $post_type_templates ) ) {
-			$post_type_templates = [];
+			$post_type_templates = array();
 		}
 
 		if ( ! is_array( $post_type_descriptions ) ) {
-			$post_type_descriptions = [];
+			$post_type_descriptions = array();
 		}
 
 		// Check for pending slug change redirect for this user.
@@ -381,17 +381,17 @@ class Admin_UI {
 		wp_localize_script(
 			'saman-seo-editor-v2',
 			'SamanSEOEditor',
-			[
+			array(
 				'variables'            => $variables,
 				'aiEnabled'            => $ai_enabled,
 				'aiProvider'           => $ai_provider, // 'Saman-ai', 'native', or 'none'.
-				'aiPilot'              => [
+				'aiPilot'              => array(
 					'installed'   => $ai_status['installed'],
 					'active'      => $ai_status['active'],
 					'ready'       => $ai_status['ready'],
 					'version'     => $ai_status['version'] ?? null,
 					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
-				],
+				),
 				'siteTitle'            => get_bloginfo( 'name' ),
 				'tagline'              => get_bloginfo( 'description' ),
 				'separator'            => get_option( 'SAMAN_SEO_title_separator', '|' ),
@@ -403,18 +403,18 @@ class Admin_UI {
 				'postTypeDescriptions' => $post_type_descriptions,
 				'slugChange'           => $slug_change,
 				'redirectNonce'        => wp_create_nonce( 'SAMAN_SEO_create_redirect' ),
-				'ai'                   => [
+				'ai'                   => array(
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
-					'strings' => [
+					'strings' => array(
 						'disabled' => __( 'Install Saman Labs AI to enable AI-powered suggestions.', 'saman-seo' ),
 						'running'  => __( 'Asking AI for ideas…', 'saman-seo' ),
 						'success'  => __( 'AI suggestion inserted.', 'saman-seo' ),
 						'error'    => __( 'Unable to fetch suggestion.', 'saman-seo' ),
-					],
-				],
-			]
+					),
+				),
+			)
 		);
 	}
 
@@ -444,7 +444,7 @@ class Admin_UI {
 		}
 
 		$meta  = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
-		$flags = [];
+		$flags = array();
 
 		if ( ! empty( $meta['noindex'] ) ) {
 			$flags[] = 'noindex';
@@ -486,7 +486,7 @@ class Admin_UI {
 	/**
 	 * Inject quick actions in post rows.
 	 *
-	 * @param array   $actions Actions.
+	 * @param array    $actions Actions.
 	 * @param \WP_Post $post   Post.
 	 *
 	 * @return array
@@ -507,10 +507,10 @@ class Admin_UI {
 			esc_url(
 				wp_nonce_url(
 					add_query_arg(
-						[
+						array(
 							'action'  => 'SAMAN_SEO_toggle_noindex',
 							'post_id' => $post->ID,
-						],
+						),
 						admin_url( 'admin-post.php' )
 					),
 					'SAMAN_SEO_toggle_noindex'
@@ -518,16 +518,16 @@ class Admin_UI {
 			),
 			esc_html__( 'Toggle noindex', 'saman-seo' )
 		);
-		
+
 		if ( '1' === get_option( 'SAMAN_SEO_enable_og_preview', '1' ) ) {
 			$actions['SAMAN_SEO_og_preview'] = sprintf(
 				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
 				esc_url(
 					add_query_arg(
-						[
+						array(
 							'SAMAN_SEO_social_card' => 1,
-							'title'                  => $post->post_title,
-						],
+							'title'                 => $post->post_title,
+						),
 						home_url( '/' )
 					)
 				),
@@ -546,8 +546,8 @@ class Admin_UI {
 	 * @return array
 	 */
 	public function bulk_actions( $actions ) {
-		$actions['SAMAN_SEO_noindex'] = __( 'Mark as noindex', 'saman-seo' );
-		$actions['SAMAN_SEO_index']   = __( 'Mark as index', 'saman-seo' );
+		$actions['SAMAN_SEO_noindex']         = __( 'Mark as noindex', 'saman-seo' );
+		$actions['SAMAN_SEO_index']           = __( 'Mark as index', 'saman-seo' );
 		$actions['SAMAN_SEO_regen_canonical'] = __( 'Regenerate canonical', 'saman-seo' );
 		$actions['SAMAN_SEO_apply_template']  = __( 'Apply title template', 'saman-seo' );
 		return $actions;
@@ -563,14 +563,14 @@ class Admin_UI {
 	 * @return string
 	 */
 	public function handle_bulk_actions( $redirect, $action, $post_ids ) {
-		if ( ! in_array( $action, [ 'SAMAN_SEO_noindex', 'SAMAN_SEO_index', 'SAMAN_SEO_regen_canonical', 'SAMAN_SEO_apply_template' ], true ) ) {
+		if ( ! in_array( $action, array( 'SAMAN_SEO_noindex', 'SAMAN_SEO_index', 'SAMAN_SEO_regen_canonical', 'SAMAN_SEO_apply_template' ), true ) ) {
 			return $redirect;
 		}
 
 		foreach ( $post_ids as $post_id ) {
 			$meta = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 
-			if ( in_array( $action, [ 'SAMAN_SEO_noindex', 'SAMAN_SEO_index' ], true ) ) {
+			if ( in_array( $action, array( 'SAMAN_SEO_noindex', 'SAMAN_SEO_index' ), true ) ) {
 				$meta['noindex'] = 'SAMAN_SEO_noindex' === $action ? '1' : '';
 			}
 
@@ -579,8 +579,8 @@ class Admin_UI {
 			}
 
 			if ( 'SAMAN_SEO_apply_template' === $action ) {
-				$post              = get_post( $post_id );
-				$meta['title']     = $post ? generate_title_from_template( $post ) : '';
+				$post                = get_post( $post_id );
+				$meta['title']       = $post ? generate_title_from_template( $post ) : '';
 				$meta['description'] = $post ? wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 ) : '';
 			}
 
@@ -611,7 +611,7 @@ class Admin_UI {
 			exit;
 		}
 
-		$meta = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
+		$meta            = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 		$meta['noindex'] = empty( $meta['noindex'] ) ? '1' : '';
 		update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
 
@@ -652,8 +652,8 @@ class Admin_UI {
 			wp_send_json_error( 'Permission denied' );
 		}
 
-		$template = isset( $_POST['template'] ) ? wp_unslash( $_POST['template'] ) : '';
-		$context  = isset( $_POST['context'] ) ? sanitize_text_field( wp_unslash( $_POST['context'] ) ) : 'global';
+		$template  = isset( $_POST['template'] ) ? wp_unslash( $_POST['template'] ) : '';
+		$context   = isset( $_POST['context'] ) ? sanitize_text_field( wp_unslash( $_POST['context'] ) ) : 'global';
 		$object_id = isset( $_POST['object_id'] ) ? absint( $_POST['object_id'] ) : 0;
 
 		$mock_object = null;
@@ -676,14 +676,25 @@ class Admin_UI {
 		// Fallback to auto-detection if no specific object found
 		if ( ! $mock_object ) {
 			if ( strpos( $context, 'post_type:' ) === 0 ) {
-				$pt = str_replace( 'post_type:', '', $context );
-				$posts = get_posts( [ 'post_type' => $pt, 'posts_per_page' => 1 ] );
+				$pt    = str_replace( 'post_type:', '', $context );
+				$posts = get_posts(
+					array(
+						'post_type'      => $pt,
+						'posts_per_page' => 1,
+					)
+				);
 				if ( $posts ) {
 					$mock_object = $posts[0];
 				}
 			} elseif ( strpos( $context, 'taxonomy:' ) === 0 ) {
-				$tax = str_replace( 'taxonomy:', '', $context );
-				$terms = get_terms( [ 'taxonomy' => $tax, 'number' => 1, 'hide_empty' => false ] );
+				$tax         = str_replace( 'taxonomy:', '', $context );
+				$terms       = get_terms(
+					array(
+						'taxonomy'   => $tax,
+						'number'     => 1,
+						'hide_empty' => false,
+					)
+				);
 				$mock_object = null;
 				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 					$mock_object = $terms[0];
@@ -692,21 +703,21 @@ class Admin_UI {
 				// Always use custom taxonomy renderer for admin preview
 				// (replace_template_variables won't detect taxonomy context in admin)
 				$rendered = $this->render_taxonomy_preview( $template, $tax, $mock_object );
-				wp_send_json_success( [ 'preview' => $rendered ] );
+				wp_send_json_success( array( 'preview' => $rendered ) );
 				return;
 			} elseif ( strpos( $context, 'archive:' ) === 0 ) {
 				// Handle archive contexts (404, search, author, date)
 				// For archives, we need to manually render the template with mock variables
 				$archive_type = str_replace( 'archive:', '', $context );
-				$rendered = $this->render_archive_preview( $template, $archive_type );
-				wp_send_json_success( [ 'preview' => $rendered ] );
+				$rendered     = $this->render_archive_preview( $template, $archive_type );
+				wp_send_json_success( array( 'preview' => $rendered ) );
 				return;
 			}
 		}
 
 		$rendered = replace_template_variables( $template, $mock_object );
 
-		wp_send_json_success( [ 'preview' => $rendered ] );
+		wp_send_json_success( array( 'preview' => $rendered ) );
 	}
 
 	/**
@@ -723,7 +734,7 @@ class Admin_UI {
 		}
 
 		// Build mock variables based on archive type
-		$vars = [
+		$vars = array(
 			'site_title'    => get_bloginfo( 'name' ),
 			'sitename'      => get_bloginfo( 'name' ),
 			'tagline'       => get_bloginfo( 'description' ),
@@ -731,7 +742,7 @@ class Admin_UI {
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),
-		];
+		);
 
 		// Add archive-type specific variables
 		switch ( $archive_type ) {
@@ -743,7 +754,12 @@ class Admin_UI {
 				break;
 			case 'author':
 				// Get a real author if possible
-				$users = get_users( [ 'number' => 1, 'capability' => 'edit_posts' ] );
+				$users = get_users(
+					array(
+						'number'     => 1,
+						'capability' => 'edit_posts',
+					)
+				);
 				if ( ! empty( $users ) ) {
 					$vars['author']      = $users[0]->display_name;
 					$vars['author_name'] = $users[0]->display_name;
@@ -780,7 +796,7 @@ class Admin_UI {
 		}
 
 		// Build mock variables
-		$vars = [
+		$vars = array(
 			'site_title'    => get_bloginfo( 'name' ),
 			'sitename'      => get_bloginfo( 'name' ),
 			'tagline'       => get_bloginfo( 'description' ),
@@ -788,7 +804,7 @@ class Admin_UI {
 			'current_year'  => date_i18n( 'Y' ),
 			'current_month' => date_i18n( 'F' ),
 			'current_day'   => date_i18n( 'j' ),
-		];
+		);
 
 		// Use real term data if available, otherwise use mock data
 		if ( $term instanceof \WP_Term ) {
@@ -801,7 +817,7 @@ class Admin_UI {
 		} else {
 			// No term exists, use generic mock data
 			$tax_object = get_taxonomy( $taxonomy );
-			$term_name = $tax_object && isset( $tax_object->labels->singular_name )
+			$term_name  = $tax_object && isset( $tax_object->labels->singular_name )
 				? $tax_object->labels->singular_name
 				: 'Example Term';
 

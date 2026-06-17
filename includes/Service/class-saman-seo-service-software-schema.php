@@ -20,7 +20,7 @@ class Software_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_software_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_software_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -31,7 +31,7 @@ class Software_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_software_schema_to_graph( $graph, $post ) {
-		
+
 		if ( ! $post || 'software' !== get_post_type( $post ) ) {
 			return $graph;
 		}
@@ -55,20 +55,20 @@ class Software_Schema {
 		$software_name = get_the_title( $post );
 
 		// In a real implementation, these would come from post meta.
-		$operating_system    = 'Windows, macOS, Linux';
+		$operating_system     = 'Windows, macOS, Linux';
 		$application_category = 'Productivity';
 
 		if ( empty( $software_name ) ) {
 			return null;
 		}
 
-		$schema = [
-			'@context'             => 'https://schema.org',
-			'@type'                => 'SoftwareApplication',
-			'name'                 => $software_name,
-			'operatingSystem'      => $operating_system,
+		$schema = array(
+			'@context'            => 'https://schema.org',
+			'@type'               => 'SoftwareApplication',
+			'name'                => $software_name,
+			'operatingSystem'     => $operating_system,
 			'applicationCategory' => $application_category,
-		];
+		);
 
 		return $schema;
 	}

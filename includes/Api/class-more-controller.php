@@ -36,11 +36,11 @@ class More_Controller extends REST_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/plugins',
-			[
+			array(
 				'methods'             => 'GET',
-				'callback'            => [ $this, 'get_plugins' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			]
+				'callback'            => array( $this, 'get_plugins' ),
+				'permission_callback' => array( $this, 'permission_check' ),
+			)
 		);
 	}
 

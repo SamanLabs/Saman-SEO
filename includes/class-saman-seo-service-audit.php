@@ -23,7 +23,7 @@ class Audit {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_link_suggestions', [ $this, 'link_suggestions' ], 10, 2 );
+		add_filter( 'SAMAN_SEO_link_suggestions', array( $this, 'link_suggestions' ), 10, 2 );
 	}
 
 	/**
@@ -37,33 +37,33 @@ class Audit {
 	 * }
 	 */
 	private function collect_issues() {
-		$data = [
-			'issues'          => [],
-			'stats'           => [
-				'severity' => [
+		$data = array(
+			'issues'          => array(),
+			'stats'           => array(
+				'severity' => array(
 					'high'   => 0,
 					'medium' => 0,
 					'low'    => 0,
-				],
-				'types'  => [],
-				'total'  => 0,
-				'posts'  => [],
-			],
-			'scanned'        => 0,
-			'recommendations' => [],
-		];
+				),
+				'types'    => array(),
+				'total'    => 0,
+				'posts'    => array(),
+			),
+			'scanned'         => 0,
+			'recommendations' => array(),
+		);
 
 		$query = new \WP_Query(
-			[
+			array(
 				'post_type'      => 'any',
 				'post_status'    => 'publish',
 				'posts_per_page' => 100,
-			]
+			)
 		);
 
-		$post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', [] );
+		$post_type_descriptions = get_option( 'SAMAN_SEO_post_type_meta_descriptions', array() );
 		if ( ! is_array( $post_type_descriptions ) ) {
-			$post_type_descriptions = [];
+			$post_type_descriptions = array();
 		}
 
 		while ( $query->have_posts() ) {
@@ -79,14 +79,14 @@ class Audit {
 			if ( empty( $meta['title'] ) || strlen( $meta['title'] ) > 65 ) {
 				$data = $this->add_issue(
 					$data,
-					[
+					array(
 						'post_id'  => $post_id,
 						'title'    => $title,
 						'severity' => empty( $meta['title'] ) ? 'high' : 'medium',
 						'message'  => empty( $meta['title'] ) ? __( 'Missing meta title.', 'saman-seo' ) : __( 'Meta title longer than 65 characters.', 'saman-seo' ),
 						'action'   => __( 'Edit SEO fields.', 'saman-seo' ),
 						'type'     => empty( $meta['title'] ) ? 'title_missing' : 'title_length',
-					]
+					)
 				);
 
 				if ( empty( $meta['title'] ) ) {
@@ -97,14 +97,14 @@ class Audit {
 			if ( empty( $meta['description'] ) ) {
 				$data = $this->add_issue(
 					$data,
-					[
+					array(
 						'post_id'  => $post_id,
 						'title'    => $title,
 						'severity' => 'high',
 						'message'  => __( 'Missing meta description.', 'saman-seo' ),
 						'action'   => __( 'Add keyword-rich summary.', 'saman-seo' ),
 						'type'     => 'description_missing',
-					]
+					)
 				);
 				$this->ensure_recommendation( $data['recommendations'], $post, $post_type_descriptions );
 			}
@@ -112,14 +112,14 @@ class Audit {
 			if ( substr_count( $content, ' alt="' ) < substr_count( $content, '<img' ) ) {
 				$data = $this->add_issue(
 					$data,
-					[
+					array(
 						'post_id'  => $post_id,
 						'title'    => $title,
 						'severity' => 'medium',
 						'message'  => __( 'Images missing alt text.', 'saman-seo' ),
 						'action'   => __( 'Add descriptive alt attributes.', 'saman-seo' ),
 						'type'     => 'missing_alt',
-					]
+					)
 				);
 			}
 		}
@@ -154,8 +154,8 @@ class Audit {
 			$data['stats']['severity'][ $severity ] = 1;
 		}
 
-		$type = $issue['type'] ?? 'general';
-		$data['stats']['types'][ $type ] = ( $data['stats']['types'][ $type ] ?? 0 ) + 1;
+		$type                                        = $issue['type'] ?? 'general';
+		$data['stats']['types'][ $type ]             = ( $data['stats']['types'][ $type ] ?? 0 ) + 1;
 		$data['stats']['posts'][ $issue['post_id'] ] = true;
 
 		return $data;
@@ -196,14 +196,14 @@ class Audit {
 			$tag_names = wp_list_pluck( get_the_category( $post->ID ), 'name' );
 		}
 
-		$recommendations[ $post->ID ] = [
+		$recommendations[ $post->ID ] = array(
 			'post_id'               => $post->ID,
 			'title'                 => get_the_title( $post ),
 			'edit_url'              => get_edit_post_link( $post->ID ),
 			'suggested_title'       => $title_suggestion,
 			'suggested_description' => $excerpt,
 			'suggested_tags'        => array_filter( (array) $tag_names ),
-		];
+		);
 	}
 
 	/**
@@ -223,24 +223,24 @@ class Audit {
 		$keywords = wp_list_pluck( get_the_category( $post_id ), 'slug' );
 
 		$query = new \WP_Query(
-			[
+			array(
 				'post_type'      => $post->post_type,
 				'posts_per_page' => 6, // Fetch a buffer so we can skip the current post without using post__not_in.
 				's'              => $post->post_title,
 				'no_found_rows'  => true,
-			]
+			)
 		);
 
-		$list = [];
+		$list = array();
 		while ( $query->have_posts() && count( $list ) < 5 ) {
 			$query->the_post();
 			if ( get_the_ID() === $post_id ) {
 				continue;
 			}
-			$list[] = [
+			$list[] = array(
 				'title' => get_the_title(),
 				'url'   => get_permalink(),
-			];
+			);
 		}
 		wp_reset_postdata();
 

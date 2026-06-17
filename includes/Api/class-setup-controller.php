@@ -11,7 +11,7 @@ namespace Saman\SEO\Api;
 use Saman\SEO\Integration\AI_Pilot;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -19,201 +19,231 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Setup_Controller extends REST_Controller {
 
-    /**
-     * Register routes.
-     */
-    public function register_routes() {
-        // Get setup status
-        register_rest_route( $this->namespace, '/setup/status', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_status' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+	/**
+	 * Register routes.
+	 */
+	public function register_routes() {
+		// Get setup status
+		register_rest_route(
+			$this->namespace,
+			'/setup/status',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_status' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Test API connection
-        register_rest_route( $this->namespace, '/setup/test-api', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'test_api' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Test API connection
+		register_rest_route(
+			$this->namespace,
+			'/setup/test-api',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'test_api' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Complete setup
-        register_rest_route( $this->namespace, '/setup/complete', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'complete_setup' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Complete setup
+		register_rest_route(
+			$this->namespace,
+			'/setup/complete',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'complete_setup' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Skip setup
-        register_rest_route( $this->namespace, '/setup/skip', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'skip_setup' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Skip setup
+		register_rest_route(
+			$this->namespace,
+			'/setup/skip',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'skip_setup' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Reset setup (show wizard again)
-        register_rest_route( $this->namespace, '/setup/reset', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'reset_setup' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
-    }
+		// Reset setup (show wizard again)
+		register_rest_route(
+			$this->namespace,
+			'/setup/reset',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'reset_setup' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
+	}
 
-    /**
-     * Get setup status.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_status( $request ) {
-        $completed = get_option( 'SAMAN_SEO_setup_completed', false );
-        $skipped = get_option( 'SAMAN_SEO_setup_skipped', false );
-        $setup_data = get_option( 'SAMAN_SEO_setup_data', [] );
+	/**
+	 * Get setup status.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_status( $request ) {
+		$completed  = get_option( 'SAMAN_SEO_setup_completed', false );
+		$skipped    = get_option( 'SAMAN_SEO_setup_skipped', false );
+		$setup_data = get_option( 'SAMAN_SEO_setup_data', array() );
 
-        return $this->success( [
-            'completed'   => (bool) $completed,
-            'skipped'     => (bool) $skipped,
-            'show_wizard' => ! $completed && ! $skipped,
-            'setup_data'  => $setup_data,
-        ] );
-    }
+		return $this->success(
+			array(
+				'completed'   => (bool) $completed,
+				'skipped'     => (bool) $skipped,
+				'show_wizard' => ! $completed && ! $skipped,
+				'setup_data'  => $setup_data,
+			)
+		);
+	}
 
-    /**
-     * Test API connection via Saman Labs AI.
-     *
-     * All AI operations are now delegated to the Saman Labs AI plugin.
-     * This endpoint checks the status of that integration.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function test_api( $request ) {
-        $status = AI_Pilot::get_status();
+	/**
+	 * Test API connection via Saman Labs AI.
+	 *
+	 * All AI operations are now delegated to the Saman Labs AI plugin.
+	 * This endpoint checks the status of that integration.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function test_api( $request ) {
+		$status = AI_Pilot::get_status();
 
-        // Check if Saman Labs AI is installed
-        if ( ! AI_Pilot::is_installed() ) {
-            return $this->success( [
-                'success'      => false,
-                'message'      => __( 'Saman Labs AI is not installed. Please install Saman Labs AI to use AI features.', 'saman-seo' ),
-                'install_url'  => admin_url( 'plugin-install.php?s=saman-ai&tab=search&type=term' ),
-                'status'       => 'not_installed',
-            ] );
-        }
+		// Check if Saman Labs AI is installed
+		if ( ! AI_Pilot::is_installed() ) {
+			return $this->success(
+				array(
+					'success'     => false,
+					'message'     => __( 'Saman Labs AI is not installed. Please install Saman Labs AI to use AI features.', 'saman-seo' ),
+					'install_url' => admin_url( 'plugin-install.php?s=saman-ai&tab=search&type=term' ),
+					'status'      => 'not_installed',
+				)
+			);
+		}
 
-        // Check if Saman Labs AI is active
-        if ( ! AI_Pilot::is_active() ) {
-            return $this->success( [
-                'success'      => false,
-                'message'      => __( 'Saman Labs AI is installed but not activated. Please activate it in your plugins.', 'saman-seo' ),
-                'plugins_url'  => admin_url( 'plugins.php' ),
-                'status'       => 'not_active',
-            ] );
-        }
+		// Check if Saman Labs AI is active
+		if ( ! AI_Pilot::is_active() ) {
+			return $this->success(
+				array(
+					'success'     => false,
+					'message'     => __( 'Saman Labs AI is installed but not activated. Please activate it in your plugins.', 'saman-seo' ),
+					'plugins_url' => admin_url( 'plugins.php' ),
+					'status'      => 'not_active',
+				)
+			);
+		}
 
-        // Check if Saman Labs AI is configured
-        if ( ! AI_Pilot::is_ready() ) {
-            return $this->success( [
-                'success'      => false,
-                'message'      => __( 'Saman Labs AI is active but not configured. Please configure your AI provider in Saman Labs AI settings.', 'saman-seo' ),
-                'settings_url' => admin_url( 'admin.php?page=Saman-ai' ),
-                'status'       => 'not_configured',
-            ] );
-        }
+		// Check if Saman Labs AI is configured
+		if ( ! AI_Pilot::is_ready() ) {
+			return $this->success(
+				array(
+					'success'      => false,
+					'message'      => __( 'Saman Labs AI is active but not configured. Please configure your AI provider in Saman Labs AI settings.', 'saman-seo' ),
+					'settings_url' => admin_url( 'admin.php?page=Saman-ai' ),
+					'status'       => 'not_configured',
+				)
+			);
+		}
 
-        // All good - Saman Labs AI is ready
-        return $this->success( [
-            'success'   => true,
-            'message'   => __( 'Saman Labs AI is ready! AI features are available.', 'saman-seo' ),
-            'status'    => 'ready',
-            'providers' => $status['providers'] ?? [],
-            'models'    => $status['models'] ?? [],
-        ] );
-    }
+		// All good - Saman Labs AI is ready
+		return $this->success(
+			array(
+				'success'   => true,
+				'message'   => __( 'Saman Labs AI is ready! AI features are available.', 'saman-seo' ),
+				'status'    => 'ready',
+				'providers' => $status['providers'] ?? array(),
+				'models'    => $status['models'] ?? array(),
+			)
+		);
+	}
 
-    /**
-     * Complete setup wizard.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function complete_setup( $request ) {
-        $params = $request->get_json_params();
-        if ( empty( $params ) ) {
-            $params = $request->get_params();
-        }
+	/**
+	 * Complete setup wizard.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function complete_setup( $request ) {
+		$params = $request->get_json_params();
+		if ( empty( $params ) ) {
+			$params = $request->get_params();
+		}
 
-        // Save setup data
-        $setup_data = [
-            'site_type'     => isset( $params['site_type'] ) ? sanitize_text_field( $params['site_type'] ) : '',
-            'primary_goal'  => isset( $params['primary_goal'] ) ? sanitize_text_field( $params['primary_goal'] ) : '',
-            'industry'      => isset( $params['industry'] ) ? sanitize_text_field( $params['industry'] ) : '',
-            'completed_at'  => current_time( 'mysql' ),
-        ];
+		// Save setup data
+		$setup_data = array(
+			'site_type'    => isset( $params['site_type'] ) ? sanitize_text_field( $params['site_type'] ) : '',
+			'primary_goal' => isset( $params['primary_goal'] ) ? sanitize_text_field( $params['primary_goal'] ) : '',
+			'industry'     => isset( $params['industry'] ) ? sanitize_text_field( $params['industry'] ) : '',
+			'completed_at' => current_time( 'mysql' ),
+		);
 
-        update_option( 'SAMAN_SEO_setup_data', $setup_data );
+		update_option( 'SAMAN_SEO_setup_data', $setup_data );
 
-        // Save module settings
-        $modules_to_toggle = [
-            'enable_sitemap'   => 'SAMAN_SEO_module_sitemap',
-            'enable_404_log'   => 'SAMAN_SEO_module_404_log',
-            'enable_redirects' => 'SAMAN_SEO_module_redirects',
-        ];
+		// Save module settings
+		$modules_to_toggle = array(
+			'enable_sitemap'   => 'SAMAN_SEO_module_sitemap',
+			'enable_404_log'   => 'SAMAN_SEO_module_404_log',
+			'enable_redirects' => 'SAMAN_SEO_module_redirects',
+		);
 
-        foreach ( $modules_to_toggle as $param_key => $option_key ) {
-            if ( isset( $params[ $param_key ] ) ) {
-                update_option( $option_key, $params[ $param_key ] ? '1' : '0' );
-            }
-        }
+		foreach ( $modules_to_toggle as $param_key => $option_key ) {
+			if ( isset( $params[ $param_key ] ) ) {
+				update_option( $option_key, $params[ $param_key ] ? '1' : '0' );
+			}
+		}
 
-        // Save title template. The rest of the plugin reads
-        // SAMAN_SEO_default_title_template; earlier versions of this
-        // controller wrote to SAMAN_SEO_title_template, which was silently
-        // ignored. Clear the dead key so two values can't drift apart.
-        if ( ! empty( $params['title_template'] ) ) {
-            update_option( 'SAMAN_SEO_default_title_template', sanitize_text_field( $params['title_template'] ) );
-            delete_option( 'SAMAN_SEO_title_template' );
-        }
+		// Save title template. The rest of the plugin reads
+		// SAMAN_SEO_default_title_template; earlier versions of this
+		// controller wrote to SAMAN_SEO_title_template, which was silently
+		// ignored. Clear the dead key so two values can't drift apart.
+		if ( ! empty( $params['title_template'] ) ) {
+			update_option( 'SAMAN_SEO_default_title_template', sanitize_text_field( $params['title_template'] ) );
+			delete_option( 'SAMAN_SEO_title_template' );
+		}
 
-        // Mark setup as completed
-        update_option( 'SAMAN_SEO_setup_completed', true );
-        delete_option( 'SAMAN_SEO_setup_skipped' );
+		// Mark setup as completed
+		update_option( 'SAMAN_SEO_setup_completed', true );
+		delete_option( 'SAMAN_SEO_setup_skipped' );
 
-        return $this->success( null, __( 'Setup completed successfully!', 'saman-seo' ) );
-    }
+		return $this->success( null, __( 'Setup completed successfully!', 'saman-seo' ) );
+	}
 
-    /**
-     * Skip setup wizard.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function skip_setup( $request ) {
-        update_option( 'SAMAN_SEO_setup_skipped', true );
+	/**
+	 * Skip setup wizard.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function skip_setup( $request ) {
+		update_option( 'SAMAN_SEO_setup_skipped', true );
 
-        return $this->success( null, __( 'Setup skipped.', 'saman-seo' ) );
-    }
+		return $this->success( null, __( 'Setup skipped.', 'saman-seo' ) );
+	}
 
-    /**
-     * Reset setup wizard (show again).
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function reset_setup( $request ) {
-        delete_option( 'SAMAN_SEO_setup_completed' );
-        delete_option( 'SAMAN_SEO_setup_skipped' );
-        delete_option( 'SAMAN_SEO_setup_data' );
+	/**
+	 * Reset setup wizard (show again).
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function reset_setup( $request ) {
+		delete_option( 'SAMAN_SEO_setup_completed' );
+		delete_option( 'SAMAN_SEO_setup_skipped' );
+		delete_option( 'SAMAN_SEO_setup_data' );
 
-        return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'saman-seo' ) );
-    }
+		return $this->success( null, __( 'Setup wizard reset. It will show on next page load.', 'saman-seo' ) );
+	}
 }

@@ -27,8 +27,8 @@ class Post_Meta {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'init', [ $this, 'register_meta' ] );
-		add_action( 'save_post', [ $this, 'save_meta' ], 10, 2 );
+		add_action( 'init', array( $this, 'register_meta' ) );
+		add_action( 'save_post', array( $this, 'save_meta' ), 10, 2 );
 	}
 
 	/**
@@ -37,77 +37,77 @@ class Post_Meta {
 	 * @return void
 	 */
 	public function register_meta() {
-		$schema = [
+		$schema = array(
 			'type'       => 'object',
-			'properties' => [
-				'title'           => [
+			'properties' => array(
+				'title'                => array(
 					'type' => 'string',
-				],
-				'description'     => [
+				),
+				'description'          => array(
 					'type' => 'string',
-				],
-				'focus_keyphrase' => [
+				),
+				'focus_keyphrase'      => array(
 					'type' => 'string',
-				],
-				'secondary_keyphrases' => [
+				),
+				'secondary_keyphrases' => array(
 					'type'  => 'array',
-					'items' => [
+					'items' => array(
 						'type' => 'string',
-					],
-				],
-				'canonical'       => [
+					),
+				),
+				'canonical'            => array(
 					'type' => 'string',
-				],
-				'noindex'         => [
+				),
+				'noindex'              => array(
 					'type' => 'string',
-				],
-				'nofollow'        => [
+				),
+				'nofollow'             => array(
 					'type' => 'string',
-				],
-				'og_image'        => [
+				),
+				'og_image'             => array(
 					'type' => 'string',
-				],
-				'schema_type'     => [
+				),
+				'schema_type'          => array(
 					'type' => 'string',
-				],
-				'custom_schema'   => [
+				),
+				'custom_schema'        => array(
 					'type' => 'string',
-				],
-			],
-		];
+				),
+			),
+		);
 
 		register_post_meta(
 			'post',
 			self::META_KEY,
-			[
+			array(
 				'type'              => 'object',
 				'single'            => true,
-				'show_in_rest'      => [
+				'show_in_rest'      => array(
 					'schema' => $schema,
-				],
-				'default'           => [],
+				),
+				'default'           => array(),
 				'auth_callback'     => function () {
 					return current_user_can( 'edit_posts' );
 				},
-				'sanitize_callback' => [ $this, 'sanitize' ],
-			]
+				'sanitize_callback' => array( $this, 'sanitize' ),
+			)
 		);
 
 		register_post_meta(
 			'page',
 			self::META_KEY,
-			[
+			array(
 				'type'              => 'object',
 				'single'            => true,
-				'show_in_rest'      => [
+				'show_in_rest'      => array(
 					'schema' => $schema,
-				],
-				'default'           => [],
+				),
+				'default'           => array(),
 				'auth_callback'     => function () {
 					return current_user_can( 'edit_pages' );
 				},
-				'sanitize_callback' => [ $this, 'sanitize' ],
-			]
+				'sanitize_callback' => array( $this, 'sanitize' ),
+			)
 		);
 	}
 
@@ -120,10 +120,10 @@ class Post_Meta {
 	 */
 	public function sanitize( $value ) {
 		if ( ! is_array( $value ) ) {
-			return [];
+			return array();
 		}
 
-		$clean = [];
+		$clean = array();
 
 		$clean['title']           = isset( $value['title'] ) ? sanitize_text_field( $value['title'] ) : '';
 		$clean['description']     = isset( $value['description'] ) ? sanitize_textarea_field( $value['description'] ) : '';
@@ -136,7 +136,7 @@ class Post_Meta {
 		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? wp_kses_post( wp_unslash( $value['custom_schema'] ) ) : '';
 
 		// Handle secondary keyphrases (max 4 additional keywords).
-		$clean['secondary_keyphrases'] = [];
+		$clean['secondary_keyphrases'] = array();
 		if ( isset( $value['secondary_keyphrases'] ) && is_array( $value['secondary_keyphrases'] ) ) {
 			$secondary = array_slice( $value['secondary_keyphrases'], 0, 4 );
 			foreach ( $secondary as $keyphrase ) {
@@ -171,16 +171,16 @@ class Post_Meta {
 			return;
 		}
 
-		$data = [
-			'title'       => isset( $_POST['SAMAN_SEO_title'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_title'] ) ) : '',
-			'description' => isset( $_POST['SAMAN_SEO_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['SAMAN_SEO_description'] ) ) : '',
-			'canonical'   => isset( $_POST['SAMAN_SEO_canonical'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_canonical'] ) ) : '',
-			'noindex'     => ! empty( $_POST['SAMAN_SEO_noindex'] ) ? '1' : '',
-			'nofollow'    => ! empty( $_POST['SAMAN_SEO_nofollow'] ) ? '1' : '',
-			'og_image'    => isset( $_POST['SAMAN_SEO_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_og_image'] ) ) : '',
+		$data = array(
+			'title'         => isset( $_POST['SAMAN_SEO_title'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_title'] ) ) : '',
+			'description'   => isset( $_POST['SAMAN_SEO_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['SAMAN_SEO_description'] ) ) : '',
+			'canonical'     => isset( $_POST['SAMAN_SEO_canonical'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_canonical'] ) ) : '',
+			'noindex'       => ! empty( $_POST['SAMAN_SEO_noindex'] ) ? '1' : '',
+			'nofollow'      => ! empty( $_POST['SAMAN_SEO_nofollow'] ) ? '1' : '',
+			'og_image'      => isset( $_POST['SAMAN_SEO_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_og_image'] ) ) : '',
 			'schema_type'   => isset( $_POST['SAMAN_SEO_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_schema_type'] ) ) : '',
 			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? wp_kses_post( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '',
-		];
+		);
 
 		update_post_meta( $post_id, self::META_KEY, $data );
 	}

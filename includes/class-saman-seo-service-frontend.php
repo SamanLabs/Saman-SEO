@@ -35,12 +35,12 @@ class Frontend {
 		// Initialize title handling immediately since we're already past after_setup_theme
 		$this->init_title_handling();
 
-		add_action( 'wp_head', [ $this, 'render_head_tags' ], 1 );
-		add_action( 'wp_head', [ $this, 'render_social_tags' ], 5 );
-		add_action( 'wp_head', [ $this, 'render_json_ld' ], 20 );
-		add_action( 'wp_head', [ $this, 'render_hreflang' ], 8 );
-		add_action( 'wp_head', [ $this, 'render_pagination_links' ], 9 );
-		add_shortcode( 'SAMAN_SEO_breadcrumbs', [ $this, 'breadcrumbs_shortcode' ] );
+		add_action( 'wp_head', array( $this, 'render_head_tags' ), 1 );
+		add_action( 'wp_head', array( $this, 'render_social_tags' ), 5 );
+		add_action( 'wp_head', array( $this, 'render_json_ld' ), 20 );
+		add_action( 'wp_head', array( $this, 'render_hreflang' ), 8 );
+		add_action( 'wp_head', array( $this, 'render_pagination_links' ), 9 );
+		add_shortcode( 'SAMAN_SEO_breadcrumbs', array( $this, 'breadcrumbs_shortcode' ) );
 	}
 
 	/**
@@ -60,11 +60,11 @@ class Frontend {
 		// Supply the real SEO title to WordPress's document-title API.
 		// Themes and plugins that call wp_get_document_title() will now
 		// receive the optimized title instead of the default one.
-		add_filter( 'pre_get_document_title', [ $this, 'filter_document_title' ], 1 );
+		add_filter( 'pre_get_document_title', array( $this, 'filter_document_title' ), 1 );
 
 		// Render our own <title> tag as a fallback for themes that do not
 		// declare title-tag support or that render it too late.
-		add_action( 'wp_head', [ $this, 'render_plugin_title_tag' ], 0 );
+		add_action( 'wp_head', array( $this, 'render_plugin_title_tag' ), 0 );
 	}
 
 	/**
@@ -152,9 +152,9 @@ class Frontend {
 			if ( is_post_type_archive() ) {
 				$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 			} else {
-				$term = get_queried_object();
+				$term      = get_queried_object();
 				$term_name = ( $term instanceof \WP_Term ) ? $term->name : get_the_archive_title();
-				$title = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				$title     = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 			}
 		}
 
@@ -183,8 +183,8 @@ class Frontend {
 			return;
 		}
 
-		$post = $this->get_context_post();
-		$meta = $this->get_meta( $post );
+		$post                   = $this->get_context_post();
+		$meta                   = $this->get_meta( $post );
 		$post_type_descriptions = $this->get_post_type_option( 'SAMAN_SEO_post_type_meta_descriptions' );
 		$post_type_keywords     = $this->get_post_type_option( 'SAMAN_SEO_post_type_keywords' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
@@ -192,8 +192,6 @@ class Frontend {
 		$homepage_title         = $is_home_view ? get_option( 'SAMAN_SEO_homepage_title', '' ) : '';
 		$homepage_description   = $is_home_view ? get_option( 'SAMAN_SEO_homepage_description', '' ) : '';
 		$homepage_keywords      = $is_home_view ? trim( (string) get_option( 'SAMAN_SEO_homepage_keywords', '' ) ) : '';
-
-
 
 		$description = $meta['description'] ?? '';
 		if ( empty( $description ) && $is_home_view && ! empty( $homepage_description ) ) {
@@ -203,7 +201,7 @@ class Frontend {
 		// Add archive page description support
 		if ( empty( $description ) ) {
 			$archive_defaults = $this->get_archive_defaults();
-			$archive_type = null;
+			$archive_type     = null;
 
 			if ( is_404() ) {
 				$archive_type = '404';
@@ -241,7 +239,7 @@ class Frontend {
 		if ( empty( $description ) ) {
 			$description = get_bloginfo( 'description' );
 		}
-		
+
 		// Run Variable Replacer with safety gate so raw tokens never leak.
 		$description = render_template_safely( $description, $post );
 		$description = apply_filters( 'SAMAN_SEO_description', $description, $post );
@@ -249,13 +247,13 @@ class Frontend {
 		$canonical = $this->get_canonical( $post, $meta );
 		$canonical = apply_filters( 'SAMAN_SEO_canonical', $canonical, $post );
 
-		$robots = $this->get_robots( $meta );
+		$robots   = $this->get_robots( $meta );
 		$keywords = $homepage_keywords;
 		if ( empty( $keywords ) && $post instanceof WP_Post && ! empty( $post_type_keywords[ $post->post_type ] ) ) {
 			$keywords = $post_type_keywords[ $post->post_type ];
 		}
 		if ( empty( $keywords ) && $post instanceof WP_Post ) {
-			$term_names = [];
+			$term_names = array();
 
 			$tags = get_the_tags( $post->ID );
 			if ( $tags && ! is_wp_error( $tags ) ) {
@@ -277,8 +275,6 @@ class Frontend {
 		// Run Replacer on Keywords too with safety gate.
 		$keywords = render_template_safely( $keywords, $post );
 		$keywords = apply_filters( 'SAMAN_SEO_keywords', $keywords, $post );
-
-
 
 		if ( ! empty( $description ) ) {
 			printf( "<meta name=\"description\" content=\"%s\" />\n", esc_attr( $description ) );
@@ -310,13 +306,13 @@ class Frontend {
 			return;
 		}
 
-		$post = $this->get_context_post();
-		$meta = $this->get_meta( $post );
+		$post          = $this->get_context_post();
+		$meta          = $this->get_meta( $post );
 		$canonical_url = $this->get_canonical( $post, $meta );
 		$canonical_url = apply_filters( 'SAMAN_SEO_canonical', $canonical_url, $post );
 
 		// OG URL should match canonical URL by default.
-		$url = apply_filters( 'SAMAN_SEO_og_url', $canonical_url, $post );
+		$url                    = apply_filters( 'SAMAN_SEO_og_url', $canonical_url, $post );
 		$post_type_descriptions = $this->get_post_type_option( 'SAMAN_SEO_post_type_meta_descriptions' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
 		$social_defaults        = $this->get_social_defaults( $post );
@@ -407,20 +403,20 @@ class Frontend {
 		$image         = $this->get_social_image( $post, $meta, $social_defaults );
 		$twitter_image = apply_filters( 'SAMAN_SEO_twitter_image', $image, $post );
 
-		$tags = [
-			'og:title'       => $title,
-			'og:description' => $description,
-			'og:url'         => $url,
-			'og:type'        => $og_type,
-			'og:site_name'   => get_bloginfo( 'name' ),
-			'og:locale'      => get_locale(),
-			'og:image'       => $image,
-			'twitter:card'   => 'summary_large_image',
+		$tags = array(
+			'og:title'            => $title,
+			'og:description'      => $description,
+			'og:url'              => $url,
+			'og:type'             => $og_type,
+			'og:site_name'        => get_bloginfo( 'name' ),
+			'og:locale'           => get_locale(),
+			'og:image'            => $image,
+			'twitter:card'        => 'summary_large_image',
 			'twitter:title'       => $twitter_title,
 			'twitter:description' => $twitter_description,
 			'twitter:image'       => $twitter_image,
 			'twitter:image:alt'   => $twitter_title,
-		];
+		);
 
 		$tags = apply_filters( 'SAMAN_SEO_social_tags', $tags, $post, $meta, $social_defaults );
 		$tags = $this->normalize_social_tags( $tags );
@@ -498,9 +494,9 @@ class Frontend {
 		} elseif ( is_date() ) {
 			$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		} elseif ( is_category() || is_tag() || is_tax() ) {
-			$term = get_queried_object();
+			$term      = get_queried_object();
 			$term_name = ( $term instanceof \WP_Term ) ? $term->name : get_the_archive_title();
-			$title = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title     = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		} elseif ( is_post_type_archive() ) {
 			$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
 		} else {
@@ -560,7 +556,7 @@ class Frontend {
 	public function render_json_ld() {
 		$post = get_post();
 
-		$payload = apply_filters( 'SAMAN_SEO_jsonld', [], $post );
+		$payload = apply_filters( 'SAMAN_SEO_jsonld', array(), $post );
 
 		if ( empty( $payload ) ) {
 			return;
@@ -657,9 +653,9 @@ class Frontend {
 	 */
 	public function breadcrumbs_shortcode( $atts ) {
 		$atts = shortcode_atts(
-			[
+			array(
 				'echo' => 'false',
-			],
+			),
 			$atts
 		);
 
@@ -723,11 +719,11 @@ class Frontend {
 	 * @return string
 	 */
 	private function get_robots( $meta ) {
-		$directives = [];
+		$directives = array();
 
 		// Check archive defaults for noindex (404, search, author, date)
 		$archive_defaults = $this->get_archive_defaults();
-		$archive_type = null;
+		$archive_type     = null;
 
 		if ( is_404() ) {
 			$archive_type = '404';
@@ -766,11 +762,11 @@ class Frontend {
 		// Add default advanced directives (can be filtered or disabled via global option).
 		$advanced = apply_filters(
 			'SAMAN_SEO_robots_advanced',
-			[
+			array(
 				'max-snippet:-1',
 				'max-image-preview:large',
 				'max-video-preview:-1',
-			]
+			)
 		);
 		if ( is_array( $advanced ) ) {
 			foreach ( $advanced as $directive ) {
@@ -785,7 +781,7 @@ class Frontend {
 		$directives = apply_filters( 'SAMAN_SEO_robots_array', $directives );
 
 		if ( ! is_array( $directives ) ) {
-			$directives = [];
+			$directives = array();
 		}
 
 		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
@@ -806,10 +802,10 @@ class Frontend {
 		// Sanitize the final directive list: remove duplicates and conflicting pairs.
 		$final_directives = array_filter( array_unique( array_map( 'trim', explode( ',', $robots_string ) ) ) );
 		if ( in_array( 'noindex', $final_directives, true ) ) {
-			$final_directives = array_diff( $final_directives, [ 'index' ] );
+			$final_directives = array_diff( $final_directives, array( 'index' ) );
 		}
 		if ( in_array( 'nofollow', $final_directives, true ) ) {
-			$final_directives = array_diff( $final_directives, [ 'follow' ] );
+			$final_directives = array_diff( $final_directives, array( 'follow' ) );
 		}
 
 		return implode( ', ', array_values( $final_directives ) );
@@ -824,7 +820,7 @@ class Frontend {
 	 *
 	 * @return string
 	 */
-	private function get_social_image( $post, $meta, $social_defaults = [] ) {
+	private function get_social_image( $post, $meta, $social_defaults = array() ) {
 		$image = '';
 
 		// 1. Check direct post meta override
@@ -862,10 +858,10 @@ class Frontend {
 		// 5. Dynamic Card Generation (last resort)
 		if ( empty( $image ) && $post instanceof WP_Post ) {
 			$image = add_query_arg(
-				[
+				array(
 					'SAMAN_SEO_social_card' => 1,
-					'title'                  => rawurlencode( get_the_title( $post ) ),
-				],
+					'title'                 => rawurlencode( get_the_title( $post ) ),
+				),
 				home_url( '/' )
 			);
 		}
@@ -889,9 +885,9 @@ class Frontend {
 	 * @return array<string,string>
 	 */
 	private function get_social_defaults( $post ) {
-		$global = get_option( 'SAMAN_SEO_social_defaults', [] );
+		$global = get_option( 'SAMAN_SEO_social_defaults', array() );
 		if ( ! is_array( $global ) ) {
-			$global = [];
+			$global = array();
 		}
 
 		$global = wp_parse_args(
@@ -901,14 +897,14 @@ class Frontend {
 					return null !== $value;
 				}
 			),
-			[
+			array(
 				'og_title'            => '',
 				'og_description'      => '',
 				'twitter_title'       => '',
 				'twitter_description' => '',
 				'image_source'        => '',
 				'schema_itemtype'     => 'article',
-			]
+			)
 		);
 
 		if ( $post instanceof WP_Post ) {
@@ -974,10 +970,10 @@ class Frontend {
 	 */
 	private function normalize_social_tags( $tags ) {
 		if ( ! is_array( $tags ) ) {
-			return [];
+			return array();
 		}
 
-		$normalized = [];
+		$normalized = array();
 
 		foreach ( $tags as $key => $value ) {
 			if ( is_int( $key ) && is_array( $value ) ) {
@@ -990,17 +986,17 @@ class Frontend {
 				}
 
 				if ( '' !== $property ) {
-					$normalized[] = [
+					$normalized[] = array(
 						'attr'     => 'property',
 						'property' => $property,
 						'content'  => $content,
-					];
+					);
 				} elseif ( '' !== $name ) {
-					$normalized[] = [
+					$normalized[] = array(
 						'attr'     => 'name',
 						'property' => $name,
 						'content'  => $content,
-					];
+					);
 				}
 
 				continue;
@@ -1035,20 +1031,20 @@ class Frontend {
 	 * @return array<int,array{attr:string,property:string,content:string}>
 	 */
 	private function dedupe_social_tags( $tags ) {
-		$multi = [
+		$multi = array(
 			'og:image',
 			'og:image:alt',
 			'og:video',
 			'og:video:secure_url',
 			'og:audio',
 			'twitter:image',
-		];
+		);
 
 		$multi = apply_filters( 'SAMAN_SEO_social_multi_tags', $multi );
 		$multi = array_map( 'strtolower', array_filter( array_map( 'strval', (array) $multi ) ) );
 
-		$deduped = [];
-		$index_by_key = [];
+		$deduped      = array();
+		$index_by_key = array();
 
 		foreach ( $tags as $tag ) {
 			$key = strtolower( $tag['property'] );
@@ -1063,7 +1059,7 @@ class Frontend {
 			}
 
 			$index_by_key[ $key ] = count( $deduped );
-			$deduped[] = $tag;
+			$deduped[]            = $tag;
 		}
 
 		return $deduped;
@@ -1080,11 +1076,11 @@ class Frontend {
 	private function format_social_tag( $property, $content ) {
 		$attr = 0 === strpos( $property, 'og:' ) ? 'property' : 'name';
 
-		return [
+		return array(
 			'attr'     => $attr,
 			'property' => $property,
 			'content'  => $content,
-		];
+		);
 	}
 
 	/**
@@ -1095,7 +1091,7 @@ class Frontend {
 	 * @return array
 	 */
 	private function get_meta( $post ) {
-		$meta = [];
+		$meta = array();
 
 		if ( $post instanceof WP_Post ) {
 			$meta = get_post_meta( $post->ID, Post_Meta::META_KEY, true );
@@ -1110,17 +1106,17 @@ class Frontend {
 		}
 
 		if ( ! is_array( $meta ) ) {
-			$meta = [];
+			$meta = array();
 		}
 
-		$defaults = [
+		$defaults = array(
 			'title'       => '',
 			'description' => '',
 			'canonical'   => '',
 			'noindex'     => '',
 			'nofollow'    => '',
 			'og_image'    => '',
-		];
+		);
 
 		return wp_parse_args( $meta, $defaults );
 	}
@@ -1131,34 +1127,34 @@ class Frontend {
 	 * @return array
 	 */
 	private function get_archive_defaults() {
-		$archive_defaults = get_option( 'SAMAN_SEO_archive_defaults', [] );
+		$archive_defaults = get_option( 'SAMAN_SEO_archive_defaults', array() );
 		if ( ! is_array( $archive_defaults ) ) {
-			$archive_defaults = [];
+			$archive_defaults = array();
 		}
 
 		// Define default templates for each archive type
-		$archive_default_templates = [
-			'author' => [
+		$archive_default_templates = array(
+			'author' => array(
 				'noindex'              => '0',
 				'title_template'       => '{{author}} {{separator}} {{sitename}}',
 				'description_template' => 'Articles written by {{author}}. {{author_bio}}',
-			],
-			'date'   => [
+			),
+			'date'   => array(
 				'noindex'              => '0',
 				'title_template'       => '{{date}} Archives {{separator}} {{sitename}}',
 				'description_template' => 'Browse our articles from {{date}}.',
-			],
-			'search' => [
+			),
+			'search' => array(
 				'noindex'              => '1',
 				'title_template'       => 'Search Results: {{search_term}} {{separator}} {{sitename}}',
 				'description_template' => 'Search results for "{{search_term}}" on {{sitename}}.',
-			],
-			'404'    => [
+			),
+			'404'    => array(
 				'noindex'              => '1',
 				'title_template'       => 'Page Not Found {{separator}} {{sitename}}',
 				'description_template' => 'The page you are looking for could not be found.',
-			],
-		];
+			),
+		);
 
 		// Merge saved values with defaults (use defaults for empty values)
 		foreach ( $archive_default_templates as $type => $defaults ) {
@@ -1172,7 +1168,7 @@ class Frontend {
 				foreach ( $defaults as $key => $default_value ) {
 					$current_value = $archive_defaults[ $type ][ $key ] ?? '';
 					// Replace if empty OR if it's a template field that doesn't have any {{variables}}
-					if ( '' === $current_value || ( in_array( $key, [ 'title_template', 'description_template' ] ) && strpos( $current_value, '{{' ) === false ) ) {
+					if ( '' === $current_value || ( in_array( $key, array( 'title_template', 'description_template' ) ) && strpos( $current_value, '{{' ) === false ) ) {
 						$archive_defaults[ $type ][ $key ] = $default_value;
 					}
 				}
@@ -1190,9 +1186,9 @@ class Frontend {
 	 * @return array
 	 */
 	private function get_post_type_option( $option ) {
-		$value = get_option( $option, [] );
+		$value = get_option( $option, array() );
 
-		return is_array( $value ) ? $value : [];
+		return is_array( $value ) ? $value : array();
 	}
 
 	/**
@@ -1219,5 +1215,4 @@ class Frontend {
 
 		return null;
 	}
-
 }

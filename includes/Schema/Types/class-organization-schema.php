@@ -66,12 +66,12 @@ class Organization_Schema extends Abstract_Schema {
 			$org_logo = get_site_icon_url();
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => Schema_IDs::organization(),
 			'name'  => $org_name,
 			'url'   => home_url( '/' ),
-		];
+		);
 
 		if ( ! empty( $org_logo ) ) {
 			$schema['logo'] = $org_logo;
@@ -101,7 +101,7 @@ class Organization_Schema extends Abstract_Schema {
 
 		// Build address if we have location data.
 		if ( ! empty( $local_street ) || ! empty( $local_city ) ) {
-			$address = [ '@type' => 'PostalAddress' ];
+			$address = array( '@type' => 'PostalAddress' );
 			if ( ! empty( $local_street ) ) {
 				$address['streetAddress'] = $local_street;
 			}
@@ -137,7 +137,7 @@ class Organization_Schema extends Abstract_Schema {
 	 * @return array Array of social profile URLs.
 	 */
 	private function get_social_profiles(): array {
-		$profiles = [];
+		$profiles = array();
 
 		// Try Local SEO social profiles first.
 		$local_social = get_option( 'SAMAN_SEO_local_social_profiles', '' );

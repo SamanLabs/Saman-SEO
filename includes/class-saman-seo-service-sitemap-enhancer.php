@@ -33,14 +33,14 @@ class Sitemap_Enhancer {
 	 *
 	 * @var array<int,array<string,mixed>>
 	 */
-	private $sitemap_map = [];
+	private $sitemap_map = array();
 
 	/**
 	 * Cache for generated sitemap page URL lists.
 	 *
 	 * @var array<string,array<int,array<string,mixed>>>
 	 */
-	private $sitemap_page_cache = [];
+	private $sitemap_page_cache = array();
 
 	/**
 	 * Cached max URLs per sitemap page.
@@ -61,23 +61,23 @@ class Sitemap_Enhancer {
 	 *
 	 * @var array<string,int>
 	 */
-	private $group_item_counts = [];
+	private $group_item_counts = array();
 
 	/**
 	 * Default excluded term slugs per taxonomy.
 	 *
 	 * @var array<string,array<int,string>>
 	 */
-	private $default_excluded_term_slugs = [
-		'category' => [ 'uncategorized' ],
-	];
+	private $default_excluded_term_slugs = array(
+		'category' => array( 'uncategorized' ),
+	);
 
 	/**
 	 * Cached excluded term IDs per taxonomy.
 	 *
 	 * @var array<string,array<int,int>>
 	 */
-	private $excluded_term_ids = [];
+	private $excluded_term_ids = array();
 
 	/**
 	 * Boot hooks.
@@ -93,16 +93,16 @@ class Sitemap_Enhancer {
 			return;
 		}
 
-		add_filter( 'wp_sitemaps_posts_entry', [ $this, 'include_media_fields' ], 10, 3 );
-		add_filter( 'wp_sitemaps_additional_namespaces', [ $this, 'add_namespaces' ] );
-		add_filter( 'wp_sitemaps_max_urls', [ $this, 'limit_sitemap_page_size' ] );
-		add_filter( 'wp_sitemaps_posts_query_args', [ $this, 'filter_posts_query_args' ], 10, 2 );
-		add_filter( 'wp_sitemaps_taxonomies_query_args', [ $this, 'filter_taxonomy_query_args' ], 10, 2 );
-		add_filter( 'wp_sitemaps_enabled', [ $this, 'disable_core_sitemaps' ] );
-		add_filter( 'wp_sitemaps_stylesheet_url', [ $this, 'filter_stylesheet_url' ] );
-		add_filter( 'wp_sitemaps_stylesheet_index_url', [ $this, 'filter_stylesheet_url' ] );
-		add_action( 'init', [ $this, 'register_custom_sitemap' ] );
-		add_action( 'template_redirect', [ $this, 'render_custom_sitemap' ], 0 );
+		add_filter( 'wp_sitemaps_posts_entry', array( $this, 'include_media_fields' ), 10, 3 );
+		add_filter( 'wp_sitemaps_additional_namespaces', array( $this, 'add_namespaces' ) );
+		add_filter( 'wp_sitemaps_max_urls', array( $this, 'limit_sitemap_page_size' ) );
+		add_filter( 'wp_sitemaps_posts_query_args', array( $this, 'filter_posts_query_args' ), 10, 2 );
+		add_filter( 'wp_sitemaps_taxonomies_query_args', array( $this, 'filter_taxonomy_query_args' ), 10, 2 );
+		add_filter( 'wp_sitemaps_enabled', array( $this, 'disable_core_sitemaps' ) );
+		add_filter( 'wp_sitemaps_stylesheet_url', array( $this, 'filter_stylesheet_url' ) );
+		add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'filter_stylesheet_url' ) );
+		add_action( 'init', array( $this, 'register_custom_sitemap' ) );
+		add_action( 'template_redirect', array( $this, 'render_custom_sitemap' ), 0 );
 	}
 
 	/**
@@ -122,8 +122,8 @@ class Sitemap_Enhancer {
 	/**
 	 * Append changefreq, priority, and image nodes.
 	 *
-	 * @param array $entry Sitemap entry.
-	 * @param int   $post_id Post ID.
+	 * @param array  $entry Sitemap entry.
+	 * @param int    $post_id Post ID.
 	 * @param string $post_type Post type.
 	 *
 	 * @return array
@@ -145,10 +145,10 @@ class Sitemap_Enhancer {
 
 		$first_video = $this->detect_video( get_post_field( 'post_content', $post_id ) );
 		if ( $first_video ) {
-			$entry['video:video'] = [
+			$entry['video:video'] = array(
 				'video:content_loc' => esc_url_raw( $first_video ),
 				'video:title'       => get_the_title( $post_id ),
-			];
+			);
 		}
 
 		return apply_filters( 'SAMAN_SEO_sitemap_entry', $entry, $post_id, $post_type );
@@ -162,8 +162,8 @@ class Sitemap_Enhancer {
 	 * @return array<int,array<string,string>>
 	 */
 	private function collect_post_images( $post_id, $content = '' ) {
-		$images    = [];
-		$seen_urls = [];
+		$images    = array();
+		$seen_urls = array();
 
 		$add_image = static function ( $url, $caption = '' ) use ( &$images, &$seen_urls ) {
 			$url = esc_url_raw( $url );
@@ -180,9 +180,9 @@ class Sitemap_Enhancer {
 
 			$seen_urls[ $key ] = true;
 
-			$image_entry = [
+			$image_entry = array(
 				'image:loc' => $url,
-			];
+			);
 
 			if ( $caption ) {
 				$image_entry['image:caption'] = wp_strip_all_tags( $caption );
@@ -430,10 +430,10 @@ class Sitemap_Enhancer {
 		$groups = $this->get_sitemap_map();
 
 		if ( empty( $groups ) ) {
-			return [];
+			return array();
 		}
 
-		$items = [];
+		$items = array();
 
 		foreach ( $groups as $group ) {
 			$max_pages = $this->get_max_pages_for_group( $group );
@@ -443,9 +443,9 @@ class Sitemap_Enhancer {
 			}
 
 			for ( $page = 1; $page <= $max_pages; $page++ ) {
-				$item = [
+				$item    = array(
 					'loc' => $this->build_sitemap_url( $group['slug'], $page ),
-				];
+				);
 				$lastmod = $this->get_sitemap_lastmod( $group, $page );
 
 				if ( $lastmod ) {
@@ -457,12 +457,12 @@ class Sitemap_Enhancer {
 		}
 
 		// Add additional pages if configured
-		$additional_pages = get_option( 'SAMAN_SEO_sitemap_additional_pages', [] );
+		$additional_pages = get_option( 'SAMAN_SEO_sitemap_additional_pages', array() );
 		if ( ! empty( $additional_pages ) && is_array( $additional_pages ) ) {
 			// Create a custom sitemap for additional pages
-			$items[] = [
+			$items[] = array(
 				'loc' => home_url( '/additional-sitemap.xml' ),
-			];
+			);
 		}
 
 		return apply_filters( 'SAMAN_SEO_sitemap_index_items', $items );
@@ -544,10 +544,10 @@ class Sitemap_Enhancer {
 		$server = $this->get_sitemaps_server();
 
 		if ( ! $server ) {
-			return [];
+			return array();
 		}
 
-		$map       = [];
+		$map       = array();
 		$providers = $server->registry->get_providers();
 
 		// Get enabled post types and taxonomies from settings
@@ -558,22 +558,22 @@ class Sitemap_Enhancer {
 		// If null, this is first time - get all available post types
 		if ( null === $enabled_post_types ) {
 			if ( isset( $providers['posts'] ) ) {
-				$post_provider = $providers['posts'];
-				$subtypes      = $post_provider->get_object_subtypes();
+				$post_provider      = $providers['posts'];
+				$subtypes           = $post_provider->get_object_subtypes();
 				$enabled_post_types = array_keys( $subtypes );
 			} else {
-				$enabled_post_types = [];
+				$enabled_post_types = array();
 			}
 		}
 
 		// If null, this is first time - get all available taxonomies
 		if ( null === $enabled_taxonomies ) {
 			if ( isset( $providers['taxonomies'] ) ) {
-				$tax_provider = $providers['taxonomies'];
-				$taxonomies_list = $tax_provider->get_object_subtypes();
+				$tax_provider       = $providers['taxonomies'];
+				$taxonomies_list    = $tax_provider->get_object_subtypes();
 				$enabled_taxonomies = array_keys( $taxonomies_list );
 			} else {
-				$enabled_taxonomies = [];
+				$enabled_taxonomies = array();
 			}
 		}
 
@@ -587,12 +587,12 @@ class Sitemap_Enhancer {
 					continue;
 				}
 
-				$map[] = [
+				$map[] = array(
 					'slug'     => $this->sanitize_slug( $name ),
 					'label'    => $object->label ?? $name,
 					'provider' => 'posts',
 					'subtype'  => $name,
-				];
+				);
 			}
 		}
 
@@ -606,22 +606,22 @@ class Sitemap_Enhancer {
 					continue;
 				}
 
-				$map[] = [
+				$map[] = array(
 					'slug'     => $this->sanitize_slug( $name ),
 					'label'    => $object->label ?? $name,
 					'provider' => 'taxonomies',
 					'subtype'  => $name,
-				];
+				);
 			}
 		}
 
 		if ( isset( $providers['users'] ) && '1' === $include_author ) {
-			$map[] = [
+			$map[] = array(
 				'slug'     => 'author',
 				'label'    => __( 'Authors', 'saman-seo' ),
 				'provider' => 'users',
 				'subtype'  => '',
-			];
+			);
 		}
 
 		/**
@@ -752,7 +752,7 @@ class Sitemap_Enhancer {
 		$provider = $this->get_provider( $group['provider'] );
 
 		if ( ! $provider ) {
-			return [];
+			return array();
 		}
 
 		$this->allow_core_sitemaps = true;
@@ -766,7 +766,7 @@ class Sitemap_Enhancer {
 		$this->allow_core_sitemaps = false;
 
 		if ( ! is_array( $list ) ) {
-			$list = [];
+			$list = array();
 		}
 
 		if ( $use_cache ) {
@@ -789,7 +789,7 @@ class Sitemap_Enhancer {
 		$timestamp        = $this->parse_lastmod_timestamp( $filtered_lastmod );
 
 		if ( ! $timestamp ) {
-			$url_list = $this->fetch_sitemap_urls( $group, $page );
+			$url_list  = $this->fetch_sitemap_urls( $group, $page );
 			$timestamp = $this->get_latest_lastmod_from_list( $url_list );
 		}
 
@@ -932,14 +932,14 @@ class Sitemap_Enhancer {
 	 * @return array<string,mixed>
 	 */
 	private function get_taxonomy_query_args_for_counts( $taxonomy ) {
-		$args = [
+		$args = array(
 			'taxonomy'               => $taxonomy,
 			'orderby'                => 'term_order',
 			'number'                 => wp_sitemaps_get_max_urls( 'term' ),
 			'hide_empty'             => true,
 			'hierarchical'           => false,
 			'update_term_meta_cache' => false,
-		];
+		);
 
 		return apply_filters( 'wp_sitemaps_taxonomies_query_args', $args, $taxonomy );
 	}
@@ -956,30 +956,30 @@ class Sitemap_Enhancer {
 		}
 
 		if ( ! taxonomy_exists( $taxonomy ) ) {
-			$this->excluded_term_ids[ $taxonomy ] = [];
+			$this->excluded_term_ids[ $taxonomy ] = array();
 
-			return [];
+			return array();
 		}
 
 		$slugs = $this->get_excluded_term_slugs( $taxonomy );
 
 		if ( empty( $slugs ) ) {
-			$this->excluded_term_ids[ $taxonomy ] = [];
+			$this->excluded_term_ids[ $taxonomy ] = array();
 
-			return [];
+			return array();
 		}
 
 		$terms = get_terms(
-			[
+			array(
 				'taxonomy'   => $taxonomy,
 				'slug'       => $slugs,
 				'hide_empty' => false,
 				'fields'     => 'ids',
-			]
+			)
 		);
 
 		if ( is_wp_error( $terms ) ) {
-			$terms = [];
+			$terms = array();
 		}
 
 		$this->excluded_term_ids[ $taxonomy ] = array_map( 'intval', (array) $terms );
@@ -994,7 +994,7 @@ class Sitemap_Enhancer {
 	 * @return array<int,string>
 	 */
 	private function get_excluded_term_slugs( $taxonomy ) {
-		$defaults = $this->default_excluded_term_slugs[ $taxonomy ] ?? [];
+		$defaults = $this->default_excluded_term_slugs[ $taxonomy ] ?? array();
 
 		$slugs = (array) apply_filters(
 			'SAMAN_SEO_sitemap_excluded_terms',
@@ -1051,7 +1051,7 @@ class Sitemap_Enhancer {
 		$count = apply_filters( 'SAMAN_SEO_sitemap_group_count', $count, $group );
 
 		if ( null !== $count ) {
-			$count = max( 0, (int) $count );
+			$count                                 = max( 0, (int) $count );
 			$this->group_item_counts[ $cache_key ] = $count;
 		}
 
@@ -1069,13 +1069,13 @@ class Sitemap_Enhancer {
 			return 0;
 		}
 
-		$counts            = wp_count_posts( $post_type, 'readable' );
-		$allowed_statuses  = (array) apply_filters(
+		$counts           = wp_count_posts( $post_type, 'readable' );
+		$allowed_statuses = (array) apply_filters(
 			'SAMAN_SEO_sitemap_count_statuses',
-			[ 'publish', 'inherit' ],
+			array( 'publish', 'inherit' ),
 			$post_type
 		);
-		$total             = 0;
+		$total            = 0;
 
 		if ( $counts instanceof \stdClass ) {
 			foreach ( $allowed_statuses as $status ) {
@@ -1119,12 +1119,12 @@ class Sitemap_Enhancer {
 	 */
 	private function count_users_for_sitemap() {
 		$query = new \WP_User_Query(
-			[
+			array(
 				'has_published_posts' => true,
 				'fields'              => 'ID',
 				'number'              => 1,
 				'count_total'         => true,
-			]
+			)
 		);
 
 		return (int) $query->get_total();
@@ -1200,9 +1200,9 @@ class Sitemap_Enhancer {
 
 		$response = wp_remote_head(
 			$maxres,
-			[
+			array(
 				'timeout' => 3,
-			]
+			)
 		);
 
 		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
@@ -1289,7 +1289,7 @@ class Sitemap_Enhancer {
 		nocache_headers();
 		header( 'Content-Type: application/xml; charset=UTF-8' );
 
-		$css_url = esc_url( plugins_url( 'assets/css/sitemap.css', dirname( __FILE__ ) ) );
+		$css_url = esc_url( plugins_url( 'assets/css/sitemap.css', __DIR__ ) );
 
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		?>
@@ -1430,12 +1430,12 @@ class Sitemap_Enhancer {
 		}
 
 		$posts = get_posts(
-			[
+			array(
 				'posts_per_page' => 50,
 				'post_status'    => 'publish',
 				'orderby'        => 'date',
 				'order'          => 'DESC',
-			]
+			)
 		);
 
 		if ( empty( $posts ) ) {
@@ -1481,26 +1481,26 @@ class Sitemap_Enhancer {
 			return;
 		}
 
-		$post_types    = get_option( 'SAMAN_SEO_sitemap_google_news_post_types', [] );
-		$pub_name      = get_option( 'SAMAN_SEO_sitemap_google_news_name', get_bloginfo( 'name' ) );
+		$post_types = get_option( 'SAMAN_SEO_sitemap_google_news_post_types', array() );
+		$pub_name   = get_option( 'SAMAN_SEO_sitemap_google_news_name', get_bloginfo( 'name' ) );
 
 		if ( empty( $post_types ) ) {
-			$post_types = [ 'post' ];
+			$post_types = array( 'post' );
 		}
 
 		$posts = get_posts(
-			[
+			array(
 				'post_type'      => $post_types,
 				'posts_per_page' => 1000,
 				'post_status'    => 'publish',
-				'date_query'     => [
-					[
+				'date_query'     => array(
+					array(
 						'after' => '2 days ago',
-					],
-				],
+					),
+				),
 				'orderby'        => 'date',
 				'order'          => 'DESC',
-			]
+			)
 		);
 
 		if ( empty( $posts ) ) {
@@ -1514,7 +1514,7 @@ class Sitemap_Enhancer {
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
-	<?php foreach ( $posts as $post ) : ?>
+		<?php foreach ( $posts as $post ) : ?>
 	<url>
 		<loc><?php echo esc_url( get_permalink( $post ) ); ?></loc>
 		<news:news>
@@ -1562,31 +1562,32 @@ class Sitemap_Enhancer {
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-	<?php foreach ( $posts_with_videos as $item ) :
-		$post = $item['post'];
-		$videos = $item['videos'];
-		foreach ( $videos as $video ) :
-			$thumbnail = '';
-			$title = get_the_title( $post );
-			$description = wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 );
+		<?php
+		foreach ( $posts_with_videos as $item ) :
+			$post   = $item['post'];
+			$videos = $item['videos'];
+			foreach ( $videos as $video ) :
+				$thumbnail   = '';
+				$title       = get_the_title( $post );
+				$description = wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 );
 
-			if ( 'youtube' === $video['platform'] ) {
-				$thumbnail = $this->get_youtube_thumbnail_url( $video['id'] );
-				$content_loc = 'https://www.youtube.com/watch?v=' . $video['id'];
-				$player_loc = 'https://www.youtube.com/embed/' . $video['id'];
-			} elseif ( 'vimeo' === $video['platform'] ) {
-				$content_loc = 'https://vimeo.com/' . $video['id'];
-				$player_loc = 'https://player.vimeo.com/video/' . $video['id'];
-			} else {
-				continue;
-			}
-	?>
+				if ( 'youtube' === $video['platform'] ) {
+					$thumbnail   = $this->get_youtube_thumbnail_url( $video['id'] );
+					$content_loc = 'https://www.youtube.com/watch?v=' . $video['id'];
+					$player_loc  = 'https://www.youtube.com/embed/' . $video['id'];
+				} elseif ( 'vimeo' === $video['platform'] ) {
+					$content_loc = 'https://vimeo.com/' . $video['id'];
+					$player_loc  = 'https://player.vimeo.com/video/' . $video['id'];
+				} else {
+					continue;
+				}
+				?>
 	<url>
 		<loc><?php echo esc_url( get_permalink( $post ) ); ?></loc>
 		<video:video>
 			<video:title><?php echo esc_html( $title ); ?></video:title>
 			<video:description><?php echo esc_html( $description ); ?></video:description>
-			<?php if ( $thumbnail ) : ?>
+				<?php if ( $thumbnail ) : ?>
 			<video:thumbnail_loc><?php echo esc_url( $thumbnail ); ?></video:thumbnail_loc>
 			<?php endif; ?>
 			<video:content_loc><?php echo esc_url( $content_loc ); ?></video:content_loc>
@@ -1594,7 +1595,10 @@ class Sitemap_Enhancer {
 			<video:publication_date><?php echo esc_html( get_post_time( DATE_W3C, true, $post ) ); ?></video:publication_date>
 		</video:video>
 	</url>
-	<?php endforeach; endforeach; ?>
+				<?php
+	endforeach;
+endforeach;
+		?>
 </urlset>
 		<?php
 		exit;
@@ -1606,24 +1610,24 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	private function render_additional_pages_sitemap() {
-		$additional_pages = get_option( 'SAMAN_SEO_sitemap_additional_pages', [] );
+		$additional_pages = get_option( 'SAMAN_SEO_sitemap_additional_pages', array() );
 
 		if ( empty( $additional_pages ) || ! is_array( $additional_pages ) ) {
 			$this->bail_404();
 			return;
 		}
 
-		$url_list = [];
+		$url_list = array();
 
 		foreach ( $additional_pages as $page ) {
 			if ( empty( $page['url'] ) ) {
 				continue;
 			}
 
-			$url_list[] = [
+			$url_list[] = array(
 				'loc'      => esc_url_raw( $page['url'] ),
 				'priority' => floatval( $page['priority'] ?? 0.5 ),
-			];
+			);
 		}
 
 		if ( empty( $url_list ) ) {

@@ -57,14 +57,14 @@ class FAQPage_Schema extends Abstract_Schema {
 		$questions = $this->collect_questions_from_blocks();
 
 		if ( empty( $questions ) ) {
-			return [];
+			return array();
 		}
 
-		return [
+		return array(
 			'@type'      => $this->get_type(),
 			'@id'        => Schema_IDs::faqpage( $this->context->canonical ),
 			'mainEntity' => $questions,
-		];
+		);
 	}
 
 	/**
@@ -77,7 +77,7 @@ class FAQPage_Schema extends Abstract_Schema {
 	 */
 	private function collect_questions_from_blocks(): array {
 		$blocks    = parse_blocks( $this->context->post->post_content );
-		$questions = [];
+		$questions = array();
 
 		$this->extract_faq_blocks( $blocks, $questions );
 
@@ -93,27 +93,27 @@ class FAQPage_Schema extends Abstract_Schema {
 	private function extract_faq_blocks( array $blocks, array &$questions ): void {
 		foreach ( $blocks as $block ) {
 			if ( 'saman-seo/faq' === $block['blockName'] ) {
-				$attrs = $block['attrs'] ?? [];
+				$attrs = $block['attrs'] ?? array();
 
 				// Respect showSchema toggle - only include if true.
 				if ( empty( $attrs['showSchema'] ) ) {
 					continue;
 				}
 
-				$faqs = $attrs['faqs'] ?? [];
+				$faqs = $attrs['faqs'] ?? array();
 				foreach ( $faqs as $faq ) {
 					$q = trim( wp_strip_all_tags( $faq['question'] ?? '' ) );
 					$a = trim( wp_strip_all_tags( $faq['answer'] ?? '' ) );
 
 					if ( ! empty( $q ) && ! empty( $a ) ) {
-						$questions[] = [
+						$questions[] = array(
 							'@type'          => 'Question',
 							'name'           => $q,
-							'acceptedAnswer' => [
+							'acceptedAnswer' => array(
 								'@type' => 'Answer',
 								'text'  => $a,
-							],
-						];
+							),
+						);
 					}
 				}
 			}

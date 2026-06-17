@@ -20,7 +20,7 @@ class Service_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_service_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_service_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Service_Schema {
 	 * @return array|null
 	 */
 	private function build_schema( $post ) {
-		$service_name = get_the_title( $post );
+		$service_name  = get_the_title( $post );
 		$provider_name = get_bloginfo( 'name' );
 
 		// In a real implementation, these would come from post meta.
@@ -62,17 +62,17 @@ class Service_Schema {
 			return null;
 		}
 
-		$schema = [
+		$schema = array(
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Service',
 			'name'        => $service_name,
 			'serviceType' => $service_type,
-			'provider'    => [
+			'provider'    => array(
 				'@type' => 'Organization',
 				'name'  => $provider_name,
-			],
+			),
 			'areaServed'  => $area_served,
-		];
+		);
 
 		return $schema;
 	}

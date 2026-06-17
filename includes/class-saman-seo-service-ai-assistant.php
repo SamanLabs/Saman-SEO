@@ -33,7 +33,7 @@ class AI_Assistant {
 			return;
 		}
 
-		add_action( 'admin_post_SAMAN_SEO_ai_reset', [ $this, 'handle_reset' ] );
+		add_action( 'admin_post_SAMAN_SEO_ai_reset', array( $this, 'handle_reset' ) );
 	}
 
 	/**
@@ -51,11 +51,11 @@ class AI_Assistant {
 		$settings = new Settings();
 		$defaults = $settings->get_defaults();
 
-		$keys = [
+		$keys = array(
 			'SAMAN_SEO_ai_prompt_system',
 			'SAMAN_SEO_ai_prompt_title',
 			'SAMAN_SEO_ai_prompt_description',
-		];
+		);
 
 		foreach ( $keys as $key ) {
 			if ( isset( $defaults[ $key ] ) ) {
@@ -64,10 +64,10 @@ class AI_Assistant {
 		}
 
 		$redirect_url = add_query_arg(
-			[
-				'page'                   => 'saman-seo',
+			array(
+				'page'               => 'saman-seo',
 				'SAMAN_SEO_ai_reset' => '1',
-			],
+			),
 			admin_url( 'admin.php' )
 		);
 

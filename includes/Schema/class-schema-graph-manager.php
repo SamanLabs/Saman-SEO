@@ -71,7 +71,7 @@ class Schema_Graph_Manager {
 	 * @return array Complete JSON-LD structure with @context and @graph.
 	 */
 	public function build( Schema_Context $context ): array {
-		$graph = [];
+		$graph = array();
 
 		// Get all registered types and sort by priority.
 		$types = $this->registry->get_types();
@@ -133,9 +133,9 @@ class Schema_Graph_Manager {
 
 		// Return complete JSON-LD structure.
 		// @context is ONLY added here at root level - never in individual pieces.
-		return [
+		return array(
 			'@context' => 'https://schema.org',
 			'@graph'   => $graph,
-		];
+		);
 	}
 }
