@@ -40,95 +40,74 @@ if ( file_exists( SAMAN_SEO_PATH . 'vendor/autoload.php' ) ) {
  * (for example after vendor/ was generated without scanning the includes/
  * directories).
  *
- * @param string $class The requested class.
+ * @param string $classname The requested class.
  */
 spl_autoload_register(
-	static function ( $class ) {
-			$class = ltrim( $class, '\\' );
+	static function ( $classname ) {
+		$classname = ltrim( $classname, '\\' );
 
-			if ( 0 !== strpos( $class, 'Saman\SEO\\' ) ) {
-				return;
+		if ( 0 !== strpos( $classname, 'Saman\SEO\\' ) ) {
+			return;
+		}
+
+		// Handle Api namespace separately (in includes/Api/ directory).
+		if ( 0 === strpos( $classname, 'Saman\SEO\\Api\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Api\\', '', $classname );
+			$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
+			$file       = SAMAN_SEO_PATH . 'includes/Api/' . $file_name;
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
 			}
+			return;
+		}
 
-			// Handle Api namespace separately (in includes/Api/ directory).
-			if ( 0 === strpos( $class, 'Saman\SEO\\Api\\' ) ) {
-				$class_name = str_replace( 'Saman\SEO\\Api\\', '', $class );
-				$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
-				$file       = SAMAN_SEO_PATH . 'includes/Api/' . $file_name;
+		// Handle Integration namespace (in includes/Integration/ directory).
+		if ( 0 === strpos( $classname, 'Saman\SEO\\Integration\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Integration\\', '', $classname );
+			$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
+			$file       = SAMAN_SEO_PATH . 'includes/Integration/' . $file_name;
 
-				if ( file_exists( $file ) ) {
-					require_once $file;
-				}
-				return;
+			if ( file_exists( $file ) ) {
+				require_once $file;
 			}
+			return;
+		}
 
-			// Handle Integration namespace (in includes/Integration/ directory).
-			if ( 0 === strpos( $class, 'Saman\SEO\\Integration\\' ) ) {
-				$class_name = str_replace( 'Saman\SEO\\Integration\\', '', $class );
-				$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
-				$file       = SAMAN_SEO_PATH . 'includes/Integration/' . $file_name;
+		// Handle Schema\Types namespace (in includes/Schema/Types/ directory).
+		if ( 0 === strpos( $classname, 'Saman\SEO\\Schema\\Types\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Schema\\Types\\', '', $classname );
+			$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
+			$file       = SAMAN_SEO_PATH . 'includes/Schema/Types/' . $file_name;
 
-				if ( file_exists( $file ) ) {
-					require_once $file;
-				}
-				return;
+			if ( file_exists( $file ) ) {
+				require_once $file;
 			}
+			return;
+		}
 
-			// Handle Schema\Types namespace (in includes/Schema/Types/ directory).
-			if ( 0 === strpos( $class, 'Saman\SEO\\Schema\\Types\\' ) ) {
-				$class_name = str_replace( 'Saman\SEO\\Schema\\Types\\', '', $class );
-				$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
-				$file       = SAMAN_SEO_PATH . 'includes/Schema/Types/' . $file_name;
+		// Handle Schema namespace (in includes/Schema/ directory).
+		if ( 0 === strpos( $classname, 'Saman\SEO\\Schema\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Schema\\', '', $classname );
+			$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
+			$file       = SAMAN_SEO_PATH . 'includes/Schema/' . $file_name;
 
-				if ( file_exists( $file ) ) {
-					require_once $file;
-				}
-				return;
+			if ( file_exists( $file ) ) {
+				require_once $file;
 			}
+			return;
+		}
 
-			// Handle Schema namespace (in includes/Schema/ directory).
-			if ( 0 === strpos( $class, 'Saman\SEO\\Schema\\' ) ) {
-				$class_name = str_replace( 'Saman\SEO\\Schema\\', '', $class );
-				$file_name  = 'class-' . strtolower( str_replace( array( '_' ), '-', $class_name ) ) . '.php';
-				$file       = SAMAN_SEO_PATH . 'includes/Schema/' . $file_name;
-
-				if ( file_exists( $file ) ) {
-					require_once $file;
-				}
-				return;
-			}
-
-			// Handle Service namespace (in includes/Service/ directory).
-			if ( 0 === strpos( $class, 'Saman\SEO\\Service\\' ) ) {
-				$class_name = str_replace( 'Saman\SEO\\Service\\', '', $class );
-				$slug       = strtolower( str_replace( array( '_' ), '-', $class_name ) );
-				$candidates = array(
-					// Primary naming convention (saman-seo-service-*).
-					SAMAN_SEO_PATH . 'includes/Service/class-saman-seo-service-' . $slug . '.php',
-					SAMAN_SEO_PATH . 'includes/class-saman-seo-service-' . $slug . '.php',
-					// Simple naming fallback (class-*).
-					SAMAN_SEO_PATH . 'includes/Service/class-' . $slug . '.php',
-				);
-
-				foreach ( $candidates as $file ) {
-					if ( file_exists( $file ) ) {
-						require_once $file;
-						break;
-					}
-				}
-				return;
-			}
-
-			// Convert class name to slug for file lookup.
-			$class_name = str_replace( 'Saman\SEO\\', '', $class );
-			$slug       = strtolower( str_replace( array( '\\', '_' ), '-', $class_name ) );
-
-			// Try naming conventions.
+		// Handle Service namespace (in includes/Service/ directory).
+		if ( 0 === strpos( $classname, 'Saman\SEO\\Service\\' ) ) {
+			$class_name = str_replace( 'Saman\SEO\\Service\\', '', $classname );
+			$slug       = strtolower( str_replace( array( '_' ), '-', $class_name ) );
 			$candidates = array(
-				// Primary naming convention (saman-seo-*).
-				SAMAN_SEO_PATH . 'includes/class-saman-seo-' . $slug . '.php',
+				// Primary naming convention (saman-seo-service-*).
+				SAMAN_SEO_PATH . 'includes/Service/class-saman-seo-service-' . $slug . '.php',
+				SAMAN_SEO_PATH . 'includes/class-saman-seo-service-' . $slug . '.php',
 				// Simple naming fallback (class-*).
-				SAMAN_SEO_PATH . 'includes/class-' . $slug . '.php',
+				SAMAN_SEO_PATH . 'includes/Service/class-' . $slug . '.php',
 			);
 
 			foreach ( $candidates as $file ) {
@@ -137,8 +116,29 @@ spl_autoload_register(
 					break;
 				}
 			}
+			return;
 		}
-	);
+
+		// Convert class name to slug for file lookup.
+		$class_name = str_replace( 'Saman\SEO\\', '', $classname );
+		$slug       = strtolower( str_replace( array( '\\', '_' ), '-', $class_name ) );
+
+		// Try naming conventions.
+			$candidates = array(
+				// Primary naming convention (saman-seo-*).
+				SAMAN_SEO_PATH . 'includes/class-saman-seo-' . $slug . '.php',
+				// Simple naming fallback (class-*).
+				SAMAN_SEO_PATH . 'includes/class-' . $slug . '.php',
+			);
+
+		foreach ( $candidates as $file ) {
+			if ( file_exists( $file ) ) {
+				require_once $file;
+				break;
+			}
+		}
+	}
+);
 
 require_once SAMAN_SEO_PATH . 'includes/helpers.php';
 
