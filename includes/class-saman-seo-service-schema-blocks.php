@@ -22,9 +22,9 @@ class Schema_Blocks {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'init', [ $this, 'register_blocks' ] );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_assets' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_styles' ] );
+		add_action( 'init', array( $this, 'register_blocks' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_styles' ) );
 	}
 
 	/**
@@ -37,25 +37,34 @@ class Schema_Blocks {
 			return;
 		}
 
-		// Register FAQ block.
-		register_block_type(
-			'saman-seo/faq',
-			[
-				'editor_script' => 'saman-seo-faq-block',
-				'editor_style'  => 'saman-seo-schema-blocks-editor',
-				'style'         => 'saman-seo-schema-blocks',
-			]
+		$faq_json   = SAMAN_SEO_PATH . 'blocks/faq/block.json';
+		$howto_json = SAMAN_SEO_PATH . 'blocks/howto/block.json';
+
+		$faq_args = array(
+			'editor_script' => 'saman-seo-faq-block',
+			'editor_style'  => 'saman-seo-schema-blocks-editor',
+			'style'         => 'saman-seo-schema-blocks',
 		);
 
-		// Register HowTo block.
-		register_block_type(
-			'saman-seo/howto',
-			[
-				'editor_script' => 'saman-seo-howto-block',
-				'editor_style'  => 'saman-seo-schema-blocks-editor',
-				'style'         => 'saman-seo-schema-blocks',
-			]
+		$howto_args = array(
+			'editor_script' => 'saman-seo-howto-block',
+			'editor_style'  => 'saman-seo-schema-blocks-editor',
+			'style'         => 'saman-seo-schema-blocks',
 		);
+
+		// Register FAQ block from block.json metadata when available.
+		if ( file_exists( $faq_json ) ) {
+			register_block_type( $faq_json, $faq_args );
+		} else {
+			register_block_type( 'saman-seo/faq', $faq_args );
+		}
+
+		// Register HowTo block from block.json metadata when available.
+		if ( file_exists( $howto_json ) ) {
+			register_block_type( $howto_json, $howto_args );
+		} else {
+			register_block_type( 'saman-seo/howto', $howto_args );
+		}
 	}
 
 	/**
@@ -68,7 +77,7 @@ class Schema_Blocks {
 		wp_register_script(
 			'saman-seo-faq-block',
 			SAMAN_SEO_URL . 'blocks/faq/index.js',
-			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
 			SAMAN_SEO_VERSION,
 			true
 		);
@@ -77,7 +86,7 @@ class Schema_Blocks {
 		wp_register_script(
 			'saman-seo-howto-block',
 			SAMAN_SEO_URL . 'blocks/howto/index.js',
-			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ],
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
 			SAMAN_SEO_VERSION,
 			true
 		);
@@ -86,7 +95,7 @@ class Schema_Blocks {
 		wp_register_style(
 			'saman-seo-schema-blocks-editor',
 			SAMAN_SEO_URL . 'assets/css/schema-blocks-editor.css',
-			[],
+			array(),
 			SAMAN_SEO_VERSION
 		);
 
@@ -119,7 +128,7 @@ class Schema_Blocks {
 			wp_register_style(
 				'saman-seo-schema-blocks',
 				SAMAN_SEO_URL . 'assets/css/schema-blocks.css',
-				[],
+				array(),
 				SAMAN_SEO_VERSION
 			);
 
@@ -330,7 +339,7 @@ class Schema_Blocks {
 				color: #666;
 			}
 			.saman-seo-faq details[open] .saman-seo-faq-question::after {
-				content: "ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢";
+				content: "−";
 			}
 			.saman-seo-faq .saman-seo-faq-answer {
 				padding: 16px;

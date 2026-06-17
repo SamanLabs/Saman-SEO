@@ -58,16 +58,16 @@ class WebSite_Schema extends Abstract_Schema {
 			$description = get_bloginfo( 'description' );
 		}
 
-		return [
+		return array(
 			'@type'       => $this->get_type(),
 			'@id'         => Schema_IDs::website(),
 			'url'         => $this->context->site_url,
 			'name'        => $this->context->site_name,
 			'description' => $description,
-			'publisher'   => [
+			'publisher'   => array(
 				'@id' => $this->get_publisher_id(),
-			],
-		];
+			),
+		);
 	}
 
 	/**

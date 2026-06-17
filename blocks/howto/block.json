@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "saman-seo/howto",
+  "version": "2.0.0",
+  "title": "How To",
+  "category": "widgets",
+  "icon": "list-view",
+  "description": "Create step-by-step instructions with automatic schema markup for rich results.",
+  "keywords": [ "howto", "how to", "steps", "instructions", "schema", "seo", "tutorial" ],
+  "textdomain": "saman-seo",
+  "supports": {
+    "html": false
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "description": {
+      "type": "string",
+      "default": ""
+    },
+    "totalTime": {
+      "type": "string",
+      "default": ""
+    },
+    "estimatedCost": {
+      "type": "string",
+      "default": ""
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "steps": {
+      "type": "array",
+      "default": [
+        {
+          "title": "",
+          "description": "",
+          "image": null
+        }
+      ]
+    },
+    "tools": {
+      "type": "array",
+      "default": []
+    },
+    "supplies": {
+      "type": "array",
+      "default": []
+    },
+    "showSchema": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

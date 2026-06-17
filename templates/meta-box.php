@@ -12,11 +12,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$SAMAN_SEO_ai_enabled = ! empty( $ai_enabled );
-$SAMAN_SEO_score      = is_array( $seo_score ) ? $seo_score : [];
-$SAMAN_SEO_score_level = isset( $SAMAN_SEO_score['level'] ) ? sanitize_html_class( $SAMAN_SEO_score['level'] ) : 'low';
-$SAMAN_SEO_score_value = isset( $SAMAN_SEO_score['score'] ) ? (int) $SAMAN_SEO_score['score'] : 0;
-$SAMAN_SEO_score_label = isset( $SAMAN_SEO_score['label'] ) ? $SAMAN_SEO_score['label'] : __( 'Needs attention', 'saman-seo' );
+$SAMAN_SEO_ai_enabled    = ! empty( $ai_enabled );
+$SAMAN_SEO_score         = is_array( $seo_score ) ? $seo_score : array();
+$SAMAN_SEO_score_level   = isset( $SAMAN_SEO_score['level'] ) ? sanitize_html_class( $SAMAN_SEO_score['level'] ) : 'low';
+$SAMAN_SEO_score_value   = isset( $SAMAN_SEO_score['score'] ) ? (int) $SAMAN_SEO_score['score'] : 0;
+$SAMAN_SEO_score_label   = isset( $SAMAN_SEO_score['label'] ) ? $SAMAN_SEO_score['label'] : __( 'Needs attention', 'saman-seo' );
 $SAMAN_SEO_score_summary = isset( $SAMAN_SEO_score['summary'] ) ? $SAMAN_SEO_score['summary'] : __( 'Add content to generate a score.', 'saman-seo' );
 ?>
 
@@ -123,7 +123,7 @@ $SAMAN_SEO_score_summary = isset( $SAMAN_SEO_score['summary'] ) ? $SAMAN_SEO_sco
 	</div>
 </div>
 
-<?php $SAMAN_SEO_suggestions = apply_filters( 'SAMAN_SEO_link_suggestions', [], $post->ID ); ?>
+<?php $SAMAN_SEO_suggestions = apply_filters( 'SAMAN_SEO_link_suggestions', array(), $post->ID ); ?>
 <?php if ( $SAMAN_SEO_suggestions ) : ?>
 	<div class="saman-seo-links">
 		<h4><?php esc_html_e( 'Internal link suggestions', 'saman-seo' ); ?></h4>

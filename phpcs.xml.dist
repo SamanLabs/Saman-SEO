@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<ruleset name="Saman SEO">
+    <description>PHP_CodeSniffer ruleset for the Saman SEO plugin.</description>
+
+    <!-- Scan all PHP files in the plugin. -->
+    <file>includes</file>
+    <file>saman-seo.php</file>
+    <file>blocks</file>
+    <file>templates</file>
+
+    <!-- Exclude build artifacts, dependencies, generated files, and vendored code. -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/build/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/.planning/*</exclude-pattern>
+    <exclude-pattern>*/useragent_detect_browser.php</exclude-pattern>
+    <exclude-pattern>*/Twiglet.php</exclude-pattern>
+    <exclude-pattern>*/class-redirects-controller.php</exclude-pattern>
+    <exclude-pattern>*/class-assistants-controller.php</exclude-pattern>
+
+    <!-- Use the WordPress Coding Standards. -->
+    <rule ref="WordPress">
+        <!-- Relax a few rules that are common in this codebase. -->
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+        <exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase"/>
+        <exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax.Found"/>
+
+        <!-- Temporary exclusions while the codebase is being cleaned up.
+             These report issues that phpcbf cannot auto-fix. Re-enable them
+             file-by-file as the violations are addressed manually.
+             TODO: remove these exclusions once the repo is clean. -->
+        <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
+        <exclude name="WordPress.NamingConventions.ValidHookName.NotLowercase"/>
+        <exclude name="WordPress.DB.PreparedSQL.InterpolatedNotPrepared"/>
+        <exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
+        <exclude name="WordPress.Security.NonceVerification.Missing"/>
+        <exclude name="WordPress.Security.NonceVerification.Recommended"/>
+        <exclude name="Universal.Operators.DisallowShortTernary.Found"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
+        <exclude name="WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler"/>
+        <exclude name="Squiz.PHP.CommentedOutCode.Found"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
+        <exclude name="WordPress.WP.AlternativeFunctions.curl_curl_setopt"/>
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.echoFound"/>
+        <exclude name="WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid"/>
+        <exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query"/>
+        <exclude name="Squiz.Commenting.VariableComment.Missing"/>
+        <exclude name="Squiz.PHP.DisallowSizeFunctionsInLoops.Found"/>
+        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace"/>
+        <exclude name="WordPress.WP.GlobalVariablesOverride.Prohibited"/>
+        <exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/>
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound"/>
+        <exclude name="Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden"/>
+        <exclude name="Universal.Namespaces.OneDeclarationPerFile.MultipleFound"/>
+        <exclude name="Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden"/>
+        <exclude name="Generic.Commenting.DocComment.MissingShort"/>
+        <exclude name="WordPress.PHP.NoSilencedErrors.Discouraged"/>
+        <exclude name="WordPress.DateTime.CurrentTimeTimestamp.Requested"/>
+        <exclude name="Squiz.Commenting.FileComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.Found"/>
+    </rule>
+
+    <!-- Require PHP 7.4 compatible syntax. -->
+    <config name="testVersion" value="7.4-"/>
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!-- Minimum WordPress version supported. -->
+    <config name="minimum_supported_wp_version" value="5.8"/>
+
+    <!-- Show progress and sniff codes. -->
+    <arg value="ps"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+</ruleset>

@@ -7,7 +7,6 @@
 
 namespace Saman\SEO\Api;
 
-use WP_REST_Controller;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -19,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Link Health REST API Controller.
  */
-class Link_Health_Controller extends WP_REST_Controller {
+class Link_Health_Controller extends REST_Controller {
 
 	/**
 	 * Namespace.
@@ -57,150 +56,141 @@ class Link_Health_Controller extends WP_REST_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/summary',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_summary' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			]
+					'callback'            => array( $this, 'get_summary' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Broken links endpoint.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/broken',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_broken_links' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'page'     => [
+					'callback'            => array( $this, 'get_broken_links' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'page'     => array(
 							'type'    => 'integer',
 							'default' => 1,
-						],
-						'per_page' => [
+						),
+						'per_page' => array(
 							'type'    => 'integer',
 							'default' => 50,
-						],
-						'type'     => [
+						),
+						'type'     => array(
 							'type'    => 'string',
-							'enum'    => [ '', 'internal', 'external' ],
+							'enum'    => array( '', 'internal', 'external' ),
 							'default' => '',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Orphan pages endpoint.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/orphans',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_orphan_pages' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'page'     => [
+					'callback'            => array( $this, 'get_orphan_pages' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'page'     => array(
 							'type'    => 'integer',
 							'default' => 1,
-						],
-						'per_page' => [
+						),
+						'per_page' => array(
 							'type'    => 'integer',
 							'default' => 50,
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Start scan endpoint.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/scan',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'start_scan' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'type'    => [
+					'callback'            => array( $this, 'start_scan' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'type'    => array(
 							'type'    => 'string',
-							'enum'    => [ 'full', 'partial', 'single' ],
+							'enum'    => array( 'full', 'partial', 'single' ),
 							'default' => 'full',
-						],
-						'post_id' => [
+						),
+						'post_id' => array(
 							'type'    => 'integer',
 							'default' => 0,
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Scan status endpoint.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/scan/status',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_scan_status' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			]
+					'callback'            => array( $this, 'get_scan_status' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Scan history endpoint.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/scan/history',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_scan_history' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			]
+					'callback'            => array( $this, 'get_scan_history' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Single link actions.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/link/(?P<id>\d+)',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => [ $this, 'delete_link' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			]
+					'callback'            => array( $this, 'delete_link' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Recheck link endpoint.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/link/(?P<id>\d+)/recheck',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'recheck_link' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			]
+					'callback'            => array( $this, 'recheck_link' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
-	}
-
-	/**
-	 * Check if user has permission.
-	 *
-	 * @return bool
-	 */
-	public function check_permission() {
-		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -212,10 +202,12 @@ class Link_Health_Controller extends WP_REST_Controller {
 	public function get_summary( $request ) {
 		$summary = $this->service->get_summary();
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => $summary,
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => $summary,
+			)
+		);
 	}
 
 	/**
@@ -225,41 +217,46 @@ class Link_Health_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_broken_links( $request ) {
-		$args = [
+		$args = array(
 			'page'     => $request->get_param( 'page' ),
 			'per_page' => $request->get_param( 'per_page' ),
 			'type'     => $request->get_param( 'type' ),
-		];
+		);
 
 		$result = $this->service->get_broken_links( $args );
 
 		// Format items for response.
-		$items = array_map( function( $link ) {
-			return [
-				'id'            => (int) $link->id,
-				'source_post_id' => (int) $link->source_post_id,
-				'source_title'  => $link->source_title ?? '',
-				'source_url'    => get_permalink( $link->source_post_id ),
-				'target_url'    => $link->target_url,
-				'link_text'     => $link->link_text,
-				'link_type'     => $link->link_type,
-				'status'        => $link->status,
-				'http_code'     => $link->http_code ? (int) $link->http_code : null,
-				'error_message' => $link->error_message,
-				'last_checked'  => $link->last_checked,
-			];
-		}, $result['items'] );
+		$items = array_map(
+			function ( $link ) {
+				return array(
+					'id'             => (int) $link->id,
+					'source_post_id' => (int) $link->source_post_id,
+					'source_title'   => $link->source_title ?? '',
+					'source_url'     => get_permalink( $link->source_post_id ),
+					'target_url'     => $link->target_url,
+					'link_text'      => $link->link_text,
+					'link_type'      => $link->link_type,
+					'status'         => $link->status,
+					'http_code'      => $link->http_code ? (int) $link->http_code : null,
+					'error_message'  => $link->error_message,
+					'last_checked'   => $link->last_checked,
+				);
+			},
+			$result['items']
+		);
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => [
-				'items'       => $items,
-				'total'       => $result['total'],
-				'page'        => $result['page'],
-				'per_page'    => $result['per_page'],
-				'total_pages' => $result['total_pages'],
-			],
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => array(
+					'items'       => $items,
+					'total'       => $result['total'],
+					'page'        => $result['page'],
+					'per_page'    => $result['per_page'],
+					'total_pages' => $result['total_pages'],
+				),
+			)
+		);
 	}
 
 	/**
@@ -269,35 +266,40 @@ class Link_Health_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_orphan_pages( $request ) {
-		$args = [
+		$args = array(
 			'page'     => $request->get_param( 'page' ),
 			'per_page' => $request->get_param( 'per_page' ),
-		];
+		);
 
 		$result = $this->service->get_orphan_pages( $args );
 
 		// Format items for response.
-		$items = array_map( function( $page ) {
-			return [
-				'id'         => (int) $page->ID,
-				'title'      => $page->post_title,
-				'post_type'  => $page->post_type,
-				'url'        => get_permalink( $page->ID ),
-				'edit_url'   => get_edit_post_link( $page->ID, 'raw' ),
-				'post_date'  => $page->post_date,
-			];
-		}, $result['items'] );
+		$items = array_map(
+			function ( $page ) {
+				return array(
+					'id'        => (int) $page->ID,
+					'title'     => $page->post_title,
+					'post_type' => $page->post_type,
+					'url'       => get_permalink( $page->ID ),
+					'edit_url'  => get_edit_post_link( $page->ID, 'raw' ),
+					'post_date' => $page->post_date,
+				);
+			},
+			$result['items']
+		);
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => [
-				'items'       => $items,
-				'total'       => $result['total'],
-				'page'        => $result['page'],
-				'per_page'    => $result['per_page'],
-				'total_pages' => $result['total_pages'],
-			],
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => array(
+					'items'       => $items,
+					'total'       => $result['total'],
+					'page'        => $result['page'],
+					'per_page'    => $result['per_page'],
+					'total_pages' => $result['total_pages'],
+				),
+			)
+		);
 	}
 
 	/**
@@ -316,17 +318,19 @@ class Link_Health_Controller extends WP_REST_Controller {
 			return new WP_Error(
 				'scan_failed',
 				__( 'Could not start scan. A scan may already be running.', 'saman-seo' ),
-				[ 'status' => 400 ]
+				array( 'status' => 400 )
 			);
 		}
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => [
-				'scan_id' => $scan_id,
-				'message' => __( 'Scan started successfully.', 'saman-seo' ),
-			],
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => array(
+					'scan_id' => $scan_id,
+					'message' => __( 'Scan started successfully.', 'saman-seo' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -338,10 +342,12 @@ class Link_Health_Controller extends WP_REST_Controller {
 	public function get_scan_status( $request ) {
 		$scan = $this->service->get_current_scan();
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => $scan,
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => $scan,
+			)
+		);
 	}
 
 	/**
@@ -353,10 +359,12 @@ class Link_Health_Controller extends WP_REST_Controller {
 	public function get_scan_history( $request ) {
 		$history = $this->service->get_scan_history( 10 );
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => $history,
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => $history,
+			)
+		);
 	}
 
 	/**
@@ -369,16 +377,18 @@ class Link_Health_Controller extends WP_REST_Controller {
 		$id = (int) $request->get_param( 'id' );
 
 		if ( $this->service->delete_link( $id ) ) {
-			return new WP_REST_Response( [
-				'success' => true,
-				'message' => __( 'Link deleted.', 'saman-seo' ),
-			] );
+			return new WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => __( 'Link deleted.', 'saman-seo' ),
+				)
+			);
 		}
 
 		return new WP_Error(
 			'delete_failed',
 			__( 'Could not delete link.', 'saman-seo' ),
-			[ 'status' => 400 ]
+			array( 'status' => 400 )
 		);
 	}
 
@@ -397,13 +407,15 @@ class Link_Health_Controller extends WP_REST_Controller {
 			return new WP_Error(
 				'recheck_failed',
 				__( 'Could not recheck link.', 'saman-seo' ),
-				[ 'status' => 400 ]
+				array( 'status' => 400 )
 			);
 		}
 
-		return new WP_REST_Response( [
-			'success' => true,
-			'data'    => $result,
-		] );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => $result,
+			)
+		);
 	}
 }

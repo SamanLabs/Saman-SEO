@@ -43,8 +43,8 @@ class WooCommerce {
 			return;
 		}
 
-		add_action( 'init', [ $this, 'disable_wc_structured_data' ], 0 );
-		add_action( 'saman_seo_register_schema_type', [ $this, 'register_product_schema' ] );
+		add_action( 'init', array( $this, 'disable_wc_structured_data' ), 0 );
+		add_action( 'saman_seo_register_schema_type', array( $this, 'register_product_schema' ) );
 	}
 
 	/**
@@ -60,8 +60,8 @@ class WooCommerce {
 		if ( ! function_exists( 'WC' ) || null === WC()->structured_data ) {
 			return;
 		}
-		remove_action( 'wp_footer', [ WC()->structured_data, 'output_structured_data' ], 10 );
-		remove_action( 'woocommerce_email_order_details', [ WC()->structured_data, 'output_email_structured_data' ], 30 );
+		remove_action( 'wp_footer', array( WC()->structured_data, 'output_structured_data' ), 10 );
+		remove_action( 'woocommerce_email_order_details', array( WC()->structured_data, 'output_email_structured_data' ), 30 );
 	}
 
 	/**
@@ -77,11 +77,11 @@ class WooCommerce {
 		$registry->register(
 			'product',
 			\Saman\SEO\Schema\Types\Product_Schema::class,
-			[
+			array(
 				'label'      => __( 'Product', 'saman-seo' ),
-				'post_types' => [ 'product' ],
+				'post_types' => array( 'product' ),
 				'priority'   => 16,
-			]
+			)
 		);
 	}
 
@@ -91,33 +91,33 @@ class WooCommerce {
 	 * @return array Array of meta field definitions.
 	 */
 	public static function get_meta_fields(): array {
-		return [
-			'_SAMAN_SEO_brand'     => [
+		return array(
+			'_SAMAN_SEO_brand'     => array(
 				'label'       => __( 'Brand', 'saman-seo' ),
 				'description' => __( 'Product brand name for schema.', 'saman-seo' ),
 				'type'        => 'text',
-			],
-			'_SAMAN_SEO_gtin'      => [
+			),
+			'_SAMAN_SEO_gtin'      => array(
 				'label'       => __( 'GTIN/UPC/EAN', 'saman-seo' ),
 				'description' => __( 'Global Trade Item Number (barcode).', 'saman-seo' ),
 				'type'        => 'text',
-			],
-			'_SAMAN_SEO_mpn'       => [
+			),
+			'_SAMAN_SEO_mpn'       => array(
 				'label'       => __( 'MPN', 'saman-seo' ),
 				'description' => __( 'Manufacturer Part Number.', 'saman-seo' ),
 				'type'        => 'text',
-			],
-			'_SAMAN_SEO_condition' => [
+			),
+			'_SAMAN_SEO_condition' => array(
 				'label'       => __( 'Condition', 'saman-seo' ),
 				'description' => __( 'Product condition for schema.', 'saman-seo' ),
 				'type'        => 'select',
-				'options'     => [
+				'options'     => array(
 					'NewCondition'         => __( 'New', 'saman-seo' ),
 					'UsedCondition'        => __( 'Used', 'saman-seo' ),
 					'RefurbishedCondition' => __( 'Refurbished', 'saman-seo' ),
 					'DamagedCondition'     => __( 'Damaged', 'saman-seo' ),
-				],
-			],
-		];
+				),
+			),
+		);
 	}
 }

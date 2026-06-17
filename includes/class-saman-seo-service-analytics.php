@@ -33,18 +33,18 @@ defined( 'ABSPATH' ) || exit;
 class Analytics {
 
 	private $matomo_url = 'https://matomo.builditdesign.com';
-	private $site_id = 1;
+	private $site_id    = 1;
 
 	// Custom dimension IDs (configured in Matomo)
 	const DIMENSION_PLUGIN_VERSION = 1;
-	const DIMENSION_WP_VERSION = 2;
-	const DIMENSION_PHP_VERSION = 3;
-	const DIMENSION_INTERFACE = 4;
+	const DIMENSION_WP_VERSION     = 2;
+	const DIMENSION_PHP_VERSION    = 3;
+	const DIMENSION_INTERFACE      = 4;
 
 	public function boot() {
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_matomo_tracking' ] );
-		add_filter( 'script_loader_tag', [ $this, 'add_async_defer_attribute' ], 10, 2 );
-		add_filter( 'wp_resource_hints', [ $this, 'add_resource_hints' ], 10, 2 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_matomo_tracking' ) );
+		add_filter( 'script_loader_tag', array( $this, 'add_async_defer_attribute' ), 10, 2 );
+		add_filter( 'wp_resource_hints', array( $this, 'add_resource_hints' ), 10, 2 );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Analytics {
 	 * Determine which interface is being used
 	 */
 	private function get_interface_type( $page ) {
-		if ( strpos( $page, 'saman-seo-v2' ) !== false ) {
+		if ( strpos( $page, 'saman-seo' ) !== false ) {
 			return 'React';
 		}
 		return 'Legacy';
@@ -120,7 +120,7 @@ class Analytics {
 		wp_enqueue_script(
 			'saman-seo-matomo',
 			$this->matomo_url . '/matomo.js',
-			[],
+			array(),
 			SAMAN_SEO_VERSION,
 			true
 		);
@@ -140,10 +140,10 @@ class Analytics {
 		$php_version    = $this->get_php_version();
 		$interface      = $this->get_interface_type( $page );
 
-		$dim_plugin  = self::DIMENSION_PLUGIN_VERSION;
-		$dim_wp      = self::DIMENSION_WP_VERSION;
-		$dim_php     = self::DIMENSION_PHP_VERSION;
-		$dim_ui      = self::DIMENSION_INTERFACE;
+		$dim_plugin = self::DIMENSION_PLUGIN_VERSION;
+		$dim_wp     = self::DIMENSION_WP_VERSION;
+		$dim_php    = self::DIMENSION_PHP_VERSION;
+		$dim_ui     = self::DIMENSION_INTERFACE;
 
 		$matomo_config = "
 			var _paq = window._paq = window._paq || [];

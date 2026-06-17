@@ -2,21 +2,36 @@
  * Single message component for assistant chat.
  */
 const AssistantMessage = ({ message, isUser, actions, onAction }) => {
-    // Simple markdown-like formatting (bold, lists)
+    // Escape HTML entities so any raw markup sent by the server is displayed
+    // as text rather than executed. Safe markdown-like formatting is then
+    // applied on top.
+    const escapeHtml = (text) => {
+        if (!text) return '';
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    // Simple markdown-like formatting (bold, lists).
     const formatMessage = (text) => {
         if (!text) return '';
 
-        // Split into lines
-        const lines = text.split('\n');
+        const safeText = escapeHtml(text);
+
+        // Split into lines.
+        const lines = safeText.split('\n');
         const formatted = [];
         let inList = false;
 
         lines.forEach((line, index) => {
-            // Bold text: **text** or __text__
+            // Bold text: **text** or __text__.
             let processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             processedLine = processedLine.replace(/__(.*?)__/g, '<strong>$1</strong>');
 
-            // Check for list items
+            // Check for list items.
             const listMatch = line.match(/^[-*]\s+(.*)$/);
             if (listMatch) {
                 if (!inList) {
@@ -32,7 +47,7 @@ const AssistantMessage = ({ message, isUser, actions, onAction }) => {
                 if (processedLine.trim()) {
                     formatted.push(`<p>${processedLine}</p>`);
                 } else if (index < lines.length - 1) {
-                    // Keep empty lines as breaks
+                    // Keep empty lines as breaks.
                     formatted.push('<br/>');
                 }
             }

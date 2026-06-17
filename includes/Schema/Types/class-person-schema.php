@@ -64,11 +64,11 @@ class Person_Schema extends Abstract_Schema {
 			$person_name = get_bloginfo( 'name' );
 		}
 
-		$schema = [
+		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => Schema_IDs::person(),
 			'name'  => $person_name,
-		];
+		);
 
 		if ( ! empty( $person_image ) ) {
 			$schema['image'] = $person_image;
@@ -101,7 +101,7 @@ class Person_Schema extends Abstract_Schema {
 	 * @return array Array of social profile URLs.
 	 */
 	private function get_social_profiles(): array {
-		$profiles = [];
+		$profiles = array();
 
 		// Try Local SEO social profiles first.
 		$local_social = get_option( 'SAMAN_SEO_local_social_profiles', '' );

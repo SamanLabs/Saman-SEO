@@ -20,7 +20,7 @@ class Robots_Manager {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'robots_txt', [ $this, 'filter_robots' ], 10, 2 );
+		add_filter( 'robots_txt', array( $this, 'filter_robots' ), 10, 2 );
 	}
 
 	/**

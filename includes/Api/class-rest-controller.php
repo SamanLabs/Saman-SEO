@@ -9,7 +9,7 @@
 namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -17,58 +17,60 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 abstract class REST_Controller {
 
-    /**
-     * REST namespace.
-     *
-     * @var string
-     */
-    protected $namespace = 'saman-seo/v1';
+	/**
+	 * REST namespace.
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'saman-seo/v1';
 
-    /**
-     * REST base for this controller.
-     *
-     * @var string
-     */
-    protected $rest_base = '';
+	/**
+	 * REST base for this controller.
+	 *
+	 * @var string
+	 */
+	protected $rest_base = '';
 
-    /**
-     * Register routes - must be implemented by child classes.
-     */
-    abstract public function register_routes();
+	/**
+	 * Register routes - must be implemented by child classes.
+	 */
+	abstract public function register_routes();
 
-    /**
-     * Permission callback - checks if user can manage options.
-     *
-     * @return bool
-     */
-    public function permission_check() {
-        return current_user_can( 'manage_options' );
-    }
+	/**
+	 * Permission callback - checks if user can manage options.
+	 *
+	 * @return bool
+	 */
+	public function permission_check() {
+		return current_user_can( 'manage_options' );
+	}
 
-    /**
-     * Return a success response.
-     *
-     * @param mixed  $data    Response data.
-     * @param string $message Optional message.
-     * @return \WP_REST_Response
-     */
-    protected function success( $data = null, $message = '' ) {
-        return rest_ensure_response( [
-            'success' => true,
-            'data'    => $data,
-            'message' => $message,
-        ] );
-    }
+	/**
+	 * Return a success response.
+	 *
+	 * @param mixed  $data    Response data.
+	 * @param string $message Optional message.
+	 * @return \WP_REST_Response
+	 */
+	protected function success( $data = null, $message = '' ) {
+		return rest_ensure_response(
+			array(
+				'success' => true,
+				'data'    => $data,
+				'message' => $message,
+			)
+		);
+	}
 
-    /**
-     * Return an error response.
-     *
-     * @param string $message Error message.
-     * @param string $code    Error code.
-     * @param int    $status  HTTP status code.
-     * @return \WP_Error
-     */
-    protected function error( $message, $code = 'error', $status = 400 ) {
-        return new \WP_Error( $code, $message, [ 'status' => $status ] );
-    }
+	/**
+	 * Return an error response.
+	 *
+	 * @param string $message Error message.
+	 * @param string $code    Error code.
+	 * @param int    $status  HTTP status code.
+	 * @return \WP_Error
+	 */
+	protected function error( $message, $code = 'error', $status = 400 ) {
+		return new \WP_Error( $code, $message, array( 'status' => $status ) );
+	}
 }

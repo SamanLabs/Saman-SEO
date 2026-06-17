@@ -27,54 +27,74 @@ class Ai_Controller extends REST_Controller {
 	 */
 	public function register_routes() {
 		// Generate SEO content.
-		register_rest_route( $this->namespace, '/ai/generate', [
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'generate' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			],
-		] );
+		register_rest_route(
+			$this->namespace,
+			'/ai/generate',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'generate' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
 		// Get AI status.
-		register_rest_route( $this->namespace, '/ai/status', [
-			[
-				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_status' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			],
-		] );
+		register_rest_route(
+			$this->namespace,
+			'/ai/status',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_status' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
 		// Get available models.
-		register_rest_route( $this->namespace, '/ai/models', [
-			[
-				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_models' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			],
-		] );
+		register_rest_route(
+			$this->namespace,
+			'/ai/models',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_models' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
 		// Get/save prompt settings.
-		register_rest_route( $this->namespace, '/ai/settings', [
-			[
-				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_settings' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			],
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'save_settings' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			],
-		] );
+		register_rest_route(
+			$this->namespace,
+			'/ai/settings',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'save_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
 		// Reset prompts to defaults.
-		register_rest_route( $this->namespace, '/ai/reset', [
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'reset_settings' ],
-				'permission_callback' => [ $this, 'permission_check' ],
-			],
-		] );
+		register_rest_route(
+			$this->namespace,
+			'/ai/reset',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'reset_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -129,13 +149,13 @@ class Ai_Controller extends REST_Controller {
 		}
 
 		// Build context from request.
-		$context = [
+		$context = array(
 			'keyword'    => $params['keyword'] ?? '',
 			'post_title' => $params['post_title'] ?? '',
 			'post_id'    => $params['post_id'] ?? 0,
-		];
+		);
 
-		$results = [];
+		$results = array();
 
 		// Generate title.
 		if ( 'title' === $type || 'both' === $type ) {
@@ -159,9 +179,13 @@ class Ai_Controller extends REST_Controller {
 			$results['description'] = trim( $result );
 		}
 
-		return $this->success( $results, __( 'AI generation completed.', 'saman-seo' ), [
-			'provider' => 'Saman-ai',
-		] );
+		return $this->success(
+			$results,
+			__( 'AI generation completed.', 'saman-seo' ),
+			array(
+				'provider' => 'Saman-ai',
+			)
+		);
 	}
 
 	/**
@@ -175,18 +199,18 @@ class Ai_Controller extends REST_Controller {
 		$provider = AI_Pilot::get_provider();
 		$ready    = AI_Pilot::is_ready();
 
-		$response = [
-			'ready'        => $ready,
-			'configured'   => $ready, // Alias for frontend compatibility.
-			'provider'     => $provider,
-			'ai_pilot'     => [
+		$response = array(
+			'ready'      => $ready,
+			'configured' => $ready, // Alias for frontend compatibility.
+			'provider'   => $provider,
+			'ai_pilot'   => array(
 				'installed'    => $status['installed'],
 				'active'       => $status['active'],
 				'ready'        => $status['ready'],
 				'version'      => $status['version'] ?? null,
 				'settings_url' => admin_url( 'admin.php?page=Saman-ai' ),
-			],
-		];
+			),
+		);
 
 		if ( $ready ) {
 			$response['message']      = __( 'Connected to Saman Labs AI', 'saman-seo' );
@@ -210,19 +234,19 @@ class Ai_Controller extends REST_Controller {
 	 */
 	public function get_models( $request ) {
 		if ( ! AI_Pilot::is_ready() ) {
-			return $this->success( [] );
+			return $this->success( array() );
 		}
 
 		$models = AI_Pilot::get_models();
 
 		// Format for frontend.
-		$formatted = [];
+		$formatted = array();
 		foreach ( $models as $model ) {
-			$formatted[] = [
+			$formatted[] = array(
 				'value'    => $model['id'] ?? $model['value'] ?? '',
 				'label'    => $model['name'] ?? $model['label'] ?? '',
 				'provider' => $model['provider'] ?? 'unknown',
-			];
+			);
 		}
 
 		return $this->success( $formatted );
@@ -235,11 +259,11 @@ class Ai_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function get_settings( $request ) {
-		$settings = [
+		$settings = array(
 			'ai_prompt_system'      => get_option( 'SAMAN_SEO_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' ),
 			'ai_prompt_title'       => get_option( 'SAMAN_SEO_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' ),
 			'ai_prompt_description' => get_option( 'SAMAN_SEO_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' ),
-		];
+		);
 
 		return $this->success( $settings );
 	}
@@ -269,11 +293,14 @@ class Ai_Controller extends REST_Controller {
 			update_option( 'SAMAN_SEO_ai_prompt_description', sanitize_textarea_field( $params['ai_prompt_description'] ) );
 		}
 
-		return $this->success( [
-			'ai_prompt_system'      => get_option( 'SAMAN_SEO_ai_prompt_system' ),
-			'ai_prompt_title'       => get_option( 'SAMAN_SEO_ai_prompt_title' ),
-			'ai_prompt_description' => get_option( 'SAMAN_SEO_ai_prompt_description' ),
-		], __( 'Settings saved.', 'saman-seo' ) );
+		return $this->success(
+			array(
+				'ai_prompt_system'      => get_option( 'SAMAN_SEO_ai_prompt_system' ),
+				'ai_prompt_title'       => get_option( 'SAMAN_SEO_ai_prompt_title' ),
+				'ai_prompt_description' => get_option( 'SAMAN_SEO_ai_prompt_description' ),
+			),
+			__( 'Settings saved.', 'saman-seo' )
+		);
 	}
 
 	/**
@@ -283,11 +310,11 @@ class Ai_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function reset_settings( $request ) {
-		$defaults = [
+		$defaults = array(
 			'ai_prompt_system'      => 'You are an SEO assistant generating concise metadata. Respond with plain text only.',
 			'ai_prompt_title'       => 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.',
 			'ai_prompt_description' => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
-		];
+		);
 
 		update_option( 'SAMAN_SEO_ai_prompt_system', $defaults['ai_prompt_system'] );
 		update_option( 'SAMAN_SEO_ai_prompt_title', $defaults['ai_prompt_title'] );

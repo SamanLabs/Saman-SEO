@@ -52,13 +52,10 @@ class Request_Monitor {
 			return;
 		}
 
-		add_action( 'template_redirect', [ $this, 'maybe_log_404' ] );
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_page' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		add_action( 'template_redirect', array( $this, 'maybe_log_404' ) );
 
 		// Setup scheduled cleanup
-		add_action( 'SAMAN_SEO_404_cleanup', [ $this, 'run_scheduled_cleanup' ] );
+		add_action( 'SAMAN_SEO_404_cleanup', array( $this, 'run_scheduled_cleanup' ) );
 		$this->maybe_schedule_cleanup();
 	}
 
@@ -68,7 +65,7 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function maybe_schedule_cleanup() {
-		$settings = get_option( 'SAMAN_SEO_settings', [] );
+		$settings = get_option( 'SAMAN_SEO_settings', array() );
 		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
 
 		if ( $enabled ) {
@@ -98,7 +95,7 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function run_scheduled_cleanup() {
-		$settings = get_option( 'SAMAN_SEO_settings', [] );
+		$settings = get_option( 'SAMAN_SEO_settings', array() );
 		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
 
 		if ( ! $enabled ) {
@@ -121,10 +118,12 @@ class Request_Monitor {
 		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $wpdb->query( $wpdb->prepare(
-			"DELETE FROM {$this->table} WHERE last_seen < %s",
-			$cutoff
-		) );
+		return $wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$this->table} WHERE last_seen < %s",
+				$cutoff
+			)
+		);
 	}
 
 	/**
@@ -136,7 +135,7 @@ class Request_Monitor {
 	 * @return void
 	 */
 	private function maybe_send_notification( $request_uri, $hits, $entry_id ) {
-		$settings = get_option( 'SAMAN_SEO_settings', [] );
+		$settings = get_option( 'SAMAN_SEO_settings', array() );
 		$enabled  = isset( $settings['enable_404_notifications'] ) ? $settings['enable_404_notifications'] : false;
 
 		if ( ! $enabled ) {
@@ -170,14 +169,14 @@ class Request_Monitor {
 	 * @return bool Whether email was sent.
 	 */
 	private function send_notification_email( $request_uri, $hits ) {
-		$settings = get_option( 'SAMAN_SEO_settings', [] );
+		$settings = get_option( 'SAMAN_SEO_settings', array() );
 		$email    = isset( $settings['notification_404_email'] ) && ! empty( $settings['notification_404_email'] )
 			? sanitize_email( $settings['notification_404_email'] )
 			: get_option( 'admin_email' );
 
 		$site_name = get_bloginfo( 'name' );
 		$site_url  = home_url();
-		$admin_url = admin_url( 'admin.php?page=saman-seo-v2#/404-log' );
+		$admin_url = admin_url( 'admin.php?page=saman-seo-404-log' );
 
 		$subject = sprintf(
 			/* translators: %s: Site name */
@@ -194,7 +193,7 @@ class Request_Monitor {
 			$admin_url
 		);
 
-		$headers = [ 'Content-Type: text/plain; charset=UTF-8' ];
+		$headers = array( 'Content-Type: text/plain; charset=UTF-8' );
 
 		return wp_mail( $email, $subject, $message, $headers );
 	}
@@ -244,7 +243,6 @@ class Request_Monitor {
 		dbDelta( $patterns_sql );
 
 		update_option( self::SCHEMA_OPTION, (string) self::SCHEMA_VERSION );
-
 	}
 
 	/**
@@ -308,116 +306,6 @@ class Request_Monitor {
 	}
 
 	/**
-	 * Enqueue admin assets.
-	 *
-	 * @param string $hook Hook suffix.
-	 * @return void
-	 */
-	public function enqueue_assets( $hook ) {
-		if ( 'wp-seo-pilot_page_saman-seo-404' !== $hook ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-	}
-
-	/**
-	 * Register admin report page.
-	 *
-	 * @return void
-	 */
-	public function register_page() {
-		add_submenu_page(
-			'saman-seo',
-			__( '404 Log', 'saman-seo' ),
-			__( '404 Log', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-404',
-			[ $this, 'render_page' ],
-			12
-		);
-	}
-
-	/**
-	 * Render 404 report.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		$sort     = isset( $_GET['sort'] ) ? sanitize_key( wp_unslash( $_GET['sort'] ) ) : 'recent';
-		$per_page = isset( $_GET['per_page'] ) ? max( 1, min( 200, absint( $_GET['per_page'] ) ) ) : 50;
-		$page     = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-		$hide_spam   = isset( $_GET['hide_spam'] ) ? (bool) absint( $_GET['hide_spam'] ) : true;
-		$hide_images = isset( $_GET['hide_images'] ) ? (bool) absint( $_GET['hide_images'] ) : false;
-
-		if ( ! in_array( $sort, [ 'recent', 'top' ], true ) ) {
-			$sort = 'recent';
-		}
-
-		$order_by = ( 'top' === $sort ) ? 'hits' : 'last_seen';
-
-		$offset = ( $page - 1 ) * $per_page;
-
-		global $wpdb;
-		$filters = [];
-		$params  = [];
-
-		if ( $hide_spam ) {
-			foreach ( $this->get_spam_url_patterns() as $pattern ) {
-				$filters[] = 'request_uri NOT LIKE %s';
-				$params[]  = $pattern;
-			}
-		}
-
-		if ( $hide_images ) {
-			foreach ( $this->get_image_url_patterns() as $pattern ) {
-				$filters[] = 'request_uri NOT LIKE %s';
-				$params[]  = $pattern;
-			}
-		}
-
-		$where_sql = $filters ? ' WHERE ' . implode( ' AND ', $filters ) : '';
-
-		$count_sql = "SELECT COUNT(*) FROM {$this->table}{$where_sql}";
-		if ( $params ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
-			$count_sql = $wpdb->prepare( $count_sql, $params );
-		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, custom pagination requires direct queries.
-		$total_count = (int) $wpdb->get_var( $count_sql );
-
-		$order_by_sql = ( 'hits' === $order_by ) ? 'hits' : 'last_seen';
-		$sql = "SELECT * FROM {$this->table}{$where_sql} ORDER BY {$order_by_sql} DESC LIMIT %d OFFSET %d";
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL built with safe table name.
-		$sql = $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, custom pagination requires direct queries.
-		$rows = $wpdb->get_results( $sql );
-
-		if ( $rows ) {
-			$rows = $this->hydrate_device_labels( $rows );
-			$rows = $this->annotate_redirect_status( $rows );
-		}
-
-		$total_pages = max( 1, (int) ceil( $total_count / $per_page ) );
-		$base_url    = menu_page_url( 'saman-seo-404-log', false );
-		// Fallback if menu page not registered yet.
-		if ( empty( $base_url ) ) {
-			$base_url = admin_url( 'admin.php?page=saman-seo-404-log' );
-		}
-
-		include SAMAN_SEO_PATH . 'templates/404-log.php';
-	}
-
-	/**
 	 * Maybe log a 404 event.
 	 *
 	 * @return void
@@ -447,6 +335,11 @@ class Request_Monitor {
 		$is_bot     = $this->detect_is_bot( $user_agent ) ? 1 : 0;
 		$now        = current_time( 'mysql' );
 
+		// Do not log URLs that match an ignore pattern.
+		if ( $this->is_url_ignored( $request ) ) {
+			return;
+		}
+
 		global $wpdb;
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Each request URI must be checked against the custom 404 log table directly, table name is safe.
 		$row = $wpdb->get_row(
@@ -458,12 +351,12 @@ class Request_Monitor {
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( $row ) {
-			$update_data = [
+			$update_data = array(
 				'hits'         => (int) $row->hits + 1,
 				'last_seen'    => $now,
 				'user_agent'   => $user_agent ?: $row->user_agent,
 				'device_label' => $device,
-			];
+			);
 
 			// Update referrer if not empty and we don't have one yet
 			if ( $referrer ) {
@@ -479,7 +372,7 @@ class Request_Monitor {
 			$wpdb->update(
 				$this->table,
 				$update_data,
-				[ 'id' => $row->id ]
+				array( 'id' => $row->id )
 			);
 
 			// Check if we should send a notification
@@ -489,7 +382,7 @@ class Request_Monitor {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Inserting new 404 rows requires writing to the custom table directly.
 			$wpdb->insert(
 				$this->table,
-				[
+				array(
 					'request_uri'  => $request,
 					'user_agent'   => $user_agent,
 					'device_label' => $device,
@@ -498,8 +391,8 @@ class Request_Monitor {
 					'first_seen'   => $now,
 					'is_bot'       => $is_bot,
 					'referrer'     => $referrer,
-				],
-				[ '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s' ]
+				),
+				array( '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s' )
 			);
 		}
 	}
@@ -518,7 +411,7 @@ class Request_Monitor {
 		$browser_label  = $this->detect_browser_label( $user_agent );
 		$platform_label = $this->detect_platform_label( $user_agent );
 
-		$parts = array_filter( [ $platform_label, $browser_label ] );
+		$parts = array_filter( array( $platform_label, $browser_label ) );
 
 		if ( ! empty( $parts ) ) {
 			return trim( implode( ' ', $parts ) );
@@ -552,10 +445,10 @@ class Request_Monitor {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Backfilling derived column requires direct updates.
 			$wpdb->update(
 				$this->table,
-				[ 'device_label' => $label ],
-				[ 'id' => (int) $row->id ],
-				[ '%s' ],
-				[ '%d' ]
+				array( 'device_label' => $label ),
+				array( 'id' => (int) $row->id ),
+				array( '%s' ),
+				array( '%d' )
 			);
 		}
 
@@ -582,7 +475,7 @@ class Request_Monitor {
 			return $rows;
 		}
 
-		$requests = [];
+		$requests = array();
 		foreach ( $rows as $row ) {
 			if ( ! empty( $row->request_uri ) ) {
 				$requests[] = $row->request_uri;
@@ -602,7 +495,7 @@ class Request_Monitor {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, matching redirects against 404 log requires direct query.
 		$sources = $wpdb->get_col( $wpdb->prepare( $sql, $requests ) );
 
-		$lookup = $sources ? array_fill_keys( $sources, true ) : [];
+		$lookup = $sources ? array_fill_keys( $sources, true ) : array();
 		foreach ( $rows as $row ) {
 			$row->redirect_exists = isset( $lookup[ $row->request_uri ] );
 		}
@@ -616,7 +509,7 @@ class Request_Monitor {
 	 * @return string[]
 	 */
 	private function get_spam_url_patterns() {
-		return [
+		return array(
 			// Executables and configs
 			'%.php',
 			'%.env',
@@ -715,7 +608,7 @@ class Request_Monitor {
 			'%/node_modules%',
 			'%/composer.json%',
 			'%/package.json%',
-		];
+		);
 	}
 
 	/**
@@ -724,7 +617,7 @@ class Request_Monitor {
 	 * @return string[]
 	 */
 	private function get_image_url_patterns() {
-		return [
+		return array(
 			// Images
 			'%.png',
 			'%.jpg',
@@ -747,7 +640,7 @@ class Request_Monitor {
 			'%.mp3',
 			'%.wav',
 			'%.ogg',
-		];
+		);
 	}
 
 	/**
@@ -756,7 +649,7 @@ class Request_Monitor {
 	 * @return string[]
 	 */
 	private function get_bot_patterns() {
-		return [
+		return array(
 			// Search engine bots
 			'googlebot',
 			'bingbot',
@@ -828,7 +721,7 @@ class Request_Monitor {
 			'feedfetcher',
 			'feedly',
 			'newsblur',
-		];
+		);
 	}
 
 	/**
@@ -878,29 +771,113 @@ class Request_Monitor {
 		}
 
 		foreach ( $patterns as $p ) {
-			if ( $p->is_regex ) {
-				// Regex pattern
-				$regex = '/' . str_replace( '/', '\\/', $p->pattern ) . '/i';
-				if ( @preg_match( $regex, $request_uri ) ) {
+			$pattern = isset( $p->pattern ) ? (string) $p->pattern : '';
+
+			if ( '' === $pattern ) {
+				continue;
+			}
+
+			if ( ! empty( $p->is_regex ) ) {
+				// Regex pattern.
+				$regex = '/' . str_replace( '/', '\\/', $pattern ) . '/i';
+				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
 					return true;
 				}
-			} else {
-				// Simple wildcard pattern - convert * to regex
-				if ( false !== strpos( $p->pattern, '*' ) ) {
-					$regex = '/^' . str_replace( [ '\\*', '/' ], [ '.*', '\\/' ], preg_quote( $p->pattern, '/' ) ) . '$/i';
-					if ( @preg_match( $regex, $request_uri ) ) {
-						return true;
-					}
-				} else {
-					// Exact match
-					if ( $request_uri === $p->pattern ) {
-						return true;
-					}
+			} elseif ( false !== strpos( $pattern, '*' ) ) {
+				// Simple wildcard pattern - convert * to regex.
+				$regex = '/^' . str_replace( array( '\\*', '/' ), array( '.*', '\\/' ), preg_quote( $pattern, '/' ) ) . '$/i';
+				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
+					return true;
 				}
+			} elseif ( $request_uri === $pattern ) {
+				// Exact match.
+				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Safely test whether a regex matches a subject.
+	 *
+	 * Invalid regex patterns are treated as "no match" instead of raising
+	 * a fatal error or warning.
+	 *
+	 * @param string $regex   Full regex including delimiters and flags.
+	 * @param string $subject Subject string.
+	 * @return bool
+	 */
+	private function regex_matches_safely( $regex, $subject ) {
+		$message  = '';
+		$previous = set_error_handler(
+			static function ( $severity, $err_message ) use ( &$message ) {
+				$message = $err_message;
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( $regex, $subject );
+		} catch ( \Throwable $e ) {
+			$result  = false;
+			$message = $e->getMessage();
+		} finally {
+			if ( false !== $previous ) {
+				restore_error_handler();
+			}
+		}
+
+		if ( false === $result ) {
+			return false;
+		}
+
+		return 1 === $result;
+	}
+
+	/**
+	 * Validate a regex pattern intended for ignore matching.
+	 *
+	 * @param string $pattern Regex pattern without delimiters.
+	 * @return true|\WP_Error True if valid, WP_Error if invalid.
+	 */
+	public function validate_regex_pattern( $pattern ) {
+		if ( empty( $pattern ) ) {
+			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'saman-seo' ) );
+		}
+
+		$regex   = '/' . str_replace( '/', '\\/', (string) $pattern ) . '/i';
+		$message = '';
+
+		$previous = set_error_handler(
+			static function ( $severity, $err_message ) use ( &$message ) {
+				$message = $err_message;
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( $regex, '' );
+		} catch ( \Throwable $e ) {
+			$result  = false;
+			$message = $e->getMessage();
+		} finally {
+			if ( false !== $previous ) {
+				restore_error_handler();
+			}
+		}
+
+		if ( false === $result ) {
+			if ( empty( $message ) ) {
+				$message = preg_last_error_msg();
+			}
+			if ( empty( $message ) ) {
+				$message = __( 'Invalid regex pattern. Please check the syntax.', 'saman-seo' );
+			}
+			return new \WP_Error( 'invalid_regex', $message );
+		}
+
+		return true;
 	}
 
 	/**
@@ -915,7 +892,7 @@ class Request_Monitor {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$has_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $this->patterns_table ) );
 		if ( $this->patterns_table !== $has_table ) {
-			return [];
+			return array();
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -936,13 +913,13 @@ class Request_Monitor {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$result = $wpdb->insert(
 			$this->patterns_table,
-			[
+			array(
 				'pattern'    => $pattern,
 				'is_regex'   => $is_regex ? 1 : 0,
 				'reason'     => $reason,
 				'created_at' => current_time( 'mysql' ),
-			],
-			[ '%s', '%d', '%s', '%s' ]
+			),
+			array( '%s', '%d', '%s', '%s' )
 		);
 
 		if ( false === $result ) {
@@ -964,8 +941,8 @@ class Request_Monitor {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		return (bool) $wpdb->delete(
 			$this->patterns_table,
-			[ 'id' => $id ],
-			[ '%d' ]
+			array( 'id' => $id ),
+			array( '%d' )
 		);
 	}
 
@@ -981,10 +958,10 @@ class Request_Monitor {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		return (bool) $wpdb->update(
 			$this->table,
-			[ 'is_ignored' => 1 ],
-			[ 'id' => $id ],
-			[ '%d' ],
-			[ '%d' ]
+			array( 'is_ignored' => 1 ),
+			array( 'id' => $id ),
+			array( '%d' ),
+			array( '%d' )
 		);
 	}
 
@@ -1000,10 +977,10 @@ class Request_Monitor {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		return (bool) $wpdb->update(
 			$this->table,
-			[ 'is_ignored' => 0 ],
-			[ 'id' => $id ],
-			[ '%d' ],
-			[ '%d' ]
+			array( 'is_ignored' => 0 ),
+			array( 'id' => $id ),
+			array( '%d' ),
+			array( '%d' )
 		);
 	}
 
@@ -1052,29 +1029,29 @@ class Request_Monitor {
 	private function detect_platform_label( $user_agent ) {
 		$ua = strtolower( $user_agent );
 
-		$map = [
-			'windows phone' => 'Windows Phone',
-			'windows nt 10' => 'Windows 10',
+		$map = array(
+			'windows phone'  => 'Windows Phone',
+			'windows nt 10'  => 'Windows 10',
 			'windows nt 6.3' => 'Windows 8.1',
 			'windows nt 6.2' => 'Windows 8',
 			'windows nt 6.1' => 'Windows 7',
 			'windows nt 6.0' => 'Windows Vista',
 			'windows nt 5.1' => 'Windows XP',
-			'android'       => 'Android',
-			'iphone'        => 'iPhone',
-			'ipad'          => 'iPad',
-			'ipod'          => 'iPod',
-			'mac os x'      => 'macOS',
-			'macintosh'     => 'macOS',
-			'cros'          => 'Chrome OS',
-			'linux'         => 'Linux',
-			'bb10'          => 'BlackBerry',
-			'blackberry'    => 'BlackBerry',
-			'playstation'   => 'PlayStation',
-			'nintendo'      => 'Nintendo',
-			'xbox'          => 'Xbox',
-			'go-http-client'=> 'Go-http-client',
-		];
+			'android'        => 'Android',
+			'iphone'         => 'iPhone',
+			'ipad'           => 'iPad',
+			'ipod'           => 'iPod',
+			'mac os x'       => 'macOS',
+			'macintosh'      => 'macOS',
+			'cros'           => 'Chrome OS',
+			'linux'          => 'Linux',
+			'bb10'           => 'BlackBerry',
+			'blackberry'     => 'BlackBerry',
+			'playstation'    => 'PlayStation',
+			'nintendo'       => 'Nintendo',
+			'xbox'           => 'Xbox',
+			'go-http-client' => 'Go-http-client',
+		);
 
 		foreach ( $map as $needle => $label ) {
 			if ( false !== strpos( $ua, $needle ) ) {
@@ -1118,5 +1095,4 @@ class Request_Monitor {
 
 		return ! empty( $existing );
 	}
-
 }

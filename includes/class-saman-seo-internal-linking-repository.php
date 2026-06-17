@@ -30,7 +30,7 @@ class Repository {
 	 *
 	 * @var array<string,mixed>
 	 */
-	private $cache = [];
+	private $cache = array();
 
 	/**
 	 * Fetch all rules with optional filtering args.
@@ -46,14 +46,14 @@ class Repository {
 	 *
 	 * @return array<int,array>
 	 */
-	public function get_rules( array $args = [] ) {
+	public function get_rules( array $args = array() ) {
 		$rules = $this->get_option_array( self::OPTION_RULES );
 
 		if ( empty( $rules ) ) {
-			return [];
+			return array();
 		}
 
-		$rules = array_map( [ $this, 'apply_rule_defaults' ], $rules );
+		$rules = array_map( array( $this, 'apply_rule_defaults' ), $rules );
 
 		if ( ! empty( $args['status'] ) ) {
 			$status = ( 'inactive' === $args['status'] ) ? 'inactive' : 'active';
@@ -80,7 +80,7 @@ class Repository {
 				$rules = array_filter(
 					$rules,
 					static function ( $rule ) use ( $post_filter ) {
-						$post_types = $rule['scope']['post_types'] ?? [];
+						$post_types = $rule['scope']['post_types'] ?? array();
 						if ( empty( $post_types ) ) {
 							return true;
 						}
@@ -96,10 +96,10 @@ class Repository {
 			$rules  = array_filter(
 				$rules,
 				static function ( $rule ) use ( $needle ) {
-					$haystacks = [
+					$haystacks = array(
 						strtolower( $rule['title'] ?? '' ),
-						implode( ' ', array_map( 'strtolower', $rule['keywords'] ?? [] ) ),
-					];
+						implode( ' ', array_map( 'strtolower', $rule['keywords'] ?? array() ) ),
+					);
 
 					foreach ( $haystacks as $haystack ) {
 						if ( false !== strpos( $haystack, $needle ) ) {
@@ -147,7 +147,7 @@ class Repository {
 	 * @return array
 	 */
 	public function get_rule_defaults() {
-		return $this->apply_rule_defaults( [] );
+		return $this->apply_rule_defaults( array() );
 	}
 
 	/**
@@ -232,9 +232,9 @@ class Repository {
 			return 0;
 		}
 
-		$rules = $this->get_option_array( self::OPTION_RULES );
+		$rules  = $this->get_option_array( self::OPTION_RULES );
 		$action = sanitize_key( $action );
-		$count = 0;
+		$count  = 0;
 
 		foreach ( $rule_ids as $rule_id ) {
 			if ( ! isset( $rules[ $rule_id ] ) ) {
@@ -244,15 +244,15 @@ class Repository {
 			switch ( $action ) {
 				case 'activate':
 					$rules[ $rule_id ]['status'] = 'active';
-					$count++;
+					++$count;
 					break;
 				case 'deactivate':
 					$rules[ $rule_id ]['status'] = 'inactive';
-					$count++;
+					++$count;
 					break;
 				case 'delete':
 					unset( $rules[ $rule_id ] );
-					$count++;
+					++$count;
 					break;
 			}
 		}
@@ -294,7 +294,7 @@ class Repository {
 	 */
 	public function get_categories() {
 		$categories = $this->get_option_array( self::OPTION_CATEGORIES );
-		return array_map( [ $this, 'apply_category_defaults' ], $categories );
+		return array_map( array( $this, 'apply_category_defaults' ), $categories );
 	}
 
 	/**
@@ -303,7 +303,7 @@ class Repository {
 	 * @return array
 	 */
 	public function get_category_defaults() {
-		return $this->apply_category_defaults( [] );
+		return $this->apply_category_defaults( array() );
 	}
 
 	/**
@@ -400,7 +400,7 @@ class Repository {
 	 */
 	public function get_templates() {
 		$templates = $this->get_option_array( self::OPTION_TEMPLATES );
-		return array_map( [ $this, 'apply_template_defaults' ], $templates );
+		return array_map( array( $this, 'apply_template_defaults' ), $templates );
 	}
 
 	/**
@@ -409,7 +409,7 @@ class Repository {
 	 * @return array
 	 */
 	public function get_template_defaults() {
-		return $this->apply_template_defaults( [] );
+		return $this->apply_template_defaults( array() );
 	}
 
 	/**
@@ -481,7 +481,7 @@ class Repository {
 		$settings = wp_parse_args( $settings, $defaults );
 
 		$settings['default_heading_levels'] = array_values(
-			array_intersect( [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ], (array) $settings['default_heading_levels'] )
+			array_intersect( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ), (array) $settings['default_heading_levels'] )
 		);
 
 		return $settings;
@@ -499,8 +499,8 @@ class Repository {
 		$settings = wp_parse_args( $data, $defaults );
 
 		$settings['default_max_links_per_page'] = $this->clamp( absint( $settings['default_max_links_per_page'] ), 0, 50 );
-		$settings['default_heading_behavior']   = in_array( $settings['default_heading_behavior'], [ 'none', 'selected', 'all' ], true ) ? $settings['default_heading_behavior'] : 'none';
-		$settings['default_heading_levels']     = array_values( array_intersect( [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ], (array) $settings['default_heading_levels'] ) );
+		$settings['default_heading_behavior']   = in_array( $settings['default_heading_behavior'], array( 'none', 'selected', 'all' ), true ) ? $settings['default_heading_behavior'] : 'none';
+		$settings['default_heading_levels']     = array_values( array_intersect( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ), (array) $settings['default_heading_levels'] ) );
 		$settings['avoid_existing_links']       = ! empty( $settings['avoid_existing_links'] );
 		$settings['prefer_word_boundaries']     = ! empty( $settings['prefer_word_boundaries'] );
 		$settings['normalize_accents']          = ! empty( $settings['normalize_accents'] );
@@ -519,16 +519,16 @@ class Repository {
 	 * @return array
 	 */
 	public function get_default_settings() {
-		return [
+		return array(
 			'default_max_links_per_page' => 0,
 			'default_heading_behavior'   => 'none',
-			'default_heading_levels'     => [ 'h2', 'h3' ],
+			'default_heading_levels'     => array( 'h2', 'h3' ),
 			'avoid_existing_links'       => true,
 			'prefer_word_boundaries'     => true,
 			'normalize_accents'          => false,
 			'cache_rendered_content'     => true,
 			'chunk_long_documents'       => true,
-		];
+		);
 	}
 
 	/**
@@ -566,10 +566,10 @@ class Repository {
 			return $this->cache[ $option ];
 		}
 
-		$value = get_option( $option, [] );
+		$value = get_option( $option, array() );
 
 		if ( ! is_array( $value ) ) {
-			$value = [];
+			$value = array();
 		}
 
 		$this->cache[ $option ] = $value;
@@ -598,48 +598,48 @@ class Repository {
 	 * @return array
 	 */
 	private function apply_rule_defaults( array $rule ) {
-		$defaults = [
-			'id'         => '',
-			'title'      => '',
-			'category'   => '',
-			'created_at' => time(),
-			'updated_at' => time(),
-			'keywords'   => [],
-			'destination' => [
+		$defaults = array(
+			'id'           => '',
+			'title'        => '',
+			'category'     => '',
+			'created_at'   => time(),
+			'updated_at'   => time(),
+			'keywords'     => array(),
+			'destination'  => array(
 				'type' => 'post',
 				'post' => 0,
 				'url'  => '',
-			],
+			),
 			'utm_template' => 'inherit',
 			'utm_apply_to' => 'both',
-			'attributes'   => [
+			'attributes'   => array(
 				'title'    => '',
 				'no_title' => false,
 				'nofollow' => false,
 				'new_tab'  => false,
-			],
-			'limits' => [
+			),
+			'limits'       => array(
 				'max_page'  => 1,
 				'max_block' => null,
-			],
-			'priority' => 10,
-			'status'   => 'active',
-			'placement' => [
+			),
+			'priority'     => 10,
+			'status'       => 'active',
+			'placement'    => array(
 				'headings'       => 'none',
-				'heading_levels' => [],
+				'heading_levels' => array(),
 				'paragraphs'     => true,
 				'lists'          => false,
 				'captions'       => false,
 				'widgets'        => false,
-			],
-			'scope' => [
-				'post_types' => [],
-				'whitelist'  => [],
-				'blacklist'  => [],
-			],
-		];
+			),
+			'scope'        => array(
+				'post_types' => array(),
+				'whitelist'  => array(),
+				'blacklist'  => array(),
+			),
+		);
 
-		$rule = wp_parse_args( $rule, $defaults );
+		$rule             = wp_parse_args( $rule, $defaults );
 		$rule['keywords'] = array_values( array_filter( (array) $rule['keywords'] ) );
 
 		return $rule;
@@ -653,7 +653,7 @@ class Repository {
 	 * @return array
 	 */
 	private function apply_category_defaults( array $category ) {
-		$defaults = [
+		$defaults = array(
 			'id'           => '',
 			'name'         => '',
 			'color'        => '#4F46E5',
@@ -662,9 +662,9 @@ class Repository {
 			'category_cap' => 0,
 			'created_at'   => time(),
 			'updated_at'   => time(),
-		];
+		);
 
-		$category = wp_parse_args( $category, $defaults );
+		$category                 = wp_parse_args( $category, $defaults );
 		$category['color']        = $category['color'] ? $category['color'] : '#4F46E5';
 		$category['category_cap'] = $this->clamp( absint( $category['category_cap'] ), 0, 50 );
 
@@ -679,7 +679,7 @@ class Repository {
 	 * @return array
 	 */
 	private function apply_template_defaults( array $template ) {
-		$defaults = [
+		$defaults = array(
 			'id'           => '',
 			'name'         => '',
 			'utm_source'   => '',
@@ -691,11 +691,11 @@ class Repository {
 			'append_mode'  => 'append_if_missing',
 			'created_at'   => time(),
 			'updated_at'   => time(),
-		];
+		);
 
-		$template = wp_parse_args( $template, $defaults );
-		$template['apply_to']    = in_array( $template['apply_to'], [ 'internal', 'external', 'both' ], true ) ? $template['apply_to'] : 'both';
-		$template['append_mode'] = in_array( $template['append_mode'], [ 'append_if_missing', 'always_overwrite', 'never' ], true ) ? $template['append_mode'] : 'append_if_missing';
+		$template                = wp_parse_args( $template, $defaults );
+		$template['apply_to']    = in_array( $template['apply_to'], array( 'internal', 'external', 'both' ), true ) ? $template['apply_to'] : 'both';
+		$template['append_mode'] = in_array( $template['append_mode'], array( 'append_if_missing', 'always_overwrite', 'never' ), true ) ? $template['append_mode'] : 'append_if_missing';
 
 		return $template;
 	}
@@ -715,7 +715,7 @@ class Repository {
 		$title       = isset( $data['title'] ) ? sanitize_text_field( $data['title'] ) : '';
 		$category    = isset( $data['category'] ) ? sanitize_key( $data['category'] ) : '';
 
-		$keywords = $this->sanitize_keywords( $data['keywords'] ?? [] );
+		$keywords = $this->sanitize_keywords( $data['keywords'] ?? array() );
 
 		if ( empty( $title ) ) {
 			return new WP_Error( 'SAMAN_SEO_rule_title', __( 'Internal Title is required.', 'saman-seo' ) );
@@ -737,10 +737,8 @@ class Repository {
 			if ( ! get_post( $destination_post ) ) {
 				return new WP_Error( 'SAMAN_SEO_rule_destination', __( 'Destination post not found.', 'saman-seo' ) );
 			}
-		} else {
-			if ( empty( $destination_url ) ) {
+		} elseif ( empty( $destination_url ) ) {
 				return new WP_Error( 'SAMAN_SEO_rule_destination', __( 'Enter a destination URL.', 'saman-seo' ) );
-			}
 		}
 
 		$utm_template = isset( $data['utm_template'] ) ? sanitize_key( $data['utm_template'] ) : 'inherit';
@@ -749,15 +747,15 @@ class Repository {
 		}
 
 		$utm_apply_to = isset( $data['utm_apply_to'] ) ? sanitize_key( $data['utm_apply_to'] ) : 'both';
-		$utm_apply_to = in_array( $utm_apply_to, [ 'internal', 'external', 'both' ], true ) ? $utm_apply_to : 'both';
+		$utm_apply_to = in_array( $utm_apply_to, array( 'internal', 'external', 'both' ), true ) ? $utm_apply_to : 'both';
 
 		$attribute_title = isset( $data['attributes']['title'] ) ? sanitize_text_field( $data['attributes']['title'] ) : '';
-		$attributes      = [
+		$attributes      = array(
 			'title'    => $attribute_title,
 			'no_title' => ! empty( $data['attributes']['no_title'] ),
 			'nofollow' => ! empty( $data['attributes']['nofollow'] ),
 			'new_tab'  => ! empty( $data['attributes']['new_tab'] ),
-		];
+		);
 
 		if ( $attributes['no_title'] ) {
 			$attributes['title'] = '';
@@ -765,35 +763,35 @@ class Repository {
 
 		$max_page_raw = $data['limits']['max_page'] ?? '';
 		$max_page     = ( '' === $max_page_raw ) ? '' : $this->clamp( absint( $max_page_raw ), 0, 50 );
-		$limits = [
+		$limits       = array(
 			'max_page'  => $max_page,
 			'max_block' => isset( $data['limits']['max_block'] ) && '' !== $data['limits']['max_block'] ? $this->clamp( absint( $data['limits']['max_block'] ), 0, 50 ) : null,
-		];
+		);
 
 		$priority = isset( $data['priority'] ) ? intval( $data['priority'] ) : 10;
 		$priority = $this->clamp( $priority, -100, 100 );
 
 		$status = isset( $data['status'] ) && 'inactive' === $data['status'] ? 'inactive' : 'active';
 
-		$placement = [
+		$placement = array(
 			'headings'       => isset( $data['placement']['headings'] ) ? sanitize_key( $data['placement']['headings'] ) : 'none',
-			'heading_levels' => array_values( array_intersect( [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ], (array) ( $data['placement']['heading_levels'] ?? [] ) ) ),
+			'heading_levels' => array_values( array_intersect( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ), (array) ( $data['placement']['heading_levels'] ?? array() ) ) ),
 			'paragraphs'     => ! empty( $data['placement']['paragraphs'] ),
 			'lists'          => ! empty( $data['placement']['lists'] ),
 			'captions'       => ! empty( $data['placement']['captions'] ),
 			'widgets'        => ! empty( $data['placement']['widgets'] ),
-		];
+		);
 
-		if ( ! in_array( $placement['headings'], [ 'none', 'selected', 'all' ], true ) ) {
+		if ( ! in_array( $placement['headings'], array( 'none', 'selected', 'all' ), true ) ) {
 			$placement['headings'] = 'none';
 		}
 
 		if ( 'selected' !== $placement['headings'] ) {
-			$placement['heading_levels'] = [];
+			$placement['heading_levels'] = array();
 		}
 
 		$scope_post_types = array_filter(
-			(array) ( $data['scope']['post_types'] ?? [] ),
+			(array) ( $data['scope']['post_types'] ?? array() ),
 			static function ( $post_type ) {
 				$post_type = sanitize_key( $post_type );
 				return post_type_exists( $post_type );
@@ -815,24 +813,24 @@ class Repository {
 
 		sort( $scope_post_types );
 
-		$scope = [
+		$scope = array(
 			'post_types' => array_values( $scope_post_types ),
-			'whitelist'  => $urls_to_array( $data['scope']['whitelist'] ?? [] ),
-			'blacklist'  => $urls_to_array( $data['scope']['blacklist'] ?? [] ),
-		];
+			'whitelist'  => $urls_to_array( $data['scope']['whitelist'] ?? array() ),
+			'blacklist'  => $urls_to_array( $data['scope']['blacklist'] ?? array() ),
+		);
 
-		return [
-			'id'          => $rule_id,
-			'title'       => $title,
-			'category'    => $category,
-			'created_at'  => isset( $data['created_at'] ) ? absint( $data['created_at'] ) : time(),
-			'updated_at'  => time(),
-			'keywords'    => $keywords,
-			'destination' => [
+		return array(
+			'id'           => $rule_id,
+			'title'        => $title,
+			'category'     => $category,
+			'created_at'   => isset( $data['created_at'] ) ? absint( $data['created_at'] ) : time(),
+			'updated_at'   => time(),
+			'keywords'     => $keywords,
+			'destination'  => array(
 				'type' => $destination_type,
 				'post' => $destination_post,
 				'url'  => $destination_url,
-			],
+			),
 			'utm_template' => $utm_template,
 			'utm_apply_to' => $utm_apply_to,
 			'attributes'   => $attributes,
@@ -841,7 +839,7 @@ class Repository {
 			'status'       => $status,
 			'placement'    => $placement,
 			'scope'        => $scope,
-		];
+		);
 	}
 
 	/**
@@ -866,7 +864,7 @@ class Repository {
 			return new WP_Error( 'SAMAN_SEO_category_name', __( 'Name is required.', 'saman-seo' ) );
 		}
 
-		return [
+		return array(
 			'id'           => $id,
 			'name'         => $name,
 			'color'        => $color ?: '#4F46E5',
@@ -875,7 +873,7 @@ class Repository {
 			'category_cap' => $this->clamp( $cap, 0, 50 ),
 			'created_at'   => isset( $data['created_at'] ) ? absint( $data['created_at'] ) : time(),
 			'updated_at'   => time(),
-		];
+		);
 	}
 
 	/**
@@ -899,15 +897,15 @@ class Repository {
 		$apply_to    = isset( $data['apply_to'] ) ? sanitize_key( $data['apply_to'] ) : 'both';
 		$append_mode = isset( $data['append_mode'] ) ? sanitize_key( $data['append_mode'] ) : 'append_if_missing';
 
-		if ( ! in_array( $apply_to, [ 'internal', 'external', 'both' ], true ) ) {
+		if ( ! in_array( $apply_to, array( 'internal', 'external', 'both' ), true ) ) {
 			$apply_to = 'both';
 		}
 
-		if ( ! in_array( $append_mode, [ 'append_if_missing', 'always_overwrite', 'never' ], true ) ) {
+		if ( ! in_array( $append_mode, array( 'append_if_missing', 'always_overwrite', 'never' ), true ) ) {
 			$append_mode = 'append_if_missing';
 		}
 
-		return [
+		return array(
 			'id'           => $id,
 			'name'         => $name,
 			'utm_source'   => isset( $data['utm_source'] ) ? sanitize_text_field( $data['utm_source'] ) : '',
@@ -919,7 +917,7 @@ class Repository {
 			'append_mode'  => $append_mode,
 			'created_at'   => isset( $data['created_at'] ) ? absint( $data['created_at'] ) : time(),
 			'updated_at'   => time(),
-		];
+		);
 	}
 
 	/**
@@ -935,7 +933,7 @@ class Repository {
 		} elseif ( is_array( $value ) ) {
 			$parts = $value;
 		} else {
-			$parts = [];
+			$parts = array();
 		}
 
 		$parts = array_map( 'sanitize_text_field', $parts );

@@ -19,28 +19,28 @@ class Sitemap_Settings {
 	 *
 	 * @var array<string,mixed>
 	 */
-	private $defaults = [
+	private $defaults = array(
 		'SAMAN_SEO_sitemap_enabled'                => '1',
-		'SAMAN_SEO_sitemap_max_urls'              => 1000,
-		'SAMAN_SEO_sitemap_enable_index'          => '1',
-		'SAMAN_SEO_sitemap_dynamic_generation'    => '1',
-		'SAMAN_SEO_sitemap_schedule_updates'      => '',
-		'SAMAN_SEO_sitemap_post_types'            => [],
-		'SAMAN_SEO_sitemap_taxonomies'            => [],
-		'SAMAN_SEO_sitemap_include_author_pages'  => '0',
-		'SAMAN_SEO_sitemap_include_date_archives' => '0',
-		'SAMAN_SEO_sitemap_exclude_images'        => '0',
-		'SAMAN_SEO_sitemap_enable_rss'            => '0',
-		'SAMAN_SEO_sitemap_enable_google_news'    => '0',
-		'SAMAN_SEO_sitemap_google_news_name'      => '',
-		'SAMAN_SEO_sitemap_google_news_post_types' => [],
-		'SAMAN_SEO_sitemap_additional_pages'      => [],
-		'SAMAN_SEO_enable_llm_txt'                => '1',
-		'SAMAN_SEO_llm_txt_posts_per_type'        => 50,
-		'SAMAN_SEO_llm_txt_title'                 => '',
-		'SAMAN_SEO_llm_txt_description'           => '',
-		'SAMAN_SEO_llm_txt_include_excerpt'       => '1',
-	];
+		'SAMAN_SEO_sitemap_max_urls'               => 1000,
+		'SAMAN_SEO_sitemap_enable_index'           => '1',
+		'SAMAN_SEO_sitemap_dynamic_generation'     => '1',
+		'SAMAN_SEO_sitemap_schedule_updates'       => '',
+		'SAMAN_SEO_sitemap_post_types'             => array(),
+		'SAMAN_SEO_sitemap_taxonomies'             => array(),
+		'SAMAN_SEO_sitemap_include_author_pages'   => '0',
+		'SAMAN_SEO_sitemap_include_date_archives'  => '0',
+		'SAMAN_SEO_sitemap_exclude_images'         => '0',
+		'SAMAN_SEO_sitemap_enable_rss'             => '0',
+		'SAMAN_SEO_sitemap_enable_google_news'     => '0',
+		'SAMAN_SEO_sitemap_google_news_name'       => '',
+		'SAMAN_SEO_sitemap_google_news_post_types' => array(),
+		'SAMAN_SEO_sitemap_additional_pages'       => array(),
+		'SAMAN_SEO_enable_llm_txt'                 => '1',
+		'SAMAN_SEO_llm_txt_posts_per_type'         => 50,
+		'SAMAN_SEO_llm_txt_title'                  => '',
+		'SAMAN_SEO_llm_txt_description'            => '',
+		'SAMAN_SEO_llm_txt_include_excerpt'        => '1',
+	);
 
 	/**
 	 * Boot hooks.
@@ -48,32 +48,13 @@ class Sitemap_Settings {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_menu' ], 20 );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		add_action( 'wp_ajax_SAMAN_SEO_regenerate_sitemap', [ $this, 'ajax_regenerate_sitemap' ] );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'wp_ajax_SAMAN_SEO_regenerate_sitemap', array( $this, 'ajax_regenerate_sitemap' ) );
 
 		// Schedule sitemap regeneration if enabled
 		if ( get_option( 'SAMAN_SEO_sitemap_schedule_updates', '' ) ) {
-			add_action( 'SAMAN_SEO_sitemap_cron', [ $this, 'regenerate_sitemap' ] );
+			add_action( 'SAMAN_SEO_sitemap_cron', array( $this, 'regenerate_sitemap' ) );
 		}
-	}
-
-	/**
-	 * Register settings menu.
-	 *
-	 * @return void
-	 */
-	public function register_menu() {
-		add_submenu_page(
-			'saman-seo',
-			__( 'Sitemap Settings', 'saman-seo' ),
-			__( 'Sitemap', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-sitemap',
-			[ $this, 'render_settings_page' ]
-		);
 	}
 
 	/**
@@ -89,71 +70,28 @@ class Sitemap_Settings {
 
 		$group = 'SAMAN_SEO_sitemap';
 
-		register_setting( $group, 'SAMAN_SEO_sitemap_enabled', [ $this, 'sanitize_bool' ] );
+		register_setting( $group, 'SAMAN_SEO_sitemap_enabled', array( $this, 'sanitize_bool' ) );
 		register_setting( $group, 'SAMAN_SEO_sitemap_max_urls', 'absint' );
-		register_setting( $group, 'SAMAN_SEO_sitemap_enable_index', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_dynamic_generation', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_schedule_updates', [ $this, 'sanitize_schedule' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_post_types', [ $this, 'sanitize_array' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_taxonomies', [ $this, 'sanitize_array' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_include_author_pages', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_include_date_archives', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_exclude_images', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_enable_rss', [ $this, 'sanitize_bool' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_enable_google_news', [ $this, 'sanitize_bool' ] );
+		register_setting( $group, 'SAMAN_SEO_sitemap_enable_index', array( $this, 'sanitize_bool' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_dynamic_generation', array( $this, 'sanitize_bool' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_schedule_updates', array( $this, 'sanitize_schedule' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_post_types', array( $this, 'sanitize_array' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_taxonomies', array( $this, 'sanitize_array' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_include_author_pages', array( $this, 'sanitize_bool' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_include_date_archives', array( $this, 'sanitize_bool' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_exclude_images', array( $this, 'sanitize_bool' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_enable_rss', array( $this, 'sanitize_bool' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_enable_google_news', array( $this, 'sanitize_bool' ) );
 		register_setting( $group, 'SAMAN_SEO_sitemap_google_news_name', 'sanitize_text_field' );
-		register_setting( $group, 'SAMAN_SEO_sitemap_google_news_post_types', [ $this, 'sanitize_array' ] );
-		register_setting( $group, 'SAMAN_SEO_sitemap_additional_pages', [ $this, 'sanitize_additional_pages' ] );
+		register_setting( $group, 'SAMAN_SEO_sitemap_google_news_post_types', array( $this, 'sanitize_array' ) );
+		register_setting( $group, 'SAMAN_SEO_sitemap_additional_pages', array( $this, 'sanitize_additional_pages' ) );
 
 		// LLM.txt settings
-		register_setting( $group, 'SAMAN_SEO_enable_llm_txt', [ $this, 'sanitize_bool' ] );
+		register_setting( $group, 'SAMAN_SEO_enable_llm_txt', array( $this, 'sanitize_bool' ) );
 		register_setting( $group, 'SAMAN_SEO_llm_txt_posts_per_type', 'absint' );
 		register_setting( $group, 'SAMAN_SEO_llm_txt_title', 'sanitize_text_field' );
 		register_setting( $group, 'SAMAN_SEO_llm_txt_description', 'sanitize_textarea_field' );
-		register_setting( $group, 'SAMAN_SEO_llm_txt_include_excerpt', [ $this, 'sanitize_bool' ] );
-	}
-
-	/**
-	 * Enqueue admin assets.
-	 *
-	 * @param string $hook Hook suffix.
-	 */
-	public function enqueue_assets( $hook ) {
-		if ( 'wp-seo-pilot_page_saman-seo-sitemap' !== $hook ) {
-			return;
-		}
-
-		// Enqueue new modern plugin styles
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		// Enqueue admin.js for tab switching functionality
-		wp_enqueue_script(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'assets/js/admin.js',
-			[ 'jquery' ],
-			SAMAN_SEO_VERSION,
-			true
-		);
-
-		// Add inline script data
-		wp_localize_script(
-			'saman-seo-admin',
-			'SamanSEOSitemap',
-			[
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'SAMAN_SEO_sitemap_action' ),
-				'strings'  => [
-					'regenerating' => __( 'Regenerating sitemap...', 'saman-seo' ),
-					'success'      => __( 'Sitemap regenerated successfully!', 'saman-seo' ),
-					'error'        => __( 'Failed to regenerate sitemap.', 'saman-seo' ),
-				],
-			]
-		);
+		register_setting( $group, 'SAMAN_SEO_llm_txt_include_excerpt', array( $this, 'sanitize_bool' ) );
 	}
 
 	/**
@@ -161,97 +99,6 @@ class Sitemap_Settings {
 	 *
 	 * @return void
 	 */
-	public function render_settings_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		// Handle sitemap form submission
-		if ( isset( $_POST['SAMAN_SEO_sitemap_submit'] ) && check_admin_referer( 'SAMAN_SEO_sitemap_settings' ) ) {
-			$this->save_settings();
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved successfully!', 'saman-seo' ) . '</p></div>';
-		}
-
-		// Handle LLM.txt form submission
-		if ( isset( $_POST['SAMAN_SEO_llm_txt_submit'] ) && check_admin_referer( 'SAMAN_SEO_llm_txt_settings' ) ) {
-			$this->save_llm_txt_settings();
-			flush_rewrite_rules();
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'LLM.txt settings saved successfully!', 'saman-seo' ) . '</p></div>';
-		}
-
-		// Prepare all variables for template
-		$enabled                = get_option( 'SAMAN_SEO_sitemap_enabled', '1' );
-		$max_urls              = get_option( 'SAMAN_SEO_sitemap_max_urls', 1000 );
-		$enable_index          = get_option( 'SAMAN_SEO_sitemap_enable_index', '1' );
-		$dynamic_generation    = get_option( 'SAMAN_SEO_sitemap_dynamic_generation', '1' );
-		$schedule_updates      = get_option( 'SAMAN_SEO_sitemap_schedule_updates', '' );
-		$selected_post_types   = get_option( 'SAMAN_SEO_sitemap_post_types', null );
-		$selected_taxonomies   = get_option( 'SAMAN_SEO_sitemap_taxonomies', null );
-		$include_author        = get_option( 'SAMAN_SEO_sitemap_include_author_pages', '0' );
-		$include_date          = get_option( 'SAMAN_SEO_sitemap_include_date_archives', '0' );
-		$exclude_images        = get_option( 'SAMAN_SEO_sitemap_exclude_images', '0' );
-		$enable_rss            = get_option( 'SAMAN_SEO_sitemap_enable_rss', '0' );
-		$enable_google_news    = get_option( 'SAMAN_SEO_sitemap_enable_google_news', '0' );
-		$google_news_name      = get_option( 'SAMAN_SEO_sitemap_google_news_name', get_bloginfo( 'name' ) );
-		$google_news_post_types = get_option( 'SAMAN_SEO_sitemap_google_news_post_types', [] );
-		$additional_pages      = get_option( 'SAMAN_SEO_sitemap_additional_pages', [] );
-
-		// Get available post types
-		$post_types = get_post_types(
-			[
-				'public'  => true,
-				'show_ui' => true,
-			],
-			'objects'
-		);
-
-		// Get available taxonomies
-		$taxonomies = get_taxonomies(
-			[
-				'public'  => true,
-				'show_ui' => true,
-			],
-			'objects'
-		);
-
-		// If null (never been set), default to all
-		if ( null === $selected_post_types ) {
-			$selected_post_types = array_keys( $post_types );
-		}
-
-		// If null (never been set), default to all
-		if ( null === $selected_taxonomies ) {
-			$selected_taxonomies = array_keys( $taxonomies );
-		}
-
-		// Ensure arrays
-		if ( ! is_array( $selected_post_types ) ) {
-			$selected_post_types = [];
-		}
-		if ( ! is_array( $selected_taxonomies ) ) {
-			$selected_taxonomies = [];
-		}
-
-		// Schedule options
-		$schedule_options = [
-			''         => __( 'No Schedule', 'saman-seo' ),
-			'hourly'   => __( 'Hourly', 'saman-seo' ),
-			'twicedaily' => __( 'Twice Daily', 'saman-seo' ),
-			'daily'    => __( 'Daily', 'saman-seo' ),
-			'weekly'   => __( 'Weekly', 'saman-seo' ),
-		];
-
-		// LLM.txt variables
-		$llm_enabled         = get_option( 'SAMAN_SEO_enable_llm_txt', '1' );
-		$llm_posts_per_type  = get_option( 'SAMAN_SEO_llm_txt_posts_per_type', 50 );
-		$llm_title           = get_option( 'SAMAN_SEO_llm_txt_title', '' );
-		$llm_description     = get_option( 'SAMAN_SEO_llm_txt_description', '' );
-		$llm_include_excerpt = get_option( 'SAMAN_SEO_llm_txt_include_excerpt', '1' );
-
-		// Load template
-		include SAMAN_SEO_PATH . 'templates/sitemap-settings.php';
-	}
-
 	/**
 	 * Save settings.
 	 *
@@ -267,13 +114,13 @@ class Sitemap_Settings {
 		// Handle post types
 		$post_types = isset( $_POST['SAMAN_SEO_sitemap_post_types'] ) && is_array( $_POST['SAMAN_SEO_sitemap_post_types'] )
 			? array_map( 'sanitize_text_field', wp_unslash( $_POST['SAMAN_SEO_sitemap_post_types'] ) )
-			: [];
+			: array();
 		update_option( 'SAMAN_SEO_sitemap_post_types', $post_types );
 
 		// Handle taxonomies
 		$taxonomies = isset( $_POST['SAMAN_SEO_sitemap_taxonomies'] ) && is_array( $_POST['SAMAN_SEO_sitemap_taxonomies'] )
 			? array_map( 'sanitize_text_field', wp_unslash( $_POST['SAMAN_SEO_sitemap_taxonomies'] ) )
-			: [];
+			: array();
 		update_option( 'SAMAN_SEO_sitemap_taxonomies', $taxonomies );
 
 		update_option( 'SAMAN_SEO_sitemap_include_author_pages', isset( $_POST['SAMAN_SEO_sitemap_include_author_pages'] ) ? '1' : '0' );
@@ -286,18 +133,18 @@ class Sitemap_Settings {
 		// Handle Google News post types
 		$google_news_post_types = isset( $_POST['SAMAN_SEO_sitemap_google_news_post_types'] ) && is_array( $_POST['SAMAN_SEO_sitemap_google_news_post_types'] )
 			? array_map( 'sanitize_text_field', wp_unslash( $_POST['SAMAN_SEO_sitemap_google_news_post_types'] ) )
-			: [];
+			: array();
 		update_option( 'SAMAN_SEO_sitemap_google_news_post_types', $google_news_post_types );
 
 		// Handle additional pages
-		$additional_pages = [];
+		$additional_pages = array();
 		if ( isset( $_POST['SAMAN_SEO_sitemap_additional_pages'] ) && is_array( $_POST['SAMAN_SEO_sitemap_additional_pages'] ) ) {
 			foreach ( wp_unslash( $_POST['SAMAN_SEO_sitemap_additional_pages'] ) as $page ) {
 				if ( ! empty( $page['url'] ) ) {
-					$additional_pages[] = [
+					$additional_pages[] = array(
 						'url'      => esc_url_raw( $page['url'] ),
 						'priority' => isset( $page['priority'] ) ? floatval( $page['priority'] ) : 0.5,
-					];
+					);
 				}
 			}
 		}
@@ -353,7 +200,7 @@ class Sitemap_Settings {
 
 		$this->regenerate_sitemap();
 
-		wp_send_json_success( [ 'message' => __( 'Sitemap regenerated successfully!', 'saman-seo' ) ] );
+		wp_send_json_success( array( 'message' => __( 'Sitemap regenerated successfully!', 'saman-seo' ) ) );
 	}
 
 	/**
@@ -389,7 +236,7 @@ class Sitemap_Settings {
 	 */
 	public function sanitize_array( $value ) {
 		if ( ! is_array( $value ) ) {
-			return [];
+			return array();
 		}
 
 		return array_map( 'sanitize_text_field', $value );
@@ -403,7 +250,7 @@ class Sitemap_Settings {
 	 * @return string
 	 */
 	public function sanitize_schedule( $value ) {
-		$allowed = [ '', 'hourly', 'twicedaily', 'daily', 'weekly' ];
+		$allowed = array( '', 'hourly', 'twicedaily', 'daily', 'weekly' );
 
 		return in_array( $value, $allowed, true ) ? $value : '';
 	}
@@ -417,20 +264,20 @@ class Sitemap_Settings {
 	 */
 	public function sanitize_additional_pages( $value ) {
 		if ( ! is_array( $value ) ) {
-			return [];
+			return array();
 		}
 
-		$sanitized = [];
+		$sanitized = array();
 
 		foreach ( $value as $page ) {
 			if ( empty( $page['url'] ) ) {
 				continue;
 			}
 
-			$sanitized[] = [
+			$sanitized[] = array(
 				'url'      => esc_url_raw( $page['url'] ),
 				'priority' => floatval( $page['priority'] ?? 0.5 ),
-			];
+			);
 		}
 
 		return $sanitized;

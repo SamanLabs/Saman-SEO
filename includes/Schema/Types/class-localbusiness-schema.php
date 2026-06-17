@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Outputs LocalBusiness structured data with address, contact info,
  * opening hours, geo coordinates, and social profiles based on
  * Local SEO plugin settings. Supports specific business type variants
- * (Restaurant, Dentist, Store, etc.).
+ * (Restaurant, Dentist, Store, etc.) and multiple locations.
  */
 class LocalBusiness_Schema extends Abstract_Schema {
 
@@ -43,49 +43,88 @@ class LocalBusiness_Schema extends Abstract_Schema {
 	/**
 	 * Determine if LocalBusiness schema should be output.
 	 *
-	 * Only outputs on homepage/front_page when business name exists.
-	 * LocalBusiness represents the business entity, not a page,
-	 * so it should appear on the site's main page.
+	 * Only outputs on homepage/front_page when the module is enabled and
+	 * business information exists.
 	 *
 	 * @return bool True if schema should be included.
 	 */
 	public function is_needed(): bool {
-		// Only on homepage.
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'local_seo' ) ) {
+			return false;
+		}
+
 		if ( ! is_front_page() && ! is_home() ) {
 			return false;
 		}
 
-		// Require business name.
-		$business_name = get_option( 'SAMAN_SEO_local_business_name', '' );
-		return ! empty( $business_name );
+		// Single-location mode requires a business name.
+		if ( ! empty( get_option( 'SAMAN_SEO_local_business_name', '' ) ) ) {
+			return true;
+		}
+
+		// Multi-location mode can output using location names.
+		if ( '1' !== get_option( 'SAMAN_SEO_local_enable_locations', '0' ) ) {
+			return false;
+		}
+
+		$locations = get_option( 'SAMAN_SEO_local_locations', array() );
+		if ( empty( $locations ) || ! is_array( $locations ) ) {
+			return false;
+		}
+
+		foreach ( $locations as $location ) {
+			if ( is_array( $location ) && ! empty( $location['name'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
 	 * Generate LocalBusiness schema.
 	 *
-	 * Builds complete LocalBusiness structured data including:
-	 * - Core: @type, @id, name, url
-	 * - Media: logo, image
-	 * - Contact: telephone, email
-	 * - Location: address (PostalAddress), geo (GeoCoordinates)
-	 * - Business: priceRange, openingHoursSpecification
-	 * - Social: sameAs
+	 * Builds one LocalBusiness piece for single-location mode, or a list
+	 * of LocalBusiness pieces when multi-location mode is enabled.
 	 *
-	 * @return array LocalBusiness schema or empty array if no business name.
+	 * @return array Single schema array, or list of schema arrays.
 	 */
 	public function generate(): array {
-		$business_name = get_option( 'SAMAN_SEO_local_business_name', '' );
+		$multi_enabled = '1' === get_option( 'SAMAN_SEO_local_enable_locations', '0' );
+		$locations     = get_option( 'SAMAN_SEO_local_locations', array() );
 
-		if ( empty( $business_name ) ) {
-			return [];
+		if ( $multi_enabled && ! empty( $locations ) && is_array( $locations ) ) {
+			$schemas = array();
+
+			foreach ( $locations as $index => $location ) {
+				if ( ! is_array( $location ) ) {
+					continue;
+				}
+
+				if ( isset( $location['enabled'] ) && '1' !== $location['enabled'] ) {
+					continue;
+				}
+
+				$location_schema = $this->build_location_schema( $location, $index );
+				if ( ! empty( $location_schema ) ) {
+					$schemas[] = $location_schema;
+				}
+			}
+
+			return $schemas;
 		}
 
-		$schema = [
+		$business_name = get_option( 'SAMAN_SEO_local_business_name', '' );
+		if ( empty( $business_name ) ) {
+			return array();
+		}
+
+		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => Schema_IDs::localbusiness(),
 			'name'  => $business_name,
 			'url'   => home_url( '/' ),
-		];
+		);
 
 		// Add optional properties via helper methods.
 		$this->add_logo( $schema );
@@ -99,6 +138,125 @@ class LocalBusiness_Schema extends Abstract_Schema {
 		$this->add_social_profiles( $schema );
 
 		return $schema;
+	}
+
+	/**
+	 * Build a LocalBusiness schema for a single location.
+	 *
+	 * Inherits shared settings (logo, image, price range, opening hours,
+	 * social profiles) and overrides name, address, phone and geo
+	 * coordinates with location-specific values.
+	 *
+	 * @param array $location Location data.
+	 * @param int   $index    Location index for unique @id.
+	 * @return array Empty array if location has no name.
+	 */
+	private function build_location_schema( array $location, int $index ): array {
+		$name = ! empty( $location['name'] ) ? sanitize_text_field( $location['name'] ) : '';
+		if ( empty( $name ) ) {
+			return array();
+		}
+
+		$business_type = ! empty( $location['type'] ) ? sanitize_text_field( $location['type'] ) : $this->get_type();
+		$site_url      = home_url( '/' );
+
+		$schema = array(
+			'@type' => $business_type,
+			'@id'   => $site_url . '#localbusiness-' . $index,
+			'name'  => $name,
+			'url'   => $site_url,
+		);
+
+		// Shared optional properties from primary settings.
+		$this->add_logo( $schema );
+		$this->add_image( $schema );
+		$this->add_price_range( $schema );
+		$this->add_opening_hours( $schema );
+		$this->add_social_profiles( $schema );
+
+		// Location-specific contact details.
+		$phone = ! empty( $location['phone'] ) ? sanitize_text_field( $location['phone'] ) : '';
+		if ( ! empty( $phone ) ) {
+			$schema['telephone'] = $phone;
+		}
+
+		$email = ! empty( $location['email'] ) ? sanitize_email( $location['email'] ) : '';
+		if ( ! empty( $email ) ) {
+			$schema['email'] = $email;
+		}
+
+		$address = $this->build_location_address( $location );
+		if ( ! empty( $address ) ) {
+			$schema['address'] = $address;
+		}
+
+		$geo = $this->build_location_geo( $location );
+		if ( ! empty( $geo ) ) {
+			$schema['geo'] = $geo;
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Build postal address for a location.
+	 *
+	 * @param array $location Location data.
+	 * @return array|null
+	 */
+	private function build_location_address( array $location ): ?array {
+		$street = ! empty( $location['street'] ) ? sanitize_text_field( $location['street'] ) : '';
+		$city   = ! empty( $location['city'] ) ? sanitize_text_field( $location['city'] ) : '';
+
+		// Require at least street and city.
+		if ( empty( $street ) || empty( $city ) ) {
+			return null;
+		}
+
+		$address = array(
+			'@type'           => 'PostalAddress',
+			'streetAddress'   => $street,
+			'addressLocality' => $city,
+		);
+
+		if ( ! empty( $location['state'] ) ) {
+			$address['addressRegion'] = sanitize_text_field( $location['state'] );
+		}
+
+		if ( ! empty( $location['zip'] ) ) {
+			$address['postalCode'] = sanitize_text_field( $location['zip'] );
+		}
+
+		if ( ! empty( $location['country'] ) ) {
+			$address['addressCountry'] = sanitize_text_field( $location['country'] );
+		}
+
+		return $address;
+	}
+
+	/**
+	 * Build geo coordinates for a location.
+	 *
+	 * @param array $location Location data.
+	 * @return array|null
+	 */
+	private function build_location_geo( array $location ): ?array {
+		$latitude  = $location['latitude'] ?? '';
+		$longitude = $location['longitude'] ?? '';
+
+		if ( empty( $latitude ) || empty( $longitude ) ) {
+			return null;
+		}
+
+		if ( ! is_numeric( $latitude ) || ! is_numeric( $longitude ) ) {
+			return null;
+		}
+
+		return array(
+			'@type'     => 'GeoCoordinates',
+			'latitude'  => (float) $latitude,
+			'longitude' => (float) $longitude,
+		);
 	}
 
 	/**
@@ -183,11 +341,11 @@ class LocalBusiness_Schema extends Abstract_Schema {
 			return;
 		}
 
-		$address = [
+		$address = array(
 			'@type'           => 'PostalAddress',
 			'streetAddress'   => $street,
 			'addressLocality' => $city,
-		];
+		);
 
 		$state = get_option( 'SAMAN_SEO_local_state', '' );
 		if ( ! empty( $state ) ) {
@@ -223,11 +381,11 @@ class LocalBusiness_Schema extends Abstract_Schema {
 			return;
 		}
 
-		$schema['geo'] = [
+		$schema['geo'] = array(
 			'@type'     => 'GeoCoordinates',
 			'latitude'  => (float) $latitude,
 			'longitude' => (float) $longitude,
-		];
+		);
 	}
 
 	/**
@@ -240,13 +398,13 @@ class LocalBusiness_Schema extends Abstract_Schema {
 	 * @param array $schema Schema array by reference.
 	 */
 	private function add_opening_hours( array &$schema ): void {
-		$hours = get_option( 'SAMAN_SEO_local_opening_hours', [] );
+		$hours = get_option( 'SAMAN_SEO_local_opening_hours', array() );
 
 		if ( empty( $hours ) || ! is_array( $hours ) ) {
 			return;
 		}
 
-		$day_map = [
+		$day_map = array(
 			'monday'    => 'Monday',
 			'tuesday'   => 'Tuesday',
 			'wednesday' => 'Wednesday',
@@ -254,9 +412,9 @@ class LocalBusiness_Schema extends Abstract_Schema {
 			'friday'    => 'Friday',
 			'saturday'  => 'Saturday',
 			'sunday'    => 'Sunday',
-		];
+		);
 
-		$grouped_hours = [];
+		$grouped_hours = array();
 
 		// Group days with same hours.
 		foreach ( $hours as $day => $data ) {
@@ -274,11 +432,11 @@ class LocalBusiness_Schema extends Abstract_Schema {
 			$key = $open . '-' . $close;
 
 			if ( ! isset( $grouped_hours[ $key ] ) ) {
-				$grouped_hours[ $key ] = [
-					'days'   => [],
+				$grouped_hours[ $key ] = array(
+					'days'   => array(),
 					'opens'  => $open,
 					'closes' => $close,
-				];
+				);
 			}
 
 			if ( isset( $day_map[ $day ] ) ) {
@@ -287,14 +445,14 @@ class LocalBusiness_Schema extends Abstract_Schema {
 		}
 
 		// Build specifications.
-		$specifications = [];
+		$specifications = array();
 		foreach ( $grouped_hours as $group ) {
-			$specifications[] = [
+			$specifications[] = array(
 				'@type'     => 'OpeningHoursSpecification',
 				'dayOfWeek' => count( $group['days'] ) === 1 ? $group['days'][0] : $group['days'],
 				'opens'     => $group['opens'],
 				'closes'    => $group['closes'],
-			];
+			);
 		}
 
 		if ( ! empty( $specifications ) ) {
@@ -310,7 +468,7 @@ class LocalBusiness_Schema extends Abstract_Schema {
 	 * @param array $schema Schema array by reference.
 	 */
 	private function add_social_profiles( array &$schema ): void {
-		$profiles = get_option( 'SAMAN_SEO_local_social_profiles', [] );
+		$profiles = get_option( 'SAMAN_SEO_local_social_profiles', array() );
 
 		if ( ! empty( $profiles ) && is_array( $profiles ) ) {
 			$filtered = array_values( array_filter( $profiles ) );

@@ -31,13 +31,32 @@ class Twiglet {
     }
 
     public function render_string(string $template, array $vars = []): string {
-        return preg_replace_callback(
+        // Curly-brace tokens: {{ var }} or {{ var | filter }}.
+        $template = preg_replace_callback(
             '/{{\s*(.*?)\s*}}/',
             function ($matches) use ($vars) {
                 return $this->evaluate_expression($matches[1], $vars);
             },
             $template
         );
+
+        // Legacy percent tokens: %var% — kept for backwards compatibility
+        // with templates the sanitizer allowlist (and older onboarding
+        // wizards) accept. No filter-chain support here; this is a plain
+        // name→value substitution. The regex only matches identifier-shaped
+        // names between two percent signs, so natural text like "50% off"
+        // is left untouched. Unknown variables resolve to '' to match the
+        // {{ var }} behaviour above and prevent literal `%var%` leaking
+        // into rendered output.
+        $template = preg_replace_callback(
+            '/%([a-zA-Z_][a-zA-Z0-9_]*)%/',
+            function ($matches) use ($vars) {
+                return $this->stringify($this->resolve_variable($matches[1], $vars));
+            },
+            $template
+        );
+
+        return $template;
     }
 
     public function add_filter(string $name, callable $callback, string $description = ''): void {

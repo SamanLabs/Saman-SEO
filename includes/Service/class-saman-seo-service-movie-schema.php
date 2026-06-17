@@ -20,7 +20,7 @@ class Movie_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_movie_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_movie_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -31,7 +31,7 @@ class Movie_Schema {
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_movie_schema_to_graph( $graph, $post ) {
-		
+
 		if ( ! $post || 'movie' !== get_post_type( $post ) ) {
 			return $graph;
 		}
@@ -52,23 +52,23 @@ class Movie_Schema {
 	 * @return array|null
 	 */
 	private function build_schema( $post ) {
-		$movie_name = get_the_title( $post );
+		$movie_name    = get_the_title( $post );
 		$director_name = 'Example Director';
 
 		if ( empty( $movie_name ) ) {
 			return null;
 		}
 
-		$schema = [
+		$schema = array(
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Movie',
 			'name'        => $movie_name,
-			'director'    => [
+			'director'    => array(
 				'@type' => 'Person',
 				'name'  => $director_name,
-			],
+			),
 			'dateCreated' => get_the_date( 'c', $post ),
-		];
+		);
 
 		return $schema;
 	}

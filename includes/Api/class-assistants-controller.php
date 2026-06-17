@@ -234,8 +234,10 @@ class Assistants_Controller extends REST_Controller {
 		// Track usage locally.
 		$this->track_usage( $assistant_id );
 
+		$message = $response['content'] ?? $response['message'] ?? $response;
+
 		return $this->success( [
-			'message' => $response['content'] ?? $response['message'] ?? $response,
+			'message' => $this->sanitize_assistant_output( $message ),
 			'actions' => [],
 		] );
 	}
@@ -282,8 +284,10 @@ class Assistants_Controller extends REST_Controller {
 		// Track usage.
 		$this->track_usage( $assistant_id );
 
+		$message = $response['content'] ?? $response;
+
 		return $this->success( [
-			'message' => $response['content'] ?? $response,
+			'message' => $this->sanitize_assistant_output( $message ),
 			'actions' => [],
 		] );
 	}
@@ -580,6 +584,25 @@ class Assistants_Controller extends REST_Controller {
 	// =========================================================================
 	// HELPER METHODS
 	// =========================================================================
+
+	/**
+	 * Sanitize assistant output before sending to the client.
+	 *
+	 * @param string $message Raw assistant message.
+	 * @return string
+	 */
+	private function sanitize_assistant_output( $message ) {
+		$message = (string) $message;
+
+		// Run through wp_kses_post to strip dangerous tags and attributes.
+		$message = wp_kses_post( $message );
+
+		// Strip event handlers and javascript: URLs that may have survived.
+		$message = preg_replace( '/\s*on\w+\s*=\s*(["\']?).*?\1/iu', '', $message );
+		$message = preg_replace( '/javascript\s*:/iu', '', $message );
+
+		return $message;
+	}
 
 	/**
 	 * Get custom assistants list.

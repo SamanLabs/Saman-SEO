@@ -94,14 +94,25 @@ jobs:
           echo "Updated plugin to version $VERSION"
           grep -E "(Version:|SAMAN_SEO_VERSION)" saman-seo.php | head -2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer
+
+      - name: Install Composer dependencies (no dev)
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies and build
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Create plugin zip
@@ -115,9 +126,11 @@ jobs:
           cp -r build saman-seo/
           cp -r includes saman-seo/
           cp -r languages saman-seo/ 2>/dev/null || mkdir -p saman-seo/languages
+          cp -r vendor saman-seo/
           cp saman-seo.php saman-seo/
           cp readme.txt saman-seo/ 2>/dev/null || true
           cp LICENSE saman-seo/ 2>/dev/null || true
+          cp composer.json saman-seo/ 2>/dev/null || true
 
           # Remove source/dev files from assets (LESS sources)
           rm -rf saman-seo/assets/less 2>/dev/null || true

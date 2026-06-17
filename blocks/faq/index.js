@@ -13,7 +13,7 @@
 	const { PanelBody, ToggleControl, Button, TextControl } = components;
 	const { __ } = i18n;
 
-	registerBlockType( 'samanseo/faq', {
+	registerBlockType( 'saman-seo/faq', {
 		title: __( 'FAQ', 'saman-seo' ),
 		description: __( 'Add frequently asked questions with automatic schema markup for rich results.', 'saman-seo' ),
 		category: 'widgets',

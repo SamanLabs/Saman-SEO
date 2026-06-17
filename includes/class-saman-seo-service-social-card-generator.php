@@ -19,7 +19,7 @@ class Social_Card_Generator {
 	 *
 	 * @var array
 	 */
-	private $current_design = [];
+	private $current_design = array();
 
 	/**
 	 * Boot hooks.
@@ -37,7 +37,7 @@ class Social_Card_Generator {
 			return;
 		}
 
-		add_action( 'template_redirect', [ $this, 'maybe_render_card' ] );
+		add_action( 'template_redirect', array( $this, 'maybe_render_card' ) );
 	}
 
 	/**
@@ -55,8 +55,8 @@ class Social_Card_Generator {
 			exit;
 		}
 
-		$title = sanitize_text_field( wp_unslash( $_GET['title'] ?? get_bloginfo( 'name' ) ) );
-		$width = (int) get_option( 'SAMAN_SEO_default_social_width', 1200 );
+		$title  = sanitize_text_field( wp_unslash( $_GET['title'] ?? get_bloginfo( 'name' ) ) );
+		$width  = (int) get_option( 'SAMAN_SEO_default_social_width', 1200 );
 		$height = (int) get_option( 'SAMAN_SEO_default_social_height', 630 );
 
 		// Ensure width and height are valid
@@ -68,12 +68,12 @@ class Social_Card_Generator {
 		}
 
 		// Load design settings
-		$design_settings = get_option( 'SAMAN_SEO_social_card_design', [] );
+		$design_settings = get_option( 'SAMAN_SEO_social_card_design', array() );
 		if ( ! is_array( $design_settings ) ) {
-			$design_settings = [];
+			$design_settings = array();
 		}
 
-		$design_defaults = [
+		$design_defaults = array(
 			'background_color' => '#1a1a36',
 			'accent_color'     => '#5a84ff',
 			'text_color'       => '#ffffff',
@@ -84,9 +84,9 @@ class Social_Card_Generator {
 			'logo_position'    => 'bottom-left',
 			'logo_size'        => 48,
 			'layout'           => 'default',
-		];
+		);
 
-		$design = wp_parse_args( $design_settings, $design_defaults );
+		$design               = wp_parse_args( $design_settings, $design_defaults );
 		$this->current_design = $design;
 
 		// Convert hex colors to RGB
@@ -95,10 +95,10 @@ class Social_Card_Generator {
 		$text_rgb   = $this->hex_to_rgb( $design['text_color'] );
 
 		// Create image
-		$img = imagecreatetruecolor( $width, $height );
-		$bg  = imagecolorallocate( $img, $bg_rgb[0], $bg_rgb[1], $bg_rgb[2] );
+		$img    = imagecreatetruecolor( $width, $height );
+		$bg     = imagecolorallocate( $img, $bg_rgb[0], $bg_rgb[1], $bg_rgb[2] );
 		$accent = imagecolorallocate( $img, $accent_rgb[0], $accent_rgb[1], $accent_rgb[2] );
-		$text = imagecolorallocate( $img, $text_rgb[0], $text_rgb[1], $text_rgb[2] );
+		$text   = imagecolorallocate( $img, $text_rgb[0], $text_rgb[1], $text_rgb[2] );
 
 		// Render layout
 		$this->render_layout( $img, $design['layout'], $width, $height, $title, $bg, $accent, $text );
@@ -126,11 +126,11 @@ class Social_Card_Generator {
 		if ( strlen( $hex ) === 3 ) {
 			$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
 		}
-		return [
+		return array(
 			hexdec( substr( $hex, 0, 2 ) ),
 			hexdec( substr( $hex, 2, 2 ) ),
 			hexdec( substr( $hex, 4, 2 ) ),
-		];
+		);
 	}
 
 	/**
@@ -300,11 +300,11 @@ class Social_Card_Generator {
 	 */
 	private function render_corner_layout( $img, $width, $height, $title, $accent, $text ) {
 		// Top-left corner accent (triangle)
-		$points_tl = [ 0, 0, 150, 0, 0, 150 ];
+		$points_tl = array( 0, 0, 150, 0, 0, 150 );
 		imagefilledpolygon( $img, $points_tl, 3, $accent );
 
 		// Bottom-right corner accent (triangle, semi-transparent effect via smaller size)
-		$points_br = [ $width, $height, $width - 200, $height, $width, $height - 200 ];
+		$points_br = array( $width, $height, $width - 200, $height, $width, $height - 200 );
 		imagefilledpolygon( $img, $points_br, 3, $accent );
 
 		// Title and site name

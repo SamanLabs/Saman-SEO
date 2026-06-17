@@ -11,6 +11,8 @@
  * @license GNU/GPL http://www.gnu.org/copyleft/gpl.html
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Detect Web Browsers
  */

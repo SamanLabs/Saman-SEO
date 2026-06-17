@@ -9,7 +9,7 @@
 namespace Saman\SEO\Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -17,447 +17,482 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Sitemap_Controller extends REST_Controller {
 
-    /**
-     * Sitemap setting keys.
-     *
-     * @var array
-     */
-    private $sitemap_settings = [
-        'SAMAN_SEO_sitemap_enabled',
-        'SAMAN_SEO_sitemap_max_urls',
-        'SAMAN_SEO_sitemap_enable_index',
-        'SAMAN_SEO_sitemap_dynamic_generation',
-        'SAMAN_SEO_sitemap_schedule_updates',
-        'SAMAN_SEO_sitemap_post_types',
-        'SAMAN_SEO_sitemap_taxonomies',
-        'SAMAN_SEO_sitemap_include_author_pages',
-        'SAMAN_SEO_sitemap_include_date_archives',
-        'SAMAN_SEO_sitemap_exclude_images',
-        'SAMAN_SEO_sitemap_enable_rss',
-        'SAMAN_SEO_sitemap_enable_google_news',
-        'SAMAN_SEO_sitemap_google_news_name',
-        'SAMAN_SEO_sitemap_google_news_post_types',
-        'SAMAN_SEO_sitemap_additional_pages',
-    ];
+	/**
+	 * Sitemap setting keys.
+	 *
+	 * @var array
+	 */
+	private $sitemap_settings = array(
+		'SAMAN_SEO_sitemap_enabled',
+		'SAMAN_SEO_sitemap_max_urls',
+		'SAMAN_SEO_sitemap_enable_index',
+		'SAMAN_SEO_sitemap_dynamic_generation',
+		'SAMAN_SEO_sitemap_schedule_updates',
+		'SAMAN_SEO_sitemap_post_types',
+		'SAMAN_SEO_sitemap_taxonomies',
+		'SAMAN_SEO_sitemap_include_author_pages',
+		'SAMAN_SEO_sitemap_include_date_archives',
+		'SAMAN_SEO_sitemap_exclude_images',
+		'SAMAN_SEO_sitemap_enable_rss',
+		'SAMAN_SEO_sitemap_enable_google_news',
+		'SAMAN_SEO_sitemap_google_news_name',
+		'SAMAN_SEO_sitemap_google_news_post_types',
+		'SAMAN_SEO_sitemap_additional_pages',
+	);
 
-    /**
-     * LLM.txt setting keys.
-     *
-     * @var array
-     */
-    private $llm_settings = [
-        'SAMAN_SEO_enable_llm_txt',
-        'SAMAN_SEO_llm_txt_title',
-        'SAMAN_SEO_llm_txt_description',
-        'SAMAN_SEO_llm_txt_posts_per_type',
-        'SAMAN_SEO_llm_txt_include_excerpt',
-    ];
+	/**
+	 * LLM.txt setting keys.
+	 *
+	 * @var array
+	 */
+	private $llm_settings = array(
+		'SAMAN_SEO_enable_llm_txt',
+		'SAMAN_SEO_llm_txt_title',
+		'SAMAN_SEO_llm_txt_description',
+		'SAMAN_SEO_llm_txt_posts_per_type',
+		'SAMAN_SEO_llm_txt_include_excerpt',
+	);
 
-    /**
-     * Register routes.
-     */
-    public function register_routes() {
-        // Get all sitemap settings
-        register_rest_route( $this->namespace, '/sitemap/settings', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_settings' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'update_settings' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+	/**
+	 * Register routes.
+	 */
+	public function register_routes() {
+		// Get all sitemap settings
+		register_rest_route(
+			$this->namespace,
+			'/sitemap/settings',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'update_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Get available post types
-        register_rest_route( $this->namespace, '/sitemap/post-types', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_post_types' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Get available post types
+		register_rest_route(
+			$this->namespace,
+			'/sitemap/post-types',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_post_types' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Get available taxonomies
-        register_rest_route( $this->namespace, '/sitemap/taxonomies', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_taxonomies' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Get available taxonomies
+		register_rest_route(
+			$this->namespace,
+			'/sitemap/taxonomies',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_taxonomies' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Regenerate sitemap
-        register_rest_route( $this->namespace, '/sitemap/regenerate', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'regenerate_sitemap' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Regenerate sitemap
+		register_rest_route(
+			$this->namespace,
+			'/sitemap/regenerate',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'regenerate_sitemap' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // Get sitemap stats
-        register_rest_route( $this->namespace, '/sitemap/stats', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_stats' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
+		// Get sitemap stats
+		register_rest_route(
+			$this->namespace,
+			'/sitemap/stats',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_stats' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 
-        // LLM.txt settings
-        register_rest_route( $this->namespace, '/sitemap/llm-settings', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_llm_settings' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ $this, 'update_llm_settings' ],
-                'permission_callback' => [ $this, 'permission_check' ],
-            ],
-        ] );
-    }
+		// LLM.txt settings
+		register_rest_route(
+			$this->namespace,
+			'/sitemap/llm-settings',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_llm_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'update_llm_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
+	}
 
-    /**
-     * Get all sitemap settings.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_settings( $request ) {
-        $settings = [];
+	/**
+	 * Get all sitemap settings.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_settings( $request ) {
+		$settings = array();
 
-        foreach ( $this->sitemap_settings as $key ) {
-            $short_key = str_replace( 'SAMAN_SEO_sitemap_', '', $key );
-            $value = get_option( $key );
+		foreach ( $this->sitemap_settings as $key ) {
+			$short_key = str_replace( 'SAMAN_SEO_sitemap_', '', $key );
+			$value     = get_option( $key );
 
-            // Handle defaults
-            if ( false === $value ) {
-                $value = $this->get_default_value( $key );
-            }
+			// Handle defaults
+			if ( false === $value ) {
+				$value = $this->get_default_value( $key );
+			}
 
-            $settings[ $short_key ] = $value;
-        }
+			$settings[ $short_key ] = $value;
+		}
 
-        // Add site URL for sitemap links
-        $settings['site_url'] = home_url();
-        $settings['sitemap_url'] = home_url( '/sitemap_index.xml' );
-        $settings['rss_sitemap_url'] = home_url( '/sitemap-rss.xml' );
-        $settings['news_sitemap_url'] = home_url( '/sitemap-news.xml' );
+		// Add site URL for sitemap links
+		$settings['site_url']         = home_url();
+		$settings['sitemap_url']      = home_url( '/sitemap_index.xml' );
+		$settings['rss_sitemap_url']  = home_url( '/sitemap-rss.xml' );
+		$settings['news_sitemap_url'] = home_url( '/sitemap-news.xml' );
 
-        return $this->success( $settings );
-    }
+		return $this->success( $settings );
+	}
 
-    /**
-     * Update sitemap settings.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function update_settings( $request ) {
-        $params = $request->get_json_params();
+	/**
+	 * Update sitemap settings.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function update_settings( $request ) {
+		$params = $request->get_json_params();
 
-        if ( empty( $params ) ) {
-            $params = $request->get_params();
-        }
+		if ( empty( $params ) ) {
+			$params = $request->get_params();
+		}
 
-        foreach ( $params as $key => $value ) {
-            $option_key = 'SAMAN_SEO_sitemap_' . $key;
+		foreach ( $params as $key => $value ) {
+			$option_key = 'SAMAN_SEO_sitemap_' . $key;
 
-            if ( in_array( $option_key, $this->sitemap_settings, true ) ) {
-                // Sanitize based on type
-                if ( is_array( $value ) ) {
-                    $value = array_map( 'sanitize_text_field', $value );
-                } elseif ( is_numeric( $value ) ) {
-                    $value = absint( $value );
-                } else {
-                    $value = sanitize_text_field( $value );
-                }
+			if ( in_array( $option_key, $this->sitemap_settings, true ) ) {
+				// Sanitize based on type
+				if ( is_array( $value ) ) {
+					$value = array_map( 'sanitize_text_field', $value );
+				} elseif ( is_numeric( $value ) ) {
+					$value = absint( $value );
+				} else {
+					$value = sanitize_text_field( $value );
+				}
 
-                update_option( $option_key, $value );
-            }
-        }
+				update_option( $option_key, $value );
+			}
+		}
 
-        // Clear any sitemap caches
-        delete_transient( 'SAMAN_SEO_sitemap_stats' );
+		// Clear any sitemap caches
+		delete_transient( 'SAMAN_SEO_sitemap_stats' );
 
-        return $this->success( null, __( 'Settings saved successfully.', 'saman-seo' ) );
-    }
+		return $this->success( null, __( 'Settings saved successfully.', 'saman-seo' ) );
+	}
 
-    /**
-     * Get available post types.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_post_types( $request ) {
-        $post_types = get_post_types( [
-            'public' => true,
-        ], 'objects' );
+	/**
+	 * Get available post types.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_post_types( $request ) {
+		$post_types = get_post_types(
+			array(
+				'public' => true,
+			),
+			'objects'
+		);
 
-        $data = [];
-        foreach ( $post_types as $post_type ) {
-            if ( 'attachment' === $post_type->name ) {
-                continue;
-            }
+		$data = array();
+		foreach ( $post_types as $post_type ) {
+			if ( 'attachment' === $post_type->name ) {
+				continue;
+			}
 
-            $count = wp_count_posts( $post_type->name );
-            $published = isset( $count->publish ) ? (int) $count->publish : 0;
+			$count     = wp_count_posts( $post_type->name );
+			$published = isset( $count->publish ) ? (int) $count->publish : 0;
 
-            $data[] = [
-                'name'      => $post_type->name,
-                'label'     => $post_type->label,
-                'count'     => $published,
-            ];
-        }
+			$data[] = array(
+				'name'  => $post_type->name,
+				'label' => $post_type->label,
+				'count' => $published,
+			);
+		}
 
-        return $this->success( $data );
-    }
+		return $this->success( $data );
+	}
 
-    /**
-     * Get available taxonomies.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_taxonomies( $request ) {
-        $taxonomies = get_taxonomies( [
-            'public' => true,
-        ], 'objects' );
+	/**
+	 * Get available taxonomies.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_taxonomies( $request ) {
+		$taxonomies = get_taxonomies(
+			array(
+				'public' => true,
+			),
+			'objects'
+		);
 
-        $data = [];
-        foreach ( $taxonomies as $taxonomy ) {
-            if ( 'post_format' === $taxonomy->name ) {
-                continue;
-            }
+		$data = array();
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( 'post_format' === $taxonomy->name ) {
+				continue;
+			}
 
-            $count = wp_count_terms( $taxonomy->name );
-            if ( is_wp_error( $count ) ) {
-                $count = 0;
-            }
+			$count = wp_count_terms( $taxonomy->name );
+			if ( is_wp_error( $count ) ) {
+				$count = 0;
+			}
 
-            $data[] = [
-                'name'  => $taxonomy->name,
-                'label' => $taxonomy->label,
-                'count' => (int) $count,
-            ];
-        }
+			$data[] = array(
+				'name'  => $taxonomy->name,
+				'label' => $taxonomy->label,
+				'count' => (int) $count,
+			);
+		}
 
-        return $this->success( $data );
-    }
+		return $this->success( $data );
+	}
 
-    /**
-     * Regenerate sitemap.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function regenerate_sitemap( $request ) {
-        // Clear sitemap caches
-        delete_transient( 'SAMAN_SEO_sitemap_stats' );
+	/**
+	 * Regenerate sitemap.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function regenerate_sitemap( $request ) {
+		// Clear sitemap caches
+		delete_transient( 'SAMAN_SEO_sitemap_stats' );
 
-        // Flush rewrite rules to ensure sitemap URLs work
-        flush_rewrite_rules();
+		// Flush rewrite rules to ensure sitemap URLs work
+		flush_rewrite_rules();
 
-        // Update last regenerated timestamp
-        update_option( 'SAMAN_SEO_sitemap_last_regenerated', current_time( 'mysql' ) );
+		// Update last regenerated timestamp
+		update_option( 'SAMAN_SEO_sitemap_last_regenerated', current_time( 'mysql' ) );
 
-        return $this->success( [
-            'regenerated_at' => current_time( 'mysql' ),
-        ], __( 'Sitemap regenerated successfully.', 'saman-seo' ) );
-    }
+		return $this->success(
+			array(
+				'regenerated_at' => current_time( 'mysql' ),
+			),
+			__( 'Sitemap regenerated successfully.', 'saman-seo' )
+		);
+	}
 
-    /**
-     * Get sitemap statistics.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_stats( $request ) {
-        // Try to get cached stats
-        $stats = get_transient( 'SAMAN_SEO_sitemap_stats' );
+	/**
+	 * Get sitemap statistics.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_stats( $request ) {
+		// Try to get cached stats
+		$stats = get_transient( 'SAMAN_SEO_sitemap_stats' );
 
-        if ( false === $stats ) {
-            $stats = $this->calculate_sitemap_stats();
-            set_transient( 'SAMAN_SEO_sitemap_stats', $stats, HOUR_IN_SECONDS );
-        }
+		if ( false === $stats ) {
+			$stats = $this->calculate_sitemap_stats();
+			set_transient( 'SAMAN_SEO_sitemap_stats', $stats, HOUR_IN_SECONDS );
+		}
 
-        $last_regenerated = get_option( 'SAMAN_SEO_sitemap_last_regenerated' );
+		$last_regenerated = get_option( 'SAMAN_SEO_sitemap_last_regenerated' );
 
-        return $this->success( [
-            'total_urls'       => $stats['total_urls'],
-            'post_count'       => $stats['post_count'],
-            'page_count'       => $stats['page_count'],
-            'taxonomy_count'   => $stats['taxonomy_count'],
-            'last_regenerated' => $last_regenerated ? $last_regenerated : null,
-        ] );
-    }
+		return $this->success(
+			array(
+				'total_urls'       => $stats['total_urls'],
+				'post_count'       => $stats['post_count'],
+				'page_count'       => $stats['page_count'],
+				'taxonomy_count'   => $stats['taxonomy_count'],
+				'last_regenerated' => $last_regenerated ? $last_regenerated : null,
+			)
+		);
+	}
 
-    /**
-     * Get LLM.txt settings.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function get_llm_settings( $request ) {
-        $settings = [];
+	/**
+	 * Get LLM.txt settings.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function get_llm_settings( $request ) {
+		$settings = array();
 
-        foreach ( $this->llm_settings as $key ) {
-            $short_key = str_replace( 'SAMAN_SEO_', '', $key );
-            $value = get_option( $key );
+		foreach ( $this->llm_settings as $key ) {
+			$short_key = str_replace( 'SAMAN_SEO_', '', $key );
+			$value     = get_option( $key );
 
-            // Handle defaults
-            if ( false === $value ) {
-                $value = $this->get_llm_default_value( $key );
-            }
+			// Handle defaults
+			if ( false === $value ) {
+				$value = $this->get_llm_default_value( $key );
+			}
 
-            $settings[ $short_key ] = $value;
-        }
+			$settings[ $short_key ] = $value;
+		}
 
-        // Add LLM.txt URL
-        $settings['llm_txt_url'] = home_url( '/llm.txt' );
+		// Add LLM.txt URL
+		$settings['llm_txt_url'] = home_url( '/llm.txt' );
 
-        return $this->success( $settings );
-    }
+		return $this->success( $settings );
+	}
 
-    /**
-     * Update LLM.txt settings.
-     *
-     * @param \WP_REST_Request $request Request object.
-     * @return \WP_REST_Response
-     */
-    public function update_llm_settings( $request ) {
-        $params = $request->get_json_params();
+	/**
+	 * Update LLM.txt settings.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function update_llm_settings( $request ) {
+		$params = $request->get_json_params();
 
-        if ( empty( $params ) ) {
-            $params = $request->get_params();
-        }
+		if ( empty( $params ) ) {
+			$params = $request->get_params();
+		}
 
-        foreach ( $params as $key => $value ) {
-            $option_key = 'SAMAN_SEO_' . $key;
+		foreach ( $params as $key => $value ) {
+			$option_key = 'SAMAN_SEO_' . $key;
 
-            if ( in_array( $option_key, $this->llm_settings, true ) ) {
-                // Sanitize based on type
-                if ( is_numeric( $value ) ) {
-                    $value = absint( $value );
-                } elseif ( 'llm_txt_description' === $key ) {
-                    $value = sanitize_textarea_field( $value );
-                } else {
-                    $value = sanitize_text_field( $value );
-                }
+			if ( in_array( $option_key, $this->llm_settings, true ) ) {
+				// Sanitize based on type
+				if ( is_numeric( $value ) ) {
+					$value = absint( $value );
+				} elseif ( 'llm_txt_description' === $key ) {
+					$value = sanitize_textarea_field( $value );
+				} else {
+					$value = sanitize_text_field( $value );
+				}
 
-                update_option( $option_key, $value );
-            }
-        }
+				update_option( $option_key, $value );
+			}
+		}
 
-        return $this->success( null, __( 'LLM.txt settings saved successfully.', 'saman-seo' ) );
-    }
+		return $this->success( null, __( 'LLM.txt settings saved successfully.', 'saman-seo' ) );
+	}
 
-    /**
-     * Calculate sitemap statistics.
-     *
-     * @return array
-     */
-    private function calculate_sitemap_stats() {
-        $selected_post_types = get_option( 'SAMAN_SEO_sitemap_post_types', [] );
-        $selected_taxonomies = get_option( 'SAMAN_SEO_sitemap_taxonomies', [] );
+	/**
+	 * Calculate sitemap statistics.
+	 *
+	 * @return array
+	 */
+	private function calculate_sitemap_stats() {
+		$selected_post_types = get_option( 'SAMAN_SEO_sitemap_post_types', array() );
+		$selected_taxonomies = get_option( 'SAMAN_SEO_sitemap_taxonomies', array() );
 
-        if ( ! is_array( $selected_post_types ) ) {
-            $selected_post_types = [];
-        }
+		if ( ! is_array( $selected_post_types ) ) {
+			$selected_post_types = array();
+		}
 
-        if ( ! is_array( $selected_taxonomies ) ) {
-            $selected_taxonomies = [];
-        }
+		if ( ! is_array( $selected_taxonomies ) ) {
+			$selected_taxonomies = array();
+		}
 
-        $total_urls = 0;
-        $post_count = 0;
-        $page_count = 0;
-        $taxonomy_count = 0;
+		$total_urls     = 0;
+		$post_count     = 0;
+		$page_count     = 0;
+		$taxonomy_count = 0;
 
-        // Count posts
-        foreach ( $selected_post_types as $post_type ) {
-            $count = wp_count_posts( $post_type );
-            $published = isset( $count->publish ) ? (int) $count->publish : 0;
-            $total_urls += $published;
+		// Count posts
+		foreach ( $selected_post_types as $post_type ) {
+			$count       = wp_count_posts( $post_type );
+			$published   = isset( $count->publish ) ? (int) $count->publish : 0;
+			$total_urls += $published;
 
-            if ( 'post' === $post_type ) {
-                $post_count = $published;
-            } elseif ( 'page' === $post_type ) {
-                $page_count = $published;
-            }
-        }
+			if ( 'post' === $post_type ) {
+				$post_count = $published;
+			} elseif ( 'page' === $post_type ) {
+				$page_count = $published;
+			}
+		}
 
-        // Count taxonomy terms
-        foreach ( $selected_taxonomies as $taxonomy ) {
-            $count = wp_count_terms( $taxonomy );
-            if ( ! is_wp_error( $count ) ) {
-                $total_urls += (int) $count;
-                $taxonomy_count += (int) $count;
-            }
-        }
+		// Count taxonomy terms
+		foreach ( $selected_taxonomies as $taxonomy ) {
+			$count = wp_count_terms( $taxonomy );
+			if ( ! is_wp_error( $count ) ) {
+				$total_urls     += (int) $count;
+				$taxonomy_count += (int) $count;
+			}
+		}
 
-        // Add author pages if enabled
-        if ( '1' === get_option( 'SAMAN_SEO_sitemap_include_author_pages', '0' ) ) {
-            $authors = count_users();
-            $total_urls += isset( $authors['total_users'] ) ? $authors['total_users'] : 0;
-        }
+		// Add author pages if enabled
+		if ( '1' === get_option( 'SAMAN_SEO_sitemap_include_author_pages', '0' ) ) {
+			$authors     = count_users();
+			$total_urls += isset( $authors['total_users'] ) ? $authors['total_users'] : 0;
+		}
 
-        return [
-            'total_urls'     => $total_urls,
-            'post_count'     => $post_count,
-            'page_count'     => $page_count,
-            'taxonomy_count' => $taxonomy_count,
-        ];
-    }
+		return array(
+			'total_urls'     => $total_urls,
+			'post_count'     => $post_count,
+			'page_count'     => $page_count,
+			'taxonomy_count' => $taxonomy_count,
+		);
+	}
 
-    /**
-     * Get default value for sitemap setting.
-     *
-     * @param string $key Setting key.
-     * @return mixed
-     */
-    private function get_default_value( $key ) {
-        $defaults = [
-            'SAMAN_SEO_sitemap_enabled'                => '1',
-            'SAMAN_SEO_sitemap_max_urls'               => 1000,
-            'SAMAN_SEO_sitemap_enable_index'           => '1',
-            'SAMAN_SEO_sitemap_dynamic_generation'     => '1',
-            'SAMAN_SEO_sitemap_schedule_updates'       => '',
-            'SAMAN_SEO_sitemap_post_types'             => [ 'post', 'page' ],
-            'SAMAN_SEO_sitemap_taxonomies'             => [ 'category' ],
-            'SAMAN_SEO_sitemap_include_author_pages'   => '0',
-            'SAMAN_SEO_sitemap_include_date_archives'  => '0',
-            'SAMAN_SEO_sitemap_exclude_images'         => '0',
-            'SAMAN_SEO_sitemap_enable_rss'             => '0',
-            'SAMAN_SEO_sitemap_enable_google_news'     => '0',
-            'SAMAN_SEO_sitemap_google_news_name'       => get_bloginfo( 'name' ),
-            'SAMAN_SEO_sitemap_google_news_post_types' => [],
-            'SAMAN_SEO_sitemap_additional_pages'       => [],
-        ];
+	/**
+	 * Get default value for sitemap setting.
+	 *
+	 * @param string $key Setting key.
+	 * @return mixed
+	 */
+	private function get_default_value( $key ) {
+		$defaults = array(
+			'SAMAN_SEO_sitemap_enabled'                => '1',
+			'SAMAN_SEO_sitemap_max_urls'               => 1000,
+			'SAMAN_SEO_sitemap_enable_index'           => '1',
+			'SAMAN_SEO_sitemap_dynamic_generation'     => '1',
+			'SAMAN_SEO_sitemap_schedule_updates'       => '',
+			'SAMAN_SEO_sitemap_post_types'             => array( 'post', 'page' ),
+			'SAMAN_SEO_sitemap_taxonomies'             => array( 'category' ),
+			'SAMAN_SEO_sitemap_include_author_pages'   => '0',
+			'SAMAN_SEO_sitemap_include_date_archives'  => '0',
+			'SAMAN_SEO_sitemap_exclude_images'         => '0',
+			'SAMAN_SEO_sitemap_enable_rss'             => '0',
+			'SAMAN_SEO_sitemap_enable_google_news'     => '0',
+			'SAMAN_SEO_sitemap_google_news_name'       => get_bloginfo( 'name' ),
+			'SAMAN_SEO_sitemap_google_news_post_types' => array(),
+			'SAMAN_SEO_sitemap_additional_pages'       => array(),
+		);
 
-        return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
-    }
+		return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
+	}
 
-    /**
-     * Get default value for LLM setting.
-     *
-     * @param string $key Setting key.
-     * @return mixed
-     */
-    private function get_llm_default_value( $key ) {
-        $defaults = [
-            'SAMAN_SEO_enable_llm_txt'           => '0',
-            'SAMAN_SEO_llm_txt_title'            => get_bloginfo( 'name' ),
-            'SAMAN_SEO_llm_txt_description'      => get_bloginfo( 'description' ),
-            'SAMAN_SEO_llm_txt_posts_per_type'   => 50,
-            'SAMAN_SEO_llm_txt_include_excerpt'  => '1',
-        ];
+	/**
+	 * Get default value for LLM setting.
+	 *
+	 * @param string $key Setting key.
+	 * @return mixed
+	 */
+	private function get_llm_default_value( $key ) {
+		$defaults = array(
+			'SAMAN_SEO_enable_llm_txt'          => '0',
+			'SAMAN_SEO_llm_txt_title'           => get_bloginfo( 'name' ),
+			'SAMAN_SEO_llm_txt_description'     => get_bloginfo( 'description' ),
+			'SAMAN_SEO_llm_txt_posts_per_type'  => 50,
+			'SAMAN_SEO_llm_txt_include_excerpt' => '1',
+		);
 
-        return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
-    }
+		return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
+	}
 }

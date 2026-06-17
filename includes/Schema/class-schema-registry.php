@@ -36,7 +36,7 @@ class Schema_Registry {
 	 *
 	 * @var array<string, array> Type slug => config array.
 	 */
-	private array $types = [];
+	private array $types = array();
 
 	/**
 	 * Private constructor to enforce singleton pattern.
@@ -73,13 +73,13 @@ class Schema_Registry {
 	 *                           - priority: Processing order (default: 10, lower = earlier)
 	 * @return void
 	 */
-	public function register( string $slug, string $class_name, array $args = [] ): void {
-		$this->types[ $slug ] = [
+	public function register( string $slug, string $class_name, array $args = array() ): void {
+		$this->types[ $slug ] = array(
 			'class'      => $class_name,
 			'label'      => $args['label'] ?? ucfirst( $slug ),
-			'post_types' => $args['post_types'] ?? [],
+			'post_types' => $args['post_types'] ?? array(),
 			'priority'   => $args['priority'] ?? 10,
-		];
+		);
 
 		/**
 		 * Fires after a schema type is registered.

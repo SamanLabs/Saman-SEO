@@ -20,7 +20,7 @@ class Restaurant_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_restaurant_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_restaurant_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -61,13 +61,13 @@ class Restaurant_Schema {
 			return null;
 		}
 
-		$schema = [
-			'@context'       => 'https://schema.org',
-			'@type'          => 'Restaurant',
-			'name'           => $restaurant_name,
-			'servesCuisine'  => $serves_cuisine,
-			'priceRange'     => $price_range,
-		];
+		$schema = array(
+			'@context'      => 'https://schema.org',
+			'@type'         => 'Restaurant',
+			'name'          => $restaurant_name,
+			'servesCuisine' => $serves_cuisine,
+			'priceRange'    => $price_range,
+		);
 
 		return $schema;
 	}

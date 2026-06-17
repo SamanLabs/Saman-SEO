@@ -20,7 +20,7 @@ class Job_Posting_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_job_posting_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_job_posting_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Job_Posting_Schema {
 	 * @return array|null
 	 */
 	private function build_schema( $post ) {
-		$job_title = get_the_title( $post );
+		$job_title           = get_the_title( $post );
 		$hiring_organization = get_bloginfo( 'name' );
 
 		// In a real implementation, these would come from post meta.
@@ -62,26 +62,26 @@ class Job_Posting_Schema {
 			return null;
 		}
 
-		$schema = [
-			'@context'            => 'https://schema.org',
-			'@type'               => 'JobPosting',
-			'title'               => $job_title,
-			'description'         => get_the_excerpt( $post ),
-			'hiringOrganization'  => [
+		$schema = array(
+			'@context'           => 'https://schema.org',
+			'@type'              => 'JobPosting',
+			'title'              => $job_title,
+			'description'        => get_the_excerpt( $post ),
+			'hiringOrganization' => array(
 				'@type' => 'Organization',
 				'name'  => $hiring_organization,
-			],
-			'employmentType'      => $employment_type,
-			'datePosted'          => get_the_date( 'c', $post ),
-			'validThrough'        => '', // Should be populated from post meta
-			'jobLocation'         => [
+			),
+			'employmentType'     => $employment_type,
+			'datePosted'         => get_the_date( 'c', $post ),
+			'validThrough'       => '', // Should be populated from post meta
+			'jobLocation'        => array(
 				'@type'   => 'Place',
-				'address' => [
-					'@type'          => 'PostalAddress',
+				'address' => array(
+					'@type'           => 'PostalAddress',
 					'addressLocality' => $job_location,
-				],
-			],
-		];
+				),
+			),
+		);
 
 		return $schema;
 	}

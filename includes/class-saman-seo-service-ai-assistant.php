@@ -33,30 +33,7 @@ class AI_Assistant {
 			return;
 		}
 
-		// V1 menu disabled - React UI handles AI via REST API
-		// All AI operations now delegate to Saman Labs AI via Integration\AI_Pilot
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		add_action( 'admin_post_SAMAN_SEO_ai_reset', [ $this, 'handle_reset' ] );
-	}
-
-	/**
-	 * Load assets only on AI page (kept for backwards compatibility).
-	 *
-	 * @param string $hook Current admin hook.
-	 *
-	 * @return void
-	 */
-	public function enqueue_assets( $hook ) {
-		if ( 'SAMAN_SEO_page_saman-seo-ai' !== $hook ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'saman-seo-admin',
-			SAMAN_SEO_URL . 'build/css/admin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
+		add_action( 'admin_post_SAMAN_SEO_ai_reset', array( $this, 'handle_reset' ) );
 	}
 
 	/**
@@ -74,11 +51,11 @@ class AI_Assistant {
 		$settings = new Settings();
 		$defaults = $settings->get_defaults();
 
-		$keys = [
+		$keys = array(
 			'SAMAN_SEO_ai_prompt_system',
 			'SAMAN_SEO_ai_prompt_title',
 			'SAMAN_SEO_ai_prompt_description',
-		];
+		);
 
 		foreach ( $keys as $key ) {
 			if ( isset( $defaults[ $key ] ) ) {
@@ -87,10 +64,10 @@ class AI_Assistant {
 		}
 
 		$redirect_url = add_query_arg(
-			[
-				'page'                   => 'saman-seo',
+			array(
+				'page'               => 'saman-seo',
 				'SAMAN_SEO_ai_reset' => '1',
-			],
+			),
 			admin_url( 'admin.php' )
 		);
 

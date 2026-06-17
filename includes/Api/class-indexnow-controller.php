@@ -27,241 +27,241 @@ class IndexNow_Controller extends REST_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/settings',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_settings' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-				],
-				[
+					'callback'            => array( $this, 'get_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'save_settings' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-				],
-			]
+					'callback'            => array( $this, 'save_settings' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Generate new API key.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/generate-key',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'generate_key' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-				],
-			]
+					'callback'            => array( $this, 'generate_key' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Verify key file.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/verify-key',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'verify_key' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-				],
-			]
+					'callback'            => array( $this, 'verify_key' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Submit URL(s).
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/submit',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'submit_urls' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'urls' => [
+					'callback'            => array( $this, 'submit_urls' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'urls' => array(
 							'required'          => true,
 							'type'              => 'array',
 							'sanitize_callback' => function ( $urls ) {
 								return array_map( 'esc_url_raw', (array) $urls );
 							},
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Get submission logs.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/logs',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_logs' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'page'     => [
+					'callback'            => array( $this, 'get_logs' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'page'     => array(
 							'type'              => 'integer',
 							'default'           => 1,
 							'sanitize_callback' => 'absint',
-						],
-						'per_page' => [
+						),
+						'per_page' => array(
 							'type'              => 'integer',
 							'default'           => 50,
 							'sanitize_callback' => 'absint',
-						],
-						'status'   => [
+						),
+						'status'   => array(
 							'type'              => 'string',
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
-						],
-						'search'   => [
+						),
+						'search'   => array(
 							'type'              => 'string',
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
-						],
-					],
-				],
-				[
+						),
+					),
+				),
+				array(
 					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => [ $this, 'clear_logs' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'days' => [
+					'callback'            => array( $this, 'clear_logs' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'days' => array(
 							'type'              => 'integer',
 							'default'           => 0,
 							'sanitize_callback' => 'absint',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Get stats.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/stats',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_stats' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-				],
-			]
+					'callback'            => array( $this, 'get_stats' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Get options (search engines, post types).
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/options',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_options' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-				],
-			]
+					'callback'            => array( $this, 'get_options' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
 		);
 
 		// Submit a single post by ID.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/submit-post/(?P<id>\d+)',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'submit_post' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'id' => [
+					'callback'            => array( $this, 'submit_post' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'id' => array(
 							'required'          => true,
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Get indexing status for a single post.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/post-status/(?P<id>\d+)',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_post_status' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'id' => [
+					'callback'            => array( $this, 'get_post_status' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'id' => array(
 							'required'          => true,
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Bulk submit multiple posts by IDs.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/bulk-submit',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'bulk_submit_posts' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'post_ids' => [
+					'callback'            => array( $this, 'bulk_submit_posts' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'post_ids' => array(
 							'required'          => true,
 							'type'              => 'array',
 							'sanitize_callback' => function ( $ids ) {
 								return array_map( 'absint', (array) $ids );
 							},
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Get posts available for bulk indexing.
 		register_rest_route(
 			$this->namespace,
 			'/indexnow/posts',
-			[
-				[
+			array(
+				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_posts_for_indexing' ],
-					'permission_callback' => [ $this, 'permission_check' ],
-					'args'                => [
-						'page'      => [
+					'callback'            => array( $this, 'get_posts_for_indexing' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+					'args'                => array(
+						'page'          => array(
 							'type'              => 'integer',
 							'default'           => 1,
 							'sanitize_callback' => 'absint',
-						],
-						'per_page'  => [
+						),
+						'per_page'      => array(
 							'type'              => 'integer',
 							'default'           => 50,
 							'sanitize_callback' => 'absint',
-						],
-						'post_type' => [
+						),
+						'post_type'     => array(
 							'type'              => 'string',
 							'default'           => 'post',
 							'sanitize_callback' => 'sanitize_text_field',
-						],
-						'search'    => [
+						),
+						'search'        => array(
 							'type'              => 'string',
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
-						],
-						'status_filter' => [
+						),
+						'status_filter' => array(
 							'type'              => 'string',
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 	}
 
@@ -291,7 +291,7 @@ class IndexNow_Controller extends REST_Controller {
 
 		// Mask API key for display (show first 8 and last 4 chars).
 		if ( ! empty( $settings['api_key'] ) ) {
-			$key                     = $settings['api_key'];
+			$key                         = $settings['api_key'];
 			$settings['api_key_display'] = substr( $key, 0, 8 ) . '...' . substr( $key, -4 );
 		}
 
@@ -351,10 +351,10 @@ class IndexNow_Controller extends REST_Controller {
 		flush_rewrite_rules();
 
 		return $this->success(
-			[
-				'api_key'     => $settings['api_key'],
+			array(
+				'api_key'      => $settings['api_key'],
 				'key_file_url' => home_url( $settings['api_key'] . '.txt' ),
-			],
+			),
 			__( 'New API key generated successfully.', 'saman-seo' )
 		);
 	}
@@ -397,9 +397,12 @@ class IndexNow_Controller extends REST_Controller {
 		}
 
 		// Filter out invalid URLs.
-		$urls = array_filter( $urls, function ( $url ) {
-			return filter_var( $url, FILTER_VALIDATE_URL );
-		} );
+		$urls = array_filter(
+			$urls,
+			function ( $url ) {
+				return filter_var( $url, FILTER_VALIDATE_URL );
+			}
+		);
 
 		if ( empty( $urls ) ) {
 			return $this->error( __( 'No valid URLs provided.', 'saman-seo' ) );
@@ -415,10 +418,10 @@ class IndexNow_Controller extends REST_Controller {
 
 		if ( $success ) {
 			return $this->success(
-				[
+				array(
 					'submitted' => count( $urls ),
 					'urls'      => $urls,
-				],
+				),
 				sprintf(
 					/* translators: %d: number of URLs */
 					_n(
@@ -448,12 +451,14 @@ class IndexNow_Controller extends REST_Controller {
 			return $this->error( __( 'IndexNow service not available.', 'saman-seo' ) );
 		}
 
-		$logs = $service->get_logs( [
-			'page'     => $request->get_param( 'page' ),
-			'per_page' => $request->get_param( 'per_page' ),
-			'status'   => $request->get_param( 'status' ),
-			'search'   => $request->get_param( 'search' ),
-		] );
+		$logs = $service->get_logs(
+			array(
+				'page'     => $request->get_param( 'page' ),
+				'per_page' => $request->get_param( 'per_page' ),
+				'status'   => $request->get_param( 'status' ),
+				'search'   => $request->get_param( 'search' ),
+			)
+		);
 
 		return $this->success( $logs );
 	}
@@ -475,7 +480,7 @@ class IndexNow_Controller extends REST_Controller {
 		$deleted = $service->clear_logs( $days );
 
 		return $this->success(
-			[ 'deleted' => $deleted ],
+			array( 'deleted' => $deleted ),
 			sprintf(
 				/* translators: %d: number of entries */
 				_n(
@@ -519,22 +524,24 @@ class IndexNow_Controller extends REST_Controller {
 		}
 
 		// Get public post types.
-		$post_types       = [];
-		$public_post_types = get_post_types( [ 'public' => true ], 'objects' );
+		$post_types        = array();
+		$public_post_types = get_post_types( array( 'public' => true ), 'objects' );
 		foreach ( $public_post_types as $pt ) {
 			if ( 'attachment' === $pt->name ) {
 				continue;
 			}
-			$post_types[] = [
+			$post_types[] = array(
 				'name'  => $pt->name,
 				'label' => $pt->labels->name,
-			];
+			);
 		}
 
-		return $this->success( [
-			'search_engines' => $service->get_search_engines(),
-			'post_types'     => $post_types,
-		] );
+		return $this->success(
+			array(
+				'search_engines' => $service->get_search_engines(),
+				'post_types'     => $post_types,
+			)
+		);
 	}
 
 	/**
@@ -576,11 +583,11 @@ class IndexNow_Controller extends REST_Controller {
 
 		if ( $success ) {
 			return $this->success(
-				[
+				array(
 					'post_id' => $post_id,
 					'url'     => $url,
 					'status'  => 'submitted',
-				],
+				),
 				__( 'URL submitted for indexing successfully.', 'saman-seo' )
 			);
 		}
@@ -615,36 +622,42 @@ class IndexNow_Controller extends REST_Controller {
 		// Get the most recent submission for this post.
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-		$latest = $wpdb->get_row( $wpdb->prepare(
-			"SELECT * FROM {$table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$post_id
-		) );
+		$latest = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$post_id
+			)
+		);
 
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		// Get total submissions for this post.
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-		$total_submissions = $wpdb->get_var( $wpdb->prepare(
-			"SELECT COUNT(*) FROM {$table} WHERE post_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$post_id
-		) );
+		$total_submissions = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE post_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$post_id
+			)
+		);
 
 		$settings = $service->get_settings();
 		$enabled  = ! empty( $settings['enabled'] ) && ! empty( $settings['api_key'] );
 
-		return $this->success( [
-			'post_id'           => $post_id,
-			'url'               => get_permalink( $post_id ),
-			'indexnow_enabled'  => $enabled,
-			'has_been_indexed'  => ! empty( $latest ),
-			'last_submission'   => $latest ? [
-				'status'           => $latest->status,
-				'response_code'    => (int) $latest->response_code,
-				'submitted_at'     => $latest->submitted_at,
-				'search_engine'    => $latest->search_engine,
-				'time_ago'         => human_time_diff( strtotime( $latest->submitted_at ) ) . ' ago',
-			] : null,
-			'total_submissions' => (int) $total_submissions,
-		] );
+		return $this->success(
+			array(
+				'post_id'           => $post_id,
+				'url'               => get_permalink( $post_id ),
+				'indexnow_enabled'  => $enabled,
+				'has_been_indexed'  => ! empty( $latest ),
+				'last_submission'   => $latest ? array(
+					'status'        => $latest->status,
+					'response_code' => (int) $latest->response_code,
+					'submitted_at'  => $latest->submitted_at,
+					'search_engine' => $latest->search_engine,
+					'time_ago'      => human_time_diff( strtotime( $latest->submitted_at ) ) . ' ago',
+				) : null,
+				'total_submissions' => (int) $total_submissions,
+			)
+		);
 	}
 
 	/**
@@ -679,18 +692,18 @@ class IndexNow_Controller extends REST_Controller {
 		// Limit to 100 posts at a time.
 		$post_ids = array_slice( $post_ids, 0, 100 );
 
-		$urls       = [];
-		$skipped    = 0;
-		$post_id_map = [];
+		$urls        = array();
+		$skipped     = 0;
+		$post_id_map = array();
 
 		foreach ( $post_ids as $post_id ) {
 			$post = get_post( $post_id );
 			if ( $post && 'publish' === $post->post_status ) {
-				$url              = get_permalink( $post_id );
-				$urls[]           = $url;
-				$post_id_map[$url] = $post_id;
+				$url                 = get_permalink( $post_id );
+				$urls[]              = $url;
+				$post_id_map[ $url ] = $post_id;
 			} else {
-				$skipped++;
+				++$skipped;
 			}
 		}
 
@@ -712,12 +725,12 @@ class IndexNow_Controller extends REST_Controller {
 		}
 
 		return $this->success(
-			[
+			array(
 				'submitted' => $success_count,
 				'failed'    => $failed_count,
 				'skipped'   => $skipped,
 				'total'     => count( $post_ids ),
-			],
+			),
 			sprintf(
 				/* translators: %d: number of URLs */
 				__( '%d URLs submitted for indexing.', 'saman-seo' ),
@@ -748,21 +761,21 @@ class IndexNow_Controller extends REST_Controller {
 		$status_filter = $request->get_param( 'status_filter' );
 
 		// Build query args.
-		$args = [
+		$args = array(
 			'post_type'      => $post_type,
 			'post_status'    => 'publish',
 			'posts_per_page' => $per_page,
 			'paged'          => $page,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
-		];
+		);
 
 		if ( ! empty( $search ) ) {
 			$args['s'] = $search;
 		}
 
 		$query = new \WP_Query( $args );
-		$posts = [];
+		$posts = array();
 
 		$log_table = $wpdb->prefix . 'SAMAN_SEO_indexnow_log';
 
@@ -770,10 +783,12 @@ class IndexNow_Controller extends REST_Controller {
 		foreach ( $query->posts as $post ) {
 			// Get latest submission for this post.
 			// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-			$latest = $wpdb->get_row( $wpdb->prepare(
-				"SELECT status, submitted_at FROM {$log_table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$post->ID
-			) );
+			$latest = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT status, submitted_at FROM {$log_table} WHERE post_id = %d ORDER BY submitted_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$post->ID
+				)
+			);
 
 			$indexing_status = 'never';
 			$last_indexed    = null;
@@ -796,37 +811,41 @@ class IndexNow_Controller extends REST_Controller {
 				}
 			}
 
-			$posts[] = [
-				'id'              => $post->ID,
-				'title'           => $post->post_title,
-				'url'             => get_permalink( $post->ID ),
-				'post_type'       => $post->post_type,
-				'date'            => $post->post_date,
-				'indexing_status' => $indexing_status,
-				'last_indexed'    => $last_indexed,
+			$posts[] = array(
+				'id'               => $post->ID,
+				'title'            => $post->post_title,
+				'url'              => get_permalink( $post->ID ),
+				'post_type'        => $post->post_type,
+				'date'             => $post->post_date,
+				'indexing_status'  => $indexing_status,
+				'last_indexed'     => $last_indexed,
 				'last_indexed_ago' => $last_indexed ? human_time_diff( strtotime( $last_indexed ) ) . ' ago' : null,
-			];
+			);
 		}
 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 
 		// Get stats for header.
 		$total_published = wp_count_posts( $post_type )->publish;
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-		$total_indexed   = $wpdb->get_var( $wpdb->prepare(
-			"SELECT COUNT(DISTINCT post_id) FROM {$log_table} WHERE status = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			'success'
-		) );
+		$total_indexed = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT post_id) FROM {$log_table} WHERE status = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'success'
+			)
+		);
 
-		return $this->success( [
-			'posts'       => $posts,
-			'total'       => $query->found_posts,
-			'pages'       => $query->max_num_pages,
-			'page'        => $page,
-			'per_page'    => $per_page,
-			'stats'       => [
-				'total_published' => (int) $total_published,
-				'total_indexed'   => (int) $total_indexed,
-			],
-		] );
+		return $this->success(
+			array(
+				'posts'    => $posts,
+				'total'    => $query->found_posts,
+				'pages'    => $query->max_num_pages,
+				'page'     => $page,
+				'per_page' => $per_page,
+				'stats'    => array(
+					'total_published' => (int) $total_published,
+					'total_indexed'   => (int) $total_indexed,
+				),
+			)
+		);
 	}
 }

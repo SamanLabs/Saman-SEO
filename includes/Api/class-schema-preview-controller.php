@@ -39,27 +39,27 @@ class Schema_Preview_Controller extends REST_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<post_id>\d+)',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'get_preview' ],
-					'permission_callback' => [ $this, 'permission_check_post' ],
-					'args'                => [
-						'post_id'     => [
+					'callback'            => array( $this, 'get_preview' ),
+					'permission_callback' => array( $this, 'permission_check_post' ),
+					'args'                => array(
+						'post_id'     => array(
 							'type'              => 'integer',
 							'required'          => true,
 							'sanitize_callback' => 'absint',
 							'description'       => 'The post ID to preview schema for.',
-						],
-						'schema_type' => [
+						),
+						'schema_type' => array(
 							'type'              => 'string',
 							'required'          => false,
 							'sanitize_callback' => 'sanitize_text_field',
 							'description'       => 'Optional schema type override for preview.',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 	}
 
@@ -107,10 +107,10 @@ class Schema_Preview_Controller extends REST_Controller {
 		$graph   = $manager->build( $context );
 
 		return $this->success(
-			[
+			array(
 				'json_ld'     => $graph,
 				'schema_type' => $context->schema_type,
-			]
+			)
 		);
 	}
 }

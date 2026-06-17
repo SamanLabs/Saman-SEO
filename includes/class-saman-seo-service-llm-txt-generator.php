@@ -28,8 +28,8 @@ class LLM_TXT_Generator {
 			return;
 		}
 
-		add_action( 'init', [ $this, 'register_rewrite_rules' ] );
-		add_action( 'template_redirect', [ $this, 'render_llm_txt' ], 0 );
+		add_action( 'init', array( $this, 'register_rewrite_rules' ) );
+		add_action( 'template_redirect', array( $this, 'render_llm_txt' ), 0 );
 	}
 
 	/**
@@ -68,14 +68,14 @@ class LLM_TXT_Generator {
 	 * @return string
 	 */
 	private function generate_llm_txt_content() {
-		$output = [];
+		$output = array();
 
 		// Header
 		if ( ! function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_info = get_plugin_data( SAMAN_SEO_PATH . 'saman-seo.php', false, false );
+		$plugin_info    = get_plugin_data( SAMAN_SEO_PATH . 'saman-seo.php', false, false );
 		$plugin_version = $plugin_info['Version'] ?? SAMAN_SEO_VERSION;
 
 		$output[] = sprintf(
@@ -87,11 +87,11 @@ class LLM_TXT_Generator {
 
 		// Site title and description
 		$custom_title = get_option( 'SAMAN_SEO_llm_txt_title', '' );
-		$title = ! empty( $custom_title ) ? $custom_title : get_bloginfo( 'name' );
-		$output[] = '# ' . $title;
+		$title        = ! empty( $custom_title ) ? $custom_title : get_bloginfo( 'name' );
+		$output[]     = '# ' . $title;
 
 		$custom_description = get_option( 'SAMAN_SEO_llm_txt_description', '' );
-		$description = ! empty( $custom_description ) ? $custom_description : get_bloginfo( 'description' );
+		$description        = ! empty( $custom_description ) ? $custom_description : get_bloginfo( 'description' );
 		if ( $description ) {
 			$output[] = '';
 			$output[] = $description;
@@ -113,10 +113,10 @@ class LLM_TXT_Generator {
 
 		// Get post types
 		$post_types = get_post_types(
-			[
+			array(
 				'public'  => true,
 				'show_ui' => true,
-			],
+			),
 			'objects'
 		);
 
@@ -130,13 +130,13 @@ class LLM_TXT_Generator {
 		// Generate sections for each post type
 		foreach ( $post_types as $post_type ) {
 			$posts = get_posts(
-				[
+				array(
 					'post_type'      => $post_type->name,
 					'posts_per_page' => $posts_per_type,
 					'post_status'    => 'publish',
 					'orderby'        => 'date',
 					'order'          => 'DESC',
-				]
+				)
 			);
 
 			if ( empty( $posts ) ) {

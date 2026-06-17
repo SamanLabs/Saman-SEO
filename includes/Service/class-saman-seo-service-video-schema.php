@@ -2,6 +2,8 @@
 /**
  * Video Schema service for video schema optimization.
  *
+ * Detects YouTube and Vimeo videos in post content and generates VideoObject schema.
+ *
  * @package Saman\SEO
  */
 
@@ -15,75 +17,291 @@ defined( 'ABSPATH' ) || exit;
 class Video_Schema {
 
 	/**
+	 * YouTube embed patterns.
+	 *
+	 * @var array
+	 */
+	private $youtube_patterns = array(
+		// iframe embeds
+		'#<iframe[^>]+src=["\'](?:https?:)?//(?:www\.)?youtube\.com/embed/([a-zA-Z0-9_-]{11})[^"\']*["\'][^>]*>#i',
+		// youtube.com/watch links
+		'#(?:https?:)?//(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})#i',
+		// youtu.be short links
+		'#(?:https?:)?//youtu\.be/([a-zA-Z0-9_-]{11})#i',
+		// WordPress embedded video blocks
+		'#wp:embed.*?url":"https?://(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})#i',
+		'#wp:embed.*?url":"https?://youtu\.be/([a-zA-Z0-9_-]{11})#i',
+	);
+
+	/**
+	 * Vimeo embed patterns.
+	 *
+	 * @var array
+	 */
+	private $vimeo_patterns = array(
+		// iframe embeds
+		'#<iframe[^>]+src=["\'](?:https?:)?//(?:player\.)?vimeo\.com/video/(\d+)[^"\']*["\'][^>]*>#i',
+		// vimeo.com links
+		'#(?:https?:)?//(?:www\.)?vimeo\.com/(\d+)#i',
+		// WordPress embedded video blocks
+		'#wp:embed.*?url":"https?://(?:www\.)?vimeo\.com/(\d+)#i',
+	);
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_video_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_video_schema_to_graph' ), 25, 1 );
 	}
 
 	/**
 	 * Add VideoObject schema to the JSON-LD graph.
 	 *
-	 * @param array         $graph The existing JSON-LD graph.
-	 * @param \WP_Post|null $post  The current post object (optional).
+	 * @param array $graph The existing JSON-LD graph.
 	 * @return array The modified JSON-LD graph.
 	 */
-	public function add_video_schema_to_graph( $graph, $post = null ) {
-		// Bail early if no post context.
-		if ( ! $post instanceof \WP_Post ) {
+	public function add_video_schema_to_graph( $graph ) {
+		if ( ! is_singular() ) {
 			return $graph;
 		}
 
-		// For now, let's assume we identify a video post by a custom field or post format.
-		if ( 'video' !== get_post_format( $post->ID ) ) {
+		global $post;
+		if ( ! $post ) {
 			return $graph;
 		}
 
-		$schema = $this->build_schema( $post );
+		// Detect videos in content.
+		$videos = $this->detect_videos( $post );
 
-		if ( ! empty( $schema ) ) {
-			$graph[] = $schema;
+		if ( empty( $videos ) ) {
+			return $graph;
+		}
+
+		// Add schema for each detected video.
+		foreach ( $videos as $video ) {
+			$schema = $this->build_schema( $video, $post );
+			if ( ! empty( $schema ) ) {
+				$graph[] = $schema;
+			}
 		}
 
 		return $graph;
 	}
 
 	/**
-	 * Build VideoObject schema.
+	 * Detect videos in post content.
 	 *
-	 * @param \WP_Post $post The current post object.
+	 * @param \WP_Post $post The post object.
+	 * @return array Array of detected videos with platform and ID.
+	 */
+	public function detect_videos( $post ) {
+		$videos  = array();
+		$content = $post->post_content;
+
+		// Detect YouTube videos.
+		foreach ( $this->youtube_patterns as $pattern ) {
+			if ( preg_match_all( $pattern, $content, $matches ) ) {
+				foreach ( $matches[1] as $video_id ) {
+					$videos[] = array(
+						'platform' => 'youtube',
+						'id'       => $video_id,
+					);
+				}
+			}
+		}
+
+		// Detect Vimeo videos.
+		foreach ( $this->vimeo_patterns as $pattern ) {
+			if ( preg_match_all( $pattern, $content, $matches ) ) {
+				foreach ( $matches[1] as $video_id ) {
+					$videos[] = array(
+						'platform' => 'vimeo',
+						'id'       => $video_id,
+					);
+				}
+			}
+		}
+
+		// Remove duplicates.
+		$unique = array();
+		$seen   = array();
+		foreach ( $videos as $video ) {
+			$key = $video['platform'] . '_' . $video['id'];
+			if ( ! isset( $seen[ $key ] ) ) {
+				$unique[]     = $video;
+				$seen[ $key ] = true;
+			}
+		}
+
+		return $unique;
+	}
+
+	/**
+	 * Build VideoObject schema for a detected video.
+	 *
+	 * @param array    $video Video data with platform and ID.
+	 * @param \WP_Post $post  The post object.
 	 * @return array|null
 	 */
-	private function build_schema( $post ) {
-		// Dummy data for now.
-		$video_name        = get_the_title( $post );
-		$video_description = get_the_excerpt( $post );
-		$upload_date       = get_the_date( 'c', $post );
+	private function build_schema( $video, $post ) {
+		$schema = array(
+			'@type'       => 'VideoObject',
+			'name'        => get_the_title( $post ),
+			'description' => wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 ),
+			'uploadDate'  => get_the_date( 'c', $post ),
+		);
 
-		// In a real implementation, these would come from post meta or other sources.
-		$thumbnail_url = 'https://example.com/thumbnail.jpg';
-		$duration      = 'PT2M30S';
-		$content_url   = 'https://example.com/video.mp4';
-		$embed_url     = 'https://example.com/embed/123';
+		if ( 'youtube' === $video['platform'] ) {
+			$schema['@id']          = get_permalink( $post ) . '#video-youtube-' . $video['id'];
+			$schema['embedUrl']     = 'https://www.youtube.com/embed/' . $video['id'];
+			$schema['contentUrl']   = 'https://www.youtube.com/watch?v=' . $video['id'];
+			$schema['thumbnailUrl'] = 'https://img.youtube.com/vi/' . $video['id'] . '/maxresdefault.jpg';
 
-		if ( empty( $video_name ) ) {
+			// Try to get additional metadata from oEmbed.
+			$oembed = $this->get_youtube_oembed( $video['id'] );
+			if ( $oembed ) {
+				if ( ! empty( $oembed['title'] ) ) {
+					$schema['name'] = $oembed['title'];
+				}
+				if ( ! empty( $oembed['author_name'] ) ) {
+					$schema['author'] = array(
+						'@type' => 'Person',
+						'name'  => $oembed['author_name'],
+					);
+				}
+			}
+		} elseif ( 'vimeo' === $video['platform'] ) {
+			$schema['@id']        = get_permalink( $post ) . '#video-vimeo-' . $video['id'];
+			$schema['embedUrl']   = 'https://player.vimeo.com/video/' . $video['id'];
+			$schema['contentUrl'] = 'https://vimeo.com/' . $video['id'];
+
+			// Try to get additional metadata from oEmbed.
+			$oembed = $this->get_vimeo_oembed( $video['id'] );
+			if ( $oembed ) {
+				if ( ! empty( $oembed['title'] ) ) {
+					$schema['name'] = $oembed['title'];
+				}
+				if ( ! empty( $oembed['description'] ) ) {
+					$schema['description'] = $oembed['description'];
+				}
+				if ( ! empty( $oembed['thumbnail_url'] ) ) {
+					$schema['thumbnailUrl'] = $oembed['thumbnail_url'];
+				}
+				if ( ! empty( $oembed['author_name'] ) ) {
+					$schema['author'] = array(
+						'@type' => 'Person',
+						'name'  => $oembed['author_name'],
+					);
+				}
+				if ( ! empty( $oembed['duration'] ) ) {
+					$schema['duration'] = 'PT' . $oembed['duration'] . 'S';
+				}
+			}
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Get YouTube video oEmbed data.
+	 *
+	 * @param string $video_id YouTube video ID.
+	 * @return array|null
+	 */
+	private function get_youtube_oembed( $video_id ) {
+		$cache_key = 'SAMAN_SEO_youtube_oembed_' . $video_id;
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$url = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json';
+
+		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
+
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return null;
 		}
 
-		$schema = [
-			'@context'    => 'https://schema.org',
-			'@type'       => 'VideoObject',
-			'name'        => $video_name,
-			'description' => $video_description,
-			'thumbnailUrl' => $thumbnail_url,
-			'uploadDate'  => $upload_date,
-			'duration'    => $duration,
-			'contentUrl'  => $content_url,
-			'embedUrl'    => $embed_url,
-		];
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		return $schema;
+		if ( $data ) {
+			set_transient( $cache_key, $data, DAY_IN_SECONDS );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get Vimeo video oEmbed data.
+	 *
+	 * @param string $video_id Vimeo video ID.
+	 * @return array|null
+	 */
+	private function get_vimeo_oembed( $video_id ) {
+		$cache_key = 'SAMAN_SEO_vimeo_oembed_' . $video_id;
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$url = 'https://vimeo.com/api/oembed.json?url=https://vimeo.com/' . $video_id;
+
+		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
+
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return null;
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( $data ) {
+			set_transient( $cache_key, $data, DAY_IN_SECONDS );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get all posts with videos for sitemap generation.
+	 *
+	 * @param int $limit Maximum number of posts to return.
+	 * @return array Array of posts with video data.
+	 */
+	public function get_posts_with_videos( $limit = 1000 ) {
+		$posts_with_videos = array();
+
+		$args = array(
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'posts_per_page' => $limit,
+			'orderby'        => 'modified',
+			'order'          => 'DESC',
+		);
+
+		$query = new \WP_Query( $args );
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				global $post;
+
+				$videos = $this->detect_videos( $post );
+
+				if ( ! empty( $videos ) ) {
+					$posts_with_videos[] = array(
+						'post'   => $post,
+						'videos' => $videos,
+					);
+				}
+			}
+			wp_reset_postdata();
+		}
+
+		return $posts_with_videos;
 	}
 }

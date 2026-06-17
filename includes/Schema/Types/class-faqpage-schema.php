@@ -2,7 +2,7 @@
 /**
  * FAQPage Schema class.
  *
- * Generates FAQPage schema from samanseo/faq Gutenberg blocks.
+ * Generates FAQPage schema from saman-seo/faq Gutenberg blocks.
  * Combines questions from all FAQ blocks in the post.
  *
  * @package Saman\SEO\Schema\Types
@@ -45,7 +45,7 @@ class FAQPage_Schema extends Abstract_Schema {
 	 */
 	public function is_needed(): bool {
 		return $this->context->post instanceof \WP_Post
-			&& has_block( 'samanseo/faq', $this->context->post );
+			&& has_block( 'saman-seo/faq', $this->context->post );
 	}
 
 	/**
@@ -57,27 +57,27 @@ class FAQPage_Schema extends Abstract_Schema {
 		$questions = $this->collect_questions_from_blocks();
 
 		if ( empty( $questions ) ) {
-			return [];
+			return array();
 		}
 
-		return [
+		return array(
 			'@type'      => $this->get_type(),
 			'@id'        => Schema_IDs::faqpage( $this->context->canonical ),
 			'mainEntity' => $questions,
-		];
+		);
 	}
 
 	/**
 	 * Collect all FAQ questions from FAQ blocks in post content.
 	 *
-	 * Iterates through all samanseo/faq blocks, respects showSchema
+	 * Iterates through all saman-seo/faq blocks, respects showSchema
 	 * attribute, and combines all valid Q&A pairs.
 	 *
 	 * @return array Array of Question objects for mainEntity.
 	 */
 	private function collect_questions_from_blocks(): array {
 		$blocks    = parse_blocks( $this->context->post->post_content );
-		$questions = [];
+		$questions = array();
 
 		$this->extract_faq_blocks( $blocks, $questions );
 
@@ -92,28 +92,28 @@ class FAQPage_Schema extends Abstract_Schema {
 	 */
 	private function extract_faq_blocks( array $blocks, array &$questions ): void {
 		foreach ( $blocks as $block ) {
-			if ( 'samanseo/faq' === $block['blockName'] ) {
-				$attrs = $block['attrs'] ?? [];
+			if ( 'saman-seo/faq' === $block['blockName'] ) {
+				$attrs = $block['attrs'] ?? array();
 
 				// Respect showSchema toggle - only include if true.
 				if ( empty( $attrs['showSchema'] ) ) {
 					continue;
 				}
 
-				$faqs = $attrs['faqs'] ?? [];
+				$faqs = $attrs['faqs'] ?? array();
 				foreach ( $faqs as $faq ) {
 					$q = trim( wp_strip_all_tags( $faq['question'] ?? '' ) );
 					$a = trim( wp_strip_all_tags( $faq['answer'] ?? '' ) );
 
 					if ( ! empty( $q ) && ! empty( $a ) ) {
-						$questions[] = [
+						$questions[] = array(
 							'@type'          => 'Question',
 							'name'           => $q,
-							'acceptedAnswer' => [
+							'acceptedAnswer' => array(
 								'@type' => 'Answer',
 								'text'  => $a,
-							],
-						];
+							),
+						);
 					}
 				}
 			}

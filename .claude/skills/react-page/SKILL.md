@@ -168,9 +168,10 @@ const {PageName} = lazy(() => import('./pages/{PageName}'));
 { path: '{page-slug}', component: {PageName} },
 ```
 
-5. **Add menu item** in `includes/class-saman-seo-admin-v2.php`:
-   - Add to `get_menu_items()` method
-   - Add URL routing in `get_page_routes()`
+5. **Register the page in Admin_V2 PHP** (`includes/class-saman-seo-admin-v2.php`):
+   - Add `'saman-seo-{slug}' => '{view-name}'` to the `$view_map` property (maps WP page slug to React view name)
+   - Add `'{slug}' => __( '{Page Title}', 'saman-seo' )` to the `$hidden_subpages` array inside `register_menu()` (registers a hidden WP submenu so direct-URL / refresh works)
+   - **WARNING**: NEVER create a separate PHP service that calls `add_submenu_page()` for the same slug — this causes a routing conflict that breaks the React SPA on refresh
 
 6. **Create styles** if needed in `src-v2/less/pages/{page-name}.less`
 

@@ -20,18 +20,18 @@ class Course_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', [ $this, 'add_course_schema_to_graph' ], 20, 2 );
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_course_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
 	 * Add Course schema to the JSON-LD graph.
 	 *
-	 * @param array $graph The existing JSON-LD graph.
+	 * @param array    $graph The existing JSON-LD graph.
 	 * @param \WP_Post $post  The current post object.
 	 * @return array The modified JSON-LD graph.
 	 */
 	public function add_course_schema_to_graph( $graph, $post ) {
-		
+
 		if ( ! $post || 'course' !== get_post_type( $post ) ) {
 			return $graph;
 		}
@@ -63,17 +63,17 @@ class Course_Schema {
 			return null;
 		}
 
-		$schema = [
+		$schema = array(
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Course',
 			'name'        => $course_name,
 			'description' => $course_description,
-			'provider'    => [
+			'provider'    => array(
 				'@type' => 'Organization',
 				'name'  => $provider_name,
-			],
+			),
 			'courseCode'  => $course_code,
-		];
+		);
 
 		return $schema;
 	}

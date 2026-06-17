@@ -1,5 +1,8 @@
 # Dependencies
 /node_modules
+/vendor
+composer.phar
+composer-setup.php
 
 # Build output (all created by npm run build)
 # Contains: css/, v2/, editor/, admin-list/
@@ -14,6 +17,7 @@ BUGFIXES.md
 .claude/settings.local.json
 tmpclaude-*
 .planning_old
+.pr/
 
 # OS/IDE files
 nul

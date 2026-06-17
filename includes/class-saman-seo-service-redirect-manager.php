@@ -75,17 +75,15 @@ class Redirect_Manager {
 			return;
 		}
 
-		add_action( 'template_redirect', [ $this, 'maybe_redirect' ], 0 );
-		// V1 menu disabled - React UI handles menu registration
-		// add_action( 'admin_menu', [ $this, 'register_menu' ] );
-		add_action( 'admin_post_SAMAN_SEO_save_redirect', [ $this, 'handle_save' ] );
-		add_action( 'admin_post_SAMAN_SEO_delete_redirect', [ $this, 'handle_delete' ] );
-		add_action( 'admin_post_SAMAN_SEO_dismiss_slug', [ $this, 'handle_dismiss_slug' ] );
+		add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
+		add_action( 'admin_post_SAMAN_SEO_save_redirect', array( $this, 'handle_save' ) );
+		add_action( 'admin_post_SAMAN_SEO_delete_redirect', array( $this, 'handle_delete' ) );
+		add_action( 'admin_post_SAMAN_SEO_dismiss_slug', array( $this, 'handle_dismiss_slug' ) );
 
 		// Slug change detection.
-		add_action( 'post_updated', [ $this, 'detect_slug_change' ], 10, 3 );
-		add_action( 'admin_notices', [ $this, 'render_slug_change_notice' ] );
-		add_action( 'wp_ajax_SAMAN_SEO_create_automatic_redirect', [ $this, 'ajax_create_redirect' ] );
+		add_action( 'post_updated', array( $this, 'detect_slug_change' ), 10, 3 );
+		add_action( 'admin_notices', array( $this, 'render_slug_change_notice' ) );
+		add_action( 'wp_ajax_SAMAN_SEO_create_automatic_redirect', array( $this, 'ajax_create_redirect' ) );
 	}
 
 	/**
@@ -140,24 +138,24 @@ class Redirect_Manager {
 		$user_id = get_current_user_id();
 		set_transient(
 			'SAMAN_SEO_slug_changed_' . $user_id,
-			[
+			array(
 				'post_id' => $post_id,
 				'old_url' => $source,
 				'new_url' => $new_url, // Use full URL for target as per existing redirect logic preference often.
-			],
+			),
 			60
 		);
 
 		// Also store in persistent option for the "Recommended Redirects" list.
-		$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
+		$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', array() );
 		$key         = md5( $source ); // Use hash of source as key to avoid special char issues in keys.
-		
-		$suggestions[ $key ] = [
+
+		$suggestions[ $key ] = array(
 			'source'  => $source,
 			'target'  => $new_url,
 			'post_id' => $post_id,
 			'date'    => current_time( 'mysql' ),
-		];
+		);
 
 		update_option( 'SAMAN_SEO_monitor_slugs', $suggestions );
 	}
@@ -221,7 +219,7 @@ class Redirect_Manager {
 	 *
 	 * @return int|\WP_Error Inserted redirect ID or WP_Error on failure.
 	 */
-	public function create_redirect( $source, $target, $status_code = 301, $extra = [] ) {
+	public function create_redirect( $source, $target, $status_code = 301, $extra = array() ) {
 		if ( empty( $source ) || empty( $target ) ) {
 			return new \WP_Error( 'invalid_data', __( 'Source and target are required.', 'saman-seo' ) );
 		}
@@ -252,9 +250,9 @@ class Redirect_Manager {
 			return new \WP_Error( 'redirect_exists', __( 'Redirect already exists.', 'saman-seo' ) );
 		}
 
-		$status_code = in_array( $status_code, [ 301, 302, 307, 410 ], true ) ? $status_code : 301;
+		$status_code = in_array( $status_code, array( 301, 302, 307, 410 ), true ) ? $status_code : 301;
 
-		$data = [
+		$data = array(
 			'source'      => $normalized,
 			'target'      => $target,
 			'status_code' => $status_code,
@@ -264,9 +262,9 @@ class Redirect_Manager {
 			'end_date'    => ! empty( $extra['end_date'] ) ? sanitize_text_field( $extra['end_date'] ) : null,
 			'notes'       => isset( $extra['notes'] ) ? sanitize_textarea_field( $extra['notes'] ) : null,
 			'created_at'  => current_time( 'mysql' ),
-		];
+		);
 
-		$formats = [ '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s' ];
+		$formats = array( '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$inserted = $wpdb->insert( $this->table, $data, $formats );
@@ -278,7 +276,7 @@ class Redirect_Manager {
 		self::flush_cache();
 
 		// Cleanup from suggestions if exists.
-		$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
+		$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', array() );
 		$key         = md5( $normalized );
 		if ( isset( $suggestions[ $key ] ) ) {
 			unset( $suggestions[ $key ] );
@@ -311,8 +309,8 @@ class Redirect_Manager {
 			return new \WP_Error( 'not_found', __( 'Redirect not found.', 'saman-seo' ) );
 		}
 
-		$update  = [];
-		$formats = [];
+		$update  = array();
+		$formats = array();
 
 		// Source.
 		if ( isset( $data['source'] ) ) {
@@ -351,9 +349,9 @@ class Redirect_Manager {
 
 		// Status code.
 		if ( isset( $data['status_code'] ) ) {
-			$status_code          = absint( $data['status_code'] );
-			$update['status_code'] = in_array( $status_code, [ 301, 302, 307, 410 ], true ) ? $status_code : 301;
-			$formats[]            = '%d';
+			$status_code           = absint( $data['status_code'] );
+			$update['status_code'] = in_array( $status_code, array( 301, 302, 307, 410 ), true ) ? $status_code : 301;
+			$formats[]             = '%d';
 		}
 
 		// Is regex.
@@ -391,7 +389,7 @@ class Redirect_Manager {
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->update( $this->table, $update, [ 'id' => $id ], $formats, [ '%d' ] );
+		$result = $wpdb->update( $this->table, $update, array( 'id' => $id ), $formats, array( '%d' ) );
 
 		if ( false === $result ) {
 			return new \WP_Error( 'db_error', __( 'Could not update redirect.', 'saman-seo' ) );
@@ -432,7 +430,7 @@ class Redirect_Manager {
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->delete( $this->table, [ 'id' => $id ], [ '%d' ] );
+		$result = $wpdb->delete( $this->table, array( 'id' => $id ), array( '%d' ) );
 
 		if ( false === $result ) {
 			return new \WP_Error( 'db_error', __( 'Could not delete redirect.', 'saman-seo' ) );
@@ -455,13 +453,38 @@ class Redirect_Manager {
 			return new \WP_Error( 'empty_pattern', __( 'Regex pattern cannot be empty.', 'saman-seo' ) );
 		}
 
-		// Test the pattern by trying to use it.
-		// Using @ to suppress warnings for invalid patterns.
-		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		$result = @preg_match( '#' . $pattern . '#', '' );
+		$pattern = (string) $pattern;
+		$message = '';
+
+		// Temporarily silence warnings without using @ so we can surface a
+		// clean error. PHP 8 throws ValueError for invalid patterns, PHP 7
+		// emits warnings and returns false.
+		$previous = set_error_handler(
+			static function ( $severity, $err_message ) use ( &$message ) {
+				$message = $err_message;
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( '#' . $pattern . '#', '' );
+		} catch ( \Throwable $e ) {
+			$result  = false;
+			$message = $e->getMessage();
+		} finally {
+			if ( false !== $previous ) {
+				restore_error_handler();
+			}
+		}
 
 		if ( false === $result ) {
-			return new \WP_Error( 'invalid_regex', __( 'Invalid regex pattern. Please check the syntax.', 'saman-seo' ) );
+			if ( empty( $message ) ) {
+				$message = preg_last_error_msg();
+			}
+			if ( empty( $message ) ) {
+				$message = __( 'Invalid regex pattern. Please check the syntax.', 'saman-seo' );
+			}
+			return new \WP_Error( 'invalid_regex', $message );
 		}
 
 		return true;
@@ -589,58 +612,6 @@ class Redirect_Manager {
 	}
 
 	/**
-	 * Register admin UI.
-	 *
-	 * @return void
-	 */
-	public function register_menu() {
-		add_submenu_page(
-			'saman-seo',
-			__( 'Redirect Manager', 'saman-seo' ),
-			__( 'Redirects', 'saman-seo' ),
-			'manage_options',
-			'saman-seo-redirects',
-			[ $this, 'render_page' ],
-			11
-		);
-	}
-
-	/**
-	 * Render redirects list + form.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		global $wpdb;
-		$redirects = wp_cache_get( self::CACHE_KEY_ADMIN, self::CACHE_GROUP );
-
-		if ( false === $redirects ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom redirect table listing requires a direct query. Results are cached just below.
-			$redirects = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT * FROM {$this->table} ORDER BY id DESC LIMIT %d",
-					200
-				)
-			);
-
-			wp_cache_set( self::CACHE_KEY_ADMIN, $redirects, self::CACHE_GROUP, self::CACHE_TTL );
-		}
-
-		wp_enqueue_style(
-			'saman-seo-plugin',
-			SAMAN_SEO_URL . 'build/css/plugin.css',
-			[],
-			SAMAN_SEO_VERSION
-		);
-
-		include SAMAN_SEO_PATH . 'templates/redirects.php';
-	}
-
-	/**
 	 * Handle save request.
 	 *
 	 * @return void
@@ -688,7 +659,7 @@ class Redirect_Manager {
 		if ( $id ) {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Deleting rows from the custom redirects table requires a direct query.
-			$wpdb->delete( $this->table, [ 'id' => $id ], [ '%d' ] );
+			$wpdb->delete( $this->table, array( 'id' => $id ), array( '%d' ) );
 
 			self::flush_cache();
 		}
@@ -714,7 +685,7 @@ class Redirect_Manager {
 		$key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
 
 		if ( $key ) {
-			$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', [] );
+			$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', array() );
 			if ( isset( $suggestions[ $key ] ) ) {
 				unset( $suggestions[ $key ] );
 				update_option( 'SAMAN_SEO_monitor_slugs', $suggestions );
@@ -791,9 +762,23 @@ class Redirect_Manager {
 						continue;
 					}
 
-					// Test regex pattern.
-					// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-					if ( @preg_match( '#' . $regex_row->source . '#', $request, $matches ) ) {
+					// Test regex pattern without suppressing errors.
+					$matched = false;
+					$matches = array();
+					set_error_handler(
+						static function () {
+							return true;
+						}
+					);
+					try {
+						$matched = (bool) preg_match( '#' . $regex_row->source . '#', $request, $matches );
+					} catch ( \Throwable $e ) {
+						$matched = false;
+					} finally {
+						restore_error_handler();
+					}
+
+					if ( $matched ) {
 						$row            = $regex_row;
 						$matched_source = $request;
 
@@ -810,7 +795,16 @@ class Redirect_Manager {
 			}
 		}
 
-		if ( ! $row || ! $target ) {
+		if ( ! $row ) {
+			return;
+		}
+
+		$status_code = (int) $row->status_code;
+
+		// Target-less status codes (410 Gone, 451 Unavailable For Legal Reasons).
+		$targetless_statuses = array( 410, 451 );
+
+		if ( ! $target && ! in_array( $status_code, $targetless_statuses, true ) ) {
 			return;
 		}
 
@@ -818,19 +812,25 @@ class Redirect_Manager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
 			$this->table,
-			[
+			array(
 				'hits'     => (int) $row->hits + 1,
 				'last_hit' => current_time( 'mysql' ),
-			],
-			[ 'id' => $row->id ]
+			),
+			array( 'id' => $row->id )
 		);
-
-		$target = esc_url_raw( $target );
 
 		// Bail if output has already started (e.g. PHP deprecation notices on 8.4+).
 		if ( headers_sent() ) {
 			return;
 		}
+
+		// Handle target-less statuses.
+		if ( ! $target && in_array( $status_code, $targetless_statuses, true ) ) {
+			status_header( $status_code );
+			exit;
+		}
+
+		$target = esc_url_raw( $target );
 
 		add_filter(
 			'allowed_redirect_hosts',
@@ -843,7 +843,7 @@ class Redirect_Manager {
 			}
 		);
 
-		wp_safe_redirect( $target, (int) $row->status_code );
+		wp_safe_redirect( $target, $status_code );
 		exit;
 	}
 

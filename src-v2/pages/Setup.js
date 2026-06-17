@@ -19,7 +19,7 @@ const Setup = ({ onComplete, onSkip }) => {
         enable_sitemap: true,
         enable_404_log: true,
         enable_redirects: true,
-        title_template: '%title% - %sitename%',
+        title_template: '{{post_title}} - {{site_title}}',
     });
 
     const updateData = (key, value) => {
@@ -338,10 +338,10 @@ const Setup = ({ onComplete, onSkip }) => {
                                 value={data.title_template}
                                 onChange={(e) => updateData('title_template', e.target.value)}
                             >
-                                <option value="%title% - %sitename%">Page Title - Site Name</option>
-                                <option value="%title% | %sitename%">Page Title | Site Name</option>
-                                <option value="%sitename% - %title%">Site Name - Page Title</option>
-                                <option value="%title%">Page Title Only</option>
+                                <option value="{{post_title}} - {{site_title}}">Page Title - Site Name</option>
+                                <option value="{{post_title}} | {{site_title}}">Page Title | Site Name</option>
+                                <option value="{{site_title}} - {{post_title}}">Site Name - Page Title</option>
+                                <option value="{{post_title}}">Page Title Only</option>
                             </select>
                             <p className="setup-help">How titles will appear in search results.</p>
                         </div>

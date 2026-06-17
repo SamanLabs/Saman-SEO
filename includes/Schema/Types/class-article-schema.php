@@ -64,16 +64,16 @@ class Article_Schema extends Abstract_Schema {
 	public function generate(): array {
 		$post = $this->context->post;
 
-		$schema = [
+		$schema = array(
 			'@type'            => $this->get_type(),
 			'@id'              => Schema_IDs::article( $this->context->canonical ),
 			'headline'         => get_the_title( $post ),
 			'datePublished'    => get_the_date( DATE_W3C, $post ),
 			'dateModified'     => get_the_modified_date( DATE_W3C, $post ),
-			'mainEntityOfPage' => [
+			'mainEntityOfPage' => array(
 				'@id' => Schema_IDs::webpage( $this->context->canonical ),
-			],
-		];
+			),
+		);
 
 		// Add author (full Person object).
 		$author = $this->get_author();
@@ -116,14 +116,14 @@ class Article_Schema extends Abstract_Schema {
 	protected function get_author(): array {
 		$author_id = (int) $this->context->post->post_author;
 		if ( ! $author_id ) {
-			return [];
+			return array();
 		}
 
-		$author = [
+		$author = array(
 			'@type' => 'Person',
 			'@id'   => Schema_IDs::author( $author_id ),
 			'name'  => get_the_author_meta( 'display_name', $author_id ),
-		];
+		);
 
 		// URL: prefer user_url, fallback to author posts URL.
 		$url = get_the_author_meta( 'user_url', $author_id );
@@ -133,7 +133,7 @@ class Article_Schema extends Abstract_Schema {
 		$author['url'] = $url;
 
 		// Optional image from Gravatar.
-		$avatar = get_avatar_url( $author_id, [ 'size' => 96 ] );
+		$avatar = get_avatar_url( $author_id, array( 'size' => 96 ) );
 		if ( $avatar ) {
 			$author['image'] = $avatar;
 		}
@@ -157,12 +157,12 @@ class Article_Schema extends Abstract_Schema {
 			if ( empty( $name ) ) {
 				$name = get_bloginfo( 'name' );
 			}
-			$publisher = [
+			$publisher = array(
 				'@type' => 'Person',
 				'@id'   => Schema_IDs::person(),
 				'name'  => $name,
-			];
-			$image = get_option( 'SAMAN_SEO_homepage_person_image', '' );
+			);
+			$image     = get_option( 'SAMAN_SEO_homepage_person_image', '' );
 			if ( ! empty( $image ) ) {
 				$publisher['logo'] = $image;
 			}
@@ -173,12 +173,12 @@ class Article_Schema extends Abstract_Schema {
 		if ( empty( $name ) ) {
 			$name = get_bloginfo( 'name' );
 		}
-		$publisher = [
+		$publisher = array(
 			'@type' => 'Organization',
 			'@id'   => Schema_IDs::organization(),
 			'name'  => $name,
-		];
-		$logo = get_option( 'SAMAN_SEO_homepage_organization_logo', '' );
+		);
+		$logo      = get_option( 'SAMAN_SEO_homepage_organization_logo', '' );
 		if ( empty( $logo ) ) {
 			$logo = get_site_icon_url();
 		}
