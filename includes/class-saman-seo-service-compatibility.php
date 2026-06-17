@@ -52,14 +52,35 @@ class Compatibility {
 			add_filter( 'SAMAN_SEO_feature_toggle', [ $this, 'maybe_disable' ], 10, 2 );
 		}
 
-		// Local WP on Windows can be very slow resolving IPv6 for .local
-		// domains, causing the validation suite's wp_remote_get calls to
-		// timeout. Force IPv4 for same-domain HTTP requests.
-		add_action( 'http_api_curl', [ $this, 'force_ipv4_for_local_host' ], 10, 3 );
+		// Local WP on Windows can be very slow resolving .local domains,
+		// causing the validation suite's wp_remote_get calls to timeout.
+		// Force IPv4, a static host-to-127.0.0.1 resolution, and a longer
+		// timeout for same-domain requests so the suite can finish reliably.
+		add_filter( 'http_request_args', [ $this, 'extend_local_timeout' ], 10, 2 );
+		add_action( 'http_api_curl', [ $this, 'force_fast_local_resolve' ], 10, 3 );
 	}
 
 	/**
-	 * Force IPv4 resolution for requests to the current site's domain.
+	 * Extend the HTTP timeout for same-domain requests on slow Local stacks.
+	 *
+	 * @param array  $parsed_args Request arguments.
+	 * @param string $url         Request URL.
+	 *
+	 * @return array
+	 */
+	public function extend_local_timeout( $parsed_args, $url ) {
+		$host      = wp_parse_url( $url, PHP_URL_HOST );
+		$site_host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+		if ( ! $host || $host !== $site_host ) {
+			return $parsed_args;
+		}
+
+		$parsed_args['timeout'] = 20;
+		return $parsed_args;
+	}
+
+	/**
+	 * Force fast loopback resolution for requests to the current site's domain.
 	 *
 	 * @param resource|\CurlHandle $handle      cURL handle.
 	 * @param array                $parsed_args Request arguments.
@@ -67,16 +88,24 @@ class Compatibility {
 	 *
 	 * @return void
 	 */
-	public function force_ipv4_for_local_host( $handle, $parsed_args, $url ) {
+	public function force_fast_local_resolve( $handle, $parsed_args, $url ) {
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 		if ( ! $host ) {
 			return;
 		}
 
 		$site_host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
-		if ( $host === $site_host ) {
-			curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+		if ( $host !== $site_host ) {
+			return;
 		}
+
+		$scheme = wp_parse_url( $url, PHP_URL_SCHEME );
+		$port   = wp_parse_url( $url, PHP_URL_PORT );
+		$port   = $port ?: ( 'https' === $scheme ? 443 : 80 );
+
+		curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+		curl_setopt( $handle, CURLOPT_RESOLVE, [ "$host:$port:127.0.0.1" ] );
+		curl_setopt( $handle, CURLOPT_CONNECT_TO, [ "$host:$port:127.0.0.1:$port" ] );
 	}
 
 	/**
