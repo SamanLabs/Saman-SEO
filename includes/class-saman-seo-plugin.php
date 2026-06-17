@@ -170,6 +170,10 @@ class Plugin {
 		saman_seo_do_action( 'saman_seo_register_schema_type', $registry );
 
 		$this->register( 'compatibility', new Service\Compatibility() );
+		// Yoast_Bridge registers option filters; keep it before any service that
+		// reads SAMAN_SEO_* options at boot (e.g. Theme_Config) so the bridged
+		// fallbacks are in place.
+		$this->register( 'yoast_bridge', new Service\Yoast_Bridge() );
 		$this->register( 'settings', new Service\Settings() );
 		// Theme_Config must boot *after* Settings (it reads plugin compile-time
 		// defaults from the Settings service) and *before* any service that
