@@ -103,9 +103,7 @@ class Yoast_Bridge {
 		return $has;
 	}
 
-	/* --------------------------------------------------------------------- */
-	/* Per-post meta bridge                                                   */
-	/* --------------------------------------------------------------------- */
+	// Per-post meta bridge.
 
 	/**
 	 * Short-circuit `get_post_meta( $id, '_SAMAN_SEO_meta', true )` to merge in
@@ -190,9 +188,7 @@ class Yoast_Bridge {
 		return $changed ? $merged : false;
 	}
 
-	/* --------------------------------------------------------------------- */
-	/* Site-wide option bridge                                                */
-	/* --------------------------------------------------------------------- */
+	// Site-wide option bridge.
 
 	/**
 	 * Wire an option so that, when Saman has no value of its own, the value is
@@ -319,9 +315,7 @@ class Yoast_Bridge {
 		return empty( $urls ) ? '' : implode( "\n", $urls );
 	}
 
-	/* --------------------------------------------------------------------- */
-	/* Helpers                                                                */
-	/* --------------------------------------------------------------------- */
+	// Helpers.
 
 	/**
 	 * Translate Yoast `%%variable%%` replacement tags into Saman's `{{variable}}`
