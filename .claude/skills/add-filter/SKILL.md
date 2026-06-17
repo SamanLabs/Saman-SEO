@@ -18,7 +18,7 @@ Add a new filter hook to the Saman SEO plugin with proper documentation.
    - Determine what data should be filterable
    - Consider what additional context to pass
 
-2. **Add the filter** using `apply_filters()`:
+2. **Add the filter** using `saman_seo_apply_filters()` so legacy aliases work:
 
 ```php
 /**
@@ -29,7 +29,7 @@ Add a new filter hook to the Saman SEO plugin with proper documentation.
  * @param {type} ${variable} The {description}.
  * @param {additional_params} Additional context parameters.
  */
-$variable = apply_filters( 'saman_seo_{filter_name}', $variable, $additional_context );
+$variable = saman_seo_apply_filters( 'saman_seo_{filter_name}', $variable, $additional_context );
 ```
 
 3. **Document the filter** in `FILTERS.md`:

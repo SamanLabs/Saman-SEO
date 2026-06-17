@@ -298,7 +298,7 @@
 
     &__image {
         aspect-ratio: 1.91/1;
-        background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+        background: @color-surface-muted;
         background-size: cover;
         background-position: center;
         display: flex;
@@ -592,4 +592,26 @@
             }
         }
     }
+}
+
+// Sidebar logo preview
+.settings-preview-row {
+    margin-top: @spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+
+    span {
+        font-size: @font-size-xs;
+        color: @color-muted;
+    }
+}
+
+.settings-logo-preview {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border: 1px solid @color-border;
+    border-radius: @radius-sm;
+    padding: 2px;
 }

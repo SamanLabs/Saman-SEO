@@ -2,8 +2,8 @@
 // Managed Plugins - Plugin Cards with Beta Toggle
 // ==========================================================================
 
-// Color variables for beta
-@color-beta: #8b5cf6;
+// Color variables for beta (use primary accent)
+@color-beta: @color-primary;
 
 // Grid layout
 .managed-plugins-grid {
@@ -94,7 +94,7 @@
     }
 
     &.ai {
-        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        background: @color-primary;
     }
 
     &.security {

@@ -682,7 +682,7 @@ const SearchAppearance = () => {
                                         <tr key={pt.slug}>
                                             <td>
                                                 <strong>{pt.name}</strong>
-                                                <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{pt.slug}</span>
+                                                <span className="muted-block">{pt.slug}</span>
                                             </td>
                                             <td>
                                                 <div className="title-preview-cell">
@@ -763,7 +763,7 @@ const SearchAppearance = () => {
                                         <tr key={tax.slug}>
                                             <td>
                                                 <strong>{tax.name}</strong>
-                                                <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{tax.slug}</span>
+                                                <span className="muted-block">{tax.slug}</span>
                                             </td>
                                             <td>
                                                 <div className="title-preview-cell">
@@ -845,7 +845,7 @@ const SearchAppearance = () => {
                                         <tr key={archive.slug}>
                                             <td>
                                                 <strong>{archive.name}</strong>
-                                                <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{archive.description}</span>
+                                                <span className="muted-block">{archive.description}</span>
                                             </td>
                                             <td>
                                                 <div className="title-preview-cell">
@@ -987,41 +987,24 @@ const SearchAppearance = () => {
                                     <p className="settings-help">Fallback image for social sharing.</p>
                                 </div>
                                 <div className="settings-control">
-                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                    <div className="image-uploader">
                                         {editingPostTypeSocial.image_source ? (
-                                            <div style={{ position: 'relative', width: '120px', height: '63px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                            <div className="image-preview">
                                                 <img
                                                     src={editingPostTypeSocial.image_source}
                                                     alt="Social fallback"
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />
                                                 <button
                                                     type="button"
+                                                    className="image-preview__remove"
                                                     onClick={() => setEditingPostTypeSocial({ ...editingPostTypeSocial, image_source: '' })}
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '4px',
-                                                        right: '4px',
-                                                        width: '20px',
-                                                        height: '20px',
-                                                        borderRadius: '50%',
-                                                        background: 'rgba(0,0,0,0.6)',
-                                                        color: '#fff',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        fontSize: '14px',
-                                                        lineHeight: 1,
-                                                    }}
                                                     title="Remove image"
                                                 >
                                                     ×
                                                 </button>
                                             </div>
                                         ) : (
-                                            <div style={{ width: '120px', height: '63px', borderRadius: '4px', border: '2px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                                            <div className="image-placeholder">
                                                 No image
                                             </div>
                                         )}
@@ -1087,12 +1070,12 @@ const SearchAppearance = () => {
                     ) : (
                         <>
                             {/* Social Preview Cards */}
-                            <div style={{ marginBottom: '32px', padding: '24px', background: '#f8f9fa', borderRadius: '8px' }}>
-                                <h4 style={{ marginBottom: '16px' }}>Social Preview</h4>
-                                <p className="muted" style={{ marginBottom: '24px' }}>
+                            <div className="preview-panel">
+                                <h4 className="form-section__title">Social Preview</h4>
+                                <p className="preview-panel__description">
                                     Preview how your content will appear when shared on social media.
                                 </p>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                                <div className="preview-grid">
                                     <FacebookPreview
                                         image={socialDefaults.image_source}
                                         title={renderTemplatePreview(socialDefaults.og_title) || siteInfo.name}
@@ -1110,9 +1093,9 @@ const SearchAppearance = () => {
                             </div>
 
                             {/* Global Social Defaults */}
-                            <div className="settings-form" style={{ marginBottom: '32px' }}>
-                                <h4 style={{ marginBottom: '16px' }}>Global Social Defaults</h4>
-                                <p className="muted" style={{ marginBottom: '24px' }}>
+                            <div className="settings-form form-section">
+                                <h4 className="form-section__title">Global Social Defaults</h4>
+                                <p className="form-section__description">
                                     These defaults apply when posts don't have custom social values.
                                 </p>
 
@@ -1200,41 +1183,24 @@ const SearchAppearance = () => {
                                         <p className="settings-help">Used when posts don't have a featured image (1200x630px recommended).</p>
                                     </div>
                                     <div className="settings-control">
-                                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                        <div className="image-uploader">
                                             {socialDefaults.image_source ? (
-                                                <div style={{ position: 'relative', width: '120px', height: '63px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                                <div className="image-preview">
                                                     <img
                                                         src={socialDefaults.image_source}
                                                         alt="Social fallback"
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                     />
                                                     <button
                                                         type="button"
+                                                        className="image-preview__remove"
                                                         onClick={() => setSocialDefaults({ ...socialDefaults, image_source: '' })}
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '4px',
-                                                            right: '4px',
-                                                            width: '20px',
-                                                            height: '20px',
-                                                            borderRadius: '50%',
-                                                            background: 'rgba(0,0,0,0.6)',
-                                                            color: '#fff',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            fontSize: '14px',
-                                                            lineHeight: 1,
-                                                        }}
                                                         title="Remove image"
                                                     >
                                                         ×
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div style={{ width: '120px', height: '63px', borderRadius: '4px', border: '2px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                                                <div className="image-placeholder">
                                                     No image
                                                 </div>
                                             )}
@@ -1292,9 +1258,9 @@ const SearchAppearance = () => {
                             </div>
 
                             {/* Post Type Specific Settings */}
-                            <div style={{ marginTop: '32px' }}>
-                                <h4 style={{ marginBottom: '8px' }}>Post Type Specific Settings</h4>
-                                <p className="muted" style={{ marginBottom: '16px' }}>
+                            <div className="form-section">
+                                <h4 className="form-section__title">Post Type Specific Settings</h4>
+                                <p className="form-section__description">
                                     Override default social settings for specific post types.
                                 </p>
 
@@ -1314,7 +1280,7 @@ const SearchAppearance = () => {
                                                 <tr key={pt.slug}>
                                                     <td>
                                                         <strong>{pt.name}</strong>
-                                                        <span className="muted" style={{ display: 'block', fontSize: '12px' }}>{pt.slug}</span>
+                                                        <span className="muted-block">{pt.slug}</span>
                                                     </td>
                                                     <td>
                                                         <span className="muted">
@@ -1377,17 +1343,15 @@ const SearchAppearance = () => {
 
                     <div className="settings-form">
                         {/* Live Preview */}
-                        <div style={{ marginBottom: '32px', padding: '24px', background: '#f8f9fa', borderRadius: '12px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                <h4 style={{ margin: 0 }}>Live Preview</h4>
+                        <div className="preview-panel">
+                            <div className="preview-panel__header">
+                                <h4>Live Preview</h4>
                             </div>
 
                             {/* Preview Title Input */}
-                            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-                                <div style={{ flex: '1 1 300px' }}>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
-                                        Preview Title
-                                    </label>
+                            <div className="inline-fields">
+                                <div className="field-group grow">
+                                    <label className="field-group__label">Preview Title</label>
                                     <input
                                         type="text"
                                         className="input"
@@ -1398,10 +1362,8 @@ const SearchAppearance = () => {
                                 </div>
                                 {Object.keys(previewPosts).length > 0 && (
                                     <>
-                                        <div style={{ flex: '0 0 140px' }}>
-                                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
-                                                Content type
-                                            </label>
+                                        <div className="field-group fixed-sm">
+                                            <label className="field-group__label">Content type</label>
                                             <select
                                                 className="input"
                                                 value={previewPostType}
@@ -1415,10 +1377,8 @@ const SearchAppearance = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div style={{ flex: '1 1 200px' }}>
-                                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#666' }}>
-                                                Select content
-                                            </label>
+                                        <div className="field-group fixed-md">
+                                            <label className="field-group__label">Select content</label>
                                             <select
                                                 className="input"
                                                 value={selectedPreviewPost || ''}
@@ -1447,28 +1407,19 @@ const SearchAppearance = () => {
                             <div
                                 className="social-card-preview"
                                 style={{
-                                    width: '100%',
-                                    maxWidth: '600px',
-                                    aspectRatio: '1200/630',
                                     background: cardDesign.layout === 'gradient'
                                         ? `linear-gradient(135deg, ${cardDesign.background_color} 0%, ${cardDesign.accent_color}44 100%)`
                                         : cardDesign.background_color,
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
                                     justifyContent: cardDesign.layout === 'centered' ? 'center' : cardDesign.layout === 'magazine' ? 'flex-end' : 'flex-end',
                                     alignItems: cardDesign.layout === 'centered' ? 'center' : 'flex-start',
                                     padding: cardDesign.layout === 'magazine' ? '40px 32px' : '32px',
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                                 }}
                             >
                                 {/* Layout-specific accent elements */}
                                 {cardDesign.layout === 'default' && (
                                     <div
+                                        className="social-card-preview__accent"
                                         style={{
-                                            position: 'absolute',
                                             bottom: 0,
                                             left: 0,
                                             right: 0,
@@ -1479,8 +1430,8 @@ const SearchAppearance = () => {
                                 )}
                                 {cardDesign.layout === 'magazine' && (
                                     <div
+                                        className="social-card-preview__accent"
                                         style={{
-                                            position: 'absolute',
                                             top: 0,
                                             left: 0,
                                             right: 0,
@@ -1492,8 +1443,8 @@ const SearchAppearance = () => {
                                 {cardDesign.layout === 'corner' && (
                                     <>
                                         <div
+                                            className="social-card-preview__accent"
                                             style={{
-                                                position: 'absolute',
                                                 top: 0,
                                                 left: 0,
                                                 width: '80px',
@@ -1503,8 +1454,8 @@ const SearchAppearance = () => {
                                             }}
                                         />
                                         <div
+                                            className="social-card-preview__accent"
                                             style={{
-                                                position: 'absolute',
                                                 bottom: 0,
                                                 right: 0,
                                                 width: '120px',
@@ -1518,8 +1469,8 @@ const SearchAppearance = () => {
                                 )}
                                 {cardDesign.layout === 'gradient' && (
                                     <div
+                                        className="social-card-preview__accent"
                                         style={{
-                                            position: 'absolute',
                                             bottom: 0,
                                             left: 0,
                                             right: 0,
@@ -1532,13 +1483,12 @@ const SearchAppearance = () => {
                                 {/* Logo */}
                                 {cardDesign.logo_url && (
                                     <img
+                                        className="social-card-preview__logo"
                                         src={cardDesign.logo_url}
                                         alt="Logo"
                                         style={{
-                                            position: 'absolute',
                                             width: `${Math.max(24, (cardDesign.logo_size || 48) / 2.5)}px`,
                                             height: `${Math.max(24, (cardDesign.logo_size || 48) / 2.5)}px`,
-                                            objectFit: 'contain',
                                             ...(cardDesign.logo_position === 'top-left' && { top: '20px', left: '20px' }),
                                             ...(cardDesign.logo_position === 'top-right' && { top: '20px', right: '20px' }),
                                             ...(cardDesign.logo_position === 'bottom-left' && { bottom: '20px', left: '20px' }),
@@ -1589,21 +1539,11 @@ const SearchAppearance = () => {
                                 <p className="settings-help">Each layout has optimized defaults.</p>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '8px', maxWidth: '500px' }}>
+                                <div className="card-layout-grid">
                                     {cardLayoutOptions.map((layout) => (
                                         <label
                                             key={layout.value}
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'center',
-                                                padding: '12px 8px',
-                                                border: `2px solid ${cardDesign.layout === layout.value ? '#2271b1' : '#e0e0e0'}`,
-                                                borderRadius: '8px',
-                                                cursor: 'pointer',
-                                                background: cardDesign.layout === layout.value ? '#f0f6fc' : '#fff',
-                                                transition: 'all 0.15s ease',
-                                            }}
+                                            className={`card-layout-option ${cardDesign.layout === layout.value ? 'is-selected' : ''}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1619,10 +1559,9 @@ const SearchAppearance = () => {
                                                         ...(layoutConfig?.defaults || {}),
                                                     });
                                                 }}
-                                                style={{ display: 'none' }}
                                             />
-                                            <span style={{ fontSize: '13px', fontWeight: 500 }}>{layout.label}</span>
-                                            <span style={{ fontSize: '11px', color: '#666', textAlign: 'center' }}>{layout.description}</span>
+                                            <span className="card-layout-option__title">{layout.label}</span>
+                                            <span className="card-layout-option__description">{layout.description}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -1636,45 +1575,23 @@ const SearchAppearance = () => {
                                 <p className="settings-help">Quick color schemes to get started.</p>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                <div className="color-presets">
                                     {colorPresets.map((preset) => (
                                         <button
                                             key={preset.name}
                                             type="button"
+                                            className="color-preset"
                                             onClick={() => setCardDesign({
                                                 ...cardDesign,
                                                 background_color: preset.bg,
                                                 accent_color: preset.accent,
                                                 text_color: preset.text,
                                             })}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '6px',
-                                                padding: '6px 10px',
-                                                border: '1px solid #ddd',
-                                                borderRadius: '6px',
-                                                background: '#fff',
-                                                cursor: 'pointer',
-                                                fontSize: '12px',
-                                            }}
                                             title={preset.name}
                                         >
-                                            <span style={{
-                                                width: '16px',
-                                                height: '16px',
-                                                borderRadius: '3px',
-                                                background: preset.bg,
-                                                border: '1px solid rgba(0,0,0,0.1)',
-                                            }} />
-                                            <span style={{
-                                                width: '16px',
-                                                height: '16px',
-                                                borderRadius: '3px',
-                                                background: preset.accent,
-                                                border: '1px solid rgba(0,0,0,0.1)',
-                                            }} />
-                                            <span style={{ color: '#666' }}>{preset.name}</span>
+                                            <span className="color-preset__swatch" style={{ background: preset.bg }} />
+                                            <span className="color-preset__swatch" style={{ background: preset.accent }} />
+                                            <span>{preset.name}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -1687,58 +1604,55 @@ const SearchAppearance = () => {
                                 <label>Colors</label>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: '#666' }}>Background</span>
-                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <div className="color-fields">
+                                    <div className="color-field">
+                                        <span className="color-field__label">Background</span>
+                                        <div className="color-field__row">
                                             <input
                                                 type="color"
+                                                className="color-field__input"
                                                 value={cardDesign.background_color}
                                                 onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
-                                                style={{ width: '36px', height: '32px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', padding: 0 }}
                                             />
                                             <input
                                                 type="text"
-                                                className="input"
+                                                className="input color-field__text"
                                                 value={cardDesign.background_color}
                                                 onChange={(e) => setCardDesign({ ...cardDesign, background_color: e.target.value })}
-                                                style={{ width: '80px', fontSize: '12px' }}
                                             />
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: '#666' }}>Accent</span>
-                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <div className="color-field">
+                                        <span className="color-field__label">Accent</span>
+                                        <div className="color-field__row">
                                             <input
                                                 type="color"
+                                                className="color-field__input"
                                                 value={cardDesign.accent_color}
                                                 onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
-                                                style={{ width: '36px', height: '32px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', padding: 0 }}
                                             />
                                             <input
                                                 type="text"
-                                                className="input"
+                                                className="input color-field__text"
                                                 value={cardDesign.accent_color}
                                                 onChange={(e) => setCardDesign({ ...cardDesign, accent_color: e.target.value })}
-                                                style={{ width: '80px', fontSize: '12px' }}
                                             />
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: '#666' }}>Text</span>
-                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <div className="color-field">
+                                        <span className="color-field__label">Text</span>
+                                        <div className="color-field__row">
                                             <input
                                                 type="color"
+                                                className="color-field__input"
                                                 value={cardDesign.text_color}
                                                 onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
-                                                style={{ width: '36px', height: '32px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', padding: 0 }}
                                             />
                                             <input
                                                 type="text"
-                                                className="input"
+                                                className="input color-field__text"
                                                 value={cardDesign.text_color}
                                                 onChange={(e) => setCardDesign({ ...cardDesign, text_color: e.target.value })}
-                                                style={{ width: '80px', fontSize: '12px' }}
                                             />
                                         </div>
                                     </div>
@@ -1752,10 +1666,10 @@ const SearchAppearance = () => {
                                 <label>Typography</label>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: '#666' }}>Title Size</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div className="inline-fields">
+                                    <div className="color-field">
+                                        <span className="color-field__label">Title Size</span>
+                                        <div className="color-field__row">
                                             <input
                                                 type="range"
                                                 min={24}
@@ -1764,16 +1678,15 @@ const SearchAppearance = () => {
                                                 onChange={(e) => setCardDesign({ ...cardDesign, title_font_size: parseInt(e.target.value) })}
                                                 style={{ width: '100px' }}
                                             />
-                                            <span style={{ fontSize: '12px', color: '#666', minWidth: '40px' }}>{cardDesign.title_font_size}px</span>
+                                            <span className="color-field__label">{cardDesign.title_font_size}px</span>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: '#666' }}>Title Weight</span>
+                                    <div className="color-field">
+                                        <span className="color-field__label">Title Weight</span>
                                         <select
-                                            className="input"
+                                            className="input color-field__text"
                                             value={cardDesign.title_weight || 600}
                                             onChange={(e) => setCardDesign({ ...cardDesign, title_weight: parseInt(e.target.value) })}
-                                            style={{ width: '100px', fontSize: '12px' }}
                                         >
                                             <option value={400}>Regular</option>
                                             <option value={500}>Medium</option>
@@ -1781,9 +1694,9 @@ const SearchAppearance = () => {
                                             <option value={700}>Bold</option>
                                         </select>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: '#666' }}>Site Name Size</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div className="color-field">
+                                        <span className="color-field__label">Site Name Size</span>
+                                        <div className="color-field__row">
                                             <input
                                                 type="range"
                                                 min={12}
@@ -1792,7 +1705,7 @@ const SearchAppearance = () => {
                                                 onChange={(e) => setCardDesign({ ...cardDesign, site_font_size: parseInt(e.target.value) })}
                                                 style={{ width: '100px' }}
                                             />
-                                            <span style={{ fontSize: '12px', color: '#666', minWidth: '40px' }}>{cardDesign.site_font_size}px</span>
+                                            <span className="color-field__label">{cardDesign.site_font_size}px</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1806,28 +1719,17 @@ const SearchAppearance = () => {
                                 <p className="settings-help">PNG with transparency works best.</p>
                             </div>
                             <div className="settings-control">
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                <div className="image-uploader">
                                     {cardDesign.logo_url && (
-                                        <div style={{
-                                            width: '60px',
-                                            height: '60px',
-                                            border: '1px solid #ddd',
-                                            borderRadius: '6px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            background: '#f5f5f5',
-                                            overflow: 'hidden',
-                                        }}>
+                                        <div className="logo-preview">
                                             <img
                                                 src={cardDesign.logo_url}
                                                 alt="Logo preview"
-                                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                                             />
                                         </div>
                                     )}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div className="color-field">
+                                        <div className="color-field__row">
                                             <button
                                                 type="button"
                                                 className="button"
@@ -1850,19 +1752,18 @@ const SearchAppearance = () => {
                                             {cardDesign.logo_url && (
                                                 <button
                                                     type="button"
-                                                    className="button"
+                                                    className="button danger"
                                                     onClick={() => setCardDesign({ ...cardDesign, logo_url: '' })}
-                                                    style={{ color: '#b32d2e' }}
                                                 >
                                                     Remove
                                                 </button>
                                             )}
                                         </div>
                                         {cardDesign.logo_url && (
-                                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                    <span style={{ fontSize: '12px', color: '#666' }}>Size</span>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div className="inline-fields">
+                                                <div className="color-field">
+                                                    <span className="color-field__label">Size</span>
+                                                    <div className="color-field__row">
                                                         <input
                                                             type="range"
                                                             min={24}
@@ -1871,16 +1772,15 @@ const SearchAppearance = () => {
                                                             onChange={(e) => setCardDesign({ ...cardDesign, logo_size: parseInt(e.target.value) })}
                                                             style={{ width: '80px' }}
                                                         />
-                                                        <span style={{ fontSize: '12px', color: '#666' }}>{cardDesign.logo_size || 48}px</span>
+                                                        <span className="color-field__label">{cardDesign.logo_size || 48}px</span>
                                                     </div>
                                                 </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                    <span style={{ fontSize: '12px', color: '#666' }}>Position</span>
+                                                <div className="color-field">
+                                                    <span className="color-field__label">Position</span>
                                                     <select
-                                                        className="input"
+                                                        className="input color-field__text"
                                                         value={cardDesign.logo_position}
                                                         onChange={(e) => setCardDesign({ ...cardDesign, logo_position: e.target.value })}
-                                                        style={{ width: '120px', fontSize: '12px' }}
                                                     >
                                                         {logoPositionOptions.map((opt) => (
                                                             <option key={opt.value} value={opt.value}>{opt.label}</option>

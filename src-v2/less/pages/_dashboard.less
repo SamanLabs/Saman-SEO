@@ -136,8 +136,8 @@
 .dashboard-card {
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    padding: @spacing-2xl;
+    border-radius: @radius-md;
+    padding: @spacing-xl;
     transition: box-shadow @transition-fast;
 
     &:hover {
@@ -247,7 +247,7 @@
     }
 
     &.good {
-        background: #22c55e;
+        background: @color-success;
     }
 
     &.fair {
@@ -315,18 +315,14 @@
         width: 100%;
         max-width: 24px;
         min-height: 4px;
-        background: linear-gradient(180deg, #60a5fa 0%, @color-primary 100%);
-        border-radius: 4px 4px 2px 2px;
+        background: @color-primary;
+        border-radius: @radius-sm @radius-sm 0 0;
         margin-top: auto;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(34, 113, 177, 0.2);
+        transition: background @transition-fast;
     }
 
     &:hover span:first-child {
-        background: linear-gradient(180deg, #3b82f6 0%, @color-primary-hover 100%);
-        box-shadow: 0 4px 8px rgba(34, 113, 177, 0.3);
-        transform: scaleY(1.05);
-        transform-origin: bottom;
+        background: @color-primary-hover;
     }
 
     .spark-label {
@@ -356,9 +352,9 @@
 
 .coverage-stat {
     text-align: center;
-    padding: @spacing-lg;
+    padding: @spacing-md @spacing-lg;
     background: @color-success-bg;
-    border-radius: @radius-md;
+    border-radius: @radius-sm;
     min-width: 90px;
 
     &.pending {
@@ -408,18 +404,17 @@
 .action-card {
     display: flex;
     align-items: center;
-    gap: @spacing-lg;
-    padding: @spacing-xl;
+    gap: @spacing-md;
+    padding: @spacing-lg;
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
+    border-radius: @radius-md;
     text-decoration: none;
-    transition: all @transition-fast;
+    transition: border-color @transition-fast, background @transition-fast;
 
     &:hover {
         border-color: @color-primary;
-        box-shadow: @shadow-md;
-        transform: translateY(-2px);
+        background: @color-primary-lighter;
 
         .action-icon {
             background: @color-primary;
@@ -428,22 +423,22 @@
     }
 
     &:focus {
-        outline: 2px solid @color-primary;
-        outline-offset: 2px;
+        outline: none;
+        box-shadow: 0 0 0 1.5px @color-primary;
     }
 }
 
 .action-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: @color-primary-light;
-    border-radius: @radius-md;
+    border-radius: @radius-sm;
     color: @color-primary;
     flex-shrink: 0;
-    transition: all @transition-fast;
+    transition: background @transition-fast, color @transition-fast;
 }
 
 .action-content {

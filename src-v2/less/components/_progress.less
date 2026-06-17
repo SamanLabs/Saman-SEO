@@ -51,22 +51,22 @@
 
     span:not(.spark-label) {
         display: block;
-        background: linear-gradient(180deg, rgba(34, 113, 177, 0.9), rgba(34, 113, 177, 0.4));
-        border-radius: 6px;
+        background: @color-primary;
+        border-radius: @radius-sm;
     }
 }
 
 // Progress Bar
 .progress-bar {
     height: 10px;
-    background: #e3e7ef;
+    background: @color-border;
     border-radius: @radius-full;
     overflow: hidden;
 
     span {
         display: block;
         height: 100%;
-        background: linear-gradient(90deg, @color-primary, #4da3e6);
+        background: @color-primary;
     }
 }
 

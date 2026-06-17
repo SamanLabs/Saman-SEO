@@ -7,13 +7,12 @@
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: @spacing-xl;
-    padding: @spacing-lg @spacing-xl;
+    padding: @spacing-md @spacing-lg;
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    box-shadow: @shadow-md;
+    box-shadow: @shadow-sm;
     position: sticky;
-    top: @spacing-lg;
+    top: @spacing-md;
     z-index: @z-sticky;
 }
 
@@ -21,21 +20,20 @@
 .brand {
     display: flex;
     align-items: center;
-    gap: @spacing-md;
+    gap: @spacing-sm;
     font-weight: @font-weight-semibold;
 }
 
 .brand-icon {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: @radius-md;
     background: @color-primary;
     .flex-center();
-    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
 
     svg {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         fill: #fff;
         display: block;
     }
@@ -43,23 +41,24 @@
 
 .brand-name {
     font-size: @font-size-lg;
-    letter-spacing: 0.2px;
+    color: @color-text;
 }
 
 // Main Navigation
 .main-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: @spacing-sm;
+    gap: 0;
     justify-content: center;
 }
 
 .nav-tab {
-    border: 1px solid transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
     background: transparent;
     color: @color-muted;
     padding: @spacing-sm @spacing-md;
-    border-radius: @radius-full;
+    border-radius: 0;
     font-size: @font-size-base;
     font-weight: @font-weight-medium;
     cursor: pointer;
@@ -72,9 +71,9 @@
 
     &.is-active {
         color: @color-primary;
-        border-color: rgba(34, 113, 177, 0.3);
-        background: @color-primary-light;
-        box-shadow: inset 0 -2px 0 rgba(34, 113, 177, 0.4);
+        border-bottom-color: @color-primary;
+        background: transparent;
+        font-weight: @font-weight-semibold;
     }
 }
 
@@ -85,25 +84,25 @@
 }
 
 .icon-button {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: @radius-md;
     border: 1px solid @color-border;
     background: @color-surface;
     .flex-center();
-    color: @color-text;
+    color: @color-muted;
     .transition();
 
     svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         fill: currentColor;
     }
 
     &:hover {
         color: @color-primary;
-        border-color: rgba(34, 113, 177, 0.4);
-        box-shadow: 0 8px 18px rgba(34, 113, 177, 0.2);
+        border-color: @color-primary;
+        background: @color-primary-lighter;
     }
 }
 
@@ -119,6 +118,7 @@
     .top-bar {
         grid-template-columns: 1fr;
         justify-items: start;
+        gap: @spacing-md;
     }
 
     .main-nav {

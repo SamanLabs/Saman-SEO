@@ -508,9 +508,9 @@ const GeneralTab = ({ settings, updateSetting }) => {
                         <div className="settings-control">
                             <input id="sidebar-logo" type="url" value={settings.sidebar_logo} onChange={(e) => updateSetting('sidebar_logo', e.target.value)} placeholder="https://example.com/icon.png" />
                             {settings.sidebar_logo && (
-                                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span style={{ fontSize: '12px', color: '#757575' }}>Preview:</span>
-                                    <img src={settings.sidebar_logo} alt="Logo preview" style={{ width: '20px', height: '20px', objectFit: 'contain', border: '1px solid #e0e0e0', borderRadius: '3px', padding: '2px' }} />
+                                <div className="settings-preview-row">
+                                    <span>Preview:</span>
+                                    <img className="settings-logo-preview" src={settings.sidebar_logo} alt="Logo preview" />
                                 </div>
                             )}
                         </div>
@@ -531,7 +531,7 @@ const GeneralTab = ({ settings, updateSetting }) => {
                             Page Title {settings.separator} Site Name
                         </span>
                     </div>
-                    <p className="muted" style={{ marginTop: '8px', fontSize: '12px' }}>
+                    <p className="muted-block">
                         This is how titles will be structured across your site.
                     </p>
                 </div>
@@ -866,7 +866,7 @@ const BreadcrumbsTab = ({ settings, updateSetting }) => {
                     <h4>Usage</h4>
                     <p className="muted">Add breadcrumbs to your theme using:</p>
                     <code className="code-block">[Saman_seo_breadcrumbs]</code>
-                    <p className="muted" style={{ marginTop: '8px' }}>Or in PHP:</p>
+                    <p className="muted-block">Or in PHP:</p>
                     <code className="code-block">Saman_seo_breadcrumbs();</code>
                 </div>
 
@@ -918,41 +918,24 @@ const SocialTab = ({ settings, updateSetting }) => {
                             <p className="settings-help">Used when no featured image is available. Recommended: 1200x630px.</p>
                         </div>
                         <div className="settings-control">
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                            <div className="image-uploader">
                                 {settings.default_og_image ? (
-                                    <div style={{ position: 'relative', width: '120px', height: '63px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                    <div className="image-preview">
                                         <img
                                             src={settings.default_og_image}
                                             alt="Default social"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
                                         <button
                                             type="button"
+                                            className="image-preview__remove"
                                             onClick={() => updateSetting('default_og_image', '')}
-                                            style={{
-                                                position: 'absolute',
-                                                top: '4px',
-                                                right: '4px',
-                                                width: '20px',
-                                                height: '20px',
-                                                borderRadius: '50%',
-                                                background: 'rgba(0,0,0,0.6)',
-                                                color: '#fff',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '14px',
-                                                lineHeight: 1,
-                                            }}
                                             title="Remove image"
                                         >
                                             ×
                                         </button>
                                     </div>
                                 ) : (
-                                    <div style={{ width: '120px', height: '63px', borderRadius: '4px', border: '2px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                                    <div className="image-placeholder">
                                         No image
                                     </div>
                                 )}
@@ -1374,7 +1357,7 @@ const AdvancedTab = ({ settings, updateSetting }) => {
                                     max="365"
                                     value={settings.cleanup_404_days || 30}
                                     onChange={(e) => updateSetting('cleanup_404_days', parseInt(e.target.value, 10) || 30)}
-                                    style={{ width: '80px' }}
+                                    className="input--narrow"
                                 />
                             </div>
                         </div>
@@ -1407,7 +1390,7 @@ const AdvancedTab = ({ settings, updateSetting }) => {
                                         max="1000"
                                         value={settings.notification_404_threshold || 10}
                                         onChange={(e) => updateSetting('notification_404_threshold', parseInt(e.target.value, 10) || 10)}
-                                        style={{ width: '80px' }}
+                                        className="input--narrow"
                                     />
                                 </div>
                             </div>
@@ -1423,7 +1406,7 @@ const AdvancedTab = ({ settings, updateSetting }) => {
                                         value={settings.notification_404_email || ''}
                                         onChange={(e) => updateSetting('notification_404_email', e.target.value)}
                                         placeholder="admin@example.com"
-                                        style={{ width: '220px' }}
+                                        className="input--medium"
                                     />
                                 </div>
                             </div>

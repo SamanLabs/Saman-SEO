@@ -49,7 +49,7 @@ class {Type}_Schema {
      *
      * @var string
      */
-    const META_KEY = '_saman_seo_{type}_schema';
+    const META_KEY = '_SAMAN_SEO_{type}_schema';
 
     /**
      * Boot the service.

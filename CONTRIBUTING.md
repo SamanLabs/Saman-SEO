@@ -203,7 +203,7 @@ function samanseo_example_function( $param1, $param2 = [] ) {
 	$sanitized_input = sanitize_text_field( $param1 );
 	
 	// Use filters to allow extensibility
-	$result = apply_filters( 'saman_seo_example_result', $sanitized_input, $param2 );
+	$result = saman_seo_apply_filters( 'saman_seo_example_result', $sanitized_input, $param2 );
 	
 	return true;
 }
