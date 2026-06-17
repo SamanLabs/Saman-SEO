@@ -51,6 +51,32 @@ class Compatibility {
 			add_action( 'admin_notices', [ $this, 'conflict_notice' ] );
 			add_filter( 'SAMAN_SEO_feature_toggle', [ $this, 'maybe_disable' ], 10, 2 );
 		}
+
+		// Local WP on Windows can be very slow resolving IPv6 for .local
+		// domains, causing the validation suite's wp_remote_get calls to
+		// timeout. Force IPv4 for same-domain HTTP requests.
+		add_action( 'http_api_curl', [ $this, 'force_ipv4_for_local_host' ], 10, 3 );
+	}
+
+	/**
+	 * Force IPv4 resolution for requests to the current site's domain.
+	 *
+	 * @param resource|\CurlHandle $handle      cURL handle.
+	 * @param array                $parsed_args Request arguments.
+	 * @param string               $url         Request URL.
+	 *
+	 * @return void
+	 */
+	public function force_ipv4_for_local_host( $handle, $parsed_args, $url ) {
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+		if ( ! $host ) {
+			return;
+		}
+
+		$site_host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+		if ( $host === $site_host ) {
+			curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+		}
 	}
 
 	/**
