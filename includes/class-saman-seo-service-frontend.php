@@ -760,7 +760,8 @@ class Frontend {
 		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
 
 		// Add default advanced directives (can be filtered or disabled via global option).
-		$advanced = saman_seo_apply_filters( 'saman_seo_robots_advanced',
+		$advanced = saman_seo_apply_filters(
+			'saman_seo_robots_advanced',
 			array(
 				'max-snippet:-1',
 				'max-image-preview:large',

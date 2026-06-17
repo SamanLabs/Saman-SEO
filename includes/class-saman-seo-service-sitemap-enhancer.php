@@ -910,7 +910,8 @@ class Sitemap_Enhancer {
 			$limit = (int) SAMAN_SEO_SITEMAP_MAX_URLS;
 		}
 
-		$limit = (int) saman_seo_apply_filters( 'saman_seo_sitemap_max_urls',
+		$limit = (int) saman_seo_apply_filters(
+			'saman_seo_sitemap_max_urls',
 			$limit,
 			$core_default ?? $this->default_max_urls_per_page
 		);
@@ -995,7 +996,8 @@ class Sitemap_Enhancer {
 	private function get_excluded_term_slugs( $taxonomy ) {
 		$defaults = $this->default_excluded_term_slugs[ $taxonomy ] ?? array();
 
-		$slugs = (array) saman_seo_apply_filters( 'saman_seo_sitemap_excluded_terms',
+		$slugs = (array) saman_seo_apply_filters(
+			'saman_seo_sitemap_excluded_terms',
 			$defaults,
 			$taxonomy
 		);
@@ -1068,7 +1070,8 @@ class Sitemap_Enhancer {
 		}
 
 		$counts           = wp_count_posts( $post_type, 'readable' );
-		$allowed_statuses = (array) saman_seo_apply_filters( 'saman_seo_sitemap_count_statuses',
+		$allowed_statuses = (array) saman_seo_apply_filters(
+			'saman_seo_sitemap_count_statuses',
 			array( 'publish', 'inherit' ),
 			$post_type
 		);
@@ -1253,7 +1256,8 @@ class Sitemap_Enhancer {
 	 * @return void
 	 */
 	private function redirect_pretty_sitemap() {
-		$target = saman_seo_apply_filters( 'saman_seo_pretty_sitemap_redirect',
+		$target = saman_seo_apply_filters(
+			'saman_seo_pretty_sitemap_redirect',
 			saman_seo_apply_filters( 'saman_seo_sitemap_redirect', home_url( '/sitemap_index.xml' ) )
 		);
 
