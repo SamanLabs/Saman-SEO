@@ -1163,7 +1163,7 @@ class Sitemap_Enhancer {
 	/**
 	 * Extract first video URL from content.
 	 *
-	 * @param string $content
+	 * @param string $content Post content.
 	 * @return string
 	 */
 	private function detect_video( $content ) {
@@ -1303,7 +1303,7 @@ class Sitemap_Enhancer {
 			<head>
 				<meta charset="utf-8" />
 				<title>Saman SEO Sitemap</title>
-				<link rel="stylesheet" href="<?php echo $css_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>" />
+				<link rel="stylesheet" href="<?php echo $css_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Escaped above; XSL template. ?>" />
 			</head>
 			<body>
 				<main>

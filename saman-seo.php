@@ -164,8 +164,9 @@ add_action(
 
 		// Initialize the React admin interface.
 		// Also load for REST API requests so endpoints are registered
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Unslashed below.
 		$is_rest_request = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
-			( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], '/wp-json/' ) !== false );
+			( strpos( $request_uri, '/wp-json/' ) !== false );
 
 		if ( ( is_admin() || $is_rest_request ) && class_exists( '\Saman\SEO\Admin_V2' ) ) {
 			\Saman\SEO\Admin_V2::get_instance();

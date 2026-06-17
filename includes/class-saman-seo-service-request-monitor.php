@@ -783,17 +783,15 @@ class Request_Monitor {
 				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
 					return true;
 				}
-			} else {
+			} elseif ( false !== strpos( $pattern, '*' ) ) {
 				// Simple wildcard pattern - convert * to regex.
-				if ( false !== strpos( $pattern, '*' ) ) {
-					$regex = '/^' . str_replace( array( '\\*', '/' ), array( '.*', '\\/' ), preg_quote( $pattern, '/' ) ) . '$/i';
-					if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
-						return true;
-					}
-				} elseif ( $request_uri === $pattern ) {
-					// Exact match.
+				$regex = '/^' . str_replace( array( '\\*', '/' ), array( '.*', '\\/' ), preg_quote( $pattern, '/' ) ) . '$/i';
+				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
 					return true;
 				}
+			} elseif ( $request_uri === $pattern ) {
+				// Exact match.
+				return true;
 			}
 		}
 

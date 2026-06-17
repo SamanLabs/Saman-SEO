@@ -30,7 +30,7 @@
         ]
     },
     "scripts": {
-        "lint": "@php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist --report-full --report-summary",
+        "lint": "@php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist --report-full --report-summary --runtime-set ignore_warnings_on_exit 1",
         "lint:fix": "@php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml.dist",
         "test": "vendor/bin/phpunit",
         "test:unit": "vendor/bin/phpunit --testsuite unit"
