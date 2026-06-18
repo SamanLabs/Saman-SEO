@@ -2,156 +2,204 @@ import { useState, useRef } from 'react';
 import { popularTools } from '../pages/Tools';
 
 const navItems = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'search-appearance', label: 'Search Appearance' },
-    { id: 'sitemap', label: 'Sitemap' },
-    { id: 'tools', label: 'Tools', hasMegaMenu: true },
-    { id: 'settings', label: 'Settings' },
-    { id: 'more', label: 'More' },
+	{ id: 'dashboard', label: 'Dashboard' },
+	{ id: 'search-appearance', label: 'Search Appearance' },
+	{ id: 'sitemap', label: 'Sitemap' },
+	{ id: 'tools', label: 'Tools', hasMegaMenu: true },
+	{ id: 'settings', label: 'Settings' },
+	{ id: 'more', label: 'More' },
 ];
 
 // Top 4 tools shown in the mega menu preview + a "more" entry.
-const megaMenuTools = popularTools.slice(0, 4);
+const megaMenuTools = popularTools.slice( 0, 4 );
 
-const Header = ({ currentView, onNavigate, onPrefetch }) => {
-    const [megaOpen, setMegaOpen] = useState(false);
-    const megaTimeout = useRef(null);
+const Header = ( { currentView, onNavigate, onPrefetch } ) => {
+	const [ megaOpen, setMegaOpen ] = useState( false );
+	const megaTimeout = useRef( null );
 
-    const openMega = () => {
-        if (megaTimeout.current) {
-            clearTimeout(megaTimeout.current);
-            megaTimeout.current = null;
-        }
-        setMegaOpen(true);
-    };
+	const openMega = () => {
+		if ( megaTimeout.current ) {
+			clearTimeout( megaTimeout.current );
+			megaTimeout.current = null;
+		}
+		setMegaOpen( true );
+	};
 
-    const closeMega = () => {
-        // Small delay prevents the menu from snapping shut when moving
-        // the cursor from the tab to the panel.
-        megaTimeout.current = setTimeout(() => {
-            setMegaOpen(false);
-        }, 120);
-    };
+	const closeMega = () => {
+		// Small delay prevents the menu from snapping shut when moving
+		// the cursor from the tab to the panel.
+		megaTimeout.current = setTimeout( () => {
+			setMegaOpen( false );
+		}, 120 );
+	};
 
-    const handleNavClick = (item) => {
-        setMegaOpen(false);
-        onNavigate(item.id);
-    };
+	const handleNavClick = ( item ) => {
+		setMegaOpen( false );
+		onNavigate( item.id );
+	};
 
-    const handleToolClick = (toolId) => {
-        setMegaOpen(false);
-        onNavigate(toolId);
-    };
+	const handleToolClick = ( toolId ) => {
+		setMegaOpen( false );
+		onNavigate( toolId );
+	};
 
-    return (
-        <header className="top-bar">
-            <div className="brand">
-                <span className="brand-icon" aria-hidden="true">
-                    <svg viewBox="491 491 2048 2048" role="img" focusable="false" preserveAspectRatio="xMidYMid meet">
-                        <path d="M2009.2,1575.62c-20.77,97.29-56.47,168.25-111.98,249.43l44.32,45.17c29.65-3.23,51.62,10.65,71.38,30.51l247,248.18c33.25,33.41,45.11,80.99,29.16,125.89-16.43,46.25-59.94,78.94-109.58,81.07-36.57,1.57-68.29-15.42-93.1-40.42l-49.57-49.96-198.34-199.1c-17.61-17.68-26.2-39.72-25.72-64.12l-48.52-44.54c-4.29,2.17-7.75,4.08-11.36,6.68-174.71,125.76-394.51,153.76-595.73,77.03-41.9-15.98-80.46-36.62-117.89-60.92-63.98-41.55-119.43-93.05-165.46-153.92-39.66-52.45-70.22-110.63-92.23-172.79-47.86-135.17-47.62-277.57-3.08-413.39,37.19-113.4,110.51-217.97,202.41-293.57,55.77-45.87,107.56-76.55,174.88-103.29,50.67-20.12,102.36-32.12,156.56-38.67,106.97-12.93,225.92,4.33,324.11,48.58,42.42,19.12,82.29,39.78,119.05,69.06l-59.71,61.31-28.09,29.35-42.37-24.49c-33.48-19.35-69.27-31.7-106.93-42.27-89.28-25.07-184.2-23.74-273.39,1.03-28.97,8.05-54.55,18.2-81.3,31.09-257.28,123.98-366.11,433.13-239.74,690.72,19.64,40.04,44.9,75.12,73.49,108.79,15.75,18.54,32.2,34.45,50.38,50.37,141.85,124.23,340.92,162.64,517.54,93.77,51.48-20.07,99.06-46.68,141.65-81.9,36.95-30.56,69.48-63.27,97.07-102.83,25.12-36.02,45.92-74.51,61.13-116.11,26.8-73.29,36.13-151.35,28.93-229.05-6.93-72.22-27.7-140.49-63.88-204.66l89.83-92.32c22.95,35.88,40.95,72.55,57.2,111.34,12.81,33.54,23.36,65.9,30.61,101.04,20.68,88.49,20.24,179.09,1.28,267.92Z"/>
-                        <path d="M958.58,1578.07c-9.76-28.54-16.85-55.64-17.74-85.19-.19-6.31,2.22-10.1,6.66-14.52l149.64-148.92,152.41-152.13c7.93-7.92,49.65-51.13,55.97-50.64,2.04.16,6.05,2.26,8.05,4.25l166.59,165.17,214.54-218.28,165.52-167.93-97.61-98.1,39.87-6.7,150.59-23.78,131.62-19.78-1.87,11.77-26.41,158.67-24.61,149.71-45.07-44.26-50.09-50.26-250.57,254.99-137.84,140.16-65.36,65.68-19.39-19.26-157.09-156.33c-20.87,18.85-38.51,38.26-57.83,57.76l-204.48,206.48-67.63,68.54c-7.72,7.82-15.16-19.12-17.88-27.08Z"/>
-                        <path d="M1478.64,1861.67c0,7.32-2.73,10.09-8.61,11.13-64.81,11.48-107.08,11.42-171.66-.54-3.65-.68-6.87-3.89-6.87-8.31l.06-475.69c0-7.98,10.04-15.35,16.58-12.66l143.78,144.8c15.11,15.21,26.64,7.34,26.64,27.5l.06,313.78Z"/>
-                        <path d="M1735.84,1707.89c-38.05,54.54-99.32,100.25-158.33,129.87-3.97,1.99-7.09,4.54-11.89,1.92l.43-359.73c0-7.78.53-17.63,4.55-23.32,7.96-11.27,16.97-19.9,26.69-29.73l153.03-154.62c4.23,8.13,4.92,16.39,4.93,25.6l.3,337.95c.02,17.31-4.09,33.32-8.31,49.63-2,7.74-6.81,15.85-11.39,22.41Z"/>
-                        <path d="M1032.27,1708.49c-8.34-12.18-12.95-27.87-7.29-41.4,3.62-8.64,11.57-15.25,17.95-21.98l57.64-60.7,91.89-95.92c.91-.95,4.39-3.67,5.19-2.7s2.27,4.21,2.27,5.91l.03,350.17c-43.86-16.17-87.21-49.17-119.56-78.46-18.32-16.58-33.8-34-48.12-54.92Z"/>
-                    </svg>
-                </span>
-                <span className="brand-name">Saman SEO</span>
-            </div>
-            <nav className="main-nav" aria-label="Primary">
-                {navItems.map((item) => (
-                    <div
-                        key={item.id}
-                        className={`nav-item ${item.hasMegaMenu ? 'nav-item--has-mega' : ''}`}
-                        onMouseEnter={() => {
-                            if (onPrefetch) {
-                                onPrefetch(item.id);
-                            }
-                            if (item.hasMegaMenu) {
-                                openMega();
-                            }
-                        }}
-                        onMouseLeave={() => {
-                            if (item.hasMegaMenu) {
-                                closeMega();
-                            }
-                        }}
-                    >
-                        <button
-                            type="button"
-                            className={`nav-tab ${currentView === item.id ? 'is-active' : ''} ${megaOpen && item.hasMegaMenu ? 'is-hovered' : ''}`}
-                            aria-current={currentView === item.id ? 'page' : undefined}
-                            aria-expanded={item.hasMegaMenu ? megaOpen : undefined}
-                            aria-haspopup={item.hasMegaMenu ? 'true' : undefined}
-                            onClick={() => handleNavClick(item)}
-                            onFocus={() => {
-                                if (onPrefetch) {
-                                    onPrefetch(item.id);
-                                }
-                            }}
-                        >
-                            {item.label}
-                            {item.hasMegaMenu && (
-                                <svg className="nav-tab__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M6 9l6 6 6-6" />
-                                </svg>
-                            )}
-                        </button>
-                        {item.hasMegaMenu && megaOpen && (
-                            <div
-                                className="mega-menu"
-                                onMouseEnter={openMega}
-                                onMouseLeave={closeMega}
-                                role="menu"
-                            >
-                                <div className="mega-menu__grid">
-                                    {megaMenuTools.map((tool) => (
-                                        <button
-                                            key={tool.id}
-                                            type="button"
-                                            className="mega-menu__item"
-                                            role="menuitem"
-                                            onClick={() => handleToolClick(tool.id)}
-                                        >
-                                            <span className="mega-menu__icon" style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
-                                                {tool.icon}
-                                            </span>
-                                            <span className="mega-menu__label">{tool.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="mega-menu__footer">
-                                    <button
-                                        type="button"
-                                        className="mega-menu__all"
-                                        role="menuitem"
-                                        onClick={() => handleToolClick('tools')}
-                                    >
-                                        View all tools
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M5 12h14M12 5l7 7-7 7" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </nav>
-            <div className="nav-actions">
-                <a
-                    className="icon-button"
-                    href="https://github.com/SamanLabs/Saman-SEO"
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Open GitHub repository"
-                >
-                    <svg viewBox="0 0 24 24" role="img" focusable="false">
-                        <path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.6 2.9 8.5 6.9 9.9.5.1.7-.2.7-.5v-1.9c-2.8.6-3.3-1.2-3.3-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.7 1.7 2.6 1.2.1-.8.4-1.2.7-1.5-2.2-.2-4.5-1.2-4.5-5.2 0-1.1.4-2 1-2.7-.1-.2-.4-1.3.1-2.7 0 0 .8-.2 2.7 1a9.2 9.2 0 0 1 4.9 0c1.9-1.2 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7.6.7 1 1.6 1 2.7 0 4-2.3 5-4.5 5.2.4.3.8 1 .8 2.1v3c0 .3.2.6.7.5 4-1.4 6.9-5.3 6.9-9.9C22 6.6 17.5 2 12 2z" />
-                    </svg>
-                </a>
-            </div>
-        </header>
-    );
+	return (
+		<header className="top-bar">
+			<div className="brand">
+				<span className="brand-icon" aria-hidden="true">
+					<svg
+						viewBox="491 491 2048 2048"
+						role="img"
+						focusable="false"
+						preserveAspectRatio="xMidYMid meet"
+					>
+						<path d="M2009.2,1575.62c-20.77,97.29-56.47,168.25-111.98,249.43l44.32,45.17c29.65-3.23,51.62,10.65,71.38,30.51l247,248.18c33.25,33.41,45.11,80.99,29.16,125.89-16.43,46.25-59.94,78.94-109.58,81.07-36.57,1.57-68.29-15.42-93.1-40.42l-49.57-49.96-198.34-199.1c-17.61-17.68-26.2-39.72-25.72-64.12l-48.52-44.54c-4.29,2.17-7.75,4.08-11.36,6.68-174.71,125.76-394.51,153.76-595.73,77.03-41.9-15.98-80.46-36.62-117.89-60.92-63.98-41.55-119.43-93.05-165.46-153.92-39.66-52.45-70.22-110.63-92.23-172.79-47.86-135.17-47.62-277.57-3.08-413.39,37.19-113.4,110.51-217.97,202.41-293.57,55.77-45.87,107.56-76.55,174.88-103.29,50.67-20.12,102.36-32.12,156.56-38.67,106.97-12.93,225.92,4.33,324.11,48.58,42.42,19.12,82.29,39.78,119.05,69.06l-59.71,61.31-28.09,29.35-42.37-24.49c-33.48-19.35-69.27-31.7-106.93-42.27-89.28-25.07-184.2-23.74-273.39,1.03-28.97,8.05-54.55,18.2-81.3,31.09-257.28,123.98-366.11,433.13-239.74,690.72,19.64,40.04,44.9,75.12,73.49,108.79,15.75,18.54,32.2,34.45,50.38,50.37,141.85,124.23,340.92,162.64,517.54,93.77,51.48-20.07,99.06-46.68,141.65-81.9,36.95-30.56,69.48-63.27,97.07-102.83,25.12-36.02,45.92-74.51,61.13-116.11,26.8-73.29,36.13-151.35,28.93-229.05-6.93-72.22-27.7-140.49-63.88-204.66l89.83-92.32c22.95,35.88,40.95,72.55,57.2,111.34,12.81,33.54,23.36,65.9,30.61,101.04,20.68,88.49,20.24,179.09,1.28,267.92Z" />
+						<path d="M958.58,1578.07c-9.76-28.54-16.85-55.64-17.74-85.19-.19-6.31,2.22-10.1,6.66-14.52l149.64-148.92,152.41-152.13c7.93-7.92,49.65-51.13,55.97-50.64,2.04.16,6.05,2.26,8.05,4.25l166.59,165.17,214.54-218.28,165.52-167.93-97.61-98.1,39.87-6.7,150.59-23.78,131.62-19.78-1.87,11.77-26.41,158.67-24.61,149.71-45.07-44.26-50.09-50.26-250.57,254.99-137.84,140.16-65.36,65.68-19.39-19.26-157.09-156.33c-20.87,18.85-38.51,38.26-57.83,57.76l-204.48,206.48-67.63,68.54c-7.72,7.82-15.16-19.12-17.88-27.08Z" />
+						<path d="M1478.64,1861.67c0,7.32-2.73,10.09-8.61,11.13-64.81,11.48-107.08,11.42-171.66-.54-3.65-.68-6.87-3.89-6.87-8.31l.06-475.69c0-7.98,10.04-15.35,16.58-12.66l143.78,144.8c15.11,15.21,26.64,7.34,26.64,27.5l.06,313.78Z" />
+						<path d="M1735.84,1707.89c-38.05,54.54-99.32,100.25-158.33,129.87-3.97,1.99-7.09,4.54-11.89,1.92l.43-359.73c0-7.78.53-17.63,4.55-23.32,7.96-11.27,16.97-19.9,26.69-29.73l153.03-154.62c4.23,8.13,4.92,16.39,4.93,25.6l.3,337.95c.02,17.31-4.09,33.32-8.31,49.63-2,7.74-6.81,15.85-11.39,22.41Z" />
+						<path d="M1032.27,1708.49c-8.34-12.18-12.95-27.87-7.29-41.4,3.62-8.64,11.57-15.25,17.95-21.98l57.64-60.7,91.89-95.92c.91-.95,4.39-3.67,5.19-2.7s2.27,4.21,2.27,5.91l.03,350.17c-43.86-16.17-87.21-49.17-119.56-78.46-18.32-16.58-33.8-34-48.12-54.92Z" />
+					</svg>
+				</span>
+				<span className="brand-name">Saman SEO</span>
+			</div>
+			<nav className="main-nav" aria-label="Primary">
+				{ navItems.map( ( item ) => (
+					<div
+						key={ item.id }
+						className={ `nav-item ${
+							item.hasMegaMenu ? 'nav-item--has-mega' : ''
+						}` }
+						onMouseEnter={ () => {
+							if ( onPrefetch ) {
+								onPrefetch( item.id );
+							}
+							if ( item.hasMegaMenu ) {
+								openMega();
+							}
+						} }
+						onMouseLeave={ () => {
+							if ( item.hasMegaMenu ) {
+								closeMega();
+							}
+						} }
+					>
+						<button
+							type="button"
+							className={ `nav-tab ${
+								currentView === item.id ? 'is-active' : ''
+							} ${
+								megaOpen && item.hasMegaMenu ? 'is-hovered' : ''
+							}` }
+							aria-current={
+								currentView === item.id ? 'page' : undefined
+							}
+							aria-expanded={
+								item.hasMegaMenu ? megaOpen : undefined
+							}
+							aria-haspopup={
+								item.hasMegaMenu ? 'true' : undefined
+							}
+							onClick={ () => handleNavClick( item ) }
+							onFocus={ () => {
+								if ( onPrefetch ) {
+									onPrefetch( item.id );
+								}
+							} }
+						>
+							{ item.label }
+							{ item.hasMegaMenu && (
+								<svg
+									className="nav-tab__chevron"
+									width="12"
+									height="12"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="3"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<path d="M6 9l6 6 6-6" />
+								</svg>
+							) }
+						</button>
+						{ item.hasMegaMenu && megaOpen && (
+							<div
+								className="mega-menu"
+								onMouseEnter={ openMega }
+								onMouseLeave={ closeMega }
+								role="menu"
+							>
+								<div className="mega-menu__grid">
+									{ megaMenuTools.map( ( tool ) => (
+										<button
+											key={ tool.id }
+											type="button"
+											className="mega-menu__item"
+											role="menuitem"
+											onClick={ () =>
+												handleToolClick( tool.id )
+											}
+										>
+											<span
+												className="mega-menu__icon"
+												style={ {
+													backgroundColor: `${ tool.color }15`,
+													color: tool.color,
+												} }
+											>
+												{ tool.icon }
+											</span>
+											<span className="mega-menu__label">
+												{ tool.name }
+											</span>
+										</button>
+									) ) }
+								</div>
+								<div className="mega-menu__footer">
+									<button
+										type="button"
+										className="mega-menu__all"
+										role="menuitem"
+										onClick={ () =>
+											handleToolClick( 'tools' )
+										}
+									>
+										View all tools
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
+											<path d="M5 12h14M12 5l7 7-7 7" />
+										</svg>
+									</button>
+								</div>
+							</div>
+						) }
+					</div>
+				) ) }
+			</nav>
+			<div className="nav-actions">
+				<a
+					className="icon-button"
+					href="https://github.com/SamanLabs/Saman-SEO"
+					target="_blank"
+					rel="noreferrer"
+					aria-label="Open GitHub repository"
+				>
+					<svg viewBox="0 0 24 24" role="img" focusable="false">
+						<path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.6 2.9 8.5 6.9 9.9.5.1.7-.2.7-.5v-1.9c-2.8.6-3.3-1.2-3.3-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.7 1.7 2.6 1.2.1-.8.4-1.2.7-1.5-2.2-.2-4.5-1.2-4.5-5.2 0-1.1.4-2 1-2.7-.1-.2-.4-1.3.1-2.7 0 0 .8-.2 2.7 1a9.2 9.2 0 0 1 4.9 0c1.9-1.2 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7.6.7 1 1.6 1 2.7 0 4-2.3 5-4.5 5.2.4.3.8 1 .8 2.1v3c0 .3.2.6.7.5 4-1.4 6.9-5.3 6.9-9.9C22 6.6 17.5 2 12 2z" />
+					</svg>
+				</a>
+			</div>
+		</header>
+	);
 };
 
 export default Header;
