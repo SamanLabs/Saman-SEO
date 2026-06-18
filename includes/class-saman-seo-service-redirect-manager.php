@@ -196,7 +196,7 @@ class Redirect_Manager {
 
 		$target = home_url( '/' );
 		if ( $post->post_parent ) {
-			$parent_url = get_permalink( $post->post_parent );
+			$parent_url  = get_permalink( $post->post_parent );
 			$parent_path = wp_parse_url( $parent_url, PHP_URL_PATH );
 			if ( $parent_path ) {
 				$target = $parent_url;
@@ -697,7 +697,7 @@ class Redirect_Manager {
 
 		if ( is_wp_error( $result ) ) {
 			// We could add an error query arg here to show admin notice.
-			wp_safe_redirect( add_query_arg( 'error', urlencode( $result->get_error_message() ), $redirect_url ) );
+			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $result->get_error_message() ), $redirect_url ) );
 			exit;
 		}
 
@@ -802,7 +802,15 @@ class Redirect_Manager {
 
 		if ( ! $row ) {
 			if ( $settings['object_cache'] ) {
-				wp_cache_set( $lookup_key, array( 'row' => null, 'target' => null ), self::CACHE_GROUP, self::CACHE_TTL );
+				wp_cache_set(
+					$lookup_key,
+					array(
+						'row'    => null,
+						'target' => null,
+					),
+					self::CACHE_GROUP,
+					self::CACHE_TTL
+				);
 			}
 			return;
 		}
@@ -816,7 +824,15 @@ class Redirect_Manager {
 				'status_code' => (int) $row->status_code,
 				'hits'        => (int) $row->hits,
 			);
-			wp_cache_set( $lookup_key, array( 'row' => $cache_row, 'target' => $target ), self::CACHE_GROUP, self::CACHE_TTL );
+			wp_cache_set(
+				$lookup_key,
+				array(
+					'row'    => $cache_row,
+					'target' => $target,
+				),
+				self::CACHE_GROUP,
+				self::CACHE_TTL
+			);
 		}
 
 		$this->execute_redirect( $row, $target, $request_query, $settings );
@@ -980,8 +996,9 @@ class Redirect_Manager {
 			}
 
 			if ( $matched ) {
-				if ( count( $matches ) > 1 ) {
-					for ( $i = 1; $i < count( $matches ); $i++ ) {
+				$match_count = count( $matches );
+				if ( $match_count > 1 ) {
+					for ( $i = 1; $i < $match_count; $i++ ) {
 						$regex_row->target = str_replace( '$' . $i, $matches[ $i ], $regex_row->target );
 					}
 				}
@@ -1028,7 +1045,7 @@ class Redirect_Manager {
 			return $target;
 		}
 
-		$target_query = wp_parse_url( $target, PHP_URL_QUERY );
+		$target_query  = wp_parse_url( $target, PHP_URL_QUERY );
 		$target_params = array();
 		if ( $target_query ) {
 			parse_str( $target_query, $target_params );

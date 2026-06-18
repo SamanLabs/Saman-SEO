@@ -1171,7 +1171,7 @@ class Frontend {
 				foreach ( $defaults as $key => $default_value ) {
 					$current_value = $archive_defaults[ $type ][ $key ] ?? '';
 					// Replace if empty OR if it's a template field that doesn't have any {{variables}}
-					if ( '' === $current_value || ( in_array( $key, array( 'title_template', 'description_template' ) ) && strpos( $current_value, '{{' ) === false ) ) {
+					if ( '' === $current_value || ( in_array( $key, array( 'title_template', 'description_template' ), true ) && strpos( $current_value, '{{' ) === false ) ) {
 						$archive_defaults[ $type ][ $key ] = $default_value;
 					}
 				}

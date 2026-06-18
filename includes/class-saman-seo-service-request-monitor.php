@@ -509,7 +509,7 @@ class Request_Monitor {
 		}
 
 		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
-			$parts   = explode( '.', $ip );
+			$parts    = explode( '.', $ip );
 			$parts[3] = '0';
 			return implode( '.', $parts );
 		}

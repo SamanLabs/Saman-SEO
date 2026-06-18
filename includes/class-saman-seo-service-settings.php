@@ -104,7 +104,7 @@ class Settings {
 		// Data cleanup.
 		'SAMAN_SEO_delete_data_on_uninstall'         => '0',
 
-		'SAMAN_SEO_breadcrumb_settings'         => array(
+		'SAMAN_SEO_breadcrumb_settings'              => array(
 			'enabled'          => false,
 			'separator'        => '>',
 			'separator_custom' => '',
@@ -119,7 +119,7 @@ class Settings {
 			'taxonomy_labels'  => array(),
 		),
 
-		'SAMAN_SEO_social_card_design'          => array(
+		'SAMAN_SEO_social_card_design'               => array(
 			'background_color' => '#1a1a36',
 			'accent_color'     => '#5a84ff',
 			'text_color'       => '#ffffff',
@@ -267,7 +267,7 @@ class Settings {
 	 */
 	public function get_context_variables() {
 		$variables = array(
-			'global'   => array(
+			'global' => array(
 				'label' => __( 'General', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -296,7 +296,7 @@ class Settings {
 					),
 				),
 			),
-			'post'     => array(
+			'post' => array(
 				'label' => __( 'Post Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -360,7 +360,7 @@ class Settings {
 					),
 				),
 			),
-			'archive'  => array(
+			'archive' => array(
 				'label' => __( 'Archive Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -377,7 +377,7 @@ class Settings {
 					),
 				),
 			),
-			'author'   => array(
+			'author' => array(
 				'label' => __( 'Author Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
