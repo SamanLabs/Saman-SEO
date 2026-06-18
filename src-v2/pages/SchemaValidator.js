@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __, sprintf } from '@wordpress/i18n';
 const SchemaValidator = ( { onNavigate } ) => {
 	const [ url, setUrl ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
@@ -17,28 +17,30 @@ const SchemaValidator = ( { onNavigate } ) => {
 	// Validate URL
 	const handleValidate = useCallback( async () => {
 		if ( ! url.trim() ) {
-			setError( 'Please enter a URL to validate' );
+			setError( __( 'Please enter a URL to validate', 'saman-seo' ) );
 			return;
 		}
-
 		setLoading( true );
 		setError( null );
 		setResults( null );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/schema-validator/validate',
 				method: 'POST',
-				data: { url: url.trim() },
+				data: {
+					url: url.trim(),
+				},
 			} );
-
 			if ( response.success ) {
 				setResults( response.data );
 			} else {
-				setError( response.message || 'Failed to validate schema' );
+				setError(
+					response.message ||
+						__( 'Failed to validate schema', 'saman-seo' )
+				);
 			}
 		} catch ( err ) {
-			setError( err.message || 'Failed to fetch URL' );
+			setError( err.message || __( 'Failed to fetch URL', 'saman-seo' ) );
 		} finally {
 			setLoading( false );
 		}
@@ -165,27 +167,46 @@ const SchemaValidator = ( { onNavigate } ) => {
 	// Get validation status badge
 	const StatusBadge = ( { status, count } ) => {
 		const config = {
-			valid: { label: 'Valid', className: 'success' },
+			valid: {
+				label: __( 'Valid', 'saman-seo' ),
+				className: 'success',
+			},
 			warnings: {
-				label: `${ count } Warning${ count !== 1 ? 's' : '' }`,
+				label: sprintf(
+					/* translators: %1$s: placeholder, %2$s: placeholder */ __(
+						'%1$s Warning%2$s',
+						'saman-seo'
+					),
+					count,
+					count !== 1 ? 's' : ''
+				),
 				className: 'warning',
 			},
 			errors: {
-				label: `${ count } Error${ count !== 1 ? 's' : '' }`,
+				label: sprintf(
+					/* translators: %1$s: placeholder, %2$s: placeholder */ __(
+						'%1$s Error%2$s',
+						'saman-seo'
+					),
+					count,
+					count !== 1 ? 's' : ''
+				),
 				className: 'danger',
 			},
 		};
 		const c = config[ status ] || config.valid;
 		return <span className={ `pill ${ c.className }` }>{ c.label }</span>;
 	};
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Schema Validator</h1>
+					<h1>{ __( 'Schema Validator', 'saman-seo' ) }</h1>
 					<p>
-						Test and validate structured data (JSON-LD) on any URL.
+						{ __(
+							'Test and validate structured data (JSON-LD) on any URL.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 			</div>
@@ -197,7 +218,10 @@ const SchemaValidator = ( { onNavigate } ) => {
 						<input
 							type="url"
 							className="tool-input"
-							placeholder="Enter URL to validate (e.g., https://example.com/page)"
+							placeholder={ __(
+								'Enter URL to validate (e.g., https://example.com/page)',
+								'saman-seo'
+							) }
 							value={ url }
 							onChange={ ( e ) => setUrl( e.target.value ) }
 							onKeyDown={ ( e ) =>
@@ -214,7 +238,7 @@ const SchemaValidator = ( { onNavigate } ) => {
 							{ loading ? (
 								<>
 									<span className="spinner" />
-									Validating...
+									{ __( 'Validating\u2026', 'saman-seo' ) }
 								</>
 							) : (
 								<>
@@ -229,7 +253,7 @@ const SchemaValidator = ( { onNavigate } ) => {
 										<circle cx="11" cy="11" r="8" />
 										<path d="M21 21l-4.35-4.35" />
 									</svg>
-									Validate
+									{ __( 'Validate', 'saman-seo' ) }
 								</>
 							) }
 						</button>
@@ -240,10 +264,13 @@ const SchemaValidator = ( { onNavigate } ) => {
 							className="button ghost small"
 							onClick={ handleValidateSite }
 						>
-							Test Homepage
+							{ __( 'Test Homepage', 'saman-seo' ) }
 						</button>
 						<span className="quick-actions__hint">
-							Enter any URL to check its structured data markup
+							{ __(
+								'Enter any URL to check its structured data markup',
+								'saman-seo'
+							) }
 						</span>
 					</div>
 				</div>
@@ -274,7 +301,9 @@ const SchemaValidator = ( { onNavigate } ) => {
 					<div className="card">
 						<div className="schema-summary">
 							<div className="schema-summary__header">
-								<h3>Validation Results</h3>
+								<h3>
+									{ __( 'Validation Results', 'saman-seo' ) }
+								</h3>
 								<a
 									href={ results.url }
 									target="_blank"
@@ -290,11 +319,11 @@ const SchemaValidator = ( { onNavigate } ) => {
 										{ results.schemas?.length || 0 }
 									</div>
 									<div className="schema-stat__label">
-										Schema
+										{ __( 'Schema', 'saman-seo' ) }
 										{ results.schemas?.length !== 1
 											? 's'
 											: '' }{ ' ' }
-										Found
+										{ __( 'Found', 'saman-seo' ) }
 									</div>
 								</div>
 								<div className="schema-stat schema-stat--success">
@@ -302,7 +331,7 @@ const SchemaValidator = ( { onNavigate } ) => {
 										{ results.valid_count || 0 }
 									</div>
 									<div className="schema-stat__label">
-										Valid
+										{ __( 'Valid', 'saman-seo' ) }
 									</div>
 								</div>
 								<div className="schema-stat schema-stat--warning">
@@ -310,7 +339,7 @@ const SchemaValidator = ( { onNavigate } ) => {
 										{ results.warning_count || 0 }
 									</div>
 									<div className="schema-stat__label">
-										Warnings
+										{ __( 'Warnings', 'saman-seo' ) }
 									</div>
 								</div>
 								<div className="schema-stat schema-stat--error">
@@ -318,7 +347,7 @@ const SchemaValidator = ( { onNavigate } ) => {
 										{ results.error_count || 0 }
 									</div>
 									<div className="schema-stat__label">
-										Errors
+										{ __( 'Errors', 'saman-seo' ) }
 									</div>
 								</div>
 							</div>
@@ -339,10 +368,17 @@ const SchemaValidator = ( { onNavigate } ) => {
 										<path d="M16 18l2-2-2-2M8 18l-2-2 2-2M14 4l-4 16" />
 									</svg>
 								</div>
-								<h3>No Structured Data Found</h3>
+								<h3>
+									{ __(
+										'No Structured Data Found',
+										'saman-seo'
+									) }
+								</h3>
 								<p>
-									This page doesn't contain any JSON-LD
-									structured data markup.
+									{ __(
+										"This page doesn't contain any JSON-LD structured data markup.",
+										'saman-seo'
+									) }
 								</p>
 							</div>
 						</div>
@@ -415,7 +451,12 @@ const SchemaValidator = ( { onNavigate } ) => {
 											{ /* Errors */ }
 											{ schema.errors?.length > 0 && (
 												<div className="schema-issues schema-issues--error">
-													<h5>Errors</h5>
+													<h5>
+														{ __(
+															'Errors',
+															'saman-seo'
+														) }
+													</h5>
 													<ul>
 														{ schema.errors.map(
 															( err, i ) => (
@@ -431,7 +472,12 @@ const SchemaValidator = ( { onNavigate } ) => {
 											{ /* Warnings */ }
 											{ schema.warnings?.length > 0 && (
 												<div className="schema-issues schema-issues--warning">
-													<h5>Warnings</h5>
+													<h5>
+														{ __(
+															'Warnings',
+															'saman-seo'
+														) }
+													</h5>
 													<ul>
 														{ schema.warnings.map(
 															( warn, i ) => (
@@ -446,7 +492,12 @@ const SchemaValidator = ( { onNavigate } ) => {
 
 											{ /* Properties */ }
 											<div className="schema-properties">
-												<h5>Properties</h5>
+												<h5>
+													{ __(
+														'Properties',
+														'saman-seo'
+													) }
+												</h5>
 												<div className="schema-properties__list">
 													{ Object.entries(
 														schema.properties || {}
@@ -461,7 +512,10 @@ const SchemaValidator = ( { onNavigate } ) => {
 																</span>
 																<span className="schema-property__value">
 																	{ typeof value ===
-																	'object'
+																	__(
+																		'object',
+																		'saman-seo'
+																	)
 																		? JSON.stringify(
 																				value,
 																				null,
@@ -483,7 +537,10 @@ const SchemaValidator = ( { onNavigate } ) => {
 											{ /* Raw JSON */ }
 											<details className="schema-raw">
 												<summary>
-													View Raw JSON-LD
+													{ __(
+														'View Raw JSON-LD',
+														'saman-seo'
+													) }
 												</summary>
 												<pre>
 													{ JSON.stringify(
@@ -502,33 +559,44 @@ const SchemaValidator = ( { onNavigate } ) => {
 
 					{ /* Tips */ }
 					<div className="card schema-tips">
-						<h4>Testing Tips</h4>
+						<h4>{ __( 'Testing Tips', 'saman-seo' ) }</h4>
 						<ul>
 							<li>
-								Use{ ' ' }
+								{ __( 'Use', 'saman-seo' ) }{ ' ' }
 								<a
 									href="https://search.google.com/test/rich-results"
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Google Rich Results Test
+									{ __(
+										'Google Rich Results Test',
+										'saman-seo'
+									) }
 								</a>{ ' ' }
-								for official validation
+								{ __( 'for official validation', 'saman-seo' ) }
 							</li>
 							<li>
-								Use{ ' ' }
+								{ __( 'Use', 'saman-seo' ) }{ ' ' }
 								<a
 									href="https://validator.schema.org/"
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Schema.org Validator
+									{ __(
+										'Schema.org Validator',
+										'saman-seo'
+									) }
 								</a>{ ' ' }
-								for detailed schema checking
+								{ __(
+									'for detailed schema checking',
+									'saman-seo'
+								) }
 							</li>
 							<li>
-								Common issues: missing required properties,
-								incorrect data types, invalid URLs
+								{ __(
+									'Common issues: missing required properties, incorrect data types, invalid URLs',
+									'saman-seo'
+								) }
 							</li>
 						</ul>
 					</div>
@@ -537,5 +605,4 @@ const SchemaValidator = ( { onNavigate } ) => {
 		</div>
 	);
 };
-
 export default SchemaValidator;

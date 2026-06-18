@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __ } from '@wordpress/i18n';
 const MobileFriendly = ( { onNavigate } ) => {
 	const [ url, setUrl ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
@@ -34,21 +34,20 @@ const MobileFriendly = ( { onNavigate } ) => {
 	// Run mobile test
 	const handleTest = useCallback( async () => {
 		if ( ! url.trim() ) {
-			setError( 'Please enter a URL to test' );
+			setError( __( 'Please enter a URL to test', 'saman-seo' ) );
 			return;
 		}
-
 		setLoading( true );
 		setError( null );
 		setResults( null );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/mobile-test/analyze',
 				method: 'POST',
-				data: { url: url.trim() },
+				data: {
+					url: url.trim(),
+				},
 			} );
-
 			if ( response.success ) {
 				setResults( response.data );
 				// Update recent tests
@@ -62,10 +61,15 @@ const MobileFriendly = ( { onNavigate } ) => {
 					...prev.slice( 0, 4 ),
 				] );
 			} else {
-				setError( response.message || 'Failed to analyze page' );
+				setError(
+					response.message ||
+						__( 'Failed to analyze page', 'saman-seo' )
+				);
 			}
 		} catch ( err ) {
-			setError( err.message || 'Failed to analyze page' );
+			setError(
+				err.message || __( 'Failed to analyze page', 'saman-seo' )
+			);
 		} finally {
 			setLoading( false );
 		}
@@ -137,13 +141,17 @@ const MobileFriendly = ( { onNavigate } ) => {
 			</svg>
 		);
 	};
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Mobile Friendly Test</h1>
-					<p>Check if your pages are optimized for mobile devices.</p>
+					<h1>{ __( 'Mobile Friendly Test', 'saman-seo' ) }</h1>
+					<p>
+						{ __(
+							'Check if your pages are optimized for mobile devices.',
+							'saman-seo'
+						) }
+					</p>
 				</div>
 			</div>
 
@@ -154,7 +162,10 @@ const MobileFriendly = ( { onNavigate } ) => {
 						<input
 							type="url"
 							className="tool-input"
-							placeholder="Enter URL to test (e.g., https://example.com)"
+							placeholder={ __(
+								'Enter URL to test (e.g., https://example.com)',
+								'saman-seo'
+							) }
 							value={ url }
 							onChange={ ( e ) => setUrl( e.target.value ) }
 							onKeyDown={ ( e ) =>
@@ -171,7 +182,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 							{ loading ? (
 								<>
 									<span className="spinner" />
-									Testing...
+									{ __( 'Testing\u2026', 'saman-seo' ) }
 								</>
 							) : (
 								<>
@@ -192,7 +203,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 										/>
 										<path d="M12 18h.01" />
 									</svg>
-									Test Page
+									{ __( 'Test Page', 'saman-seo' ) }
 								</>
 							) }
 						</button>
@@ -203,11 +214,13 @@ const MobileFriendly = ( { onNavigate } ) => {
 							className="button ghost small"
 							onClick={ handleTestHomepage }
 						>
-							Test Homepage
+							{ __( 'Test Homepage', 'saman-seo' ) }
 						</button>
 						<span className="quick-actions__hint">
-							Analyzes viewport, touch targets, font sizes, and
-							more
+							{ __(
+								'Analyzes viewport, touch targets, font sizes, and more',
+								'saman-seo'
+							) }
 						</span>
 					</div>
 				</div>
@@ -268,10 +281,13 @@ const MobileFriendly = ( { onNavigate } ) => {
 									className={ `mobile-score__status mobile-score__status--${ results.status }` }
 								>
 									{ results.status === 'pass'
-										? 'Mobile Friendly'
+										? __( 'Mobile Friendly', 'saman-seo' )
 										: results.status === 'warning'
-										? 'Needs Improvement'
-										: 'Not Mobile Friendly' }
+										? __( 'Needs Improvement', 'saman-seo' )
+										: __(
+												'Not Mobile Friendly',
+												'saman-seo'
+										  ) }
 								</h3>
 								<p className="mobile-score__url">
 									{ results.url }
@@ -282,7 +298,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 
 					{ /* Checks Grid */ }
 					<div className="mobile-checks">
-						<h3>Checks Performed</h3>
+						<h3>{ __( 'Checks Performed', 'saman-seo' ) }</h3>
 						<div className="mobile-checks__grid">
 							{ results.checks?.map( ( check, index ) => (
 								<div
@@ -364,7 +380,10 @@ const MobileFriendly = ( { onNavigate } ) => {
 					{ /* Issues */ }
 					{ results.issues && results.issues.length > 0 && (
 						<div className="card mobile-issues">
-							<h3>Issues Found ({ results.issues.length })</h3>
+							<h3>
+								{ __( 'Issues Found (', 'saman-seo' ) }
+								{ results.issues.length })
+							</h3>
 							<ul className="mobile-issues__list">
 								{ results.issues.map( ( issue, index ) => (
 									<li
@@ -379,7 +398,12 @@ const MobileFriendly = ( { onNavigate } ) => {
 											<p>{ issue.description }</p>
 											{ issue.fix && (
 												<span className="mobile-issue__fix">
-													<strong>Fix:</strong>{ ' ' }
+													<strong>
+														{ __(
+															'Fix:',
+															'saman-seo'
+														) }
+													</strong>{ ' ' }
 													{ issue.fix }
 												</span>
 											) }
@@ -392,7 +416,9 @@ const MobileFriendly = ( { onNavigate } ) => {
 
 					{ /* External Tools */ }
 					<div className="card mobile-external">
-						<h4>Test with Official Tools</h4>
+						<h4>
+							{ __( 'Test with Official Tools', 'saman-seo' ) }
+						</h4>
 						<div className="mobile-external__links">
 							<a
 								href={ `https://search.google.com/test/mobile-friendly?url=${ encodeURIComponent(
@@ -413,7 +439,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 									<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
 									<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
 								</svg>
-								Google Mobile Test
+								{ __( 'Google Mobile Test', 'saman-seo' ) }
 							</a>
 							<a
 								href={ `https://pagespeed.web.dev/report?url=${ encodeURIComponent(
@@ -434,7 +460,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 									<circle cx="12" cy="12" r="10" />
 									<path d="M12 6v6l4 2" />
 								</svg>
-								PageSpeed Insights
+								{ __( 'PageSpeed Insights', 'saman-seo' ) }
 							</a>
 						</div>
 					</div>
@@ -444,7 +470,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 			{ /* Recent Tests */ }
 			{ ! results && recentTests.length > 0 && (
 				<div className="card">
-					<h3>Recent Tests</h3>
+					<h3>{ __( 'Recent Tests', 'saman-seo' ) }</h3>
 					<ul className="recent-tests">
 						{ recentTests.map( ( test, index ) => (
 							<li key={ index } className="recent-test">
@@ -473,5 +499,4 @@ const MobileFriendly = ( { onNavigate } ) => {
 		</div>
 	);
 };
-
 export default MobileFriendly;

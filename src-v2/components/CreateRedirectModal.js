@@ -1,13 +1,24 @@
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __ } from '@wordpress/i18n';
 const STATUS_CODES = [
-	{ value: 301, label: '301 - Permanent Redirect' },
-	{ value: 302, label: '302 - Temporary Redirect' },
-	{ value: 307, label: '307 - Temporary (Preserve Method)' },
-	{ value: 410, label: '410 - Gone (Deleted)' },
+	{
+		value: 301,
+		label: __( '301 - Permanent Redirect', 'saman-seo' ),
+	},
+	{
+		value: 302,
+		label: __( '302 - Temporary Redirect', 'saman-seo' ),
+	},
+	{
+		value: 307,
+		label: __( '307 - Temporary (Preserve Method)', 'saman-seo' ),
+	},
+	{
+		value: 410,
+		label: __( '410 - Gone (Deleted)', 'saman-seo' ),
+	},
 ];
-
 const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 	const [ suggestions, setSuggestions ] = useState( [] );
 	const [ loading, setLoading ] = useState( true );
@@ -39,21 +50,18 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 				setLoading( false );
 			}
 		};
-
 		fetchSuggestions();
 	}, [ entry.id ] );
-
 	const handleCreate = async () => {
 		const targetUrl = selectedUrl === 'custom' ? customUrl : selectedUrl;
-
 		if ( ! targetUrl ) {
-			setError( 'Please select or enter a target URL.' );
+			setError(
+				__( 'Please select or enter a target URL.', 'saman-seo' )
+			);
 			return;
 		}
-
 		setCreating( true );
 		setError( '' );
-
 		try {
 			const response = await apiFetch( {
 				path: `/saman-seo/v1/404-log/${ entry.id }/create-redirect`,
@@ -64,19 +72,22 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 					delete_entry: deleteEntry,
 				},
 			} );
-
 			if ( response.success ) {
 				onSuccess( response.data );
 			} else {
-				setError( response.message || 'Failed to create redirect.' );
+				setError(
+					response.message ||
+						__( 'Failed to create redirect.', 'saman-seo' )
+				);
 			}
 		} catch ( err ) {
-			setError( err.message || 'Failed to create redirect.' );
+			setError(
+				err.message || __( 'Failed to create redirect.', 'saman-seo' )
+			);
 		} finally {
 			setCreating( false );
 		}
 	};
-
 	return (
 		<div
 			className="modal-overlay"
@@ -84,7 +95,7 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 		>
 			<div className="modal redirect-modal">
 				<div className="modal__header">
-					<h2>Create Redirect</h2>
+					<h2>{ __( 'Create Redirect', 'saman-seo' ) }</h2>
 					<button
 						type="button"
 						className="modal__close"
@@ -106,28 +117,34 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 				<div className="modal__body">
 					{ /* Source URL */ }
 					<div className="form-group">
-						<label>Source URL (404)</label>
+						<label>{ __( 'Source URL (404)', 'saman-seo' ) }</label>
 						<div className="source-url">
 							<code>{ entry.request_uri }</code>
 							<span className="hits-badge">
-								{ entry.hits } hits
+								{ entry.hits } { __( 'hits', 'saman-seo' ) }
 							</span>
 						</div>
 					</div>
 
 					{ /* Suggestions */ }
 					<div className="form-group">
-						<label>Target URL</label>
+						<label>{ __( 'Target URL', 'saman-seo' ) }</label>
 						{ loading ? (
 							<div className="suggestions-loading">
-								Loading suggestions...
+								{ __(
+									'Loading suggestions\u2026',
+									'saman-seo'
+								) }
 							</div>
 						) : (
 							<>
 								{ suggestions.length > 0 && (
 									<div className="suggestions-list">
 										<p className="suggestions-label">
-											Suggested targets:
+											{ __(
+												'Suggested targets:',
+												'saman-seo'
+											) }
 										</p>
 										{ suggestions.map(
 											( suggestion, idx ) => (
@@ -158,7 +175,10 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 														</span>
 														<span className="suggestion-score">
 															{ suggestion.score }
-															% match
+															{ __(
+																'% match',
+																'saman-seo'
+															) }
 														</span>
 													</div>
 												</label>
@@ -178,19 +198,16 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 												setSelectedUrl( 'custom' )
 											}
 										/>
-										<span>Enter custom URL</span>
+										<span>
+											{ __(
+												'Enter custom URL',
+												'saman-seo'
+											) }
+										</span>
 									</label>
-									{ selectedUrl === 'custom' && (
-										<input
-											type="url"
-											className="custom-url-input"
-											placeholder="https://example.com/page"
-											value={ customUrl }
-											onChange={ ( e ) =>
-												setCustomUrl( e.target.value )
-											}
-											autoFocus
-										/>
+									{ __(
+										'https://example.com/page',
+										'saman-seo'
 									) }
 								</div>
 							</>
@@ -199,7 +216,9 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 
 					{ /* Status Code */ }
 					<div className="form-group">
-						<label htmlFor="status-code">Status Code</label>
+						<label htmlFor="status-code">
+							{ __( 'Status Code', 'saman-seo' ) }
+						</label>
 						<select
 							id="status-code"
 							value={ statusCode }
@@ -226,7 +245,10 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 								}
 							/>
 							<span>
-								Remove 404 entry after creating redirect
+								{ __(
+									'Remove 404 entry after creating redirect',
+									'saman-seo'
+								) }
 							</span>
 						</label>
 					</div>
@@ -242,7 +264,7 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 						onClick={ onClose }
 						disabled={ creating }
 					>
-						Cancel
+						{ __( 'Cancel', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
@@ -255,12 +277,13 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 							( selectedUrl === 'custom' && ! customUrl )
 						}
 					>
-						{ creating ? 'Creating...' : 'Create Redirect' }
+						{ creating
+							? __( 'Creating\u2026', 'saman-seo' )
+							: __( 'Create Redirect', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 		</div>
 	);
 };
-
 export default CreateRedirectModal;

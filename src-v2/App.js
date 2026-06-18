@@ -17,6 +17,7 @@ import Settings from './pages/Settings';
 import More from './pages/More';
 
 // Lazy load secondary / heavy page components
+import { __ } from '@wordpress/i18n';
 const SearchAppearance = lazy( () => import( './pages/SearchAppearance' ) );
 const Sitemap = lazy( () => import( './pages/Sitemap' ) );
 const Redirects = lazy( () => import( './pages/Redirects' ) );
@@ -68,7 +69,6 @@ const PageLoader = () => (
 		<div className="page-loader__spinner" />
 	</div>
 );
-
 const viewToPage = {
 	dashboard: 'saman-seo-dashboard',
 	'search-appearance': 'saman-seo-search-appearance',
@@ -94,7 +94,6 @@ const viewToPage = {
 	'htaccess-editor': 'saman-seo-htaccess-editor',
 	'mobile-friendly': 'saman-seo-mobile-friendly',
 };
-
 const pageToView = Object.entries( viewToPage ).reduce(
 	( acc, [ view, page ] ) => {
 		acc[ page ] = view;
@@ -102,7 +101,6 @@ const pageToView = Object.entries( viewToPage ).reduce(
 	},
 	{}
 );
-
 const App = ( { initialView = 'dashboard' } ) => {
 	const [ currentView, setCurrentView ] = useState( initialView );
 	const [ showSetup, setShowSetup ] = useState( false );
@@ -124,29 +122,23 @@ const App = ( { initialView = 'dashboard' } ) => {
 			}
 			setSetupChecked( true );
 		};
-
 		checkSetupStatus();
 	}, [] );
-
 	const handleSetupComplete = () => {
 		setShowSetup( false );
 		setCurrentView( 'dashboard' );
 	};
-
 	const handleSetupSkip = () => {
 		setShowSetup( false );
 	};
-
 	const updateAdminMenuHighlight = useCallback( ( view ) => {
 		if ( typeof document === 'undefined' ) {
 			return;
 		}
-
 		const menu = document.getElementById( 'toplevel_page_saman-seo' );
 		if ( ! menu ) {
 			return;
 		}
-
 		const submenuLinks = menu.querySelectorAll(
 			'.wp-submenu a[href*="page=saman-seo"]'
 		);
@@ -157,7 +149,6 @@ const App = ( { initialView = 'dashboard' } ) => {
 				listItem.classList.remove( 'current' );
 			}
 		} );
-
 		const page = viewToPage[ view ] || viewToPage.dashboard;
 		const activeLink = menu.querySelector(
 			`.wp-submenu a[href*="page=${ page }"]`
@@ -169,11 +160,9 @@ const App = ( { initialView = 'dashboard' } ) => {
 				listItem.classList.add( 'current' );
 			}
 		}
-
 		menu.classList.remove( 'wp-not-current-submenu' );
 		menu.classList.add( 'current', 'wp-has-current-submenu' );
 	}, [] );
-
 	const handleNavigate = useCallback(
 		( view ) => {
 			if ( view === currentView ) {
@@ -186,7 +175,6 @@ const App = ( { initialView = 'dashboard' } ) => {
 			startTransition( () => {
 				setCurrentView( view );
 			} );
-
 			if ( typeof window === 'undefined' ) {
 				return;
 			}
@@ -211,7 +199,6 @@ const App = ( { initialView = 'dashboard' } ) => {
 			}
 		}
 	}, [] );
-
 	useEffect( () => {
 		const handlePopState = () => {
 			const url = new URL( window.location.href );
@@ -220,46 +207,37 @@ const App = ( { initialView = 'dashboard' } ) => {
 				setCurrentView( pageToView[ page ] );
 			}
 		};
-
 		window.addEventListener( 'popstate', handlePopState );
 		return () => window.removeEventListener( 'popstate', handlePopState );
 	}, [] );
-
 	useEffect( () => {
 		updateAdminMenuHighlight( currentView );
 	}, [ currentView, updateAdminMenuHighlight ] );
-
 	useEffect( () => {
 		const handleMenuClick = ( event ) => {
 			const link = event.target.closest( 'a' );
 			if ( ! link || typeof window === 'undefined' ) {
 				return;
 			}
-
 			const menu = document.getElementById( 'toplevel_page_saman-seo' );
 			if ( ! menu || ! menu.contains( link ) ) {
 				return;
 			}
-
 			const href = link.getAttribute( 'href' );
 			if ( ! href || ! href.includes( 'page=saman-seo' ) ) {
 				return;
 			}
-
 			const url = new URL( href, window.location.origin );
 			const page = url.searchParams.get( 'page' );
 			if ( ! page || ! pageToView[ page ] ) {
 				return;
 			}
-
 			event.preventDefault();
 			handleNavigate( pageToView[ page ] );
 		};
-
 		document.addEventListener( 'click', handleMenuClick );
 		return () => document.removeEventListener( 'click', handleMenuClick );
 	}, [ handleNavigate ] );
-
 	const renderView = () => {
 		switch ( currentView ) {
 			case 'search-appearance':
@@ -317,7 +295,9 @@ const App = ( { initialView = 'dashboard' } ) => {
 			<div className="saman-seo-admin">
 				<div className="saman-seo-shell">
 					<div className="content-area">
-						<div className="loading-state">Loading...</div>
+						<div className="loading-state">
+							{ __( 'Loading\u2026', 'saman-seo' ) }
+						</div>
 					</div>
 				</div>
 			</div>
@@ -337,7 +317,6 @@ const App = ( { initialView = 'dashboard' } ) => {
 			</div>
 		);
 	}
-
 	return (
 		<div className="saman-seo-admin">
 			<div className="saman-seo-shell">
@@ -355,5 +334,4 @@ const App = ( { initialView = 'dashboard' } ) => {
 		</div>
 	);
 };
-
 export default App;

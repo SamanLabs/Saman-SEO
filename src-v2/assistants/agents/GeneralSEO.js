@@ -1,10 +1,14 @@
+import { __ } from '@wordpress/i18n';
 /**
  * General SEO Assistant configuration.
  */
 const GeneralSEO = {
 	id: 'general-seo',
-	name: 'SEO Assistant',
-	description: 'Your helpful SEO buddy for all things search optimization.',
+	name: __( 'SEO Assistant', 'saman-seo' ),
+	description: __(
+		'Your helpful SEO buddy for all things search optimization.',
+		'saman-seo'
+	),
 	icon: (
 		<svg
 			viewBox="0 0 24 24"
@@ -27,5 +31,4 @@ const GeneralSEO = {
 		'What are internal links and why do they matter?',
 	],
 };
-
 export default GeneralSEO;

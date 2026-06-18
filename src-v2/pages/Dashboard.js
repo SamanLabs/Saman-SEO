@@ -2,16 +2,25 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Score level configuration
+import { __, sprintf } from '@wordpress/i18n';
 const SCORE_LEVELS = {
 	excellent: {
-		label: 'Excellent',
+		label: __( 'Excellent', 'saman-seo' ),
 		color: 'var(--color-success)',
 		class: 'success',
 	},
-	good: { label: 'Good', color: 'var(--color-success)', class: 'success' },
-	fair: { label: 'Fair', color: 'var(--color-warning)', class: 'warning' },
+	good: {
+		label: __( 'Good', 'saman-seo' ),
+		color: 'var(--color-success)',
+		class: 'success',
+	},
+	fair: {
+		label: __( 'Fair', 'saman-seo' ),
+		color: 'var(--color-warning)',
+		class: 'warning',
+	},
 	poor: {
-		label: 'Needs Work',
+		label: __( 'Needs Work', 'saman-seo' ),
 		color: 'var(--color-danger)',
 		class: 'danger',
 	},
@@ -33,13 +42,11 @@ const ACTION_VIEW_MAP = {
 	content: 'audit',
 	seo: 'audit',
 };
-
 const COVERAGE_VIEWS = {
 	breakdown: 'breakdown',
 	timeline: 'timeline',
 	checklist: 'checklist',
 };
-
 const Dashboard = ( { onNavigate } ) => {
 	const [ loading, setLoading ] = useState( true );
 	const [ data, setData ] = useState( null );
@@ -59,7 +66,9 @@ const Dashboard = ( { onNavigate } ) => {
 	const fetchDashboard = useCallback( async () => {
 		setLoading( true );
 		try {
-			const res = await apiFetch( { path: '/saman-seo/v1/dashboard' } );
+			const res = await apiFetch( {
+				path: '/saman-seo/v1/dashboard',
+			} );
 			if ( res.success ) {
 				setData( res.data );
 			}
@@ -69,7 +78,6 @@ const Dashboard = ( { onNavigate } ) => {
 			setLoading( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		fetchDashboard();
 	}, [ fetchDashboard ] );
@@ -114,25 +122,31 @@ const Dashboard = ( { onNavigate } ) => {
 	const handleRunAudit = () => {
 		handleNavigation( 'audit' );
 	};
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="page-header">
 					<div>
-						<h1>Dashboard</h1>
+						<h1>{ __( 'Dashboard', 'saman-seo' ) }</h1>
 						<p>
-							SEO health, content insights, and optimization
-							status at a glance.
+							{ __(
+								'SEO health, content insights, and optimization status at a glance.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				</div>
-				<div className="loading-state">Loading dashboard data...</div>
+				<div className="loading-state">
+					{ __( 'Loading dashboard data\u2026', 'saman-seo' ) }
+				</div>
 			</div>
 		);
 	}
-
-	const seoScore = data?.seo_score || { score: 0, level: 'poor', issues: 0 };
+	const seoScore = data?.seo_score || {
+		score: 0,
+		level: 'poor',
+		issues: 0,
+	};
 	const coverage = data?.content_coverage || {
 		total: 0,
 		optimized: 0,
@@ -149,8 +163,14 @@ const Dashboard = ( { onNavigate } ) => {
 		hits_today: 0,
 		suggestions: 0,
 	};
-	const errors404 = data?.errors_404 || { total: 0, last_30_days: 0 };
-	const schema = data?.schema || { status: 'partial', types: [] };
+	const errors404 = data?.errors_404 || {
+		total: 0,
+		last_30_days: 0,
+	};
+	const schema = data?.schema || {
+		status: 'partial',
+		types: [],
+	};
 	const allNotifications = data?.notifications || [];
 
 	// Sort notifications by priority
@@ -165,17 +185,17 @@ const Dashboard = ( { onNavigate } ) => {
 		? sortedNotifications
 		: sortedNotifications.slice( 0, 3 );
 	const hasMoreNotifications = sortedNotifications.length > 3;
-
 	const scoreConfig = SCORE_LEVELS[ seoScore.level ] || SCORE_LEVELS.poor;
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Dashboard</h1>
+					<h1>{ __( 'Dashboard', 'saman-seo' ) }</h1>
 					<p>
-						SEO health, content insights, and optimization status at
-						a glance.
+						{ __(
+							'SEO health, content insights, and optimization status at a glance.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<button
@@ -183,133 +203,14 @@ const Dashboard = ( { onNavigate } ) => {
 					className="button primary"
 					onClick={ handleRunAudit }
 				>
-					Run SEO Audit
+					{ __( 'Run SEO Audit', 'saman-seo' ) }
 				</button>
 			</div>
 
 			{ /* Notifications */ }
 			{ visibleNotifications.length > 0 && (
 				<div className="dashboard-notifications">
-					{ visibleNotifications.map( ( notif ) => (
-						<div
-							key={ notif.id }
-							className={ `notification-banner notification-banner--${ notif.type }` }
-						>
-							<div className="notification-icon">
-								{ notif.type === 'error' && (
-									<svg
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-									>
-										<circle
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											strokeWidth="2"
-										/>
-										<path
-											d="M12 8v4M12 16h.01"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-										/>
-									</svg>
-								) }
-								{ notif.type === 'warning' && (
-									<svg
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-									>
-										<path
-											d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-								) }
-								{ notif.type === 'info' && (
-									<svg
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-									>
-										<circle
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											strokeWidth="2"
-										/>
-										<path
-											d="M12 16v-4m0-4h.01"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-										/>
-									</svg>
-								) }
-							</div>
-							<div className="notification-content">
-								<strong>{ notif.title }</strong>
-								<span>{ notif.message }</span>
-							</div>
-							<div className="notification-actions">
-								{ notif.action && (
-									<button
-										type="button"
-										className="button ghost small notification-action"
-										onClick={ () =>
-											handleNavigation(
-												ACTION_VIEW_MAP[
-													notif.category
-												] || 'tools'
-											)
-										}
-									>
-										{ notif.action.label }
-									</button>
-								) }
-								<button
-									type="button"
-									className="button ghost small notification-action notification-action--dismiss"
-									onClick={ () =>
-										handleDismissNotification( notif.id )
-									}
-									disabled={ dismissing === notif.id }
-									aria-label="Dismiss notification"
-									title="Dismiss"
-								>
-									{ dismissing === notif.id ? (
-										<span className="loading-dots">
-											...
-										</span>
-									) : (
-										<svg
-											width="16"
-											height="16"
-											viewBox="0 0 24 24"
-											fill="none"
-										>
-											<path
-												d="M18 6L6 18M6 6l12 12"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-											/>
-										</svg>
-									) }
-								</button>
-							</div>
-						</div>
-					) ) }
+					{ __( 'Dismiss', 'saman-seo' ) }
 					{ hasMoreNotifications && (
 						<button
 							type="button"
@@ -321,8 +222,14 @@ const Dashboard = ( { onNavigate } ) => {
 							}
 						>
 							{ showAllNotifications
-								? 'Show less'
-								: `View all ${ sortedNotifications.length } notifications` }
+								? __( 'Show less', 'saman-seo' )
+								: sprintf(
+										/* translators: %s: placeholder */ __(
+											'View all %s notifications',
+											'saman-seo'
+										),
+										sortedNotifications.length
+								  ) }
 						</button>
 					) }
 				</div>
@@ -333,7 +240,7 @@ const Dashboard = ( { onNavigate } ) => {
 				{ /* SEO Score Card - Large */ }
 				<div className="dashboard-card seo-score-card">
 					<div className="card-header">
-						<h3>SEO Score</h3>
+						<h3>{ __( 'SEO Score', 'saman-seo' ) }</h3>
 						<span className={ `pill ${ scoreConfig.class }` }>
 							{ scoreConfig.label }
 						</span>
@@ -360,7 +267,9 @@ const Dashboard = ( { onNavigate } ) => {
 										( seoScore.score / 100 ) * 314
 									} 314` }
 									strokeLinecap="round"
-									style={ { stroke: scoreConfig.color } }
+									style={ {
+										stroke: scoreConfig.color,
+									} }
 								/>
 							</svg>
 							<div className="gauge-center">
@@ -368,7 +277,8 @@ const Dashboard = ( { onNavigate } ) => {
 									{ seoScore.score }%
 								</div>
 								<div className="gauge-label">
-									{ seoScore.posts_scored || 0 } posts
+									{ seoScore.posts_scored || 0 }{ ' ' }
+									{ __( 'posts', 'saman-seo' ) }
 								</div>
 							</div>
 						</div>
@@ -376,7 +286,7 @@ const Dashboard = ( { onNavigate } ) => {
 							<div className="breakdown-item">
 								<span className="breakdown-dot excellent"></span>
 								<span className="breakdown-label">
-									Excellent (80+)
+									{ __( 'Excellent (80+)', 'saman-seo' ) }
 								</span>
 								<span className="breakdown-value">
 									{ seoScore.distribution?.excellent || 0 }
@@ -385,7 +295,7 @@ const Dashboard = ( { onNavigate } ) => {
 							<div className="breakdown-item">
 								<span className="breakdown-dot good"></span>
 								<span className="breakdown-label">
-									Good (60-79)
+									{ __( 'Good (60–79)', 'saman-seo' ) }
 								</span>
 								<span className="breakdown-value">
 									{ seoScore.distribution?.good || 0 }
@@ -394,7 +304,7 @@ const Dashboard = ( { onNavigate } ) => {
 							<div className="breakdown-item">
 								<span className="breakdown-dot fair"></span>
 								<span className="breakdown-label">
-									Fair (40-59)
+									{ __( 'Fair (40–59)', 'saman-seo' ) }
 								</span>
 								<span className="breakdown-value">
 									{ seoScore.distribution?.fair || 0 }
@@ -403,7 +313,7 @@ const Dashboard = ( { onNavigate } ) => {
 							<div className="breakdown-item">
 								<span className="breakdown-dot poor"></span>
 								<span className="breakdown-label">
-									Poor (&lt;40)
+									{ __( 'Poor (<40)', 'saman-seo' ) }
 								</span>
 								<span className="breakdown-value">
 									{ seoScore.distribution?.poor || 0 }
@@ -413,9 +323,9 @@ const Dashboard = ( { onNavigate } ) => {
 					</div>
 					{ seoScore.issues > 0 && (
 						<p className="card-note">
-							{ seoScore.issues } post
-							{ seoScore.issues !== 1 ? 's' : '' } could use
-							optimization.
+							{ seoScore.issues } { __( 'post', 'saman-seo' ) }
+							{ seoScore.issues !== 1 ? 's' : '' }{ ' ' }
+							{ __( 'could use optimization.', 'saman-seo' ) }
 						</p>
 					) }
 				</div>
@@ -423,7 +333,7 @@ const Dashboard = ( { onNavigate } ) => {
 				{ /* Content Coverage Card - Large */ }
 				<div className="dashboard-card content-coverage-card">
 					<div className="card-header">
-						<h3>Content Coverage</h3>
+						<h3>{ __( 'Content Coverage', 'saman-seo' ) }</h3>
 						<div className="coverage-view-toggle">
 							<button
 								type="button"
@@ -437,8 +347,11 @@ const Dashboard = ( { onNavigate } ) => {
 										COVERAGE_VIEWS.breakdown
 									)
 								}
-								aria-label="Breakdown view"
-								title="Breakdown"
+								aria-label={ __(
+									'Breakdown view',
+									'saman-seo'
+								) }
+								title={ __( 'Breakdown', 'saman-seo' ) }
 							>
 								<svg
 									width="16"
@@ -466,8 +379,11 @@ const Dashboard = ( { onNavigate } ) => {
 										COVERAGE_VIEWS.timeline
 									)
 								}
-								aria-label="Timeline view"
-								title="Timeline"
+								aria-label={ __(
+									'Timeline view',
+									'saman-seo'
+								) }
+								title={ __( 'Timeline', 'saman-seo' ) }
 							>
 								<svg
 									width="16"
@@ -496,8 +412,11 @@ const Dashboard = ( { onNavigate } ) => {
 										COVERAGE_VIEWS.checklist
 									)
 								}
-								aria-label="Checklist view"
-								title="Checklist"
+								aria-label={ __(
+									'Checklist view',
+									'saman-seo'
+								) }
+								title={ __( 'Checklist', 'saman-seo' ) }
 							>
 								<svg
 									width="16"
@@ -514,7 +433,8 @@ const Dashboard = ( { onNavigate } ) => {
 								</svg>
 							</button>
 							<span className="pill">
-								{ coverage.coverage_pct || 0 }% Optimized
+								{ coverage.coverage_pct || 0 }
+								{ __( '% Optimized', 'saman-seo' ) }
 							</span>
 						</div>
 					</div>
@@ -540,7 +460,14 @@ const Dashboard = ( { onNavigate } ) => {
 												<div
 													key={ idx }
 													className="spark-bar-wrapper"
-													title={ `${ day.label }: ${ day.optimized } optimized` }
+													title={ sprintf(
+														/* translators: %1$s: placeholder, %2$s: placeholder */ __(
+															'%1$s: %2$s optimized',
+															'saman-seo'
+														),
+														day.label,
+														day.optimized
+													) }
 												>
 													<span
 														style={ {
@@ -599,7 +526,7 @@ const Dashboard = ( { onNavigate } ) => {
 											{ coverage.coverage_pct || 0 }%
 										</span>
 										<span className="coverage-donut__label">
-											Optimized
+											{ __( 'Optimized', 'saman-seo' ) }
 										</span>
 									</div>
 								</div>
@@ -607,7 +534,7 @@ const Dashboard = ( { onNavigate } ) => {
 									<div className="coverage-legend__item">
 										<span className="coverage-legend__dot coverage-legend__dot--optimized" />
 										<span className="coverage-legend__label">
-											Optimized
+											{ __( 'Optimized', 'saman-seo' ) }
 										</span>
 										<span className="coverage-legend__value">
 											{ coverage.optimized || 0 }
@@ -616,7 +543,7 @@ const Dashboard = ( { onNavigate } ) => {
 									<div className="coverage-legend__item">
 										<span className="coverage-legend__dot coverage-legend__dot--pending" />
 										<span className="coverage-legend__label">
-											Pending
+											{ __( 'Pending', 'saman-seo' ) }
 										</span>
 										<span className="coverage-legend__value">
 											{ coverage.pending || 0 }
@@ -652,9 +579,13 @@ const Dashboard = ( { onNavigate } ) => {
 											</svg>
 										</span>
 										<span className="coverage-checklist__text">
-											{ coverage.with_title || 0 } of{ ' ' }
-											{ coverage.total || 0 } pages have
-											SEO titles
+											{ coverage.with_title || 0 }{ ' ' }
+											{ __( 'of', 'saman-seo' ) }{ ' ' }
+											{ coverage.total || 0 }{ ' ' }
+											{ __(
+												'pages have SEO titles',
+												'saman-seo'
+											) }
 										</span>
 									</div>
 									<div
@@ -682,8 +613,12 @@ const Dashboard = ( { onNavigate } ) => {
 										</span>
 										<span className="coverage-checklist__text">
 											{ coverage.with_description || 0 }{ ' ' }
-											of { coverage.total || 0 } pages
-											have meta descriptions
+											{ __( 'of', 'saman-seo' ) }{ ' ' }
+											{ coverage.total || 0 }{ ' ' }
+											{ __(
+												'pages have meta descriptions',
+												'saman-seo'
+											) }
 										</span>
 									</div>
 									<div
@@ -710,9 +645,13 @@ const Dashboard = ( { onNavigate } ) => {
 											</svg>
 										</span>
 										<span className="coverage-checklist__text">
-											{ coverage.optimized || 0 } of{ ' ' }
-											{ coverage.total || 0 } pages are
-											fully optimized
+											{ coverage.optimized || 0 }{ ' ' }
+											{ __( 'of', 'saman-seo' ) }{ ' ' }
+											{ coverage.total || 0 }{ ' ' }
+											{ __(
+												'pages are fully optimized',
+												'saman-seo'
+											) }
 										</span>
 									</div>
 								</div>
@@ -724,7 +663,7 @@ const Dashboard = ( { onNavigate } ) => {
 									{ coverage.optimized || 0 }
 								</div>
 								<div className="coverage-stat-label">
-									Optimized
+									{ __( 'Optimized', 'saman-seo' ) }
 								</div>
 							</div>
 							<div className="coverage-stat pending">
@@ -732,15 +671,18 @@ const Dashboard = ( { onNavigate } ) => {
 									{ coverage.pending || 0 }
 								</div>
 								<div className="coverage-stat-label">
-									Pending
+									{ __( 'Pending', 'saman-seo' ) }
 								</div>
 							</div>
 						</div>
 					</div>
 					<p className="card-note">
-						{ coverage.total || 0 } total pages &middot;{ ' ' }
-						{ coverage.with_title || 0 } with titles &middot;{ ' ' }
-						{ coverage.with_description || 0 } with descriptions
+						{ coverage.total || 0 }{ ' ' }
+						{ __( 'total pages \xB7', 'saman-seo' ) }{ ' ' }
+						{ coverage.with_title || 0 }{ ' ' }
+						{ __( 'with titles \xB7', 'saman-seo' ) }{ ' ' }
+						{ coverage.with_description || 0 }{ ' ' }
+						{ __( 'with descriptions', 'saman-seo' ) }
 					</p>
 				</div>
 			</div>
@@ -748,19 +690,23 @@ const Dashboard = ( { onNavigate } ) => {
 			{ /* Secondary Stats Grid */ }
 			<div
 				className="card-grid"
-				style={ { marginTop: 'var(--space-lg)' } }
+				style={ {
+					marginTop: 'var(--space-lg)',
+				} }
 			>
 				{ /* Sitemap Status */ }
 				<div className="card">
 					<div className="card-header">
-						<h3>Sitemap Status</h3>
+						<h3>{ __( 'Sitemap Status', 'saman-seo' ) }</h3>
 						<span
 							className={ `pill ${
 								sitemap.enabled ? 'success' : 'warning'
 							}` }
 						>
 							{ sitemap.status_label ||
-								( sitemap.enabled ? 'Active' : 'Disabled' ) }
+								( sitemap.enabled
+									? __( 'Active', 'saman-seo' )
+									: __( 'Disabled', 'saman-seo' ) ) }
 						</span>
 					</div>
 					<div className="status-row">
@@ -773,13 +719,28 @@ const Dashboard = ( { onNavigate } ) => {
 						<div>
 							<div className="status-title">
 								{ sitemap.enabled
-									? `${ sitemap.total_urls } URLs indexed`
-									: 'Sitemap disabled' }
+									? sprintf(
+											/* translators: %s: placeholder */ __(
+												'%s URLs indexed',
+												'saman-seo'
+											),
+											sitemap.total_urls
+									  )
+									: __( 'Sitemap disabled', 'saman-seo' ) }
 							</div>
 							<div className="status-subtitle">
 								{ sitemap.enabled
-									? `Last generated: ${ sitemap.last_generated }`
-									: 'Enable to help search engines' }
+									? sprintf(
+											/* translators: %s: placeholder */ __(
+												'Last generated: %s',
+												'saman-seo'
+											),
+											sitemap.last_generated
+									  )
+									: __(
+											'Enable to help search engines',
+											'saman-seo'
+									  ) }
 							</div>
 						</div>
 					</div>
@@ -788,20 +749,22 @@ const Dashboard = ( { onNavigate } ) => {
 						className="button ghost small"
 						onClick={ () => handleNavigation( 'sitemap' ) }
 					>
-						{ sitemap.enabled ? 'View Sitemap' : 'Enable Sitemap' }
+						{ sitemap.enabled
+							? __( 'View Sitemap', 'saman-seo' )
+							: __( 'Enable Sitemap', 'saman-seo' ) }
 					</button>
 				</div>
 
 				{ /* Redirects */ }
 				<div className="card">
 					<div className="card-header">
-						<h3>Redirects</h3>
+						<h3>{ __( 'Redirects', 'saman-seo' ) }</h3>
 						<span
 							className={ `pill ${
 								redirects.active > 0 ? 'success' : ''
 							}` }
 						>
-							{ redirects.active } Active
+							{ redirects.active } { __( 'Active', 'saman-seo' ) }
 						</span>
 					</div>
 					<div className="status-row">
@@ -816,17 +779,24 @@ const Dashboard = ( { onNavigate } ) => {
 						<div>
 							<div className="status-title">
 								{ redirects.suggestions > 0
-									? `${
-											redirects.suggestions
-									  } pending suggestion${
+									? sprintf(
+											/* translators: %1$s: placeholder, %2$s: placeholder */ __(
+												'%1$s pending suggestion%2$s',
+												'saman-seo'
+											),
+											redirects.suggestions,
 											redirects.suggestions !== 1
 												? 's'
 												: ''
-									  }`
-									: 'All redirects working' }
+									  )
+									: __(
+											'All redirects working',
+											'saman-seo'
+									  ) }
 							</div>
 							<div className="status-subtitle">
-								{ redirects.hits_today || 0 } hits today
+								{ redirects.hits_today || 0 }{ ' ' }
+								{ __( 'hits today', 'saman-seo' ) }
 							</div>
 						</div>
 					</div>
@@ -835,14 +805,14 @@ const Dashboard = ( { onNavigate } ) => {
 						className="button ghost small"
 						onClick={ () => handleNavigation( 'redirects' ) }
 					>
-						Manage Redirects
+						{ __( 'Manage Redirects', 'saman-seo' ) }
 					</button>
 				</div>
 
 				{ /* 404 Errors */ }
 				<div className="card">
 					<div className="card-header">
-						<h3>404 Errors</h3>
+						<h3>{ __( '404 Errors', 'saman-seo' ) }</h3>
 						<span
 							className={ `pill ${
 								errors404.last_30_days > 0
@@ -851,8 +821,14 @@ const Dashboard = ( { onNavigate } ) => {
 							}` }
 						>
 							{ errors404.last_30_days > 0
-								? `${ errors404.last_30_days } Found`
-								: 'None' }
+								? sprintf(
+										/* translators: %s: placeholder */ __(
+											'%s Found',
+											'saman-seo'
+										),
+										errors404.last_30_days
+								  )
+								: __( 'None', 'saman-seo' ) }
 						</span>
 					</div>
 					<div className="status-row">
@@ -867,10 +843,18 @@ const Dashboard = ( { onNavigate } ) => {
 						<div>
 							<div className="status-title">
 								{ errors404.last_7_days > 0
-									? `${ errors404.last_7_days } errors this week`
-									: 'No recent errors' }
+									? sprintf(
+											/* translators: %s: placeholder */ __(
+												'%s errors this week',
+												'saman-seo'
+											),
+											errors404.last_7_days
+									  )
+									: __( 'No recent errors', 'saman-seo' ) }
 							</div>
-							<div className="status-subtitle">Last 30 days</div>
+							<div className="status-subtitle">
+								{ __( 'Last 30 days', 'saman-seo' ) }
+							</div>
 						</div>
 					</div>
 					<button
@@ -878,14 +862,14 @@ const Dashboard = ( { onNavigate } ) => {
 						className="button ghost small"
 						onClick={ () => handleNavigation( '404-log' ) }
 					>
-						View 404 Log
+						{ __( 'View 404 Log', 'saman-seo' ) }
 					</button>
 				</div>
 
 				{ /* Schema Status */ }
 				<div className="card">
 					<div className="card-header">
-						<h3>Schema Markup</h3>
+						<h3>{ __( 'Schema Markup', 'saman-seo' ) }</h3>
 						<span
 							className={ `pill ${
 								schema.status === 'valid' ? 'success' : ''
@@ -905,12 +889,18 @@ const Dashboard = ( { onNavigate } ) => {
 							<div className="status-title">
 								{ schema.types?.length > 0
 									? schema.types.slice( 0, 3 ).join( ', ' )
-									: 'Basic markup' }
+									: __( 'Basic markup', 'saman-seo' ) }
 							</div>
 							<div className="status-subtitle">
 								{ schema.types?.length > 3
-									? `+${ schema.types.length - 3 } more types`
-									: 'Schema types active' }
+									? sprintf(
+											/* translators: %s: placeholder */ __(
+												'+%s more types',
+												'saman-seo'
+											),
+											schema.types.length - 3
+									  )
+									: __( 'Schema types active', 'saman-seo' ) }
 							</div>
 						</div>
 					</div>
@@ -921,14 +911,14 @@ const Dashboard = ( { onNavigate } ) => {
 							handleNavigation( 'search-appearance' )
 						}
 					>
-						Configure Schema
+						{ __( 'Configure Schema', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 
 			{ /* Quick Actions */ }
 			<div className="dashboard-actions">
-				<h3>Quick Actions</h3>
+				<h3>{ __( 'Quick Actions', 'saman-seo' ) }</h3>
 				<div className="actions-grid">
 					<button
 						type="button"
@@ -952,8 +942,12 @@ const Dashboard = ( { onNavigate } ) => {
 							</svg>
 						</div>
 						<div className="action-content">
-							<strong>Run SEO Audit</strong>
-							<span>Scan for issues</span>
+							<strong>
+								{ __( 'Run SEO Audit', 'saman-seo' ) }
+							</strong>
+							<span>
+								{ __( 'Scan for issues', 'saman-seo' ) }
+							</span>
 						</div>
 					</button>
 					<button
@@ -978,11 +972,19 @@ const Dashboard = ( { onNavigate } ) => {
 							</svg>
 						</div>
 						<div className="action-content">
-							<strong>Manage Redirects</strong>
+							<strong>
+								{ __( 'Manage Redirects', 'saman-seo' ) }
+							</strong>
 							<span>
 								{ redirects.suggestions > 0
-									? `${ redirects.suggestions } suggestions`
-									: 'All good' }
+									? sprintf(
+											/* translators: %s: placeholder */ __(
+												'%s suggestions',
+												'saman-seo'
+											),
+											redirects.suggestions
+									  )
+									: __( 'All good', 'saman-seo' ) }
 							</span>
 						</div>
 					</button>
@@ -1007,8 +1009,13 @@ const Dashboard = ( { onNavigate } ) => {
 							</svg>
 						</div>
 						<div className="action-content">
-							<strong>View Sitemap</strong>
-							<span>{ sitemap.total_urls } URLs</span>
+							<strong>
+								{ __( 'View Sitemap', 'saman-seo' ) }
+							</strong>
+							<span>
+								{ sitemap.total_urls }{ ' ' }
+								{ __( 'URLs', 'saman-seo' ) }
+							</span>
 						</div>
 					</button>
 					<button
@@ -1043,8 +1050,12 @@ const Dashboard = ( { onNavigate } ) => {
 							</svg>
 						</div>
 						<div className="action-content">
-							<strong>AI Assistant</strong>
-							<span>Generate content</span>
+							<strong>
+								{ __( 'AI Assistant', 'saman-seo' ) }
+							</strong>
+							<span>
+								{ __( 'Generate content', 'saman-seo' ) }
+							</span>
 						</div>
 					</button>
 				</div>
@@ -1052,5 +1063,4 @@ const Dashboard = ( { onNavigate } ) => {
 		</div>
 	);
 };
-
 export default Dashboard;

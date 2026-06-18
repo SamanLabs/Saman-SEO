@@ -5,10 +5,9 @@
  */
 
 import { useState } from '@wordpress/element';
-
+import { __ } from '@wordpress/i18n';
 const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 	const [ expanded, setExpanded ] = useState( false );
-
 	return (
 		<div className="analytics-notice">
 			<div className="analytics-notice__header">
@@ -27,11 +26,12 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 					</svg>
 				</div>
 				<div className="analytics-notice__content">
-					<h4>Help Improve Saman SEO</h4>
+					<h4>{ __( 'Help Improve Saman SEO', 'saman-seo' ) }</h4>
 					<p>
-						Share anonymous usage data to help us understand which
-						features are most valuable and improve the plugin for
-						everyone.
+						{ __(
+							'Share anonymous usage data to help us understand which features are most valuable and improve the plugin for everyone.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<label className="toggle">
@@ -49,7 +49,9 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 				className="analytics-notice__expand"
 				onClick={ () => setExpanded( ! expanded ) }
 			>
-				{ expanded ? 'Hide details' : 'What data is collected?' }
+				{ expanded
+					? __( 'Hide details', 'saman-seo' )
+					: __( 'What data is collected?', 'saman-seo' ) }
 				<svg
 					width="16"
 					height="16"
@@ -68,7 +70,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 			{ expanded && (
 				<div className="analytics-notice__details">
 					<div className="analytics-privacy-info">
-						<h5>What We Collect</h5>
+						<h5>{ __( 'What We Collect', 'saman-seo' ) }</h5>
 						<ul>
 							<li>
 								<svg
@@ -82,35 +84,11 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									<polyline points="20 6 9 17 4 12" />
 								</svg>
 								<span>
-									Feature usage (e.g., "redirect created", "AI
-									title generated")
+									{ __(
+										'Feature usage (e.g., "redirect created", "AI title generated")',
+										'saman-seo'
+									) }
 								</span>
-							</li>
-							<li>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<polyline points="20 6 9 17 4 12" />
-								</svg>
-								<span>Plugin version number</span>
-							</li>
-							<li>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<polyline points="20 6 9 17 4 12" />
-								</svg>
-								<span>Pages visited within the plugin</span>
 							</li>
 							<li>
 								<svg
@@ -124,12 +102,51 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									<polyline points="20 6 9 17 4 12" />
 								</svg>
 								<span>
-									Anonymized site identifier (hashed URL)
+									{ __(
+										'Plugin version number',
+										'saman-seo'
+									) }
+								</span>
+							</li>
+							<li>
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</svg>
+								<span>
+									{ __(
+										'Pages visited within the plugin',
+										'saman-seo'
+									) }
+								</span>
+							</li>
+							<li>
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</svg>
+								<span>
+									{ __(
+										'Anonymized site identifier (hashed URL)',
+										'saman-seo'
+									) }
 								</span>
 							</li>
 						</ul>
 
-						<h5>What We Never Collect</h5>
+						<h5>{ __( 'What We Never Collect', 'saman-seo' ) }</h5>
 						<ul className="analytics-privacy-info__never">
 							<li>
 								<svg
@@ -144,8 +161,10 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									<line x1="6" y1="6" x2="18" y2="18" />
 								</svg>
 								<span>
-									Personal information (names, emails, IP
-									addresses)
+									{ __(
+										'Personal information (names, emails, IP addresses)',
+										'saman-seo'
+									) }
 								</span>
 							</li>
 							<li>
@@ -161,7 +180,10 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									<line x1="6" y1="6" x2="18" y2="18" />
 								</svg>
 								<span>
-									Your content (posts, pages, meta data)
+									{ __(
+										'Your content (posts, pages, meta data)',
+										'saman-seo'
+									) }
 								</span>
 							</li>
 							<li>
@@ -176,7 +198,12 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									<line x1="18" y1="6" x2="6" y2="18" />
 									<line x1="6" y1="6" x2="18" y2="18" />
 								</svg>
-								<span>API keys or credentials</span>
+								<span>
+									{ __(
+										'API keys or credentials',
+										'saman-seo'
+									) }
+								</span>
 							</li>
 							<li>
 								<svg
@@ -190,11 +217,16 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									<line x1="18" y1="6" x2="6" y2="18" />
 									<line x1="6" y1="6" x2="18" y2="18" />
 								</svg>
-								<span>Your site's URL or domain name</span>
+								<span>
+									{ __(
+										"Your site's URL or domain name",
+										'saman-seo'
+									) }
+								</span>
 							</li>
 						</ul>
 
-						<h5>Privacy Measures</h5>
+						<h5>{ __( 'Privacy Measures', 'saman-seo' ) }</h5>
 						<div className="analytics-privacy-info__measures">
 							<div className="privacy-measure">
 								<span className="privacy-measure__icon">
@@ -218,9 +250,14 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									</svg>
 								</span>
 								<div>
-									<strong>No Cookies</strong>
+									<strong>
+										{ __( 'No Cookies', 'saman-seo' ) }
+									</strong>
 									<span>
-										We don't use any tracking cookies
+										{ __(
+											"We don't use any tracking cookies",
+											'saman-seo'
+										) }
 									</span>
 								</div>
 							</div>
@@ -238,9 +275,14 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									</svg>
 								</span>
 								<div>
-									<strong>Admin Only</strong>
+									<strong>
+										{ __( 'Admin Only', 'saman-seo' ) }
+									</strong>
 									<span>
-										Only tracks within plugin admin pages
+										{ __(
+											'Only tracks within plugin admin pages',
+											'saman-seo'
+										) }
 									</span>
 								</div>
 							</div>
@@ -264,8 +306,15 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									</svg>
 								</span>
 								<div>
-									<strong>Opt-out Anytime</strong>
-									<span>Disable tracking at any time</span>
+									<strong>
+										{ __( 'Opt-out Anytime', 'saman-seo' ) }
+									</strong>
+									<span>
+										{ __(
+											'Disable tracking at any time',
+											'saman-seo'
+										) }
+									</span>
 								</div>
 							</div>
 							<div className="privacy-measure">
@@ -282,19 +331,24 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 									</svg>
 								</span>
 								<div>
-									<strong>Self-Hosted</strong>
+									<strong>
+										{ __( 'Self-Hosted', 'saman-seo' ) }
+									</strong>
 									<span>
-										Analytics on our own Matomo instance
+										{ __(
+											'Analytics on our own Matomo instance',
+											'saman-seo'
+										) }
 									</span>
 								</div>
 							</div>
 						</div>
 
 						<p className="analytics-privacy-info__footer">
-							This data helps us prioritize features, fix common
-							issues, and understand how the plugin is used in
-							real-world scenarios. Thank you for helping us
-							improve!
+							{ __(
+								'This data helps us prioritize features, fix common issues, and understand how the plugin is used in real-world scenarios. Thank you for helping us improve!',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				</div>
@@ -302,5 +356,4 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 		</div>
 	);
 };
-
 export default AnalyticsNotice;

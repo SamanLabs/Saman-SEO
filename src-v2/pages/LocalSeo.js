@@ -1,53 +1,153 @@
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __, sprintf } from '@wordpress/i18n';
 const businessTypes = [
-	{ value: 'LocalBusiness', label: 'Local Business (Generic)' },
-	{ value: 'Restaurant', label: 'Restaurant' },
-	{ value: 'Dentist', label: 'Dentist' },
-	{ value: 'Physician', label: 'Physician' },
-	{ value: 'MedicalClinic', label: 'Medical Clinic' },
-	{ value: 'Attorney', label: 'Attorney' },
-	{ value: 'RealEstateAgent', label: 'Real Estate Agent' },
-	{ value: 'Store', label: 'Store' },
-	{ value: 'AutoDealer', label: 'Auto Dealer' },
-	{ value: 'HairSalon', label: 'Hair Salon' },
-	{ value: 'BeautySalon', label: 'Beauty Salon' },
-	{ value: 'Plumber', label: 'Plumber' },
-	{ value: 'Electrician', label: 'Electrician' },
-	{ value: 'AccountingService', label: 'Accounting Service' },
-	{ value: 'FinancialService', label: 'Financial Service' },
-	{ value: 'InsuranceAgency', label: 'Insurance Agency' },
-	{ value: 'Hotel', label: 'Hotel' },
-	{ value: 'Bakery', label: 'Bakery' },
-	{ value: 'BarOrPub', label: 'Bar or Pub' },
-	{ value: 'CafeOrCoffeeShop', label: 'Cafe / Coffee Shop' },
-	{ value: 'Pharmacy', label: 'Pharmacy' },
-	{ value: 'SportsClub', label: 'Sports Club' },
-	{ value: 'HealthClub', label: 'Health Club / Gym' },
+	{
+		value: 'LocalBusiness',
+		label: __( 'Local Business (Generic)', 'saman-seo' ),
+	},
+	{
+		value: 'Restaurant',
+		label: __( 'Restaurant', 'saman-seo' ),
+	},
+	{
+		value: 'Dentist',
+		label: __( 'Dentist', 'saman-seo' ),
+	},
+	{
+		value: 'Physician',
+		label: __( 'Physician', 'saman-seo' ),
+	},
+	{
+		value: 'MedicalClinic',
+		label: __( 'Medical Clinic', 'saman-seo' ),
+	},
+	{
+		value: 'Attorney',
+		label: __( 'Attorney', 'saman-seo' ),
+	},
+	{
+		value: 'RealEstateAgent',
+		label: __( 'Real Estate Agent', 'saman-seo' ),
+	},
+	{
+		value: 'Store',
+		label: __( 'Store', 'saman-seo' ),
+	},
+	{
+		value: 'AutoDealer',
+		label: __( 'Auto Dealer', 'saman-seo' ),
+	},
+	{
+		value: 'HairSalon',
+		label: __( 'Hair Salon', 'saman-seo' ),
+	},
+	{
+		value: 'BeautySalon',
+		label: __( 'Beauty Salon', 'saman-seo' ),
+	},
+	{
+		value: 'Plumber',
+		label: __( 'Plumber', 'saman-seo' ),
+	},
+	{
+		value: 'Electrician',
+		label: __( 'Electrician', 'saman-seo' ),
+	},
+	{
+		value: 'AccountingService',
+		label: __( 'Accounting Service', 'saman-seo' ),
+	},
+	{
+		value: 'FinancialService',
+		label: __( 'Financial Service', 'saman-seo' ),
+	},
+	{
+		value: 'InsuranceAgency',
+		label: __( 'Insurance Agency', 'saman-seo' ),
+	},
+	{
+		value: 'Hotel',
+		label: __( 'Hotel', 'saman-seo' ),
+	},
+	{
+		value: 'Bakery',
+		label: __( 'Bakery', 'saman-seo' ),
+	},
+	{
+		value: 'BarOrPub',
+		label: __( 'Bar or Pub', 'saman-seo' ),
+	},
+	{
+		value: 'CafeOrCoffeeShop',
+		label: __( 'Cafe / Coffee Shop', 'saman-seo' ),
+	},
+	{
+		value: 'Pharmacy',
+		label: __( 'Pharmacy', 'saman-seo' ),
+	},
+	{
+		value: 'SportsClub',
+		label: __( 'Sports Club', 'saman-seo' ),
+	},
+	{
+		value: 'HealthClub',
+		label: __( 'Health Club / Gym', 'saman-seo' ),
+	},
 ];
-
 const days = [
-	{ key: 'monday', label: 'Monday', short: 'Mon' },
-	{ key: 'tuesday', label: 'Tuesday', short: 'Tue' },
-	{ key: 'wednesday', label: 'Wednesday', short: 'Wed' },
-	{ key: 'thursday', label: 'Thursday', short: 'Thu' },
-	{ key: 'friday', label: 'Friday', short: 'Fri' },
-	{ key: 'saturday', label: 'Saturday', short: 'Sat' },
-	{ key: 'sunday', label: 'Sunday', short: 'Sun' },
+	{
+		key: 'monday',
+		label: __( 'Monday', 'saman-seo' ),
+		short: __( 'Mon', 'saman-seo' ),
+	},
+	{
+		key: 'tuesday',
+		label: __( 'Tuesday', 'saman-seo' ),
+		short: __( 'Tue', 'saman-seo' ),
+	},
+	{
+		key: 'wednesday',
+		label: __( 'Wednesday', 'saman-seo' ),
+		short: __( 'Wed', 'saman-seo' ),
+	},
+	{
+		key: 'thursday',
+		label: __( 'Thursday', 'saman-seo' ),
+		short: __( 'Thu', 'saman-seo' ),
+	},
+	{
+		key: 'friday',
+		label: __( 'Friday', 'saman-seo' ),
+		short: __( 'Fri', 'saman-seo' ),
+	},
+	{
+		key: 'saturday',
+		label: __( 'Saturday', 'saman-seo' ),
+		short: __( 'Sat', 'saman-seo' ),
+	},
+	{
+		key: 'sunday',
+		label: __( 'Sunday', 'saman-seo' ),
+		short: __( 'Sun', 'saman-seo' ),
+	},
 ];
-
 const defaultHours = days.reduce( ( acc, day ) => {
-	acc[ day.key ] = { enabled: false, open: '09:00', close: '17:00' };
+	acc[ day.key ] = {
+		enabled: false,
+		open: '09:00',
+		close: '17:00',
+	};
 	return acc;
 }, {} );
-
 const hourPresets = [
 	{
 		id: '9-5-weekdays',
-		label: '9-5 Mon-Fri',
+		label: __( '9–5 Mon–Fri', 'saman-seo' ),
 		apply: () => {
-			const hours = { ...defaultHours };
+			const hours = {
+				...defaultHours,
+			};
 			[ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday' ].forEach(
 				( day ) => {
 					hours[ day ] = {
@@ -62,9 +162,11 @@ const hourPresets = [
 	},
 	{
 		id: '9-6-mon-sat',
-		label: '9-6 Mon-Sat',
+		label: __( '9–6 Mon–Sat', 'saman-seo' ),
 		apply: () => {
-			const hours = { ...defaultHours };
+			const hours = {
+				...defaultHours,
+			};
 			[
 				'monday',
 				'tuesday',
@@ -73,7 +175,11 @@ const hourPresets = [
 				'friday',
 				'saturday',
 			].forEach( ( day ) => {
-				hours[ day ] = { enabled: true, open: '09:00', close: '18:00' };
+				hours[ day ] = {
+					enabled: true,
+					open: '09:00',
+					close: '18:00',
+				};
 			} );
 			return hours;
 		},
@@ -95,7 +201,7 @@ const hourPresets = [
 	},
 	{
 		id: 'custom',
-		label: 'Custom',
+		label: __( 'Custom', 'saman-seo' ),
 		apply: null,
 	},
 ];
@@ -113,9 +219,11 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 	// Calculate if currently open
 	const getHoursStatus = () => {
 		if ( ! hours || Object.keys( hours ).length === 0 ) {
-			return { isOpen: false, text: 'Hours not set' };
+			return {
+				isOpen: false,
+				text: __( 'Hours not set', 'saman-seo' ),
+			};
 		}
-
 		const now = new Date();
 		const dayNames = [
 			'sunday',
@@ -131,12 +239,13 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 			now.getHours().toString().padStart( 2, '0' ) +
 			':' +
 			now.getMinutes().toString().padStart( 2, '0' );
-
 		const todayHours = hours[ currentDay ];
 		if ( ! todayHours || ! todayHours.enabled ) {
-			return { isOpen: false, text: 'Closed today' };
+			return {
+				isOpen: false,
+				text: __( 'Closed today', 'saman-seo' ),
+			};
 		}
-
 		if (
 			currentTime >= todayHours.open &&
 			currentTime <= todayHours.close
@@ -144,23 +253,33 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 			const closeTime = new Date( `2000-01-01T${ todayHours.close }` );
 			return {
 				isOpen: true,
-				text: `Open · Closes ${ closeTime.toLocaleTimeString( [], {
-					hour: 'numeric',
-					minute: '2-digit',
-				} ) }`,
+				text: sprintf(
+					/* translators: %s: placeholder */ __(
+						'Open \xB7 Closes %s',
+						'saman-seo'
+					),
+					closeTime.toLocaleTimeString( [], {
+						hour: 'numeric',
+						minute: '2-digit',
+					} )
+				),
 			};
 		}
-
 		const openTime = new Date( `2000-01-01T${ todayHours.open }` );
 		return {
 			isOpen: false,
-			text: `Closed · Opens ${ openTime.toLocaleTimeString( [], {
-				hour: 'numeric',
-				minute: '2-digit',
-			} ) }`,
+			text: sprintf(
+				/* translators: %s: placeholder */ __(
+					'Closed \xB7 Opens %s',
+					'saman-seo'
+				),
+				openTime.toLocaleTimeString( [], {
+					hour: 'numeric',
+					minute: '2-digit',
+				} )
+			),
 		};
 	};
-
 	const hoursStatus = getHoursStatus();
 	const businessTypeLabel =
 		businessTypes.find( ( t ) => t.value === business.type )?.label ||
@@ -177,14 +296,12 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 		if ( url.includes( 'youtube.com' ) ) return '▶️';
 		return '🔗';
 	};
-
 	const socialLinks = ( socialProfiles || [] )
 		.filter( Boolean )
 		.map( ( url ) => ( {
 			url,
 			icon: getSocialIcon( url ),
 		} ) );
-
 	return (
 		<div className="knowledge-panel">
 			<div className="knowledge-panel__header">
@@ -211,13 +328,15 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 						fill="#EA4335"
 					/>
 				</svg>
-				<span>Knowledge Panel Preview</span>
+				<span>{ __( 'Knowledge Panel Preview', 'saman-seo' ) }</span>
 			</div>
 
 			{ business.image ? (
 				<div
 					className="knowledge-panel__cover has-image"
-					style={ { backgroundImage: `url(${ business.image })` } }
+					style={ {
+						backgroundImage: `url(${ business.image })`,
+					} }
 				/>
 			) : (
 				<div className="knowledge-panel__cover">
@@ -272,7 +391,8 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 								! business.name ? 'is-empty' : ''
 							}` }
 						>
-							{ business.name || 'Business Name' }
+							{ business.name ||
+								__( 'Business Name', 'saman-seo' ) }
 						</h3>
 						<p className="knowledge-panel__type">
 							{ businessTypeLabel }
@@ -286,7 +406,10 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 					</p>
 				) : (
 					<p className="knowledge-panel__description is-empty">
-						Add a description to tell customers about your business.
+						{ __(
+							'Add a description to tell customers about your business.',
+							'saman-seo'
+						) }
 					</p>
 				) }
 
@@ -307,7 +430,10 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 							<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
 							<circle cx="12" cy="10" r="3" />
 						</svg>
-						<span>{ addressString || 'No address set' }</span>
+						<span>
+							{ addressString ||
+								__( 'No address set', 'saman-seo' ) }
+						</span>
 					</div>
 
 					<div
@@ -325,7 +451,10 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 						>
 							<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
 						</svg>
-						<span>{ business.phone || 'No phone set' }</span>
+						<span>
+							{ business.phone ||
+								__( 'No phone set', 'saman-seo' ) }
+						</span>
 					</div>
 
 					<div className="knowledge-panel__detail">
@@ -393,13 +522,12 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 					rel="noopener noreferrer"
 					className="button ghost small"
 				>
-					Test with Google
+					{ __( 'Test with Google', 'saman-seo' ) }
 				</a>
 			</div>
 		</div>
 	);
 };
-
 const LocalSeo = () => {
 	const [ loading, setLoading ] = useState( true );
 	const [ saving, setSaving ] = useState( false );
@@ -437,7 +565,6 @@ const LocalSeo = () => {
 		'',
 		'',
 	] );
-
 	const loadSettings = useCallback( async () => {
 		try {
 			setLoading( true );
@@ -446,7 +573,6 @@ const LocalSeo = () => {
 			} );
 			if ( response.success ) {
 				const data = response.data;
-
 				setBusiness( {
 					name:
 						data.local_business_name ||
@@ -478,7 +604,10 @@ const LocalSeo = () => {
 							typeof data.local_opening_hours === 'string'
 								? JSON.parse( data.local_opening_hours )
 								: data.local_opening_hours;
-						setHours( { ...defaultHours, ...parsedHours } );
+						setHours( {
+							...defaultHours,
+							...parsedHours,
+						} );
 					} catch ( e ) {
 						setHours( defaultHours );
 					}
@@ -506,23 +635,23 @@ const LocalSeo = () => {
 			}
 		} catch ( error ) {
 			console.error( 'Failed to load settings:', error );
-			setNotice( { type: 'error', message: 'Failed to load settings.' } );
+			setNotice( {
+				type: 'error',
+				message: __( 'Failed to load settings.', 'saman-seo' ),
+			} );
 		} finally {
 			setLoading( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		loadSettings();
 	}, [ loadSettings ] );
-
 	useEffect( () => {
 		if ( notice ) {
 			const timer = setTimeout( () => setNotice( null ), 5000 );
 			return () => clearTimeout( timer );
 		}
 	}, [ notice ] );
-
 	const saveSettings = async () => {
 		setSaving( true );
 		try {
@@ -556,35 +685,40 @@ const LocalSeo = () => {
 			} );
 			setNotice( {
 				type: 'success',
-				message: 'Settings saved successfully.',
+				message: __( 'Settings saved successfully.', 'saman-seo' ),
 			} );
 		} catch ( error ) {
 			console.error( 'Failed to save settings:', error );
-			setNotice( { type: 'error', message: 'Failed to save settings.' } );
+			setNotice( {
+				type: 'error',
+				message: __( 'Failed to save settings.', 'saman-seo' ),
+			} );
 		} finally {
 			setSaving( false );
 		}
 	};
-
 	const handleBusinessChange = ( field, value ) => {
-		setBusiness( ( prev ) => ( { ...prev, [ field ]: value } ) );
+		setBusiness( ( prev ) => ( {
+			...prev,
+			[ field ]: value,
+		} ) );
 	};
-
 	const handleHoursChange = ( day, field, value ) => {
 		setHours( ( prev ) => ( {
 			...prev,
-			[ day ]: { ...prev[ day ], [ field ]: value },
+			[ day ]: {
+				...prev[ day ],
+				[ field ]: value,
+			},
 		} ) );
 		setActivePreset( 'custom' );
 	};
-
 	const applyPreset = ( preset ) => {
 		if ( preset.apply ) {
 			setHours( preset.apply() );
 		}
 		setActivePreset( preset.id );
 	};
-
 	const copyToWeekdays = ( sourceDay ) => {
 		const sourceHours = hours[ sourceDay ];
 		const weekdays = [
@@ -595,15 +729,18 @@ const LocalSeo = () => {
 			'friday',
 		];
 		setHours( ( prev ) => {
-			const updated = { ...prev };
+			const updated = {
+				...prev,
+			};
 			weekdays.forEach( ( day ) => {
-				updated[ day ] = { ...sourceHours };
+				updated[ day ] = {
+					...sourceHours,
+				};
 			} );
 			return updated;
 		} );
 		setActivePreset( 'custom' );
 	};
-
 	const handleSocialChange = ( index, value ) => {
 		setSocialProfiles( ( prev ) => {
 			const updated = [ ...prev ];
@@ -616,8 +753,13 @@ const LocalSeo = () => {
 	const openMediaLibrary = ( field ) => {
 		if ( window.wp && window.wp.media ) {
 			const frame = window.wp.media( {
-				title: field === 'logo' ? 'Select Logo' : 'Select Cover Image',
-				button: { text: 'Use Image' },
+				title:
+					field === 'logo'
+						? __( 'Select Logo', 'saman-seo' )
+						: __( 'Select Cover Image', 'saman-seo' ),
+				button: {
+					text: __( 'Use Image', 'saman-seo' ),
+				},
 				multiple: false,
 			} );
 			frame.on( 'select', () => {
@@ -631,26 +773,31 @@ const LocalSeo = () => {
 			frame.open();
 		}
 	};
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="loading-state">
 					<span className="spinner is-active"></span>
-					<p>Loading Local SEO settings...</p>
+					<p>
+						{ __(
+							'Loading Local SEO settings\u2026',
+							'saman-seo'
+						) }
+					</p>
 				</div>
 			</div>
 		);
 	}
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Local SEO</h1>
+					<h1>{ __( 'Local SEO', 'saman-seo' ) }</h1>
 					<p>
-						Configure your business information for local search
-						results and Google Knowledge Panel.
+						{ __(
+							'Configure your business information for local search results and Google Knowledge Panel.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<button
@@ -658,7 +805,9 @@ const LocalSeo = () => {
 					onClick={ saveSettings }
 					disabled={ saving }
 				>
-					{ saving ? 'Saving...' : 'Save Changes' }
+					{ saving
+						? __( 'Saving\u2026', 'saman-seo' )
+						: __( 'Save Changes', 'saman-seo' ) }
 				</button>
 			</div>
 
@@ -670,7 +819,9 @@ const LocalSeo = () => {
 						className="notice-dismiss"
 						onClick={ () => setNotice( null ) }
 					>
-						<span className="screen-reader-text">Dismiss</span>
+						<span className="screen-reader-text">
+							{ __( 'Dismiss', 'saman-seo' ) }
+						</span>
 					</button>
 				</div>
 			) }
@@ -686,7 +837,7 @@ const LocalSeo = () => {
 							}` }
 							onClick={ () => setActiveTab( 'business' ) }
 						>
-							Business Information
+							{ __( 'Business Information', 'saman-seo' ) }
 						</button>
 						<button
 							className={ `tab ${
@@ -694,414 +845,36 @@ const LocalSeo = () => {
 							}` }
 							onClick={ () => setActiveTab( 'hours' ) }
 						>
-							Opening Hours
+							{ __( 'Opening Hours', 'saman-seo' ) }
 						</button>
 					</div>
 
 					{ /* Business Information Tab */ }
-					{ activeTab === 'business' && (
-						<div className="tab-content">
-							{ /* Business Identity */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>Business Identity</h2>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field">
-											<label>Business Name</label>
-											<input
-												type="text"
-												value={ business.name }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'name',
-														e.target.value
-													)
-												}
-												placeholder="Your Business Name"
-											/>
-										</div>
-										<div className="form-field">
-											<label>Business Type</label>
-											<select
-												value={ business.type }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'type',
-														e.target.value
-													)
-												}
-											>
-												{ businessTypes.map(
-													( type ) => (
-														<option
-															key={ type.value }
-															value={ type.value }
-														>
-															{ type.label }
-														</option>
-													)
-												) }
-											</select>
-										</div>
-										<div className="form-field full-width">
-											<label>Description</label>
-											<textarea
-												value={ business.description }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'description',
-														e.target.value
-													)
-												}
-												placeholder="Brief description of your business"
-												rows={ 3 }
-											/>
-										</div>
-										<div className="form-field">
-											<label>Logo</label>
-											<div className="image-picker">
-												{ business.logo ? (
-													<div className="image-preview">
-														<img
-															src={
-																business.logo
-															}
-															alt="Logo"
-														/>
-														<button
-															className="image-remove"
-															onClick={ () =>
-																handleBusinessChange(
-																	'logo',
-																	''
-																)
-															}
-														>
-															×
-														</button>
-													</div>
-												) : (
-													<button
-														className="button ghost"
-														onClick={ () =>
-															openMediaLibrary(
-																'logo'
-															)
-														}
-													>
-														Select Logo
-													</button>
-												) }
-											</div>
-										</div>
-										<div className="form-field">
-											<label>Cover Image</label>
-											<div className="image-picker">
-												{ business.image ? (
-													<div className="image-preview">
-														<img
-															src={
-																business.image
-															}
-															alt="Cover"
-														/>
-														<button
-															className="image-remove"
-															onClick={ () =>
-																handleBusinessChange(
-																	'image',
-																	''
-																)
-															}
-														>
-															×
-														</button>
-													</div>
-												) : (
-													<button
-														className="button ghost"
-														onClick={ () =>
-															openMediaLibrary(
-																'image'
-															)
-														}
-													>
-														Select Image
-													</button>
-												) }
-											</div>
-										</div>
-										<div className="form-field">
-											<label>Price Range</label>
-											<select
-												value={ business.priceRange }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'priceRange',
-														e.target.value
-													)
-												}
-											>
-												<option value="">
-													Select...
-												</option>
-												<option value="$">
-													$ (Budget)
-												</option>
-												<option value="$$">
-													$$ (Moderate)
-												</option>
-												<option value="$$$">
-													$$$ (Expensive)
-												</option>
-												<option value="$$$$">
-													$$$$ (Luxury)
-												</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{ /* Contact Information */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>Contact Information</h2>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field">
-											<label>Phone</label>
-											<input
-												type="tel"
-												value={ business.phone }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'phone',
-														e.target.value
-													)
-												}
-												placeholder="+1 (555) 123-4567"
-											/>
-										</div>
-										<div className="form-field">
-											<label>Email</label>
-											<input
-												type="email"
-												value={ business.email }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'email',
-														e.target.value
-													)
-												}
-												placeholder="contact@yourbusiness.com"
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{ /* Address */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>Address</h2>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field full-width">
-											<label>Street Address</label>
-											<input
-												type="text"
-												value={ business.street }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'street',
-														e.target.value
-													)
-												}
-												placeholder="123 Main Street"
-											/>
-										</div>
-										<div className="form-field">
-											<label>City</label>
-											<input
-												type="text"
-												value={ business.city }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'city',
-														e.target.value
-													)
-												}
-												placeholder="New York"
-											/>
-										</div>
-										<div className="form-field">
-											<label>State/Province</label>
-											<input
-												type="text"
-												value={ business.state }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'state',
-														e.target.value
-													)
-												}
-												placeholder="NY"
-											/>
-										</div>
-										<div className="form-field">
-											<label>ZIP/Postal Code</label>
-											<input
-												type="text"
-												value={ business.zip }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'zip',
-														e.target.value
-													)
-												}
-												placeholder="10001"
-											/>
-										</div>
-										<div className="form-field">
-											<label>Country</label>
-											<input
-												type="text"
-												value={ business.country }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'country',
-														e.target.value
-													)
-												}
-												placeholder="US"
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{ /* Geo Coordinates */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>Geo Coordinates</h2>
-									<p>
-										Optional but recommended for precise
-										location in search results.
-									</p>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field">
-											<label>Latitude</label>
-											<input
-												type="text"
-												value={ business.latitude }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'latitude',
-														e.target.value
-													)
-												}
-												placeholder="40.7128"
-											/>
-										</div>
-										<div className="form-field">
-											<label>Longitude</label>
-											<input
-												type="text"
-												value={ business.longitude }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'longitude',
-														e.target.value
-													)
-												}
-												placeholder="-74.0060"
-											/>
-										</div>
-									</div>
-									<p className="form-help">
-										<a
-											href={ `https://www.google.com/maps/search/${ encodeURIComponent(
-												[
-													business.street,
-													business.city,
-													business.state,
-													business.zip,
-												]
-													.filter( Boolean )
-													.join( ', ' )
-											) }` }
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Find coordinates on Google Maps →
-										</a>
-									</p>
-								</div>
-							</div>
-
-							{ /* Social Profiles */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>Social Profiles</h2>
-									<p>
-										Add your social media profile URLs for
-										rich search results.
-									</p>
-								</div>
-								<div className="card-body">
-									<div className="social-profiles">
-										{ socialProfiles.map(
-											( url, index ) => (
-												<div
-													key={ index }
-													className="form-field"
-												>
-													<input
-														type="url"
-														value={ url }
-														onChange={ ( e ) =>
-															handleSocialChange(
-																index,
-																e.target.value
-															)
-														}
-														placeholder={ `Social profile URL ${
-															index + 1
-														}` }
-													/>
-												</div>
-											)
-										) }
-									</div>
-								</div>
-							</div>
-						</div>
-					) }
+					{ __( 'US', 'saman-seo' ) }
 
 					{ /* Opening Hours Tab */ }
 					{ activeTab === 'hours' && (
 						<div className="tab-content">
 							<div className="card">
 								<div className="card-header">
-									<h2>Opening Hours</h2>
+									<h2>
+										{ __( 'Opening Hours', 'saman-seo' ) }
+									</h2>
 									<p>
-										Set your business hours. These appear in
-										search results and Google Knowledge
-										Panel.
+										{ __(
+											'Set your business hours. These appear in search results and Google Knowledge Panel.',
+											'saman-seo'
+										) }
 									</p>
 								</div>
 								<div className="card-body">
 									{ /* Presets */ }
 									<div className="hours-presets">
 										<span className="presets-label">
-											Quick presets:
+											{ __(
+												'Quick presets:',
+												'saman-seo'
+											) }
 										</span>
 										{ hourPresets.map( ( preset ) => (
 											<button
@@ -1172,7 +945,10 @@ const LocalSeo = () => {
 															className="hours-time"
 														/>
 														<span className="hours-separator">
-															to
+															{ __(
+																'to',
+																'saman-seo'
+															) }
 														</span>
 														<input
 															type="time"
@@ -1191,31 +967,17 @@ const LocalSeo = () => {
 															}
 															className="hours-time"
 														/>
-														{ [
-															'monday',
-															'tuesday',
-															'wednesday',
-															'thursday',
-															'friday',
-														].includes(
-															day.key
-														) && (
-															<button
-																className="button ghost small"
-																onClick={ () =>
-																	copyToWeekdays(
-																		day.key
-																	)
-																}
-																title="Copy to all weekdays"
-															>
-																Copy to weekdays
-															</button>
+														{ __(
+															'Copy to all weekdays',
+															'saman-seo'
 														) }
 													</>
 												) : (
 													<span className="hours-closed">
-														Closed
+														{ __(
+															'Closed',
+															'saman-seo'
+														) }
 													</span>
 												) }
 											</div>
@@ -1239,5 +1001,4 @@ const LocalSeo = () => {
 		</div>
 	);
 };
-
 export default LocalSeo;

@@ -2,32 +2,43 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Issue type labels
+import { __, sprintf } from '@wordpress/i18n';
 const ISSUE_TYPE_LABELS = {
-	title_missing: 'Missing Meta Title',
-	title_length: 'Title Too Long',
-	description_missing: 'Missing Meta Description',
-	description_length: 'Description Too Long',
-	missing_alt: 'Missing Alt Text',
-	low_word_count: 'Low Word Count',
-	missing_h1: 'Missing H1 Heading',
+	title_missing: __( 'Missing Meta Title', 'saman-seo' ),
+	title_length: __( 'Title Too Long', 'saman-seo' ),
+	description_missing: __( 'Missing Meta Description', 'saman-seo' ),
+	description_length: __( 'Description Too Long', 'saman-seo' ),
+	missing_alt: __( 'Missing Alt Text', 'saman-seo' ),
+	low_word_count: __( 'Low Word Count', 'saman-seo' ),
+	missing_h1: __( 'Missing H1 Heading', 'saman-seo' ),
 };
 
 // Severity colors and labels
 const SEVERITY_CONFIG = {
-	high: { label: 'Critical', class: 'danger', color: 'var(--color-danger)' },
+	high: {
+		label: __( 'Critical', 'saman-seo' ),
+		class: 'danger',
+		color: 'var(--color-danger)',
+	},
 	medium: {
-		label: 'Warning',
+		label: __( 'Warning', 'saman-seo' ),
 		class: 'warning',
 		color: 'var(--color-warning)',
 	},
-	low: { label: 'Suggestion', class: 'muted', color: 'var(--color-muted)' },
+	low: {
+		label: __( 'Suggestion', 'saman-seo' ),
+		class: 'muted',
+		color: 'var(--color-muted)',
+	},
 };
-
 const Audit = () => {
 	const [ loading, setLoading ] = useState( true );
 	const [ running, setRunning ] = useState( false );
 	const [ auditData, setAuditData ] = useState( null );
-	const [ message, setMessage ] = useState( { type: '', text: '' } );
+	const [ message, setMessage ] = useState( {
+		type: '',
+		text: '',
+	} );
 	const [ expandedType, setExpandedType ] = useState( null );
 	const [ applyingRecommendation, setApplyingRecommendation ] =
 		useState( null );
@@ -36,18 +47,22 @@ const Audit = () => {
 	const fetchAudit = useCallback( async () => {
 		setLoading( true );
 		try {
-			const res = await apiFetch( { path: '/saman-seo/v1/audit' } );
+			const res = await apiFetch( {
+				path: '/saman-seo/v1/audit',
+			} );
 			if ( res.success ) {
 				setAuditData( res.data );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to fetch audit:', error );
-			setMessage( { type: 'error', text: 'Failed to load audit data.' } );
+			setMessage( {
+				type: 'error',
+				text: __( 'Failed to load audit data.', 'saman-seo' ),
+			} );
 		} finally {
 			setLoading( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		fetchAudit();
 	}, [ fetchAudit ] );
@@ -55,23 +70,38 @@ const Audit = () => {
 	// Run new audit
 	const handleRunAudit = async () => {
 		setRunning( true );
-		setMessage( { type: '', text: '' } );
+		setMessage( {
+			type: '',
+			text: '',
+		} );
 		try {
 			const res = await apiFetch( {
 				path: '/saman-seo/v1/audit/run',
 				method: 'POST',
-				data: { post_type: 'any', limit: 100 },
+				data: {
+					post_type: 'any',
+					limit: 100,
+				},
 			} );
 			if ( res.success ) {
 				setAuditData( res.data );
 				setMessage( {
 					type: 'success',
-					text: `Audit complete! Scanned ${ res.data.scanned } posts.`,
+					text: sprintf(
+						/* translators: %s: placeholder */ __(
+							'Audit complete! Scanned %s posts.',
+							'saman-seo'
+						),
+						res.data.scanned
+					),
 				} );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to run audit:', error );
-			setMessage( { type: 'error', text: 'Failed to run audit.' } );
+			setMessage( {
+				type: 'error',
+				text: __( 'Failed to run audit.', 'saman-seo' ),
+			} );
 		} finally {
 			setRunning( false );
 		}
@@ -92,7 +122,13 @@ const Audit = () => {
 			if ( res.success ) {
 				setMessage( {
 					type: 'success',
-					text: `Applied recommendations to "${ rec.title }"`,
+					text: sprintf(
+						/* translators: %s: placeholder */ __(
+							'Applied recommendations to "%s"',
+							'saman-seo'
+						),
+						rec.title
+					),
 				} );
 				// Remove from recommendations list
 				setAuditData( ( prev ) => ( {
@@ -106,7 +142,7 @@ const Audit = () => {
 			console.error( 'Failed to apply recommendation:', error );
 			setMessage( {
 				type: 'error',
-				text: 'Failed to apply recommendation.',
+				text: __( 'Failed to apply recommendation.', 'saman-seo' ),
 			} );
 		} finally {
 			setApplyingRecommendation( null );
@@ -132,43 +168,52 @@ const Audit = () => {
 		if ( issues.some( ( i ) => i.severity === 'medium' ) ) return 'medium';
 		return 'low';
 	};
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="page-header">
 					<div>
-						<h1>SEO Audit</h1>
+						<h1>{ __( 'SEO Audit', 'saman-seo' ) }</h1>
 						<p>
-							Scan your site for SEO issues and get actionable
-							recommendations.
+							{ __(
+								'Scan your site for SEO issues and get actionable recommendations.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				</div>
-				<div className="loading-state">Loading audit data...</div>
+				<div className="loading-state">
+					{ __( 'Loading audit data\u2026', 'saman-seo' ) }
+				</div>
 			</div>
 		);
 	}
-
 	const stats = auditData?.stats || {
-		severity: { high: 0, medium: 0, low: 0 },
+		severity: {
+			high: 0,
+			medium: 0,
+			low: 0,
+		},
 		total: 0,
 	};
 	const issuesByType = getIssuesByType();
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>SEO Audit</h1>
+					<h1>{ __( 'SEO Audit', 'saman-seo' ) }</h1>
 					<p>
-						Scan your site for SEO issues and get actionable
-						recommendations.
+						{ __(
+							'Scan your site for SEO issues and get actionable recommendations.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="header-actions">
 					{ auditData?.from_cache && (
-						<span className="cache-badge">Cached results</span>
+						<span className="cache-badge">
+							{ __( 'Cached results', 'saman-seo' ) }
+						</span>
 					) }
 					<button
 						type="button"
@@ -179,10 +224,10 @@ const Audit = () => {
 						{ running ? (
 							<>
 								<span className="spinner"></span>
-								Running Audit...
+								{ __( 'Running Audit\u2026', 'saman-seo' ) }
 							</>
 						) : (
-							'Run Full Audit'
+							__( 'Run Full Audit', 'saman-seo' )
 						) }
 					</button>
 				</div>
@@ -220,11 +265,19 @@ const Audit = () => {
 						<div className="audit-stat-number">
 							{ stats.severity.high }
 						</div>
-						<div className="audit-stat-label">Critical Issues</div>
+						<div className="audit-stat-label">
+							{ __( 'Critical Issues', 'saman-seo' ) }
+						</div>
 						<div className="audit-stat-desc">
 							{ stats.severity.high === 0
-								? 'All critical checks passed'
-								: 'Issues severely impacting SEO' }
+								? __(
+										'All critical checks passed',
+										'saman-seo'
+								  )
+								: __(
+										'Issues severely impacting SEO',
+										'saman-seo'
+								  ) }
 						</div>
 					</div>
 				</div>
@@ -254,11 +307,16 @@ const Audit = () => {
 						<div className="audit-stat-number">
 							{ stats.severity.medium }
 						</div>
-						<div className="audit-stat-label">Warnings</div>
+						<div className="audit-stat-label">
+							{ __( 'Warnings', 'saman-seo' ) }
+						</div>
 						<div className="audit-stat-desc">
 							{ stats.severity.medium === 0
-								? 'No warnings found'
-								: 'Issues that may affect rankings' }
+								? __( 'No warnings found', 'saman-seo' )
+								: __(
+										'Issues that may affect rankings',
+										'saman-seo'
+								  ) }
 						</div>
 					</div>
 				</div>
@@ -284,11 +342,16 @@ const Audit = () => {
 						<div className="audit-stat-number">
 							{ stats.severity.low }
 						</div>
-						<div className="audit-stat-label">Suggestions</div>
+						<div className="audit-stat-label">
+							{ __( 'Suggestions', 'saman-seo' ) }
+						</div>
 						<div className="audit-stat-desc">
 							{ stats.severity.low === 0
-								? 'No suggestions'
-								: 'Optional improvements available' }
+								? __( 'No suggestions', 'saman-seo' )
+								: __(
+										'Optional improvements available',
+										'saman-seo'
+								  ) }
 						</div>
 					</div>
 				</div>
@@ -314,9 +377,12 @@ const Audit = () => {
 						<div className="audit-stat-number">
 							{ auditData?.scanned || 0 }
 						</div>
-						<div className="audit-stat-label">Posts Scanned</div>
+						<div className="audit-stat-label">
+							{ __( 'Posts Scanned', 'saman-seo' ) }
+						</div>
 						<div className="audit-stat-desc">
-							{ stats.posts_with_issues || 0 } with issues
+							{ stats.posts_with_issues || 0 }{ ' ' }
+							{ __( 'with issues', 'saman-seo' ) }
 						</div>
 					</div>
 				</div>
@@ -325,9 +391,12 @@ const Audit = () => {
 			{ /* Issues by Type */ }
 			<section className="audit-section">
 				<div className="audit-section-header">
-					<h2>Issues by Type</h2>
+					<h2>{ __( 'Issues by Type', 'saman-seo' ) }</h2>
 					<p className="muted">
-						Click on an issue type to see affected posts.
+						{ __(
+							'Click on an issue type to see affected posts.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 
@@ -338,7 +407,9 @@ const Audit = () => {
 							height="48"
 							viewBox="0 0 24 24"
 							fill="none"
-							style={ { color: 'var(--color-success)' } }
+							style={ {
+								color: 'var(--color-success)',
+							} }
 						>
 							<path
 								d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -348,8 +419,13 @@ const Audit = () => {
 								strokeLinejoin="round"
 							/>
 						</svg>
-						<h3>No issues found!</h3>
-						<p>Your site is in great SEO shape.</p>
+						<h3>{ __( 'No issues found!', 'saman-seo' ) }</h3>
+						<p>
+							{ __(
+								'Your site is in great SEO shape.',
+								'saman-seo'
+							) }
+						</p>
 					</div>
 				) : (
 					<div className="audit-issues-list">
@@ -358,7 +434,6 @@ const Audit = () => {
 								const severity = getTypeSeverity( issues );
 								const config = SEVERITY_CONFIG[ severity ];
 								const isExpanded = expandedType === type;
-
 								return (
 									<div
 										key={ type }
@@ -414,9 +489,24 @@ const Audit = () => {
 												<table className="data-table compact">
 													<thead>
 														<tr>
-															<th>Post</th>
-															<th>Issue</th>
-															<th>Action</th>
+															<th>
+																{ __(
+																	'Post',
+																	'saman-seo'
+																) }
+															</th>
+															<th>
+																{ __(
+																	'Issue',
+																	'saman-seo'
+																) }
+															</th>
+															<th>
+																{ __(
+																	'Action',
+																	'saman-seo'
+																) }
+															</th>
 														</tr>
 													</thead>
 													<tbody>
@@ -450,8 +540,10 @@ const Audit = () => {
 																			rel="noopener noreferrer"
 																			className="link-button"
 																		>
-																			Edit
-																			Post
+																			{ __(
+																				'Edit Post',
+																				'saman-seo'
+																			) }
 																		</a>
 																	</td>
 																</tr>
@@ -474,10 +566,12 @@ const Audit = () => {
 				auditData.recommendations.length > 0 && (
 					<section className="audit-section">
 						<div className="audit-section-header">
-							<h2>Quick Fixes</h2>
+							<h2>{ __( 'Quick Fixes', 'saman-seo' ) }</h2>
 							<p className="muted">
-								Apply suggested meta titles and descriptions
-								with one click.
+								{ __(
+									'Apply suggested meta titles and descriptions with one click.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 
@@ -495,21 +589,34 @@ const Audit = () => {
 											rel="noopener noreferrer"
 											className="link-button small"
 										>
-											Edit Post
+											{ __( 'Edit Post', 'saman-seo' ) }
 										</a>
 									</div>
 									<div className="recommendation-suggestions">
 										<div className="suggestion-item">
-											<label>Suggested Title</label>
+											<label>
+												{ __(
+													'Suggested Title',
+													'saman-seo'
+												) }
+											</label>
 											<div className="suggestion-value">
 												{ rec.suggested_title }
 											</div>
 										</div>
 										<div className="suggestion-item">
-											<label>Suggested Description</label>
+											<label>
+												{ __(
+													'Suggested Description',
+													'saman-seo'
+												) }
+											</label>
 											<div className="suggestion-value">
 												{ rec.suggested_description ||
-													'(No suggestion available)' }
+													__(
+														'(No suggestion available)',
+														'saman-seo'
+													) }
 											</div>
 										</div>
 									</div>
@@ -527,8 +634,14 @@ const Audit = () => {
 										>
 											{ applyingRecommendation ===
 											rec.post_id
-												? 'Applying...'
-												: 'Apply Suggestions' }
+												? __(
+														'Applying\u2026',
+														'saman-seo'
+												  )
+												: __(
+														'Apply Suggestions',
+														'saman-seo'
+												  ) }
 										</button>
 									</div>
 								</div>
@@ -539,5 +652,4 @@ const Audit = () => {
 		</div>
 	);
 };
-
 export default Audit;

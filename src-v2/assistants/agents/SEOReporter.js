@@ -1,11 +1,14 @@
+import { __ } from '@wordpress/i18n';
 /**
  * SEO Reporter Assistant configuration.
  */
 const SEOReporter = {
 	id: 'seo-reporter',
-	name: 'SEO Reporter',
-	description:
+	name: __( 'SEO Reporter', 'saman-seo' ),
+	description: __(
 		'Your weekly SEO buddy that gives you the rundown on your site.',
+		'saman-seo'
+	),
 	icon: (
 		<svg
 			viewBox="0 0 24 24"
@@ -28,5 +31,4 @@ const SEOReporter = {
 		'Find posts missing SEO data',
 	],
 };
-
 export default SEOReporter;

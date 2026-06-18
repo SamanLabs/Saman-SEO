@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 /**
  * Search Preview Component
  *
@@ -26,12 +27,11 @@ const SearchPreview = ( {
 	const displayDescription = isDescriptionOverLimit
 		? description.substring( 0, maxDescriptionLength ) + '...'
 		: description;
-
 	return (
 		<div className="search-preview">
 			<div className="search-preview__header">
 				<span className="search-preview__label">
-					Search Result Preview
+					{ __( 'Search Result Preview', 'saman-seo' ) }
 				</span>
 			</div>
 			<div className="search-preview__body">
@@ -50,11 +50,14 @@ const SearchPreview = ( {
 					</span>
 				</div>
 				<div className="search-preview__title">
-					{ displayTitle || 'Page Title' }
+					{ displayTitle || __( 'Page Title', 'saman-seo' ) }
 				</div>
 				<div className="search-preview__description">
 					{ displayDescription ||
-						'Meta description will appear here...' }
+						__(
+							'Meta description will appear here\u2026',
+							'saman-seo'
+						) }
 				</div>
 			</div>
 			<div className="search-preview__footer">
@@ -63,8 +66,8 @@ const SearchPreview = ( {
 						isTitleOverLimit ? 'over-limit' : ''
 					}` }
 				>
-					<strong>{ titleLength }</strong> / { maxTitleLength } chars
-					(title)
+					<strong>{ titleLength }</strong> / { maxTitleLength }{ ' ' }
+					{ __( 'chars (title)', 'saman-seo' ) }
 				</span>
 				<span
 					className={ `search-preview__counter ${
@@ -72,11 +75,11 @@ const SearchPreview = ( {
 					}` }
 				>
 					<strong>{ descriptionLength }</strong> /{ ' ' }
-					{ maxDescriptionLength } chars (description)
+					{ maxDescriptionLength }{ ' ' }
+					{ __( 'chars (description)', 'saman-seo' ) }
 				</span>
 			</div>
 		</div>
 	);
 };
-
 export default SearchPreview;

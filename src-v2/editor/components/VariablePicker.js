@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef, useEffect } from '@wordpress/element';
-
+import { __ } from '@wordpress/i18n';
 const VariablePicker = ( {
 	variables = {},
 	onSelect,
@@ -56,7 +56,6 @@ const VariablePicker = ( {
 	// Filter variables by context and search term
 	const getFilteredVariables = () => {
 		const filtered = {};
-
 		const contextGroups = {
 			global: [ 'global' ],
 			post: [ 'global', 'post' ],
@@ -67,12 +66,9 @@ const VariablePicker = ( {
 			search: [ 'global' ],
 			404: [ 'global' ],
 		};
-
 		const allowedGroups = contextGroups[ context ] || [ 'global', 'post' ];
-
 		Object.entries( variables ).forEach( ( [ groupKey, group ] ) => {
 			if ( ! allowedGroups.includes( groupKey ) ) return;
-
 			const filteredVars = ( group.vars || [] ).filter( ( v ) => {
 				if ( ! searchTerm ) return true;
 				const term = searchTerm.toLowerCase();
@@ -82,15 +78,15 @@ const VariablePicker = ( {
 					( v.desc && v.desc.toLowerCase().includes( term ) )
 				);
 			} );
-
 			if ( filteredVars.length > 0 ) {
-				filtered[ groupKey ] = { ...group, vars: filteredVars };
+				filtered[ groupKey ] = {
+					...group,
+					vars: filteredVars,
+				};
 			}
 		} );
-
 		return filtered;
 	};
-
 	const handleSelect = ( variable ) => {
 		if ( onSelect ) {
 			onSelect( `{{${ variable.tag }}}` );
@@ -98,7 +94,6 @@ const VariablePicker = ( {
 		setIsOpen( false );
 		setSearchTerm( '' );
 	};
-
 	const handleToggle = () => {
 		if ( controlledOpen !== undefined ) {
 			onToggle?.();
@@ -106,7 +101,6 @@ const VariablePicker = ( {
 			setInternalOpen( ! internalOpen );
 		}
 	};
-
 	const filteredVariables = isOpen ? getFilteredVariables() : {};
 
 	// Compact mode - just an icon button
@@ -121,7 +115,7 @@ const VariablePicker = ( {
 					className="saman-seo-template-input__action-btn saman-seo-template-input__action-btn--vars"
 					onClick={ handleToggle }
 					disabled={ disabled }
-					title="Insert variable"
+					title={ __( 'Insert variable', 'saman-seo' ) }
 				>
 					<svg
 						width="14"
@@ -142,72 +136,7 @@ const VariablePicker = ( {
 					</svg>
 				</button>
 
-				{ isOpen && (
-					<div className="saman-seo-variable-picker__dropdown">
-						<div className="saman-seo-variable-picker__search">
-							<input
-								type="text"
-								placeholder="Search variables..."
-								value={ searchTerm }
-								onChange={ ( e ) =>
-									setSearchTerm( e.target.value )
-								}
-								autoFocus
-							/>
-						</div>
-
-						<div className="saman-seo-variable-picker__groups">
-							{ Object.entries( filteredVariables ).map(
-								( [ groupKey, group ] ) => (
-									<div
-										key={ groupKey }
-										className="saman-seo-variable-picker__group"
-									>
-										<div
-											className={ `saman-seo-variable-picker__group-label saman-seo-variable-picker__group-label--${ groupKey }` }
-										>
-											{ group.label }
-										</div>
-										<div className="saman-seo-variable-picker__items">
-											{ group.vars.map( ( variable ) => (
-												<button
-													key={ variable.tag }
-													type="button"
-													className="saman-seo-variable-picker__item"
-													onClick={ () =>
-														handleSelect( variable )
-													}
-												>
-													<div className="saman-seo-variable-picker__item-header">
-														<code
-															className={ `saman-seo-variable-picker__tag saman-seo-variable-picker__tag--${ groupKey }` }
-														>
-															{ variable.tag }
-														</code>
-														<span className="saman-seo-variable-picker__label">
-															{ variable.label }
-														</span>
-													</div>
-													{ variable.preview && (
-														<div className="saman-seo-variable-picker__preview">
-															{ variable.preview }
-														</div>
-													) }
-												</button>
-											) ) }
-										</div>
-									</div>
-								)
-							) }
-
-							{ Object.keys( filteredVariables ).length === 0 && (
-								<div className="saman-seo-variable-picker__empty">
-									No variables found
-								</div>
-							) }
-						</div>
-					</div>
-				) }
+				{ __( 'Search variables\u2026', 'saman-seo' ) }
 			</div>
 		);
 	}
@@ -220,7 +149,7 @@ const VariablePicker = ( {
 				className="saman-seo-variable-picker__trigger"
 				onClick={ handleToggle }
 				disabled={ disabled }
-				title="Insert variable"
+				title={ __( 'Insert variable', 'saman-seo' ) }
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -238,74 +167,8 @@ const VariablePicker = ( {
 				<span>{ buttonLabel }</span>
 			</button>
 
-			{ isOpen && (
-				<div className="saman-seo-variable-picker__dropdown">
-					<div className="saman-seo-variable-picker__search">
-						<input
-							type="text"
-							placeholder="Search variables..."
-							value={ searchTerm }
-							onChange={ ( e ) =>
-								setSearchTerm( e.target.value )
-							}
-							autoFocus
-						/>
-					</div>
-
-					<div className="saman-seo-variable-picker__groups">
-						{ Object.entries( filteredVariables ).map(
-							( [ groupKey, group ] ) => (
-								<div
-									key={ groupKey }
-									className="saman-seo-variable-picker__group"
-								>
-									<div
-										className={ `saman-seo-variable-picker__group-label saman-seo-variable-picker__group-label--${ groupKey }` }
-									>
-										{ group.label }
-									</div>
-									<div className="saman-seo-variable-picker__items">
-										{ group.vars.map( ( variable ) => (
-											<button
-												key={ variable.tag }
-												type="button"
-												className="saman-seo-variable-picker__item"
-												onClick={ () =>
-													handleSelect( variable )
-												}
-											>
-												<div className="saman-seo-variable-picker__item-header">
-													<code
-														className={ `saman-seo-variable-picker__tag saman-seo-variable-picker__tag--${ groupKey }` }
-													>
-														{ variable.tag }
-													</code>
-													<span className="saman-seo-variable-picker__label">
-														{ variable.label }
-													</span>
-												</div>
-												{ variable.preview && (
-													<div className="saman-seo-variable-picker__preview">
-														{ variable.preview }
-													</div>
-												) }
-											</button>
-										) ) }
-									</div>
-								</div>
-							)
-						) }
-
-						{ Object.keys( filteredVariables ).length === 0 && (
-							<div className="saman-seo-variable-picker__empty">
-								No variables found
-							</div>
-						) }
-					</div>
-				</div>
-			) }
+			{ __( 'Search variables\u2026', 'saman-seo' ) }
 		</div>
 	);
 };
-
 export default VariablePicker;

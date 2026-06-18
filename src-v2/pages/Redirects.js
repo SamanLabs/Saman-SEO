@@ -1,11 +1,23 @@
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __, sprintf } from '@wordpress/i18n';
 const STATUS_CODES = [
-	{ value: 301, label: '301 Permanent' },
-	{ value: 302, label: '302 Temporary' },
-	{ value: 307, label: '307' },
-	{ value: 410, label: '410 Gone' },
+	{
+		value: 301,
+		label: __( '301 Permanent', 'saman-seo' ),
+	},
+	{
+		value: 302,
+		label: __( '302 Temporary', 'saman-seo' ),
+	},
+	{
+		value: 307,
+		label: '307',
+	},
+	{
+		value: 410,
+		label: __( '410 Gone', 'saman-seo' ),
+	},
 ];
 
 // Empty form state
@@ -28,7 +40,6 @@ const emptyForm = {
  */
 const parseRegexPattern = ( pattern ) => {
 	let i = 0;
-
 	const parseSequence = ( endChar ) => {
 		const nodes = [];
 		while ( i < pattern.length ) {
@@ -38,10 +49,18 @@ const parseRegexPattern = ( pattern ) => {
 			}
 			if ( c === '|' ) {
 				const left =
-					nodes.length === 1 ? nodes[ 0 ] : { type: 'seq', nodes };
+					nodes.length === 1
+						? nodes[ 0 ]
+						: {
+								type: 'seq',
+								nodes,
+						  };
 				i++;
 				const right = parseSequence( endChar );
-				return { type: 'alt', branches: [ left, right ] };
+				return {
+					type: 'alt',
+					branches: [ left, right ],
+				};
 			}
 			const node = parseAtom();
 			if ( ! node ) {
@@ -60,14 +79,18 @@ const parseRegexPattern = ( pattern ) => {
 			}
 		}
 		if ( nodes.length === 0 ) {
-			return { type: 'empty' };
+			return {
+				type: 'empty',
+			};
 		}
 		if ( nodes.length === 1 ) {
 			return nodes[ 0 ];
 		}
-		return { type: 'seq', nodes };
+		return {
+			type: 'seq',
+			nodes,
+		};
 	};
-
 	const parseAtom = () => {
 		if ( i >= pattern.length ) {
 			return null;
@@ -75,7 +98,9 @@ const parseRegexPattern = ( pattern ) => {
 		const c = pattern[ i ];
 		if ( c === '^' || c === '$' ) {
 			i++;
-			return { type: 'anchor' };
+			return {
+				type: 'anchor',
+			};
 		}
 		if ( c === '\\' ) {
 			i += 2;
@@ -91,11 +116,17 @@ const parseRegexPattern = ( pattern ) => {
 			else if ( n === 'n' ) value = '\n';
 			else if ( n === 'r' ) value = '\r';
 			else if ( n === 'b' || n === 'B' ) value = '';
-			return { type: 'literal', value };
+			return {
+				type: 'literal',
+				value,
+			};
 		}
 		if ( c === '.' ) {
 			i++;
-			return { type: 'literal', value: 'a' };
+			return {
+				type: 'literal',
+				value: 'a',
+			};
 		}
 		if ( c === '[' ) {
 			i++;
@@ -128,7 +159,10 @@ const parseRegexPattern = ( pattern ) => {
 					break;
 				}
 			}
-			return { type: 'literal', value };
+			return {
+				type: 'literal',
+				value,
+			};
 		}
 		if ( c === '(' ) {
 			i++;
@@ -149,7 +183,9 @@ const parseRegexPattern = ( pattern ) => {
 				if ( pattern[ i ] === ')' ) {
 					i++;
 				}
-				return { type: 'empty' };
+				return {
+					type: 'empty',
+				};
 			}
 			if (
 				pattern.substr( i, 3 ) === '?<=' ||
@@ -160,25 +196,34 @@ const parseRegexPattern = ( pattern ) => {
 				if ( pattern[ i ] === ')' ) {
 					i++;
 				}
-				return { type: 'empty' };
+				return {
+					type: 'empty',
+				};
 			}
 			if ( pattern[ i ] === '?' ) {
 				const end = pattern.indexOf( ')', i );
 				if ( end !== -1 ) {
 					i = end + 1;
 				}
-				return { type: 'empty' };
+				return {
+					type: 'empty',
+				};
 			}
 			const node = parseSequence( ')' );
 			if ( pattern[ i ] === ')' ) {
 				i++;
 			}
-			return { type: 'group', node };
+			return {
+				type: 'group',
+				node,
+			};
 		}
 		i++;
-		return { type: 'literal', value: c };
+		return {
+			type: 'literal',
+			value: c,
+		};
 	};
-
 	const parseQuantifier = () => {
 		if ( i >= pattern.length ) {
 			return null;
@@ -186,15 +231,24 @@ const parseRegexPattern = ( pattern ) => {
 		const c = pattern[ i ];
 		if ( c === '?' ) {
 			i++;
-			return { min: 0, max: 1 };
+			return {
+				min: 0,
+				max: 1,
+			};
 		}
 		if ( c === '*' ) {
 			i++;
-			return { min: 0, max: Infinity };
+			return {
+				min: 0,
+				max: Infinity,
+			};
 		}
 		if ( c === '+' ) {
 			i++;
-			return { min: 1, max: Infinity };
+			return {
+				min: 1,
+				max: Infinity,
+			};
 		}
 		if ( c === '{' ) {
 			const end = pattern.indexOf( '}', i );
@@ -207,19 +261,24 @@ const parseRegexPattern = ( pattern ) => {
 			if ( parts.length === 1 ) {
 				const n = parseInt( parts[ 0 ], 10 );
 				if ( ! isNaN( n ) ) {
-					return { min: n, max: n };
+					return {
+						min: n,
+						max: n,
+					};
 				}
 			} else if ( parts.length === 2 ) {
 				const min = parseInt( parts[ 0 ], 10 );
 				const max = parts[ 1 ] ? parseInt( parts[ 1 ], 10 ) : Infinity;
 				if ( ! isNaN( min ) ) {
-					return { min, max };
+					return {
+						min,
+						max,
+					};
 				}
 			}
 		}
 		return null;
 	};
-
 	return parseSequence( null );
 };
 
@@ -234,11 +293,9 @@ const generateRegexExamples = ( pattern, count = 3 ) => {
 	if ( ! pattern || typeof pattern !== 'string' ) {
 		return [];
 	}
-
 	const ast = parseRegexPattern( pattern );
 	const examples = [];
 	const seen = new Set();
-
 	const emit = ( str ) => {
 		if ( examples.length >= count ) {
 			return false;
@@ -249,7 +306,6 @@ const generateRegexExamples = ( pattern, count = 3 ) => {
 		}
 		return examples.length < count;
 	};
-
 	const generate = ( node, limit ) => {
 		if ( ! node || node.type === 'empty' || node.type === 'anchor' ) {
 			return [ '' ];
@@ -304,13 +360,11 @@ const generateRegexExamples = ( pattern, count = 3 ) => {
 		}
 		return [ '' ];
 	};
-
 	for ( const str of generate( ast, count ) ) {
 		if ( ! emit( str ) ) {
 			break;
 		}
 	}
-
 	return examples;
 };
 
@@ -329,7 +383,6 @@ const buildRegexTooltip = ( source ) => {
 		.map( ( ex ) => `• ${ ex }` )
 		.join( '\n' ) }`;
 };
-
 const Redirects = () => {
 	// Redirects state
 	const [ redirects, setRedirects ] = useState( [] );
@@ -342,7 +395,9 @@ const Redirects = () => {
 	} );
 
 	// Form state
-	const [ formData, setFormData ] = useState( { ...emptyForm } );
+	const [ formData, setFormData ] = useState( {
+		...emptyForm,
+	} );
 	const [ editingId, setEditingId ] = useState( null );
 	const [ showModal, setShowModal ] = useState( false );
 	const [ formLoading, setFormLoading ] = useState( false );
@@ -380,7 +435,6 @@ const Redirects = () => {
 		top_redirect: null,
 	} );
 	const [ summaryLoading, setSummaryLoading ] = useState( true );
-
 	const fileInputRef = useRef( null );
 
 	// Fetch redirects with filters
@@ -395,7 +449,6 @@ const Redirects = () => {
 				if ( filterGroup ) params.append( 'group', filterGroup );
 				if ( filterStatus )
 					params.append( 'status_code', filterStatus );
-
 				const response = await apiFetch( {
 					path: `/saman-seo/v1/redirects?${ params }`,
 				} );
@@ -482,7 +535,10 @@ const Redirects = () => {
 			'Saman_seo_redirect_source'
 		);
 		if ( storedSource ) {
-			setFormData( ( prev ) => ( { ...prev, source: storedSource } ) );
+			setFormData( ( prev ) => ( {
+				...prev,
+				source: storedSource,
+			} ) );
 			setShowModal( true );
 			sessionStorage.removeItem( 'Saman_seo_redirect_source' );
 		}
@@ -503,7 +559,11 @@ const Redirects = () => {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/redirects/validate-chain',
 				method: 'POST',
-				data: { source, target, exclude_id: editingId || 0 },
+				data: {
+					source,
+					target,
+					exclude_id: editingId || 0,
+				},
 			} );
 			if ( response.success ) {
 				setChainWarnings( response.data.warnings || [] );
@@ -523,13 +583,18 @@ const Redirects = () => {
 
 	// Update form field
 	const updateForm = ( field, value ) => {
-		setFormData( ( prev ) => ( { ...prev, [ field ]: value } ) );
+		setFormData( ( prev ) => ( {
+			...prev,
+			[ field ]: value,
+		} ) );
 		setFormError( '' );
 	};
 
 	// Open modal for creating
 	const openCreateModal = () => {
-		setFormData( { ...emptyForm } );
+		setFormData( {
+			...emptyForm,
+		} );
 		setEditingId( null );
 		setShowModal( true );
 		setChainWarnings( [] );
@@ -564,7 +629,9 @@ const Redirects = () => {
 	const closeModal = () => {
 		setShowModal( false );
 		setEditingId( null );
-		setFormData( { ...emptyForm } );
+		setFormData( {
+			...emptyForm,
+		} );
 		setChainWarnings( [] );
 		setFormError( '' );
 	};
@@ -574,13 +641,13 @@ const Redirects = () => {
 		e.preventDefault();
 		setFormLoading( true );
 		setFormError( '' );
-
 		try {
-			const data = { ...formData };
+			const data = {
+				...formData,
+			};
 			// Convert empty strings to null for dates
 			if ( ! data.start_date ) data.start_date = null;
 			if ( ! data.end_date ) data.end_date = null;
-
 			let response;
 			if ( editingId ) {
 				response = await apiFetch( {
@@ -595,7 +662,6 @@ const Redirects = () => {
 					data,
 				} );
 			}
-
 			if ( response.success ) {
 				closeModal();
 				fetchRedirects( pagination.page );
@@ -603,10 +669,15 @@ const Redirects = () => {
 				fetchSuggestions();
 				fetchSummary();
 			} else {
-				setFormError( response.message || 'Failed to save redirect' );
+				setFormError(
+					response.message ||
+						__( 'Failed to save redirect', 'saman-seo' )
+				);
 			}
 		} catch ( error ) {
-			setFormError( error.message || 'Failed to save redirect' );
+			setFormError(
+				error.message || __( 'Failed to save redirect', 'saman-seo' )
+			);
 		} finally {
 			setFormLoading( false );
 		}
@@ -615,11 +686,15 @@ const Redirects = () => {
 	// Delete redirect
 	const handleDeleteRedirect = async ( id ) => {
 		if (
-			! window.confirm( 'Are you sure you want to delete this redirect?' )
+			! window.confirm(
+				__(
+					'Are you sure you want to delete this redirect?',
+					'saman-seo'
+				)
+			)
 		) {
 			return;
 		}
-
 		try {
 			await apiFetch( {
 				path: `/saman-seo/v1/redirects/${ id }`,
@@ -638,17 +713,24 @@ const Redirects = () => {
 		if ( selectedIds.length === 0 ) return;
 		if (
 			! window.confirm(
-				`Delete ${ selectedIds.length } selected redirect(s)?`
+				sprintf(
+					/* translators: %s: placeholder */ __(
+						'Delete %s selected redirect(s)?',
+						'saman-seo'
+					),
+					selectedIds.length
+				)
 			)
 		)
 			return;
-
 		setBulkLoading( true );
 		try {
 			await apiFetch( {
 				path: '/saman-seo/v1/redirects/bulk-delete',
 				method: 'POST',
-				data: { ids: selectedIds },
+				data: {
+					ids: selectedIds,
+				},
 			} );
 			setSelectedIds( [] );
 			fetchRedirects( pagination.page );
@@ -704,7 +786,6 @@ const Redirects = () => {
 	// Import redirects
 	const handleImport = async () => {
 		if ( ! importData.trim() ) return;
-
 		setImportLoading( true );
 		setImportResult( null );
 		try {
@@ -717,17 +798,20 @@ const Redirects = () => {
 					overwrite: importOverwrite,
 				},
 			} );
-
 			if ( response.success ) {
 				setImportResult( response.data );
 				fetchRedirects( 1 );
 				fetchGroups();
 				fetchSummary();
 			} else {
-				setImportResult( { error: response.message } );
+				setImportResult( {
+					error: response.message,
+				} );
 			}
 		} catch ( error ) {
-			setImportResult( { error: error.message } );
+			setImportResult( {
+				error: error.message,
+			} );
 		} finally {
 			setImportLoading( false );
 		}
@@ -737,7 +821,6 @@ const Redirects = () => {
 	const handleFileUpload = ( e ) => {
 		const file = e.target.files?.[ 0 ];
 		if ( ! file ) return;
-
 		const reader = new FileReader();
 		reader.onload = ( event ) => {
 			setImportData( event.target.result );
@@ -807,15 +890,16 @@ const Redirects = () => {
 		const date = new Date( dateStr );
 		return date.toLocaleDateString();
 	};
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Redirects</h1>
+					<h1>{ __( 'Redirects', 'saman-seo' ) }</h1>
 					<p>
-						Create and manage URL redirects to maintain SEO value
-						when URLs change.
+						{ __(
+							'Create and manage URL redirects to maintain SEO value when URLs change.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="page-header-actions">
@@ -824,11 +908,11 @@ const Redirects = () => {
 						className="button ghost"
 						onClick={ () => setShowImport( true ) }
 					>
-						Import
+						{ __( 'Import', 'saman-seo' ) }
 					</button>
 					<div className="dropdown">
 						<button type="button" className="button ghost">
-							Export
+							{ __( 'Export', 'saman-seo' ) }
 						</button>
 						<div className="dropdown-menu">
 							<button
@@ -836,14 +920,14 @@ const Redirects = () => {
 								className="dropdown-menu__item"
 								onClick={ () => handleExport( 'json' ) }
 							>
-								Export as JSON
+								{ __( 'Export as JSON', 'saman-seo' ) }
 							</button>
 							<button
 								type="button"
 								className="dropdown-menu__item"
 								onClick={ () => handleExport( 'csv' ) }
 							>
-								Export as CSV
+								{ __( 'Export as CSV', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
@@ -852,7 +936,7 @@ const Redirects = () => {
 						className="button primary"
 						onClick={ openCreateModal }
 					>
-						Add Redirect
+						{ __( 'Add Redirect', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -869,7 +953,7 @@ const Redirects = () => {
 										: summary.total.toLocaleString() }
 								</span>
 								<span className="stat-list__label">
-									Total redirects
+									{ __( 'Total redirects', 'saman-seo' ) }
 								</span>
 							</div>
 							<div className="stat-list__item">
@@ -878,7 +962,9 @@ const Redirects = () => {
 										? '...'
 										: summary.active_count.toLocaleString() }
 								</span>
-								<span className="stat-list__label">Active</span>
+								<span className="stat-list__label">
+									{ __( 'Active', 'saman-seo' ) }
+								</span>
 							</div>
 							<div className="stat-list__item">
 								<span className="stat-list__value">
@@ -887,7 +973,7 @@ const Redirects = () => {
 										: summary.total_hits.toLocaleString() }
 								</span>
 								<span className="stat-list__label">
-									Total hits
+									{ __( 'Total hits', 'saman-seo' ) }
 								</span>
 							</div>
 							<div
@@ -906,7 +992,7 @@ const Redirects = () => {
 										: '0' }
 								</span>
 								<span className="stat-list__label">
-									Top hits
+									{ __( 'Top hits', 'saman-seo' ) }
 								</span>
 							</div>
 						</div>
@@ -914,7 +1000,10 @@ const Redirects = () => {
 					<div className="page-toolbar__filters">
 						<input
 							type="search"
-							placeholder="Search redirects..."
+							placeholder={ __(
+								'Search redirects\u2026',
+								'saman-seo'
+							) }
 							value={ search }
 							onChange={ ( e ) => setSearch( e.target.value ) }
 							className="search-input"
@@ -925,7 +1014,9 @@ const Redirects = () => {
 								setFilterGroup( e.target.value )
 							}
 						>
-							<option value="">All groups</option>
+							<option value="">
+								{ __( 'All groups', 'saman-seo' ) }
+							</option>
 							{ groups.map( ( group ) => (
 								<option key={ group } value={ group }>
 									{ group }
@@ -938,7 +1029,9 @@ const Redirects = () => {
 								setFilterStatus( e.target.value )
 							}
 						>
-							<option value="">All status</option>
+							<option value="">
+								{ __( 'All status', 'saman-seo' ) }
+							</option>
 							{ STATUS_CODES.map( ( code ) => (
 								<option key={ code.value } value={ code.value }>
 									{ code.label }
@@ -946,7 +1039,8 @@ const Redirects = () => {
 							) ) }
 						</select>
 						<span className="page-toolbar__count">
-							{ pagination.total } redirect
+							{ pagination.total }{ ' ' }
+							{ __( 'redirect', 'saman-seo' ) }
 							{ pagination.total !== 1 ? 's' : '' }
 						</span>
 					</div>
@@ -956,19 +1050,29 @@ const Redirects = () => {
 				{ ! suggestionsLoading && suggestions.length > 0 && (
 					<div className="alert-card warning">
 						<div className="alert-header">
-							<h3>Detected slug changes</h3>
+							<h3>
+								{ __( 'Detected slug changes', 'saman-seo' ) }
+							</h3>
 						</div>
 						<p className="muted">
-							The following posts have changed their URL
-							structure. Create redirects to prevent 404 errors.
+							{ __(
+								'The following posts have changed their URL structure. Create redirects to prevent 404 errors.',
+								'saman-seo'
+							) }
 						</p>
 						<div className="table-wrap">
 							<table className="data-table data-table--compact">
 								<thead>
 									<tr>
-										<th className="col-url">Old path</th>
-										<th className="col-url">New target</th>
-										<th className="col-actions">Actions</th>
+										<th className="col-url">
+											{ __( 'Old path', 'saman-seo' ) }
+										</th>
+										<th className="col-url">
+											{ __( 'New target', 'saman-seo' ) }
+										</th>
+										<th className="col-actions">
+											{ __( 'Actions', 'saman-seo' ) }
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -999,7 +1103,10 @@ const Redirects = () => {
 															)
 														}
 													>
-														Apply
+														{ __(
+															'Apply',
+															'saman-seo'
+														) }
 													</button>
 													<button
 														type="button"
@@ -1010,7 +1117,10 @@ const Redirects = () => {
 															)
 														}
 													>
-														Edit
+														{ __(
+															'Edit',
+															'saman-seo'
+														) }
 													</button>
 													<button
 														type="button"
@@ -1021,7 +1131,10 @@ const Redirects = () => {
 															)
 														}
 													>
-														Dismiss
+														{ __(
+															'Dismiss',
+															'saman-seo'
+														) }
 													</button>
 												</div>
 											</td>
@@ -1036,28 +1149,35 @@ const Redirects = () => {
 				{ /* Bulk actions */ }
 				{ selectedIds.length > 0 && (
 					<div className="bulk-actions">
-						<span>{ selectedIds.length } selected</span>
+						<span>
+							{ selectedIds.length }{ ' ' }
+							{ __( 'selected', 'saman-seo' ) }
+						</span>
 						<button
 							type="button"
 							className="button danger small"
 							onClick={ handleBulkDelete }
 							disabled={ bulkLoading }
 						>
-							{ bulkLoading ? 'Deleting...' : 'Delete Selected' }
+							{ bulkLoading
+								? __( 'Deleting\u2026', 'saman-seo' )
+								: __( 'Delete Selected', 'saman-seo' ) }
 						</button>
 						<button
 							type="button"
 							className="link-button"
 							onClick={ () => setSelectedIds( [] ) }
 						>
-							Clear Selection
+							{ __( 'Clear Selection', 'saman-seo' ) }
 						</button>
 					</div>
 				) }
 
 				{ /* Redirects Table */ }
 				{ redirectsLoading ? (
-					<div className="loading-state">Loading redirects...</div>
+					<div className="loading-state">
+						{ __( 'Loading redirects\u2026', 'saman-seo' ) }
+					</div>
 				) : redirects.length === 0 ? (
 					<div className="empty-state">
 						<div className="empty-state__icon">
@@ -1073,11 +1193,17 @@ const Redirects = () => {
 								<path d="M15 6l-6 6 6 6" opacity="0.5" />
 							</svg>
 						</div>
-						<h3>No redirects found</h3>
+						<h3>{ __( 'No redirects found', 'saman-seo' ) }</h3>
 						<p>
 							{ search || filterGroup || filterStatus
-								? 'Try adjusting your filters.'
-								: 'Add your first redirect to get started.' }
+								? __(
+										'Try adjusting your filters.',
+										'saman-seo'
+								  )
+								: __(
+										'Add your first redirect to get started.',
+										'saman-seo'
+								  ) }
 						</p>
 						{ ! search && ! filterGroup && ! filterStatus && (
 							<button
@@ -1085,7 +1211,7 @@ const Redirects = () => {
 								className="button primary"
 								onClick={ openCreateModal }
 							>
-								Add Redirect
+								{ __( 'Add Redirect', 'saman-seo' ) }
 							</button>
 						) }
 					</div>
@@ -1106,12 +1232,24 @@ const Redirects = () => {
 												onChange={ toggleSelectAll }
 											/>
 										</th>
-										<th className="col-url">Source</th>
-										<th className="col-url">Target</th>
-										<th className="col-status">Status</th>
-										<th className="col-numeric">Hits</th>
-										<th className="col-date">Last hit</th>
-										<th className="col-actions">Actions</th>
+										<th className="col-url">
+											{ __( 'Source', 'saman-seo' ) }
+										</th>
+										<th className="col-url">
+											{ __( 'Target', 'saman-seo' ) }
+										</th>
+										<th className="col-status">
+											{ __( 'Status', 'saman-seo' ) }
+										</th>
+										<th className="col-numeric">
+											{ __( 'Hits', 'saman-seo' ) }
+										</th>
+										<th className="col-date">
+											{ __( 'Last hit', 'saman-seo' ) }
+										</th>
+										<th className="col-actions">
+											{ __( 'Actions', 'saman-seo' ) }
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -1151,7 +1289,10 @@ const Redirects = () => {
 																redirect.source
 															) }
 														>
-															Regex
+															{ __(
+																'Regex',
+																'saman-seo'
+															) }
 														</span>
 													) }
 													{ redirect.group_name && (
@@ -1201,12 +1342,24 @@ const Redirects = () => {
 														new Date(
 															redirect.start_date
 														) > new Date()
-															? `Starts: ${ formatShortDate(
-																	redirect.start_date
-															  ) }`
-															: `Ended: ${ formatShortDate(
-																	redirect.end_date
-															  ) }` }
+															? sprintf(
+																	/* translators: %s: placeholder */ __(
+																		'Starts: %s',
+																		'saman-seo'
+																	),
+																	formatShortDate(
+																		redirect.start_date
+																	)
+															  )
+															: sprintf(
+																	/* translators: %s: placeholder */ __(
+																		'Ended: %s',
+																		'saman-seo'
+																	),
+																	formatShortDate(
+																		redirect.end_date
+																	)
+															  ) }
 													</div>
 												) }
 											</td>
@@ -1221,7 +1374,10 @@ const Redirects = () => {
 															)
 														}
 													>
-														Edit
+														{ __(
+															'Edit',
+															'saman-seo'
+														) }
 													</button>
 													<button
 														type="button"
@@ -1232,7 +1388,10 @@ const Redirects = () => {
 															)
 														}
 													>
-														Delete
+														{ __(
+															'Delete',
+															'saman-seo'
+														) }
 													</button>
 												</div>
 											</td>
@@ -1253,10 +1412,12 @@ const Redirects = () => {
 										fetchRedirects( pagination.page - 1 )
 									}
 								>
-									&lsaquo; Previous
+									{ __( '\u2039 Previous', 'saman-seo' ) }
 								</button>
 								<span className="pagination-info">
-									Page { pagination.page } of{ ' ' }
+									{ __( 'Page', 'saman-seo' ) }{ ' ' }
+									{ pagination.page }{ ' ' }
+									{ __( 'of', 'saman-seo' ) }{ ' ' }
 									{ pagination.total_pages }
 								</span>
 								<button
@@ -1270,7 +1431,7 @@ const Redirects = () => {
 										fetchRedirects( pagination.page + 1 )
 									}
 								>
-									Next &rsaquo;
+									{ __( 'Next \u203A', 'saman-seo' ) }
 								</button>
 							</div>
 						) }
@@ -1279,417 +1440,11 @@ const Redirects = () => {
 			</section>
 
 			{ /* Create/Edit Modal */ }
-			{ showModal && (
-				<div className="modal-overlay" onClick={ closeModal }>
-					<div
-						className="modal"
-						onClick={ ( e ) => e.stopPropagation() }
-					>
-						<div className="modal-header">
-							<h2>
-								{ editingId ? 'Edit Redirect' : 'Add Redirect' }
-							</h2>
-							<button
-								type="button"
-								className="modal-close"
-								onClick={ closeModal }
-							>
-								&times;
-							</button>
-						</div>
-						<form onSubmit={ handleSaveRedirect }>
-							<div className="modal-body">
-								{ /* Chain/Loop Warnings */ }
-								{ chainWarnings.length > 0 && (
-									<div className="chain-warnings">
-										{ chainWarnings.map( ( warning, i ) => (
-											<div
-												key={ i }
-												className={ `alert-inline ${
-													warning.type === 'loop'
-														? 'danger'
-														: 'warning'
-												}` }
-											>
-												{ warning.message }
-											</div>
-										) ) }
-									</div>
-								) }
-
-								<div className="form-group">
-									<label htmlFor="modal-source">
-										Source Path
-									</label>
-									<input
-										type="text"
-										id="modal-source"
-										placeholder={
-											formData.is_regex
-												? '^/old-path/(.*)$'
-												: '/old-url'
-										}
-										value={ formData.source }
-										onChange={ ( e ) =>
-											updateForm(
-												'source',
-												e.target.value
-											)
-										}
-										required
-									/>
-									<label className="checkbox-label">
-										<input
-											type="checkbox"
-											checked={ formData.is_regex }
-											onChange={ ( e ) =>
-												updateForm(
-													'is_regex',
-													e.target.checked
-												)
-											}
-										/>
-										Use regex pattern
-									</label>
-									{ formData.is_regex && (
-										<p className="field-hint">
-											Use capture groups like (.*) and
-											reference them in target as $1, $2,
-											etc.
-										</p>
-									) }
-								</div>
-
-								<div className="form-group">
-									<label htmlFor="modal-target">
-										Target URL
-									</label>
-									<input
-										type="text"
-										id="modal-target"
-										placeholder={
-											formData.is_regex
-												? 'https://example.com/new-path/$1'
-												: 'https://example.com/new-url'
-										}
-										value={ formData.target }
-										onChange={ ( e ) =>
-											updateForm(
-												'target',
-												e.target.value
-											)
-										}
-										required
-									/>
-								</div>
-
-								<div className="form-row">
-									<div className="form-group">
-										<label htmlFor="modal-status">
-											Status Code
-										</label>
-										<select
-											id="modal-status"
-											value={ formData.status_code }
-											onChange={ ( e ) =>
-												updateForm(
-													'status_code',
-													parseInt(
-														e.target.value,
-														10
-													)
-												)
-											}
-										>
-											{ STATUS_CODES.map( ( code ) => (
-												<option
-													key={ code.value }
-													value={ code.value }
-												>
-													{ code.label }
-												</option>
-											) ) }
-										</select>
-									</div>
-									<div className="form-group">
-										<label htmlFor="modal-group">
-											Group (optional)
-										</label>
-										<input
-											type="text"
-											id="modal-group"
-											placeholder="e.g., migration, campaign"
-											value={ formData.group_name }
-											onChange={ ( e ) =>
-												updateForm(
-													'group_name',
-													e.target.value
-												)
-											}
-											list="group-suggestions"
-										/>
-										<datalist id="group-suggestions">
-											{ groups.map( ( group ) => (
-												<option
-													key={ group }
-													value={ group }
-												/>
-											) ) }
-										</datalist>
-									</div>
-								</div>
-
-								<button
-									type="button"
-									className="link-button advanced-toggle"
-									onClick={ () =>
-										setShowAdvanced( ! showAdvanced )
-									}
-								>
-									{ showAdvanced
-										? 'Hide Advanced Options'
-										: 'Show Advanced Options' }
-								</button>
-
-								{ showAdvanced && (
-									<div className="advanced-options">
-										<div className="form-row">
-											<div className="form-group">
-												<label htmlFor="modal-start-date">
-													Start Date (optional)
-												</label>
-												<input
-													type="datetime-local"
-													id="modal-start-date"
-													value={
-														formData.start_date
-													}
-													onChange={ ( e ) =>
-														updateForm(
-															'start_date',
-															e.target.value
-														)
-													}
-												/>
-												<p className="field-hint">
-													Redirect activates at this
-													time
-												</p>
-											</div>
-											<div className="form-group">
-												<label htmlFor="modal-end-date">
-													End Date (optional)
-												</label>
-												<input
-													type="datetime-local"
-													id="modal-end-date"
-													value={ formData.end_date }
-													onChange={ ( e ) =>
-														updateForm(
-															'end_date',
-															e.target.value
-														)
-													}
-												/>
-												<p className="field-hint">
-													Redirect expires after this
-													time
-												</p>
-											</div>
-										</div>
-
-										<div className="form-group">
-											<label htmlFor="modal-notes">
-												Notes (optional)
-											</label>
-											<textarea
-												id="modal-notes"
-												placeholder="Internal notes about this redirect..."
-												value={ formData.notes }
-												onChange={ ( e ) =>
-													updateForm(
-														'notes',
-														e.target.value
-													)
-												}
-												rows="2"
-											/>
-										</div>
-									</div>
-								) }
-
-								{ formError && (
-									<p className="form-error">{ formError }</p>
-								) }
-							</div>
-							<div className="modal-footer">
-								<button
-									type="button"
-									className="button ghost"
-									onClick={ closeModal }
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="button primary"
-									disabled={ formLoading }
-								>
-									{ formLoading
-										? 'Saving...'
-										: editingId
-										? 'Update Redirect'
-										: 'Add Redirect' }
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			) }
+			{ __( 'e.g., migration, campaign', 'saman-seo' ) }
 
 			{ /* Import Modal */ }
-			{ showImport && (
-				<div
-					className="modal-overlay"
-					onClick={ () => setShowImport( false ) }
-				>
-					<div
-						className="modal modal-wide"
-						onClick={ ( e ) => e.stopPropagation() }
-					>
-						<div className="modal-header">
-							<h2>Import Redirects</h2>
-							<button
-								type="button"
-								className="modal-close"
-								onClick={ () => setShowImport( false ) }
-							>
-								&times;
-							</button>
-						</div>
-						<div className="modal-body">
-							<div className="form-group">
-								<label>Upload File</label>
-								<input
-									type="file"
-									ref={ fileInputRef }
-									accept=".json,.csv"
-									onChange={ handleFileUpload }
-								/>
-							</div>
-
-							<div className="form-group">
-								<label>Or paste data directly</label>
-								<textarea
-									value={ importData }
-									onChange={ ( e ) =>
-										setImportData( e.target.value )
-									}
-									placeholder="Paste JSON or CSV data here..."
-									rows="8"
-									className="code-textarea"
-								/>
-							</div>
-
-							<div className="form-row">
-								<div className="form-group">
-									<label>Format</label>
-									<select
-										value={ importFormat }
-										onChange={ ( e ) =>
-											setImportFormat( e.target.value )
-										}
-									>
-										<option value="json">JSON</option>
-										<option value="csv">CSV</option>
-									</select>
-								</div>
-								<div className="form-group">
-									<label
-										className="checkbox-label"
-										style={ { marginTop: '28px' } }
-									>
-										<input
-											type="checkbox"
-											checked={ importOverwrite }
-											onChange={ ( e ) =>
-												setImportOverwrite(
-													e.target.checked
-												)
-											}
-										/>
-										Overwrite existing redirects
-									</label>
-								</div>
-							</div>
-
-							{ importResult && (
-								<div
-									className={ `import-result ${
-										importResult.error ? 'error' : 'success'
-									}` }
-								>
-									{ importResult.error ? (
-										<p>Error: { importResult.error }</p>
-									) : (
-										<>
-											<p>
-												Imported:{ ' ' }
-												{ importResult.imported } |
-												Skipped:{ ' ' }
-												{ importResult.skipped }
-											</p>
-											{ importResult.errors?.length >
-												0 && (
-												<ul className="import-errors">
-													{ importResult.errors
-														.slice( 0, 5 )
-														.map( ( err, i ) => (
-															<li key={ i }>
-																{ err }
-															</li>
-														) ) }
-													{ importResult.errors
-														.length > 5 && (
-														<li>
-															...and{ ' ' }
-															{ importResult
-																.errors.length -
-																5 }{ ' ' }
-															more
-														</li>
-													) }
-												</ul>
-											) }
-										</>
-									) }
-								</div>
-							) }
-						</div>
-						<div className="modal-footer">
-							<button
-								type="button"
-								className="button ghost"
-								onClick={ () => setShowImport( false ) }
-							>
-								Close
-							</button>
-							<button
-								type="button"
-								className="button primary"
-								onClick={ handleImport }
-								disabled={
-									importLoading || ! importData.trim()
-								}
-							>
-								{ importLoading ? 'Importing...' : 'Import' }
-							</button>
-						</div>
-					</div>
-				</div>
-			) }
+			{ __( 'Paste JSON or CSV data here\u2026', 'saman-seo' ) }
 		</div>
 	);
 };
-
 export default Redirects;

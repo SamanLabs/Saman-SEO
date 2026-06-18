@@ -1,6 +1,6 @@
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __ } from '@wordpress/i18n';
 const ContentGaps = ( { onNavigate } ) => {
 	const [ analyzing, setAnalyzing ] = useState( false );
 	const [ results, setResults ] = useState( null );
@@ -9,11 +9,9 @@ const ContentGaps = ( { onNavigate } ) => {
 	const [ topic, setTopic ] = useState( '' );
 	const [ selectedCategory, setSelectedCategory ] = useState( '' );
 	const [ categories, setCategories ] = useState( [] );
-
 	useEffect( () => {
 		fetchCategories();
 	}, [] );
-
 	const fetchCategories = async () => {
 		try {
 			const response = await apiFetch( {
@@ -24,12 +22,10 @@ const ContentGaps = ( { onNavigate } ) => {
 			console.error( 'Failed to fetch categories:', error );
 		}
 	};
-
 	const handleAnalyze = async () => {
 		setAnalyzing( true );
 		setResults( null );
 		setOutline( null );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/tools/content-gaps/analyze',
@@ -39,7 +35,6 @@ const ContentGaps = ( { onNavigate } ) => {
 					category_id: selectedCategory || null,
 				},
 			} );
-
 			if ( response.success ) {
 				setResults( response.data );
 			}
@@ -49,17 +44,16 @@ const ContentGaps = ( { onNavigate } ) => {
 			setAnalyzing( false );
 		}
 	};
-
 	const handleGenerateOutline = async ( gapTopic ) => {
 		setGeneratingOutline( gapTopic );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/tools/content-gaps/outline',
 				method: 'POST',
-				data: { topic: gapTopic },
+				data: {
+					topic: gapTopic,
+				},
 			} );
-
 			if ( response.success ) {
 				setOutline( {
 					topic: gapTopic,
@@ -72,7 +66,6 @@ const ContentGaps = ( { onNavigate } ) => {
 			setGeneratingOutline( null );
 		}
 	};
-
 	const getPriorityColor = ( priority ) => {
 		switch ( priority ) {
 			case 'high':
@@ -85,7 +78,6 @@ const ContentGaps = ( { onNavigate } ) => {
 				return '#757575';
 		}
 	};
-
 	return (
 		<div className="page content-gaps-page">
 			<div className="page-header">
@@ -96,15 +88,19 @@ const ContentGaps = ( { onNavigate } ) => {
 							className="breadcrumb-link"
 							onClick={ () => onNavigate( 'tools' ) }
 						>
-							Tools
+							{ __( 'Tools', 'saman-seo' ) }
 						</button>
 						<span className="breadcrumb-separator">/</span>
-						<span>Content Gaps Finder</span>
+						<span>
+							{ __( 'Content Gaps Finder', 'saman-seo' ) }
+						</span>
 					</div>
-					<h1>Content Gaps Finder</h1>
+					<h1>{ __( 'Content Gaps Finder', 'saman-seo' ) }</h1>
 					<p>
-						Discover missing topics and content opportunities based
-						on your existing content.
+						{ __(
+							'Discover missing topics and content opportunities based on your existing content.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 			</div>
@@ -112,24 +108,31 @@ const ContentGaps = ( { onNavigate } ) => {
 			<div className="content-gaps-input">
 				<div className="input-row">
 					<div className="input-group">
-						<label>Focus Topic (optional)</label>
+						<label>
+							{ __( 'Focus Topic (optional)', 'saman-seo' ) }
+						</label>
 						<input
 							type="text"
 							value={ topic }
 							onChange={ ( e ) => setTopic( e.target.value ) }
-							placeholder="e.g., coffee brewing, SEO, cooking..."
+							placeholder={ __(
+								'e.g., coffee brewing, SEO, cooking\u2026',
+								'saman-seo'
+							) }
 						/>
 					</div>
 
 					<div className="input-group">
-						<label>Category Filter</label>
+						<label>{ __( 'Category Filter', 'saman-seo' ) }</label>
 						<select
 							value={ selectedCategory }
 							onChange={ ( e ) =>
 								setSelectedCategory( e.target.value )
 							}
 						>
-							<option value="">All Categories</option>
+							<option value="">
+								{ __( 'All Categories', 'saman-seo' ) }
+							</option>
 							{ categories.map( ( cat ) => (
 								<option key={ cat.id } value={ cat.id }>
 									{ cat.name } ({ cat.count })
@@ -147,7 +150,7 @@ const ContentGaps = ( { onNavigate } ) => {
 						{ analyzing ? (
 							<>
 								<span className="spinner"></span>
-								Analyzing...
+								{ __( 'Analyzing\u2026', 'saman-seo' ) }
 							</>
 						) : (
 							<>
@@ -163,7 +166,7 @@ const ContentGaps = ( { onNavigate } ) => {
 									<path d="M21 21l-4.35-4.35" />
 									<path d="M11 8v6M8 11h6" />
 								</svg>
-								Find Content Gaps
+								{ __( 'Find Content Gaps', 'saman-seo' ) }
 							</>
 						) }
 					</button>
@@ -174,9 +177,17 @@ const ContentGaps = ( { onNavigate } ) => {
 				<div className="content-gaps-loading">
 					<div className="loading-animation">
 						<span className="spinner-large"></span>
-						<p>Analyzing your content...</p>
+						<p>
+							{ __(
+								'Analyzing your content\u2026',
+								'saman-seo'
+							) }
+						</p>
 						<span className="loading-hint">
-							This may take a moment as we review your posts.
+							{ __(
+								'This may take a moment as we review your posts.',
+								'saman-seo'
+							) }
 						</span>
 					</div>
 				</div>
@@ -189,25 +200,33 @@ const ContentGaps = ( { onNavigate } ) => {
 							<span className="stat-value">
 								{ results.posts_analyzed }
 							</span>
-							<span className="stat-label">Posts Analyzed</span>
+							<span className="stat-label">
+								{ __( 'Posts Analyzed', 'saman-seo' ) }
+							</span>
 						</div>
 						<div className="summary-stat">
 							<span className="stat-value">
 								{ results.gaps?.length || 0 }
 							</span>
-							<span className="stat-label">Gaps Found</span>
+							<span className="stat-label">
+								{ __( 'Gaps Found', 'saman-seo' ) }
+							</span>
 						</div>
 						<div className="summary-stat">
 							<span className="stat-value">
 								{ results.clusters?.length || 0 }
 							</span>
-							<span className="stat-label">Content Clusters</span>
+							<span className="stat-label">
+								{ __( 'Content Clusters', 'saman-seo' ) }
+							</span>
 						</div>
 					</div>
 
 					{ results.existing_topics?.length > 0 && (
 						<div className="results-section">
-							<h3>Your Current Topics</h3>
+							<h3>
+								{ __( 'Your Current Topics', 'saman-seo' ) }
+							</h3>
 							<div className="topic-tags">
 								{ results.existing_topics.map(
 									( topic, idx ) => (
@@ -222,9 +241,12 @@ const ContentGaps = ( { onNavigate } ) => {
 
 					{ results.gaps?.length > 0 && (
 						<div className="results-section">
-							<h3>Content Gaps</h3>
+							<h3>{ __( 'Content Gaps', 'saman-seo' ) }</h3>
 							<p className="section-desc">
-								Topics you should consider writing about:
+								{ __(
+									'Topics you should consider writing about:',
+									'saman-seo'
+								) }
 							</p>
 							<div className="gaps-grid">
 								{ results.gaps.map( ( gap, idx ) => (
@@ -262,7 +284,8 @@ const ContentGaps = ( { onNavigate } ) => {
 														<path d="M3 3v18h18" />
 														<path d="M18 9l-5 5-4-4-3 3" />
 													</svg>
-													~{ gap.search_volume }/mo
+													~{ gap.search_volume }
+													{ __( '/mo', 'saman-seo' ) }
 												</span>
 											</div>
 										) }
@@ -282,7 +305,10 @@ const ContentGaps = ( { onNavigate } ) => {
 											gap.topic ? (
 												<>
 													<span className="spinner-small"></span>
-													Generating...
+													{ __(
+														'Generating\u2026',
+														'saman-seo'
+													) }
 												</>
 											) : (
 												<>
@@ -309,7 +335,10 @@ const ContentGaps = ( { onNavigate } ) => {
 															y2="17"
 														/>
 													</svg>
-													Generate Outline
+													{ __(
+														'Generate Outline',
+														'saman-seo'
+													) }
 												</>
 											) }
 										</button>
@@ -321,10 +350,12 @@ const ContentGaps = ( { onNavigate } ) => {
 
 					{ results.clusters?.length > 0 && (
 						<div className="results-section">
-							<h3>Content Clusters</h3>
+							<h3>{ __( 'Content Clusters', 'saman-seo' ) }</h3>
 							<p className="section-desc">
-								Group related content for better internal
-								linking:
+								{ __(
+									'Group related content for better internal linking:',
+									'saman-seo'
+								) }
 							</p>
 							<div className="clusters-list">
 								{ results.clusters.map( ( cluster, idx ) => (
@@ -333,14 +364,17 @@ const ContentGaps = ( { onNavigate } ) => {
 											<h4>{ cluster.name }</h4>
 											<span className="cluster-count">
 												{ cluster.posts?.length || 0 }{ ' ' }
-												posts
+												{ __( 'posts', 'saman-seo' ) }
 											</span>
 										</div>
 										{ cluster.missing_subtopics?.length >
 											0 && (
 											<div className="cluster-missing">
 												<span className="missing-label">
-													Missing subtopics:
+													{ __(
+														'Missing subtopics:',
+														'saman-seo'
+													) }
 												</span>
 												<div className="missing-tags">
 													{ cluster.missing_subtopics.map(
@@ -374,7 +408,10 @@ const ContentGaps = ( { onNavigate } ) => {
 						onClick={ ( e ) => e.stopPropagation() }
 					>
 						<div className="outline-header">
-							<h3>Content Outline: { outline.topic }</h3>
+							<h3>
+								{ __( 'Content Outline:', 'saman-seo' ) }{ ' ' }
+								{ outline.topic }
+							</h3>
 							<button
 								type="button"
 								className="outline-close"
@@ -396,7 +433,9 @@ const ContentGaps = ( { onNavigate } ) => {
 						<div className="outline-content">
 							{ outline.suggested_title && (
 								<div className="outline-section">
-									<h4>Suggested Title</h4>
+									<h4>
+										{ __( 'Suggested Title', 'saman-seo' ) }
+									</h4>
 									<p className="suggested-title">
 										{ outline.suggested_title }
 									</p>
@@ -404,13 +443,23 @@ const ContentGaps = ( { onNavigate } ) => {
 							) }
 							{ outline.meta_description && (
 								<div className="outline-section">
-									<h4>Meta Description</h4>
+									<h4>
+										{ __(
+											'Meta Description',
+											'saman-seo'
+										) }
+									</h4>
 									<p>{ outline.meta_description }</p>
 								</div>
 							) }
 							{ outline.outline?.length > 0 && (
 								<div className="outline-section">
-									<h4>Content Structure</h4>
+									<h4>
+										{ __(
+											'Content Structure',
+											'saman-seo'
+										) }
+									</h4>
 									<ul className="outline-list">
 										{ outline.outline.map(
 											( item, idx ) => (
@@ -452,7 +501,9 @@ const ContentGaps = ( { onNavigate } ) => {
 							) }
 							{ outline.target_keywords?.length > 0 && (
 								<div className="outline-section">
-									<h4>Target Keywords</h4>
+									<h4>
+										{ __( 'Target Keywords', 'saman-seo' ) }
+									</h4>
 									<div className="keyword-tags">
 										{ outline.target_keywords.map(
 											( kw, idx ) => (
@@ -510,14 +561,14 @@ const ContentGaps = ( { onNavigate } ) => {
 									/>
 									<path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
 								</svg>
-								Copy Outline
+								{ __( 'Copy Outline', 'saman-seo' ) }
 							</button>
 							<button
 								type="button"
 								className="button button--primary"
 								onClick={ () => setOutline( null ) }
 							>
-								Done
+								{ __( 'Done', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
@@ -538,16 +589,18 @@ const ContentGaps = ( { onNavigate } ) => {
 						<rect x="9" y="3" width="6" height="4" rx="1" />
 						<path d="M12 12v4M10 14h4" />
 					</svg>
-					<h3>Find Your Content Opportunities</h3>
+					<h3>
+						{ __( 'Find Your Content Opportunities', 'saman-seo' ) }
+					</h3>
 					<p>
-						Enter a focus topic or select a category, then click
-						"Find Content Gaps" to discover what topics you should
-						be writing about based on your existing content.
+						{ __(
+							'Enter a focus topic or select a category, then click "Find Content Gaps" to discover what topics you should be writing about based on your existing content.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 			) }
 		</div>
 	);
 };
-
 export default ContentGaps;

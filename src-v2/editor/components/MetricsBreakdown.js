@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 /**
  * Metrics Breakdown Component
  *
@@ -116,39 +117,53 @@ const StatusIcons = {
 		</svg>
 	),
 };
-
 const MetricsBreakdown = ( { metrics, metricsByCategory, hasKeyphrase } ) => {
 	const categories = [
-		{ key: 'basic', label: 'Basic SEO' },
-		{ key: 'keyword', label: 'Keywords' },
-		{ key: 'structure', label: 'Content Structure' },
-		{ key: 'links', label: 'Links & Media' },
+		{
+			key: 'basic',
+			label: __( 'Basic SEO', 'saman-seo' ),
+		},
+		{
+			key: 'keyword',
+			label: __( 'Keywords', 'saman-seo' ),
+		},
+		{
+			key: 'structure',
+			label: __( 'Content Structure', 'saman-seo' ),
+		},
+		{
+			key: 'links',
+			label: __( 'Links & Media', 'saman-seo' ),
+		},
 	];
 
 	// Skip keyword category if no keyphrase set
 	const visibleCategories = hasKeyphrase
 		? categories
 		: categories.filter( ( c ) => c.key !== 'keyword' );
-
 	const getGroupPercentage = ( items ) => {
 		if ( ! items || items.length === 0 ) return 0;
 		const earned = items.reduce( ( sum, m ) => sum + ( m.score || 0 ), 0 );
 		const max = items.reduce( ( sum, m ) => sum + ( m.max || 0 ), 0 );
 		return max > 0 ? Math.round( ( earned / max ) * 100 ) : 0;
 	};
-
 	const getPassCount = ( items ) => {
-		if ( ! items ) return { passed: 0, total: 0 };
+		if ( ! items )
+			return {
+				passed: 0,
+				total: 0,
+			};
 		const passed = items.filter( ( m ) => m.is_pass ).length;
-		return { passed, total: items.length };
+		return {
+			passed,
+			total: items.length,
+		};
 	};
-
 	return (
 		<div className="saman-seo-analysis">
 			{ visibleCategories.map( ( category ) => {
 				const group = metricsByCategory?.[ category.key ];
 				if ( ! group || group.items.length === 0 ) return null;
-
 				const percentage = getGroupPercentage( group.items );
 				const { passed, total } = getPassCount( group.items );
 				const status =
@@ -157,7 +172,6 @@ const MetricsBreakdown = ( { metrics, metricsByCategory, hasKeyphrase } ) => {
 						: percentage >= 50
 						? 'fair'
 						: 'poor';
-
 				return (
 					<div
 						key={ category.key }
@@ -207,10 +221,14 @@ const MetricsBreakdown = ( { metrics, metricsByCategory, hasKeyphrase } ) => {
 						</svg>
 					</div>
 					<div className="saman-seo-analysis__tip-content">
-						<strong>Add a focus keyphrase</strong>
+						<strong>
+							{ __( 'Add a focus keyphrase', 'saman-seo' ) }
+						</strong>
 						<span>
-							Unlock keyword analysis with density and placement
-							checks
+							{ __(
+								'Unlock keyword analysis with density and placement checks',
+								'saman-seo'
+							) }
 						</span>
 					</div>
 				</div>
@@ -218,14 +236,12 @@ const MetricsBreakdown = ( { metrics, metricsByCategory, hasKeyphrase } ) => {
 		</div>
 	);
 };
-
 const MetricItem = ( { metric } ) => {
 	const statusClass = metric.is_pass
 		? 'pass'
 		: metric.score > 0
 		? 'partial'
 		: 'fail';
-
 	return (
 		<div
 			className={ `saman-seo-analysis__item saman-seo-analysis__item--${ statusClass }` }
@@ -248,5 +264,4 @@ const MetricItem = ( { metric } ) => {
 		</div>
 	);
 };
-
 export default MetricsBreakdown;

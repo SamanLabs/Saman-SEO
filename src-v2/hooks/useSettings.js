@@ -10,6 +10,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Hook for fetching and updating plugin settings.
  */
+import { __ } from '@wordpress/i18n';
 export function useSettings() {
 	const [ settings, setSettings ] = useState( {} );
 	const [ loading, setLoading ] = useState( true );
@@ -29,7 +30,9 @@ export function useSettings() {
 			setError( null );
 		} catch ( err ) {
 			console.error( 'Failed to fetch settings:', err );
-			setError( err.message || 'Failed to fetch settings' );
+			setError(
+				err.message || __( 'Failed to fetch settings', 'saman-seo' )
+			);
 		} finally {
 			setLoading( false );
 		}
@@ -49,12 +52,17 @@ export function useSettings() {
 				method: 'POST',
 				data: newSettings,
 			} );
-			setSettings( ( prev ) => ( { ...prev, ...newSettings } ) );
+			setSettings( ( prev ) => ( {
+				...prev,
+				...newSettings,
+			} ) );
 			setError( null );
 			return true;
 		} catch ( err ) {
 			console.error( 'Failed to save settings:', err );
-			setError( err.message || 'Failed to save settings' );
+			setError(
+				err.message || __( 'Failed to save settings', 'saman-seo' )
+			);
 			return false;
 		} finally {
 			setSaving( false );
@@ -74,14 +82,21 @@ export function useSettings() {
 			await apiFetch( {
 				path: `/saman-seo/v1/settings/${ key }`,
 				method: 'PUT',
-				data: { value },
+				data: {
+					value,
+				},
 			} );
-			setSettings( ( prev ) => ( { ...prev, [ key ]: value } ) );
+			setSettings( ( prev ) => ( {
+				...prev,
+				[ key ]: value,
+			} ) );
 			setError( null );
 			return true;
 		} catch ( err ) {
 			console.error( `Failed to save setting ${ key }:`, err );
-			setError( err.message || 'Failed to save setting' );
+			setError(
+				err.message || __( 'Failed to save setting', 'saman-seo' )
+			);
 			return false;
 		} finally {
 			setSaving( false );
@@ -99,7 +114,6 @@ export function useSettings() {
 	useEffect( () => {
 		fetchSettings();
 	}, [ fetchSettings ] );
-
 	return {
 		settings,
 		loading,

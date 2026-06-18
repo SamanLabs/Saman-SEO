@@ -4,6 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Setup Wizard - First-time plugin configuration
  */
+import { __ } from '@wordpress/i18n';
 const Setup = ( { onComplete, onSkip } ) => {
 	const [ step, setStep ] = useState( 1 );
 	const [ loading, setLoading ] = useState( false );
@@ -21,9 +22,11 @@ const Setup = ( { onComplete, onSkip } ) => {
 		enable_redirects: true,
 		title_template: '{{post_title}} - {{site_title}}',
 	} );
-
 	const updateData = ( key, value ) => {
-		setData( ( prev ) => ( { ...prev, [ key ]: value } ) );
+		setData( ( prev ) => ( {
+			...prev,
+			[ key ]: value,
+		} ) );
 	};
 
 	// Check AI plugin status when entering step 3
@@ -32,9 +35,10 @@ const Setup = ( { onComplete, onSkip } ) => {
 			checkAiStatus();
 		}
 	}, [ step ] );
-
 	const checkAiStatus = async () => {
-		setAiStatus( { status: 'loading' } );
+		setAiStatus( {
+			status: 'loading',
+		} );
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/setup/test-api',
@@ -44,29 +48,24 @@ const Setup = ( { onComplete, onSkip } ) => {
 		} catch ( err ) {
 			setAiStatus( {
 				status: 'error',
-				message: 'Could not check AI status.',
+				message: __( 'Could not check AI status.', 'saman-seo' ),
 			} );
 		}
 	};
-
 	const handleNext = () => {
 		if ( step < 5 ) setStep( step + 1 );
 	};
-
 	const handleBack = () => {
 		if ( step > 1 ) setStep( step - 1 );
 	};
-
 	const handleComplete = async () => {
 		setLoading( true );
-
 		try {
 			await apiFetch( {
 				path: '/saman-seo/v1/setup/complete',
 				method: 'POST',
 				data,
 			} );
-
 			if ( onComplete ) onComplete();
 		} catch ( err ) {
 			console.error( 'Failed to save setup:', err );
@@ -74,7 +73,6 @@ const Setup = ( { onComplete, onSkip } ) => {
 			setLoading( false );
 		}
 	};
-
 	const handleSkip = async () => {
 		try {
 			await apiFetch( {
@@ -84,33 +82,71 @@ const Setup = ( { onComplete, onSkip } ) => {
 		} catch ( err ) {
 			// Ignore errors, just navigate away
 		}
-
 		if ( onSkip ) onSkip();
 	};
-
 	const siteTypes = [
-		{ value: 'blog', label: 'Blog / News', icon: '📝' },
-		{ value: 'business', label: 'Business / Company', icon: '🏢' },
-		{ value: 'ecommerce', label: 'E-commerce / Store', icon: '🛒' },
-		{ value: 'portfolio', label: 'Portfolio / Personal', icon: '🎨' },
-		{ value: 'agency', label: 'Agency / Services', icon: '💼' },
-		{ value: 'nonprofit', label: 'Non-profit / Charity', icon: '❤️' },
+		{
+			value: 'blog',
+			label: __( 'Blog / News', 'saman-seo' ),
+			icon: '📝',
+		},
+		{
+			value: 'business',
+			label: __( 'Business / Company', 'saman-seo' ),
+			icon: '🏢',
+		},
+		{
+			value: 'ecommerce',
+			label: __( 'E-commerce / Store', 'saman-seo' ),
+			icon: '🛒',
+		},
+		{
+			value: 'portfolio',
+			label: __( 'Portfolio / Personal', 'saman-seo' ),
+			icon: '🎨',
+		},
+		{
+			value: 'agency',
+			label: __( 'Agency / Services', 'saman-seo' ),
+			icon: '💼',
+		},
+		{
+			value: 'nonprofit',
+			label: __( 'Non-profit / Charity', 'saman-seo' ),
+			icon: '❤️',
+		},
 	];
-
 	const goals = [
-		{ value: 'traffic', label: 'Get more traffic', icon: '📈' },
-		{ value: 'leads', label: 'Generate leads', icon: '📋' },
-		{ value: 'sales', label: 'Increase sales', icon: '💰' },
-		{ value: 'brand', label: 'Build brand awareness', icon: '🌟' },
+		{
+			value: 'traffic',
+			label: __( 'Get more traffic', 'saman-seo' ),
+			icon: '📈',
+		},
+		{
+			value: 'leads',
+			label: __( 'Generate leads', 'saman-seo' ),
+			icon: '📋',
+		},
+		{
+			value: 'sales',
+			label: __( 'Increase sales', 'saman-seo' ),
+			icon: '💰',
+		},
+		{
+			value: 'brand',
+			label: __( 'Build brand awareness', 'saman-seo' ),
+			icon: '🌟',
+		},
 	];
-
 	return (
 		<div className="setup-wizard">
 			{ /* Progress bar */ }
 			<div className="setup-progress">
 				<div
 					className="setup-progress__bar"
-					style={ { width: `${ ( step / 5 ) * 100 }%` } }
+					style={ {
+						width: `${ ( step / 5 ) * 100 }%`,
+					} }
 				/>
 			</div>
 
@@ -128,24 +164,38 @@ const Setup = ( { onComplete, onSkip } ) => {
 								<path d="M5 12h14M12 5l7 7-7 7" />
 							</svg>
 						</div>
-						<h1>Welcome to Saman SEO</h1>
+						<h1>{ __( 'Welcome to Saman SEO', 'saman-seo' ) }</h1>
 						<p className="setup-step__subtitle">
-							Let's get your site ready for search engines. This
-							will only take a minute.
+							{ __(
+								"Let's get your site ready for search engines. This will only take a minute.",
+								'saman-seo'
+							) }
 						</p>
 
 						<div className="setup-features">
 							<div className="setup-feature">
 								<span className="setup-feature__icon">🚀</span>
-								<span>AI-powered optimization</span>
+								<span>
+									{ __(
+										'AI-powered optimization',
+										'saman-seo'
+									) }
+								</span>
 							</div>
 							<div className="setup-feature">
 								<span className="setup-feature__icon">📊</span>
-								<span>Real-time SEO analysis</span>
+								<span>
+									{ __(
+										'Real-time SEO analysis',
+										'saman-seo'
+									) }
+								</span>
 							</div>
 							<div className="setup-feature">
 								<span className="setup-feature__icon">🔧</span>
-								<span>Easy-to-use tools</span>
+								<span>
+									{ __( 'Easy-to-use tools', 'saman-seo' ) }
+								</span>
 							</div>
 						</div>
 
@@ -155,159 +205,69 @@ const Setup = ( { onComplete, onSkip } ) => {
 								className="button primary large"
 								onClick={ handleNext }
 							>
-								Let's Get Started
+								{ __( "Let's Get Started", 'saman-seo' ) }
 							</button>
 							<button
 								type="button"
 								className="button ghost"
 								onClick={ handleSkip }
 							>
-								Skip for now
+								{ __( 'Skip for now', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
 				) }
 
 				{ /* Step 2: Site Info */ }
-				{ step === 2 && (
-					<div className="setup-step">
-						<span className="setup-step__number">Step 1 of 4</span>
-						<h2>Tell us about your site</h2>
-						<p className="setup-step__subtitle">
-							This helps us customize SEO recommendations for your
-							needs.
-						</p>
-
-						<div className="setup-section">
-							<label className="setup-label">
-								What type of site is this?
-							</label>
-							<div className="setup-options setup-options--grid">
-								{ siteTypes.map( ( type ) => (
-									<button
-										key={ type.value }
-										type="button"
-										className={ `setup-option ${
-											data.site_type === type.value
-												? 'active'
-												: ''
-										}` }
-										onClick={ () =>
-											updateData(
-												'site_type',
-												type.value
-											)
-										}
-									>
-										<span className="setup-option__icon">
-											{ type.icon }
-										</span>
-										<span className="setup-option__label">
-											{ type.label }
-										</span>
-									</button>
-								) ) }
-							</div>
-						</div>
-
-						<div className="setup-section">
-							<label className="setup-label">
-								What's your primary goal?
-							</label>
-							<div className="setup-options">
-								{ goals.map( ( goal ) => (
-									<button
-										key={ goal.value }
-										type="button"
-										className={ `setup-option setup-option--horizontal ${
-											data.primary_goal === goal.value
-												? 'active'
-												: ''
-										}` }
-										onClick={ () =>
-											updateData(
-												'primary_goal',
-												goal.value
-											)
-										}
-									>
-										<span className="setup-option__icon">
-											{ goal.icon }
-										</span>
-										<span className="setup-option__label">
-											{ goal.label }
-										</span>
-									</button>
-								) ) }
-							</div>
-						</div>
-
-						<div className="setup-section">
-							<label className="setup-label" htmlFor="industry">
-								Industry / Niche (optional)
-							</label>
-							<input
-								id="industry"
-								type="text"
-								className="setup-input"
-								value={ data.industry }
-								onChange={ ( e ) =>
-									updateData( 'industry', e.target.value )
-								}
-								placeholder="e.g., Technology, Health, Finance..."
-							/>
-						</div>
-
-						<div className="setup-actions">
-							<button
-								type="button"
-								className="button ghost"
-								onClick={ handleBack }
-							>
-								Back
-							</button>
-							<button
-								type="button"
-								className="button primary"
-								onClick={ handleNext }
-								disabled={ ! data.site_type }
-							>
-								Continue
-							</button>
-						</div>
-					</div>
-				) }
+				{ __( 'e.g., Technology, Health, Finance\u2026', 'saman-seo' ) }
 
 				{ /* Step 3: AI Status */ }
 				{ step === 3 && (
 					<div className="setup-step">
-						<span className="setup-step__number">Step 2 of 4</span>
-						<h2>AI Features</h2>
+						<span className="setup-step__number">
+							{ __( 'Step 2 of 4', 'saman-seo' ) }
+						</span>
+						<h2>{ __( 'AI Features', 'saman-seo' ) }</h2>
 						<p className="setup-step__subtitle">
-							AI-powered features are provided by the Saman Labs
-							AI plugin.
+							{ __(
+								'AI-powered features are provided by the Saman Labs AI plugin.',
+								'saman-seo'
+							) }
 						</p>
 
 						{ aiStatus?.status === 'loading' && (
 							<div className="setup-info-box">
-								<p>Checking AI status...</p>
+								<p>
+									{ __(
+										'Checking AI status\u2026',
+										'saman-seo'
+									) }
+								</p>
 							</div>
 						) }
 
 						{ aiStatus?.status === 'ready' && (
 							<div className="setup-test-result setup-test-result--success">
-								Saman Labs AI is ready! AI features are
-								available.
+								{ __(
+									'Saman Labs AI is ready! AI features are available.',
+									'saman-seo'
+								) }
 							</div>
 						) }
 
 						{ aiStatus?.status === 'not_installed' && (
 							<div className="setup-info-box">
-								<h4>Saman Labs AI Not Installed</h4>
+								<h4>
+									{ __(
+										'Saman Labs AI Not Installed',
+										'saman-seo'
+									) }
+								</h4>
 								<p>
-									Install the Saman Labs AI plugin to enable
-									AI-powered features like content suggestions
-									and meta generation.
+									{ __(
+										'Install the Saman Labs AI plugin to enable AI-powered features like content suggestions and meta generation.',
+										'saman-seo'
+									) }
 								</p>
 								<a
 									href={ aiStatus.install_url }
@@ -315,17 +275,24 @@ const Setup = ( { onComplete, onSkip } ) => {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Install Plugin
+									{ __( 'Install Plugin', 'saman-seo' ) }
 								</a>
 							</div>
 						) }
 
 						{ aiStatus?.status === 'not_active' && (
 							<div className="setup-info-box">
-								<h4>Saman Labs AI Not Active</h4>
+								<h4>
+									{ __(
+										'Saman Labs AI Not Active',
+										'saman-seo'
+									) }
+								</h4>
 								<p>
-									The plugin is installed but needs to be
-									activated.
+									{ __(
+										'The plugin is installed but needs to be activated.',
+										'saman-seo'
+									) }
 								</p>
 								<a
 									href={ aiStatus.plugins_url }
@@ -333,17 +300,24 @@ const Setup = ( { onComplete, onSkip } ) => {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Activate Plugin
+									{ __( 'Activate Plugin', 'saman-seo' ) }
 								</a>
 							</div>
 						) }
 
 						{ aiStatus?.status === 'not_configured' && (
 							<div className="setup-info-box">
-								<h4>Saman Labs AI Not Configured</h4>
+								<h4>
+									{ __(
+										'Saman Labs AI Not Configured',
+										'saman-seo'
+									) }
+								</h4>
 								<p>
-									The plugin is active but needs to be
-									configured with your AI provider.
+									{ __(
+										'The plugin is active but needs to be configured with your AI provider.',
+										'saman-seo'
+									) }
 								</p>
 								<a
 									href={ aiStatus.settings_url }
@@ -351,15 +325,17 @@ const Setup = ( { onComplete, onSkip } ) => {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Configure AI
+									{ __( 'Configure AI', 'saman-seo' ) }
 								</a>
 							</div>
 						) }
 
 						{ aiStatus?.status === 'error' && (
 							<div className="setup-test-result setup-test-result--error">
-								Could not check AI status. You can configure
-								this later in Settings.
+								{ __(
+									'Could not check AI status. You can configure this later in Settings.',
+									'saman-seo'
+								) }
 							</div>
 						) }
 
@@ -369,14 +345,14 @@ const Setup = ( { onComplete, onSkip } ) => {
 								className="button ghost"
 								onClick={ handleBack }
 							>
-								Back
+								{ __( 'Back', 'saman-seo' ) }
 							</button>
 							<button
 								type="button"
 								className="button primary"
 								onClick={ handleNext }
 							>
-								Continue
+								{ __( 'Continue', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
@@ -385,20 +361,28 @@ const Setup = ( { onComplete, onSkip } ) => {
 				{ /* Step 4: Quick Wins */ }
 				{ step === 4 && (
 					<div className="setup-step">
-						<span className="setup-step__number">Step 3 of 4</span>
-						<h2>Quick Wins</h2>
+						<span className="setup-step__number">
+							{ __( 'Step 3 of 4', 'saman-seo' ) }
+						</span>
+						<h2>{ __( 'Quick Wins', 'saman-seo' ) }</h2>
 						<p className="setup-step__subtitle">
-							Enable these essential features to get started
-							quickly.
+							{ __(
+								'Enable these essential features to get started quickly.',
+								'saman-seo'
+							) }
 						</p>
 
 						<div className="setup-toggles">
 							<label className="setup-toggle">
 								<div className="setup-toggle__content">
-									<strong>XML Sitemap</strong>
+									<strong>
+										{ __( 'XML Sitemap', 'saman-seo' ) }
+									</strong>
 									<span>
-										Help search engines discover your
-										content
+										{ __(
+											'Help search engines discover your content',
+											'saman-seo'
+										) }
 									</span>
 								</div>
 								<input
@@ -416,8 +400,18 @@ const Setup = ( { onComplete, onSkip } ) => {
 
 							<label className="setup-toggle">
 								<div className="setup-toggle__content">
-									<strong>404 Error Logging</strong>
-									<span>Track broken links and fix them</span>
+									<strong>
+										{ __(
+											'404 Error Logging',
+											'saman-seo'
+										) }
+									</strong>
+									<span>
+										{ __(
+											'Track broken links and fix them',
+											'saman-seo'
+										) }
+									</span>
 								</div>
 								<input
 									type="checkbox"
@@ -434,8 +428,18 @@ const Setup = ( { onComplete, onSkip } ) => {
 
 							<label className="setup-toggle">
 								<div className="setup-toggle__content">
-									<strong>Redirects Manager</strong>
-									<span>Create and manage URL redirects</span>
+									<strong>
+										{ __(
+											'Redirects Manager',
+											'saman-seo'
+										) }
+									</strong>
+									<span>
+										{ __(
+											'Create and manage URL redirects',
+											'saman-seo'
+										) }
+									</span>
 								</div>
 								<input
 									type="checkbox"
@@ -453,7 +457,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 
 						<div className="setup-section">
 							<label className="setup-label">
-								Title Template
+								{ __( 'Title Template', 'saman-seo' ) }
 							</label>
 							<select
 								className="setup-select"
@@ -466,20 +470,32 @@ const Setup = ( { onComplete, onSkip } ) => {
 								}
 							>
 								<option value="{{post_title}} - {{site_title}}">
-									Page Title - Site Name
+									{ __(
+										'Page Title - Site Name',
+										'saman-seo'
+									) }
 								</option>
 								<option value="{{post_title}} | {{site_title}}">
-									Page Title | Site Name
+									{ __(
+										'Page Title | Site Name',
+										'saman-seo'
+									) }
 								</option>
 								<option value="{{site_title}} - {{post_title}}">
-									Site Name - Page Title
+									{ __(
+										'Site Name - Page Title',
+										'saman-seo'
+									) }
 								</option>
 								<option value="{{post_title}}">
-									Page Title Only
+									{ __( 'Page Title Only', 'saman-seo' ) }
 								</option>
 							</select>
 							<p className="setup-help">
-								How titles will appear in search results.
+								{ __(
+									'How titles will appear in search results.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 
@@ -489,14 +505,14 @@ const Setup = ( { onComplete, onSkip } ) => {
 								className="button ghost"
 								onClick={ handleBack }
 							>
-								Back
+								{ __( 'Back', 'saman-seo' ) }
 							</button>
 							<button
 								type="button"
 								className="button primary"
 								onClick={ handleNext }
 							>
-								Continue
+								{ __( 'Continue', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
@@ -515,36 +531,38 @@ const Setup = ( { onComplete, onSkip } ) => {
 								<path d="M20 6L9 17l-5-5" />
 							</svg>
 						</div>
-						<h1>You're All Set!</h1>
+						<h1>{ __( "You're All Set!", 'saman-seo' ) }</h1>
 						<p className="setup-step__subtitle">
-							Saman SEO is configured and ready to help you rank
-							higher.
+							{ __(
+								'Saman SEO is configured and ready to help you rank higher.',
+								'saman-seo'
+							) }
 						</p>
 
 						<div className="setup-summary">
 							<div className="setup-summary__item">
 								<span className="setup-summary__label">
-									Site Type
+									{ __( 'Site Type', 'saman-seo' ) }
 								</span>
 								<span className="setup-summary__value">
 									{ siteTypes.find(
 										( t ) => t.value === data.site_type
-									)?.label || 'Not set' }
+									)?.label || __( 'Not set', 'saman-seo' ) }
 								</span>
 							</div>
 							<div className="setup-summary__item">
 								<span className="setup-summary__label">
-									AI Features
+									{ __( 'AI Features', 'saman-seo' ) }
 								</span>
 								<span className="setup-summary__value">
 									{ aiStatus?.status === 'ready'
-										? 'Enabled'
-										: 'Not configured' }
+										? __( 'Enabled', 'saman-seo' )
+										: __( 'Not configured', 'saman-seo' ) }
 								</span>
 							</div>
 							<div className="setup-summary__item">
 								<span className="setup-summary__label">
-									Features Enabled
+									{ __( 'Features Enabled', 'saman-seo' ) }
 								</span>
 								<span className="setup-summary__value">
 									{ [
@@ -553,7 +571,8 @@ const Setup = ( { onComplete, onSkip } ) => {
 										data.enable_redirects && 'Redirects',
 									]
 										.filter( Boolean )
-										.join( ', ' ) || 'None' }
+										.join( ', ' ) ||
+										__( 'None', 'saman-seo' ) }
 								</span>
 							</div>
 						</div>
@@ -565,12 +584,17 @@ const Setup = ( { onComplete, onSkip } ) => {
 								onClick={ handleComplete }
 								disabled={ loading }
 							>
-								{ loading ? 'Saving...' : 'Go to Dashboard' }
+								{ loading
+									? __( 'Saving\u2026', 'saman-seo' )
+									: __( 'Go to Dashboard', 'saman-seo' ) }
 							</button>
 						</div>
 
 						<p className="setup-note">
-							You can change these settings anytime in Settings.
+							{ __(
+								'You can change these settings anytime in Settings.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				) }
@@ -578,5 +602,4 @@ const Setup = ( { onComplete, onSkip } ) => {
 		</div>
 	);
 };
-
 export default Setup;

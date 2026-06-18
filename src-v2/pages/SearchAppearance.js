@@ -8,44 +8,104 @@ import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
 import useUrlTab from '../hooks/useUrlTab';
 
 // Get AI status from global settings
+import { __ } from '@wordpress/i18n';
 const globalSettings = window.samanSeoV2Settings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
 const aiProvider = globalSettings.aiProvider || 'none';
 const aiPilot = globalSettings.aiPilot || null;
-
 const searchAppearanceTabs = [
-	{ id: 'homepage', label: 'Homepage' },
-	{ id: 'content-types', label: 'Content Types' },
-	{ id: 'taxonomies', label: 'Taxonomies' },
-	{ id: 'archives', label: 'Archives' },
-	{ id: 'social-settings', label: 'Social Settings' },
-	{ id: 'social-cards', label: 'Social Cards' },
+	{
+		id: 'homepage',
+		label: __( 'Homepage', 'saman-seo' ),
+	},
+	{
+		id: 'content-types',
+		label: __( 'Content Types', 'saman-seo' ),
+	},
+	{
+		id: 'taxonomies',
+		label: __( 'Taxonomies', 'saman-seo' ),
+	},
+	{
+		id: 'archives',
+		label: __( 'Archives', 'saman-seo' ),
+	},
+	{
+		id: 'social-settings',
+		label: __( 'Social Settings', 'saman-seo' ),
+	},
+	{
+		id: 'social-cards',
+		label: __( 'Social Cards', 'saman-seo' ),
+	},
 ];
 
 // Schema type options
 const schemaTypeOptions = [
-	{ value: '', label: 'Use default (Article)' },
-	{ value: 'article', label: 'Article' },
-	{ value: 'blogposting', label: 'Blog posting' },
-	{ value: 'newsarticle', label: 'News article' },
-	{ value: 'product', label: 'Product' },
-	{ value: 'profilepage', label: 'Profile page' },
-	{ value: 'website', label: 'Website' },
-	{ value: 'organization', label: 'Organization' },
-	{ value: 'event', label: 'Event' },
-	{ value: 'recipe', label: 'Recipe' },
-	{ value: 'videoobject', label: 'Video object' },
-	{ value: 'book', label: 'Book' },
-	{ value: 'service', label: 'Service' },
-	{ value: 'localbusiness', label: 'Local business' },
+	{
+		value: '',
+		label: __( 'Use default (Article)', 'saman-seo' ),
+	},
+	{
+		value: 'article',
+		label: __( 'Article', 'saman-seo' ),
+	},
+	{
+		value: 'blogposting',
+		label: __( 'Blog posting', 'saman-seo' ),
+	},
+	{
+		value: 'newsarticle',
+		label: __( 'News article', 'saman-seo' ),
+	},
+	{
+		value: 'product',
+		label: __( 'Product', 'saman-seo' ),
+	},
+	{
+		value: 'profilepage',
+		label: __( 'Profile page', 'saman-seo' ),
+	},
+	{
+		value: 'website',
+		label: __( 'Website', 'saman-seo' ),
+	},
+	{
+		value: 'organization',
+		label: __( 'Organization', 'saman-seo' ),
+	},
+	{
+		value: 'event',
+		label: __( 'Event', 'saman-seo' ),
+	},
+	{
+		value: 'recipe',
+		label: __( 'Recipe', 'saman-seo' ),
+	},
+	{
+		value: 'videoobject',
+		label: __( 'Video object', 'saman-seo' ),
+	},
+	{
+		value: 'book',
+		label: __( 'Book', 'saman-seo' ),
+	},
+	{
+		value: 'service',
+		label: __( 'Service', 'saman-seo' ),
+	},
+	{
+		value: 'localbusiness',
+		label: __( 'Local business', 'saman-seo' ),
+	},
 ];
 
 // Social card layout options with sensible defaults for each
 const cardLayoutOptions = [
 	{
 		value: 'default',
-		label: 'Classic',
-		description: 'Bottom accent stripe',
+		label: __( 'Classic', 'saman-seo' ),
+		description: __( 'Bottom accent stripe', 'saman-seo' ),
 		defaults: {
 			title_font_size: 42,
 			site_font_size: 18,
@@ -54,8 +114,8 @@ const cardLayoutOptions = [
 	},
 	{
 		value: 'centered',
-		label: 'Centered',
-		description: 'Centered text',
+		label: __( 'Centered', 'saman-seo' ),
+		description: __( 'Centered text', 'saman-seo' ),
 		defaults: {
 			title_font_size: 48,
 			site_font_size: 20,
@@ -64,8 +124,8 @@ const cardLayoutOptions = [
 	},
 	{
 		value: 'minimal',
-		label: 'Minimal',
-		description: 'Clean, no accent',
+		label: __( 'Minimal', 'saman-seo' ),
+		description: __( 'Clean, no accent', 'saman-seo' ),
 		defaults: {
 			title_font_size: 36,
 			site_font_size: 16,
@@ -74,8 +134,8 @@ const cardLayoutOptions = [
 	},
 	{
 		value: 'magazine',
-		label: 'Magazine',
-		description: 'Top bar, elegant',
+		label: __( 'Magazine', 'saman-seo' ),
+		description: __( 'Top bar, elegant', 'saman-seo' ),
 		defaults: {
 			title_font_size: 44,
 			site_font_size: 14,
@@ -84,8 +144,8 @@ const cardLayoutOptions = [
 	},
 	{
 		value: 'gradient',
-		label: 'Gradient',
-		description: 'Gradient overlay',
+		label: __( 'Gradient', 'saman-seo' ),
+		description: __( 'Gradient overlay', 'saman-seo' ),
 		defaults: {
 			title_font_size: 40,
 			site_font_size: 18,
@@ -94,8 +154,8 @@ const cardLayoutOptions = [
 	},
 	{
 		value: 'corner',
-		label: 'Corner',
-		description: 'Corner accent',
+		label: __( 'Corner', 'saman-seo' ),
+		description: __( 'Corner accent', 'saman-seo' ),
 		defaults: {
 			title_font_size: 38,
 			site_font_size: 16,
@@ -106,25 +166,79 @@ const cardLayoutOptions = [
 
 // Color presets for quick styling
 const colorPresets = [
-	{ name: 'Dark Blue', bg: '#1a1a36', accent: '#5a84ff', text: '#ffffff' },
-	{ name: 'Slate', bg: '#1e293b', accent: '#38bdf8', text: '#f1f5f9' },
-	{ name: 'Forest', bg: '#14532d', accent: '#86efac', text: '#f0fdf4' },
-	{ name: 'Charcoal', bg: '#18181b', accent: '#a78bfa', text: '#fafafa' },
-	{ name: 'Navy', bg: '#0c1929', accent: '#f97316', text: '#fff7ed' },
-	{ name: 'Wine', bg: '#450a0a', accent: '#fca5a5', text: '#fef2f2' },
-	{ name: 'Ocean', bg: '#083344', accent: '#22d3ee', text: '#ecfeff' },
-	{ name: 'Cream', bg: '#fef3c7', accent: '#d97706', text: '#451a03' },
+	{
+		name: __( 'Dark Blue', 'saman-seo' ),
+		bg: '#1a1a36',
+		accent: '#5a84ff',
+		text: __( '#ffffff', 'saman-seo' ),
+	},
+	{
+		name: __( 'Slate', 'saman-seo' ),
+		bg: '#1e293b',
+		accent: '#38bdf8',
+		text: __( '#f1f5f9', 'saman-seo' ),
+	},
+	{
+		name: __( 'Forest', 'saman-seo' ),
+		bg: '#14532d',
+		accent: '#86efac',
+		text: __( '#f0fdf4', 'saman-seo' ),
+	},
+	{
+		name: __( 'Charcoal', 'saman-seo' ),
+		bg: '#18181b',
+		accent: '#a78bfa',
+		text: __( '#fafafa', 'saman-seo' ),
+	},
+	{
+		name: __( 'Navy', 'saman-seo' ),
+		bg: '#0c1929',
+		accent: '#f97316',
+		text: __( '#fff7ed', 'saman-seo' ),
+	},
+	{
+		name: __( 'Wine', 'saman-seo' ),
+		bg: '#450a0a',
+		accent: '#fca5a5',
+		text: __( '#fef2f2', 'saman-seo' ),
+	},
+	{
+		name: __( 'Ocean', 'saman-seo' ),
+		bg: '#083344',
+		accent: '#22d3ee',
+		text: __( '#ecfeff', 'saman-seo' ),
+	},
+	{
+		name: __( 'Cream', 'saman-seo' ),
+		bg: '#fef3c7',
+		accent: '#d97706',
+		text: __( '#451a03', 'saman-seo' ),
+	},
 ];
 
 // Logo position options
 const logoPositionOptions = [
-	{ value: 'top-left', label: 'Top Left' },
-	{ value: 'top-right', label: 'Top Right' },
-	{ value: 'bottom-left', label: 'Bottom Left' },
-	{ value: 'bottom-right', label: 'Bottom Right' },
-	{ value: 'center', label: 'Center' },
+	{
+		value: 'top-left',
+		label: __( 'Top Left', 'saman-seo' ),
+	},
+	{
+		value: 'top-right',
+		label: __( 'Top Right', 'saman-seo' ),
+	},
+	{
+		value: 'bottom-left',
+		label: __( 'Bottom Left', 'saman-seo' ),
+	},
+	{
+		value: 'bottom-right',
+		label: __( 'Bottom Right', 'saman-seo' ),
+	},
+	{
+		value: 'center',
+		label: __( 'Center', 'saman-seo' ),
+	},
 ];
-
 const SearchAppearance = () => {
 	const [ activeTab, setActiveTab ] = useUrlTab( {
 		tabs: searchAppearanceTabs,
@@ -256,7 +370,10 @@ const SearchAppearance = () => {
 				setTaxonomies( data.taxonomies || [] );
 				setArchives( data.archives || [] );
 				setSchemaOptions(
-					data.schema_options || { page: {}, article: {} }
+					data.schema_options || {
+						page: {},
+						article: {},
+					}
 				);
 				setSiteInfo( data.site_info || {} );
 				setVariables( data.variables || {} );
@@ -305,7 +422,6 @@ const SearchAppearance = () => {
 			setLoading( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		fetchData();
 	}, [ fetchData ] );
@@ -353,9 +469,11 @@ const SearchAppearance = () => {
 	const renderTemplatePreview = useCallback(
 		( template, contextOverrides = {} ) => {
 			if ( ! template ) return '';
-
 			let preview = template;
-			const allValues = { ...variableValues, ...contextOverrides };
+			const allValues = {
+				...variableValues,
+				...contextOverrides,
+			};
 
 			// Replace all {{variable}} or {{variable | modifier}} patterns
 			preview = preview.replace(
@@ -385,7 +503,6 @@ const SearchAppearance = () => {
 						: match;
 				}
 			);
-
 			return preview;
 		},
 		[ variableValues ]
@@ -401,11 +518,13 @@ const SearchAppearance = () => {
 				data: homepage,
 			} );
 			if ( response.success ) {
-				setSaveMessage( 'Homepage settings saved successfully.' );
+				setSaveMessage(
+					__( 'Homepage settings saved successfully.', 'saman-seo' )
+				);
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save homepage settings:', error );
-			setSaveMessage( 'Failed to save settings.' );
+			setSaveMessage( __( 'Failed to save settings.', 'saman-seo' ) );
 		} finally {
 			setSaving( false );
 		}
@@ -418,7 +537,9 @@ const SearchAppearance = () => {
 			await apiFetch( {
 				path: '/saman-seo/v1/search-appearance/separator',
 				method: 'POST',
-				data: { separator: newSeparator },
+				data: {
+					separator: newSeparator,
+				},
 			} );
 		} catch ( error ) {
 			console.error( 'Failed to save separator:', error );
@@ -437,11 +558,18 @@ const SearchAppearance = () => {
 			if ( response.success ) {
 				setPostTypes( ( prev ) =>
 					prev.map( ( pt ) =>
-						pt.slug === postType.slug ? { ...pt, ...postType } : pt
+						pt.slug === postType.slug
+							? {
+									...pt,
+									...postType,
+							  }
+							: pt
 					)
 				);
 				setEditingPostType( null );
-				setSaveMessage( 'Post type settings saved.' );
+				setSaveMessage(
+					__( 'Post type settings saved.', 'saman-seo' )
+				);
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save post type:', error );
@@ -463,12 +591,15 @@ const SearchAppearance = () => {
 				setTaxonomies( ( prev ) =>
 					prev.map( ( tax ) =>
 						tax.slug === taxonomy.slug
-							? { ...tax, ...taxonomy }
+							? {
+									...tax,
+									...taxonomy,
+							  }
 							: tax
 					)
 				);
 				setEditingTaxonomy( null );
-				setSaveMessage( 'Taxonomy settings saved.' );
+				setSaveMessage( __( 'Taxonomy settings saved.', 'saman-seo' ) );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save taxonomy:', error );
@@ -489,7 +620,7 @@ const SearchAppearance = () => {
 			if ( response.success ) {
 				setArchives( response.data );
 				setEditingArchive( null );
-				setSaveMessage( 'Archive settings saved.' );
+				setSaveMessage( __( 'Archive settings saved.', 'saman-seo' ) );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save archives:', error );
@@ -508,7 +639,7 @@ const SearchAppearance = () => {
 				data: socialDefaults,
 			} );
 			if ( response.success ) {
-				setSaveMessage( 'Social settings saved.' );
+				setSaveMessage( __( 'Social settings saved.', 'saman-seo' ) );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save social defaults:', error );
@@ -532,7 +663,9 @@ const SearchAppearance = () => {
 					[ slug ]: settings,
 				} ) );
 				setEditingPostTypeSocial( null );
-				setSaveMessage( 'Post type social settings saved.' );
+				setSaveMessage(
+					__( 'Post type social settings saved.', 'saman-seo' )
+				);
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save post type social settings:', error );
@@ -551,7 +684,9 @@ const SearchAppearance = () => {
 				data: cardDesign,
 			} );
 			if ( response.success ) {
-				setSaveMessage( 'Social card design saved.' );
+				setSaveMessage(
+					__( 'Social card design saved.', 'saman-seo' )
+				);
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save card design:', error );
@@ -559,23 +694,29 @@ const SearchAppearance = () => {
 			setSaving( false );
 		}
 	};
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="loading-state">
-					Loading search appearance settings...
+					{ __(
+						'Loading search appearance settings\u2026',
+						'saman-seo'
+					) }
 				</div>
 			</div>
 		);
 	}
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Search Appearance</h1>
-					<p>Control how your content appears in search results.</p>
+					<h1>{ __( 'Search Appearance', 'saman-seo' ) }</h1>
+					<p>
+						{ __(
+							'Control how your content appears in search results.',
+							'saman-seo'
+						) }
+					</p>
 				</div>
 				{ saveMessage && (
 					<span className="pill success">{ saveMessage }</span>
@@ -586,222 +727,23 @@ const SearchAppearance = () => {
 				tabs={ searchAppearanceTabs }
 				activeTab={ activeTab }
 				onChange={ setActiveTab }
-				ariaLabel="Search appearance sections"
+				ariaLabel={ __( 'Search appearance sections', 'saman-seo' ) }
 			/>
 
 			{ /* Homepage Tab */ }
-			{ activeTab === 'homepage' && (
-				<section className="panel">
-					<div className="table-toolbar">
-						<div>
-							<h3>Homepage SEO</h3>
-							<p className="muted">
-								Configure default title and meta description for
-								your homepage.
-							</p>
-						</div>
-					</div>
-
-					<SearchPreview
-						title={ renderTemplatePreview(
-							homepage.meta_title ||
-								`{{site_title}} {{separator}} {{tagline}}`
-						) }
-						description={ renderTemplatePreview(
-							homepage.meta_description ||
-								siteInfo.description ||
-								''
-						) }
-						domain={ siteInfo.domain }
-						url={ siteInfo.url }
-						favicon={ siteInfo.favicon }
-					/>
-
-					<div className="settings-form">
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label htmlFor="home-title">
-									Homepage Title
-								</label>
-								<p className="settings-help">
-									The title tag for your homepage.
-								</p>
-							</div>
-							<div className="settings-control">
-								<TemplateInput
-									id="home-title"
-									value={ homepage.meta_title }
-									onChange={ ( val ) =>
-										setHomepage( {
-											...homepage,
-											meta_title: val,
-										} )
-									}
-									placeholder={ `${ siteInfo.name } ${ separator } ${ siteInfo.description }` }
-									variables={ variables }
-									variableValues={ variableValues }
-									context="global"
-									maxLength={ 60 }
-									onAiClick={ () =>
-										openAiModal(
-											'title',
-											( val ) =>
-												setHomepage( {
-													...homepage,
-													meta_title: val,
-												} ),
-											{ type: 'Homepage' }
-										)
-									}
-									aiEnabled={ aiEnabled }
-								/>
-							</div>
-						</div>
-
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label htmlFor="home-desc">
-									Meta Description
-								</label>
-								<p className="settings-help">
-									A brief description of your website (150-160
-									chars recommended).
-								</p>
-							</div>
-							<div className="settings-control">
-								<TemplateInput
-									id="home-desc"
-									value={ homepage.meta_description }
-									onChange={ ( val ) =>
-										setHomepage( {
-											...homepage,
-											meta_description: val,
-										} )
-									}
-									placeholder="A brief description of your website..."
-									variables={ variables }
-									variableValues={ variableValues }
-									context="global"
-									multiline
-									maxLength={ 160 }
-									onAiClick={ () =>
-										openAiModal(
-											'description',
-											( val ) =>
-												setHomepage( {
-													...homepage,
-													meta_description: val,
-												} ),
-											{ type: 'Homepage' }
-										)
-									}
-									aiEnabled={ aiEnabled }
-								/>
-							</div>
-						</div>
-
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label>Title Separator</label>
-								<p className="settings-help">
-									Character used between title parts across
-									your site.
-								</p>
-							</div>
-							<div className="settings-control">
-								<div className="separator-selector">
-									{ Object.entries( separatorOptions ).map(
-										( [ value, label ] ) => (
-											<button
-												key={ value }
-												type="button"
-												className={ `separator-option ${
-													separator === value
-														? 'active'
-														: ''
-												}` }
-												onClick={ () =>
-													saveSeparator( value )
-												}
-												title={ label }
-											>
-												{ value }
-											</button>
-										)
-									) }
-									<div className="separator-custom">
-										<input
-											type="text"
-											className="separator-custom__input"
-											value={
-												! Object.keys(
-													separatorOptions
-												).includes( separator )
-													? separator
-													: ''
-											}
-											onChange={ ( e ) =>
-												saveSeparator( e.target.value )
-											}
-											placeholder="Custom"
-											maxLength={ 5 }
-										/>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label htmlFor="home-keywords">
-									Meta Keywords
-								</label>
-								<p className="settings-help">
-									Comma-separated keywords (optional, less
-									relevant for modern SEO).
-								</p>
-							</div>
-							<div className="settings-control">
-								<input
-									type="text"
-									id="home-keywords"
-									className="input"
-									value={ homepage.meta_keywords || '' }
-									onChange={ ( e ) =>
-										setHomepage( {
-											...homepage,
-											meta_keywords: e.target.value,
-										} )
-									}
-									placeholder="keyword1, keyword2, keyword3"
-								/>
-							</div>
-						</div>
-
-						<div className="form-actions">
-							<button
-								type="button"
-								className="button primary"
-								onClick={ saveHomepage }
-								disabled={ saving }
-							>
-								{ saving
-									? 'Saving...'
-									: 'Save Homepage Settings' }
-							</button>
-						</div>
-					</div>
-				</section>
-			) }
+			{ __( 'keyword1, keyword2, keyword3', 'saman-seo' ) }
 
 			{ /* Content Types Tab */ }
 			{ activeTab === 'content-types' && (
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>Content Types</h3>
+							<h3>{ __( 'Content Types', 'saman-seo' ) }</h3>
 							<p className="muted">
-								Configure SEO defaults for each post type.
+								{ __(
+									'Configure SEO defaults for each post type.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 					</div>
@@ -824,11 +766,15 @@ const SearchAppearance = () => {
 						<table className="data-table">
 							<thead>
 								<tr>
-									<th>Post Type</th>
-									<th>Title Preview</th>
-									<th>Show in Search</th>
-									<th>Posts</th>
-									<th>Action</th>
+									<th>{ __( 'Post Type', 'saman-seo' ) }</th>
+									<th>
+										{ __( 'Title Preview', 'saman-seo' ) }
+									</th>
+									<th>
+										{ __( 'Show in Search', 'saman-seo' ) }
+									</th>
+									<th>{ __( 'Posts', 'saman-seo' ) }</th>
+									<th>{ __( 'Action', 'saman-seo' ) }</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -871,8 +817,14 @@ const SearchAppearance = () => {
 													}` }
 												>
 													{ pt.noindex
-														? 'No'
-														: 'Yes' }
+														? __(
+																'No',
+																'saman-seo'
+														  )
+														: __(
+																'Yes',
+																'saman-seo'
+														  ) }
 												</span>
 											</td>
 											<td>{ pt.count }</td>
@@ -886,7 +838,10 @@ const SearchAppearance = () => {
 														} )
 													}
 												>
-													Edit
+													{ __(
+														'Edit',
+														'saman-seo'
+													) }
 												</button>
 											</td>
 										</tr>
@@ -903,10 +858,12 @@ const SearchAppearance = () => {
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>Taxonomies</h3>
+							<h3>{ __( 'Taxonomies', 'saman-seo' ) }</h3>
 							<p className="muted">
-								Configure SEO settings for categories, tags, and
-								custom taxonomies.
+								{ __(
+									'Configure SEO settings for categories, tags, and custom taxonomies.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 					</div>
@@ -928,11 +885,15 @@ const SearchAppearance = () => {
 						<table className="data-table">
 							<thead>
 								<tr>
-									<th>Taxonomy</th>
-									<th>Title Preview</th>
-									<th>Show in Search</th>
-									<th>Terms</th>
-									<th>Action</th>
+									<th>{ __( 'Taxonomy', 'saman-seo' ) }</th>
+									<th>
+										{ __( 'Title Preview', 'saman-seo' ) }
+									</th>
+									<th>
+										{ __( 'Show in Search', 'saman-seo' ) }
+									</th>
+									<th>{ __( 'Terms', 'saman-seo' ) }</th>
+									<th>{ __( 'Action', 'saman-seo' ) }</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -976,8 +937,14 @@ const SearchAppearance = () => {
 													}` }
 												>
 													{ tax.noindex
-														? 'No'
-														: 'Yes' }
+														? __(
+																'No',
+																'saman-seo'
+														  )
+														: __(
+																'Yes',
+																'saman-seo'
+														  ) }
 												</span>
 											</td>
 											<td>{ tax.count }</td>
@@ -991,7 +958,10 @@ const SearchAppearance = () => {
 														} )
 													}
 												>
-													Edit
+													{ __(
+														'Edit',
+														'saman-seo'
+													) }
 												</button>
 											</td>
 										</tr>
@@ -1008,10 +978,12 @@ const SearchAppearance = () => {
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>Archives</h3>
+							<h3>{ __( 'Archives', 'saman-seo' ) }</h3>
 							<p className="muted">
-								Configure SEO for author, date, search, and 404
-								pages.
+								{ __(
+									'Configure SEO for author, date, search, and 404 pages.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 					</div>
@@ -1039,10 +1011,16 @@ const SearchAppearance = () => {
 						<table className="data-table">
 							<thead>
 								<tr>
-									<th>Archive Type</th>
-									<th>Title Preview</th>
-									<th>Show in Search</th>
-									<th>Action</th>
+									<th>
+										{ __( 'Archive Type', 'saman-seo' ) }
+									</th>
+									<th>
+										{ __( 'Title Preview', 'saman-seo' ) }
+									</th>
+									<th>
+										{ __( 'Show in Search', 'saman-seo' ) }
+									</th>
+									<th>{ __( 'Action', 'saman-seo' ) }</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -1085,8 +1063,14 @@ const SearchAppearance = () => {
 													}` }
 												>
 													{ archive.noindex
-														? 'No'
-														: 'Yes' }
+														? __(
+																'No',
+																'saman-seo'
+														  )
+														: __(
+																'Yes',
+																'saman-seo'
+														  ) }
 												</span>
 											</td>
 											<td>
@@ -1099,7 +1083,10 @@ const SearchAppearance = () => {
 														} )
 													}
 												>
-													Edit
+													{ __(
+														'Edit',
+														'saman-seo'
+													) }
 												</button>
 											</td>
 										</tr>
@@ -1116,761 +1103,17 @@ const SearchAppearance = () => {
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>Social Settings</h3>
+							<h3>{ __( 'Social Settings', 'saman-seo' ) }</h3>
 							<p className="muted">
-								Configure default Open Graph, Twitter, and
-								schema values for social sharing.
+								{ __(
+									'Configure default Open Graph, Twitter, and schema values for social sharing.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 					</div>
 
-					{ editingPostTypeSocial ? (
-						<div className="settings-form">
-							<div className="type-editor__header">
-								<h4>
-									Edit { editingPostTypeSocial.name } Social
-									Settings
-								</h4>
-								<button
-									type="button"
-									className="link-button"
-									onClick={ () =>
-										setEditingPostTypeSocial( null )
-									}
-								>
-									Cancel
-								</button>
-							</div>
-
-							<div className="settings-row compact">
-								<div className="settings-label">
-									<label>OG Title</label>
-									<p className="settings-help">
-										Open Graph title for Facebook shares.
-									</p>
-								</div>
-								<div className="settings-control">
-									<TemplateInput
-										value={
-											editingPostTypeSocial.og_title || ''
-										}
-										onChange={ ( val ) =>
-											setEditingPostTypeSocial( {
-												...editingPostTypeSocial,
-												og_title: val,
-											} )
-										}
-										placeholder="{{post_title}} {{separator}} {{site_title}}"
-										variables={ variables }
-										variableValues={ variableValues }
-										context="post"
-										maxLength={ 60 }
-										onAiClick={ () =>
-											openAiModal(
-												'title',
-												( val ) =>
-													setEditingPostTypeSocial( {
-														...editingPostTypeSocial,
-														og_title: val,
-													} ),
-												{
-													type: editingPostTypeSocial.name,
-													name: 'OG Title',
-												}
-											)
-										}
-									/>
-								</div>
-							</div>
-
-							<div className="settings-row compact">
-								<div className="settings-label">
-									<label>OG Description</label>
-									<p className="settings-help">
-										Open Graph description for Facebook
-										shares.
-									</p>
-								</div>
-								<div className="settings-control">
-									<TemplateInput
-										value={
-											editingPostTypeSocial.og_description ||
-											''
-										}
-										onChange={ ( val ) =>
-											setEditingPostTypeSocial( {
-												...editingPostTypeSocial,
-												og_description: val,
-											} )
-										}
-										placeholder="{{post_excerpt}}"
-										variables={ variables }
-										variableValues={ variableValues }
-										context="post"
-										multiline
-										maxLength={ 160 }
-										onAiClick={ () =>
-											openAiModal(
-												'description',
-												( val ) =>
-													setEditingPostTypeSocial( {
-														...editingPostTypeSocial,
-														og_description: val,
-													} ),
-												{
-													type: editingPostTypeSocial.name,
-													name: 'OG Description',
-												}
-											)
-										}
-									/>
-								</div>
-							</div>
-
-							<div className="settings-row compact">
-								<div className="settings-label">
-									<label>Twitter Title</label>
-									<p className="settings-help">
-										Twitter card title.
-									</p>
-								</div>
-								<div className="settings-control">
-									<TemplateInput
-										value={
-											editingPostTypeSocial.twitter_title ||
-											''
-										}
-										onChange={ ( val ) =>
-											setEditingPostTypeSocial( {
-												...editingPostTypeSocial,
-												twitter_title: val,
-											} )
-										}
-										placeholder="{{post_title}} {{separator}} {{site_title}}"
-										variables={ variables }
-										variableValues={ variableValues }
-										context="post"
-										maxLength={ 60 }
-										onAiClick={ () =>
-											openAiModal(
-												'title',
-												( val ) =>
-													setEditingPostTypeSocial( {
-														...editingPostTypeSocial,
-														twitter_title: val,
-													} ),
-												{
-													type: editingPostTypeSocial.name,
-													name: 'Twitter Title',
-												}
-											)
-										}
-									/>
-								</div>
-							</div>
-
-							<div className="settings-row compact">
-								<div className="settings-label">
-									<label>Twitter Description</label>
-									<p className="settings-help">
-										Twitter card description.
-									</p>
-								</div>
-								<div className="settings-control">
-									<TemplateInput
-										value={
-											editingPostTypeSocial.twitter_description ||
-											''
-										}
-										onChange={ ( val ) =>
-											setEditingPostTypeSocial( {
-												...editingPostTypeSocial,
-												twitter_description: val,
-											} )
-										}
-										placeholder="{{post_excerpt}}"
-										variables={ variables }
-										variableValues={ variableValues }
-										context="post"
-										multiline
-										maxLength={ 160 }
-										onAiClick={ () =>
-											openAiModal(
-												'description',
-												( val ) =>
-													setEditingPostTypeSocial( {
-														...editingPostTypeSocial,
-														twitter_description:
-															val,
-													} ),
-												{
-													type: editingPostTypeSocial.name,
-													name: 'Twitter Description',
-												}
-											)
-										}
-									/>
-								</div>
-							</div>
-
-							<div className="settings-row compact">
-								<div className="settings-label">
-									<label>Fallback Image</label>
-									<p className="settings-help">
-										Fallback image for social sharing.
-									</p>
-								</div>
-								<div className="settings-control">
-									<div className="image-uploader">
-										{ editingPostTypeSocial.image_source ? (
-											<div className="image-preview">
-												<img
-													src={
-														editingPostTypeSocial.image_source
-													}
-													alt="Social fallback"
-												/>
-												<button
-													type="button"
-													className="image-preview__remove"
-													onClick={ () =>
-														setEditingPostTypeSocial(
-															{
-																...editingPostTypeSocial,
-																image_source:
-																	'',
-															}
-														)
-													}
-													title="Remove image"
-												>
-													×
-												</button>
-											</div>
-										) : (
-											<div className="image-placeholder">
-												No image
-											</div>
-										) }
-										<button
-											type="button"
-											className="button"
-											onClick={ () => {
-												const frame = wp.media( {
-													title: 'Select Fallback Image',
-													button: {
-														text: 'Use Image',
-													},
-													multiple: false,
-													library: { type: 'image' },
-												} );
-												frame.on( 'select', () => {
-													const attachment = frame
-														.state()
-														.get( 'selection' )
-														.first()
-														.toJSON();
-													setEditingPostTypeSocial( {
-														...editingPostTypeSocial,
-														image_source:
-															attachment.url,
-													} );
-												} );
-												frame.open();
-											} }
-										>
-											{ editingPostTypeSocial.image_source
-												? 'Change Image'
-												: 'Select Image' }
-										</button>
-									</div>
-								</div>
-							</div>
-
-							<div className="settings-row compact">
-								<div className="settings-label">
-									<label>Schema Type</label>
-									<p className="settings-help">
-										Schema.org type for this post type.
-									</p>
-								</div>
-								<div className="settings-control">
-									<select
-										className="input"
-										value={
-											editingPostTypeSocial.schema_itemtype ||
-											''
-										}
-										onChange={ ( e ) =>
-											setEditingPostTypeSocial( {
-												...editingPostTypeSocial,
-												schema_itemtype: e.target.value,
-											} )
-										}
-									>
-										{ schemaTypeOptions.map( ( opt ) => (
-											<option
-												key={ opt.value }
-												value={ opt.value }
-											>
-												{ opt.label }
-											</option>
-										) ) }
-									</select>
-								</div>
-							</div>
-
-							<div className="form-actions">
-								<button
-									type="button"
-									className="button primary"
-									onClick={ () =>
-										savePostTypeSocial(
-											editingPostTypeSocial.slug,
-											editingPostTypeSocial
-										)
-									}
-									disabled={ saving }
-								>
-									{ saving ? 'Saving...' : 'Save Settings' }
-								</button>
-								<button
-									type="button"
-									className="button"
-									onClick={ () =>
-										setEditingPostTypeSocial( null )
-									}
-								>
-									Cancel
-								</button>
-							</div>
-						</div>
-					) : (
-						<>
-							{ /* Social Preview Cards */ }
-							<div className="preview-panel">
-								<h4 className="form-section__title">
-									Social Preview
-								</h4>
-								<p className="preview-panel__description">
-									Preview how your content will appear when
-									shared on social media.
-								</p>
-								<div className="preview-grid">
-									<FacebookPreview
-										image={ socialDefaults.image_source }
-										title={
-											renderTemplatePreview(
-												socialDefaults.og_title
-											) || siteInfo.name
-										}
-										description={
-											renderTemplatePreview(
-												socialDefaults.og_description
-											) || siteInfo.description
-										}
-										domain={ siteInfo.domain }
-									/>
-									<TwitterPreview
-										image={ socialDefaults.image_source }
-										title={
-											renderTemplatePreview(
-												socialDefaults.twitter_title ||
-													socialDefaults.og_title
-											) || siteInfo.name
-										}
-										description={
-											renderTemplatePreview(
-												socialDefaults.twitter_description ||
-													socialDefaults.og_description
-											) || siteInfo.description
-										}
-										domain={ siteInfo.domain }
-										cardType="summary_large_image"
-									/>
-								</div>
-							</div>
-
-							{ /* Global Social Defaults */ }
-							<div className="settings-form form-section">
-								<h4 className="form-section__title">
-									Global Social Defaults
-								</h4>
-								<p className="form-section__description">
-									These defaults apply when posts don't have
-									custom social values.
-								</p>
-
-								<div className="settings-row compact">
-									<div className="settings-label">
-										<label>OG Title</label>
-										<p className="settings-help">
-											Default Open Graph title for
-											Facebook.
-										</p>
-									</div>
-									<div className="settings-control">
-										<TemplateInput
-											value={
-												socialDefaults.og_title || ''
-											}
-											onChange={ ( val ) =>
-												setSocialDefaults( {
-													...socialDefaults,
-													og_title: val,
-												} )
-											}
-											placeholder="{{site_title}} {{separator}} {{tagline}}"
-											variables={ variables }
-											variableValues={ variableValues }
-											context="global"
-											maxLength={ 60 }
-											onAiClick={ () =>
-												openAiModal(
-													'title',
-													( val ) =>
-														setSocialDefaults( {
-															...socialDefaults,
-															og_title: val,
-														} ),
-													{
-														type: 'Social',
-														name: 'Open Graph Title',
-													}
-												)
-											}
-										/>
-									</div>
-								</div>
-
-								<div className="settings-row compact">
-									<div className="settings-label">
-										<label>OG Description</label>
-										<p className="settings-help">
-											Default Open Graph description.
-										</p>
-									</div>
-									<div className="settings-control">
-										<TemplateInput
-											value={
-												socialDefaults.og_description ||
-												''
-											}
-											onChange={ ( val ) =>
-												setSocialDefaults( {
-													...socialDefaults,
-													og_description: val,
-												} )
-											}
-											placeholder="{{tagline}}"
-											variables={ variables }
-											variableValues={ variableValues }
-											context="global"
-											multiline
-											maxLength={ 160 }
-											onAiClick={ () =>
-												openAiModal(
-													'description',
-													( val ) =>
-														setSocialDefaults( {
-															...socialDefaults,
-															og_description: val,
-														} ),
-													{
-														type: 'Social',
-														name: 'Open Graph Description',
-													}
-												)
-											}
-										/>
-									</div>
-								</div>
-
-								<div className="settings-row compact">
-									<div className="settings-label">
-										<label>Twitter Title</label>
-										<p className="settings-help">
-											Default Twitter card title.
-										</p>
-									</div>
-									<div className="settings-control">
-										<TemplateInput
-											value={
-												socialDefaults.twitter_title ||
-												''
-											}
-											onChange={ ( val ) =>
-												setSocialDefaults( {
-													...socialDefaults,
-													twitter_title: val,
-												} )
-											}
-											placeholder="{{site_title}} {{separator}} {{tagline}}"
-											variables={ variables }
-											variableValues={ variableValues }
-											context="global"
-											maxLength={ 60 }
-											onAiClick={ () =>
-												openAiModal(
-													'title',
-													( val ) =>
-														setSocialDefaults( {
-															...socialDefaults,
-															twitter_title: val,
-														} ),
-													{
-														type: 'Social',
-														name: 'Twitter Card Title',
-													}
-												)
-											}
-										/>
-									</div>
-								</div>
-
-								<div className="settings-row compact">
-									<div className="settings-label">
-										<label>Twitter Description</label>
-										<p className="settings-help">
-											Default Twitter card description.
-										</p>
-									</div>
-									<div className="settings-control">
-										<TemplateInput
-											value={
-												socialDefaults.twitter_description ||
-												''
-											}
-											onChange={ ( val ) =>
-												setSocialDefaults( {
-													...socialDefaults,
-													twitter_description: val,
-												} )
-											}
-											placeholder="{{tagline}}"
-											variables={ variables }
-											variableValues={ variableValues }
-											context="global"
-											multiline
-											maxLength={ 160 }
-											onAiClick={ () =>
-												openAiModal(
-													'description',
-													( val ) =>
-														setSocialDefaults( {
-															...socialDefaults,
-															twitter_description:
-																val,
-														} ),
-													{
-														type: 'Social',
-														name: 'Twitter Card Description',
-													}
-												)
-											}
-										/>
-									</div>
-								</div>
-
-								<div className="settings-row compact">
-									<div className="settings-label">
-										<label>Fallback Image</label>
-										<p className="settings-help">
-											Used when posts don't have a
-											featured image (1200x630px
-											recommended).
-										</p>
-									</div>
-									<div className="settings-control">
-										<div className="image-uploader">
-											{ socialDefaults.image_source ? (
-												<div className="image-preview">
-													<img
-														src={
-															socialDefaults.image_source
-														}
-														alt="Social fallback"
-													/>
-													<button
-														type="button"
-														className="image-preview__remove"
-														onClick={ () =>
-															setSocialDefaults( {
-																...socialDefaults,
-																image_source:
-																	'',
-															} )
-														}
-														title="Remove image"
-													>
-														×
-													</button>
-												</div>
-											) : (
-												<div className="image-placeholder">
-													No image
-												</div>
-											) }
-											<button
-												type="button"
-												className="button"
-												onClick={ () => {
-													const frame = wp.media( {
-														title: 'Select Fallback Image',
-														button: {
-															text: 'Use Image',
-														},
-														multiple: false,
-														library: {
-															type: 'image',
-														},
-													} );
-													frame.on( 'select', () => {
-														const attachment = frame
-															.state()
-															.get( 'selection' )
-															.first()
-															.toJSON();
-														setSocialDefaults( {
-															...socialDefaults,
-															image_source:
-																attachment.url,
-														} );
-													} );
-													frame.open();
-												} }
-											>
-												{ socialDefaults.image_source
-													? 'Change Image'
-													: 'Select Image' }
-											</button>
-										</div>
-									</div>
-								</div>
-
-								<div className="settings-row compact">
-									<div className="settings-label">
-										<label>Default Schema Type</label>
-										<p className="settings-help">
-											Controls the og:type meta tag for
-											content.
-										</p>
-									</div>
-									<div className="settings-control">
-										<select
-											className="input"
-											value={
-												socialDefaults.schema_itemtype ||
-												''
-											}
-											onChange={ ( e ) =>
-												setSocialDefaults( {
-													...socialDefaults,
-													schema_itemtype:
-														e.target.value,
-												} )
-											}
-										>
-											{ schemaTypeOptions.map(
-												( opt ) => (
-													<option
-														key={ opt.value }
-														value={ opt.value }
-													>
-														{ opt.label }
-													</option>
-												)
-											) }
-										</select>
-									</div>
-								</div>
-
-								<div className="form-actions">
-									<button
-										type="button"
-										className="button primary"
-										onClick={ saveSocialDefaults }
-										disabled={ saving }
-									>
-										{ saving
-											? 'Saving...'
-											: 'Save Global Defaults' }
-									</button>
-								</div>
-							</div>
-
-							{ /* Post Type Specific Settings */ }
-							<div className="form-section">
-								<h4 className="form-section__title">
-									Post Type Specific Settings
-								</h4>
-								<p className="form-section__description">
-									Override default social settings for
-									specific post types.
-								</p>
-
-								<table className="data-table">
-									<thead>
-										<tr>
-											<th>Post Type</th>
-											<th>OG Title</th>
-											<th>Schema Type</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tbody>
-										{ postTypes.map( ( pt ) => {
-											const socialSettings =
-												postTypeSocialDefaults[
-													pt.slug
-												] || {};
-											return (
-												<tr key={ pt.slug }>
-													<td>
-														<strong>
-															{ pt.name }
-														</strong>
-														<span className="muted-block">
-															{ pt.slug }
-														</span>
-													</td>
-													<td>
-														<span className="muted">
-															{ socialSettings.og_title ||
-																'Using global default' }
-														</span>
-													</td>
-													<td>
-														<span className="muted">
-															{ socialSettings.schema_itemtype ||
-																'Article' }
-														</span>
-													</td>
-													<td>
-														<button
-															type="button"
-															className="link-button"
-															onClick={ () =>
-																setEditingPostTypeSocial(
-																	{
-																		slug: pt.slug,
-																		name: pt.name,
-																		...socialSettings,
-																	}
-																)
-															}
-														>
-															Edit
-														</button>
-													</td>
-												</tr>
-											);
-										} ) }
-									</tbody>
-								</table>
-							</div>
-						</>
-					) }
+					{ __( '{{tagline}}', 'saman-seo' ) }
 				</section>
 			) }
 
@@ -1885,807 +1128,7 @@ const SearchAppearance = () => {
 			/>
 
 			{ /* Social Cards Tab */ }
-			{ activeTab === 'social-cards' && (
-				<section className="panel">
-					<div className="table-toolbar">
-						<div>
-							<h3>Social Cards</h3>
-							<p className="muted">
-								Customize the appearance of dynamically
-								generated social card images.
-							</p>
-						</div>
-						<div>
-							<span
-								className={ `pill ${
-									cardModuleEnabled ? 'success' : 'warning'
-								}` }
-							>
-								{ cardModuleEnabled ? 'Active' : 'Disabled' }
-							</span>
-						</div>
-					</div>
-
-					<div className="settings-form">
-						{ /* Live Preview */ }
-						<div className="preview-panel">
-							<div className="preview-panel__header">
-								<h4>Live Preview</h4>
-							</div>
-
-							{ /* Preview Title Input */ }
-							<div className="inline-fields">
-								<div className="field-group grow">
-									<label className="field-group__label">
-										Preview Title
-									</label>
-									<input
-										type="text"
-										className="input"
-										value={ cardPreviewTitle }
-										onChange={ ( e ) =>
-											setCardPreviewTitle(
-												e.target.value
-											)
-										}
-										placeholder="Enter a sample title..."
-									/>
-								</div>
-								{ Object.keys( previewPosts ).length > 0 && (
-									<>
-										<div className="field-group fixed-sm">
-											<label className="field-group__label">
-												Content type
-											</label>
-											<select
-												className="input"
-												value={ previewPostType }
-												onChange={ ( e ) => {
-													setPreviewPostType(
-														e.target.value
-													);
-													setSelectedPreviewPost(
-														''
-													);
-												} }
-											>
-												{ Object.entries(
-													previewPosts
-												).map( ( [ slug, data ] ) => (
-													<option
-														key={ slug }
-														value={ slug }
-													>
-														{ data.label }
-													</option>
-												) ) }
-											</select>
-										</div>
-										<div className="field-group fixed-md">
-											<label className="field-group__label">
-												Select content
-											</label>
-											<select
-												className="input"
-												value={
-													selectedPreviewPost || ''
-												}
-												onChange={ ( e ) => {
-													const postId =
-														e.target.value;
-													setSelectedPreviewPost(
-														postId
-													);
-													if (
-														postId &&
-														previewPosts[
-															previewPostType
-														]
-													) {
-														const post =
-															previewPosts[
-																previewPostType
-															].posts.find(
-																( p ) =>
-																	String(
-																		p.id
-																	) === postId
-															);
-														if ( post ) {
-															setCardPreviewTitle(
-																post.title
-															);
-														}
-													}
-												} }
-											>
-												<option value="">
-													Custom text
-												</option>
-												{ previewPosts[
-													previewPostType
-												]?.posts?.map( ( post ) => (
-													<option
-														key={ post.id }
-														value={ post.id }
-													>
-														{ post.title }
-													</option>
-												) ) }
-											</select>
-										</div>
-									</>
-								) }
-							</div>
-
-							{ /* Card Preview */ }
-							<div
-								className="social-card-preview"
-								style={ {
-									background:
-										cardDesign.layout === 'gradient'
-											? `linear-gradient(135deg, ${ cardDesign.background_color } 0%, ${ cardDesign.accent_color }44 100%)`
-											: cardDesign.background_color,
-									justifyContent:
-										cardDesign.layout === 'centered'
-											? 'center'
-											: cardDesign.layout === 'magazine'
-											? 'flex-end'
-											: 'flex-end',
-									alignItems:
-										cardDesign.layout === 'centered'
-											? 'center'
-											: 'flex-start',
-									padding:
-										cardDesign.layout === 'magazine'
-											? '40px 32px'
-											: '32px',
-								} }
-							>
-								{ /* Layout-specific accent elements */ }
-								{ cardDesign.layout === 'default' && (
-									<div
-										className="social-card-preview__accent"
-										style={ {
-											bottom: 0,
-											left: 0,
-											right: 0,
-											height: '4px',
-											background: cardDesign.accent_color,
-										} }
-									/>
-								) }
-								{ cardDesign.layout === 'magazine' && (
-									<div
-										className="social-card-preview__accent"
-										style={ {
-											top: 0,
-											left: 0,
-											right: 0,
-											height: '4px',
-											background: cardDesign.accent_color,
-										} }
-									/>
-								) }
-								{ cardDesign.layout === 'corner' && (
-									<>
-										<div
-											className="social-card-preview__accent"
-											style={ {
-												top: 0,
-												left: 0,
-												width: '80px',
-												height: '80px',
-												background:
-													cardDesign.accent_color,
-												clipPath:
-													'polygon(0 0, 100% 0, 0 100%)',
-											} }
-										/>
-										<div
-											className="social-card-preview__accent"
-											style={ {
-												bottom: 0,
-												right: 0,
-												width: '120px',
-												height: '120px',
-												background:
-													cardDesign.accent_color,
-												clipPath:
-													'polygon(100% 100%, 0 100%, 100% 0)',
-												opacity: 0.5,
-											} }
-										/>
-									</>
-								) }
-								{ cardDesign.layout === 'gradient' && (
-									<div
-										className="social-card-preview__accent"
-										style={ {
-											bottom: 0,
-											left: 0,
-											right: 0,
-											height: '50%',
-											background: `linear-gradient(to top, ${ cardDesign.background_color } 0%, transparent 100%)`,
-										} }
-									/>
-								) }
-
-								{ /* Logo */ }
-								{ cardDesign.logo_url && (
-									<img
-										className="social-card-preview__logo"
-										src={ cardDesign.logo_url }
-										alt="Logo"
-										style={ {
-											width: `${ Math.max(
-												24,
-												( cardDesign.logo_size || 48 ) /
-													2.5
-											) }px`,
-											height: `${ Math.max(
-												24,
-												( cardDesign.logo_size || 48 ) /
-													2.5
-											) }px`,
-											...( cardDesign.logo_position ===
-												'top-left' && {
-												top: '20px',
-												left: '20px',
-											} ),
-											...( cardDesign.logo_position ===
-												'top-right' && {
-												top: '20px',
-												right: '20px',
-											} ),
-											...( cardDesign.logo_position ===
-												'bottom-left' && {
-												bottom: '20px',
-												left: '20px',
-											} ),
-											...( cardDesign.logo_position ===
-												'bottom-right' && {
-												bottom: '20px',
-												right: '20px',
-											} ),
-											...( cardDesign.logo_position ===
-												'center' && {
-												top: '50%',
-												left: '50%',
-												transform:
-													'translate(-50%, -50%)',
-												opacity: 0.1,
-												width: '40%',
-												height: '40%',
-											} ),
-										} }
-									/>
-								) }
-
-								{ /* Title */ }
-								<h2
-									style={ {
-										color: cardDesign.text_color,
-										fontSize: `${ Math.max(
-											14,
-											cardDesign.title_font_size / 3
-										) }px`,
-										fontWeight:
-											cardDesign.title_weight || 600,
-										margin: 0,
-										marginBottom: '6px',
-										textAlign:
-											cardDesign.layout === 'centered'
-												? 'center'
-												: 'left',
-										zIndex: 1,
-										lineHeight: 1.3,
-										maxWidth:
-											cardDesign.layout === 'centered'
-												? '90%'
-												: '85%',
-									} }
-								>
-									{ cardPreviewTitle }
-								</h2>
-
-								{ /* Site Name */ }
-								<span
-									style={ {
-										color: cardDesign.text_color,
-										fontSize: `${ Math.max(
-											9,
-											cardDesign.site_font_size / 3
-										) }px`,
-										opacity: 0.7,
-										zIndex: 1,
-										fontWeight: 400,
-										letterSpacing:
-											cardDesign.layout === 'magazine'
-												? '0.5px'
-												: '0',
-										textTransform:
-											cardDesign.layout === 'magazine'
-												? 'uppercase'
-												: 'none',
-									} }
-								>
-									{ siteInfo.name || 'Your Site Name' }
-								</span>
-							</div>
-						</div>
-
-						{ /* Layout Selection */ }
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label>Layout Style</label>
-								<p className="settings-help">
-									Each layout has optimized defaults.
-								</p>
-							</div>
-							<div className="settings-control">
-								<div className="card-layout-grid">
-									{ cardLayoutOptions.map( ( layout ) => (
-										<label
-											key={ layout.value }
-											className={ `card-layout-option ${
-												cardDesign.layout ===
-												layout.value
-													? 'is-selected'
-													: ''
-											}` }
-										>
-											<input
-												type="radio"
-												name="card-layout"
-												value={ layout.value }
-												checked={
-													cardDesign.layout ===
-													layout.value
-												}
-												onChange={ ( e ) => {
-													const newLayout =
-														e.target.value;
-													const layoutConfig =
-														cardLayoutOptions.find(
-															( l ) =>
-																l.value ===
-																newLayout
-														);
-													setCardDesign( {
-														...cardDesign,
-														layout: newLayout,
-														...( layoutConfig?.defaults ||
-															{} ),
-													} );
-												} }
-											/>
-											<span className="card-layout-option__title">
-												{ layout.label }
-											</span>
-											<span className="card-layout-option__description">
-												{ layout.description }
-											</span>
-										</label>
-									) ) }
-								</div>
-							</div>
-						</div>
-
-						{ /* Color Presets */ }
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label>Color Presets</label>
-								<p className="settings-help">
-									Quick color schemes to get started.
-								</p>
-							</div>
-							<div className="settings-control">
-								<div className="color-presets">
-									{ colorPresets.map( ( preset ) => (
-										<button
-											key={ preset.name }
-											type="button"
-											className="color-preset"
-											onClick={ () =>
-												setCardDesign( {
-													...cardDesign,
-													background_color: preset.bg,
-													accent_color: preset.accent,
-													text_color: preset.text,
-												} )
-											}
-											title={ preset.name }
-										>
-											<span
-												className="color-preset__swatch"
-												style={ {
-													background: preset.bg,
-												} }
-											/>
-											<span
-												className="color-preset__swatch"
-												style={ {
-													background: preset.accent,
-												} }
-											/>
-											<span>{ preset.name }</span>
-										</button>
-									) ) }
-								</div>
-							</div>
-						</div>
-
-						{ /* Colors Row */ }
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label>Colors</label>
-							</div>
-							<div className="settings-control">
-								<div className="color-fields">
-									<div className="color-field">
-										<span className="color-field__label">
-											Background
-										</span>
-										<div className="color-field__row">
-											<input
-												type="color"
-												className="color-field__input"
-												value={
-													cardDesign.background_color
-												}
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														background_color:
-															e.target.value,
-													} )
-												}
-											/>
-											<input
-												type="text"
-												className="input color-field__text"
-												value={
-													cardDesign.background_color
-												}
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														background_color:
-															e.target.value,
-													} )
-												}
-											/>
-										</div>
-									</div>
-									<div className="color-field">
-										<span className="color-field__label">
-											Accent
-										</span>
-										<div className="color-field__row">
-											<input
-												type="color"
-												className="color-field__input"
-												value={
-													cardDesign.accent_color
-												}
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														accent_color:
-															e.target.value,
-													} )
-												}
-											/>
-											<input
-												type="text"
-												className="input color-field__text"
-												value={
-													cardDesign.accent_color
-												}
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														accent_color:
-															e.target.value,
-													} )
-												}
-											/>
-										</div>
-									</div>
-									<div className="color-field">
-										<span className="color-field__label">
-											Text
-										</span>
-										<div className="color-field__row">
-											<input
-												type="color"
-												className="color-field__input"
-												value={ cardDesign.text_color }
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														text_color:
-															e.target.value,
-													} )
-												}
-											/>
-											<input
-												type="text"
-												className="input color-field__text"
-												value={ cardDesign.text_color }
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														text_color:
-															e.target.value,
-													} )
-												}
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						{ /* Typography */ }
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label>Typography</label>
-							</div>
-							<div className="settings-control">
-								<div className="inline-fields">
-									<div className="color-field">
-										<span className="color-field__label">
-											Title Size
-										</span>
-										<div className="color-field__row">
-											<input
-												type="range"
-												min={ 24 }
-												max={ 72 }
-												value={
-													cardDesign.title_font_size
-												}
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														title_font_size:
-															parseInt(
-																e.target.value
-															),
-													} )
-												}
-												style={ { width: '100px' } }
-											/>
-											<span className="color-field__label">
-												{ cardDesign.title_font_size }px
-											</span>
-										</div>
-									</div>
-									<div className="color-field">
-										<span className="color-field__label">
-											Title Weight
-										</span>
-										<select
-											className="input color-field__text"
-											value={
-												cardDesign.title_weight || 600
-											}
-											onChange={ ( e ) =>
-												setCardDesign( {
-													...cardDesign,
-													title_weight: parseInt(
-														e.target.value
-													),
-												} )
-											}
-										>
-											<option value={ 400 }>
-												Regular
-											</option>
-											<option value={ 500 }>
-												Medium
-											</option>
-											<option value={ 600 }>
-												Semibold
-											</option>
-											<option value={ 700 }>Bold</option>
-										</select>
-									</div>
-									<div className="color-field">
-										<span className="color-field__label">
-											Site Name Size
-										</span>
-										<div className="color-field__row">
-											<input
-												type="range"
-												min={ 12 }
-												max={ 32 }
-												value={
-													cardDesign.site_font_size
-												}
-												onChange={ ( e ) =>
-													setCardDesign( {
-														...cardDesign,
-														site_font_size:
-															parseInt(
-																e.target.value
-															),
-													} )
-												}
-												style={ { width: '100px' } }
-											/>
-											<span className="color-field__label">
-												{ cardDesign.site_font_size }px
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						{ /* Logo Settings */ }
-						<div className="settings-row compact">
-							<div className="settings-label">
-								<label>Logo</label>
-								<p className="settings-help">
-									PNG with transparency works best.
-								</p>
-							</div>
-							<div className="settings-control">
-								<div className="image-uploader">
-									{ cardDesign.logo_url && (
-										<div className="logo-preview">
-											<img
-												src={ cardDesign.logo_url }
-												alt="Logo preview"
-											/>
-										</div>
-									) }
-									<div className="color-field">
-										<div className="color-field__row">
-											<button
-												type="button"
-												className="button"
-												onClick={ () => {
-													const frame = wp.media( {
-														title: 'Select Logo',
-														button: {
-															text: 'Use Logo',
-														},
-														multiple: false,
-														library: {
-															type: 'image',
-														},
-													} );
-													frame.on( 'select', () => {
-														const attachment = frame
-															.state()
-															.get( 'selection' )
-															.first()
-															.toJSON();
-														setCardDesign( {
-															...cardDesign,
-															logo_url:
-																attachment.url,
-														} );
-													} );
-													frame.open();
-												} }
-											>
-												{ cardDesign.logo_url
-													? 'Change Logo'
-													: 'Select Logo' }
-											</button>
-											{ cardDesign.logo_url && (
-												<button
-													type="button"
-													className="button danger"
-													onClick={ () =>
-														setCardDesign( {
-															...cardDesign,
-															logo_url: '',
-														} )
-													}
-												>
-													Remove
-												</button>
-											) }
-										</div>
-										{ cardDesign.logo_url && (
-											<div className="inline-fields">
-												<div className="color-field">
-													<span className="color-field__label">
-														Size
-													</span>
-													<div className="color-field__row">
-														<input
-															type="range"
-															min={ 24 }
-															max={ 120 }
-															value={
-																cardDesign.logo_size ||
-																48
-															}
-															onChange={ ( e ) =>
-																setCardDesign( {
-																	...cardDesign,
-																	logo_size:
-																		parseInt(
-																			e
-																				.target
-																				.value
-																		),
-																} )
-															}
-															style={ {
-																width: '80px',
-															} }
-														/>
-														<span className="color-field__label">
-															{ cardDesign.logo_size ||
-																48 }
-															px
-														</span>
-													</div>
-												</div>
-												<div className="color-field">
-													<span className="color-field__label">
-														Position
-													</span>
-													<select
-														className="input color-field__text"
-														value={
-															cardDesign.logo_position
-														}
-														onChange={ ( e ) =>
-															setCardDesign( {
-																...cardDesign,
-																logo_position:
-																	e.target
-																		.value,
-															} )
-														}
-													>
-														{ logoPositionOptions.map(
-															( opt ) => (
-																<option
-																	key={
-																		opt.value
-																	}
-																	value={
-																		opt.value
-																	}
-																>
-																	{
-																		opt.label
-																	}
-																</option>
-															)
-														) }
-													</select>
-												</div>
-											</div>
-										) }
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="form-actions">
-							<button
-								type="button"
-								className="button primary"
-								onClick={ saveCardDesign }
-								disabled={ saving }
-							>
-								{ saving ? 'Saving...' : 'Save Card Design' }
-							</button>
-						</div>
-					</div>
-				</section>
-			) }
+			{ __( 'Enter a sample title\u2026', 'saman-seo' ) }
 		</div>
 	);
 };
@@ -2707,24 +1150,24 @@ const PostTypeEditor = ( {
 	openAiModal,
 } ) => {
 	const [ data, setData ] = useState( postType );
-
 	const previewTitle = renderTemplatePreview(
 		data.title_template || '{{post_title}} {{separator}} {{site_title}}'
 	);
 	const previewDescription = renderTemplatePreview(
 		data.description_template || '{{post_excerpt}}'
 	);
-
 	return (
 		<div className="type-editor">
 			<div className="type-editor__header">
-				<h4>Edit: { postType.name }</h4>
+				<h4>
+					{ __( 'Edit:', 'saman-seo' ) } { postType.name }
+				</h4>
 				<button
 					type="button"
 					className="link-button"
 					onClick={ onCancel }
 				>
-					Cancel
+					{ __( 'Cancel', 'saman-seo' ) }
 				</button>
 			</div>
 
@@ -2738,9 +1181,14 @@ const PostTypeEditor = ( {
 			<div className="settings-form">
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Show in Search Results</label>
+						<label>
+							{ __( 'Show in Search Results', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Allow search engines to index this content type.
+							{ __(
+								'Allow search engines to index this content type.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -2757,7 +1205,9 @@ const PostTypeEditor = ( {
 							/>
 							<span className="toggle-track" />
 							<span className="toggle-text">
-								{ data.noindex ? 'Hidden' : 'Visible' }
+								{ data.noindex
+									? __( 'Hidden', 'saman-seo' )
+									: __( 'Visible', 'saman-seo' ) }
 							</span>
 						</label>
 					</div>
@@ -2765,18 +1215,27 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Title Template</label>
+						<label>{ __( 'Title Template', 'saman-seo' ) }</label>
 						<p className="settings-help">
-							Click "Variables" to insert dynamic content.
+							{ __(
+								'Click "Variables" to insert dynamic content.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
 						<TemplateInput
 							value={ data.title_template }
 							onChange={ ( val ) =>
-								setData( { ...data, title_template: val } )
+								setData( {
+									...data,
+									title_template: val,
+								} )
 							}
-							placeholder="{{post_title}} {{separator}} {{site_title}}"
+							placeholder={ __(
+								'{{post_title}} {{separator}} {{site_title}}',
+								'saman-seo'
+							) }
 							variables={ variables }
 							variableValues={ variableValues }
 							context="post"
@@ -2789,7 +1248,10 @@ const PostTypeEditor = ( {
 											...data,
 											title_template: val,
 										} ),
-									{ type: 'Post Type', name: postType.name }
+									{
+										type: 'Post Type',
+										name: postType.name,
+									}
 								)
 							}
 						/>
@@ -2798,9 +1260,14 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Description Template</label>
+						<label>
+							{ __( 'Description Template', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Default meta description for this post type.
+							{ __(
+								'Default meta description for this post type.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -2812,7 +1279,10 @@ const PostTypeEditor = ( {
 									description_template: val,
 								} )
 							}
-							placeholder="{{post_excerpt}}"
+							placeholder={ __(
+								'{{post_excerpt}}',
+								'saman-seo'
+							) }
 							variables={ variables }
 							variableValues={ variableValues }
 							context="post"
@@ -2826,7 +1296,10 @@ const PostTypeEditor = ( {
 											...data,
 											description_template: val,
 										} ),
-									{ type: 'Post Type', name: postType.name }
+									{
+										type: 'Post Type',
+										name: postType.name,
+									}
 								)
 							}
 						/>
@@ -2835,10 +1308,14 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Default Schema Type</label>
+						<label>
+							{ __( 'Default Schema Type', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Schema type used for posts of this type unless
-							overridden per-post.
+							{ __(
+								'Schema type used for posts of this type unless overridden per-post.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -2862,9 +1339,12 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Schema Page Type</label>
+						<label>{ __( 'Schema Page Type', 'saman-seo' ) }</label>
 						<p className="settings-help">
-							Default structured data page type.
+							{ __(
+								'Default structured data page type.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -2890,9 +1370,14 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Schema Article Type</label>
+						<label>
+							{ __( 'Schema Article Type', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Default structured data article type.
+							{ __(
+								'Default structured data article type.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -2918,9 +1403,14 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Show SEO Controls</label>
+						<label>
+							{ __( 'Show SEO Controls', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Show SEO meta box in editor for this post type.
+							{ __(
+								'Show SEO meta box in editor for this post type.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -2938,8 +1428,8 @@ const PostTypeEditor = ( {
 							<span className="toggle-track" />
 							<span className="toggle-text">
 								{ data.show_seo_controls
-									? 'Enabled'
-									: 'Disabled' }
+									? __( 'Enabled', 'saman-seo' )
+									: __( 'Disabled', 'saman-seo' ) }
 							</span>
 						</label>
 					</div>
@@ -2952,14 +1442,16 @@ const PostTypeEditor = ( {
 						onClick={ () => onSave( data ) }
 						disabled={ saving }
 					>
-						{ saving ? 'Saving...' : 'Save Changes' }
+						{ saving
+							? __( 'Saving\u2026', 'saman-seo' )
+							: __( 'Save Changes', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
 						className="button ghost"
 						onClick={ onCancel }
 					>
-						Cancel
+						{ __( 'Cancel', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -2983,7 +1475,6 @@ const TaxonomyEditor = ( {
 	openAiModal,
 } ) => {
 	const [ data, setData ] = useState( taxonomy );
-
 	const previewTitle = renderTemplatePreview(
 		data.title_template ||
 			'{{term_title}} Archives {{separator}} {{site_title}}'
@@ -2991,17 +1482,18 @@ const TaxonomyEditor = ( {
 	const previewDescription = renderTemplatePreview(
 		data.description_template || '{{term_description}}'
 	);
-
 	return (
 		<div className="type-editor">
 			<div className="type-editor__header">
-				<h4>Edit: { taxonomy.name }</h4>
+				<h4>
+					{ __( 'Edit:', 'saman-seo' ) } { taxonomy.name }
+				</h4>
 				<button
 					type="button"
 					className="link-button"
 					onClick={ onCancel }
 				>
-					Cancel
+					{ __( 'Cancel', 'saman-seo' ) }
 				</button>
 			</div>
 
@@ -3015,9 +1507,14 @@ const TaxonomyEditor = ( {
 			<div className="settings-form">
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Show in Search Results</label>
+						<label>
+							{ __( 'Show in Search Results', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Allow search engines to index this taxonomy.
+							{ __(
+								'Allow search engines to index this taxonomy.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -3034,7 +1531,9 @@ const TaxonomyEditor = ( {
 							/>
 							<span className="toggle-track" />
 							<span className="toggle-text">
-								{ data.noindex ? 'Hidden' : 'Visible' }
+								{ data.noindex
+									? __( 'Hidden', 'saman-seo' )
+									: __( 'Visible', 'saman-seo' ) }
 							</span>
 						</label>
 					</div>
@@ -3042,18 +1541,27 @@ const TaxonomyEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Title Template</label>
+						<label>{ __( 'Title Template', 'saman-seo' ) }</label>
 						<p className="settings-help">
-							Click "Variables" to insert dynamic content.
+							{ __(
+								'Click "Variables" to insert dynamic content.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
 						<TemplateInput
 							value={ data.title_template }
 							onChange={ ( val ) =>
-								setData( { ...data, title_template: val } )
+								setData( {
+									...data,
+									title_template: val,
+								} )
 							}
-							placeholder="{{term_title}} Archives {{separator}} {{site_title}}"
+							placeholder={ __(
+								'{{term_title}} Archives {{separator}} {{site_title}}',
+								'saman-seo'
+							) }
 							variables={ variables }
 							variableValues={ variableValues }
 							context="taxonomy"
@@ -3066,7 +1574,10 @@ const TaxonomyEditor = ( {
 											...data,
 											title_template: val,
 										} ),
-									{ type: 'Taxonomy', name: taxonomy.name }
+									{
+										type: 'Taxonomy',
+										name: taxonomy.name,
+									}
 								)
 							}
 						/>
@@ -3075,9 +1586,14 @@ const TaxonomyEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Description Template</label>
+						<label>
+							{ __( 'Description Template', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Default meta description for taxonomy archives.
+							{ __(
+								'Default meta description for taxonomy archives.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -3089,7 +1605,10 @@ const TaxonomyEditor = ( {
 									description_template: val,
 								} )
 							}
-							placeholder="{{term_description}}"
+							placeholder={ __(
+								'{{term_description}}',
+								'saman-seo'
+							) }
 							variables={ variables }
 							variableValues={ variableValues }
 							context="taxonomy"
@@ -3103,7 +1622,10 @@ const TaxonomyEditor = ( {
 											...data,
 											description_template: val,
 										} ),
-									{ type: 'Taxonomy', name: taxonomy.name }
+									{
+										type: 'Taxonomy',
+										name: taxonomy.name,
+									}
 								)
 							}
 						/>
@@ -3112,9 +1634,14 @@ const TaxonomyEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Show SEO Controls</label>
+						<label>
+							{ __( 'Show SEO Controls', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Show SEO fields when editing terms.
+							{ __(
+								'Show SEO fields when editing terms.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -3132,8 +1659,8 @@ const TaxonomyEditor = ( {
 							<span className="toggle-track" />
 							<span className="toggle-text">
 								{ data.show_seo_controls
-									? 'Enabled'
-									: 'Disabled' }
+									? __( 'Enabled', 'saman-seo' )
+									: __( 'Disabled', 'saman-seo' ) }
 							</span>
 						</label>
 					</div>
@@ -3146,14 +1673,16 @@ const TaxonomyEditor = ( {
 						onClick={ () => onSave( data ) }
 						disabled={ saving }
 					>
-						{ saving ? 'Saving...' : 'Save Changes' }
+						{ saving
+							? __( 'Saving\u2026', 'saman-seo' )
+							: __( 'Save Changes', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
 						className="button ghost"
 						onClick={ onCancel }
 					>
-						Cancel
+						{ __( 'Cancel', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -3192,22 +1721,22 @@ const ArchiveEditor = ( {
 				return 'global';
 		}
 	};
-
 	const previewTitle = renderTemplatePreview( data.title_template );
 	const previewDescription = renderTemplatePreview(
 		data.description_template
 	);
-
 	return (
 		<div className="type-editor">
 			<div className="type-editor__header">
-				<h4>Edit: { archive.name }</h4>
+				<h4>
+					{ __( 'Edit:', 'saman-seo' ) } { archive.name }
+				</h4>
 				<button
 					type="button"
 					className="link-button"
 					onClick={ onCancel }
 				>
-					Cancel
+					{ __( 'Cancel', 'saman-seo' ) }
 				</button>
 			</div>
 
@@ -3221,9 +1750,14 @@ const ArchiveEditor = ( {
 			<div className="settings-form">
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Show in Search Results</label>
+						<label>
+							{ __( 'Show in Search Results', 'saman-seo' ) }
+						</label>
 						<p className="settings-help">
-							Allow search engines to index this page type.
+							{ __(
+								'Allow search engines to index this page type.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
@@ -3240,7 +1774,9 @@ const ArchiveEditor = ( {
 							/>
 							<span className="toggle-track" />
 							<span className="toggle-text">
-								{ data.noindex ? 'Hidden' : 'Visible' }
+								{ data.noindex
+									? __( 'Hidden', 'saman-seo' )
+									: __( 'Visible', 'saman-seo' ) }
 							</span>
 						</label>
 					</div>
@@ -3248,16 +1784,22 @@ const ArchiveEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Title Template</label>
+						<label>{ __( 'Title Template', 'saman-seo' ) }</label>
 						<p className="settings-help">
-							Click "Variables" to insert dynamic content.
+							{ __(
+								'Click "Variables" to insert dynamic content.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 					<div className="settings-control">
 						<TemplateInput
 							value={ data.title_template }
 							onChange={ ( val ) =>
-								setData( { ...data, title_template: val } )
+								setData( {
+									...data,
+									title_template: val,
+								} )
 							}
 							variables={ variables }
 							variableValues={ variableValues }
@@ -3271,7 +1813,10 @@ const ArchiveEditor = ( {
 											...data,
 											title_template: val,
 										} ),
-									{ type: 'Archive', name: archive.name }
+									{
+										type: 'Archive',
+										name: archive.name,
+									}
 								)
 							}
 						/>
@@ -3280,7 +1825,9 @@ const ArchiveEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>Description Template</label>
+						<label>
+							{ __( 'Description Template', 'saman-seo' ) }
+						</label>
 					</div>
 					<div className="settings-control">
 						<TemplateInput
@@ -3304,7 +1851,10 @@ const ArchiveEditor = ( {
 											...data,
 											description_template: val,
 										} ),
-									{ type: 'Archive', name: archive.name }
+									{
+										type: 'Archive',
+										name: archive.name,
+									}
 								)
 							}
 						/>
@@ -3317,19 +1867,18 @@ const ArchiveEditor = ( {
 						className="button primary"
 						onClick={ () => onSave( data ) }
 					>
-						Save Changes
+						{ __( 'Save Changes', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
 						className="button ghost"
 						onClick={ onCancel }
 					>
-						Cancel
+						{ __( 'Cancel', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 		</div>
 	);
 };
-
 export default SearchAppearance;

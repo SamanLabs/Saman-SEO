@@ -15,6 +15,7 @@ import SEOPanel from './components/SEOPanel';
 import './editor.css';
 
 // Sidebar name constant
+import { __ } from '@wordpress/i18n';
 const SIDEBAR_NAME = 'saman-seo/seo-sidebar';
 
 // Get localized data
@@ -31,7 +32,7 @@ const PluginIcon = () => {
 		return (
 			<img
 				src={ sidebarLogo }
-				alt="SEO"
+				alt={ __( 'SEO', 'saman-seo' ) }
 				style={ {
 					width: '20px',
 					height: '20px',
@@ -40,7 +41,6 @@ const PluginIcon = () => {
 			/>
 		);
 	}
-
 	return (
 		<span
 			style={ {
@@ -54,7 +54,7 @@ const PluginIcon = () => {
 				lineHeight: 1,
 			} }
 		>
-			SEO
+			{ __( 'SEO', 'saman-seo' ) }
 		</span>
 	);
 };
@@ -114,7 +114,6 @@ const SEOModalPlugin = () => {
 		const post = editor.getCurrentPost();
 		const featuredImageId =
 			editor.getEditedPostAttribute( 'featured_media' );
-
 		let featuredImageUrl = '';
 		if ( featuredImageId ) {
 			const media = select( 'core' ).getMedia( featuredImageId );
@@ -122,7 +121,6 @@ const SEOModalPlugin = () => {
 				featuredImageUrl = media.source_url;
 			}
 		}
-
 		return {
 			postId: editor.getCurrentPostId(),
 			postTitle: editor.getEditedPostAttribute( 'title' ) || '',
@@ -133,7 +131,6 @@ const SEOModalPlugin = () => {
 			featuredImage: featuredImageUrl,
 		};
 	}, [] );
-
 	const { editPost } = useDispatch( 'core/editor' );
 
 	// Get post type REST base
@@ -150,9 +147,10 @@ const SEOModalPlugin = () => {
 	// Load initial meta from post
 	useEffect( () => {
 		if ( ! postId || ! postType ) return;
-
 		const restBase = getRestBase( postType );
-		apiFetch( { path: `/wp/v2/${ restBase }/${ postId }` } )
+		apiFetch( {
+			path: `/wp/v2/${ restBase }/${ postId }`,
+		} )
 			.then( ( post ) => {
 				if ( post.meta && post.meta._SAMAN_SEO_meta ) {
 					const meta = post.meta._SAMAN_SEO_meta;
@@ -176,9 +174,10 @@ const SEOModalPlugin = () => {
 	// Calculate SEO score
 	useEffect( () => {
 		if ( ! postId ) return;
-
 		const timer = setTimeout( () => {
-			apiFetch( { path: `/saman-seo/v1/audit/post/${ postId }` } )
+			apiFetch( {
+				path: `/saman-seo/v1/audit/post/${ postId }`,
+			} )
 				.then( ( response ) => {
 					if ( response.success && response.data ) {
 						setSeoScore( response.data );
@@ -188,7 +187,6 @@ const SEOModalPlugin = () => {
 					// Score calculation might fail
 				} );
 		}, 500 );
-
 		return () => clearTimeout( timer );
 	}, [ postId, seoMeta, postTitle, postContent ] );
 
@@ -208,7 +206,10 @@ const SEOModalPlugin = () => {
 	// Update meta field
 	const updateMeta = useCallback(
 		( field, value ) => {
-			setSeoMeta( ( prev ) => ( { ...prev, [ field ]: value } ) );
+			setSeoMeta( ( prev ) => ( {
+				...prev,
+				[ field ]: value,
+			} ) );
 			setHasChanges( true );
 
 			// Also update post meta for saving
@@ -228,8 +229,11 @@ const SEOModalPlugin = () => {
 				focus_keyphrase: newMeta.focus_keyphrase,
 				schema_type: newMeta.schema_type || '',
 			};
-
-			editPost( { meta: { _SAMAN_SEO_meta: metaForSave } } );
+			editPost( {
+				meta: {
+					_SAMAN_SEO_meta: metaForSave,
+				},
+			} );
 		},
 		[ seoMeta, editPost ]
 	);
@@ -239,13 +243,12 @@ const SEOModalPlugin = () => {
 	const effectiveDescription = seoMeta.description || postExcerpt || '';
 	const siteUrl = window.location.origin;
 	const postUrl = postSlug ? `${ siteUrl }/${ postSlug }/` : siteUrl;
-
 	return (
 		<>
 			{ /* PluginSidebar creates the pinned icon button in the header */ }
 			<PluginSidebar
 				name="seo-sidebar"
-				title="Saman SEO"
+				title={ __( 'Saman SEO', 'saman-seo' ) }
 				icon={ <PluginIcon /> }
 			>
 				{ /* Empty - we intercept and show modal instead */ }
@@ -256,7 +259,7 @@ const SEOModalPlugin = () => {
 						color: '#757575',
 					} }
 				>
-					Opening SEO settings...
+					{ __( 'Opening SEO settings\u2026', 'saman-seo' ) }
 				</div>
 			</PluginSidebar>
 
@@ -265,40 +268,11 @@ const SEOModalPlugin = () => {
 				target="seo-sidebar"
 				icon={ <PluginIcon /> }
 			>
-				SEO Settings
+				{ __( 'SEO Settings', 'saman-seo' ) }
 			</PluginSidebarMoreMenuItem>
 
 			{ /* The actual modal with SEO content */ }
-			{ isModalOpen && (
-				<Modal
-					title="Saman SEO"
-					onRequestClose={ () => setIsModalOpen( false ) }
-					className="saman-seo-modal-wrapper"
-					isDismissible={ true }
-					shouldCloseOnClickOutside={ true }
-					shouldCloseOnEsc={ true }
-				>
-					<SEOPanel
-						postId={ postId }
-						postType={ postType }
-						seoMeta={ seoMeta }
-						updateMeta={ updateMeta }
-						seoScore={ seoScore }
-						effectiveTitle={ effectiveTitle }
-						effectiveDescription={ effectiveDescription }
-						postUrl={ postUrl }
-						postTitle={ postTitle }
-						postContent={ postContent }
-						featuredImage={ featuredImage }
-						hasChanges={ hasChanges }
-						variables={ variables }
-						variableValues={ variableValues }
-						aiEnabled={ aiEnabled }
-						aiProvider={ aiProvider }
-						aiPilot={ aiPilot }
-					/>
-				</Modal>
-			) }
+			{ __( 'Saman SEO', 'saman-seo' ) }
 		</>
 	);
 };

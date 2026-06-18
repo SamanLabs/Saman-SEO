@@ -6,6 +6,7 @@ import AssistantTyping from './AssistantTyping';
 /**
  * Main chat interface component.
  */
+import { __ } from '@wordpress/i18n';
 const AssistantChat = ( { suggestedPrompts = [] } ) => {
 	const { messages, isLoading, error, sendMessage, executeAction } =
 		useAssistant();
@@ -15,14 +16,15 @@ const AssistantChat = ( { suggestedPrompts = [] } ) => {
 
 	// Auto-scroll to bottom when new messages arrive
 	useEffect( () => {
-		messagesEndRef.current?.scrollIntoView( { behavior: 'smooth' } );
+		messagesEndRef.current?.scrollIntoView( {
+			behavior: 'smooth',
+		} );
 	}, [ messages, isLoading ] );
 
 	// Focus input on mount
 	useEffect( () => {
 		inputRef.current?.focus();
 	}, [] );
-
 	const handleSubmit = ( e ) => {
 		e.preventDefault();
 		if ( input.trim() && ! isLoading ) {
@@ -30,28 +32,23 @@ const AssistantChat = ( { suggestedPrompts = [] } ) => {
 			setInput( '' );
 		}
 	};
-
 	const handleSuggestedPrompt = ( prompt ) => {
 		if ( ! isLoading ) {
 			sendMessage( prompt );
 		}
 	};
-
 	const handleAction = ( actionId ) => {
 		if ( ! isLoading ) {
 			executeAction( actionId );
 		}
 	};
-
 	const handleKeyDown = ( e ) => {
 		if ( e.key === 'Enter' && ! e.shiftKey ) {
 			e.preventDefault();
 			handleSubmit( e );
 		}
 	};
-
 	const showSuggestions = messages.length <= 1 && suggestedPrompts.length > 0;
-
 	return (
 		<div className="assistant-chat">
 			<div className="assistant-chat__messages">
@@ -88,7 +85,7 @@ const AssistantChat = ( { suggestedPrompts = [] } ) => {
 			{ showSuggestions && (
 				<div className="assistant-chat__suggestions">
 					<p className="assistant-chat__suggestions-label">
-						Try asking:
+						{ __( 'Try asking:', 'saman-seo' ) }
 					</p>
 					<div className="assistant-chat__suggestions-list">
 						{ suggestedPrompts.map( ( prompt, index ) => (
@@ -119,7 +116,10 @@ const AssistantChat = ( { suggestedPrompts = [] } ) => {
 						value={ input }
 						onChange={ ( e ) => setInput( e.target.value ) }
 						onKeyDown={ handleKeyDown }
-						placeholder="Type your message..."
+						placeholder={ __(
+							'Type your message\u2026',
+							'saman-seo'
+						) }
 						disabled={ isLoading }
 						rows={ 1 }
 					/>
@@ -142,5 +142,4 @@ const AssistantChat = ( { suggestedPrompts = [] } ) => {
 		</div>
 	);
 };
-
 export default AssistantChat;

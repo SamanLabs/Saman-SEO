@@ -13,13 +13,13 @@ import apiFetch from '@wordpress/api-fetch';
  * @param {Array}  dependencies - Additional dependencies to trigger refetch.
  * @returns {{ preview: object|null, loading: boolean, error: string|null }}
  */
+import { __ } from '@wordpress/i18n';
 const useSchemaPreview = ( postId, schemaType, dependencies = [] ) => {
 	const [ preview, setPreview ] = useState( null );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState( null );
 	const timeoutRef = useRef( null );
 	const abortControllerRef = useRef( null );
-
 	useEffect( () => {
 		// Don't fetch if no post ID (unsaved post)
 		if ( ! postId ) {
@@ -41,13 +41,13 @@ const useSchemaPreview = ( postId, schemaType, dependencies = [] ) => {
 		timeoutRef.current = setTimeout( () => {
 			setLoading( true );
 			setError( null );
-
 			abortControllerRef.current = new AbortController();
-
 			apiFetch( {
 				path: `/saman-seo/v1/schema/preview/${ postId }`,
 				method: 'POST',
-				data: { schema_type: schemaType || '' },
+				data: {
+					schema_type: schemaType || '',
+				},
 				signal: abortControllerRef.current.signal,
 			} )
 				.then( ( response ) => {
@@ -55,19 +55,22 @@ const useSchemaPreview = ( postId, schemaType, dependencies = [] ) => {
 						setPreview( response.data.json_ld );
 					} else {
 						setError(
-							response.message || 'Failed to load preview'
+							response.message ||
+								__( 'Failed to load preview', 'saman-seo' )
 						);
 					}
 				} )
 				.catch( ( err ) => {
 					// Ignore abort errors
 					if ( err.name !== 'AbortError' ) {
-						setError( err.message || 'Failed to load preview' );
+						setError(
+							err.message ||
+								__( 'Failed to load preview', 'saman-seo' )
+						);
 					}
 				} )
 				.finally( () => setLoading( false ) );
 		}, 500 );
-
 		return () => {
 			if ( timeoutRef.current ) {
 				clearTimeout( timeoutRef.current );
@@ -77,8 +80,10 @@ const useSchemaPreview = ( postId, schemaType, dependencies = [] ) => {
 			}
 		};
 	}, [ postId, schemaType, ...dependencies ] );
-
-	return { preview, loading, error };
+	return {
+		preview,
+		loading,
+		error,
+	};
 };
-
 export default useSchemaPreview;

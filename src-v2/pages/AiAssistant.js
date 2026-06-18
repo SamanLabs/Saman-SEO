@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __ } from '@wordpress/i18n';
 const AiAssistant = () => {
 	// Loading states
 	const [ loading, setLoading ] = useState( true );
@@ -19,7 +19,7 @@ const AiAssistant = () => {
 	const [ apiStatus, setApiStatus ] = useState( {
 		configured: false,
 		status: 'not_configured',
-		message: 'Not configured',
+		message: __( 'Not configured', 'saman-seo' ),
 		provider: 'none',
 		ai_pilot: null,
 	} );
@@ -30,17 +30,23 @@ const AiAssistant = () => {
 	const [ generatedDescription, setGeneratedDescription ] = useState( '' );
 
 	// Messages
-	const [ message, setMessage ] = useState( { type: '', text: '' } );
+	const [ message, setMessage ] = useState( {
+		type: '',
+		text: '',
+	} );
 
 	// Fetch data
 	const fetchData = useCallback( async () => {
 		setLoading( true );
 		try {
 			const [ settingsRes, statusRes ] = await Promise.all( [
-				apiFetch( { path: '/saman-seo/v1/ai/settings' } ),
-				apiFetch( { path: '/saman-seo/v1/ai/status' } ),
+				apiFetch( {
+					path: '/saman-seo/v1/ai/settings',
+				} ),
+				apiFetch( {
+					path: '/saman-seo/v1/ai/status',
+				} ),
 			] );
-
 			if ( settingsRes.success ) {
 				setSettings( ( prev ) => ( {
 					...prev,
@@ -55,13 +61,12 @@ const AiAssistant = () => {
 			console.error( 'Failed to fetch AI settings:', error );
 			setMessage( {
 				type: 'error',
-				text: 'Failed to load AI settings.',
+				text: __( 'Failed to load AI settings.', 'saman-seo' ),
 			} );
 		} finally {
 			setLoading( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		fetchData();
 	}, [ fetchData ] );
@@ -69,7 +74,10 @@ const AiAssistant = () => {
 	// Save prompt settings only
 	const handleSaveSettings = async () => {
 		setSaving( true );
-		setMessage( { type: '', text: '' } );
+		setMessage( {
+			type: '',
+			text: '',
+		} );
 		try {
 			const res = await apiFetch( {
 				path: '/saman-seo/v1/ai/settings',
@@ -80,16 +88,21 @@ const AiAssistant = () => {
 					ai_prompt_description: settings.ai_prompt_description,
 				},
 			} );
-
 			if ( res.success ) {
 				setMessage( {
 					type: 'success',
-					text: 'Prompt settings saved successfully!',
+					text: __(
+						'Prompt settings saved successfully!',
+						'saman-seo'
+					),
 				} );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save settings:', error );
-			setMessage( { type: 'error', text: 'Failed to save settings.' } );
+			setMessage( {
+				type: 'error',
+				text: __( 'Failed to save settings.', 'saman-seo' ),
+			} );
 		} finally {
 			setSaving( false );
 		}
@@ -97,18 +110,21 @@ const AiAssistant = () => {
 
 	// Reset to defaults
 	const handleReset = async () => {
-		if ( ! window.confirm( 'Reset prompts to defaults?' ) ) {
+		if (
+			! window.confirm( __( 'Reset prompts to defaults?', 'saman-seo' ) )
+		) {
 			return;
 		}
-
 		setResetting( true );
-		setMessage( { type: '', text: '' } );
+		setMessage( {
+			type: '',
+			text: '',
+		} );
 		try {
 			const res = await apiFetch( {
 				path: '/saman-seo/v1/ai/reset',
 				method: 'POST',
 			} );
-
 			if ( res.success ) {
 				setSettings( ( prev ) => ( {
 					...prev,
@@ -118,12 +134,15 @@ const AiAssistant = () => {
 				} ) );
 				setMessage( {
 					type: 'success',
-					text: 'Prompts restored to defaults.',
+					text: __( 'Prompts restored to defaults.', 'saman-seo' ),
 				} );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to reset settings:', error );
-			setMessage( { type: 'error', text: 'Failed to reset settings.' } );
+			setMessage( {
+				type: 'error',
+				text: __( 'Failed to reset settings.', 'saman-seo' ),
+			} );
 		} finally {
 			setResetting( false );
 		}
@@ -134,41 +153,54 @@ const AiAssistant = () => {
 		if ( ! testContent.trim() ) {
 			setMessage( {
 				type: 'error',
-				text: 'Please enter some content to analyze.',
+				text: __(
+					'Please enter some content to analyze.',
+					'saman-seo'
+				),
 			} );
 			return;
 		}
-
 		if ( ! apiStatus.configured ) {
 			setMessage( {
 				type: 'error',
-				text: 'Please configure WP AI Pilot to enable AI generation.',
+				text: __(
+					'Please configure WP AI Pilot to enable AI generation.',
+					'saman-seo'
+				),
 			} );
 			return;
 		}
-
 		setGenerating( true );
-		setMessage( { type: '', text: '' } );
+		setMessage( {
+			type: '',
+			text: '',
+		} );
 		setGeneratedTitle( '' );
 		setGeneratedDescription( '' );
-
 		try {
 			const res = await apiFetch( {
 				path: '/saman-seo/v1/ai/generate',
 				method: 'POST',
-				data: { content: testContent, type: 'both' },
+				data: {
+					content: testContent,
+					type: 'both',
+				},
 			} );
-
 			if ( res.success ) {
 				setGeneratedTitle( res.data.title || '' );
 				setGeneratedDescription( res.data.description || '' );
-				setMessage( { type: 'success', text: 'Generation complete!' } );
+				setMessage( {
+					type: 'success',
+					text: __( 'Generation complete!', 'saman-seo' ),
+				} );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to generate:', error );
 			setMessage( {
 				type: 'error',
-				text: error.message || 'Failed to generate content.',
+				text:
+					error.message ||
+					__( 'Failed to generate content.', 'saman-seo' ),
 			} );
 		} finally {
 			setGenerating( false );
@@ -186,27 +218,37 @@ const AiAssistant = () => {
 				return 'Not Configured';
 		}
 	};
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="page-header">
 					<div>
-						<h1>AI Assistant</h1>
-						<p>Configure AI-powered SEO content generation.</p>
+						<h1>{ __( 'AI Assistant', 'saman-seo' ) }</h1>
+						<p>
+							{ __(
+								'Configure AI-powered SEO content generation.',
+								'saman-seo'
+							) }
+						</p>
 					</div>
 				</div>
-				<div className="loading-state">Loading AI settings...</div>
+				<div className="loading-state">
+					{ __( 'Loading AI settings\u2026', 'saman-seo' ) }
+				</div>
 			</div>
 		);
 	}
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>AI Assistant</h1>
-					<p>Configure AI-powered SEO content generation.</p>
+					<h1>{ __( 'AI Assistant', 'saman-seo' ) }</h1>
+					<p>
+						{ __(
+							'Configure AI-powered SEO content generation.',
+							'saman-seo'
+						) }
+					</p>
 				</div>
 				<div className="header-actions">
 					<div
@@ -215,7 +257,9 @@ const AiAssistant = () => {
 						}` }
 					>
 						<span className="status-dot"></span>
-						{ apiStatus.configured ? 'Connected' : 'Not Connected' }
+						{ apiStatus.configured
+							? __( 'Connected', 'saman-seo' )
+							: __( 'Not Connected', 'saman-seo' ) }
 					</div>
 				</div>
 			</div>
@@ -232,7 +276,7 @@ const AiAssistant = () => {
 					{ /* AI Provider Status Card */ }
 					<div className="ai-card">
 						<div className="ai-card-header">
-							<h3>AI Provider</h3>
+							<h3>{ __( 'AI Provider', 'saman-seo' ) }</h3>
 							{ apiStatus.provider === 'wp-ai-pilot' && (
 								<span className="provider-badge provider-badge--active">
 									<svg
@@ -245,7 +289,7 @@ const AiAssistant = () => {
 									>
 										<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
 									</svg>
-									WP AI Pilot
+									{ __( 'WP AI Pilot', 'saman-seo' ) }
 								</span>
 							) }
 						</div>
@@ -266,11 +310,17 @@ const AiAssistant = () => {
 										</svg>
 									</div>
 									<div className="ai-provider-status__content">
-										<h4>Connected to WP AI Pilot</h4>
+										<h4>
+											{ __(
+												'Connected to WP AI Pilot',
+												'saman-seo'
+											) }
+										</h4>
 										<p>
-											AI features are powered by WP AI
-											Pilot. Manage your API keys and
-											models there.
+											{ __(
+												'AI features are powered by WP AI Pilot. Manage your API keys and models there.',
+												'saman-seo'
+											) }
 										</p>
 										<a
 											href={
@@ -280,7 +330,10 @@ const AiAssistant = () => {
 											}
 											className="button primary"
 										>
-											Open WP AI Pilot Settings
+											{ __(
+												'Open WP AI Pilot Settings',
+												'saman-seo'
+											) }
 										</a>
 									</div>
 								</div>
@@ -300,11 +353,17 @@ const AiAssistant = () => {
 										</svg>
 									</div>
 									<div className="ai-provider-status__content">
-										<h4>WP AI Pilot Needs Configuration</h4>
+										<h4>
+											{ __(
+												'WP AI Pilot Needs Configuration',
+												'saman-seo'
+											) }
+										</h4>
 										<p>
-											WP AI Pilot is installed but not
-											configured. Add an API key to enable
-											AI features.
+											{ __(
+												'WP AI Pilot is installed but not configured. Add an API key to enable AI features.',
+												'saman-seo'
+											) }
 										</p>
 										<a
 											href={
@@ -314,7 +373,10 @@ const AiAssistant = () => {
 											}
 											className="button primary"
 										>
-											Configure WP AI Pilot
+											{ __(
+												'Configure WP AI Pilot',
+												'saman-seo'
+											) }
 										</a>
 									</div>
 								</div>
@@ -333,18 +395,26 @@ const AiAssistant = () => {
 										</svg>
 									</div>
 									<div className="ai-provider-status__content">
-										<h4>Install WP AI Pilot</h4>
+										<h4>
+											{ __(
+												'Install WP AI Pilot',
+												'saman-seo'
+											) }
+										</h4>
 										<p>
-											AI features in Saman SEO are now
-											powered by WP AI Pilot. Install it
-											to enable AI-powered title and
-											description generation.
+											{ __(
+												'AI features in Saman SEO are now powered by WP AI Pilot. Install it to enable AI-powered title and description generation.',
+												'saman-seo'
+											) }
 										</p>
 										<a
 											href="plugin-install.php?s=wp+ai+pilot&tab=search"
 											className="button primary"
 										>
-											Install WP AI Pilot
+											{ __(
+												'Install WP AI Pilot',
+												'saman-seo'
+											) }
 										</a>
 									</div>
 								</div>
@@ -365,13 +435,16 @@ const AiAssistant = () => {
 								</svg>
 								<div>
 									<strong>
-										API Key Management Deprecated
+										{ __(
+											'API Key Management Deprecated',
+											'saman-seo'
+										) }
 									</strong>
 									<p>
-										Direct API key configuration has been
-										moved to WP AI Pilot. This provides
-										centralized AI management across all
-										your WordPress plugins.
+										{ __(
+											'Direct API key configuration has been moved to WP AI Pilot. This provides centralized AI management across all your WordPress plugins.',
+											'saman-seo'
+										) }
 									</p>
 								</div>
 							</div>
@@ -381,7 +454,9 @@ const AiAssistant = () => {
 					{ /* Prompts Card - Still functional */ }
 					<div className="ai-card">
 						<div className="ai-card-header">
-							<h3>Prompt Configuration</h3>
+							<h3>
+								{ __( 'Prompt Configuration', 'saman-seo' ) }
+							</h3>
 							<button
 								type="button"
 								className="link-button"
@@ -389,17 +464,20 @@ const AiAssistant = () => {
 								disabled={ resetting }
 							>
 								{ resetting
-									? 'Resetting...'
-									: 'Reset Defaults' }
+									? __( 'Resetting\u2026', 'saman-seo' )
+									: __( 'Reset Defaults', 'saman-seo' ) }
 							</button>
 						</div>
 						<div className="ai-card-body">
 							<div className="ai-prompts-stack">
 								<div className="ai-prompt-field">
 									<label htmlFor="system-prompt">
-										System Prompt
+										{ __( 'System Prompt', 'saman-seo' ) }
 										<span className="label-hint">
-											Base instructions for every request
+											{ __(
+												'Base instructions for every request',
+												'saman-seo'
+											) }
 										</span>
 									</label>
 									<textarea
@@ -413,15 +491,24 @@ const AiAssistant = () => {
 											} ) )
 										}
 										rows="2"
-										placeholder="You are an SEO assistant..."
+										placeholder={ __(
+											'You are an SEO assistant\u2026',
+											'saman-seo'
+										) }
 									/>
 								</div>
 								<div className="ai-prompts-row">
 									<div className="ai-prompt-field">
 										<label htmlFor="title-prompt">
-											Title Prompt
+											{ __(
+												'Title Prompt',
+												'saman-seo'
+											) }
 											<span className="label-hint">
-												How to craft titles
+												{ __(
+													'How to craft titles',
+													'saman-seo'
+												) }
 											</span>
 										</label>
 										<textarea
@@ -435,14 +522,23 @@ const AiAssistant = () => {
 												} ) )
 											}
 											rows="2"
-											placeholder="Write an SEO meta title..."
+											placeholder={ __(
+												'Write an SEO meta title\u2026',
+												'saman-seo'
+											) }
 										/>
 									</div>
 									<div className="ai-prompt-field">
 										<label htmlFor="desc-prompt">
-											Description Prompt
+											{ __(
+												'Description Prompt',
+												'saman-seo'
+											) }
 											<span className="label-hint">
-												How to craft descriptions
+												{ __(
+													'How to craft descriptions',
+													'saman-seo'
+												) }
 											</span>
 										</label>
 										<textarea
@@ -458,7 +554,10 @@ const AiAssistant = () => {
 												} ) )
 											}
 											rows="2"
-											placeholder="Write a meta description..."
+											placeholder={ __(
+												'Write a meta description\u2026',
+												'saman-seo'
+											) }
 										/>
 									</div>
 								</div>
@@ -472,8 +571,11 @@ const AiAssistant = () => {
 								disabled={ saving }
 							>
 								{ saving
-									? 'Saving...'
-									: 'Save Prompt Settings' }
+									? __( 'Saving\u2026', 'saman-seo' )
+									: __(
+											'Save Prompt Settings',
+											'saman-seo'
+									  ) }
 							</button>
 						</div>
 					</div>
@@ -484,11 +586,12 @@ const AiAssistant = () => {
 					{ /* Test Generation */ }
 					<div className="ai-card ai-test-card">
 						<div className="ai-card-header">
-							<h3>Test Generation</h3>
+							<h3>{ __( 'Test Generation', 'saman-seo' ) }</h3>
 							{ apiStatus.provider &&
 								apiStatus.provider !== 'none' && (
 									<span className="provider-tag">
-										via { getProviderName() }
+										{ __( 'via', 'saman-seo' ) }{ ' ' }
+										{ getProviderName() }
 									</span>
 								) }
 						</div>
@@ -500,7 +603,10 @@ const AiAssistant = () => {
 										setTestContent( e.target.value )
 									}
 									rows="4"
-									placeholder="Paste content here to test AI generation. Provide at least 100 words for best results..."
+									placeholder={ __(
+										'Paste content here to test AI generation. Provide at least 100 words for best results\u2026',
+										'saman-seo'
+									) }
 									disabled={ ! apiStatus.configured }
 								/>
 								<button
@@ -514,10 +620,13 @@ const AiAssistant = () => {
 									{ generating ? (
 										<>
 											<span className="spinner"></span>
-											Generating...
+											{ __(
+												'Generating\u2026',
+												'saman-seo'
+											) }
 										</>
 									) : (
-										'Generate'
+										__( 'Generate', 'saman-seo' )
 									) }
 								</button>
 							</div>
@@ -525,8 +634,10 @@ const AiAssistant = () => {
 							{ ! apiStatus.configured && (
 								<div className="ai-test-disabled-notice">
 									<p>
-										Configure WP AI Pilot to test AI
-										generation.
+										{ __(
+											'Configure WP AI Pilot to test AI generation.',
+											'saman-seo'
+										) }
 									</p>
 								</div>
 							) }
@@ -537,11 +648,17 @@ const AiAssistant = () => {
 										<div className="ai-result-item">
 											<div className="ai-result-header">
 												<span className="ai-result-label">
-													Title
+													{ __(
+														'Title',
+														'saman-seo'
+													) }
 												</span>
 												<span className="ai-result-count">
 													{ generatedTitle.length }{ ' ' }
-													chars
+													{ __(
+														'chars',
+														'saman-seo'
+													) }
 												</span>
 											</div>
 											<div className="ai-result-value">
@@ -553,13 +670,19 @@ const AiAssistant = () => {
 										<div className="ai-result-item">
 											<div className="ai-result-header">
 												<span className="ai-result-label">
-													Description
+													{ __(
+														'Description',
+														'saman-seo'
+													) }
 												</span>
 												<span className="ai-result-count">
 													{
 														generatedDescription.length
 													}{ ' ' }
-													chars
+													{ __(
+														'chars',
+														'saman-seo'
+													) }
 												</span>
 											</div>
 											<div className="ai-result-value">
@@ -592,10 +715,14 @@ const AiAssistant = () => {
 								</svg>
 							</div>
 							<div className="ai-info-content">
-								<strong>Unified AI Platform</strong>
+								<strong>
+									{ __( 'Unified AI Platform', 'saman-seo' ) }
+								</strong>
 								<p>
-									WP AI Pilot manages AI for all your plugins
-									in one place
+									{ __(
+										'WP AI Pilot manages AI for all your plugins in one place',
+										'saman-seo'
+									) }
 								</p>
 							</div>
 						</div>
@@ -617,10 +744,14 @@ const AiAssistant = () => {
 								</svg>
 							</div>
 							<div className="ai-info-content">
-								<strong>Privacy First</strong>
+								<strong>
+									{ __( 'Privacy First', 'saman-seo' ) }
+								</strong>
 								<p>
-									API keys stored locally, nothing saved
-									externally
+									{ __(
+										'API keys stored locally, nothing saved externally',
+										'saman-seo'
+									) }
 								</p>
 							</div>
 						</div>
@@ -642,10 +773,14 @@ const AiAssistant = () => {
 								</svg>
 							</div>
 							<div className="ai-info-content">
-								<strong>Multiple Providers</strong>
+								<strong>
+									{ __( 'Multiple Providers', 'saman-seo' ) }
+								</strong>
 								<p>
-									OpenAI, Anthropic, Google AI, and more via
-									WP AI Pilot
+									{ __(
+										'OpenAI, Anthropic, Google AI, and more via WP AI Pilot',
+										'saman-seo'
+									) }
 								</p>
 							</div>
 						</div>
@@ -655,5 +790,4 @@ const AiAssistant = () => {
 		</div>
 	);
 };
-
 export default AiAssistant;

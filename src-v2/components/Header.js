@@ -1,22 +1,39 @@
 import { useState, useRef } from 'react';
 import { popularTools } from '../pages/Tools';
-
+import { __ } from '@wordpress/i18n';
 const navItems = [
-	{ id: 'dashboard', label: 'Dashboard' },
-	{ id: 'search-appearance', label: 'Search Appearance' },
-	{ id: 'sitemap', label: 'Sitemap' },
-	{ id: 'tools', label: 'Tools', hasMegaMenu: true },
-	{ id: 'settings', label: 'Settings' },
-	{ id: 'more', label: 'More' },
+	{
+		id: 'dashboard',
+		label: __( 'Dashboard', 'saman-seo' ),
+	},
+	{
+		id: 'search-appearance',
+		label: __( 'Search Appearance', 'saman-seo' ),
+	},
+	{
+		id: 'sitemap',
+		label: __( 'Sitemap', 'saman-seo' ),
+	},
+	{
+		id: 'tools',
+		label: __( 'Tools', 'saman-seo' ),
+		hasMegaMenu: true,
+	},
+	{
+		id: 'settings',
+		label: __( 'Settings', 'saman-seo' ),
+	},
+	{
+		id: 'more',
+		label: __( 'More', 'saman-seo' ),
+	},
 ];
 
 // Top 4 tools shown in the mega menu preview + a "more" entry.
 const megaMenuTools = popularTools.slice( 0, 4 );
-
 const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 	const [ megaOpen, setMegaOpen ] = useState( false );
 	const megaTimeout = useRef( null );
-
 	const openMega = () => {
 		if ( megaTimeout.current ) {
 			clearTimeout( megaTimeout.current );
@@ -24,7 +41,6 @@ const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 		}
 		setMegaOpen( true );
 	};
-
 	const closeMega = () => {
 		// Small delay prevents the menu from snapping shut when moving
 		// the cursor from the tab to the panel.
@@ -32,17 +48,14 @@ const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 			setMegaOpen( false );
 		}, 120 );
 	};
-
 	const handleNavClick = ( item ) => {
 		setMegaOpen( false );
 		onNavigate( item.id );
 	};
-
 	const handleToolClick = ( toolId ) => {
 		setMegaOpen( false );
 		onNavigate( toolId );
 	};
-
 	return (
 		<header className="top-bar">
 			<div className="brand">
@@ -60,9 +73,14 @@ const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 						<path d="M1032.27,1708.49c-8.34-12.18-12.95-27.87-7.29-41.4,3.62-8.64,11.57-15.25,17.95-21.98l57.64-60.7,91.89-95.92c.91-.95,4.39-3.67,5.19-2.7s2.27,4.21,2.27,5.91l.03,350.17c-43.86-16.17-87.21-49.17-119.56-78.46-18.32-16.58-33.8-34-48.12-54.92Z" />
 					</svg>
 				</span>
-				<span className="brand-name">Saman SEO</span>
+				<span className="brand-name">
+					{ __( 'Saman SEO', 'saman-seo' ) }
+				</span>
 			</div>
-			<nav className="main-nav" aria-label="Primary">
+			<nav
+				className="main-nav"
+				aria-label={ __( 'Primary', 'saman-seo' ) }
+			>
 				{ navItems.map( ( item ) => (
 					<div
 						key={ item.id }
@@ -165,7 +183,7 @@ const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 											handleToolClick( 'tools' )
 										}
 									>
-										View all tools
+										{ __( 'View all tools', 'saman-seo' ) }
 										<svg
 											width="14"
 											height="14"
@@ -191,7 +209,7 @@ const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 					href="https://github.com/SamanLabs/Saman-SEO"
 					target="_blank"
 					rel="noreferrer"
-					aria-label="Open GitHub repository"
+					aria-label={ __( 'Open GitHub repository', 'saman-seo' ) }
 				>
 					<svg viewBox="0 0 24 24" role="img" focusable="false">
 						<path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.6 2.9 8.5 6.9 9.9.5.1.7-.2.7-.5v-1.9c-2.8.6-3.3-1.2-3.3-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.7 1.7 2.6 1.2.1-.8.4-1.2.7-1.5-2.2-.2-4.5-1.2-4.5-5.2 0-1.1.4-2 1-2.7-.1-.2-.4-1.3.1-2.7 0 0 .8-.2 2.7 1a9.2 9.2 0 0 1 4.9 0c1.9-1.2 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7.6.7 1 1.6 1 2.7 0 4-2.3 5-4.5 5.2.4.3.8 1 .8 2.1v3c0 .3.2.6.7.5 4-1.4 6.9-5.3 6.9-9.9C22 6.6 17.5 2 12 2z" />
@@ -201,5 +219,4 @@ const Header = ( { currentView, onNavigate, onPrefetch } ) => {
 		</header>
 	);
 };
-
 export default Header;

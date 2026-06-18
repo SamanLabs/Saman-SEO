@@ -2,14 +2,18 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import CreateRedirectModal from '../components/CreateRedirectModal';
 import IgnorePatternManager from '../components/IgnorePatternManager';
-
+import { __ } from '@wordpress/i18n';
 const SORT_OPTIONS = [
-	{ value: 'recent', label: 'Most recent' },
-	{ value: 'top', label: 'Top hits' },
+	{
+		value: 'recent',
+		label: __( 'Most recent', 'saman-seo' ),
+	},
+	{
+		value: 'top',
+		label: __( 'Top hits', 'saman-seo' ),
+	},
 ];
-
 const PER_PAGE_OPTIONS = [ 25, 50, 100, 200 ];
-
 const Log404 = ( { onNavigate } ) => {
 	// 404 Log state
 	const [ logEntries, setLogEntries ] = useState( [] );
@@ -96,7 +100,10 @@ const Log404 = ( { onNavigate } ) => {
 			setLogEntries( ( prev ) =>
 				prev.map( ( e ) =>
 					e.request_uri === data.redirect.source
-						? { ...e, redirect_exists: true }
+						? {
+								...e,
+								redirect_exists: true,
+						  }
 						: e
 				)
 			);
@@ -109,12 +116,14 @@ const Log404 = ( { onNavigate } ) => {
 	const handleClearLog = async () => {
 		if (
 			! window.confirm(
-				'Are you sure you want to clear the entire 404 log? This cannot be undone.'
+				__(
+					'Are you sure you want to clear the entire 404 log? This cannot be undone.',
+					'saman-seo'
+				)
 			)
 		) {
 			return;
 		}
-
 		setClearingLog( true );
 		try {
 			await apiFetch( {
@@ -137,14 +146,12 @@ const Log404 = ( { onNavigate } ) => {
 		if ( ! showExportMenu ) {
 			return;
 		}
-
 		const handleClickOutside = ( event ) => {
 			const wrapper = document.querySelector( '.log-export-dropdown' );
 			if ( wrapper && ! wrapper.contains( event.target ) ) {
 				setShowExportMenu( false );
 			}
 		};
-
 		document.addEventListener( 'mousedown', handleClickOutside );
 		return () =>
 			document.removeEventListener( 'mousedown', handleClickOutside );
@@ -196,7 +203,12 @@ const Log404 = ( { onNavigate } ) => {
 			// Update the entry in the list
 			setLogEntries( ( prev ) =>
 				prev.map( ( e ) =>
-					e.id === entry.id ? { ...e, is_ignored: true } : e
+					e.id === entry.id
+						? {
+								...e,
+								is_ignored: true,
+						  }
+						: e
 				)
 			);
 			setIgnoredCount( ( prev ) => prev + 1 );
@@ -225,7 +237,12 @@ const Log404 = ( { onNavigate } ) => {
 			// Update the entry in the list
 			setLogEntries( ( prev ) =>
 				prev.map( ( e ) =>
-					e.id === entry.id ? { ...e, is_ignored: false } : e
+					e.id === entry.id
+						? {
+								...e,
+								is_ignored: false,
+						  }
+						: e
 				)
 			);
 			setIgnoredCount( ( prev ) => Math.max( 0, prev - 1 ) );
@@ -249,14 +266,16 @@ const Log404 = ( { onNavigate } ) => {
 			} )
 		);
 	};
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>404 Log</h1>
+					<h1>{ __( '404 Log', 'saman-seo' ) }</h1>
 					<p>
-						Monitor broken links and create redirects to fix them.
+						{ __(
+							'Monitor broken links and create redirects to fix them.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="header-actions">
@@ -265,7 +284,7 @@ const Log404 = ( { onNavigate } ) => {
 						className="button"
 						onClick={ () => setShowIgnoreManager( true ) }
 					>
-						Manage Ignore Patterns
+						{ __( 'Manage Ignore Patterns', 'saman-seo' ) }
 					</button>
 					<div
 						className={ `dropdown log-export-dropdown ${
@@ -282,7 +301,9 @@ const Log404 = ( { onNavigate } ) => {
 							aria-expanded={ showExportMenu }
 							aria-haspopup="true"
 						>
-							{ exporting ? 'Exporting...' : 'Export' }
+							{ exporting
+								? __( 'Exporting\u2026', 'saman-seo' )
+								: __( 'Export', 'saman-seo' ) }
 							<svg
 								className="dropdown__chevron"
 								viewBox="0 0 20 20"
@@ -303,14 +324,14 @@ const Log404 = ( { onNavigate } ) => {
 								className="dropdown-menu__item"
 								onClick={ () => handleExport( 'csv' ) }
 							>
-								Export as CSV
+								{ __( 'Export as CSV', 'saman-seo' ) }
 							</button>
 							<button
 								type="button"
 								className="dropdown-menu__item"
 								onClick={ () => handleExport( 'json' ) }
 							>
-								Export as JSON
+								{ __( 'Export as JSON', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
@@ -320,7 +341,9 @@ const Log404 = ( { onNavigate } ) => {
 						onClick={ handleClearLog }
 						disabled={ clearingLog || logEntries.length === 0 }
 					>
-						{ clearingLog ? 'Clearing...' : 'Clear Log' }
+						{ clearingLog
+							? __( 'Clearing\u2026', 'saman-seo' )
+							: __( 'Clear Log', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -335,7 +358,7 @@ const Log404 = ( { onNavigate } ) => {
 									{ logTotal.toLocaleString() }
 								</span>
 								<span className="stat-list__label">
-									Total entries
+									{ __( 'Total entries', 'saman-seo' ) }
 								</span>
 							</div>
 							<div className="stat-list__item">
@@ -347,7 +370,7 @@ const Log404 = ( { onNavigate } ) => {
 									}
 								</span>
 								<span className="stat-list__label">
-									Need redirect
+									{ __( 'Need redirect', 'saman-seo' ) }
 								</span>
 							</div>
 							<div className="stat-list__item">
@@ -355,7 +378,7 @@ const Log404 = ( { onNavigate } ) => {
 									{ botCount.toLocaleString() }
 								</span>
 								<span className="stat-list__label">
-									Bot hits
+									{ __( 'Bot hits', 'saman-seo' ) }
 								</span>
 							</div>
 							<div className="stat-list__item">
@@ -363,14 +386,14 @@ const Log404 = ( { onNavigate } ) => {
 									{ ignoredCount.toLocaleString() }
 								</span>
 								<span className="stat-list__label">
-									Ignored
+									{ __( 'Ignored', 'saman-seo' ) }
 								</span>
 							</div>
 						</div>
 					</div>
 					<div className="page-toolbar__filters">
 						<label className="filter-field">
-							<span>Sort by</span>
+							<span>{ __( 'Sort by', 'saman-seo' ) }</span>
 							<select
 								value={ logSort }
 								onChange={ ( e ) => {
@@ -389,7 +412,7 @@ const Log404 = ( { onNavigate } ) => {
 							</select>
 						</label>
 						<label className="filter-field">
-							<span>Rows</span>
+							<span>{ __( 'Rows', 'saman-seo' ) }</span>
 							<select
 								value={ logPerPage }
 								onChange={ ( e ) => {
@@ -415,7 +438,7 @@ const Log404 = ( { onNavigate } ) => {
 									setLogPage( 1 );
 								} }
 							/>
-							<span>Hide spam</span>
+							<span>{ __( 'Hide spam', 'saman-seo' ) }</span>
 						</label>
 						<label className="filter-checkbox">
 							<input
@@ -426,7 +449,7 @@ const Log404 = ( { onNavigate } ) => {
 									setLogPage( 1 );
 								} }
 							/>
-							<span>Hide images</span>
+							<span>{ __( 'Hide images', 'saman-seo' ) }</span>
 						</label>
 						<label className="filter-checkbox">
 							<input
@@ -437,7 +460,7 @@ const Log404 = ( { onNavigate } ) => {
 									setLogPage( 1 );
 								} }
 							/>
-							<span>Hide bots</span>
+							<span>{ __( 'Hide bots', 'saman-seo' ) }</span>
 						</label>
 						<label className="filter-checkbox">
 							<input
@@ -448,14 +471,16 @@ const Log404 = ( { onNavigate } ) => {
 									setLogPage( 1 );
 								} }
 							/>
-							<span>Show ignored</span>
+							<span>{ __( 'Show ignored', 'saman-seo' ) }</span>
 						</label>
 					</div>
 				</div>
 
 				{ /* 404 Log Table */ }
 				{ logLoading ? (
-					<div className="loading-state">Loading 404 log...</div>
+					<div className="loading-state">
+						{ __( 'Loading 404 log\u2026', 'saman-seo' ) }
+					</div>
 				) : logEntries.length === 0 ? (
 					<div className="empty-state">
 						<div className="empty-state__icon">
@@ -471,10 +496,12 @@ const Log404 = ( { onNavigate } ) => {
 								<path d="M9 9l6 6m0-6l-6 6" />
 							</svg>
 						</div>
-						<h3>No 404 errors logged</h3>
+						<h3>{ __( 'No 404 errors logged', 'saman-seo' ) }</h3>
 						<p>
-							Great news! Your site doesn't have any broken links
-							recorded yet.
+							{ __(
+								"Great news! Your site doesn't have any broken links recorded yet.",
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				) : (
@@ -483,11 +510,21 @@ const Log404 = ( { onNavigate } ) => {
 							<table className="data-table data-table--compact">
 								<thead>
 									<tr>
-										<th className="col-url">Request URL</th>
-										<th className="col-numeric">Hits</th>
-										<th className="col-date">Last seen</th>
-										<th className="col-device">Device</th>
-										<th className="col-actions">Action</th>
+										<th className="col-url">
+											{ __( 'Request URL', 'saman-seo' ) }
+										</th>
+										<th className="col-numeric">
+											{ __( 'Hits', 'saman-seo' ) }
+										</th>
+										<th className="col-date">
+											{ __( 'Last seen', 'saman-seo' ) }
+										</th>
+										<th className="col-device">
+											{ __( 'Device', 'saman-seo' ) }
+										</th>
+										<th className="col-actions">
+											{ __( 'Action', 'saman-seo' ) }
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -514,24 +551,19 @@ const Log404 = ( { onNavigate } ) => {
 												<span className="url-cell__badges">
 													{ entry.redirect_exists && (
 														<span className="badge success">
-															Redirect exists
+															{ __(
+																'Redirect exists',
+																'saman-seo'
+															) }
 														</span>
 													) }
-													{ entry.is_bot && (
-														<span
-															className="badge muted"
-															title="Bot/crawler request"
-														>
-															Bot
-														</span>
+													{ __(
+														'Bot/crawler request',
+														'saman-seo'
 													) }
-													{ entry.is_ignored && (
-														<span
-															className="badge warning"
-															title="This URL is ignored"
-														>
-															Ignored
-														</span>
+													{ __(
+														'This URL is ignored',
+														'saman-seo'
 													) }
 												</span>
 											</td>
@@ -561,59 +593,13 @@ const Log404 = ( { onNavigate } ) => {
 											</td>
 											<td className="action-cell">
 												<div className="table-actions">
-													{ ! entry.redirect_exists && (
-														<button
-															type="button"
-															className="table-actions__primary"
-															onClick={ () =>
-																handleCreateFrom404(
-																	entry
-																)
-															}
-															title="Create redirect"
-														>
-															Redirect
-														</button>
+													{ __(
+														'Create redirect',
+														'saman-seo'
 													) }
-													{ entry.is_ignored ? (
-														<button
-															type="button"
-															className="table-actions__secondary"
-															onClick={ () =>
-																handleUnignoreEntry(
-																	entry
-																)
-															}
-															disabled={
-																ignoringEntry ===
-																entry.id
-															}
-														>
-															{ ignoringEntry ===
-															entry.id
-																? '...'
-																: 'Unignore' }
-														</button>
-													) : (
-														<button
-															type="button"
-															className="table-actions__secondary"
-															onClick={ () =>
-																handleIgnoreEntry(
-																	entry
-																)
-															}
-															disabled={
-																ignoringEntry ===
-																entry.id
-															}
-															title="Ignore this URL"
-														>
-															{ ignoringEntry ===
-															entry.id
-																? '...'
-																: 'Ignore' }
-														</button>
+													{ __(
+														'Ignore this URL',
+														'saman-seo'
 													) }
 												</div>
 											</td>
@@ -628,7 +614,9 @@ const Log404 = ( { onNavigate } ) => {
 							<div className="pagination">
 								<span className="pagination-info">
 									{ logTotal.toLocaleString() }{ ' ' }
-									{ logTotal === 1 ? 'item' : 'items' }
+									{ logTotal === 1
+										? __( 'item', 'saman-seo' )
+										: __( 'items', 'saman-seo' ) }
 								</span>
 								<div className="pagination-links">
 									<button
@@ -639,10 +627,11 @@ const Log404 = ( { onNavigate } ) => {
 											setLogPage( logPage - 1 )
 										}
 									>
-										&lsaquo; Previous
+										{ __( '\u2039 Previous', 'saman-seo' ) }
 									</button>
 									<span className="pagination-current">
-										{ logPage } of { logTotalPages }
+										{ logPage } { __( 'of', 'saman-seo' ) }{ ' ' }
+										{ logTotalPages }
 									</span>
 									<button
 										type="button"
@@ -652,7 +641,7 @@ const Log404 = ( { onNavigate } ) => {
 											setLogPage( logPage + 1 )
 										}
 									>
-										Next &rsaquo;
+										{ __( 'Next \u203A', 'saman-seo' ) }
 									</button>
 								</div>
 							</div>
@@ -680,5 +669,4 @@ const Log404 = ( { onNavigate } ) => {
 		</div>
 	);
 };
-
 export default Log404;

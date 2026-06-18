@@ -23,7 +23,7 @@ const SchemaPreview = ( { jsonLd, loading, error } ) => {
 		return (
 			<div className="saman-seo-schema-preview saman-seo-schema-preview--loading">
 				<Spinner />
-				<span>{ __( 'Loading preview...', 'saman-seo' ) }</span>
+				<span>{ __( 'Loading preview…', 'saman-seo' ) }</span>
 			</div>
 		);
 	}

@@ -1,12 +1,20 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __ } from '@wordpress/i18n';
 const TAB_OPTIONS = [
-	{ value: 'overview', label: 'Overview' },
-	{ value: 'broken', label: 'Broken Links' },
-	{ value: 'orphans', label: 'Orphan Pages' },
+	{
+		value: 'overview',
+		label: __( 'Overview', 'saman-seo' ),
+	},
+	{
+		value: 'broken',
+		label: __( 'Broken Links', 'saman-seo' ),
+	},
+	{
+		value: 'orphans',
+		label: __( 'Orphan Pages', 'saman-seo' ),
+	},
 ];
-
 const LinkHealth = () => {
 	const [ activeTab, setActiveTab ] = useState( 'overview' );
 	const [ loading, setLoading ] = useState( true );
@@ -71,7 +79,10 @@ const LinkHealth = () => {
 	const fetchOrphanPages = useCallback( async ( page = 1 ) => {
 		setLoading( true );
 		try {
-			const params = new URLSearchParams( { page, per_page: 50 } );
+			const params = new URLSearchParams( {
+				page,
+				per_page: 50,
+			} );
 			const res = await apiFetch( {
 				path: `/saman-seo/v1/link-health/orphans?${ params }`,
 			} );
@@ -139,7 +150,9 @@ const LinkHealth = () => {
 			await apiFetch( {
 				path: '/saman-seo/v1/link-health/scan',
 				method: 'POST',
-				data: { type: 'full' },
+				data: {
+					type: 'full',
+				},
 			} );
 			checkScanStatus();
 		} catch ( error ) {
@@ -172,7 +185,10 @@ const LinkHealth = () => {
 	const handleDeleteLink = async ( linkId ) => {
 		if (
 			! window.confirm(
-				'Remove this link from the report? This will not remove the actual link from your content.'
+				__(
+					'Remove this link from the report? This will not remove the actual link from your content.',
+					'saman-seo'
+				)
 			)
 		) {
 			return;
@@ -209,13 +225,17 @@ const LinkHealth = () => {
 		if ( score >= 70 ) return 'warning';
 		return 'danger';
 	};
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Link Health</h1>
-					<p>Monitor and fix broken links across your site.</p>
+					<h1>{ __( 'Link Health', 'saman-seo' ) }</h1>
+					<p>
+						{ __(
+							'Monitor and fix broken links across your site.',
+							'saman-seo'
+						) }
+					</p>
 				</div>
 				<div className="header-actions">
 					<button
@@ -224,7 +244,9 @@ const LinkHealth = () => {
 						onClick={ handleStartScan }
 						disabled={ scanning }
 					>
-						{ scanning ? 'Scanning...' : 'Run Full Scan' }
+						{ scanning
+							? __( 'Scanning\u2026', 'saman-seo' )
+							: __( 'Run Full Scan', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -234,7 +256,8 @@ const LinkHealth = () => {
 				<div className="scan-progress">
 					<div className="scan-progress__info">
 						<span>
-							Scanning posts... { scanStatus.scanned_posts } /{ ' ' }
+							{ __( 'Scanning posts\u2026', 'saman-seo' ) }{ ' ' }
+							{ scanStatus.scanned_posts } /{ ' ' }
 							{ scanStatus.total_posts }
 						</span>
 					</div>
@@ -285,7 +308,9 @@ const LinkHealth = () => {
 			{ activeTab === 'overview' && (
 				<section className="panel">
 					{ ! summary ? (
-						<div className="loading-state">Loading summary...</div>
+						<div className="loading-state">
+							{ __( 'Loading summary\u2026', 'saman-seo' ) }
+						</div>
 					) : (
 						<>
 							{ /* Health Score */ }
@@ -299,20 +324,32 @@ const LinkHealth = () => {
 										{ summary.health_score }%
 									</span>
 									<span className="health-score__label">
-										Link Health Score
+										{ __(
+											'Link Health Score',
+											'saman-seo'
+										) }
 									</span>
 								</div>
 								<div className="health-score__info">
 									<p>
 										{ summary.health_score >= 90
-											? 'Excellent! Your links are in great shape.'
+											? __(
+													'Excellent! Your links are in great shape.',
+													'saman-seo'
+											  )
 											: summary.health_score >= 70
-											? 'Good, but there are some issues to address.'
-											: 'Needs attention. Multiple broken links detected.' }
+											? __(
+													'Good, but there are some issues to address.',
+													'saman-seo'
+											  )
+											: __(
+													'Needs attention. Multiple broken links detected.',
+													'saman-seo'
+											  ) }
 									</p>
 									{ summary.last_scan && (
 										<span className="muted">
-											Last scan:{ ' ' }
+											{ __( 'Last scan:', 'saman-seo' ) }{ ' ' }
 											{ formatDate( summary.last_scan ) }
 										</span>
 									) }
@@ -326,7 +363,7 @@ const LinkHealth = () => {
 										{ summary.total_links.toLocaleString() }
 									</span>
 									<span className="stat-card__label">
-										Total Links
+										{ __( 'Total Links', 'saman-seo' ) }
 									</span>
 								</div>
 								<div className="stat-card danger">
@@ -334,7 +371,7 @@ const LinkHealth = () => {
 										{ summary.broken_links.toLocaleString() }
 									</span>
 									<span className="stat-card__label">
-										Broken Links
+										{ __( 'Broken Links', 'saman-seo' ) }
 									</span>
 								</div>
 								<div className="stat-card warning">
@@ -342,7 +379,7 @@ const LinkHealth = () => {
 										{ summary.redirects.toLocaleString() }
 									</span>
 									<span className="stat-card__label">
-										Redirects
+										{ __( 'Redirects', 'saman-seo' ) }
 									</span>
 								</div>
 								<div className="stat-card">
@@ -350,7 +387,7 @@ const LinkHealth = () => {
 										{ summary.internal.toLocaleString() }
 									</span>
 									<span className="stat-card__label">
-										Internal Links
+										{ __( 'Internal Links', 'saman-seo' ) }
 									</span>
 								</div>
 								<div className="stat-card">
@@ -358,7 +395,7 @@ const LinkHealth = () => {
 										{ summary.external.toLocaleString() }
 									</span>
 									<span className="stat-card__label">
-										External Links
+										{ __( 'External Links', 'saman-seo' ) }
 									</span>
 								</div>
 								<div className="stat-card warning">
@@ -366,7 +403,7 @@ const LinkHealth = () => {
 										{ summary.orphan_pages.toLocaleString() }
 									</span>
 									<span className="stat-card__label">
-										Orphan Pages
+										{ __( 'Orphan Pages', 'saman-seo' ) }
 									</span>
 								</div>
 							</div>
@@ -375,7 +412,12 @@ const LinkHealth = () => {
 							{ ( summary.broken_links > 0 ||
 								summary.orphan_pages > 0 ) && (
 								<div className="quick-actions">
-									<h3>Recommended Actions</h3>
+									<h3>
+										{ __(
+											'Recommended Actions',
+											'saman-seo'
+										) }
+									</h3>
 									{ summary.broken_links > 0 && (
 										<button
 											type="button"
@@ -389,15 +431,21 @@ const LinkHealth = () => {
 											</span>
 											<div className="action-card__content">
 												<strong>
-													Fix { summary.broken_links }{ ' ' }
-													broken link
+													{ __( 'Fix', 'saman-seo' ) }{ ' ' }
+													{ summary.broken_links }{ ' ' }
+													{ __(
+														'broken link',
+														'saman-seo'
+													) }
 													{ summary.broken_links !== 1
 														? 's'
 														: '' }
 												</strong>
 												<span>
-													Update or remove links that
-													return errors
+													{ __(
+														'Update or remove links that return errors',
+														'saman-seo'
+													) }
 												</span>
 											</div>
 										</button>
@@ -415,16 +463,24 @@ const LinkHealth = () => {
 											</span>
 											<div className="action-card__content">
 												<strong>
-													Link to{ ' ' }
+													{ __(
+														'Link to',
+														'saman-seo'
+													) }{ ' ' }
 													{ summary.orphan_pages }{ ' ' }
-													orphan page
+													{ __(
+														'orphan page',
+														'saman-seo'
+													) }
 													{ summary.orphan_pages !== 1
 														? 's'
 														: '' }
 												</strong>
 												<span>
-													Pages with no internal links
-													pointing to them
+													{ __(
+														'Pages with no internal links pointing to them',
+														'saman-seo'
+													) }
 												</span>
 											</div>
 										</button>
@@ -440,22 +496,24 @@ const LinkHealth = () => {
 			{ activeTab === 'broken' && (
 				<section className="panel">
 					<div className="panel-header">
-						<h3>Broken Links</h3>
+						<h3>{ __( 'Broken Links', 'saman-seo' ) }</h3>
 						<div className="filter-row">
 							<label className="filter-field">
-								<span>Type</span>
+								<span>{ __( 'Type', 'saman-seo' ) }</span>
 								<select
 									value={ linkTypeFilter }
 									onChange={ ( e ) =>
 										setLinkTypeFilter( e.target.value )
 									}
 								>
-									<option value="">All Links</option>
+									<option value="">
+										{ __( 'All Links', 'saman-seo' ) }
+									</option>
 									<option value="internal">
-										Internal Only
+										{ __( 'Internal Only', 'saman-seo' ) }
 									</option>
 									<option value="external">
-										External Only
+										{ __( 'External Only', 'saman-seo' ) }
 									</option>
 								</select>
 							</label>
@@ -464,7 +522,7 @@ const LinkHealth = () => {
 
 					{ loading ? (
 						<div className="loading-state">
-							Loading broken links...
+							{ __( 'Loading broken links\u2026', 'saman-seo' ) }
 						</div>
 					) : brokenLinks.items.length === 0 ? (
 						<div className="empty-state">
@@ -481,19 +539,34 @@ const LinkHealth = () => {
 									<path d="M9 12l2 2 4-4" />
 								</svg>
 							</div>
-							<h3>No broken links found</h3>
-							<p>All your links are working correctly.</p>
+							<h3>
+								{ __( 'No broken links found', 'saman-seo' ) }
+							</h3>
+							<p>
+								{ __(
+									'All your links are working correctly.',
+									'saman-seo'
+								) }
+							</p>
 						</div>
 					) : (
 						<>
 							<table className="data-table">
 								<thead>
 									<tr>
-										<th>Source Page</th>
-										<th>Broken URL</th>
-										<th>Link Text</th>
-										<th>Status</th>
-										<th>Actions</th>
+										<th>
+											{ __( 'Source Page', 'saman-seo' ) }
+										</th>
+										<th>
+											{ __( 'Broken URL', 'saman-seo' ) }
+										</th>
+										<th>
+											{ __( 'Link Text', 'saman-seo' ) }
+										</th>
+										<th>{ __( 'Status', 'saman-seo' ) }</th>
+										<th>
+											{ __( 'Actions', 'saman-seo' ) }
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -506,7 +579,10 @@ const LinkHealth = () => {
 													rel="noopener noreferrer"
 												>
 													{ link.source_title ||
-														'Untitled' }
+														__(
+															'Untitled',
+															'saman-seo'
+														) }
 												</a>
 											</td>
 											<td className="url-cell">
@@ -526,7 +602,10 @@ const LinkHealth = () => {
 											<td>
 												<span className="badge danger">
 													{ link.http_code ||
-														'Error' }
+														__(
+															'Error',
+															'saman-seo'
+														) }
 												</span>
 												{ link.error_message && (
 													<span
@@ -551,7 +630,10 @@ const LinkHealth = () => {
 														target="_blank"
 														rel="noopener noreferrer"
 													>
-														Edit
+														{ __(
+															'Edit',
+															'saman-seo'
+														) }
 													</a>
 													<button
 														type="button"
@@ -569,7 +651,10 @@ const LinkHealth = () => {
 														{ recheckingId ===
 														link.id
 															? '...'
-															: 'Recheck' }
+															: __(
+																	'Recheck',
+																	'saman-seo'
+															  ) }
 													</button>
 													<button
 														type="button"
@@ -580,7 +665,10 @@ const LinkHealth = () => {
 															)
 														}
 													>
-														Dismiss
+														{ __(
+															'Dismiss',
+															'saman-seo'
+														) }
 													</button>
 												</div>
 											</td>
@@ -594,7 +682,7 @@ const LinkHealth = () => {
 								<div className="pagination">
 									<span className="pagination-info">
 										{ brokenLinks.total.toLocaleString() }{ ' ' }
-										broken link
+										{ __( 'broken link', 'saman-seo' ) }
 										{ brokenLinks.total !== 1 ? 's' : '' }
 									</span>
 									<div className="pagination-links">
@@ -608,10 +696,14 @@ const LinkHealth = () => {
 												)
 											}
 										>
-											&lsaquo; Previous
+											{ __(
+												'\u2039 Previous',
+												'saman-seo'
+											) }
 										</button>
 										<span className="pagination-current">
-											{ brokenLinks.page } of{ ' ' }
+											{ brokenLinks.page }{ ' ' }
+											{ __( 'of', 'saman-seo' ) }{ ' ' }
 											{ brokenLinks.total_pages }
 										</span>
 										<button
@@ -627,7 +719,7 @@ const LinkHealth = () => {
 												)
 											}
 										>
-											Next &rsaquo;
+											{ __( 'Next \u203A', 'saman-seo' ) }
 										</button>
 									</div>
 								</div>
@@ -641,16 +733,18 @@ const LinkHealth = () => {
 			{ activeTab === 'orphans' && (
 				<section className="panel">
 					<div className="panel-header">
-						<h3>Orphan Pages</h3>
+						<h3>{ __( 'Orphan Pages', 'saman-seo' ) }</h3>
 						<p className="panel-desc">
-							Pages with no internal links pointing to them.
-							Consider adding links from other content.
+							{ __(
+								'Pages with no internal links pointing to them. Consider adding links from other content.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 
 					{ loading ? (
 						<div className="loading-state">
-							Loading orphan pages...
+							{ __( 'Loading orphan pages\u2026', 'saman-seo' ) }
 						</div>
 					) : orphanPages.items.length === 0 ? (
 						<div className="empty-state">
@@ -667,10 +761,14 @@ const LinkHealth = () => {
 									<path d="M9 12l2 2 4-4" />
 								</svg>
 							</div>
-							<h3>No orphan pages found</h3>
+							<h3>
+								{ __( 'No orphan pages found', 'saman-seo' ) }
+							</h3>
 							<p>
-								All your pages have at least one internal link
-								pointing to them.
+								{ __(
+									'All your pages have at least one internal link pointing to them.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 					) : (
@@ -678,10 +776,16 @@ const LinkHealth = () => {
 							<table className="data-table">
 								<thead>
 									<tr>
-										<th>Page Title</th>
-										<th>Type</th>
-										<th>Published</th>
-										<th>Actions</th>
+										<th>
+											{ __( 'Page Title', 'saman-seo' ) }
+										</th>
+										<th>{ __( 'Type', 'saman-seo' ) }</th>
+										<th>
+											{ __( 'Published', 'saman-seo' ) }
+										</th>
+										<th>
+											{ __( 'Actions', 'saman-seo' ) }
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -693,7 +797,11 @@ const LinkHealth = () => {
 													target="_blank"
 													rel="noopener noreferrer"
 												>
-													{ page.title || 'Untitled' }
+													{ page.title ||
+														__(
+															'Untitled',
+															'saman-seo'
+														) }
 												</a>
 											</td>
 											<td>
@@ -711,7 +819,10 @@ const LinkHealth = () => {
 													target="_blank"
 													rel="noopener noreferrer"
 												>
-													Edit
+													{ __(
+														'Edit',
+														'saman-seo'
+													) }
 												</a>
 											</td>
 										</tr>
@@ -724,7 +835,7 @@ const LinkHealth = () => {
 								<div className="pagination">
 									<span className="pagination-info">
 										{ orphanPages.total.toLocaleString() }{ ' ' }
-										orphan page
+										{ __( 'orphan page', 'saman-seo' ) }
 										{ orphanPages.total !== 1 ? 's' : '' }
 									</span>
 									<div className="pagination-links">
@@ -738,10 +849,14 @@ const LinkHealth = () => {
 												)
 											}
 										>
-											&lsaquo; Previous
+											{ __(
+												'\u2039 Previous',
+												'saman-seo'
+											) }
 										</button>
 										<span className="pagination-current">
-											{ orphanPages.page } of{ ' ' }
+											{ orphanPages.page }{ ' ' }
+											{ __( 'of', 'saman-seo' ) }{ ' ' }
 											{ orphanPages.total_pages }
 										</span>
 										<button
@@ -757,7 +872,7 @@ const LinkHealth = () => {
 												)
 											}
 										>
-											Next &rsaquo;
+											{ __( 'Next \u203A', 'saman-seo' ) }
 										</button>
 									</div>
 								</div>
@@ -769,5 +884,4 @@ const LinkHealth = () => {
 		</div>
 	);
 };
-
 export default LinkHealth;

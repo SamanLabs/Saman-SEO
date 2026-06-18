@@ -1,6 +1,6 @@
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __ } from '@wordpress/i18n';
 const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 	const [ patterns, setPatterns ] = useState( [] );
 	const [ loading, setLoading ] = useState( true );
@@ -15,7 +15,6 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 	useEffect( () => {
 		fetchPatterns();
 	}, [] );
-
 	const fetchPatterns = async () => {
 		setLoading( true );
 		try {
@@ -31,14 +30,11 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 			setLoading( false );
 		}
 	};
-
 	const handleAddPattern = async ( e ) => {
 		e.preventDefault();
 		if ( ! newPattern.trim() ) return;
-
 		setAdding( true );
 		setError( '' );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/404-ignore-patterns',
@@ -49,7 +45,6 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 					reason: reason.trim(),
 				},
 			} );
-
 			if ( response.success ) {
 				setPatterns( ( prev ) => [ ...prev, response.data ] );
 				setNewPattern( '' );
@@ -57,15 +52,19 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 				setReason( '' );
 				onPatternChange?.();
 			} else {
-				setError( response.message || 'Failed to add pattern' );
+				setError(
+					response.message ||
+						__( 'Failed to add pattern', 'saman-seo' )
+				);
 			}
 		} catch ( err ) {
-			setError( err.message || 'Failed to add pattern' );
+			setError(
+				err.message || __( 'Failed to add pattern', 'saman-seo' )
+			);
 		} finally {
 			setAdding( false );
 		}
 	};
-
 	const handleDeletePattern = async ( id ) => {
 		setDeletingId( id );
 		try {
@@ -81,13 +80,11 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 			setDeletingId( null );
 		}
 	};
-
 	const formatDate = ( dateStr ) => {
 		if ( ! dateStr || dateStr === '0000-00-00 00:00:00' ) return '-';
 		const date = new Date( dateStr );
 		return date.toLocaleDateString();
 	};
-
 	return (
 		<div className="modal-overlay" onClick={ onClose }>
 			<div
@@ -95,7 +92,7 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 				onClick={ ( e ) => e.stopPropagation() }
 			>
 				<div className="modal-header">
-					<h2>Manage Ignore Patterns</h2>
+					<h2>{ __( 'Manage Ignore Patterns', 'saman-seo' ) }</h2>
 					<button
 						type="button"
 						className="modal-close"
@@ -118,10 +115,17 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 
 				<div className="modal-body">
 					<p className="modal-description">
-						Add URL patterns to automatically ignore matching 404
-						errors. Use <code>*</code> as wildcard (e.g.,{ ' ' }
-						<code>/uploads/*</code>) or enable regex for complex
-						patterns.
+						{ __(
+							'Add URL patterns to automatically ignore matching 404 errors. Use',
+							'saman-seo'
+						) }{ ' ' }
+						<code>*</code>{ ' ' }
+						{ __( 'as wildcard (e.g.,', 'saman-seo' ) }{ ' ' }
+						<code>/uploads/*</code>
+						{ __(
+							') or enable regex for complex patterns.',
+							'saman-seo'
+						) }
 					</p>
 
 					{ /* Add Pattern Form */ }
@@ -131,32 +135,36 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 					>
 						<div className="form-row">
 							<label className="form-field">
-								<span>Pattern</span>
+								<span>{ __( 'Pattern', 'saman-seo' ) }</span>
 								<input
 									type="text"
 									value={ newPattern }
 									onChange={ ( e ) =>
 										setNewPattern( e.target.value )
 									}
-									placeholder={
-										isRegex
-											? '^/old-.*\\.html$'
-											: '/uploads/*'
-									}
+									placeholder={ __(
+										'/uploads/*',
+										'saman-seo'
+									) }
 									disabled={ adding }
 								/>
 							</label>
 						</div>
 						<div className="form-row form-row--split">
 							<label className="form-field">
-								<span>Reason (optional)</span>
+								<span>
+									{ __( 'Reason (optional)', 'saman-seo' ) }
+								</span>
 								<input
 									type="text"
 									value={ reason }
 									onChange={ ( e ) =>
 										setReason( e.target.value )
 									}
-									placeholder="e.g., Legacy URLs"
+									placeholder={ __(
+										'e.g., Legacy URLs',
+										'saman-seo'
+									) }
 									disabled={ adding }
 								/>
 							</label>
@@ -169,7 +177,7 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 									}
 									disabled={ adding }
 								/>
-								<span>Use Regex</span>
+								<span>{ __( 'Use Regex', 'saman-seo' ) }</span>
 							</label>
 						</div>
 						{ error && <p className="form-error">{ error }</p> }
@@ -179,31 +187,42 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 								className="button primary"
 								disabled={ adding || ! newPattern.trim() }
 							>
-								{ adding ? 'Adding...' : 'Add Pattern' }
+								{ adding
+									? __( 'Adding\u2026', 'saman-seo' )
+									: __( 'Add Pattern', 'saman-seo' ) }
 							</button>
 						</div>
 					</form>
 
 					{ /* Patterns List */ }
 					<div className="patterns-list">
-						<h3>Current Patterns</h3>
+						<h3>{ __( 'Current Patterns', 'saman-seo' ) }</h3>
 						{ loading ? (
 							<div className="loading-state">
-								Loading patterns...
+								{ __( 'Loading patterns\u2026', 'saman-seo' ) }
 							</div>
 						) : patterns.length === 0 ? (
 							<div className="empty-state small">
-								<p>No ignore patterns defined yet.</p>
+								<p>
+									{ __(
+										'No ignore patterns defined yet.',
+										'saman-seo'
+									) }
+								</p>
 							</div>
 						) : (
 							<table className="data-table compact">
 								<thead>
 									<tr>
-										<th>Pattern</th>
-										<th>Type</th>
-										<th>Reason</th>
-										<th>Created</th>
-										<th>Action</th>
+										<th>
+											{ __( 'Pattern', 'saman-seo' ) }
+										</th>
+										<th>{ __( 'Type', 'saman-seo' ) }</th>
+										<th>{ __( 'Reason', 'saman-seo' ) }</th>
+										<th>
+											{ __( 'Created', 'saman-seo' ) }
+										</th>
+										<th>{ __( 'Action', 'saman-seo' ) }</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -221,8 +240,14 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 													}` }
 												>
 													{ pattern.is_regex
-														? 'Regex'
-														: 'Wildcard' }
+														? __(
+																'Regex',
+																'saman-seo'
+														  )
+														: __(
+																'Wildcard',
+																'saman-seo'
+														  ) }
 												</span>
 											</td>
 											<td>{ pattern.reason || '-' }</td>
@@ -247,7 +272,10 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 												>
 													{ deletingId === pattern.id
 														? '...'
-														: 'Delete' }
+														: __(
+																'Delete',
+																'saman-seo'
+														  ) }
 												</button>
 											</td>
 										</tr>
@@ -264,12 +292,11 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 						className="button"
 						onClick={ onClose }
 					>
-						Close
+						{ __( 'Close', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 		</div>
 	);
 };
-
 export default IgnorePatternManager;

@@ -2,20 +2,39 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
 import useUrlTab from '../hooks/useUrlTab';
-
+import { __, sprintf } from '@wordpress/i18n';
 const sitemapTabs = [
-	{ id: 'xml-sitemap', label: 'XML Sitemap' },
-	{ id: 'llm-txt', label: 'LLM.txt' },
+	{
+		id: 'xml-sitemap',
+		label: __( 'XML Sitemap', 'saman-seo' ),
+	},
+	{
+		id: 'llm-txt',
+		label: __( 'LLM.txt', 'saman-seo' ),
+	},
 ];
-
 const SCHEDULE_OPTIONS = [
-	{ value: '', label: 'Manual only' },
-	{ value: 'hourly', label: 'Hourly' },
-	{ value: 'twicedaily', label: 'Twice Daily' },
-	{ value: 'daily', label: 'Daily' },
-	{ value: 'weekly', label: 'Weekly' },
+	{
+		value: '',
+		label: __( 'Manual only', 'saman-seo' ),
+	},
+	{
+		value: 'hourly',
+		label: __( 'Hourly', 'saman-seo' ),
+	},
+	{
+		value: 'twicedaily',
+		label: __( 'Twice Daily', 'saman-seo' ),
+	},
+	{
+		value: 'daily',
+		label: __( 'Daily', 'saman-seo' ),
+	},
+	{
+		value: 'weekly',
+		label: __( 'Weekly', 'saman-seo' ),
+	},
 ];
-
 const Sitemap = () => {
 	const [ activeTab, setActiveTab ] = useUrlTab( {
 		tabs: sitemapTabs,
@@ -80,13 +99,22 @@ const Sitemap = () => {
 				taxonomiesRes,
 				statsRes,
 			] = await Promise.all( [
-				apiFetch( { path: '/saman-seo/v1/sitemap/settings' } ),
-				apiFetch( { path: '/saman-seo/v1/sitemap/llm-settings' } ),
-				apiFetch( { path: '/saman-seo/v1/sitemap/post-types' } ),
-				apiFetch( { path: '/saman-seo/v1/sitemap/taxonomies' } ),
-				apiFetch( { path: '/saman-seo/v1/sitemap/stats' } ),
+				apiFetch( {
+					path: '/saman-seo/v1/sitemap/settings',
+				} ),
+				apiFetch( {
+					path: '/saman-seo/v1/sitemap/llm-settings',
+				} ),
+				apiFetch( {
+					path: '/saman-seo/v1/sitemap/post-types',
+				} ),
+				apiFetch( {
+					path: '/saman-seo/v1/sitemap/taxonomies',
+				} ),
+				apiFetch( {
+					path: '/saman-seo/v1/sitemap/stats',
+				} ),
 			] );
-
 			if ( settingsRes.success ) setSettings( settingsRes.data );
 			if ( llmRes.success ) setLlmSettings( llmRes.data );
 			if ( postTypesRes.success ) setPostTypes( postTypesRes.data );
@@ -98,7 +126,6 @@ const Sitemap = () => {
 			setLoading( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		fetchData();
 	}, [ fetchData ] );
@@ -170,7 +197,10 @@ const Sitemap = () => {
 			const updated = current.includes( name )
 				? current.filter( ( pt ) => pt !== name )
 				: [ ...current, name ];
-			return { ...prev, post_types: updated };
+			return {
+				...prev,
+				post_types: updated,
+			};
 		} );
 	};
 
@@ -183,7 +213,10 @@ const Sitemap = () => {
 			const updated = current.includes( name )
 				? current.filter( ( t ) => t !== name )
 				: [ ...current, name ];
-			return { ...prev, taxonomies: updated };
+			return {
+				...prev,
+				taxonomies: updated,
+			};
 		} );
 	};
 
@@ -196,7 +229,10 @@ const Sitemap = () => {
 			const updated = current.includes( name )
 				? current.filter( ( pt ) => pt !== name )
 				: [ ...current, name ];
-			return { ...prev, google_news_post_types: updated };
+			return {
+				...prev,
+				google_news_post_types: updated,
+			};
 		} );
 	};
 
@@ -206,7 +242,10 @@ const Sitemap = () => {
 			...prev,
 			additional_pages: [
 				...( prev.additional_pages || [] ),
-				{ url: '', priority: '0.5' },
+				{
+					url: '',
+					priority: '0.5',
+				},
 			],
 		} ) );
 	};
@@ -215,8 +254,14 @@ const Sitemap = () => {
 	const updateAdditionalPage = ( index, field, value ) => {
 		setSettings( ( prev ) => {
 			const pages = [ ...( prev.additional_pages || [] ) ];
-			pages[ index ] = { ...pages[ index ], [ field ]: value };
-			return { ...prev, additional_pages: pages };
+			pages[ index ] = {
+				...pages[ index ],
+				[ field ]: value,
+			};
+			return {
+				...prev,
+				additional_pages: pages,
+			};
 		} );
 	};
 
@@ -232,41 +277,53 @@ const Sitemap = () => {
 
 	// Format date
 	const formatDate = ( dateStr ) => {
-		if ( ! dateStr ) return 'Never';
+		if ( ! dateStr ) return __( 'Never', 'saman-seo' );
 		const date = new Date( dateStr );
 		const now = new Date();
 		const diff = now - date;
 		const hours = Math.floor( diff / ( 1000 * 60 * 60 ) );
-
-		if ( hours < 1 ) return 'Just now';
-		if ( hours < 24 ) return `${ hours } hour${ hours > 1 ? 's' : '' } ago`;
+		if ( hours < 1 ) return __( 'Just now', 'saman-seo' );
+		if ( hours < 24 )
+			return sprintf(
+				/* translators: %1$s: placeholder, %2$s: placeholder */ __(
+					'%1$s hour%2$s ago',
+					'saman-seo'
+				),
+				hours,
+				hours > 1 ? 's' : ''
+			);
 		return date.toLocaleDateString();
 	};
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="page-header">
 					<div>
-						<h1>Sitemap</h1>
+						<h1>{ __( 'Sitemap', 'saman-seo' ) }</h1>
 						<p>
-							Configure XML sitemap generation and LLM.txt
-							settings.
+							{ __(
+								'Configure XML sitemap generation and LLM.txt settings.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				</div>
-				<div className="loading-state">Loading sitemap settings...</div>
+				<div className="loading-state">
+					{ __( 'Loading sitemap settings\u2026', 'saman-seo' ) }
+				</div>
 			</div>
 		);
 	}
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Sitemap</h1>
+					<h1>{ __( 'Sitemap', 'saman-seo' ) }</h1>
 					<p>
-						Configure XML sitemap generation and LLM.txt settings.
+						{ __(
+							'Configure XML sitemap generation and LLM.txt settings.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="header-actions">
@@ -276,7 +333,7 @@ const Sitemap = () => {
 						rel="noopener noreferrer"
 						className="button ghost"
 					>
-						View Sitemap
+						{ __( 'View Sitemap', 'saman-seo' ) }
 					</a>
 					{ llmSettings.enable_llm_txt === '1' && (
 						<a
@@ -285,7 +342,7 @@ const Sitemap = () => {
 							rel="noopener noreferrer"
 							className="button ghost"
 						>
-							Open llm.txt
+							{ __( 'Open llm.txt', 'saman-seo' ) }
 						</a>
 					) }
 				</div>
@@ -295,7 +352,7 @@ const Sitemap = () => {
 				tabs={ sitemapTabs }
 				activeTab={ activeTab }
 				onChange={ setActiveTab }
-				ariaLabel="Sitemap sections"
+				ariaLabel={ __( 'Sitemap sections', 'saman-seo' ) }
 			/>
 
 			{ activeTab === 'xml-sitemap' ? (
@@ -303,19 +360,31 @@ const Sitemap = () => {
 					<div className="main-column">
 						{ /* XML Sitemap Configuration - Single Panel */ }
 						<section className="panel">
-							<h3>XML Sitemap Settings</h3>
+							<h3>
+								{ __( 'XML Sitemap Settings', 'saman-seo' ) }
+							</h3>
 							<p className="muted">
-								Configure your sitemap generation, content
-								types, and additional options.
+								{ __(
+									'Configure your sitemap generation, content types, and additional options.',
+									'saman-seo'
+								) }
 							</p>
 
 							<div className="settings-form">
 								{ /* General Settings */ }
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Automatic Updates</label>
+										<label>
+											{ __(
+												'Automatic Updates',
+												'saman-seo'
+											) }
+										</label>
 										<p className="settings-help">
-											Regenerate sitemap on a schedule.
+											{ __(
+												'Regenerate sitemap on a schedule.',
+												'saman-seo'
+											) }
 										</p>
 									</div>
 									<div className="settings-control">
@@ -343,9 +412,17 @@ const Sitemap = () => {
 
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Max URLs Per Page</label>
+										<label>
+											{ __(
+												'Max URLs Per Page',
+												'saman-seo'
+											) }
+										</label>
 										<p className="settings-help">
-											Maximum URLs per sitemap page.
+											{ __(
+												'Maximum URLs per sitemap page.',
+												'saman-seo'
+											) }
 										</p>
 									</div>
 									<div className="settings-control">
@@ -364,14 +441,21 @@ const Sitemap = () => {
 											}
 											min="1"
 											max="50000"
-											style={ { width: '120px' } }
+											style={ {
+												width: '120px',
+											} }
 										/>
 									</div>
 								</div>
 
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Generation Options</label>
+										<label>
+											{ __(
+												'Generation Options',
+												'saman-seo'
+											) }
+										</label>
 									</div>
 									<div className="settings-control">
 										<label className="checkbox-row">
@@ -391,7 +475,12 @@ const Sitemap = () => {
 													} ) )
 												}
 											/>
-											<span>Enable sitemap indexes</span>
+											<span>
+												{ __(
+													'Enable sitemap indexes',
+													'saman-seo'
+												) }
+											</span>
 										</label>
 										<label className="checkbox-row">
 											<input
@@ -411,7 +500,10 @@ const Sitemap = () => {
 												}
 											/>
 											<span>
-												Dynamic generation on-demand
+												{ __(
+													'Dynamic generation on-demand',
+													'saman-seo'
+												) }
 											</span>
 										</label>
 										<label className="checkbox-row">
@@ -432,7 +524,10 @@ const Sitemap = () => {
 												}
 											/>
 											<span>
-												Exclude images from entries
+												{ __(
+													'Exclude images from entries',
+													'saman-seo'
+												) }
 											</span>
 										</label>
 									</div>
@@ -441,9 +536,14 @@ const Sitemap = () => {
 								{ /* Content Types */ }
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Post Types</label>
+										<label>
+											{ __( 'Post Types', 'saman-seo' ) }
+										</label>
 										<p className="settings-help">
-											Include in sitemap.
+											{ __(
+												'Include in sitemap.',
+												'saman-seo'
+											) }
 										</p>
 									</div>
 									<div className="settings-control">
@@ -477,9 +577,14 @@ const Sitemap = () => {
 
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Taxonomies</label>
+										<label>
+											{ __( 'Taxonomies', 'saman-seo' ) }
+										</label>
 										<p className="settings-help">
-											Include taxonomy archives.
+											{ __(
+												'Include taxonomy archives.',
+												'saman-seo'
+											) }
 										</p>
 									</div>
 									<div className="settings-control">
@@ -513,7 +618,12 @@ const Sitemap = () => {
 
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Archive Pages</label>
+										<label>
+											{ __(
+												'Archive Pages',
+												'saman-seo'
+											) }
+										</label>
 									</div>
 									<div className="settings-control">
 										<label className="checkbox-row">
@@ -533,7 +643,12 @@ const Sitemap = () => {
 													} ) )
 												}
 											/>
-											<span>Include author pages</span>
+											<span>
+												{ __(
+													'Include author pages',
+													'saman-seo'
+												) }
+											</span>
 										</label>
 										<label className="checkbox-row">
 											<input
@@ -552,7 +667,12 @@ const Sitemap = () => {
 													} ) )
 												}
 											/>
-											<span>Include date archives</span>
+											<span>
+												{ __(
+													'Include date archives',
+													'saman-seo'
+												) }
+											</span>
 										</label>
 									</div>
 								</div>
@@ -560,7 +680,9 @@ const Sitemap = () => {
 								{ /* Additional Sitemaps */ }
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>RSS Sitemap</label>
+										<label>
+											{ __( 'RSS Sitemap', 'saman-seo' ) }
+										</label>
 									</div>
 									<div className="settings-control">
 										<label className="checkbox-row">
@@ -580,8 +702,10 @@ const Sitemap = () => {
 												}
 											/>
 											<span>
-												Generate RSS sitemap (latest 50
-												posts)
+												{ __(
+													'Generate RSS sitemap (latest 50 posts)',
+													'saman-seo'
+												) }
 											</span>
 										</label>
 									</div>
@@ -589,7 +713,9 @@ const Sitemap = () => {
 
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Google News</label>
+										<label>
+											{ __( 'Google News', 'saman-seo' ) }
+										</label>
 									</div>
 									<div className="settings-control">
 										<label className="checkbox-row">
@@ -610,63 +736,16 @@ const Sitemap = () => {
 												}
 											/>
 											<span>
-												Enable Google News sitemap
+												{ __(
+													'Enable Google News sitemap',
+													'saman-seo'
+												) }
 											</span>
 										</label>
 
-										{ settings.enable_google_news ===
-											'1' && (
-											<div
-												style={ { marginTop: '12px' } }
-											>
-												<input
-													type="text"
-													value={
-														settings.google_news_name
-													}
-													onChange={ ( e ) =>
-														setSettings(
-															( prev ) => ( {
-																...prev,
-																google_news_name:
-																	e.target
-																		.value,
-															} )
-														)
-													}
-													placeholder="Publication Name"
-													style={ {
-														width: '100%',
-														marginBottom: '8px',
-													} }
-												/>
-												<div className="checkbox-grid">
-													{ postTypes.map( ( pt ) => (
-														<label
-															key={ pt.name }
-															className="checkbox-row"
-														>
-															<input
-																type="checkbox"
-																checked={ (
-																	settings.google_news_post_types ||
-																	[]
-																).includes(
-																	pt.name
-																) }
-																onChange={ () =>
-																	toggleNewsPostType(
-																		pt.name
-																	)
-																}
-															/>
-															<span>
-																{ pt.label }
-															</span>
-														</label>
-													) ) }
-												</div>
-											</div>
+										{ __(
+											'Publication Name',
+											'saman-seo'
 										) }
 									</div>
 								</div>
@@ -674,66 +753,32 @@ const Sitemap = () => {
 								{ /* Additional Pages */ }
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Custom Pages</label>
+										<label>
+											{ __(
+												'Custom Pages',
+												'saman-seo'
+											) }
+										</label>
 										<p className="settings-help">
-											Add URLs not managed by WordPress.
+											{ __(
+												'Add URLs not managed by WordPress.',
+												'saman-seo'
+											) }
 										</p>
 									</div>
 									<div className="settings-control">
 										<div className="additional-pages-list">
-											{ (
-												settings.additional_pages || []
-											).map( ( page, index ) => (
-												<div
-													key={ index }
-													className="additional-page-row"
-												>
-													<input
-														type="url"
-														value={ page.url }
-														onChange={ ( e ) =>
-															updateAdditionalPage(
-																index,
-																'url',
-																e.target.value
-															)
-														}
-														placeholder="https://example.com/page"
-														className="page-url-input"
-													/>
-													<input
-														type="text"
-														value={ page.priority }
-														onChange={ ( e ) =>
-															updateAdditionalPage(
-																index,
-																'priority',
-																e.target.value
-															)
-														}
-														placeholder="0.5"
-														className="page-priority-input"
-													/>
-													<button
-														type="button"
-														className="button ghost small"
-														onClick={ () =>
-															removeAdditionalPage(
-																index
-															)
-														}
-													>
-														Remove
-													</button>
-												</div>
-											) ) }
+											{ __(
+												'https://example.com/page',
+												'saman-seo'
+											) }
 										</div>
 										<button
 											type="button"
 											className="button ghost small"
 											onClick={ addAdditionalPage }
 										>
-											+ Add Page
+											{ __( '+ Add Page', 'saman-seo' ) }
 										</button>
 									</div>
 								</div>
@@ -754,7 +799,9 @@ const Sitemap = () => {
 									onClick={ handleSaveSettings }
 									disabled={ saving }
 								>
-									{ saving ? 'Saving...' : 'Save Changes' }
+									{ saving
+										? __( 'Saving\u2026', 'saman-seo' )
+										: __( 'Save Changes', 'saman-seo' ) }
 								</button>
 								<button
 									type="button"
@@ -763,8 +810,11 @@ const Sitemap = () => {
 									disabled={ regenerating }
 								>
 									{ regenerating
-										? 'Regenerating...'
-										: 'Regenerate Now' }
+										? __(
+												'Regenerating\u2026',
+												'saman-seo'
+										  )
+										: __( 'Regenerate Now', 'saman-seo' ) }
 								</button>
 							</div>
 						</section>
@@ -773,10 +823,12 @@ const Sitemap = () => {
 					{ /* Sidebar */ }
 					<aside className="side-panel">
 						<div className="side-card highlight">
-							<h3>Your Sitemaps</h3>
+							<h3>{ __( 'Your Sitemaps', 'saman-seo' ) }</h3>
 							<div className="sitemap-links">
 								<div className="sitemap-link-item">
-									<strong>Main Index</strong>
+									<strong>
+										{ __( 'Main Index', 'saman-seo' ) }
+									</strong>
 									<a
 										href={ settings.sitemap_url }
 										target="_blank"
@@ -787,7 +839,9 @@ const Sitemap = () => {
 								</div>
 								{ settings.enable_rss === '1' && (
 									<div className="sitemap-link-item">
-										<strong>RSS Feed</strong>
+										<strong>
+											{ __( 'RSS Feed', 'saman-seo' ) }
+										</strong>
 										<a
 											href={ settings.rss_sitemap_url }
 											target="_blank"
@@ -799,7 +853,9 @@ const Sitemap = () => {
 								) }
 								{ settings.enable_google_news === '1' && (
 									<div className="sitemap-link-item">
-										<strong>Google News</strong>
+										<strong>
+											{ __( 'Google News', 'saman-seo' ) }
+										</strong>
 										<a
 											href={ settings.news_sitemap_url }
 											target="_blank"
@@ -813,16 +869,20 @@ const Sitemap = () => {
 						</div>
 
 						<div className="side-card">
-							<h3>Statistics</h3>
+							<h3>{ __( 'Statistics', 'saman-seo' ) }</h3>
 							<div className="stats-list">
 								<div className="stat-item">
-									<span className="muted">Total URLs</span>
+									<span className="muted">
+										{ __( 'Total URLs', 'saman-seo' ) }
+									</span>
 									<span className="stat-value">
 										{ stats.total_urls.toLocaleString() }
 									</span>
 								</div>
 								<div className="stat-item">
-									<span className="muted">Last Updated</span>
+									<span className="muted">
+										{ __( 'Last Updated', 'saman-seo' ) }
+									</span>
 									<span className="stat-value">
 										{ formatDate( stats.last_regenerated ) }
 									</span>
@@ -831,10 +891,12 @@ const Sitemap = () => {
 						</div>
 
 						<div className="side-card">
-							<h3>Pro Tip</h3>
+							<h3>{ __( 'Pro Tip', 'saman-seo' ) }</h3>
 							<p className="muted">
-								Submit your sitemap to Google Search Console and
-								Bing Webmaster Tools for faster indexing.
+								{ __(
+									'Submit your sitemap to Google Search Console and Bing Webmaster Tools for faster indexing.',
+									'saman-seo'
+								) }
 							</p>
 						</div>
 					</aside>
@@ -844,26 +906,37 @@ const Sitemap = () => {
 					<div className="main-column">
 						{ /* LLM.txt - Single Panel */ }
 						<section className="panel">
-							<h3>LLM.txt Configuration</h3>
+							<h3>
+								{ __( 'LLM.txt Configuration', 'saman-seo' ) }
+							</h3>
 							<p className="muted">
-								Help AI engines discover your content. Similar
-								to XML sitemaps for search engines, llm.txt
-								guides AI crawlers like ChatGPT and Claude.{ ' ' }
+								{ __(
+									'Help AI engines discover your content. Similar to XML sitemaps for search engines, llm.txt guides AI crawlers like ChatGPT and Claude.',
+									'saman-seo'
+								) }{ ' ' }
 								<a
 									href="https://llmstxt.org/"
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Learn more
+									{ __( 'Learn more', 'saman-seo' ) }
 								</a>
 							</p>
 
 							<div className="settings-form">
 								<div className="settings-row compact">
 									<div className="settings-label">
-										<label>Enable llm.txt</label>
+										<label>
+											{ __(
+												'Enable llm.txt',
+												'saman-seo'
+											) }
+										</label>
 										<p className="settings-help">
-											Generate and serve the llm.txt file.
+											{ __(
+												'Generate and serve the llm.txt file.',
+												'saman-seo'
+											) }
 										</p>
 									</div>
 									<div className="settings-control">
@@ -890,188 +963,22 @@ const Sitemap = () => {
 											<span className="toggle-text">
 												{ llmSettings.enable_llm_txt ===
 												'1'
-													? 'Enabled'
-													: 'Disabled' }
+													? __(
+															'Enabled',
+															'saman-seo'
+													  )
+													: __(
+															'Disabled',
+															'saman-seo'
+													  ) }
 											</span>
 										</label>
 									</div>
 								</div>
 
-								{ llmSettings.enable_llm_txt === '1' && (
-									<>
-										<div className="settings-row compact">
-											<div className="settings-label">
-												<label>Title</label>
-												<p className="settings-help">
-													Main title in your llm.txt
-													file.
-												</p>
-											</div>
-											<div className="settings-control">
-												<input
-													type="text"
-													value={
-														llmSettings.llm_txt_title
-													}
-													onChange={ ( e ) =>
-														setLlmSettings(
-															( prev ) => ( {
-																...prev,
-																llm_txt_title:
-																	e.target
-																		.value,
-															} )
-														)
-													}
-													placeholder="Defaults to site name"
-												/>
-											</div>
-										</div>
-
-										<div className="settings-row compact">
-											<div className="settings-label">
-												<label>Description</label>
-												<p className="settings-help">
-													Brief description below the
-													title.
-												</p>
-											</div>
-											<div className="settings-control">
-												<textarea
-													value={
-														llmSettings.llm_txt_description
-													}
-													onChange={ ( e ) =>
-														setLlmSettings(
-															( prev ) => ( {
-																...prev,
-																llm_txt_description:
-																	e.target
-																		.value,
-															} )
-														)
-													}
-													placeholder="Defaults to site tagline"
-													rows="3"
-												/>
-											</div>
-										</div>
-
-										<div className="settings-row compact">
-											<div className="settings-label">
-												<label>
-													Max Posts Per Type
-												</label>
-												<p className="settings-help">
-													Limit posts included per
-													type (1-500).
-												</p>
-											</div>
-											<div className="settings-control">
-												<input
-													type="number"
-													value={
-														llmSettings.llm_txt_posts_per_type
-													}
-													onChange={ ( e ) =>
-														setLlmSettings(
-															( prev ) => ( {
-																...prev,
-																llm_txt_posts_per_type:
-																	parseInt(
-																		e.target
-																			.value,
-																		10
-																	) || 50,
-															} )
-														)
-													}
-													min="1"
-													max="500"
-													style={ { width: '120px' } }
-												/>
-											</div>
-										</div>
-
-										<div className="settings-row compact">
-											<div className="settings-label">
-												<label>Options</label>
-											</div>
-											<div className="settings-control">
-												<label className="checkbox-row">
-													<input
-														type="checkbox"
-														checked={
-															llmSettings.llm_txt_include_excerpt ===
-															'1'
-														}
-														onChange={ ( e ) =>
-															setLlmSettings(
-																( prev ) => ( {
-																	...prev,
-																	llm_txt_include_excerpt:
-																		e.target
-																			.checked
-																			? '1'
-																			: '0',
-																} )
-															)
-														}
-													/>
-													<span>
-														Include post
-														excerpts/descriptions
-													</span>
-												</label>
-											</div>
-										</div>
-
-										{ /* Content Types Preview */ }
-										<div className="settings-row compact">
-											<div className="settings-label">
-												<label>Content Included</label>
-												<p className="settings-help">
-													Post types in your llm.txt
-													file.
-												</p>
-											</div>
-											<div className="settings-control">
-												<div className="post-types-preview">
-													{ postTypes.map( ( pt ) => {
-														const willInclude =
-															Math.min(
-																pt.count,
-																llmSettings.llm_txt_posts_per_type
-															);
-														return (
-															<div
-																key={ pt.name }
-																className="post-type-preview-item"
-															>
-																<div className="post-type-info">
-																	<strong>
-																		{
-																			pt.label
-																		}
-																	</strong>
-																	<span className="muted">
-																		{
-																			willInclude
-																		}{ ' ' }
-																		of{ ' ' }
-																		{
-																			pt.count
-																		}{ ' ' }
-																		posts
-																	</span>
-																</div>
-															</div>
-														);
-													} ) }
-												</div>
-											</div>
-										</div>
-									</>
+								{ __(
+									'Defaults to site tagline',
+									'saman-seo'
 								) }
 							</div>
 
@@ -1092,8 +999,11 @@ const Sitemap = () => {
 										disabled={ saving }
 									>
 										{ saving
-											? 'Saving...'
-											: 'Save Changes' }
+											? __( 'Saving\u2026', 'saman-seo' )
+											: __(
+													'Save Changes',
+													'saman-seo'
+											  ) }
 									</button>
 									<a
 										href={ llmSettings.llm_txt_url }
@@ -1101,7 +1011,7 @@ const Sitemap = () => {
 										rel="noopener noreferrer"
 										className="button ghost"
 									>
-										View llm.txt
+										{ __( 'View llm.txt', 'saman-seo' ) }
 									</a>
 								</div>
 							) }
@@ -1111,7 +1021,7 @@ const Sitemap = () => {
 					{ /* Sidebar */ }
 					<aside className="side-panel">
 						<div className="side-card highlight">
-							<h3>Your llm.txt</h3>
+							<h3>{ __( 'Your llm.txt', 'saman-seo' ) }</h3>
 							{ llmSettings.enable_llm_txt === '1' ? (
 								<>
 									<code className="url-display">
@@ -1124,37 +1034,51 @@ const Sitemap = () => {
 											fontSize: '13px',
 										} }
 									>
-										If not accessible, go to Settings &gt;
-										Permalinks and save to flush rewrite
-										rules.
+										{ __(
+											'If not accessible, go to Settings > Permalinks and save to flush rewrite rules.',
+											'saman-seo'
+										) }
 									</p>
 								</>
 							) : (
 								<p className="muted">
-									Enable llm.txt to generate your file.
+									{ __(
+										'Enable llm.txt to generate your file.',
+										'saman-seo'
+									) }
 								</p>
 							) }
 						</div>
 
 						<div className="side-card">
-							<h3>What is llm.txt?</h3>
+							<h3>{ __( 'What is llm.txt?', 'saman-seo' ) }</h3>
 							<p className="muted">
-								A standardized file that helps AI language
-								models like ChatGPT, Claude, and Gemini discover
-								and understand your content structure.
+								{ __(
+									'A standardized file that helps AI language models like ChatGPT, Claude, and Gemini discover and understand your content structure.',
+									'saman-seo'
+								) }
 							</p>
-							<p className="muted" style={ { marginTop: '8px' } }>
-								This improves how AI systems reference and cite
-								your content when answering questions.
+							<p
+								className="muted"
+								style={ {
+									marginTop: '8px',
+								} }
+							>
+								{ __(
+									'This improves how AI systems reference and cite your content when answering questions.',
+									'saman-seo'
+								) }
 							</p>
 							<a
 								href="https://llmstxt.org/"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="button ghost small"
-								style={ { marginTop: '12px' } }
+								style={ {
+									marginTop: '12px',
+								} }
 							>
-								Learn More
+								{ __( 'Learn More', 'saman-seo' ) }
 							</a>
 						</div>
 					</aside>
@@ -1163,5 +1087,4 @@ const Sitemap = () => {
 		</div>
 	);
 };
-
 export default Sitemap;

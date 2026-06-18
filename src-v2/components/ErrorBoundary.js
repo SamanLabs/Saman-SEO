@@ -32,7 +32,9 @@ class ErrorBoundary extends Component {
 				</p>
 				{ this.state.error && this.state.error.message && (
 					<details>
-						<summary>{ __( 'Error details', 'saman-seo' ) }</summary>
+						<summary>
+							{ __( 'Error details', 'saman-seo' ) }
+						</summary>
 						<pre>{ this.state.error.message }</pre>
 					</details>
 				) }

@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 /**
  * Google Search Preview Component
  *
@@ -26,7 +27,6 @@ const SearchPreview = ( { title, description, url } ) => {
 			return urlString;
 		}
 	};
-
 	return (
 		<div className="saman-seo-search-preview">
 			{ /* Favicon and URL breadcrumb */ }
@@ -68,7 +68,7 @@ const SearchPreview = ( { title, description, url } ) => {
 				<button
 					type="button"
 					className="saman-seo-search-preview__menu"
-					aria-label="More options"
+					aria-label={ __( 'More options', 'saman-seo' ) }
 				>
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none">
 						<circle cx="12" cy="5" r="1.5" fill="currentColor" />
@@ -80,7 +80,7 @@ const SearchPreview = ( { title, description, url } ) => {
 
 			{ /* Title */ }
 			<h3 className="saman-seo-search-preview__title">
-				{ displayTitle || 'Page Title' }
+				{ displayTitle || __( 'Page Title', 'saman-seo' ) }
 			</h3>
 
 			{ /* Description */ }
@@ -90,5 +90,4 @@ const SearchPreview = ( { title, description, url } ) => {
 		</div>
 	);
 };
-
 export default SearchPreview;

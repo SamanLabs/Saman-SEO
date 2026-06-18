@@ -9,6 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Assistant Context for managing chat state.
  */
+import { __ } from '@wordpress/i18n';
 const AssistantContext = createContext( null );
 
 /**
@@ -64,7 +65,6 @@ export const AssistantProvider = ( {
 			setMessages( ( prev ) => [ ...prev, userMessage ] );
 			setIsLoading( true );
 			setError( null );
-
 			try {
 				const response = await apiFetch( {
 					path: '/saman-seo/v1/assistants/chat',
@@ -75,7 +75,6 @@ export const AssistantProvider = ( {
 						context,
 					},
 				} );
-
 				if ( response.success ) {
 					const assistantMessage = {
 						id: `assistant-${ Date.now() }`,
@@ -86,10 +85,15 @@ export const AssistantProvider = ( {
 					};
 					setMessages( ( prev ) => [ ...prev, assistantMessage ] );
 				} else {
-					setError( response.message || 'Failed to get response' );
+					setError(
+						response.message ||
+							__( 'Failed to get response', 'saman-seo' )
+					);
 				}
 			} catch ( err ) {
-				setError( err.message || 'An error occurred' );
+				setError(
+					err.message || __( 'An error occurred', 'saman-seo' )
+				);
 			} finally {
 				setIsLoading( false );
 			}
@@ -104,7 +108,6 @@ export const AssistantProvider = ( {
 		async ( actionId, context = {} ) => {
 			setIsLoading( true );
 			setError( null );
-
 			try {
 				const response = await apiFetch( {
 					path: '/saman-seo/v1/assistants/action',
@@ -115,7 +118,6 @@ export const AssistantProvider = ( {
 						context,
 					},
 				} );
-
 				if ( response.success ) {
 					const assistantMessage = {
 						id: `assistant-${ Date.now() }`,
@@ -126,10 +128,15 @@ export const AssistantProvider = ( {
 					};
 					setMessages( ( prev ) => [ ...prev, assistantMessage ] );
 				} else {
-					setError( response.message || 'Failed to execute action' );
+					setError(
+						response.message ||
+							__( 'Failed to execute action', 'saman-seo' )
+					);
 				}
 			} catch ( err ) {
-				setError( err.message || 'An error occurred' );
+				setError(
+					err.message || __( 'An error occurred', 'saman-seo' )
+				);
 			} finally {
 				setIsLoading( false );
 			}
@@ -155,7 +162,6 @@ export const AssistantProvider = ( {
 		);
 		setError( null );
 	}, [ initialMessage ] );
-
 	const value = {
 		messages,
 		isLoading,
@@ -165,12 +171,10 @@ export const AssistantProvider = ( {
 		clearChat,
 		assistantId,
 	};
-
 	return (
 		<AssistantContext.Provider value={ value }>
 			{ children }
 		</AssistantContext.Provider>
 	);
 };
-
 export default AssistantProvider;

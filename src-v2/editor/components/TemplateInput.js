@@ -11,6 +11,7 @@ import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 import VariablePicker from './VariablePicker';
 
 // Variable type color mapping
+import { __ } from '@wordpress/i18n';
 const variableColors = {
 	// Global variables - blue
 	site_title: 'global',
@@ -20,7 +21,6 @@ const variableColors = {
 	current_year: 'global',
 	current_month: 'global',
 	current_day: 'global',
-
 	// Post variables - violet
 	post_title: 'post',
 	post_excerpt: 'post',
@@ -29,16 +29,13 @@ const variableColors = {
 	post_author: 'post',
 	post_id: 'post',
 	post_content: 'post',
-
 	// Taxonomy variables - green
 	term_title: 'taxonomy',
 	term_description: 'taxonomy',
 	term_count: 'taxonomy',
-
 	// Author variables - orange
 	author_name: 'author',
 	author_bio: 'author',
-
 	// Archive variables - teal
 	archive_title: 'archive',
 	search_query: 'archive',
@@ -53,12 +50,10 @@ const getBaseTag = ( fullTag ) => {
 	}
 	return fullTag.trim();
 };
-
 const getVariableType = ( tag ) => {
 	const baseTag = getBaseTag( tag );
 	return variableColors[ baseTag ] || 'global';
 };
-
 const TemplateInput = ( {
 	value = '',
 	onChange,
@@ -87,12 +82,10 @@ const TemplateInput = ( {
 		const input = inputRef.current;
 		const highlight = highlightRef.current;
 		if ( ! input || ! highlight ) return;
-
 		const syncScroll = () => {
 			highlight.scrollTop = input.scrollTop;
 			highlight.scrollLeft = input.scrollLeft;
 		};
-
 		input.addEventListener( 'scroll', syncScroll );
 		return () => input.removeEventListener( 'scroll', syncScroll );
 	}, [] );
@@ -100,12 +93,10 @@ const TemplateInput = ( {
 	// Parse template into parts with syntax highlighting
 	const renderHighlighted = useMemo( () => {
 		if ( ! value ) return [];
-
 		const parts = [];
 		let lastIndex = 0;
 		const regex = /\{\{([^}]+)\}\}/g;
 		let match;
-
 		while ( ( match = regex.exec( value ) ) !== null ) {
 			// Add text before the variable
 			if ( match.index > lastIndex ) {
@@ -114,14 +105,12 @@ const TemplateInput = ( {
 					content: value.slice( lastIndex, match.index ),
 				} );
 			}
-
 			const fullTag = match[ 1 ].trim();
 			const baseTag = getBaseTag( fullTag );
 			const varType = getVariableType( baseTag );
 			const previewValue =
 				variableValues[ baseTag ] ||
 				variableValues[ `{{${ baseTag }}}` ];
-
 			parts.push( {
 				type: 'variable',
 				fullTag: fullTag,
@@ -130,7 +119,6 @@ const TemplateInput = ( {
 				preview: previewValue || baseTag,
 				varType: varType,
 			} );
-
 			lastIndex = regex.lastIndex;
 		}
 
@@ -141,7 +129,6 @@ const TemplateInput = ( {
 				content: value.slice( lastIndex ),
 			} );
 		}
-
 		return parts;
 	}, [ value, variableValues ] );
 
@@ -152,27 +139,21 @@ const TemplateInput = ( {
 			onChange( value + variableTag );
 			return;
 		}
-
 		const start = input.selectionStart;
 		const end = input.selectionEnd;
 		const newValue =
 			value.slice( 0, start ) + variableTag + value.slice( end );
-
 		onChange( newValue );
 		setShowVariablePicker( false );
-
 		requestAnimationFrame( () => {
 			const newPos = start + variableTag.length;
 			input.setSelectionRange( newPos, newPos );
 			input.focus();
 		} );
 	};
-
 	const charCount = value.length;
 	const isOverLimit = maxLength && charCount > maxLength;
-
 	const InputComponent = multiline ? 'textarea' : 'input';
-
 	return (
 		<div
 			className={ `saman-seo-template-input ${
@@ -218,7 +199,10 @@ const TemplateInput = ( {
 								key={ index }
 								className={ `saman-seo-template-input__var saman-seo-template-input__var--${ part.varType }` }
 								onMouseEnter={ () =>
-									setHoveredVariable( { ...part, index } )
+									setHoveredVariable( {
+										...part,
+										index,
+									} )
 								}
 								onMouseLeave={ () =>
 									setHoveredVariable( null )
@@ -276,47 +260,7 @@ const TemplateInput = ( {
 
 				{ /* Floating action buttons */ }
 				<div className="saman-seo-template-input__actions">
-					{ showAiButton && (
-						<button
-							type="button"
-							className={ `saman-seo-template-input__action-btn saman-seo-template-input__action-btn--ai ${
-								! aiEnabled ? 'is-disabled' : ''
-							}` }
-							onClick={ () => {
-								if ( aiEnabled && onAiClick ) {
-									onAiClick();
-								} else if ( ! aiEnabled ) {
-									// Show alert when AI is disabled
-									if (
-										window.confirm(
-											'AI features require WP AI Pilot to be configured.\n\nWould you like to open the AI settings now?'
-										)
-									) {
-										window.open(
-											'admin.php?page=wp-ai-pilot',
-											'_blank'
-										);
-									}
-								}
-							} }
-							disabled={ disabled }
-							title="Generate with AI"
-						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" />
-								<circle cx="12" cy="12" r="4" />
-							</svg>
-						</button>
-					) }
+					{ __( 'Generate with AI', 'saman-seo' ) }
 					<VariablePicker
 						variables={ variables }
 						context={ context }
@@ -342,5 +286,4 @@ const TemplateInput = ( {
 		</div>
 	);
 };
-
 export default TemplateInput;

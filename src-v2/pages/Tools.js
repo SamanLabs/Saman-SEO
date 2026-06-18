@@ -2,12 +2,15 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Most Popular Tools - Practical SEO tools that work NOW
+import { __ } from '@wordpress/i18n';
 export const popularTools = [
 	{
 		id: 'redirects',
-		name: 'Redirects',
-		description:
+		name: __( 'Redirects', 'saman-seo' ),
+		description: __(
 			'Create and manage URL redirects. Handle 301, 302, 307 redirects with regex support, import/export, and analytics.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -20,14 +23,16 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#2271b1',
-		stats: 'Import/Export, Regex, Groups',
+		stats: __( 'Import/Export, Regex, Groups', 'saman-seo' ),
 		moduleKey: 'module_redirects',
 	},
 	{
 		id: '404-log',
-		name: '404 Monitor',
-		description:
+		name: __( '404 Monitor', 'saman-seo' ),
+		description: __(
 			'Track broken links in real-time. Get smart redirect suggestions, filter bots, and create redirects with one click.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -40,14 +45,16 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#d63638',
-		stats: 'Real-time, Smart Suggestions',
+		stats: __( 'Real-time, Smart Suggestions', 'saman-seo' ),
 		moduleKey: 'module_404_log',
 	},
 	{
 		id: 'instant-indexing',
-		name: 'Instant Indexing',
-		description:
+		name: __( 'Instant Indexing', 'saman-seo' ),
+		description: __(
 			'Submit URLs to search engines via IndexNow. Bulk submit posts for faster discovery by Bing, Yandex, and more.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -59,14 +66,16 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#0891b2',
-		stats: 'IndexNow, Bulk Submit',
+		stats: __( 'IndexNow, Bulk Submit', 'saman-seo' ),
 		moduleKey: 'module_indexnow',
 	},
 	{
 		id: 'audit',
-		name: 'SEO Audit',
-		description:
+		name: __( 'SEO Audit', 'saman-seo' ),
+		description: __(
 			'Comprehensive 14-factor SEO analysis. Get actionable recommendations to improve rankings and fix issues.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -80,7 +89,7 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#00a32a',
-		stats: '14-Factor Analysis',
+		stats: __( '14-Factor Analysis', 'saman-seo' ),
 	},
 ];
 
@@ -88,9 +97,11 @@ export const popularTools = [
 const aiTools = [
 	{
 		id: 'bulk-editor',
-		name: 'Smart Bulk Editor',
-		description:
+		name: __( 'Smart Bulk Editor', 'saman-seo' ),
+		description: __(
 			'Edit SEO titles and descriptions in bulk. Spreadsheet view for efficient editing across all your content.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -106,9 +117,11 @@ const aiTools = [
 	},
 	{
 		id: 'content-gaps',
-		name: 'Content Gaps',
-		description:
+		name: __( 'Content Gaps', 'saman-seo' ),
+		description: __(
 			"Discover missing topics and content opportunities. Find what your competitors cover that you don't.",
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -125,9 +138,11 @@ const aiTools = [
 	},
 	{
 		id: 'schema-builder',
-		name: 'Schema Builder',
-		description:
+		name: __( 'Schema Builder', 'saman-seo' ),
+		description: __(
 			'Visual schema creation for rich search results. Generate JSON-LD structured data with ease.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -143,9 +158,11 @@ const aiTools = [
 	},
 	{
 		id: 'ai-assistant',
-		name: 'AI Assistant',
-		description:
+		name: __( 'AI Assistant', 'saman-seo' ),
+		description: __(
 			'Chat with AI about SEO. Get suggestions for titles, descriptions, and content optimization.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -168,9 +185,11 @@ const aiTools = [
 const moreTools = [
 	{
 		id: 'internal-linking',
-		name: 'Internal Linking',
-		description:
+		name: __( 'Internal Linking', 'saman-seo' ),
+		description: __(
 			'Discover and manage internal link opportunities. Build a stronger site structure.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -187,9 +206,11 @@ const moreTools = [
 	},
 	{
 		id: 'link-health',
-		name: 'Link Health',
-		description:
+		name: __( 'Link Health', 'saman-seo' ),
+		description: __(
 			'Scan for broken links and orphan pages. Find and fix link issues.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -206,9 +227,11 @@ const moreTools = [
 	},
 	{
 		id: 'image-seo',
-		name: 'Image SEO',
-		description:
+		name: __( 'Image SEO', 'saman-seo' ),
+		description: __(
 			'Bulk edit alt text for all images. Find and fix missing alt texts.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -225,9 +248,11 @@ const moreTools = [
 	},
 	{
 		id: 'robots-txt',
-		name: 'robots.txt Editor',
-		description:
+		name: __( 'robots.txt Editor', 'saman-seo' ),
+		description: __(
 			'Edit your robots.txt with validation and presets. Test if URLs are blocked.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -243,9 +268,11 @@ const moreTools = [
 	},
 	{
 		id: 'local-seo',
-		name: 'Local SEO',
-		description:
+		name: __( 'Local SEO', 'saman-seo' ),
+		description: __(
 			'Manage business locations with schema. Multi-location support.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -262,9 +289,11 @@ const moreTools = [
 	},
 	{
 		id: 'sitemap',
-		name: 'Sitemap Settings',
-		description:
+		name: __( 'Sitemap Settings', 'saman-seo' ),
+		description: __(
 			'Configure XML sitemaps including news and video sitemaps.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -282,9 +311,11 @@ const moreTools = [
 	},
 	{
 		id: 'schema-validator',
-		name: 'Schema Validator',
-		description:
+		name: __( 'Schema Validator', 'saman-seo' ),
+		description: __(
 			'Test structured data on any page. Validate JSON-LD markup.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -301,9 +332,11 @@ const moreTools = [
 	},
 	{
 		id: 'htaccess-editor',
-		name: '.htaccess Editor',
-		description:
+		name: __( '.htaccess Editor', 'saman-seo' ),
+		description: __(
 			'Safely edit your .htaccess file with backups and presets.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -318,9 +351,11 @@ const moreTools = [
 	},
 	{
 		id: 'mobile-friendly',
-		name: 'Mobile Friendly',
-		description:
+		name: __( 'Mobile Friendly', 'saman-seo' ),
+		description: __(
 			'Check if pages are mobile-friendly. Identify viewport and touch issues.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -340,9 +375,11 @@ const moreTools = [
 const comingSoonTools = [
 	{
 		id: 'search-console',
-		name: 'Search Console',
-		description:
+		name: __( 'Search Console', 'saman-seo' ),
+		description: __(
 			'Connect Google Search Console. View clicks, impressions, CTR, and index status.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -359,9 +396,11 @@ const comingSoonTools = [
 	},
 	{
 		id: 'import-export',
-		name: 'Import / Export',
-		description:
+		name: __( 'Import / Export', 'saman-seo' ),
+		description: __(
 			'Migrate from Yoast, Rank Math, or AIOSEO. Export all settings.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -378,9 +417,11 @@ const comingSoonTools = [
 	},
 	{
 		id: 'keyword-tracker',
-		name: 'Keyword Tracker',
-		description:
+		name: __( 'Keyword Tracker', 'saman-seo' ),
+		description: __(
 			'Monitor keyword rankings over time. Track your positions in search results.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -396,9 +437,11 @@ const comingSoonTools = [
 	},
 	{
 		id: 'page-speed',
-		name: 'Page Speed',
-		description:
+		name: __( 'Page Speed', 'saman-seo' ),
+		description: __(
 			'Test page load performance. Get Core Web Vitals scores and tips.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -414,9 +457,11 @@ const comingSoonTools = [
 	},
 	{
 		id: 'heading-analyzer',
-		name: 'Heading Analyzer',
-		description:
+		name: __( 'Heading Analyzer', 'saman-seo' ),
+		description: __(
 			'Analyze heading structure. Check H1-H6 hierarchy and find issues.',
+			'saman-seo'
+		),
 		icon: (
 			<svg
 				viewBox="0 0 24 24"
@@ -430,7 +475,6 @@ const comingSoonTools = [
 		color: '#0284c7',
 	},
 ];
-
 const Tools = ( { onNavigate } ) => {
 	const [ hoveredTool, setHoveredTool ] = useState( null );
 	const [ settings, setSettings ] = useState( {} );
@@ -439,7 +483,9 @@ const Tools = ( { onNavigate } ) => {
 	// Fetch settings on mount
 	const fetchSettings = useCallback( async () => {
 		try {
-			const res = await apiFetch( { path: '/saman-seo/v1/settings' } );
+			const res = await apiFetch( {
+				path: '/saman-seo/v1/settings',
+			} );
 			if ( res.success && res.data ) {
 				const { system_info, ...settingsData } = res.data;
 				setSettings( settingsData );
@@ -450,7 +496,6 @@ const Tools = ( { onNavigate } ) => {
 			setLoadingSettings( false );
 		}
 	}, [] );
-
 	useEffect( () => {
 		fetchSettings();
 	}, [ fetchSettings ] );
@@ -460,13 +505,17 @@ const Tools = ( { onNavigate } ) => {
 		e.stopPropagation(); // Prevent card click
 
 		// Optimistic update
-		setSettings( ( prev ) => ( { ...prev, [ moduleKey ]: enabled } ) );
-
+		setSettings( ( prev ) => ( {
+			...prev,
+			[ moduleKey ]: enabled,
+		} ) );
 		try {
 			await apiFetch( {
 				path: '/saman-seo/v1/settings',
 				method: 'POST',
-				data: { [ moduleKey ]: enabled },
+				data: {
+					[ moduleKey ]: enabled,
+				},
 			} );
 		} catch ( error ) {
 			// Revert on error
@@ -477,12 +526,10 @@ const Tools = ( { onNavigate } ) => {
 			console.error( 'Failed to update setting:', error );
 		}
 	};
-
 	const handleToolClick = ( tool ) => {
 		// Check if module is disabled
 		if ( tool.moduleKey && ! settings[ tool.moduleKey ] ) return;
 		if ( tool.comingSoon ) return;
-
 		const viewId = tool.navigateTo || tool.id;
 		if ( onNavigate ) {
 			onNavigate( viewId );
@@ -495,14 +542,12 @@ const Tools = ( { onNavigate } ) => {
 		if ( tool.moduleKey && ! settings[ tool.moduleKey ] ) return true;
 		return false;
 	};
-
 	const ToolCard = ( { tool, size = 'large', showBadge = null } ) => {
 		const disabled = isToolDisabled( tool );
 		const hasModuleToggle = tool.moduleKey && ! tool.comingSoon;
 		const moduleEnabled = tool.moduleKey
 			? settings[ tool.moduleKey ]
 			: true;
-
 		return (
 			<button
 				type="button"
@@ -564,11 +609,13 @@ const Tools = ( { onNavigate } ) => {
 							</span>
 						) }
 						{ tool.comingSoon && (
-							<span className="tool-card__badge">Soon</span>
+							<span className="tool-card__badge">
+								{ __( 'Soon', 'saman-seo' ) }
+							</span>
 						) }
 						{ hasModuleToggle && ! moduleEnabled && (
 							<span className="tool-card__badge tool-card__badge--disabled">
-								Disabled
+								{ __( 'Disabled', 'saman-seo' ) }
 							</span>
 						) }
 					</div>
@@ -580,7 +627,9 @@ const Tools = ( { onNavigate } ) => {
 				{ size !== 'compact' && ! disabled && (
 					<div
 						className="tool-card__arrow"
-						style={ { color: tool.color } }
+						style={ {
+							color: tool.color,
+						} }
 					>
 						<svg
 							viewBox="0 0 24 24"
@@ -595,16 +644,17 @@ const Tools = ( { onNavigate } ) => {
 			</button>
 		);
 	};
-
 	return (
 		<div className="page">
 			{ /* Hero Header */ }
 			<div className="page-header page-header--hero">
 				<div className="page-header__content">
-					<h1>SEO Tools Hub</h1>
+					<h1>{ __( 'SEO Tools Hub', 'saman-seo' ) }</h1>
 					<p>
-						All your SEO tools in one place. From redirects and 404
-						monitoring to AI-powered content optimization.
+						{ __(
+							'All your SEO tools in one place. From redirects and 404 monitoring to AI-powered content optimization.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 			</div>
@@ -612,9 +662,14 @@ const Tools = ( { onNavigate } ) => {
 			{ /* Popular Tools - Practical SEO */ }
 			<section className="tools-section">
 				<div className="tools-section__header">
-					<h2 className="tools-section__title">Most Popular</h2>
+					<h2 className="tools-section__title">
+						{ __( 'Most Popular', 'saman-seo' ) }
+					</h2>
 					<p className="tools-section__subtitle">
-						Essential tools for everyday SEO management
+						{ __(
+							'Essential tools for everyday SEO management',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="tools-grid tools-grid--large">
@@ -627,9 +682,14 @@ const Tools = ( { onNavigate } ) => {
 			{ /* AI Tools */ }
 			<section className="tools-section">
 				<div className="tools-section__header">
-					<h2 className="tools-section__title">AI-Powered</h2>
+					<h2 className="tools-section__title">
+						{ __( 'AI-Powered', 'saman-seo' ) }
+					</h2>
 					<p className="tools-section__subtitle">
-						Smart tools to speed up your workflow
+						{ __(
+							'Smart tools to speed up your workflow',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="tools-grid tools-grid--large">
@@ -647,9 +707,14 @@ const Tools = ( { onNavigate } ) => {
 			{ /* More Tools */ }
 			<section className="tools-section">
 				<div className="tools-section__header">
-					<h2 className="tools-section__title">More Tools</h2>
+					<h2 className="tools-section__title">
+						{ __( 'More Tools', 'saman-seo' ) }
+					</h2>
 					<p className="tools-section__subtitle">
-						Additional utilities for complete SEO coverage
+						{ __(
+							'Additional utilities for complete SEO coverage',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="tools-grid tools-grid--medium">
@@ -662,16 +727,21 @@ const Tools = ( { onNavigate } ) => {
 			{ /* Coming Soon */ }
 			<section className="tools-section tools-section--muted">
 				<div className="tools-section__header">
-					<h2 className="tools-section__title">Coming Soon</h2>
+					<h2 className="tools-section__title">
+						{ __( 'Coming Soon', 'saman-seo' ) }
+					</h2>
 					<p className="tools-section__subtitle">
-						New tools in development
+						{ __( 'New tools in development', 'saman-seo' ) }
 					</p>
 				</div>
 				<div className="tools-grid tools-grid--small">
 					{ comingSoonTools.map( ( tool ) => (
 						<ToolCard
 							key={ tool.id }
-							tool={ { ...tool, comingSoon: true } }
+							tool={ {
+								...tool,
+								comingSoon: true,
+							} }
 							size="compact"
 						/>
 					) ) }
@@ -680,5 +750,4 @@ const Tools = ( { onNavigate } ) => {
 		</div>
 	);
 };
-
 export default Tools;

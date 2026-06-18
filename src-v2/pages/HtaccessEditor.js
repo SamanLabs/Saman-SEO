@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __, sprintf } from '@wordpress/i18n';
 const HtaccessEditor = ( { onNavigate } ) => {
 	const [ content, setContent ] = useState( '' );
 	const [ originalContent, setOriginalContent ] = useState( '' );
@@ -21,49 +21,58 @@ const HtaccessEditor = ( { onNavigate } ) => {
 	// Presets
 	const presets = [
 		{
-			name: 'Disable Directory Browsing',
+			name: __( 'Disable Directory Browsing', 'saman-seo' ),
 			code: 'Options -Indexes',
-			description: 'Prevent users from seeing directory contents',
+			description: __(
+				'Prevent users from seeing directory contents',
+				'saman-seo'
+			),
 		},
 		{
-			name: 'Force HTTPS',
+			name: __( 'Force HTTPS', 'saman-seo' ),
 			code: `RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]`,
-			description: 'Redirect all HTTP traffic to HTTPS',
+			description: __(
+				'Redirect all HTTP traffic to HTTPS',
+				'saman-seo'
+			),
 		},
 		{
-			name: 'Remove www',
+			name: __( 'Remove www', 'saman-seo' ),
 			code: `RewriteEngine On
 RewriteCond %{HTTP_HOST} ^www\\.(.*)$ [NC]
 RewriteRule ^(.*)$ https://%1/$1 [R=301,L]`,
-			description: 'Redirect www to non-www version',
+			description: __( 'Redirect www to non-www version', 'saman-seo' ),
 		},
 		{
-			name: 'Add www',
+			name: __( 'Add www', 'saman-seo' ),
 			code: `RewriteEngine On
 RewriteCond %{HTTP_HOST} !^www\\. [NC]
 RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]`,
-			description: 'Redirect non-www to www version',
+			description: __( 'Redirect non-www to www version', 'saman-seo' ),
 		},
 		{
-			name: 'Block Bad Bots',
+			name: __( 'Block Bad Bots', 'saman-seo' ),
 			code: `RewriteEngine On
 RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|MJ12bot|SemrushBot|DotBot) [NC]
 RewriteRule .* - [F,L]`,
-			description: 'Block common SEO crawlers/bots',
+			description: __( 'Block common SEO crawlers/bots', 'saman-seo' ),
 		},
 		{
-			name: 'Enable GZIP Compression',
+			name: __( 'Enable GZIP Compression', 'saman-seo' ),
 			code: `<IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
   AddOutputFilterByType DEFLATE application/javascript application/x-javascript
   AddOutputFilterByType DEFLATE application/json application/xml
 </IfModule>`,
-			description: 'Compress text-based files for faster loading',
+			description: __(
+				'Compress text-based files for faster loading',
+				'saman-seo'
+			),
 		},
 		{
-			name: 'Browser Caching',
+			name: __( 'Browser Caching', 'saman-seo' ),
 			code: `<IfModule mod_expires.c>
   ExpiresActive On
   ExpiresByType image/jpg "access plus 1 year"
@@ -74,17 +83,20 @@ RewriteRule .* - [F,L]`,
   ExpiresByType text/css "access plus 1 month"
   ExpiresByType application/javascript "access plus 1 month"
 </IfModule>`,
-			description: 'Set browser caching for static files',
+			description: __(
+				'Set browser caching for static files',
+				'saman-seo'
+			),
 		},
 		{
-			name: 'Security Headers',
+			name: __( 'Security Headers', 'saman-seo' ),
 			code: `<IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
   Header set X-XSS-Protection "1; mode=block"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>`,
-			description: 'Add security-related HTTP headers',
+			description: __( 'Add security-related HTTP headers', 'saman-seo' ),
 		},
 	];
 
@@ -102,14 +114,13 @@ RewriteRule .* - [F,L]`,
 				}
 			} catch ( err ) {
 				setError(
-					'Failed to load .htaccess file: ' +
-						( err.message || 'Unknown error' )
+					__( 'Failed to load .htaccess file:', 'saman-seo' ) +
+						( err.message || __( 'Unknown error', 'saman-seo' ) )
 				);
 			} finally {
 				setLoading( false );
 			}
 		};
-
 		fetchContent();
 	}, [] );
 
@@ -123,14 +134,14 @@ RewriteRule .* - [F,L]`,
 		setSaving( true );
 		setError( null );
 		setSuccess( null );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/htaccess',
 				method: 'POST',
-				data: { content },
+				data: {
+					content,
+				},
 			} );
-
 			if ( response.success ) {
 				setOriginalContent( content );
 				setSuccess( 'File saved successfully! A backup was created.' );
@@ -138,10 +149,12 @@ RewriteRule .* - [F,L]`,
 					setBackups( response.data.backups );
 				}
 			} else {
-				setError( response.message || 'Failed to save file' );
+				setError(
+					response.message || __( 'Failed to save file', 'saman-seo' )
+				);
 			}
 		} catch ( err ) {
-			setError( err.message || 'Failed to save file' );
+			setError( err.message || __( 'Failed to save file', 'saman-seo' ) );
 		} finally {
 			setSaving( false );
 		}
@@ -151,32 +164,42 @@ RewriteRule .* - [F,L]`,
 	const handleRestore = useCallback( async ( backup ) => {
 		if (
 			! window.confirm(
-				`Restore backup from ${ backup.date }? This will overwrite the current .htaccess file.`
+				sprintf(
+					/* translators: %s: placeholder */ __(
+						'Restore backup from %s? This will overwrite the current .htaccess file.',
+						'saman-seo'
+					),
+					backup.date
+				)
 			)
 		) {
 			return;
 		}
-
 		setSaving( true );
 		setError( null );
-
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/htaccess/restore',
 				method: 'POST',
-				data: { backup: backup.file },
+				data: {
+					backup: backup.file,
+				},
 			} );
-
 			if ( response.success ) {
 				setContent( response.data.content );
 				setOriginalContent( response.data.content );
 				setSuccess( 'Backup restored successfully!' );
 				setShowBackups( false );
 			} else {
-				setError( response.message || 'Failed to restore backup' );
+				setError(
+					response.message ||
+						__( 'Failed to restore backup', 'saman-seo' )
+				);
 			}
 		} catch ( err ) {
-			setError( err.message || 'Failed to restore backup' );
+			setError(
+				err.message || __( 'Failed to restore backup', 'saman-seo' )
+			);
 		} finally {
 			setSaving( false );
 		}
@@ -195,32 +218,34 @@ RewriteRule .* - [F,L]`,
 
 	// Reset to original
 	const handleReset = useCallback( () => {
-		if ( window.confirm( 'Discard all changes?' ) ) {
+		if ( window.confirm( __( 'Discard all changes?', 'saman-seo' ) ) ) {
 			setContent( originalContent );
 		}
 	}, [ originalContent ] );
-
 	if ( loading ) {
 		return (
 			<div className="page">
 				<div className="page-header">
-					<h1>.htaccess Editor</h1>
+					<h1>{ __( '.htaccess Editor', 'saman-seo' ) }</h1>
 				</div>
 				<div className="card">
-					<div className="loading-state">Loading...</div>
+					<div className="loading-state">
+						{ __( 'Loading\u2026', 'saman-seo' ) }
+					</div>
 				</div>
 			</div>
 		);
 	}
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>.htaccess Editor</h1>
+					<h1>{ __( '.htaccess Editor', 'saman-seo' ) }</h1>
 					<p>
-						Edit your server configuration file. Changes take effect
-						immediately.
+						{ __(
+							'Edit your server configuration file. Changes take effect immediately.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				<div className="page-header-actions">
@@ -240,7 +265,8 @@ RewriteRule .* - [F,L]`,
 							<path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
 							<path d="M3 3v5h5" />
 						</svg>
-						Backups ({ backups.length })
+						{ __( 'Backups (', 'saman-seo' ) }
+						{ backups.length })
 					</button>
 					{ hasChanges && (
 						<button
@@ -248,7 +274,7 @@ RewriteRule .* - [F,L]`,
 							className="button ghost"
 							onClick={ handleReset }
 						>
-							Discard Changes
+							{ __( 'Discard Changes', 'saman-seo' ) }
 						</button>
 					) }
 					<button
@@ -257,7 +283,9 @@ RewriteRule .* - [F,L]`,
 						onClick={ handleSave }
 						disabled={ saving || ! hasChanges }
 					>
-						{ saving ? 'Saving...' : 'Save Changes' }
+						{ saving
+							? __( 'Saving\u2026', 'saman-seo' )
+							: __( 'Save Changes', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -277,8 +305,11 @@ RewriteRule .* - [F,L]`,
 					<line x1="12" y1="17" x2="12.01" y2="17" />
 				</svg>
 				<span>
-					<strong>Caution:</strong> Incorrect .htaccess rules can
-					break your site. A backup is created before each save.
+					<strong>{ __( 'Caution:', 'saman-seo' ) }</strong>{ ' ' }
+					{ __(
+						'Incorrect .htaccess rules can break your site. A backup is created before each save.',
+						'saman-seo'
+					) }
 				</span>
 			</div>
 
@@ -320,10 +351,12 @@ RewriteRule .* - [F,L]`,
 				{ /* Editor */ }
 				<div className="card htaccess-editor-card">
 					<div className="htaccess-editor-header">
-						<span className="htaccess-editor-path">/.htaccess</span>
+						<span className="htaccess-editor-path">
+							{ __( '/.htaccess', 'saman-seo' ) }
+						</span>
 						{ hasChanges && (
 							<span className="htaccess-editor-modified">
-								Modified
+								{ __( 'Modified', 'saman-seo' ) }
 							</span>
 						) }
 					</div>
@@ -332,7 +365,10 @@ RewriteRule .* - [F,L]`,
 						value={ content }
 						onChange={ ( e ) => setContent( e.target.value ) }
 						spellCheck="false"
-						placeholder="# Your .htaccess rules here..."
+						placeholder={ __(
+							'# Your .htaccess rules here\u2026',
+							'saman-seo'
+						) }
 					/>
 				</div>
 
@@ -341,10 +377,10 @@ RewriteRule .* - [F,L]`,
 					{ /* Backups Panel */ }
 					{ showBackups && (
 						<div className="card htaccess-backups">
-							<h3>Backups</h3>
+							<h3>{ __( 'Backups', 'saman-seo' ) }</h3>
 							{ backups.length === 0 ? (
 								<p className="htaccess-backups__empty">
-									No backups yet
+									{ __( 'No backups yet', 'saman-seo' ) }
 								</p>
 							) : (
 								<ul className="htaccess-backups__list">
@@ -368,7 +404,7 @@ RewriteRule .* - [F,L]`,
 													handleRestore( backup )
 												}
 											>
-												Restore
+												{ __( 'Restore', 'saman-seo' ) }
 											</button>
 										</li>
 									) ) }
@@ -379,9 +415,9 @@ RewriteRule .* - [F,L]`,
 
 					{ /* Presets */ }
 					<div className="card htaccess-presets">
-						<h3>Quick Insert</h3>
+						<h3>{ __( 'Quick Insert', 'saman-seo' ) }</h3>
 						<p className="htaccess-presets__desc">
-							Click to add common rules
+							{ __( 'Click to add common rules', 'saman-seo' ) }
 						</p>
 						<ul className="htaccess-presets__list">
 							{ presets.map( ( preset ) => (
@@ -408,5 +444,4 @@ RewriteRule .* - [F,L]`,
 		</div>
 	);
 };
-
 export default HtaccessEditor;

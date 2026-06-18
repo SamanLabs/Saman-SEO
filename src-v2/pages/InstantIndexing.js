@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
-
+import { __, sprintf } from '@wordpress/i18n';
 const InstantIndexing = ( { onNavigate } ) => {
 	// State
 	const [ settings, setSettings ] = useState( null );
@@ -34,12 +34,17 @@ const InstantIndexing = ( { onNavigate } ) => {
 			try {
 				const [ settingsRes, optionsRes, statsRes ] = await Promise.all(
 					[
-						apiFetch( { path: '/saman-seo/v1/indexnow/settings' } ),
-						apiFetch( { path: '/saman-seo/v1/indexnow/options' } ),
-						apiFetch( { path: '/saman-seo/v1/indexnow/stats' } ),
+						apiFetch( {
+							path: '/saman-seo/v1/indexnow/settings',
+						} ),
+						apiFetch( {
+							path: '/saman-seo/v1/indexnow/options',
+						} ),
+						apiFetch( {
+							path: '/saman-seo/v1/indexnow/stats',
+						} ),
 					]
 				);
-
 				if ( settingsRes.success ) {
 					setSettings( settingsRes.data );
 				}
@@ -53,7 +58,6 @@ const InstantIndexing = ( { onNavigate } ) => {
 				console.error( 'Failed to fetch settings:', err );
 			}
 		};
-
 		fetchInitial();
 	}, [] );
 
@@ -65,7 +69,6 @@ const InstantIndexing = ( { onNavigate } ) => {
 				const response = await apiFetch( {
 					path: `/saman-seo/v1/indexnow/posts?post_type=${ postType }&page=${ page }&per_page=20&search=${ search }&status_filter=${ statusFilter }`,
 				} );
-
 				if ( response.success ) {
 					setPosts( response.data.posts || [] );
 					setTotalPages( response.data.pages || 1 );
@@ -82,14 +85,12 @@ const InstantIndexing = ( { onNavigate } ) => {
 				setLoading( false );
 			}
 		};
-
 		fetchPosts();
 	}, [ postType, page, search, statusFilter ] );
 
 	// Fetch logs
 	useEffect( () => {
 		if ( activeTab !== 'logs' ) return;
-
 		const fetchLogs = async () => {
 			try {
 				const response = await apiFetch( {
@@ -102,7 +103,6 @@ const InstantIndexing = ( { onNavigate } ) => {
 				console.error( 'Failed to fetch logs:', err );
 			}
 		};
-
 		fetchLogs();
 	}, [ activeTab ] );
 
@@ -131,31 +131,31 @@ const InstantIndexing = ( { onNavigate } ) => {
 	// Handle bulk submit
 	const handleBulkSubmit = useCallback( async () => {
 		if ( selectedPosts.length === 0 || submitting ) return;
-
 		setSubmitting( true );
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/indexnow/bulk-submit',
 				method: 'POST',
-				data: { post_ids: selectedPosts },
+				data: {
+					post_ids: selectedPosts,
+				},
 			} );
-
 			if ( response.success ) {
 				// Refresh posts and stats
 				const [ postsRes, statsRes ] = await Promise.all( [
 					apiFetch( {
 						path: `/saman-seo/v1/indexnow/posts?post_type=${ postType }&page=${ page }&per_page=20`,
 					} ),
-					apiFetch( { path: '/saman-seo/v1/indexnow/stats' } ),
+					apiFetch( {
+						path: '/saman-seo/v1/indexnow/stats',
+					} ),
 				] );
-
 				if ( postsRes.success ) {
 					setPosts( postsRes.data.posts || [] );
 				}
 				if ( statsRes.success ) {
 					setStats( statsRes.data );
 				}
-
 				setSelectedPosts( [] );
 			}
 		} catch ( err ) {
@@ -191,9 +191,18 @@ const InstantIndexing = ( { onNavigate } ) => {
 	// Status badge component
 	const StatusBadge = ( { status } ) => {
 		const statusConfig = {
-			success: { label: 'Indexed', className: 'success' },
-			failed: { label: 'Failed', className: 'danger' },
-			never: { label: 'Not Submitted', className: '' },
+			success: {
+				label: __( 'Indexed', 'saman-seo' ),
+				className: 'success',
+			},
+			failed: {
+				label: __( 'Failed', 'saman-seo' ),
+				className: 'danger',
+			},
+			never: {
+				label: __( 'Not Submitted', 'saman-seo' ),
+				className: '',
+			},
 		};
 		const config = statusConfig[ status ] || statusConfig.never;
 		return (
@@ -209,10 +218,12 @@ const InstantIndexing = ( { onNavigate } ) => {
 			<div className="page">
 				<div className="page-header">
 					<div>
-						<h1>Instant Indexing</h1>
+						<h1>{ __( 'Instant Indexing', 'saman-seo' ) }</h1>
 						<p>
-							Submit URLs to search engines via IndexNow for
-							faster discovery.
+							{ __(
+								'Submit URLs to search engines via IndexNow for faster discovery.',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 				</div>
@@ -231,10 +242,14 @@ const InstantIndexing = ( { onNavigate } ) => {
 								<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
 							</svg>
 						</div>
-						<h3>IndexNow is not enabled</h3>
+						<h3>
+							{ __( 'IndexNow is not enabled', 'saman-seo' ) }
+						</h3>
 						<p>
-							Enable IndexNow in Settings to use instant indexing
-							features.
+							{ __(
+								'Enable IndexNow in Settings to use instant indexing features.',
+								'saman-seo'
+							) }
 						</p>
 						<button
 							type="button"
@@ -243,22 +258,23 @@ const InstantIndexing = ( { onNavigate } ) => {
 								onNavigate && onNavigate( 'settings' )
 							}
 						>
-							Go to Settings
+							{ __( 'Go to Settings', 'saman-seo' ) }
 						</button>
 					</div>
 				</div>
 			</div>
 		);
 	}
-
 	return (
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>Instant Indexing</h1>
+					<h1>{ __( 'Instant Indexing', 'saman-seo' ) }</h1>
 					<p>
-						Submit URLs to search engines via IndexNow for faster
-						discovery.
+						{ __(
+							'Submit URLs to search engines via IndexNow for faster discovery.',
+							'saman-seo'
+						) }
 					</p>
 				</div>
 				{ selectedPosts.length > 0 && (
@@ -269,8 +285,14 @@ const InstantIndexing = ( { onNavigate } ) => {
 						disabled={ submitting }
 					>
 						{ submitting
-							? 'Submitting...'
-							: `Submit ${ selectedPosts.length } URLs` }
+							? __( 'Submitting\u2026', 'saman-seo' )
+							: sprintf(
+									/* translators: %s: placeholder */ __(
+										'Submit %s URLs',
+										'saman-seo'
+									),
+									selectedPosts.length
+							  ) }
 					</button>
 				) }
 			</div>
@@ -283,26 +305,32 @@ const InstantIndexing = ( { onNavigate } ) => {
 							{ stats.total || 0 }
 						</div>
 						<div className="indexing-stat__label">
-							Total Submissions
+							{ __( 'Total Submissions', 'saman-seo' ) }
 						</div>
 					</div>
 					<div className="indexing-stat indexing-stat--success">
 						<div className="indexing-stat__value">
 							{ stats.success || 0 }
 						</div>
-						<div className="indexing-stat__label">Successful</div>
+						<div className="indexing-stat__label">
+							{ __( 'Successful', 'saman-seo' ) }
+						</div>
 					</div>
 					<div className="indexing-stat indexing-stat--danger">
 						<div className="indexing-stat__value">
 							{ stats.failed || 0 }
 						</div>
-						<div className="indexing-stat__label">Failed</div>
+						<div className="indexing-stat__label">
+							{ __( 'Failed', 'saman-seo' ) }
+						</div>
 					</div>
 					<div className="indexing-stat">
 						<div className="indexing-stat__value">
 							{ stats.today || 0 }
 						</div>
-						<div className="indexing-stat__label">Today</div>
+						<div className="indexing-stat__label">
+							{ __( 'Today', 'saman-seo' ) }
+						</div>
 					</div>
 				</div>
 			) }
@@ -316,7 +344,7 @@ const InstantIndexing = ( { onNavigate } ) => {
 					}` }
 					onClick={ () => setActiveTab( 'posts' ) }
 				>
-					Posts
+					{ __( 'Posts', 'saman-seo' ) }
 				</button>
 				<button
 					type="button"
@@ -325,200 +353,33 @@ const InstantIndexing = ( { onNavigate } ) => {
 					}` }
 					onClick={ () => setActiveTab( 'logs' ) }
 				>
-					Submission Logs
+					{ __( 'Submission Logs', 'saman-seo' ) }
 				</button>
 			</div>
 
 			{ /* Posts Tab */ }
-			{ activeTab === 'posts' && (
-				<>
-					{ /* Filters */ }
-					<div className="table-toolbar">
-						<div className="table-toolbar-filters">
-							<select
-								value={ postType }
-								onChange={ ( e ) => {
-									setPostType( e.target.value );
-									setPage( 1 );
-								} }
-							>
-								{ postTypes.map( ( pt ) => (
-									<option key={ pt.name } value={ pt.name }>
-										{ pt.label }
-									</option>
-								) ) }
-							</select>
-							<select
-								value={ statusFilter }
-								onChange={ ( e ) => {
-									setStatusFilter( e.target.value );
-									setPage( 1 );
-								} }
-							>
-								<option value="">All Status</option>
-								<option value="never">Not Submitted</option>
-								<option value="indexed">Indexed</option>
-								<option value="failed">Failed</option>
-							</select>
-							<input
-								type="search"
-								className="search-input"
-								placeholder="Search posts..."
-								value={ search }
-								onChange={ ( e ) => {
-									setSearch( e.target.value );
-									setPage( 1 );
-								} }
-							/>
-						</div>
-					</div>
-
-					{ /* Posts Table */ }
-					<table className="data-table">
-						<thead>
-							<tr>
-								<th className="checkbox-col">
-									<input
-										type="checkbox"
-										checked={
-											posts.length > 0 &&
-											selectedPosts.length ===
-												posts.length
-										}
-										onChange={ handleSelectAll }
-									/>
-								</th>
-								<th>Title</th>
-								<th>Status</th>
-								<th>Last Indexed</th>
-								<th>Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{ loading ? (
-								<tr>
-									<td colSpan="5" className="loading-cell">
-										Loading...
-									</td>
-								</tr>
-							) : posts.length === 0 ? (
-								<tr>
-									<td colSpan="5" className="empty-cell">
-										No posts found.
-									</td>
-								</tr>
-							) : (
-								posts.map( ( post ) => (
-									<tr key={ post.id }>
-										<td className="checkbox-col">
-											<input
-												type="checkbox"
-												checked={ selectedPosts.includes(
-													post.id
-												) }
-												onChange={ () =>
-													handleSelectPost( post.id )
-												}
-											/>
-										</td>
-										<td>
-											<div className="post-cell">
-												<strong>
-													{ post.title ||
-														'(no title)' }
-												</strong>
-												<a
-													href={ post.url }
-													target="_blank"
-													rel="noopener noreferrer"
-													className="post-cell__url"
-												>
-													{ post.url }
-												</a>
-											</div>
-										</td>
-										<td>
-											<StatusBadge
-												status={ post.indexing_status }
-											/>
-										</td>
-										<td>
-											{ post.last_indexed_ago || '-' }
-										</td>
-										<td>
-											<button
-												type="button"
-												className="button ghost small"
-												onClick={ () =>
-													handleSubmitSingle(
-														post.id
-													)
-												}
-												title="Submit for indexing"
-											>
-												<svg
-													width="14"
-													height="14"
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-												>
-													<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-												</svg>
-												Submit
-											</button>
-										</td>
-									</tr>
-								) )
-							) }
-						</tbody>
-					</table>
-
-					{ /* Pagination */ }
-					{ totalPages > 1 && (
-						<div className="pagination">
-							<button
-								type="button"
-								className="button ghost small"
-								disabled={ page === 1 }
-								onClick={ () => setPage( ( p ) => p - 1 ) }
-							>
-								Previous
-							</button>
-							<span className="pagination-info">
-								Page { page } of { totalPages }
-							</span>
-							<button
-								type="button"
-								className="button ghost small"
-								disabled={ page === totalPages }
-								onClick={ () => setPage( ( p ) => p + 1 ) }
-							>
-								Next
-							</button>
-						</div>
-					) }
-				</>
-			) }
+			{ __( 'Search posts\u2026', 'saman-seo' ) }
 
 			{ /* Logs Tab */ }
 			{ activeTab === 'logs' && (
 				<table className="data-table">
 					<thead>
 						<tr>
-							<th>URL</th>
-							<th>Status</th>
-							<th>Response</th>
-							<th>Search Engine</th>
-							<th>Submitted</th>
+							<th>{ __( 'URL', 'saman-seo' ) }</th>
+							<th>{ __( 'Status', 'saman-seo' ) }</th>
+							<th>{ __( 'Response', 'saman-seo' ) }</th>
+							<th>{ __( 'Search Engine', 'saman-seo' ) }</th>
+							<th>{ __( 'Submitted', 'saman-seo' ) }</th>
 						</tr>
 					</thead>
 					<tbody>
 						{ logs.length === 0 ? (
 							<tr>
 								<td colSpan="5" className="empty-cell">
-									No submission logs yet.
+									{ __(
+										'No submission logs yet.',
+										'saman-seo'
+									) }
 								</td>
 							</tr>
 						) : (
@@ -549,5 +410,4 @@ const InstantIndexing = ( { onNavigate } ) => {
 		</div>
 	);
 };
-
 export default InstantIndexing;

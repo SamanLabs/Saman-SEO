@@ -17,33 +17,42 @@ import SchemaPreview from './SchemaPreview';
 import useSchemaPreview from '../hooks/useSchemaPreview';
 
 // Quick template presets for the editor
+import { __, sprintf } from '@wordpress/i18n';
 const quickTemplates = [
 	{
 		id: 'standard',
-		name: 'Standard',
-		title: '{{post_title}} | {{site_title}}',
-		description: '{{post_excerpt}}',
+		name: __( 'Standard', 'saman-seo' ),
+		title: __( '{{post_title}} | {{site_title}}', 'saman-seo' ),
+		description: __( '{{post_excerpt}}', 'saman-seo' ),
 	},
 	{
 		id: 'keyword',
-		name: 'Keyword Focus',
-		title: '{{post_title}} - Guide',
-		description: 'Learn about {{post_title}}. {{post_excerpt}}',
+		name: __( 'Keyword Focus', 'saman-seo' ),
+		title: __( '{{post_title}} - Guide', 'saman-seo' ),
+		description: __(
+			'Learn about {{post_title}}. {{post_excerpt}}',
+			'saman-seo'
+		),
 	},
 	{
 		id: 'how_to',
-		name: 'How-To',
-		title: 'How to {{post_title}}',
-		description: 'Learn how to {{post_title}} with this guide.',
+		name: __( 'How-To', 'saman-seo' ),
+		title: __( 'How to {{post_title}}', 'saman-seo' ),
+		description: __(
+			'Learn how to {{post_title}} with this guide.',
+			'saman-seo'
+		),
 	},
 	{
 		id: 'list',
-		name: 'List Post',
-		title: 'Best {{post_title}}',
-		description: 'Discover the best {{post_title}}. {{post_excerpt}}',
+		name: __( 'List Post', 'saman-seo' ),
+		title: __( 'Best {{post_title}}', 'saman-seo' ),
+		description: __(
+			'Discover the best {{post_title}}. {{post_excerpt}}',
+			'saman-seo'
+		),
 	},
 ];
-
 const SEOPanel = ( {
 	postId,
 	postType,
@@ -90,8 +99,9 @@ const SEOPanel = ( {
 	// Fetch indexing status
 	useEffect( () => {
 		if ( ! postId ) return;
-
-		apiFetch( { path: `/saman-seo/v1/indexnow/post-status/${ postId }` } )
+		apiFetch( {
+			path: `/saman-seo/v1/indexnow/post-status/${ postId }`,
+		} )
 			.then( ( response ) => {
 				if ( response.success ) {
 					setIndexingStatus( response.data );
@@ -105,16 +115,13 @@ const SEOPanel = ( {
 	// Handle request indexing
 	const handleRequestIndexing = useCallback( async () => {
 		if ( ! postId || isSubmitting ) return;
-
 		setIsSubmitting( true );
 		setIndexError( null );
-
 		try {
 			const response = await apiFetch( {
 				path: `/saman-seo/v1/indexnow/submit-post/${ postId }`,
 				method: 'POST',
 			} );
-
 			if ( response.success ) {
 				// Refresh status after submission
 				const statusResponse = await apiFetch( {
@@ -148,17 +155,14 @@ const SEOPanel = ( {
 	// Character limits
 	const TITLE_MAX = 60;
 	const DESC_MAX = 160;
-
 	const titleLength = ( seoMeta.title || '' ).length;
 	const descLength = ( seoMeta.description || '' ).length;
-
 	const getTitleStatus = () => {
 		if ( titleLength === 0 ) return 'empty';
 		if ( titleLength < 30 ) return 'short';
 		if ( titleLength > TITLE_MAX ) return 'long';
 		return 'good';
 	};
-
 	const getDescStatus = () => {
 		if ( descLength === 0 ) return 'empty';
 		if ( descLength < 70 ) return 'short';
@@ -174,7 +178,6 @@ const SEOPanel = ( {
 			onApply,
 		} );
 	}, [] );
-
 	const closeAiModal = useCallback( () => {
 		setAiModal( {
 			isOpen: false,
@@ -182,7 +185,6 @@ const SEOPanel = ( {
 			onApply: null,
 		} );
 	}, [] );
-
 	const handleAiGenerate = useCallback(
 		( result ) => {
 			if ( aiModal.onApply && result ) {
@@ -192,7 +194,6 @@ const SEOPanel = ( {
 		},
 		[ aiModal, closeAiModal ]
 	);
-
 	return (
 		<div className="saman-seo-editor-panel">
 			{ /* Score Header */ }
@@ -202,27 +203,39 @@ const SEOPanel = ( {
 					level={ seoScore?.level || 'poor' }
 				/>
 				<div className="saman-seo-score-info">
-					<div className="saman-seo-score-label">SEO Score</div>
+					<div className="saman-seo-score-label">
+						{ __( 'SEO Score', 'saman-seo' ) }
+					</div>
 					<div className="saman-seo-score-status">
 						{ seoScore?.issues?.length > 0
-							? `${ seoScore.issues.length } issue${
+							? sprintf(
+									/* translators: %1$s: placeholder, %2$s: placeholder */ __(
+										'%1$s issue%2$s found',
+										'saman-seo'
+									),
+									seoScore.issues.length,
 									seoScore.issues.length !== 1 ? 's' : ''
-							  } found`
-							: 'Looking good!' }
+							  )
+							: __( 'Looking good!', 'saman-seo' ) }
 					</div>
 					{ ! seoMeta.focus_keyphrase && (
 						<div className="saman-seo-keyphrase-hint">
-							Add keyphrases for full analysis
+							{ __(
+								'Add keyphrases for full analysis',
+								'saman-seo'
+							) }
 						</div>
 					) }
 					{ seoMeta.focus_keyphrase &&
 						seoMeta.secondary_keyphrases?.length > 0 && (
 							<div
 								className="saman-seo-keyphrase-hint"
-								style={ { color: '#00a32a' } }
+								style={ {
+									color: '#00a32a',
+								} }
 							>
 								{ 1 + seoMeta.secondary_keyphrases.length }{ ' ' }
-								keywords tracked
+								{ __( 'keywords tracked', 'saman-seo' ) }
 							</div>
 						) }
 				</div>
@@ -237,7 +250,7 @@ const SEOPanel = ( {
 					}` }
 					onClick={ () => setActiveTab( 'general' ) }
 				>
-					General
+					{ __( 'General', 'saman-seo' ) }
 				</button>
 				<button
 					type="button"
@@ -246,7 +259,7 @@ const SEOPanel = ( {
 					}` }
 					onClick={ () => setActiveTab( 'analysis' ) }
 				>
-					Analysis
+					{ __( 'Analysis', 'saman-seo' ) }
 				</button>
 				<button
 					type="button"
@@ -255,7 +268,7 @@ const SEOPanel = ( {
 					}` }
 					onClick={ () => setActiveTab( 'advanced' ) }
 				>
-					Advanced
+					{ __( 'Advanced', 'saman-seo' ) }
 				</button>
 				<button
 					type="button"
@@ -264,7 +277,7 @@ const SEOPanel = ( {
 					}` }
 					onClick={ () => setActiveTab( 'social' ) }
 				>
-					Social
+					{ __( 'Social', 'saman-seo' ) }
 				</button>
 				<button
 					type="button"
@@ -273,295 +286,12 @@ const SEOPanel = ( {
 					}` }
 					onClick={ () => setActiveTab( 'schema' ) }
 				>
-					Schema
+					{ __( 'Schema', 'saman-seo' ) }
 				</button>
 			</div>
 
 			{ /* General Tab */ }
-			{ activeTab === 'general' && (
-				<div className="saman-seo-tab-content">
-					{ /* Search Preview */ }
-					<div className="saman-seo-preview-section">
-						<label className="saman-seo-section-label">
-							Search Preview
-						</label>
-						<SearchPreview
-							title={ effectiveTitle }
-							description={ effectiveDescription }
-							url={ postUrl }
-						/>
-					</div>
-
-					{ /* Focus Keyphrases - Multi-keyword support */ }
-					<div className="saman-seo-field saman-seo-field--keyphrases">
-						<div className="saman-seo-field-header">
-							<label>Focus Keyphrases</label>
-							<span className="saman-seo-field-count">
-								{ 1 +
-									( seoMeta.secondary_keyphrases?.length ||
-										0 ) }
-								/5
-							</span>
-						</div>
-
-						{ /* Primary Keyphrase */ }
-						<div className="saman-seo-keyphrase-item saman-seo-keyphrase-primary">
-							<span className="saman-seo-keyphrase-badge">
-								Primary
-							</span>
-							<input
-								type="text"
-								className="saman-seo-field-input"
-								value={ seoMeta.focus_keyphrase || '' }
-								onChange={ ( e ) =>
-									updateMeta(
-										'focus_keyphrase',
-										e.target.value
-									)
-								}
-								placeholder="Enter your main target keyword"
-							/>
-						</div>
-
-						{ /* Secondary Keyphrases */ }
-						{ ( seoMeta.secondary_keyphrases || [] ).map(
-							( keyphrase, index ) => (
-								<div
-									key={ index }
-									className="saman-seo-keyphrase-item saman-seo-keyphrase-secondary"
-								>
-									<span className="saman-seo-keyphrase-badge">
-										#{ index + 2 }
-									</span>
-									<input
-										type="text"
-										className="saman-seo-field-input"
-										value={ keyphrase }
-										onChange={ ( e ) => {
-											const updated = [
-												...( seoMeta.secondary_keyphrases ||
-													[] ),
-											];
-											updated[ index ] = e.target.value;
-											updateMeta(
-												'secondary_keyphrases',
-												updated
-											);
-										} }
-										placeholder={ `Secondary keyword ${
-											index + 1
-										}` }
-									/>
-									<button
-										type="button"
-										className="saman-seo-keyphrase-remove"
-										onClick={ () => {
-											const updated = (
-												seoMeta.secondary_keyphrases ||
-												[]
-											).filter( ( _, i ) => i !== index );
-											updateMeta(
-												'secondary_keyphrases',
-												updated
-											);
-										} }
-										aria-label="Remove keyphrase"
-									>
-										×
-									</button>
-								</div>
-							)
-						) }
-
-						{ /* Add Button - Max 4 secondary (5 total) */ }
-						{ ( seoMeta.secondary_keyphrases?.length || 0 ) < 4 && (
-							<button
-								type="button"
-								className="saman-seo-keyphrase-add"
-								onClick={ () => {
-									const current =
-										seoMeta.secondary_keyphrases || [];
-									updateMeta( 'secondary_keyphrases', [
-										...current,
-										'',
-									] );
-								} }
-							>
-								<svg
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<line x1="12" y1="5" x2="12" y2="19"></line>
-									<line x1="5" y1="12" x2="19" y2="12"></line>
-								</svg>
-								Add Secondary Keyphrase
-							</button>
-						) }
-
-						<p className="saman-seo-field-help">
-							Add up to 5 keyphrases to optimize your content for
-							multiple search terms
-						</p>
-					</div>
-
-					{ /* Quick Templates */ }
-					<div className="saman-seo-field saman-seo-field--templates">
-						<div className="saman-seo-templates-header">
-							<button
-								type="button"
-								className={ `saman-seo-templates-toggle ${
-									showTemplates ? 'active' : ''
-								}` }
-								onClick={ () =>
-									setShowTemplates( ! showTemplates )
-								}
-							>
-								<svg
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<rect
-										x="3"
-										y="3"
-										width="18"
-										height="18"
-										rx="2"
-									/>
-									<path d="M7 7h10M7 12h10M7 17h6" />
-								</svg>
-								Quick Templates
-								<svg
-									width="12"
-									height="12"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									style={ {
-										transform: showTemplates
-											? 'rotate(180deg)'
-											: 'none',
-										transition: 'transform 0.15s',
-									} }
-								>
-									<polyline points="6 9 12 15 18 9" />
-								</svg>
-							</button>
-						</div>
-						{ showTemplates && (
-							<div className="saman-seo-templates-list">
-								{ quickTemplates.map( ( template ) => (
-									<button
-										key={ template.id }
-										type="button"
-										className="saman-seo-template-item"
-										onClick={ () =>
-											applyTemplate( template )
-										}
-									>
-										<span className="saman-seo-template-name">
-											{ template.name }
-										</span>
-										<span className="saman-seo-template-preview">
-											{ template.title }
-										</span>
-									</button>
-								) ) }
-							</div>
-						) }
-					</div>
-
-					{ /* SEO Title with AI and Variables */ }
-					<TemplateInput
-						label="SEO Title"
-						id="saman-seo-seo-title"
-						value={ seoMeta.title || '' }
-						onChange={ ( value ) => updateMeta( 'title', value ) }
-						placeholder={ postTitle || 'Enter SEO title' }
-						maxLength={ TITLE_MAX }
-						variables={ variables }
-						variableValues={ variableValues }
-						context="post"
-						showAiButton={ true }
-						aiEnabled={ aiEnabled }
-						onAiClick={ () =>
-							openAiModal( 'title', ( val ) =>
-								updateMeta( 'title', val )
-							)
-						}
-					/>
-
-					{ /* Meta Description with AI and Variables */ }
-					<TemplateInput
-						label="Meta Description"
-						id="saman-seo-meta-desc"
-						value={ seoMeta.description || '' }
-						onChange={ ( value ) =>
-							updateMeta( 'description', value )
-						}
-						placeholder="Enter meta description"
-						maxLength={ DESC_MAX }
-						multiline
-						variables={ variables }
-						variableValues={ variableValues }
-						context="post"
-						showAiButton={ true }
-						aiEnabled={ aiEnabled }
-						onAiClick={ () =>
-							openAiModal( 'description', ( val ) =>
-								updateMeta( 'description', val )
-							)
-						}
-					/>
-
-					{ /* Quick Analysis */ }
-					{ seoScore?.issues?.length > 0 && (
-						<div className="saman-seo-issues">
-							<label className="saman-seo-section-label">
-								Issues
-							</label>
-							<ul className="saman-seo-issues-list">
-								{ seoScore.issues
-									.slice( 0, 5 )
-									.map( ( issue, idx ) => (
-										<li
-											key={ idx }
-											className={ `saman-seo-issue saman-seo-issue--${
-												issue.severity || 'warning'
-											}` }
-										>
-											<span className="saman-seo-issue-icon">
-												{ issue.severity === 'high'
-													? '!'
-													: '?' }
-											</span>
-											<span className="saman-seo-issue-text">
-												{ issue.message }
-											</span>
-										</li>
-									) ) }
-							</ul>
-							{ seoScore.issues.length > 5 && (
-								<button
-									type="button"
-									className="saman-seo-view-all-link"
-									onClick={ () => setActiveTab( 'analysis' ) }
-								>
-									View all { seoScore.issues.length } issues →
-								</button>
-							) }
-						</div>
-					) }
-				</div>
-			) }
+			{ __( 'Enter meta description', 'saman-seo' ) }
 
 			{ /* Analysis Tab */ }
 			{ activeTab === 'analysis' && (
@@ -580,7 +310,9 @@ const SEOPanel = ( {
 					{ /* Canonical URL */ }
 					<div className="saman-seo-field">
 						<div className="saman-seo-field-header">
-							<label>Canonical URL</label>
+							<label>
+								{ __( 'Canonical URL', 'saman-seo' ) }
+							</label>
 						</div>
 						<input
 							type="url"
@@ -592,20 +324,31 @@ const SEOPanel = ( {
 							placeholder={ postUrl }
 						/>
 						<p className="saman-seo-field-help">
-							Leave empty to use the default URL
+							{ __(
+								'Leave empty to use the default URL',
+								'saman-seo'
+							) }
 						</p>
 					</div>
 
 					{ /* Robots Settings */ }
 					<div className="saman-seo-robots-section">
 						<label className="saman-seo-section-label">
-							Search Engine Visibility
+							{ __( 'Search Engine Visibility', 'saman-seo' ) }
 						</label>
 
 						<label className="saman-seo-toggle">
 							<span className="saman-seo-toggle-label">
-								Hide from search results
-								<small>Add noindex meta tag</small>
+								{ __(
+									'Hide from search results',
+									'saman-seo'
+								) }
+								<small>
+									{ __(
+										'Add noindex meta tag',
+										'saman-seo'
+									) }
+								</small>
 							</span>
 							<input
 								type="checkbox"
@@ -619,8 +362,13 @@ const SEOPanel = ( {
 
 						<label className="saman-seo-toggle">
 							<span className="saman-seo-toggle-label">
-								Don't follow links
-								<small>Add nofollow meta tag</small>
+								{ __( "Don't follow links", 'saman-seo' ) }
+								<small>
+									{ __(
+										'Add nofollow meta tag',
+										'saman-seo'
+									) }
+								</small>
 							</span>
 							<input
 								type="checkbox"
@@ -636,23 +384,27 @@ const SEOPanel = ( {
 					{ /* Robots Preview */ }
 					<div className="saman-seo-robots-preview">
 						<label className="saman-seo-section-label">
-							Robots Meta
+							{ __( 'Robots Meta', 'saman-seo' ) }
 						</label>
 						<code className="saman-seo-robots-code">
 							{ seoMeta.noindex || seoMeta.nofollow
 								? `${
-										seoMeta.noindex ? 'noindex' : 'index'
+										seoMeta.noindex
+											? __( 'noindex', 'saman-seo' )
+											: __( 'index', 'saman-seo' )
 								  }, ${
-										seoMeta.nofollow ? 'nofollow' : 'follow'
+										seoMeta.nofollow
+											? __( 'nofollow', 'saman-seo' )
+											: __( 'follow', 'saman-seo' )
 								  }`
-								: 'index, follow (default)' }
+								: __( 'index, follow (default)', 'saman-seo' ) }
 						</code>
 					</div>
 
 					{ /* Instant Indexing Section */ }
 					<div className="saman-seo-indexing-section">
 						<label className="saman-seo-section-label">
-							Instant Indexing
+							{ __( 'Instant Indexing', 'saman-seo' ) }
 						</label>
 
 						{ indexingStatus &&
@@ -670,8 +422,10 @@ const SEOPanel = ( {
 										<path d="M12 16v-4M12 8h.01" />
 									</svg>
 									<span>
-										Enable IndexNow in Settings to use
-										instant indexing
+										{ __(
+											'Enable IndexNow in Settings to use instant indexing',
+											'saman-seo'
+										) }
 									</span>
 								</div>
 							) }
@@ -720,8 +474,14 @@ const SEOPanel = ( {
 													{ indexingStatus
 														.last_submission
 														.status === 'success'
-														? 'Submitted'
-														: 'Failed' }
+														? __(
+																'Submitted',
+																'saman-seo'
+														  )
+														: __(
+																'Failed',
+																'saman-seo'
+														  ) }
 												</strong>
 												<span>
 													{
@@ -754,10 +514,17 @@ const SEOPanel = ( {
 											</svg>
 										</div>
 										<div className="saman-seo-indexing-status-text">
-											<strong>Not submitted</strong>
+											<strong>
+												{ __(
+													'Not submitted',
+													'saman-seo'
+												) }
+											</strong>
 											<span>
-												Request indexing to notify
-												search engines
+												{ __(
+													'Request indexing to notify search engines',
+													'saman-seo'
+												) }
 											</span>
 										</div>
 									</div>
@@ -780,7 +547,10 @@ const SEOPanel = ( {
 									{ isSubmitting ? (
 										<>
 											<span className="saman-seo-indexing-spinner" />
-											Submitting...
+											{ __(
+												'Submitting\u2026',
+												'saman-seo'
+											) }
 										</>
 									) : (
 										<>
@@ -794,22 +564,28 @@ const SEOPanel = ( {
 											>
 												<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
 											</svg>
-											Request Indexing
+											{ __(
+												'Request Indexing',
+												'saman-seo'
+											) }
 										</>
 									) }
 								</Button>
 
 								<p className="saman-seo-field-help">
-									Submit this URL to search engines via
-									IndexNow for faster discovery.
+									{ __(
+										'Submit this URL to search engines via IndexNow for faster discovery.',
+										'saman-seo'
+									) }
 									{ indexingStatus.total_submissions > 0 && (
 										<>
 											{ ' ' }
-											Submitted{ ' ' }
-											{
-												indexingStatus.total_submissions
-											}{ ' ' }
-											time
+											{ __(
+												'Submitted',
+												'saman-seo'
+											) }{ ' ' }
+											{ indexingStatus.total_submissions }{ ' ' }
+											{ __( 'time', 'saman-seo' ) }
 											{ indexingStatus.total_submissions !==
 											1
 												? 's'
@@ -832,7 +608,7 @@ const SEOPanel = ( {
 						<div className="saman-seo-social-col">
 							<div className="saman-seo-social-preview">
 								<label className="saman-seo-section-label">
-									Social Preview
+									{ __( 'Social Preview', 'saman-seo' ) }
 								</label>
 								<div className="saman-seo-social-card">
 									<div className="saman-seo-social-image">
@@ -875,7 +651,12 @@ const SEOPanel = ( {
 														strokeLinejoin="round"
 													/>
 												</svg>
-												<span>No image set</span>
+												<span>
+													{ __(
+														'No image set',
+														'saman-seo'
+													) }
+												</span>
 											</div>
 										) }
 									</div>
@@ -888,7 +669,10 @@ const SEOPanel = ( {
 										</div>
 										<div className="saman-seo-social-desc">
 											{ effectiveDescription ||
-												'No description available' }
+												__(
+													'No description available',
+													'saman-seo'
+												) }
 										</div>
 									</div>
 								</div>
@@ -899,68 +683,32 @@ const SEOPanel = ( {
 						<div className="saman-seo-social-col">
 							<div className="saman-seo-field">
 								<div className="saman-seo-field-header">
-									<label>Social Image</label>
+									<label>
+										{ __( 'Social Image', 'saman-seo' ) }
+									</label>
 								</div>
 								<div className="saman-seo-image-picker">
-									{ seoMeta.og_image ? (
-										<div className="saman-seo-image-preview">
-											<img
-												src={ seoMeta.og_image }
-												alt=""
-											/>
-											<button
-												type="button"
-												className="saman-seo-image-remove"
-												onClick={ () =>
-													updateMeta( 'og_image', '' )
-												}
-												aria-label="Remove image"
-											>
-												×
-											</button>
-										</div>
-									) : (
-										<div className="saman-seo-image-placeholder">
-											<svg
-												width="24"
-												height="24"
-												viewBox="0 0 24 24"
-												fill="none"
-											>
-												<rect
-													x="3"
-													y="3"
-													width="18"
-													height="18"
-													rx="2"
-													stroke="currentColor"
-													strokeWidth="2"
-												/>
-												<circle
-													cx="8.5"
-													cy="8.5"
-													r="1.5"
-													fill="currentColor"
-												/>
-												<path
-													d="M21 15l-5-5L5 21"
-													stroke="currentColor"
-													strokeWidth="2"
-												/>
-											</svg>
-											<span>No image</span>
-										</div>
-									) }
+									{ __( 'Remove image', 'saman-seo' ) }
 								</div>
 								<Button
 									variant="secondary"
 									className="saman-seo-media-button"
 									onClick={ () => {
 										const frame = wp.media( {
-											title: 'Select Social Image',
-											button: { text: 'Use Image' },
+											title: __(
+												'Select Social Image',
+												'saman-seo'
+											),
+											button: {
+												text: __(
+													'Use Image',
+													'saman-seo'
+												),
+											},
 											multiple: false,
-											library: { type: 'image' },
+											library: {
+												type: 'image',
+											},
 										} );
 										frame.on( 'select', () => {
 											const attachment = frame
@@ -981,7 +729,9 @@ const SEOPanel = ( {
 										height="16"
 										viewBox="0 0 24 24"
 										fill="none"
-										style={ { marginRight: '6px' } }
+										style={ {
+											marginRight: '6px',
+										} }
 									>
 										<rect
 											x="3"
@@ -1005,16 +755,21 @@ const SEOPanel = ( {
 										/>
 									</svg>
 									{ seoMeta.og_image
-										? 'Change Image'
-										: 'Select Image' }
+										? __( 'Change Image', 'saman-seo' )
+										: __( 'Select Image', 'saman-seo' ) }
 								</Button>
 								<p className="saman-seo-field-help">
-									1200x630 recommended. Leave empty to use
-									featured image.
+									{ __(
+										'1200x630 recommended. Leave empty to use featured image.',
+										'saman-seo'
+									) }
 								</p>
 								{ ! seoMeta.og_image && featuredImage && (
 									<p className="saman-seo-field-note">
-										Using featured image as fallback
+										{ __(
+											'Using featured image as fallback',
+											'saman-seo'
+										) }
 									</p>
 								) }
 							</div>
@@ -1061,5 +816,4 @@ const SEOPanel = ( {
 		</div>
 	);
 };
-
 export default SEOPanel;
