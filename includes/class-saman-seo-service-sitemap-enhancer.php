@@ -1488,10 +1488,15 @@ class Sitemap_Enhancer {
 			$post_types = array( 'post' );
 		}
 
+		// Google News sitemaps accept up to 1,000 URLs per file. Allow filtering
+		// for sites with heavier recent publishing volumes.
+		// phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Google News max URLs.
+		$posts_per_page = apply_filters( 'saman_seo_news_sitemap_posts_per_page', 1000 );
+
 		$posts = get_posts(
 			array(
 				'post_type'      => $post_types,
-				'posts_per_page' => 1000,
+				'posts_per_page' => absint( $posts_per_page ),
 				'post_status'    => 'publish',
 				'date_query'     => array(
 					array(
