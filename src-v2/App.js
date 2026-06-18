@@ -127,6 +127,7 @@ const App = ({ initialView = 'dashboard' }) => {
             }
         }
 
+        menu.classList.remove('wp-not-current-submenu');
         menu.classList.add('current', 'wp-has-current-submenu');
     }, []);
 

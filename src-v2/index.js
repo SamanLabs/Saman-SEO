@@ -1,3 +1,11 @@
+/* global __webpack_public_path__ */
+
+// Set webpack public path so lazy-loaded chunks always resolve from the plugin
+// build folder, regardless of the current WordPress admin page URL.
+if (window.samanSeoV2Settings && window.samanSeoV2Settings.pluginUrl) {
+    __webpack_public_path__ = window.samanSeoV2Settings.pluginUrl + 'build/v2/';
+}
+
 import { render } from '@wordpress/element';
 import App from './App';
 
