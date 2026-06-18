@@ -1,21 +1,23 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState, useTransition } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import Header from './components/Header';
 import './index.css';
 
-// Lazy load page components for better performance
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+// Eager-load the primary nav views so top-level navigation feels instant.
+import Dashboard from './pages/Dashboard';
+import Tools from './pages/Tools';
+import Settings from './pages/Settings';
+import More from './pages/More';
+
+// Lazy load secondary / heavy page components
 const SearchAppearance = lazy(() => import('./pages/SearchAppearance'));
 const Sitemap = lazy(() => import('./pages/Sitemap'));
-const Tools = lazy(() => import('./pages/Tools'));
 const Redirects = lazy(() => import('./pages/Redirects'));
 const Log404 = lazy(() => import('./pages/Log404'));
 const InternalLinking = lazy(() => import('./pages/InternalLinking'));
 const Audit = lazy(() => import('./pages/Audit'));
 const AiAssistant = lazy(() => import('./pages/AiAssistant'));
 const Assistants = lazy(() => import('./pages/Assistants'));
-const Settings = lazy(() => import('./pages/Settings'));
-const More = lazy(() => import('./pages/More'));
 const Setup = lazy(() => import('./pages/Setup'));
 const BulkEditor = lazy(() => import('./pages/BulkEditor'));
 const ContentGaps = lazy(() => import('./pages/ContentGaps'));
@@ -28,6 +30,30 @@ const InstantIndexing = lazy(() => import('./pages/InstantIndexing'));
 const SchemaValidator = lazy(() => import('./pages/SchemaValidator'));
 const HtaccessEditor = lazy(() => import('./pages/HtaccessEditor'));
 const MobileFriendly = lazy(() => import('./pages/MobileFriendly'));
+
+// Component prefetch registry: maps view id to its lazy import factory.
+const prefetchRegistry = {
+    'search-appearance': () => import('./pages/SearchAppearance'),
+    sitemap: () => import('./pages/Sitemap'),
+    redirects: () => import('./pages/Redirects'),
+    '404-log': () => import('./pages/Log404'),
+    'internal-linking': () => import('./pages/InternalLinking'),
+    audit: () => import('./pages/Audit'),
+    'ai-assistant': () => import('./pages/AiAssistant'),
+    assistants: () => import('./pages/Assistants'),
+    setup: () => import('./pages/Setup'),
+    'bulk-editor': () => import('./pages/BulkEditor'),
+    'content-gaps': () => import('./pages/ContentGaps'),
+    'schema-builder': () => import('./pages/SchemaBuilder'),
+    'link-health': () => import('./pages/LinkHealth'),
+    'local-seo': () => import('./pages/LocalSeo'),
+    'robots-txt': () => import('./pages/RobotsTxt'),
+    'image-seo': () => import('./pages/ImageSeo'),
+    'instant-indexing': () => import('./pages/InstantIndexing'),
+    'schema-validator': () => import('./pages/SchemaValidator'),
+    'htaccess-editor': () => import('./pages/HtaccessEditor'),
+    'mobile-friendly': () => import('./pages/MobileFriendly'),
+};
 
 // Loading spinner for lazy-loaded components
 const PageLoader = () => (
@@ -71,6 +97,7 @@ const App = ({ initialView = 'dashboard' }) => {
     const [currentView, setCurrentView] = useState(initialView);
     const [showSetup, setShowSetup] = useState(false);
     const [setupChecked, setSetupChecked] = useState(false);
+    const [, startTransition] = useTransition();
 
     // Check setup status on mount
     useEffect(() => {
@@ -137,7 +164,13 @@ const App = ({ initialView = 'dashboard' }) => {
                 return;
             }
 
-            setCurrentView(view);
+            // Use a transition so React can keep the UI responsive while
+            // lazy chunks load. The old view stays visible briefly instead of
+            // snapping to a blank spinner.
+            startTransition(() => {
+                setCurrentView(view);
+            });
+
             if (typeof window === 'undefined') {
                 return;
             }
@@ -150,6 +183,18 @@ const App = ({ initialView = 'dashboard' }) => {
         },
         [currentView, updateAdminMenuHighlight]
     );
+
+    // Prefetch a view's chunk on hover so navigation feels instant.
+    const handlePrefetch = useCallback((view) => {
+        const importer = prefetchRegistry[view];
+        if (importer && typeof importer === 'function') {
+            try {
+                importer();
+            } catch (err) {
+                // Prefetch is best-effort; ignore failures.
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const handlePopState = () => {
@@ -277,7 +322,7 @@ const App = ({ initialView = 'dashboard' }) => {
     return (
         <div className="saman-seo-admin">
             <div className="saman-seo-shell">
-                <Header currentView={currentView} onNavigate={handleNavigate} />
+                <Header currentView={currentView} onNavigate={handleNavigate} onPrefetch={handlePrefetch} />
                 <div className="content-area">
                     <Suspense fallback={<PageLoader />}>
                         {renderView()}

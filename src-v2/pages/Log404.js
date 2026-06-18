@@ -114,6 +114,23 @@ const Log404 = ({ onNavigate }) => {
         }
     };
 
+    // Close export menu when clicking outside
+    useEffect(() => {
+        if (!showExportMenu) {
+            return;
+        }
+
+        const handleClickOutside = (event) => {
+            const wrapper = document.querySelector('.log-export-dropdown');
+            if (wrapper && !wrapper.contains(event.target)) {
+                setShowExportMenu(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showExportMenu]);
+
     // Export 404 log
     const handleExport = async (format) => {
         setExporting(true);
@@ -214,28 +231,28 @@ const Log404 = ({ onNavigate }) => {
                     >
                         Manage Ignore Patterns
                     </button>
-                    <div className="dropdown-wrapper">
+                    <div className={`dropdown log-export-dropdown ${showExportMenu ? 'is-open' : ''}`}>
                         <button
                             type="button"
-                            className="button"
+                            className="button dropdown__trigger"
                             onClick={() => setShowExportMenu(!showExportMenu)}
                             disabled={exporting || logEntries.length === 0}
+                            aria-expanded={showExportMenu}
+                            aria-haspopup="true"
                         >
                             {exporting ? 'Exporting...' : 'Export'}
-                            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style={{ marginLeft: 4 }}>
+                            <svg className="dropdown__chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
                                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
                         </button>
-                        {showExportMenu && (
-                            <div className="dropdown-menu">
-                                <button type="button" onClick={() => handleExport('csv')}>
-                                    Export as CSV
-                                </button>
-                                <button type="button" onClick={() => handleExport('json')}>
-                                    Export as JSON
-                                </button>
-                            </div>
-                        )}
+                        <div className="dropdown-menu">
+                            <button type="button" className="dropdown-menu__item" onClick={() => handleExport('csv')}>
+                                Export as CSV
+                            </button>
+                            <button type="button" className="dropdown-menu__item" onClick={() => handleExport('json')}>
+                                Export as JSON
+                            </button>
+                        </div>
                     </div>
                     <button
                         type="button"
@@ -248,32 +265,30 @@ const Log404 = ({ onNavigate }) => {
                 </div>
             </div>
 
-            <section className="panel">
-                {/* Stats Bar */}
-                <div className="table-toolbar">
-                    <div className="stats-bar">
-                        <div className="stat-box">
-                            <span className="stat-box__value">{logTotal.toLocaleString()}</span>
-                            <span className="stat-box__label">Total Entries</span>
-                        </div>
-                        <div className="stat-box">
-                            <span className="stat-box__value">{logEntries.filter(e => !e.redirect_exists).length}</span>
-                            <span className="stat-box__label">Need Redirect</span>
-                        </div>
-                        <div className="stat-box">
-                            <span className="stat-box__value">{botCount.toLocaleString()}</span>
-                            <span className="stat-box__label">Bot Hits</span>
-                        </div>
-                        <div className="stat-box">
-                            <span className="stat-box__value">{ignoredCount.toLocaleString()}</span>
-                            <span className="stat-box__label">Ignored</span>
+            <section className="page-body">
+                {/* Summary + Filters */}
+                <div className="page-toolbar">
+                    <div className="page-summary">
+                        <div className="stat-list">
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{logTotal.toLocaleString()}</span>
+                                <span className="stat-list__label">Total entries</span>
+                            </div>
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{logEntries.filter(e => !e.redirect_exists).length}</span>
+                                <span className="stat-list__label">Need redirect</span>
+                            </div>
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{botCount.toLocaleString()}</span>
+                                <span className="stat-list__label">Bot hits</span>
+                            </div>
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{ignoredCount.toLocaleString()}</span>
+                                <span className="stat-list__label">Ignored</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Filters */}
-                <div className="filter-form">
-                    <div className="filter-row">
+                    <div className="page-toolbar__filters">
                         <label className="filter-field">
                             <span>Sort by</span>
                             <select
@@ -289,7 +304,7 @@ const Log404 = ({ onNavigate }) => {
                             </select>
                         </label>
                         <label className="filter-field">
-                            <span>Rows per page</span>
+                            <span>Rows</span>
                             <select
                                 value={logPerPage}
                                 onChange={(e) => {
@@ -311,7 +326,7 @@ const Log404 = ({ onNavigate }) => {
                                     setLogPage(1);
                                 }}
                             />
-                            <span>Hide spammy extensions</span>
+                            <span>Hide spam</span>
                         </label>
                         <label className="filter-checkbox">
                             <input
@@ -322,7 +337,7 @@ const Log404 = ({ onNavigate }) => {
                                     setLogPage(1);
                                 }}
                             />
-                            <span>Hide image extensions</span>
+                            <span>Hide images</span>
                         </label>
                         <label className="filter-checkbox">
                             <input
@@ -333,7 +348,7 @@ const Log404 = ({ onNavigate }) => {
                                     setLogPage(1);
                                 }}
                             />
-                            <span>Hide bots/crawlers</span>
+                            <span>Hide bots</span>
                         </label>
                         <label className="filter-checkbox">
                             <input
@@ -365,75 +380,84 @@ const Log404 = ({ onNavigate }) => {
                     </div>
                 ) : (
                     <>
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Request URL</th>
-                                    <th>Hits</th>
-                                    <th>Last Seen</th>
-                                    <th>Device</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {logEntries.map(entry => (
-                                    <tr key={entry.id} className={`${entry.is_bot ? 'is-bot-row' : ''} ${entry.is_ignored ? 'is-ignored-row' : ''}`}>
-                                        <td className="url-cell">
-                                            <code>{entry.request_uri}</code>
-                                            {entry.redirect_exists && (
-                                                <span className="badge success">Redirect exists</span>
-                                            )}
-                                            {entry.is_bot && (
-                                                <span className="badge muted" title="Bot/crawler request">Bot</span>
-                                            )}
-                                            {entry.is_ignored && (
-                                                <span className="badge warning" title="This URL is ignored">Ignored</span>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <span className={`hits-badge ${entry.hits > 10 ? 'high' : entry.hits > 5 ? 'medium' : ''}`}>
-                                                {entry.hits}
-                                            </span>
-                                        </td>
-                                        <td>{formatDate(entry.last_seen)}</td>
-                                        <td>{entry.device_label}</td>
-                                        <td className="action-cell">
-                                            <div className="action-buttons">
-                                                {!entry.redirect_exists && (
-                                                    <button
-                                                        type="button"
-                                                        className="button primary small"
-                                                        onClick={() => handleCreateFrom404(entry)}
-                                                    >
-                                                        Redirect
-                                                    </button>
-                                                )}
-                                                {entry.is_ignored ? (
-                                                    <button
-                                                        type="button"
-                                                        className="button small"
-                                                        onClick={() => handleUnignoreEntry(entry)}
-                                                        disabled={ignoringEntry === entry.id}
-                                                    >
-                                                        {ignoringEntry === entry.id ? '...' : 'Unignore'}
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        type="button"
-                                                        className="button ghost small"
-                                                        onClick={() => handleIgnoreEntry(entry)}
-                                                        disabled={ignoringEntry === entry.id}
-                                                        title="Ignore this URL"
-                                                    >
-                                                        {ignoringEntry === entry.id ? '...' : 'Ignore'}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
+                        <div className="table-wrap">
+                            <table className="data-table data-table--compact">
+                                <thead>
+                                    <tr>
+                                        <th className="col-url">Request URL</th>
+                                        <th className="col-numeric">Hits</th>
+                                        <th className="col-date">Last seen</th>
+                                        <th className="col-device">Device</th>
+                                        <th className="col-actions">Action</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {logEntries.map(entry => (
+                                        <tr key={entry.id} className={`${entry.is_bot ? 'is-bot-row' : ''} ${entry.is_ignored ? 'is-ignored-row' : ''}`}>
+                                            <td className="url-cell">
+                                                <span className="url-cell__path" title={entry.request_uri}>
+                                                    <code>{entry.request_uri}</code>
+                                                </span>
+                                                <span className="url-cell__badges">
+                                                    {entry.redirect_exists && (
+                                                        <span className="badge success">Redirect exists</span>
+                                                    )}
+                                                    {entry.is_bot && (
+                                                        <span className="badge muted" title="Bot/crawler request">Bot</span>
+                                                    )}
+                                                    {entry.is_ignored && (
+                                                        <span className="badge warning" title="This URL is ignored">Ignored</span>
+                                                    )}
+                                                </span>
+                                            </td>
+                                            <td className="numeric-cell">
+                                                <span className={`hits-badge ${entry.hits > 10 ? 'high' : entry.hits > 5 ? 'medium' : ''}`}>
+                                                    {entry.hits}
+                                                </span>
+                                            </td>
+                                            <td className="date-cell">{formatDate(entry.last_seen)}</td>
+                                            <td className="device-cell" title={entry.device_label}>
+                                                {entry.device_label}
+                                            </td>
+                                            <td className="action-cell">
+                                                <div className="table-actions">
+                                                    {!entry.redirect_exists && (
+                                                        <button
+                                                            type="button"
+                                                            className="table-actions__primary"
+                                                            onClick={() => handleCreateFrom404(entry)}
+                                                            title="Create redirect"
+                                                        >
+                                                            Redirect
+                                                        </button>
+                                                    )}
+                                                    {entry.is_ignored ? (
+                                                        <button
+                                                            type="button"
+                                                            className="table-actions__secondary"
+                                                            onClick={() => handleUnignoreEntry(entry)}
+                                                            disabled={ignoringEntry === entry.id}
+                                                        >
+                                                            {ignoringEntry === entry.id ? '...' : 'Unignore'}
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className="table-actions__secondary"
+                                                            onClick={() => handleIgnoreEntry(entry)}
+                                                            disabled={ignoringEntry === entry.id}
+                                                            title="Ignore this URL"
+                                                        >
+                                                            {ignoringEntry === entry.id ? '...' : 'Ignore'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         {/* Pagination */}
                         {logTotalPages > 1 && (

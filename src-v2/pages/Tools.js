@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Most Popular Tools - Practical SEO tools that work NOW
-const popularTools = [
+export const popularTools = [
     {
         id: 'redirects',
         name: 'Redirects',

@@ -1,13 +1,48 @@
+import { useState, useRef } from 'react';
+import { popularTools } from '../pages/Tools';
+
 const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'search-appearance', label: 'Search Appearance' },
     { id: 'sitemap', label: 'Sitemap' },
-    { id: 'tools', label: 'Tools' },
+    { id: 'tools', label: 'Tools', hasMegaMenu: true },
     { id: 'settings', label: 'Settings' },
     { id: 'more', label: 'More' },
 ];
 
-const Header = ({ currentView, onNavigate }) => {
+// Top 4 tools shown in the mega menu preview + a "more" entry.
+const megaMenuTools = popularTools.slice(0, 4);
+
+const Header = ({ currentView, onNavigate, onPrefetch }) => {
+    const [megaOpen, setMegaOpen] = useState(false);
+    const megaTimeout = useRef(null);
+
+    const openMega = () => {
+        if (megaTimeout.current) {
+            clearTimeout(megaTimeout.current);
+            megaTimeout.current = null;
+        }
+        setMegaOpen(true);
+    };
+
+    const closeMega = () => {
+        // Small delay prevents the menu from snapping shut when moving
+        // the cursor from the tab to the panel.
+        megaTimeout.current = setTimeout(() => {
+            setMegaOpen(false);
+        }, 120);
+    };
+
+    const handleNavClick = (item) => {
+        setMegaOpen(false);
+        onNavigate(item.id);
+    };
+
+    const handleToolClick = (toolId) => {
+        setMegaOpen(false);
+        onNavigate(toolId);
+    };
+
     return (
         <header className="top-bar">
             <div className="brand">
@@ -24,15 +59,82 @@ const Header = ({ currentView, onNavigate }) => {
             </div>
             <nav className="main-nav" aria-label="Primary">
                 {navItems.map((item) => (
-                    <button
+                    <div
                         key={item.id}
-                        type="button"
-                        className={`nav-tab ${currentView === item.id ? 'is-active' : ''}`}
-                        aria-current={currentView === item.id ? 'page' : undefined}
-                        onClick={() => onNavigate(item.id)}
+                        className={`nav-item ${item.hasMegaMenu ? 'nav-item--has-mega' : ''}`}
+                        onMouseEnter={() => {
+                            if (onPrefetch) {
+                                onPrefetch(item.id);
+                            }
+                            if (item.hasMegaMenu) {
+                                openMega();
+                            }
+                        }}
+                        onMouseLeave={() => {
+                            if (item.hasMegaMenu) {
+                                closeMega();
+                            }
+                        }}
                     >
-                        {item.label}
-                    </button>
+                        <button
+                            type="button"
+                            className={`nav-tab ${currentView === item.id ? 'is-active' : ''} ${megaOpen && item.hasMegaMenu ? 'is-hovered' : ''}`}
+                            aria-current={currentView === item.id ? 'page' : undefined}
+                            aria-expanded={item.hasMegaMenu ? megaOpen : undefined}
+                            aria-haspopup={item.hasMegaMenu ? 'true' : undefined}
+                            onClick={() => handleNavClick(item)}
+                            onFocus={() => {
+                                if (onPrefetch) {
+                                    onPrefetch(item.id);
+                                }
+                            }}
+                        >
+                            {item.label}
+                            {item.hasMegaMenu && (
+                                <svg className="nav-tab__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            )}
+                        </button>
+                        {item.hasMegaMenu && megaOpen && (
+                            <div
+                                className="mega-menu"
+                                onMouseEnter={openMega}
+                                onMouseLeave={closeMega}
+                                role="menu"
+                            >
+                                <div className="mega-menu__grid">
+                                    {megaMenuTools.map((tool) => (
+                                        <button
+                                            key={tool.id}
+                                            type="button"
+                                            className="mega-menu__item"
+                                            role="menuitem"
+                                            onClick={() => handleToolClick(tool.id)}
+                                        >
+                                            <span className="mega-menu__icon" style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
+                                                {tool.icon}
+                                            </span>
+                                            <span className="mega-menu__label">{tool.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="mega-menu__footer">
+                                    <button
+                                        type="button"
+                                        className="mega-menu__all"
+                                        role="menuitem"
+                                        onClick={() => handleToolClick('tools')}
+                                    >
+                                        View all tools
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M5 12h14M12 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 ))}
             </nav>
             <div className="nav-actions">

@@ -763,76 +763,38 @@ const Redirects = () => {
                     <div className="dropdown">
                         <button type="button" className="button ghost">Export</button>
                         <div className="dropdown-menu">
-                            <button onClick={() => handleExport('json')}>Export as JSON</button>
-                            <button onClick={() => handleExport('csv')}>Export as CSV</button>
+                            <button type="button" className="dropdown-menu__item" onClick={() => handleExport('json')}>Export as JSON</button>
+                            <button type="button" className="dropdown-menu__item" onClick={() => handleExport('csv')}>Export as CSV</button>
                         </div>
                     </div>
                     <button type="button" className="button primary" onClick={openCreateModal}>Add Redirect</button>
                 </div>
             </div>
 
-            <section>
-                {/* Stats Bar */}
-                <div className="table-toolbar">
-                    <div className="stats-bar">
-                        <div className="stat-box">
-                            <span className="stat-box__value">{summaryLoading ? '...' : summary.total.toLocaleString()}</span>
-                            <span className="stat-box__label">Total Redirects</span>
-                        </div>
-                        <div className="stat-box">
-                            <span className="stat-box__value">{summaryLoading ? '...' : summary.active_count.toLocaleString()}</span>
-                            <span className="stat-box__label">Active</span>
-                        </div>
-                        <div className="stat-box">
-                            <span className="stat-box__value">{summaryLoading ? '...' : summary.total_hits.toLocaleString()}</span>
-                            <span className="stat-box__label">Total Hits</span>
-                        </div>
-                        <div className="stat-box stat-box--top" title={summary.top_redirect ? summary.top_redirect.source : ''}>
-                            <span className="stat-box__value">{summaryLoading ? '...' : (summary.top_redirect ? summary.top_redirect.hits.toLocaleString() : '0')}</span>
-                            <span className="stat-box__label">Top Redirect Hits</span>
+            <section className="page-body">
+                {/* Summary + Filters */}
+                <div className="page-toolbar">
+                    <div className="page-summary">
+                        <div className="stat-list">
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{summaryLoading ? '...' : summary.total.toLocaleString()}</span>
+                                <span className="stat-list__label">Total redirects</span>
+                            </div>
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{summaryLoading ? '...' : summary.active_count.toLocaleString()}</span>
+                                <span className="stat-list__label">Active</span>
+                            </div>
+                            <div className="stat-list__item">
+                                <span className="stat-list__value">{summaryLoading ? '...' : summary.total_hits.toLocaleString()}</span>
+                                <span className="stat-list__label">Total hits</span>
+                            </div>
+                            <div className="stat-list__item" title={summary.top_redirect ? summary.top_redirect.source : ''}>
+                                <span className="stat-list__value">{summaryLoading ? '...' : (summary.top_redirect ? summary.top_redirect.hits.toLocaleString() : '0')}</span>
+                                <span className="stat-list__label">Top hits</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Slug Change Suggestions */}
-                {!suggestionsLoading && suggestions.length > 0 && (
-                    <div className="alert-card warning" style={{ marginBottom: '24px' }}>
-                        <div className="alert-header">
-                            <h3>Detected Slug Changes</h3>
-                        </div>
-                        <p className="muted">The following posts have changed their URL structure. Create redirects to prevent 404 errors.</p>
-                        <table className="data-table suggestions-table">
-                            <thead>
-                                <tr>
-                                    <th>Old Path</th>
-                                    <th>New Target</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {suggestions.map(suggestion => (
-                                    <tr key={suggestion.key}>
-                                        <td><code>{suggestion.source}</code></td>
-                                        <td>
-                                            <a href={suggestion.target} target="_blank" rel="noopener noreferrer">
-                                                {suggestion.target}
-                                            </a>
-                                        </td>
-                                        <td className="action-buttons">
-                                            <button type="button" className="button primary small" onClick={() => handleApplySuggestion(suggestion.key)}>Apply</button>
-                                            <button type="button" className="button ghost small" onClick={() => handleUseSuggestion(suggestion)}>Edit</button>
-                                            <button type="button" className="link-button danger" onClick={() => handleDismissSuggestion(suggestion.key)}>Dismiss</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {/* Filters */}
-                <div className="table-toolbar">
-                    <div className="table-toolbar-filters">
+                    <div className="page-toolbar__filters">
                         <input
                             type="search"
                             placeholder="Search redirects..."
@@ -841,22 +803,60 @@ const Redirects = () => {
                             className="search-input"
                         />
                         <select value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)}>
-                            <option value="">All Groups</option>
+                            <option value="">All groups</option>
                             {groups.map(group => (
                                 <option key={group} value={group}>{group}</option>
                             ))}
                         </select>
                         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-                            <option value="">All Status</option>
+                            <option value="">All status</option>
                             {STATUS_CODES.map(code => (
                                 <option key={code.value} value={code.value}>{code.label}</option>
                             ))}
                         </select>
-                    </div>
-                    <div className="table-toolbar-info">
-                        <span className="muted">{pagination.total} redirect{pagination.total !== 1 ? 's' : ''}</span>
+                        <span className="page-toolbar__count">{pagination.total} redirect{pagination.total !== 1 ? 's' : ''}</span>
                     </div>
                 </div>
+
+                {/* Slug Change Suggestions */}
+                {!suggestionsLoading && suggestions.length > 0 && (
+                    <div className="alert-card warning">
+                        <div className="alert-header">
+                            <h3>Detected slug changes</h3>
+                        </div>
+                        <p className="muted">The following posts have changed their URL structure. Create redirects to prevent 404 errors.</p>
+                        <div className="table-wrap">
+                            <table className="data-table data-table--compact">
+                                <thead>
+                                    <tr>
+                                        <th className="col-url">Old path</th>
+                                        <th className="col-url">New target</th>
+                                        <th className="col-actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {suggestions.map(suggestion => (
+                                        <tr key={suggestion.key}>
+                                            <td className="url-cell"><code>{suggestion.source}</code></td>
+                                            <td className="url-cell">
+                                                <a href={suggestion.target} target="_blank" rel="noopener noreferrer">
+                                                    {suggestion.target}
+                                                </a>
+                                            </td>
+                                            <td className="action-cell">
+                                                <div className="table-actions">
+                                                    <button type="button" className="table-actions__primary" onClick={() => handleApplySuggestion(suggestion.key)}>Apply</button>
+                                                    <button type="button" className="table-actions__secondary" onClick={() => handleUseSuggestion(suggestion)}>Edit</button>
+                                                    <button type="button" className="table-actions__danger" onClick={() => handleDismissSuggestion(suggestion.key)}>Dismiss</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
 
                 {/* Bulk actions */}
                 {selectedIds.length > 0 && (
@@ -888,98 +888,103 @@ const Redirects = () => {
                     </div>
                 ) : (
                     <>
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th className="checkbox-col">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.length === redirects.length && redirects.length > 0}
-                                            onChange={toggleSelectAll}
-                                        />
-                                    </th>
-                                    <th>Source</th>
-                                    <th>Target</th>
-                                    <th>Status</th>
-                                    <th>Hits</th>
-                                    <th>Last Hit</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {redirects.map(redirect => (
-                                    <tr key={redirect.id} className={!redirect.is_active ? 'inactive-row' : ''}>
-                                        <td className="checkbox-col">
+                        <div className="table-wrap">
+                            <table className="data-table data-table--compact">
+                                <thead>
+                                    <tr>
+                                        <th className="checkbox-col">
                                             <input
                                                 type="checkbox"
-                                                checked={selectedIds.includes(redirect.id)}
-                                                onChange={() => toggleSelect(redirect.id)}
+                                                checked={selectedIds.length === redirects.length && redirects.length > 0}
+                                                onChange={toggleSelectAll}
                                             />
-                                        </td>
-                                        <td>
-                                            <code>{redirect.source}</code>
-                                            {redirect.is_regex && (
-                                                <span
-                                                    className="pill info small"
-                                                    style={{ marginLeft: '6px', cursor: 'help' }}
-                                                    title={buildRegexTooltip(redirect.source)}
-                                                >
-                                                    Regex
-                                                </span>
-                                            )}
-                                            {redirect.group_name && <span className="pill muted small" style={{ marginLeft: '6px' }}>{redirect.group_name}</span>}
-                                        </td>
-                                        <td>
-                                            <a href={redirect.target} target="_blank" rel="noopener noreferrer" className="truncate-link">
-                                                {redirect.target}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <span className={`pill ${redirect.status_code === 301 ? 'success' : redirect.status_code === 410 ? 'danger' : 'warning'}`}>
-                                                {redirect.status_code}
-                                            </span>
-                                        </td>
-                                        <td>{redirect.hits}</td>
-                                        <td>
-                                            {formatDate(redirect.last_hit)}
-                                            {!redirect.is_active && (
-                                                <div className="text-muted text-small">
-                                                    {redirect.start_date && new Date(redirect.start_date) > new Date()
-                                                        ? `Starts: ${formatShortDate(redirect.start_date)}`
-                                                        : `Ended: ${formatShortDate(redirect.end_date)}`}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="action-buttons">
-                                            <button type="button" className="link-button" onClick={() => openEditModal(redirect)}>Edit</button>
-                                            <button type="button" className="link-button danger" onClick={() => handleDeleteRedirect(redirect.id)}>Delete</button>
-                                        </td>
+                                        </th>
+                                        <th className="col-url">Source</th>
+                                        <th className="col-url">Target</th>
+                                        <th className="col-status">Status</th>
+                                        <th className="col-numeric">Hits</th>
+                                        <th className="col-date">Last hit</th>
+                                        <th className="col-actions">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {redirects.map(redirect => (
+                                        <tr key={redirect.id} className={!redirect.is_active ? 'inactive-row' : ''}>
+                                            <td className="checkbox-col">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedIds.includes(redirect.id)}
+                                                    onChange={() => toggleSelect(redirect.id)}
+                                                />
+                                            </td>
+                                            <td className="url-cell">
+                                                <span className="url-cell__path"><code>{redirect.source}</code></span>
+                                                <span className="url-cell__badges">
+                                                    {redirect.is_regex && (
+                                                        <span
+                                                            className="pill info small"
+                                                            title={buildRegexTooltip(redirect.source)}
+                                                        >
+                                                            Regex
+                                                        </span>
+                                                    )}
+                                                    {redirect.group_name && <span className="pill muted small">{redirect.group_name}</span>}
+                                                </span>
+                                            </td>
+                                            <td className="url-cell">
+                                                <a href={redirect.target} target="_blank" rel="noopener noreferrer" className="truncate-link">
+                                                    {redirect.target}
+                                                </a>
+                                            </td>
+                                            <td className="status-cell">
+                                                <span className={`pill ${redirect.status_code === 301 ? 'success' : redirect.status_code === 410 ? 'danger' : 'warning'}`}>
+                                                    {redirect.status_code}
+                                                </span>
+                                            </td>
+                                            <td className="numeric-cell">{redirect.hits}</td>
+                                            <td className="date-cell">
+                                                {formatDate(redirect.last_hit)}
+                                                {!redirect.is_active && (
+                                                    <div className="text-muted text-small">
+                                                        {redirect.start_date && new Date(redirect.start_date) > new Date()
+                                                            ? `Starts: ${formatShortDate(redirect.start_date)}`
+                                                            : `Ended: ${formatShortDate(redirect.end_date)}`}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="action-cell">
+                                                <div className="table-actions">
+                                                    <button type="button" className="table-actions__secondary" onClick={() => openEditModal(redirect)}>Edit</button>
+                                                    <button type="button" className="table-actions__danger" onClick={() => handleDeleteRedirect(redirect.id)}>Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         {/* Pagination */}
                         {pagination.total_pages > 1 && (
                             <div className="pagination">
                                 <button
                                     type="button"
-                                    className="button ghost small"
+                                    className="pagination-btn"
                                     disabled={pagination.page <= 1}
                                     onClick={() => fetchRedirects(pagination.page - 1)}
                                 >
-                                    Previous
+                                    &lsaquo; Previous
                                 </button>
                                 <span className="pagination-info">
                                     Page {pagination.page} of {pagination.total_pages}
                                 </span>
                                 <button
                                     type="button"
-                                    className="button ghost small"
+                                    className="pagination-btn"
                                     disabled={pagination.page >= pagination.total_pages}
                                     onClick={() => fetchRedirects(pagination.page + 1)}
                                 >
-                                    Next
+                                    Next &rsaquo;
                                 </button>
                             </div>
                         )}
