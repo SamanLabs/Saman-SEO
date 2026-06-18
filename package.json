@@ -37,6 +37,7 @@
     "extends @wordpress/browserslist-config"
   ],
   "devDependencies": {
+    "@types/react": "^18.3.31",
     "@wordpress/scripts": "^32.4.1",
     "concurrently": "^9.1.2",
     "less": "^4.2.2",
@@ -45,6 +46,7 @@
   },
   "dependencies": {
     "@wordpress/api-fetch": "^7.48.1",
-    "@wordpress/element": "^8.0.1"
+    "@wordpress/element": "^8.0.1",
+    "@wordpress/i18n": "^6.21.1"
   }
 }
