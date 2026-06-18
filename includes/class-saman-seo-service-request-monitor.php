@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class Request_Monitor {
 
-	private const SCHEMA_VERSION = 5;
+	private const SCHEMA_VERSION = 6;
 	private const SCHEMA_OPTION  = 'SAMAN_SEO_404_log_schema';
 
 	/**
@@ -65,8 +65,7 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function maybe_schedule_cleanup() {
-		$settings = get_option( 'SAMAN_SEO_settings', array() );
-		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
+		$enabled = $this->get_404_option( 'enable_404_cleanup', false );
 
 		if ( $enabled ) {
 			if ( ! wp_next_scheduled( 'SAMAN_SEO_404_cleanup' ) ) {
@@ -95,14 +94,13 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function run_scheduled_cleanup() {
-		$settings = get_option( 'SAMAN_SEO_settings', array() );
-		$enabled  = isset( $settings['enable_404_cleanup'] ) ? $settings['enable_404_cleanup'] : false;
+		$enabled = $this->get_404_option( 'enable_404_cleanup', false );
 
 		if ( ! $enabled ) {
 			return;
 		}
 
-		$days = isset( $settings['cleanup_404_days'] ) ? (int) $settings['cleanup_404_days'] : 30;
+		$days = (int) $this->get_404_option( 'cleanup_404_days', 30 );
 		$this->cleanup_old_entries( $days );
 	}
 
@@ -135,14 +133,13 @@ class Request_Monitor {
 	 * @return void
 	 */
 	private function maybe_send_notification( $request_uri, $hits, $entry_id ) {
-		$settings = get_option( 'SAMAN_SEO_settings', array() );
-		$enabled  = isset( $settings['enable_404_notifications'] ) ? $settings['enable_404_notifications'] : false;
+		$enabled = $this->get_404_option( 'enable_404_notifications', false );
 
 		if ( ! $enabled ) {
 			return;
 		}
 
-		$threshold = isset( $settings['notification_404_threshold'] ) ? (int) $settings['notification_404_threshold'] : 10;
+		$threshold = (int) $this->get_404_option( 'notification_404_threshold', 10 );
 
 		// Only notify exactly when threshold is reached (not every hit after)
 		if ( $hits !== $threshold ) {
@@ -169,10 +166,8 @@ class Request_Monitor {
 	 * @return bool Whether email was sent.
 	 */
 	private function send_notification_email( $request_uri, $hits ) {
-		$settings = get_option( 'SAMAN_SEO_settings', array() );
-		$email    = isset( $settings['notification_404_email'] ) && ! empty( $settings['notification_404_email'] )
-			? sanitize_email( $settings['notification_404_email'] )
-			: get_option( 'admin_email' );
+		$email = $this->get_404_option( 'notification_404_email', '' );
+		$email = ! empty( $email ) ? sanitize_email( $email ) : get_option( 'admin_email' );
 
 		$site_name = get_bloginfo( 'name' );
 		$site_url  = home_url();
@@ -220,6 +215,7 @@ class Request_Monitor {
 			is_bot tinyint(1) NOT NULL DEFAULT 0,
 			is_ignored tinyint(1) NOT NULL DEFAULT 0,
 			referrer varchar(500) DEFAULT '',
+			ip_address varchar(100) DEFAULT '',
 			first_seen datetime DEFAULT NULL,
 			PRIMARY KEY (id),
 			KEY request_uri (request_uri),
@@ -270,6 +266,10 @@ class Request_Monitor {
 				$this->migrate_to_version_5();
 			}
 
+			if ( $current > 0 && $current < 6 ) {
+				$this->migrate_to_version_6();
+			}
+
 			return;
 		}
 
@@ -306,6 +306,20 @@ class Request_Monitor {
 	}
 
 	/**
+	 * Migrate data for version 6 schema.
+	 *
+	 * @return void
+	 */
+	private function migrate_to_version_6() {
+		global $wpdb;
+
+		if ( ! $this->has_column( 'ip_address' ) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Schema migration requires direct queries.
+			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN ip_address varchar(100) DEFAULT ''" );
+		}
+	}
+
+	/**
 	 * Maybe log a 404 event.
 	 *
 	 * @return void
@@ -329,14 +343,21 @@ class Request_Monitor {
 			}
 		}
 
+		$settings   = $this->get_404_log_settings();
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-		$referrer   = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+		$referrer   = ! empty( $settings['log_referer'] ) && isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 		$device     = $this->describe_device_from_user_agent( $user_agent );
 		$is_bot     = $this->detect_is_bot( $user_agent ) ? 1 : 0;
 		$now        = current_time( 'mysql' );
+		$ip_address = $this->get_client_ip( $settings );
 
 		// Do not log URLs that match an ignore pattern.
 		if ( $this->is_url_ignored( $request ) ) {
+			return;
+		}
+
+		// Optionally skip bot requests entirely.
+		if ( $settings['ignore_bots'] && $is_bot ) {
 			return;
 		}
 
@@ -356,6 +377,7 @@ class Request_Monitor {
 				'last_seen'    => $now,
 				'user_agent'   => $user_agent ?: $row->user_agent,
 				'device_label' => $device,
+				'ip_address'   => $ip_address,
 			);
 
 			// Update referrer if not empty and we don't have one yet
@@ -391,10 +413,116 @@ class Request_Monitor {
 					'first_seen'   => $now,
 					'is_bot'       => $is_bot,
 					'referrer'     => $referrer,
+					'ip_address'   => $ip_address,
 				),
-				array( '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s' )
+				array( '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s', '%s' )
 			);
 		}
+	}
+
+	/**
+	 * Get 404 log privacy/logging settings.
+	 *
+	 * @return array
+	 */
+	private function get_404_log_settings() {
+		$ip_level = get_option( 'SAMAN_SEO_404_log_ip_level', 'none' );
+		if ( ! in_array( $ip_level, array( 'none', 'anonymized', 'full' ), true ) ) {
+			$ip_level = 'none';
+		}
+
+		return array(
+			'ip_level'    => $ip_level,
+			'ip_header'   => get_option( 'SAMAN_SEO_404_log_ip_header', 'REMOTE_ADDR' ),
+			'log_referer' => ! empty( get_option( 'SAMAN_SEO_404_log_referer', '1' ) ),
+			'ignore_bots' => ! empty( get_option( 'SAMAN_SEO_404_log_ignore_bots', '0' ) ),
+		);
+	}
+
+	/**
+	 * Read a 404-related setting from the modern individual option, falling back
+	 * to the legacy consolidated option when needed.
+	 *
+	 * @param string $key     Setting key without SAMAN_SEO_ prefix.
+	 * @param mixed  $default Default value.
+	 * @return mixed
+	 */
+	private function get_404_option( $key, $default = false ) {
+		$individual = get_option( 'SAMAN_SEO_' . $key );
+		if ( false !== $individual ) {
+			return $individual;
+		}
+
+		$legacy = get_option( 'SAMAN_SEO_settings', array() );
+		if ( isset( $legacy[ $key ] ) ) {
+			return $legacy[ $key ];
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Get the client IP address based on settings.
+	 *
+	 * @param array $settings 404 log settings.
+	 * @return string
+	 */
+	private function get_client_ip( $settings ) {
+		if ( 'none' === $settings['ip_level'] ) {
+			return '';
+		}
+
+		$header = $settings['ip_header'];
+		if ( empty( $header ) ) {
+			$header = 'REMOTE_ADDR';
+		}
+
+		$ip = '';
+		if ( 'REMOTE_ADDR' === $header && isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		} elseif ( isset( $_SERVER[ $header ] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) );
+		}
+
+		// X-Forwarded-For can contain multiple IPs; use the first one.
+		if ( false !== strpos( $ip, ',' ) ) {
+			$ips = explode( ',', $ip );
+			$ip  = trim( $ips[0] );
+		}
+
+		if ( 'anonymized' === $settings['ip_level'] ) {
+			$ip = $this->anonymize_ip( $ip );
+		}
+
+		return $ip;
+	}
+
+	/**
+	 * Anonymize an IP address by zeroing the last octet (IPv4) or last group (IPv6).
+	 *
+	 * @param string $ip IP address.
+	 * @return string
+	 */
+	private function anonymize_ip( $ip ) {
+		if ( empty( $ip ) || ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+			return '';
+		}
+
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			$parts    = explode( '.', $ip );
+			$parts[3] = '0';
+			return implode( '.', $parts );
+		}
+
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+			$parts = explode( ':', $ip );
+			if ( count( $parts ) >= 2 ) {
+				$parts[ count( $parts ) - 1 ] = '0';
+			}
+			return implode( ':', $parts );
+		}
+
+		return '';
 	}
 
 	/**

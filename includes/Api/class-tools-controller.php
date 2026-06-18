@@ -277,6 +277,18 @@ class Tools_Controller extends REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/tools/delete-all-data',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'delete_all_data' ),
+					'permission_callback' => array( $this, 'permission_check' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -1526,5 +1538,50 @@ class Tools_Controller extends REST_Controller {
 			),
 			__( 'Alt text generated from filename.', 'saman-seo' )
 		);
+	}
+
+	/**
+	 * Delete all plugin data (tables, options, and post meta).
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function delete_all_data() {
+		global $wpdb;
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return $this->error( __( 'Permission denied.', 'saman-seo' ), 'permission_denied', 403 );
+		}
+
+		$tables = array(
+			$wpdb->prefix . 'SAMAN_SEO_redirects',
+			$wpdb->prefix . 'SAMAN_SEO_404_log',
+			$wpdb->prefix . 'SAMAN_SEO_404_ignore_patterns',
+			$wpdb->prefix . 'SAMAN_SEO_link_health',
+			$wpdb->prefix . 'SAMAN_SEO_link_scans',
+			$wpdb->prefix . 'SAMAN_SEO_indexnow_log',
+			$wpdb->prefix . 'SAMAN_SEO_custom_assistants',
+			$wpdb->prefix . 'SAMAN_SEO_assistant_usage',
+		);
+
+		foreach ( $tables as $table ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Data removal requires direct query.
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+		}
+
+		// Delete all SAMAN_SEO options.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct option removal required.
+		$options = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'SAMAN_SEO_%'" );
+		foreach ( $options as $option ) {
+			delete_option( $option );
+		}
+
+		// Delete all Saman SEO post meta.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct meta removal required.
+		$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '_saman_seo_%'" );
+
+		// Clear caches.
+		wp_cache_flush();
+
+		return $this->success( null, __( 'All plugin data has been deleted.', 'saman-seo' ) );
 	}
 }

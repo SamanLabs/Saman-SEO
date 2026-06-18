@@ -84,7 +84,27 @@ class Settings {
 		'SAMAN_SEO_module_internal_links'       => '1',
 		'SAMAN_SEO_module_ai_assistant'         => '1',
 		'SAMAN_SEO_module_breadcrumbs'          => '0',
-		'SAMAN_SEO_breadcrumb_settings'         => array(
+
+		// Redirect settings.
+		'SAMAN_SEO_redirect_case_insensitive'        => '0',
+		'SAMAN_SEO_redirect_ignore_trailing_slashes' => '0',
+		'SAMAN_SEO_redirect_query_matching'          => 'ignore',
+		'SAMAN_SEO_redirect_cache_header_hours'      => '1',
+		'SAMAN_SEO_redirect_object_cache'            => '0',
+		'SAMAN_SEO_redirect_auto_generate_url'       => '',
+		'SAMAN_SEO_redirect_monitor_post_types'      => array( 'post', 'page' ),
+		'SAMAN_SEO_redirect_monitor_trash'           => '0',
+
+		// 404 log privacy/logging settings.
+		'SAMAN_SEO_404_log_ip_level'                 => 'none',
+		'SAMAN_SEO_404_log_ip_header'                => 'REMOTE_ADDR',
+		'SAMAN_SEO_404_log_referer'                  => '1',
+		'SAMAN_SEO_404_log_ignore_bots'              => '0',
+
+		// Data cleanup.
+		'SAMAN_SEO_delete_data_on_uninstall'         => '0',
+
+		'SAMAN_SEO_breadcrumb_settings'              => array(
 			'enabled'          => false,
 			'separator'        => '>',
 			'separator_custom' => '',
@@ -99,7 +119,7 @@ class Settings {
 			'taxonomy_labels'  => array(),
 		),
 
-		'SAMAN_SEO_social_card_design'          => array(
+		'SAMAN_SEO_social_card_design'               => array(
 			'background_color' => '#1a1a36',
 			'accent_color'     => '#5a84ff',
 			'text_color'       => '#ffffff',
@@ -219,6 +239,25 @@ class Settings {
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_ai_assistant', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_breadcrumbs', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_breadcrumb_settings', array( $this, 'sanitize_breadcrumb_settings' ) );
+
+		// Redirect settings.
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_case_insensitive', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_ignore_trailing_slashes', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_query_matching', array( $this, 'sanitize_redirect_query_matching' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_cache_header_hours', 'absint' );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_object_cache', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_auto_generate_url', 'sanitize_text_field' );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_monitor_post_types', array( $this, 'sanitize_redirect_monitor_post_types' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_monitor_trash', array( $this, 'sanitize_bool' ) );
+
+		// 404 log privacy/logging settings.
+		register_setting( 'saman-seo', 'SAMAN_SEO_404_log_ip_level', array( $this, 'sanitize_404_log_ip_level' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_404_log_ip_header', 'sanitize_text_field' );
+		register_setting( 'saman-seo', 'SAMAN_SEO_404_log_referer', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_404_log_ignore_bots', array( $this, 'sanitize_bool' ) );
+
+		// Data cleanup.
+		register_setting( 'saman-seo', 'SAMAN_SEO_delete_data_on_uninstall', array( $this, 'sanitize_bool' ) );
 	}
 
 	/**
@@ -228,7 +267,7 @@ class Settings {
 	 */
 	public function get_context_variables() {
 		$variables = array(
-			'global'   => array(
+			'global' => array(
 				'label' => __( 'General', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -257,7 +296,7 @@ class Settings {
 					),
 				),
 			),
-			'post'     => array(
+			'post' => array(
 				'label' => __( 'Post Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -321,7 +360,7 @@ class Settings {
 					),
 				),
 			),
-			'archive'  => array(
+			'archive' => array(
 				'label' => __( 'Archive Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -338,7 +377,7 @@ class Settings {
 					),
 				),
 			),
-			'author'   => array(
+			'author' => array(
 				'label' => __( 'Author Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -942,6 +981,51 @@ class Settings {
 			'post_type_labels' => $sanitize_labels( $value['post_type_labels'] ?? array() ),
 			'taxonomy_labels'  => $sanitize_labels( $value['taxonomy_labels'] ?? array() ),
 		);
+	}
+
+	/**
+	 * Sanitize redirect query matching mode.
+	 *
+	 * @param string $value Submitted value.
+	 * @return string
+	 */
+	public function sanitize_redirect_query_matching( $value ) {
+		$value = sanitize_key( $value );
+		return in_array( $value, array( 'exact', 'ignore', 'pass' ), true ) ? $value : 'exact';
+	}
+
+	/**
+	 * Sanitize monitored post types list.
+	 *
+	 * @param array|string $value Post types.
+	 * @return array
+	 */
+	public function sanitize_redirect_monitor_post_types( $value ) {
+		if ( ! is_array( $value ) ) {
+			return $this->defaults['SAMAN_SEO_redirect_monitor_post_types'];
+		}
+
+		$public = get_post_types( array( 'public' => true ), 'names' );
+		$clean  = array();
+		foreach ( $value as $slug ) {
+			$slug = sanitize_key( $slug );
+			if ( in_array( $slug, $public, true ) ) {
+				$clean[] = $slug;
+			}
+		}
+
+		return empty( $clean ) ? $this->defaults['SAMAN_SEO_redirect_monitor_post_types'] : $clean;
+	}
+
+	/**
+	 * Sanitize 404 log IP level.
+	 *
+	 * @param string $value Submitted value.
+	 * @return string
+	 */
+	public function sanitize_404_log_ip_level( $value ) {
+		$value = sanitize_key( $value );
+		return in_array( $value, array( 'none', 'anonymized', 'full' ), true ) ? $value : 'none';
 	}
 
 	/**

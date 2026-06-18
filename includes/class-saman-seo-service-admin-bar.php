@@ -282,7 +282,7 @@ class Admin_Bar {
 			),
 			'404'       => array(
 				'label' => __( '404 Monitor', 'saman-seo' ),
-				'url'   => admin_url( 'admin.php?page=saman-seo-404' ),
+				'url'   => admin_url( 'admin.php?page=saman-seo-404-log' ),
 			),
 			'audit'     => array(
 				'label' => __( 'Site Audit', 'saman-seo' ),

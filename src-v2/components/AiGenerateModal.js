@@ -9,7 +9,7 @@ import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Get AI status from global settings
-const globalSettings = window?.SamanSEOSettings || {};
+const globalSettings = window.samanSeoV2Settings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
 const aiProvider = globalSettings.aiProvider || 'none';
 const aiPilot = globalSettings.aiPilot || null;

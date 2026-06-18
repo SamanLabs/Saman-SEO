@@ -64,7 +64,7 @@ const MobileFriendly = ({ onNavigate }) => {
 
     // Test homepage
     const handleTestHomepage = useCallback(() => {
-        const siteUrl = window.SamanSEOSettings?.adminUrl?.replace('/wp-admin/', '') || '';
+        const siteUrl = window.samanSeoV2Settings?.adminUrl?.replace('/wp-admin/', '') || '';
         if (siteUrl) {
             setUrl(siteUrl);
             setTimeout(() => {

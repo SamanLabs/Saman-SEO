@@ -26,11 +26,24 @@ const ACTION_VIEW_MAP = {
     seo: 'audit',
 };
 
+const COVERAGE_VIEWS = {
+    breakdown: 'breakdown',
+    timeline: 'timeline',
+    checklist: 'checklist',
+};
+
 const Dashboard = ({ onNavigate }) => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [dismissing, setDismissing] = useState(null);
     const [showAllNotifications, setShowAllNotifications] = useState(false);
+    const [coverageView, setCoverageView] = useState(() => {
+        if (typeof window === 'undefined') {
+            return COVERAGE_VIEWS.breakdown;
+        }
+        const saved = window.localStorage.getItem('saman_seo_coverage_view');
+        return Object.values(COVERAGE_VIEWS).includes(saved) ? saved : COVERAGE_VIEWS.breakdown;
+    });
 
     // Fetch dashboard data
     const fetchDashboard = useCallback(async () => {
@@ -74,6 +87,14 @@ const Dashboard = ({ onNavigate }) => {
     const handleNavigation = (view) => {
         if (onNavigate) {
             onNavigate(view);
+        }
+    };
+
+    // Switch coverage card visualization and persist preference.
+    const handleCoverageViewChange = (view) => {
+        setCoverageView(view);
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('saman_seo_coverage_view', view);
         }
     };
 
@@ -163,7 +184,7 @@ const Dashboard = ({ onNavigate }) => {
                                 {notif.action && (
                                     <button
                                         type="button"
-                                        className="button small"
+                                        className="button ghost small notification-action"
                                         onClick={() => handleNavigation(ACTION_VIEW_MAP[notif.category] || 'tools')}
                                     >
                                         {notif.action.label}
@@ -171,10 +192,11 @@ const Dashboard = ({ onNavigate }) => {
                                 )}
                                 <button
                                     type="button"
-                                    className="button ghost small"
+                                    className="button ghost small notification-action notification-action--dismiss"
                                     onClick={() => handleDismissNotification(notif.id)}
                                     disabled={dismissing === notif.id}
                                     aria-label="Dismiss notification"
+                                    title="Dismiss"
                                 >
                                     {dismissing === notif.id ? (
                                         <span className="loading-dots">...</span>
@@ -271,23 +293,133 @@ const Dashboard = ({ onNavigate }) => {
                 <div className="dashboard-card content-coverage-card">
                     <div className="card-header">
                         <h3>Content Coverage</h3>
-                        <span className="pill">{coverage.coverage_pct || 0}% Optimized</span>
+                        <div className="coverage-view-toggle">
+                            <button
+                                type="button"
+                                className={`coverage-view-btn ${coverageView === COVERAGE_VIEWS.breakdown ? 'is-active' : ''}`}
+                                onClick={() => handleCoverageViewChange(COVERAGE_VIEWS.breakdown)}
+                                aria-label="Breakdown view"
+                                title="Breakdown"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 2a10 10 0 0 1 10 10H12V2z" />
+                                </svg>
+                            </button>
+                            <button
+                                type="button"
+                                className={`coverage-view-btn ${coverageView === COVERAGE_VIEWS.timeline ? 'is-active' : ''}`}
+                                onClick={() => handleCoverageViewChange(COVERAGE_VIEWS.timeline)}
+                                aria-label="Timeline view"
+                                title="Timeline"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10" />
+                                    <line x1="12" y1="20" x2="12" y2="4" />
+                                    <line x1="6" y1="20" x2="6" y2="14" />
+                                </svg>
+                            </button>
+                            <button
+                                type="button"
+                                className={`coverage-view-btn ${coverageView === COVERAGE_VIEWS.checklist ? 'is-active' : ''}`}
+                                onClick={() => handleCoverageViewChange(COVERAGE_VIEWS.checklist)}
+                                aria-label="Checklist view"
+                                title="Checklist"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M9 11l3 3L22 4" />
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                                </svg>
+                            </button>
+                            <span className="pill">{coverage.coverage_pct || 0}% Optimized</span>
+                        </div>
                     </div>
                     <div className="coverage-content">
-                        <div className="coverage-chart">
-                            <div className="spark-bars" aria-hidden="true">
-                                {(coverage.daily_stats || []).map((day, idx) => {
-                                    const maxOptimized = Math.max(...coverage.daily_stats.map(d => d.optimized || 0), 1);
-                                    const height = Math.max(15, ((day.optimized || 0) / maxOptimized) * 100);
-                                    return (
-                                        <div key={idx} className="spark-bar-wrapper" title={`${day.label}: ${day.optimized} optimized`}>
-                                            <span style={{ height: `${height}%` }} />
-                                            <span className="spark-label">{day.label}</span>
-                                        </div>
-                                    );
-                                })}
+                        {coverageView === COVERAGE_VIEWS.timeline && (
+                            <div className="coverage-chart">
+                                <div className="spark-bars" aria-hidden="true">
+                                    {(coverage.daily_stats || []).map((day, idx) => {
+                                        const maxOptimized = Math.max(...coverage.daily_stats.map(d => d.optimized || 0), 1);
+                                        const height = Math.max(15, ((day.optimized || 0) / maxOptimized) * 100);
+                                        return (
+                                            <div key={idx} className="spark-bar-wrapper" title={`${day.label}: ${day.optimized} optimized`}>
+                                                <span style={{ height: `${height}%` }} />
+                                                <span className="spark-label">{day.label}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        )}
+                        {coverageView === COVERAGE_VIEWS.breakdown && (
+                            <div className="coverage-chart coverage-chart--breakdown">
+                                <div className="coverage-donut" aria-hidden="true">
+                                    <svg viewBox="0 0 120 120" className="coverage-donut__svg">
+                                        <circle className="coverage-donut__bg" cx="60" cy="60" r="50" />
+                                        <circle
+                                            className="coverage-donut__fill"
+                                            cx="60"
+                                            cy="60"
+                                            r="50"
+                                            strokeDasharray={`${(coverage.coverage_pct / 100) * 314} 314`}
+                                            style={{ stroke: coverage.coverage_pct >= 80 ? 'var(--color-success)' : coverage.coverage_pct >= 50 ? 'var(--color-warning)' : 'var(--color-danger)' }}
+                                        />
+                                    </svg>
+                                    <div className="coverage-donut__center">
+                                        <span className="coverage-donut__value">{coverage.coverage_pct || 0}%</span>
+                                        <span className="coverage-donut__label">Optimized</span>
+                                    </div>
+                                </div>
+                                <div className="coverage-legend">
+                                    <div className="coverage-legend__item">
+                                        <span className="coverage-legend__dot coverage-legend__dot--optimized" />
+                                        <span className="coverage-legend__label">Optimized</span>
+                                        <span className="coverage-legend__value">{coverage.optimized || 0}</span>
+                                    </div>
+                                    <div className="coverage-legend__item">
+                                        <span className="coverage-legend__dot coverage-legend__dot--pending" />
+                                        <span className="coverage-legend__label">Pending</span>
+                                        <span className="coverage-legend__value">{coverage.pending || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {coverageView === COVERAGE_VIEWS.checklist && (
+                            <div className="coverage-chart coverage-chart--checklist">
+                                <div className="coverage-checklist">
+                                    <div className={`coverage-checklist__item ${coverage.with_title >= coverage.total && coverage.total > 0 ? 'is-done' : ''}`}>
+                                        <span className="coverage-checklist__icon">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M20 6L9 17l-5-5" />
+                                            </svg>
+                                        </span>
+                                        <span className="coverage-checklist__text">
+                                            {coverage.with_title || 0} of {coverage.total || 0} pages have SEO titles
+                                        </span>
+                                    </div>
+                                    <div className={`coverage-checklist__item ${coverage.with_description >= coverage.total && coverage.total > 0 ? 'is-done' : ''}`}>
+                                        <span className="coverage-checklist__icon">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M20 6L9 17l-5-5" />
+                                            </svg>
+                                        </span>
+                                        <span className="coverage-checklist__text">
+                                            {coverage.with_description || 0} of {coverage.total || 0} pages have meta descriptions
+                                        </span>
+                                    </div>
+                                    <div className={`coverage-checklist__item ${coverage.optimized >= coverage.total && coverage.total > 0 ? 'is-done' : ''}`}>
+                                        <span className="coverage-checklist__icon">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M20 6L9 17l-5-5" />
+                                            </svg>
+                                        </span>
+                                        <span className="coverage-checklist__text">
+                                            {coverage.optimized || 0} of {coverage.total || 0} pages are fully optimized
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <div className="coverage-stats">
                             <div className="coverage-stat">
                                 <div className="coverage-stat-value">{coverage.optimized || 0}</div>
