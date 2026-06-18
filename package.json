@@ -19,7 +19,10 @@
     "lint:js": "wp-scripts lint-js src-v2/",
     "format:js": "wp-scripts format src-v2/",
     "lint:css": "wp-scripts lint-style '**/*.css'",
-    "test:unit": "wp-scripts test-unit-js --passWithNoTests"
+    "test:unit": "wp-scripts test-unit-js --passWithNoTests",
+    "validate": "npm run build && npm run lint:js",
+    "validate:php": "find includes saman-seo.php -name '*.php' -print0 | xargs -0 -n1 php -l",
+    "validate:phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist --report-full --report-summary --runtime-set ignore_warnings_on_exit 1 includes/"
   },
   "keywords": [
     "wordpress",
