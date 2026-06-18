@@ -26,12 +26,12 @@ class Robots_Manager {
 	/**
 	 * Override robots content if option provided.
 	 *
-	 * @param string $output Default.
-	 * @param bool   $public Public flag.
+	 * @param string $output    Default.
+	 * @param bool   $is_public Public flag.
 	 *
 	 * @return string
 	 */
-	public function filter_robots( $output, $public ) {
+	public function filter_robots( $output, $is_public ) {
 		$custom = get_option( 'SAMAN_SEO_robots_txt', '' );
 
 		if ( $custom ) {
