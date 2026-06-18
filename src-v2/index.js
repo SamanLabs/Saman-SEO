@@ -8,6 +8,7 @@ if ( window.samanSeoV2Settings && window.samanSeoV2Settings.pluginUrl ) {
 
 import { render } from '@wordpress/element';
 import App from './App';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import './index.css';
 
@@ -52,6 +53,8 @@ const getInitialView = () => {
 };
 
 render(
-	<App initialView={ getInitialView() } />,
+	<ErrorBoundary>
+		<App initialView={ getInitialView() } />
+	</ErrorBoundary>,
 	document.getElementById( 'saman-seo-v2-root' )
 );
