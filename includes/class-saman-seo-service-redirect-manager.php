@@ -82,6 +82,7 @@ class Redirect_Manager {
 
 		// Slug change detection.
 		add_action( 'post_updated', array( $this, 'detect_slug_change' ), 10, 3 );
+		add_action( 'wp_trash_post', array( $this, 'detect_trash_redirect' ), 10, 1 );
 		add_action( 'admin_notices', array( $this, 'render_slug_change_notice' ) );
 		add_action( 'wp_ajax_SAMAN_SEO_create_automatic_redirect', array( $this, 'ajax_create_redirect' ) );
 	}
@@ -108,6 +109,12 @@ class Redirect_Manager {
 
 		// Don't trigger on post type changes, revisions, etc.
 		if ( $post_after->post_type !== $post_before->post_type ) {
+			return;
+		}
+
+		// Respect monitored post types setting.
+		$monitored = get_option( 'SAMAN_SEO_redirect_monitor_post_types', array( 'post', 'page' ) );
+		if ( ! in_array( $post_after->post_type, (array) $monitored, true ) ) {
 			return;
 		}
 
@@ -153,6 +160,55 @@ class Redirect_Manager {
 		$suggestions[ $key ] = array(
 			'source'  => $source,
 			'target'  => $new_url,
+			'post_id' => $post_id,
+			'date'    => current_time( 'mysql' ),
+		);
+
+		update_option( 'SAMAN_SEO_monitor_slugs', $suggestions );
+	}
+
+	/**
+	 * Detect when a monitored post is trashed and store a suggestion.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	public function detect_trash_redirect( $post_id ) {
+		if ( ! get_option( 'SAMAN_SEO_redirect_monitor_trash', '0' ) ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || 'trash' !== $post->post_status ) {
+			return;
+		}
+
+		$monitored = get_option( 'SAMAN_SEO_redirect_monitor_post_types', array( 'post', 'page' ) );
+		if ( ! in_array( $post->post_type, (array) $monitored, true ) ) {
+			return;
+		}
+
+		$permalink = get_permalink( $post_id );
+		$source    = wp_parse_url( $permalink, PHP_URL_PATH );
+		if ( ! $source ) {
+			return;
+		}
+
+		$target = home_url( '/' );
+		if ( $post->post_parent ) {
+			$parent_url = get_permalink( $post->post_parent );
+			$parent_path = wp_parse_url( $parent_url, PHP_URL_PATH );
+			if ( $parent_path ) {
+				$target = $parent_url;
+			}
+		}
+
+		$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', array() );
+		$key         = md5( $source );
+
+		$suggestions[ $key ] = array(
+			'source'  => $source,
+			'target'  => $target,
 			'post_id' => $post_id,
 			'date'    => current_time( 'mysql' ),
 		);
@@ -220,8 +276,15 @@ class Redirect_Manager {
 	 * @return int|\WP_Error Inserted redirect ID or WP_Error on failure.
 	 */
 	public function create_redirect( $source, $target, $status_code = 301, $extra = array() ) {
-		if ( empty( $source ) || empty( $target ) ) {
-			return new \WP_Error( 'invalid_data', __( 'Source and target are required.', 'saman-seo' ) );
+		if ( empty( $source ) ) {
+			return new \WP_Error( 'invalid_data', __( 'Source is required.', 'saman-seo' ) );
+		}
+
+		if ( empty( $target ) ) {
+			$target = $this->auto_generate_target();
+			if ( empty( $target ) ) {
+				return new \WP_Error( 'invalid_data', __( 'Target is required when auto-generate URL is not configured.', 'saman-seo' ) );
+			}
 		}
 
 		global $wpdb;
@@ -708,118 +771,309 @@ class Redirect_Manager {
 			return;
 		}
 
+		$settings    = $this->get_redirect_settings();
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
-		$request     = wp_parse_url( $request_uri, PHP_URL_PATH );
-		if ( $request ) {
-			$request = sanitize_text_field( $request );
-		} else {
-			$request = '/';
-		}
 
-		if ( '/' !== $request ) {
-			$request = rtrim( $request, '/' );
-			if ( '' === $request ) {
-				$request = '/';
+		$request_path  = wp_parse_url( $request_uri, PHP_URL_PATH );
+		$request_path  = $request_path ? sanitize_text_field( $request_path ) : '/';
+		$request_query = wp_parse_url( $request_uri, PHP_URL_QUERY );
+		$request_query = $request_query ? $request_query : '';
+
+		$request_path = $this->normalize_path( $request_path, $settings['ignore_trailing_slashes'] );
+		$lookup_key   = $this->build_lookup_key( $request_path, $request_query, $settings );
+
+		// Object-cache lookup.
+		if ( $settings['object_cache'] ) {
+			$cached = wp_cache_get( $lookup_key, self::CACHE_GROUP );
+			if ( false !== $cached ) {
+				if ( ! empty( $cached['row'] ) ) {
+					$this->execute_redirect( $cached['row'], $cached['target'], $request_query, $settings );
+				}
+				return;
 			}
 		}
 
 		global $wpdb;
 
-		// First, try exact match (non-regex redirects).
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
-		$row = $wpdb->get_row(
-			$wpdb->prepare(
-				'SELECT * FROM ' . $this->table . ' WHERE source = %s AND is_regex = 0 LIMIT 1',
-				$request
-			)
-		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
-
-		$target         = null;
-		$matched_source = $request;
-
-		if ( $row ) {
-			// Check if timed redirect is active.
-			if ( ! $this->is_redirect_active( $row ) ) {
-				$row = null;
-			} else {
-				$target = $row->target;
-			}
-		}
-
-		// If no exact match, try regex redirects.
+		$row = $this->find_exact_redirect( $request_path, $request_query, $settings );
 		if ( ! $row ) {
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
-			$regex_redirects = $wpdb->get_results(
-				'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1'
-			);
-			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
-
-			if ( $regex_redirects ) {
-				foreach ( $regex_redirects as $regex_row ) {
-					// Check if timed redirect is active.
-					if ( ! $this->is_redirect_active( $regex_row ) ) {
-						continue;
-					}
-
-					// Test regex pattern without suppressing errors.
-					$matched = false;
-					$matches = array();
-					set_error_handler(
-						static function () {
-							return true;
-						}
-					);
-					try {
-						$matched = (bool) preg_match( '#' . $regex_row->source . '#', $request, $matches );
-					} catch ( \Throwable $e ) {
-						$matched = false;
-					} finally {
-						restore_error_handler();
-					}
-
-					if ( $matched ) {
-						$row            = $regex_row;
-						$matched_source = $request;
-
-						// Replace backreferences in target ($1, $2, etc.).
-						$target = $regex_row->target;
-						if ( count( $matches ) > 1 ) {
-							for ( $i = 1; $i < count( $matches ); $i++ ) {
-								$target = str_replace( '$' . $i, $matches[ $i ], $target );
-							}
-						}
-						break;
-					}
-				}
-			}
+			$row = $this->find_regex_redirect( $request_path, $request_query, $settings );
 		}
 
 		if ( ! $row ) {
+			if ( $settings['object_cache'] ) {
+				wp_cache_set( $lookup_key, array( 'row' => null, 'target' => null ), self::CACHE_GROUP, self::CACHE_TTL );
+			}
 			return;
 		}
 
-		$status_code = (int) $row->status_code;
+		$target = $this->resolve_target( $row, $request_path, $request_query, $settings );
 
-		// Target-less status codes (410 Gone, 451 Unavailable For Legal Reasons).
+		if ( $settings['object_cache'] ) {
+			// Store a snapshot so backreference replacements are not cached.
+			$cache_row = array(
+				'id'          => (int) $row->id,
+				'status_code' => (int) $row->status_code,
+				'hits'        => (int) $row->hits,
+			);
+			wp_cache_set( $lookup_key, array( 'row' => $cache_row, 'target' => $target ), self::CACHE_GROUP, self::CACHE_TTL );
+		}
+
+		$this->execute_redirect( $row, $target, $request_query, $settings );
+	}
+
+	/**
+	 * Get redirect-related settings.
+	 *
+	 * @return array
+	 */
+	private function get_redirect_settings() {
+		$query_matching = get_option( 'SAMAN_SEO_redirect_query_matching', 'ignore' );
+		if ( ! in_array( $query_matching, array( 'exact', 'ignore', 'pass' ), true ) ) {
+			$query_matching = 'ignore';
+		}
+
+		return array(
+			'case_insensitive'        => ! empty( get_option( 'SAMAN_SEO_redirect_case_insensitive', '0' ) ),
+			'ignore_trailing_slashes' => ! empty( get_option( 'SAMAN_SEO_redirect_ignore_trailing_slashes', '0' ) ),
+			'query_matching'          => $query_matching,
+			'cache_header_hours'      => (int) get_option( 'SAMAN_SEO_redirect_cache_header_hours', 1 ),
+			'object_cache'            => ! empty( get_option( 'SAMAN_SEO_redirect_object_cache', '0' ) ),
+		);
+	}
+
+	/**
+	 * Normalize a URL path.
+	 *
+	 * @param string $path                 Path.
+	 * @param bool   $ignore_trailing_slash Whether to strip trailing slash.
+	 * @return string
+	 */
+	private function normalize_path( $path, $ignore_trailing_slash ) {
+		$path = '/' . ltrim( $path, '/' );
+		if ( $ignore_trailing_slash && '/' !== $path ) {
+			$path = rtrim( $path, '/' );
+		}
+		if ( '' === $path ) {
+			$path = '/';
+		}
+		return $path;
+	}
+
+	/**
+	 * Normalize a query string for comparison.
+	 *
+	 * @param string $query Raw query string.
+	 * @return string
+	 */
+	private function normalize_query( $query ) {
+		if ( empty( $query ) ) {
+			return '';
+		}
+		parse_str( $query, $params );
+		if ( empty( $params ) ) {
+			return '';
+		}
+		ksort( $params );
+		return http_build_query( $params );
+	}
+
+	/**
+	 * Build a cache / lookup key from request parts and settings.
+	 *
+	 * @param string $path     Normalized path.
+	 * @param string $query    Raw query string.
+	 * @param array  $settings Redirect settings.
+	 * @return string
+	 */
+	private function build_lookup_key( $path, $query, $settings ) {
+		if ( 'exact' === $settings['query_matching'] ) {
+			$query = $this->normalize_query( $query );
+			return $query ? $path . '?' . $query : $path;
+		}
+		return $path;
+	}
+
+	/**
+	 * Find a non-regex redirect matching the request.
+	 *
+	 * @param string $path    Normalized request path.
+	 * @param string $query   Raw request query string.
+	 * @param array  $settings Redirect settings.
+	 * @return object|null
+	 */
+	private function find_exact_redirect( $path, $query, $settings ) {
+		global $wpdb;
+
+		$lookup = 'exact' === $settings['query_matching'] && $query ? $path . '?' . $this->normalize_query( $query ) : $path;
+
+		if ( $settings['case_insensitive'] ) {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
+			$row = $wpdb->get_row(
+				$wpdb->prepare(
+					'SELECT * FROM ' . $this->table . ' WHERE LOWER(source) = LOWER(%s) AND is_regex = 0 LIMIT 1',
+					$lookup
+				)
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+		} else {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
+			$row = $wpdb->get_row(
+				$wpdb->prepare(
+					'SELECT * FROM ' . $this->table . ' WHERE source = %s AND is_regex = 0 LIMIT 1',
+					$lookup
+				)
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+		}
+
+		if ( ! $row || ! $this->is_redirect_active( $row ) ) {
+			return null;
+		}
+
+		return $row;
+	}
+
+	/**
+	 * Find a regex redirect matching the request.
+	 *
+	 * @param string $path     Normalized request path.
+	 * @param string $query    Raw request query string.
+	 * @param array  $settings Redirect settings.
+	 * @return object|null
+	 */
+	private function find_regex_redirect( $path, $query, $settings ) {
+		global $wpdb;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
+		$regex_redirects = $wpdb->get_results(
+			'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1'
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( ! $regex_redirects ) {
+			return null;
+		}
+
+		$lookup = 'exact' === $settings['query_matching'] && $query ? $path . '?' . $this->normalize_query( $query ) : $path;
+
+		foreach ( $regex_redirects as $regex_row ) {
+			if ( ! $this->is_redirect_active( $regex_row ) ) {
+				continue;
+			}
+
+			$modifiers = $settings['case_insensitive'] ? 'i' : '';
+
+			$matched = false;
+			$matches = array();
+			set_error_handler(
+				static function () {
+					return true;
+				}
+			);
+			try {
+				$matched = (bool) preg_match( '#' . $regex_row->source . '#' . $modifiers, $lookup, $matches );
+			} catch ( \Throwable $e ) {
+				$matched = false;
+			} finally {
+				restore_error_handler();
+			}
+
+			if ( $matched ) {
+				if ( count( $matches ) > 1 ) {
+					for ( $i = 1; $i < count( $matches ); $i++ ) {
+						$regex_row->target = str_replace( '$' . $i, $matches[ $i ], $regex_row->target );
+					}
+				}
+				return $regex_row;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Resolve the final target URL for a matched redirect.
+	 *
+	 * @param object $row     Matched redirect row.
+	 * @param string $path    Normalized request path.
+	 * @param string $query   Raw request query string.
+	 * @param array  $settings Redirect settings.
+	 * @return string
+	 */
+	private function resolve_target( $row, $path, $query, $settings ) {
+		$target = $row->target;
+
+		if ( 'pass' === $settings['query_matching'] && $query ) {
+			$target = $this->append_query_to_target( $target, $query );
+		}
+
+		return $target;
+	}
+
+	/**
+	 * Merge a request query string into a target URL.
+	 *
+	 * @param string $target Target URL.
+	 * @param string $query  Query string to append/merge.
+	 * @return string
+	 */
+	private function append_query_to_target( $target, $query ) {
+		if ( empty( $query ) ) {
+			return $target;
+		}
+
+		parse_str( $query, $request_params );
+		if ( empty( $request_params ) ) {
+			return $target;
+		}
+
+		$target_query = wp_parse_url( $target, PHP_URL_QUERY );
+		$target_params = array();
+		if ( $target_query ) {
+			parse_str( $target_query, $target_params );
+		}
+
+		$merged = array_merge( $target_params, $request_params );
+		$target = add_query_arg( $merged, $target );
+
+		return $target;
+	}
+
+	/**
+	 * Execute a matched redirect.
+	 *
+	 * @param object $row     Matched redirect row.
+	 * @param string $target  Resolved target URL.
+	 * @param string $query   Raw request query string.
+	 * @param array  $settings Redirect settings.
+	 * @return void
+	 */
+	private function execute_redirect( $row, $target, $query, $settings ) {
+		$redirect  = is_array( $row ) ? $row : (array) $row;
+		$status_code = (int) $redirect['status_code'];
+
+		// Target-less status codes (410 Gone, 451).
 		$targetless_statuses = array( 410, 451 );
 
 		if ( ! $target && ! in_array( $status_code, $targetless_statuses, true ) ) {
 			return;
 		}
 
+		global $wpdb;
+
 		// Update hit stats.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
 			$this->table,
 			array(
-				'hits'     => (int) $row->hits + 1,
+				'hits'     => (int) $redirect['hits'] + 1,
 				'last_hit' => current_time( 'mysql' ),
 			),
-			array( 'id' => $row->id )
+			array( 'id' => $redirect['id'] )
 		);
 
-		// Bail if output has already started (e.g. PHP deprecation notices on 8.4+).
+		// Bail if output has already started.
 		if ( headers_sent() ) {
 			return;
 		}
@@ -831,6 +1085,13 @@ class Redirect_Manager {
 		}
 
 		$target = esc_url_raw( $target );
+
+		// Send Expires header for 301 redirects.
+		if ( 301 === $status_code && $settings['cache_header_hours'] > 0 ) {
+			$expires = gmdate( 'D, d M Y H:i:s', time() + ( $settings['cache_header_hours'] * HOUR_IN_SECONDS ) ) . ' GMT';
+			header( 'Expires: ' . $expires );
+			header( 'Cache-Control: max-age=' . ( $settings['cache_header_hours'] * HOUR_IN_SECONDS ) );
+		}
 
 		add_filter(
 			'allowed_redirect_hosts',
@@ -845,6 +1106,22 @@ class Redirect_Manager {
 
 		wp_safe_redirect( $target, $status_code );
 		exit;
+	}
+
+	/**
+	 * Auto-generate a target URL from the configured template.
+	 *
+	 * @return string
+	 */
+	private function auto_generate_target() {
+		$template = get_option( 'SAMAN_SEO_redirect_auto_generate_url', '' );
+		if ( empty( $template ) ) {
+			return '';
+		}
+
+		$unique = wp_rand( 100000, 999999 );
+		$target = str_replace( array( '$dec$', '$hex$' ), array( $unique, dechex( $unique ) ), $template );
+		return esc_url_raw( $target );
 	}
 
 	/**

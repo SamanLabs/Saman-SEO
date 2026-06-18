@@ -20,6 +20,302 @@ const emptyForm = {
     notes: '',
 };
 
+/**
+ * Parse a simple PCRE-like pattern into an AST for example generation.
+ *
+ * @param {string} pattern Regex source.
+ * @returns {object} AST node.
+ */
+const parseRegexPattern = (pattern) => {
+    let i = 0;
+
+    const parseSequence = (endChar) => {
+        const nodes = [];
+        while (i < pattern.length) {
+            const c = pattern[i];
+            if (c === endChar || (endChar === null && c === ')')) {
+                break;
+            }
+            if (c === '|') {
+                const left = nodes.length === 1 ? nodes[0] : { type: 'seq', nodes };
+                i++;
+                const right = parseSequence(endChar);
+                return { type: 'alt', branches: [left, right] };
+            }
+            const node = parseAtom();
+            if (!node) {
+                continue;
+            }
+            const quant = parseQuantifier();
+            if (quant) {
+                nodes.push({ type: 'quant', node, min: quant.min, max: quant.max });
+            } else {
+                nodes.push(node);
+            }
+        }
+        if (nodes.length === 0) {
+            return { type: 'empty' };
+        }
+        if (nodes.length === 1) {
+            return nodes[0];
+        }
+        return { type: 'seq', nodes };
+    };
+
+    const parseAtom = () => {
+        if (i >= pattern.length) {
+            return null;
+        }
+        const c = pattern[i];
+        if (c === '^' || c === '$') {
+            i++;
+            return { type: 'anchor' };
+        }
+        if (c === '\\') {
+            i += 2;
+            const n = pattern[i - 1];
+            let value = n;
+            if (n === 'd') value = '1';
+            else if (n === 'D') value = 'a';
+            else if (n === 'w') value = 'a';
+            else if (n === 'W') value = '-';
+            else if (n === 's') value = ' ';
+            else if (n === 'S') value = 'a';
+            else if (n === 't') value = '\t';
+            else if (n === 'n') value = '\n';
+            else if (n === 'r') value = '\r';
+            else if (n === 'b' || n === 'B') value = '';
+            return { type: 'literal', value };
+        }
+        if (c === '.') {
+            i++;
+            return { type: 'literal', value: 'a' };
+        }
+        if (c === '[') {
+            i++;
+            let negated = false;
+            if (pattern[i] === '^') {
+                negated = true;
+                i++;
+            }
+            let chars = '';
+            while (i < pattern.length && pattern[i] !== ']') {
+                if (pattern[i] === '\\') {
+                    chars += pattern[i + 1] || '';
+                    i += 2;
+                } else {
+                    chars += pattern[i];
+                    i++;
+                }
+            }
+            if (pattern[i] === ']') {
+                i++;
+            }
+            let value = 'a';
+            if (!negated && chars) {
+                for (let k = 0; k < chars.length; k++) {
+                    if (chars[k + 1] === '-' && k + 2 < chars.length) {
+                        value = chars[k];
+                        break;
+                    }
+                    value = chars[k];
+                    break;
+                }
+            }
+            return { type: 'literal', value };
+        }
+        if (c === '(') {
+            i++;
+            if (pattern.substr(i, 2) === '?:') {
+                i += 2;
+                const node = parseSequence(')');
+                if (pattern[i] === ')') {
+                    i++;
+                }
+                return node;
+            }
+            if (pattern.substr(i, 2) === '?=' || pattern.substr(i, 2) === '?!') {
+                i += 2;
+                parseSequence(')');
+                if (pattern[i] === ')') {
+                    i++;
+                }
+                return { type: 'empty' };
+            }
+            if (pattern.substr(i, 3) === '?<=' || pattern.substr(i, 3) === '?<!') {
+                i += 3;
+                parseSequence(')');
+                if (pattern[i] === ')') {
+                    i++;
+                }
+                return { type: 'empty' };
+            }
+            if (pattern[i] === '?') {
+                const end = pattern.indexOf(')', i);
+                if (end !== -1) {
+                    i = end + 1;
+                }
+                return { type: 'empty' };
+            }
+            const node = parseSequence(')');
+            if (pattern[i] === ')') {
+                i++;
+            }
+            return { type: 'group', node };
+        }
+        i++;
+        return { type: 'literal', value: c };
+    };
+
+    const parseQuantifier = () => {
+        if (i >= pattern.length) {
+            return null;
+        }
+        const c = pattern[i];
+        if (c === '?') {
+            i++;
+            return { min: 0, max: 1 };
+        }
+        if (c === '*') {
+            i++;
+            return { min: 0, max: Infinity };
+        }
+        if (c === '+') {
+            i++;
+            return { min: 1, max: Infinity };
+        }
+        if (c === '{') {
+            const end = pattern.indexOf('}', i);
+            if (end === -1) {
+                return null;
+            }
+            const spec = pattern.slice(i + 1, end);
+            i = end + 1;
+            const parts = spec.split(',').map(s => s.trim());
+            if (parts.length === 1) {
+                const n = parseInt(parts[0], 10);
+                if (!isNaN(n)) {
+                    return { min: n, max: n };
+                }
+            } else if (parts.length === 2) {
+                const min = parseInt(parts[0], 10);
+                const max = parts[1] ? parseInt(parts[1], 10) : Infinity;
+                if (!isNaN(min)) {
+                    return { min, max };
+                }
+            }
+        }
+        return null;
+    };
+
+    return parseSequence(null);
+};
+
+/**
+ * Generate a few example strings that a regex pattern could match.
+ *
+ * @param {string} pattern Regex source.
+ * @param {number} count   Number of examples to generate.
+ * @returns {string[]} Example strings.
+ */
+const generateRegexExamples = (pattern, count = 3) => {
+    if (!pattern || typeof pattern !== 'string') {
+        return [];
+    }
+
+    const ast = parseRegexPattern(pattern);
+    const examples = [];
+    const seen = new Set();
+
+    const emit = (str) => {
+        if (examples.length >= count) {
+            return false;
+        }
+        if (str && !seen.has(str)) {
+            seen.add(str);
+            examples.push(str);
+        }
+        return examples.length < count;
+    };
+
+    const generate = (node, limit) => {
+        if (!node || node.type === 'empty' || node.type === 'anchor') {
+            return [''];
+        }
+        if (node.type === 'literal') {
+            return [node.value];
+        }
+        if (node.type === 'group') {
+            return generate(node.node, limit);
+        }
+        if (node.type === 'quant') {
+            const base = generate(node.node, limit);
+            let reps = 1;
+            if (node.min > 0) {
+                reps = node.min;
+            } else if (node.max > 0) {
+                reps = 1;
+            } else {
+                reps = 0;
+            }
+            return [base[0].repeat(reps)];
+        }
+        if (node.type === 'seq') {
+            let result = [''];
+            for (const child of node.nodes) {
+                const childStrings = generate(child, limit);
+                const combined = [];
+                for (const prefix of result) {
+                    for (const suffix of childStrings) {
+                        combined.push(prefix + suffix);
+                        if (combined.length >= limit) {
+                            break;
+                        }
+                    }
+                    if (combined.length >= limit) {
+                        break;
+                    }
+                }
+                result = combined;
+            }
+            return result.slice(0, limit);
+        }
+        if (node.type === 'alt') {
+            const result = [];
+            for (const branch of node.branches) {
+                result.push(...generate(branch, limit));
+                if (result.length >= limit) {
+                    break;
+                }
+            }
+            return result.slice(0, limit);
+        }
+        return [''];
+    };
+
+    for (const str of generate(ast, count)) {
+        if (!emit(str)) {
+            break;
+        }
+    }
+
+    return examples;
+};
+
+/**
+ * Build a tooltip title showing example matches for a regex redirect.
+ *
+ * @param {string} source Regex source pattern.
+ * @returns {string|null} Tooltip text or null if no examples.
+ */
+const buildRegexTooltip = (source) => {
+    const examples = generateRegexExamples(source, 3);
+    if (examples.length === 0) {
+        return null;
+    }
+    return `Example matches:\n${examples.map(ex => `• ${ex}`).join('\n')}`;
+};
+
 const Redirects = () => {
     // Redirects state
     const [redirects, setRedirects] = useState([]);
@@ -57,6 +353,15 @@ const Redirects = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [suggestionsLoading, setSuggestionsLoading] = useState(true);
 
+    // Summary stats
+    const [summary, setSummary] = useState({
+        total: 0,
+        active_count: 0,
+        total_hits: 0,
+        top_redirect: null,
+    });
+    const [summaryLoading, setSummaryLoading] = useState(true);
+
     const fileInputRef = useRef(null);
 
     // Fetch redirects with filters
@@ -86,6 +391,26 @@ const Redirects = () => {
             setRedirectsLoading(false);
         }
     }, [search, filterGroup, filterStatus, pagination.per_page]);
+
+    // Fetch summary stats
+    const fetchSummary = useCallback(async () => {
+        setSummaryLoading(true);
+        try {
+            const response = await apiFetch({ path: '/saman-seo/v1/redirects/summary' });
+            if (response.success) {
+                setSummary({
+                    total: response.data.total || 0,
+                    active_count: response.data.active_count || 0,
+                    total_hits: response.data.total_hits || 0,
+                    top_redirect: response.data.top_redirect || null,
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch redirect summary:', error);
+        } finally {
+            setSummaryLoading(false);
+        }
+    }, []);
 
     // Fetch groups
     const fetchGroups = useCallback(async () => {
@@ -119,6 +444,7 @@ const Redirects = () => {
         fetchRedirects();
         fetchGroups();
         fetchSuggestions();
+        fetchSummary();
 
         // Check if there's a redirect source from 404 Log page
         const storedSource = sessionStorage.getItem('Saman_seo_redirect_source');
@@ -238,6 +564,7 @@ const Redirects = () => {
                 fetchRedirects(pagination.page);
                 fetchGroups();
                 fetchSuggestions();
+                fetchSummary();
             } else {
                 setFormError(response.message || 'Failed to save redirect');
             }
@@ -261,6 +588,7 @@ const Redirects = () => {
             });
             fetchRedirects(pagination.page);
             fetchGroups();
+            fetchSummary();
         } catch (error) {
             console.error('Failed to delete redirect:', error);
         }
@@ -281,6 +609,7 @@ const Redirects = () => {
             setSelectedIds([]);
             fetchRedirects(pagination.page);
             fetchGroups();
+            fetchSummary();
         } catch (error) {
             console.error('Failed to bulk delete:', error);
         } finally {
@@ -343,6 +672,7 @@ const Redirects = () => {
                 setImportResult(response.data);
                 fetchRedirects(1);
                 fetchGroups();
+                fetchSummary();
             } else {
                 setImportResult({ error: response.message });
             }
@@ -376,6 +706,7 @@ const Redirects = () => {
             if (response.success) {
                 setSuggestions(suggestions.filter(s => s.key !== key));
                 fetchRedirects();
+                fetchSummary();
             }
         } catch (error) {
             console.error('Failed to apply suggestion:', error);
@@ -441,6 +772,28 @@ const Redirects = () => {
             </div>
 
             <section>
+                {/* Stats Bar */}
+                <div className="table-toolbar">
+                    <div className="stats-bar">
+                        <div className="stat-box">
+                            <span className="stat-box__value">{summaryLoading ? '...' : summary.total.toLocaleString()}</span>
+                            <span className="stat-box__label">Total Redirects</span>
+                        </div>
+                        <div className="stat-box">
+                            <span className="stat-box__value">{summaryLoading ? '...' : summary.active_count.toLocaleString()}</span>
+                            <span className="stat-box__label">Active</span>
+                        </div>
+                        <div className="stat-box">
+                            <span className="stat-box__value">{summaryLoading ? '...' : summary.total_hits.toLocaleString()}</span>
+                            <span className="stat-box__label">Total Hits</span>
+                        </div>
+                        <div className="stat-box stat-box--top" title={summary.top_redirect ? summary.top_redirect.source : ''}>
+                            <span className="stat-box__value">{summaryLoading ? '...' : (summary.top_redirect ? summary.top_redirect.hits.toLocaleString() : '0')}</span>
+                            <span className="stat-box__label">Top Redirect Hits</span>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Slug Change Suggestions */}
                 {!suggestionsLoading && suggestions.length > 0 && (
                     <div className="alert-card warning" style={{ marginBottom: '24px' }}>
@@ -565,7 +918,15 @@ const Redirects = () => {
                                         </td>
                                         <td>
                                             <code>{redirect.source}</code>
-                                            {redirect.is_regex && <span className="pill info small" style={{ marginLeft: '6px' }}>Regex</span>}
+                                            {redirect.is_regex && (
+                                                <span
+                                                    className="pill info small"
+                                                    style={{ marginLeft: '6px', cursor: 'help' }}
+                                                    title={buildRegexTooltip(redirect.source)}
+                                                >
+                                                    Regex
+                                                </span>
+                                            )}
                                             {redirect.group_name && <span className="pill muted small" style={{ marginLeft: '6px' }}>{redirect.group_name}</span>}
                                         </td>
                                         <td>

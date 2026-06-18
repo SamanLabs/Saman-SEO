@@ -45,6 +45,24 @@ const defaultSettings = {
     enable_404_notifications: false,
     notification_404_threshold: 10,
     notification_404_email: '',
+    '404_log_ip_level': 'none',
+    '404_log_ip_header': 'REMOTE_ADDR',
+    '404_log_referer': true,
+    '404_log_ignore_bots': false,
+
+    // Redirect settings
+    redirect_case_insensitive: false,
+    redirect_ignore_trailing_slashes: false,
+    redirect_query_matching: 'ignore',
+    redirect_cache_header_hours: 1,
+    redirect_object_cache: false,
+    redirect_auto_generate_url: '',
+    redirect_monitor_post_types: ['post', 'page'],
+    redirect_monitor_trash: false,
+
+    // Data cleanup
+    delete_data_on_uninstall: false,
+
     module_llm_txt: false,
     module_local_seo: false,
     module_internal_linking: true,
@@ -277,6 +295,7 @@ const Settings = () => {
             {activeTab === 'tools' && (
                 <ToolsTab
                     settings={settings}
+                    updateSetting={updateSetting}
                     onExport={handleExport}
                     onImport={handleImport}
                     onReset={handleReset}
@@ -392,7 +411,7 @@ const GeneralTab = ({ settings, updateSetting }) => {
                             <div className="settings-info-box settings-info-box--cta">
                                 <strong>Need more business details?</strong>
                                 <p>Add address, phone, opening hours, and social profiles in Local SEO for a complete Google Knowledge Panel.</p>
-                                <a href="admin.php?page=saman-seo-local-seo" className="button ghost small">Configure Local SEO →</a>
+                                <a href={`${window.samanSeoV2Settings?.adminUrl || ''}admin.php?page=saman-seo-local-seo`} className="button ghost small">Configure Local SEO →</a>
                             </div>
                         </>
                     ) : (
@@ -1039,11 +1058,168 @@ const SocialTab = ({ settings, updateSetting }) => {
     );
 };
 
+// Redirects Panel
+const RedirectsPanel = ({ settings, updateSetting }) => {
+    const [postTypes, setPostTypes] = useState([]);
+
+    useEffect(() => {
+        apiFetch({ path: '/wp/v2/types' })
+            .then((types) => {
+                const publicTypes = Object.values(types).filter((type) => type.public && type.slug !== 'attachment');
+                setPostTypes(publicTypes);
+            })
+            .catch(() => {
+                setPostTypes([
+                    { slug: 'post', name: 'Posts' },
+                    { slug: 'page', name: 'Pages' },
+                ]);
+            });
+    }, []);
+
+    const togglePostType = (slug) => {
+        const current = settings.redirect_monitor_post_types || [];
+        const updated = current.includes(slug)
+            ? current.filter((s) => s !== slug)
+            : [...current, slug];
+        updateSetting('redirect_monitor_post_types', updated);
+    };
+
+    return (
+        <section className="panel">
+            <h3>Redirects</h3>
+            <p className="panel-desc">Configure default redirect matching and URL monitoring behavior.</p>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>Case Insensitive Matches</label>
+                    <p className="settings-help">/Exciting-Post will match /exciting-post.</p>
+                </div>
+                <div className="settings-control">
+                    <label className="toggle">
+                        <input type="checkbox" checked={settings.redirect_case_insensitive} onChange={(e) => updateSetting('redirect_case_insensitive', e.target.checked)} />
+                        <span className="toggle-track" />
+                    </label>
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>Ignore Trailing Slashes</label>
+                    <p className="settings-help">/exciting-post/ will match /exciting-post.</p>
+                </div>
+                <div className="settings-control">
+                    <label className="toggle">
+                        <input type="checkbox" checked={settings.redirect_ignore_trailing_slashes} onChange={(e) => updateSetting('redirect_ignore_trailing_slashes', e.target.checked)} />
+                        <span className="toggle-track" />
+                    </label>
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>Default Query Matching</label>
+                    <p className="settings-help">Applies to all redirects unless configured otherwise.</p>
+                </div>
+                <div className="settings-control">
+                    <select value={settings.redirect_query_matching} onChange={(e) => updateSetting('redirect_query_matching', e.target.value)}>
+                        <option value="exact">Exact - match query parameters exactly</option>
+                        <option value="ignore">Ignore - ignore unknown query parameters</option>
+                        <option value="pass">Pass - copy query parameters to target</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>301 Cache Header (hours)</label>
+                    <p className="settings-help">How long to cache 301 redirects via the Expires header. 0 disables caching.</p>
+                </div>
+                <div className="settings-control">
+                    <input
+                        type="number"
+                        min="0"
+                        max="8760"
+                        value={settings.redirect_cache_header_hours || 0}
+                        onChange={(e) => updateSetting('redirect_cache_header_hours', parseInt(e.target.value, 10) || 0)}
+                        style={{ width: '80px' }}
+                    />
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>Cache Redirects in Object Cache</label>
+                    <p className="settings-help">Improves performance when an object cache is available.</p>
+                </div>
+                <div className="settings-control">
+                    <label className="toggle">
+                        <input type="checkbox" checked={settings.redirect_object_cache} onChange={(e) => updateSetting('redirect_object_cache', e.target.checked)} />
+                        <span className="toggle-track" />
+                    </label>
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label htmlFor="redirect-auto-generate">Auto-Generate URL</label>
+                    <p className="settings-help">Used when no target URL is given. Use $dec$ or $hex$ for a unique ID.</p>
+                </div>
+                <div className="settings-control">
+                    <input
+                        id="redirect-auto-generate"
+                        type="text"
+                        value={settings.redirect_auto_generate_url || ''}
+                        onChange={(e) => updateSetting('redirect_auto_generate_url', e.target.value)}
+                        placeholder="https://example.com/redirect/$dec$"
+                        style={{ width: '280px' }}
+                    />
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>Monitor URL Changes</label>
+                    <p className="settings-help">Automatically suggest redirects when URLs change for these content types.</p>
+                </div>
+                <div className="settings-control">
+                    <div className="checkbox-group">
+                        {postTypes.map((type) => (
+                            <label key={type.slug} className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    checked={(settings.redirect_monitor_post_types || []).includes(type.slug)}
+                                    onChange={() => togglePostType(type.slug)}
+                                />
+                                <span>{type.name || type.slug}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="settings-row compact">
+                <div className="settings-label">
+                    <label>Monitor Trashed Content</label>
+                    <p className="settings-help">Suggest a redirect when monitored content is moved to trash.</p>
+                </div>
+                <div className="settings-control">
+                    <label className="toggle">
+                        <input type="checkbox" checked={settings.redirect_monitor_trash} onChange={(e) => updateSetting('redirect_monitor_trash', e.target.checked)} />
+                        <span className="toggle-track" />
+                    </label>
+                </div>
+            </div>
+        </section>
+    );
+};
+
 // Advanced Tab
 const AdvancedTab = ({ settings, updateSetting }) => {
     return (
         <div className="settings-layout">
             <div className="settings-main">
+                <RedirectsPanel settings={settings} updateSetting={updateSetting} />
+
                 <section className="panel">
                     <h3>User Interface</h3>
                     <p className="panel-desc">Customize how Saman SEO appears in your WordPress admin.</p>
@@ -1412,6 +1588,65 @@ const AdvancedTab = ({ settings, updateSetting }) => {
                             </div>
                         </>
                     )}
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Log IP Address</label>
+                            <p className="settings-help">Store the visitor IP address with each 404 log entry.</p>
+                        </div>
+                        <div className="settings-control">
+                            <select value={settings['404_log_ip_level']} onChange={(e) => updateSetting('404_log_ip_level', e.target.value)}>
+                                <option value="none">No IP logging</option>
+                                <option value="anonymized">Anonymized (last octet hidden)</option>
+                                <option value="full">Full IP address</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {settings['404_log_ip_level'] !== 'none' && (
+                        <div className="settings-row compact">
+                            <div className="settings-label">
+                                <label htmlFor="404-ip-header">IP Address Header</label>
+                                <p className="settings-help">Only change if your server uses a custom header for the client IP.</p>
+                            </div>
+                            <div className="settings-control">
+                                <input
+                                    id="404-ip-header"
+                                    type="text"
+                                    value={settings['404_log_ip_header'] || 'REMOTE_ADDR'}
+                                    onChange={(e) => updateSetting('404_log_ip_header', e.target.value)}
+                                    placeholder="REMOTE_ADDR"
+                                    className="input--medium"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Log HTTP Referer</label>
+                            <p className="settings-help">Store the referring URL with each 404 log entry.</p>
+                        </div>
+                        <div className="settings-control">
+                            <label className="toggle">
+                                <input type="checkbox" checked={settings['404_log_referer']} onChange={(e) => updateSetting('404_log_referer', e.target.checked)} />
+                                <span className="toggle-track" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="settings-row compact">
+                        <div className="settings-label">
+                            <label>Ignore Bot Requests</label>
+                            <p className="settings-help">Do not log 404s from known bots and crawlers.</p>
+                        </div>
+                        <div className="settings-control">
+                            <label className="toggle">
+                                <input type="checkbox" checked={settings['404_log_ignore_bots']} onChange={(e) => updateSetting('404_log_ignore_bots', e.target.checked)} />
+                                <span className="toggle-track" />
+                            </label>
+                        </div>
+                    </div>
                 </section>
 
                 <section className="panel">
@@ -1457,7 +1692,29 @@ const AdvancedTab = ({ settings, updateSetting }) => {
 };
 
 // Tools Tab
-const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resettingWizard, importFile, setImportFile, systemInfo }) => {
+const ToolsTab = ({ settings, updateSetting, onExport, onImport, onReset, onResetWizard, resettingWizard, importFile, setImportFile, systemInfo }) => {
+    const [deletingData, setDeletingData] = useState(false);
+
+    const handleDeleteAllData = async () => {
+        if (!window.confirm('Are you sure you want to delete all Saman SEO data? This will remove redirects, 404 logs, settings, and post meta. This cannot be undone.')) {
+            return;
+        }
+        setDeletingData(true);
+        try {
+            await apiFetch({
+                path: '/saman-seo/v1/tools/delete-all-data',
+                method: 'POST',
+            });
+            alert('All plugin data has been deleted. The page will reload.');
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to delete data:', error);
+            alert('Failed to delete plugin data.');
+        } finally {
+            setDeletingData(false);
+        }
+    };
+
     return (
         <div className="settings-layout">
             <div className="settings-main">
@@ -1548,7 +1805,27 @@ const ToolsTab = ({ settings, onExport, onImport, onReset, onResetWizard, resett
                         <div className="tool-action">
                             <h4>Delete All Data</h4>
                             <p className="muted">Remove all plugin data including redirects, 404 logs, and meta.</p>
-                            <button type="button" className="button danger">Delete All Data</button>
+                            <button
+                                type="button"
+                                className="button danger"
+                                onClick={handleDeleteAllData}
+                                disabled={deletingData}
+                            >
+                                {deletingData ? 'Deleting...' : 'Delete All Data'}
+                            </button>
+                        </div>
+
+                        <div className="tool-action">
+                            <h4>Delete Data on Uninstall</h4>
+                            <p className="muted">Remove all plugin data when the plugin is uninstalled.</p>
+                            <label className="toggle">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.delete_data_on_uninstall}
+                                    onChange={(e) => updateSetting('delete_data_on_uninstall', e.target.checked)}
+                                />
+                                <span className="toggle-track" />
+                            </label>
                         </div>
                     </div>
                 </section>

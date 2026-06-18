@@ -8,7 +8,7 @@ import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
 import useUrlTab from '../hooks/useUrlTab';
 
 // Get AI status from global settings
-const globalSettings = window?.SamanSEOSettings || {};
+const globalSettings = window.samanSeoV2Settings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
 const aiProvider = globalSettings.aiProvider || 'none';
 const aiPilot = globalSettings.aiPilot || null;

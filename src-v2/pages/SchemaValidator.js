@@ -46,7 +46,7 @@ const SchemaValidator = ({ onNavigate }) => {
 
     // Validate current site URL
     const handleValidateSite = useCallback(async () => {
-        const siteUrl = window.SamanSEOSettings?.adminUrl?.replace('/wp-admin/', '') || '';
+        const siteUrl = window.samanSeoV2Settings?.adminUrl?.replace('/wp-admin/', '') || '';
         if (siteUrl) {
             setUrl(siteUrl);
             // Trigger validation after state update

@@ -220,6 +220,15 @@ class Redirects_Controller extends REST_Controller {
             ],
         ] );
 
+        // Summary endpoint
+        register_rest_route( $this->namespace, '/redirects/summary', [
+            [
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => [ $this, 'get_redirects_summary' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+            ],
+        ] );
+
         // Chain detection endpoint
         register_rest_route( $this->namespace, '/redirects/validate-chain', [
             [
@@ -875,6 +884,59 @@ class Redirects_Controller extends REST_Controller {
         );
 
         return $this->success( $groups ? $groups : [] );
+    }
+
+    /**
+     * Get redirect summary statistics.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function get_redirects_summary( $request ) {
+        global $wpdb;
+
+        // Check if table exists.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema check requires direct query.
+        $table_exists = $wpdb->get_var( $wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $this->redirects_table
+        ) );
+
+        if ( ! $table_exists ) {
+            return $this->success( [
+                'total'        => 0,
+                'active_count' => 0,
+                'total_hits'   => 0,
+                'top_redirect' => null,
+            ] );
+        }
+
+        $now = current_time( 'mysql' );
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, summary requires direct query.
+        $total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->redirects_table}" );
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, summary requires direct query.
+        $active_count = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$this->redirects_table} WHERE ( start_date IS NULL OR start_date = '0000-00-00 00:00:00' OR start_date <= %s ) AND ( end_date IS NULL OR end_date = '0000-00-00 00:00:00' OR end_date >= %s )",
+                $now,
+                $now
+            )
+        );
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, summary requires direct query.
+        $total_hits = (int) $wpdb->get_var( "SELECT COALESCE(SUM(hits), 0) FROM {$this->redirects_table}" );
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, summary requires direct query.
+        $top_redirect = $wpdb->get_row( "SELECT * FROM {$this->redirects_table} ORDER BY hits DESC, id DESC LIMIT 1" );
+
+        return $this->success( [
+            'total'        => $total,
+            'active_count' => $active_count,
+            'total_hits'   => $total_hits,
+            'top_redirect' => $top_redirect ? $this->format_redirect( $top_redirect ) : null,
+        ] );
     }
 
     /**

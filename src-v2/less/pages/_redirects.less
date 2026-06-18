@@ -119,6 +119,42 @@
     }
 }
 
+// Stats bar (shared between Redirects and 404 Log)
+.stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-md;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 110px;
+    padding: @spacing-sm @spacing-md;
+    background: @color-surface-muted;
+    border: 1px solid @color-border-light;
+    border-radius: @radius-md;
+
+    &__value {
+        font-size: @font-size-xl;
+        font-weight: @font-weight-bold;
+        color: @color-text;
+        line-height: 1.2;
+    }
+
+    &__label {
+        font-size: @font-size-xs;
+        color: @color-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    &--top {
+        cursor: help;
+    }
+}
+
 input[type="search"].search-input {
     .input-base();
     flex: 1;

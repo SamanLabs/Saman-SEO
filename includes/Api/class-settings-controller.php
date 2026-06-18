@@ -316,6 +316,25 @@ class Settings_Controller extends REST_Controller {
 			'llm_txt'                     => 'textarea',
 			'hreflang_map'                => 'textarea',
 			'sidebar_logo'                => 'url',
+
+			// Redirect settings.
+			'redirect_case_insensitive'        => 'bool',
+			'redirect_ignore_trailing_slashes' => 'bool',
+			'redirect_query_matching'          => 'text',
+			'redirect_cache_header_hours'      => 'int',
+			'redirect_object_cache'            => 'bool',
+			'redirect_auto_generate_url'       => 'text',
+			'redirect_monitor_post_types'      => 'array',
+			'redirect_monitor_trash'           => 'bool',
+
+			// 404 log privacy/logging settings.
+			'404_log_ip_level'                 => 'text',
+			'404_log_ip_header'                => 'text',
+			'404_log_referer'                  => 'bool',
+			'404_log_ignore_bots'              => 'bool',
+
+			// Data cleanup.
+			'delete_data_on_uninstall'         => 'bool',
 		);
 
 		return saman_seo_apply_filters( 'saman_seo_allowed_settings', $settings );
@@ -344,7 +363,23 @@ class Settings_Controller extends REST_Controller {
 				return sanitize_textarea_field( $value );
 
 			case 'array':
-				return is_array( $value ) ? $value : array();
+				if ( ! is_array( $value ) ) {
+					return array();
+				}
+
+				if ( 'redirect_monitor_post_types' === $key ) {
+					$public = get_post_types( array( 'public' => true ), 'names' );
+					$clean  = array();
+					foreach ( $value as $slug ) {
+						$slug = sanitize_key( $slug );
+						if ( in_array( $slug, $public, true ) ) {
+							$clean[] = $slug;
+						}
+					}
+					return $clean;
+				}
+
+				return $value;
 
 			case 'text':
 			default:
