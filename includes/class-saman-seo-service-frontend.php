@@ -109,7 +109,13 @@ class Frontend {
 		// Default homepage title when no override is saved.
 		if ( $is_home_view && empty( $title ) ) {
 			$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
-			$title     = __( 'Home', 'saman-seo' ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title     = sprintf(
+				/* translators: 1: Home label, 2: title separator, 3: site name */
+				__( '%1$s %2$s %3$s', 'saman-seo' ),
+				__( 'Home', 'saman-seo' ),
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		}
 
 		// Handle archive pages (404, search, author, date).
@@ -137,13 +143,36 @@ class Frontend {
 				$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 
 				if ( '404' === $archive_type ) {
-					$title = 'Page Not Found ' . $separator . ' ' . get_bloginfo( 'name' );
+					$title = sprintf(
+						/* translators: 1: title separator, 2: site name */
+						__( 'Page Not Found %1$s %2$s', 'saman-seo' ),
+						$separator,
+						get_bloginfo( 'name' )
+					);
 				} elseif ( 'search' === $archive_type ) {
-					$title = __( 'Search Results', 'saman-seo' ) . ': ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+					$title = sprintf(
+						/* translators: 1: search query, 2: title separator, 3: site name */
+						__( 'Search Results: %1$s %2$s %3$s', 'saman-seo' ),
+						get_search_query(),
+						$separator,
+						get_bloginfo( 'name' )
+					);
 				} elseif ( 'author' === $archive_type ) {
-					$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+					$title = sprintf(
+						/* translators: 1: author name, 2: title separator, 3: site name */
+						__( '%1$s %2$s %3$s', 'saman-seo' ),
+						get_the_author(),
+						$separator,
+						get_bloginfo( 'name' )
+					);
 				} elseif ( 'date' === $archive_type ) {
-					$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+					$title = sprintf(
+						/* translators: 1: archive title, 2: title separator, 3: site name */
+						__( '%1$s %2$s %3$s', 'saman-seo' ),
+						get_the_archive_title(),
+						$separator,
+						get_bloginfo( 'name' )
+					);
 				}
 			}
 		}
@@ -153,11 +182,23 @@ class Frontend {
 			$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 
 			if ( is_post_type_archive() ) {
-				$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				$title = sprintf(
+					/* translators: 1: post type archive title, 2: title separator, 3: site name */
+					__( '%1$s %2$s %3$s', 'saman-seo' ),
+					post_type_archive_title( '', false ),
+					$separator,
+					get_bloginfo( 'name' )
+				);
 			} else {
 				$term      = get_queried_object();
 				$term_name = ( $term instanceof \WP_Term ) ? $term->name : get_the_archive_title();
-				$title     = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+				$title     = sprintf(
+					/* translators: 1: term name, 2: title separator, 3: site name */
+					__( '%1$s %2$s %3$s', 'saman-seo' ),
+					$term_name,
+					$separator,
+					get_bloginfo( 'name' )
+				);
 			}
 		}
 
@@ -491,19 +532,55 @@ class Frontend {
 		$separator = get_option( 'SAMAN_SEO_title_separator', '|' );
 
 		if ( is_search() ) {
-			$title = __( 'Search Results', 'saman-seo' ) . ': ' . get_search_query() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title = sprintf(
+				/* translators: 1: search query, 2: title separator, 3: site name */
+				__( 'Search Results: %1$s %2$s %3$s', 'saman-seo' ),
+				get_search_query(),
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		} elseif ( is_author() ) {
-			$title = get_the_author() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title = sprintf(
+				/* translators: 1: author name, 2: title separator, 3: site name */
+				__( '%1$s %2$s %3$s', 'saman-seo' ),
+				get_the_author(),
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		} elseif ( is_date() ) {
-			$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title = sprintf(
+				/* translators: 1: archive title, 2: title separator, 3: site name */
+				__( '%1$s %2$s %3$s', 'saman-seo' ),
+				get_the_archive_title(),
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$term      = get_queried_object();
 			$term_name = ( $term instanceof \WP_Term ) ? $term->name : get_the_archive_title();
-			$title     = $term_name . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title     = sprintf(
+				/* translators: 1: term name, 2: title separator, 3: site name */
+				__( '%1$s %2$s %3$s', 'saman-seo' ),
+				$term_name,
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		} elseif ( is_post_type_archive() ) {
-			$title = post_type_archive_title( '', false ) . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title = sprintf(
+				/* translators: 1: post type archive title, 2: title separator, 3: site name */
+				__( '%1$s %2$s %3$s', 'saman-seo' ),
+				post_type_archive_title( '', false ),
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		} else {
-			$title = get_the_archive_title() . ' ' . $separator . ' ' . get_bloginfo( 'name' );
+			$title = sprintf(
+				/* translators: 1: archive title, 2: title separator, 3: site name */
+				__( '%1$s %2$s %3$s', 'saman-seo' ),
+				get_the_archive_title(),
+				$separator,
+				get_bloginfo( 'name' )
+			);
 		}
 
 		return saman_seo_apply_filters( 'saman_seo_og_title', $title, null );
@@ -1204,6 +1281,16 @@ class Frontend {
 			$post = get_post();
 
 			return $post instanceof WP_Post ? $post : null;
+		}
+
+		if ( is_front_page() ) {
+			$front_page_id = (int) get_option( 'page_on_front' );
+			if ( $front_page_id ) {
+				$front_page = get_post( $front_page_id );
+				if ( $front_page instanceof WP_Post ) {
+					return $front_page;
+				}
+			}
 		}
 
 		if ( is_home() && ! is_front_page() ) {

@@ -20,33 +20,33 @@ class Settings {
 	 * @var array<string,mixed>
 	 */
 	private $defaults = array(
-		'SAMAN_SEO_default_title_template'      => '{{post_title}} | {{site_title}}',
-		'SAMAN_SEO_post_type_title_templates'   => array(),
-		'SAMAN_SEO_post_type_meta_descriptions' => array(),
-		'SAMAN_SEO_post_type_keywords'          => array(),
-		'SAMAN_SEO_post_type_settings'          => array(),
-		'SAMAN_SEO_taxonomy_settings'           => array(),
-		'SAMAN_SEO_archive_settings'            => array(),
+		'SAMAN_SEO_default_title_template'           => '{{post_title}} | {{site_title}}',
+		'SAMAN_SEO_post_type_title_templates'        => array(),
+		'SAMAN_SEO_post_type_meta_descriptions'      => array(),
+		'SAMAN_SEO_post_type_keywords'               => array(),
+		'SAMAN_SEO_post_type_settings'               => array(),
+		'SAMAN_SEO_taxonomy_settings'                => array(),
+		'SAMAN_SEO_archive_settings'                 => array(),
 		// AI prompt customization (model selection handled by Saman Labs AI)
-		'SAMAN_SEO_ai_prompt_system'            => 'You are an SEO assistant generating concise metadata. Respond with plain text only.',
-		'SAMAN_SEO_ai_prompt_title'             => 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.',
-		'SAMAN_SEO_ai_prompt_description'       => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
-		'SAMAN_SEO_homepage_title'              => '',
-		'SAMAN_SEO_homepage_description'        => '',
-		'SAMAN_SEO_homepage_keywords'           => '',
-		'SAMAN_SEO_homepage_description_prompt' => '',
-		'SAMAN_SEO_homepage_knowledge_type'     => 'organization',
-		'SAMAN_SEO_homepage_organization_name'  => '',
-		'SAMAN_SEO_homepage_organization_logo'  => '',
-		'SAMAN_SEO_homepage_person_name'        => '',
-		'SAMAN_SEO_homepage_person_image'       => '',
-		'SAMAN_SEO_homepage_person_job_title'   => '',
-		'SAMAN_SEO_homepage_person_url'         => '',
-		'SAMAN_SEO_homepage_social_profiles'    => '',
-		'SAMAN_SEO_title_separator'             => '-',
-		'SAMAN_SEO_default_meta_description'    => '',
-		'SAMAN_SEO_default_og_image'            => '',
-		'SAMAN_SEO_social_defaults'             => array(
+		'SAMAN_SEO_ai_prompt_system'                 => 'You are an SEO assistant generating concise metadata. Respond with plain text only.',
+		'SAMAN_SEO_ai_prompt_title'                  => 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.',
+		'SAMAN_SEO_ai_prompt_description'            => 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.',
+		'SAMAN_SEO_homepage_title'                   => '',
+		'SAMAN_SEO_homepage_description'             => '',
+		'SAMAN_SEO_homepage_keywords'                => '',
+		'SAMAN_SEO_homepage_description_prompt'      => '',
+		'SAMAN_SEO_homepage_knowledge_type'          => 'organization',
+		'SAMAN_SEO_homepage_organization_name'       => '',
+		'SAMAN_SEO_homepage_organization_logo'       => '',
+		'SAMAN_SEO_homepage_person_name'             => '',
+		'SAMAN_SEO_homepage_person_image'            => '',
+		'SAMAN_SEO_homepage_person_job_title'        => '',
+		'SAMAN_SEO_homepage_person_url'              => '',
+		'SAMAN_SEO_homepage_social_profiles'         => '',
+		'SAMAN_SEO_title_separator'                  => '-',
+		'SAMAN_SEO_default_meta_description'         => '',
+		'SAMAN_SEO_default_og_image'                 => '',
+		'SAMAN_SEO_social_defaults'                  => array(
 			'og_title'            => '',
 			'og_description'      => '',
 			'twitter_title'       => '',
@@ -54,36 +54,36 @@ class Settings {
 			'image_source'        => '',
 			'schema_itemtype'     => '',
 		),
-		'SAMAN_SEO_post_type_social_defaults'   => array(),
-		'SAMAN_SEO_default_social_width'        => 1200,
-		'SAMAN_SEO_default_social_height'       => 630,
-		'SAMAN_SEO_default_noindex'             => '0',
-		'SAMAN_SEO_default_nofollow'            => '0',
-		'SAMAN_SEO_global_robots'               => 'index, follow',
-		'SAMAN_SEO_hreflang_map'                => '',
-		'SAMAN_SEO_robots_txt'                  => '',
+		'SAMAN_SEO_post_type_social_defaults'        => array(),
+		'SAMAN_SEO_default_social_width'             => 1200,
+		'SAMAN_SEO_default_social_height'            => 630,
+		'SAMAN_SEO_default_noindex'                  => '0',
+		'SAMAN_SEO_default_nofollow'                 => '0',
+		'SAMAN_SEO_global_robots'                    => 'index, follow',
+		'SAMAN_SEO_hreflang_map'                     => '',
+		'SAMAN_SEO_robots_txt'                       => '',
 		// Legacy enable_* options - @deprecated Use SAMAN_SEO_module_* options instead.
 		// Kept for backward compatibility; the module_enabled() helper handles migration.
-		'SAMAN_SEO_enable_sitemap_enhancer'     => '1',
-		'SAMAN_SEO_enable_redirect_manager'     => '1',
-		'SAMAN_SEO_enable_404_logging'          => '1',
-		'SAMAN_SEO_enable_og_preview'           => '1',
-		'SAMAN_SEO_enable_llm_txt'              => '1',
-		'SAMAN_SEO_enable_local_seo'            => '0',
-		'SAMAN_SEO_enable_analytics'            => '1',
+		'SAMAN_SEO_enable_sitemap_enhancer'          => '1',
+		'SAMAN_SEO_enable_redirect_manager'          => '1',
+		'SAMAN_SEO_enable_404_logging'               => '1',
+		'SAMAN_SEO_enable_og_preview'                => '1',
+		'SAMAN_SEO_enable_llm_txt'                   => '1',
+		'SAMAN_SEO_enable_local_seo'                 => '0',
+		'SAMAN_SEO_enable_analytics'                 => '1',
 
 		// New module toggle options (used by React UI).
-		'SAMAN_SEO_module_sitemap'              => '1',
-		'SAMAN_SEO_module_redirects'            => '1',
-		'SAMAN_SEO_module_404_log'              => '1',
-		'SAMAN_SEO_module_llm_txt'              => '1',
-		'SAMAN_SEO_module_local_seo'            => '0',
-		'SAMAN_SEO_module_social_cards'         => '1',
-		'SAMAN_SEO_module_analytics'            => '1',
-		'SAMAN_SEO_module_admin_bar'            => '1',
-		'SAMAN_SEO_module_internal_links'       => '1',
-		'SAMAN_SEO_module_ai_assistant'         => '1',
-		'SAMAN_SEO_module_breadcrumbs'          => '0',
+		'SAMAN_SEO_module_sitemap'                   => '1',
+		'SAMAN_SEO_module_redirects'                 => '1',
+		'SAMAN_SEO_module_404_log'                   => '1',
+		'SAMAN_SEO_module_llm_txt'                   => '1',
+		'SAMAN_SEO_module_local_seo'                 => '0',
+		'SAMAN_SEO_module_social_cards'              => '1',
+		'SAMAN_SEO_module_analytics'                 => '1',
+		'SAMAN_SEO_module_admin_bar'                 => '1',
+		'SAMAN_SEO_module_internal_links'            => '1',
+		'SAMAN_SEO_module_ai_assistant'              => '1',
+		'SAMAN_SEO_module_breadcrumbs'               => '0',
 
 		// Redirect settings.
 		'SAMAN_SEO_redirect_case_insensitive'        => '0',
@@ -267,7 +267,7 @@ class Settings {
 	 */
 	public function get_context_variables() {
 		$variables = array(
-			'global' => array(
+			'global'   => array(
 				'label' => __( 'General', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -296,7 +296,7 @@ class Settings {
 					),
 				),
 			),
-			'post' => array(
+			'post'     => array(
 				'label' => __( 'Post Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -360,7 +360,7 @@ class Settings {
 					),
 				),
 			),
-			'archive' => array(
+			'archive'  => array(
 				'label' => __( 'Archive Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(
@@ -377,7 +377,7 @@ class Settings {
 					),
 				),
 			),
-			'author' => array(
+			'author'   => array(
 				'label' => __( 'Author Variables', 'saman-seo' ),
 				'vars'  => array(
 					array(

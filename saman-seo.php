@@ -50,6 +50,20 @@ spl_autoload_register(
 			return;
 		}
 
+		/*
+		 * This autoloader intentionally deviates from strict PSR-4 directory
+		 * layout for historical/backwards-compatibility reasons:
+		 *
+		 * - Namespaced classes under Saman\SEO\Service may live in either
+		 *   includes/Service/ or the includes/ root.
+		 * - Internal_Linking classes live in the includes/ root.
+		 *
+		 * The Composer classmap (via composer.json autoload.classmap) is the
+		 * primary autoloading mechanism; this fallback handles edge cases and
+		 * development environments where vendor/ was generated without scanning
+		 * the includes/ subdirectories.
+		 */
+
 		// Handle Api namespace separately (in includes/Api/ directory).
 		if ( 0 === strpos( $classname, 'Saman\SEO\\Api\\' ) ) {
 			$class_name = str_replace( 'Saman\SEO\\Api\\', '', $classname );
@@ -124,12 +138,12 @@ spl_autoload_register(
 		$slug       = strtolower( str_replace( array( '\\', '_' ), '-', $class_name ) );
 
 		// Try naming conventions.
-			$candidates = array(
-				// Primary naming convention (saman-seo-*).
-				SAMAN_SEO_PATH . 'includes/class-saman-seo-' . $slug . '.php',
-				// Simple naming fallback (class-*).
-				SAMAN_SEO_PATH . 'includes/class-' . $slug . '.php',
-			);
+		$candidates = array(
+			// Primary naming convention (saman-seo-*).
+			SAMAN_SEO_PATH . 'includes/class-saman-seo-' . $slug . '.php',
+			// Simple naming fallback (class-*).
+			SAMAN_SEO_PATH . 'includes/class-' . $slug . '.php',
+		);
 
 		foreach ( $candidates as $file ) {
 			if ( file_exists( $file ) ) {

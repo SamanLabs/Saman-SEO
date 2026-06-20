@@ -142,12 +142,14 @@ namespace Saman\SEO\Helpers {
 			$vars['post_title'] = \wp_strip_all_tags( $context->post_title );
 			// Legacy alias so %title% (the Setup wizard's historical default)
 			// resolves to the post title alongside {{post_title}}.
-			$vars['title']        = $vars['post_title'];
-			$vars['post_excerpt'] = \wp_strip_all_tags( \get_the_excerpt( $context ) );
-			$vars['post_date']    = get_the_date( '', $context );
-			$vars['post_author']  = get_the_author_meta( 'display_name', $context->post_author );
-			$vars['modified']     = get_the_modified_date( '', $context );
-			$vars['id']           = $context->ID;
+			$vars['title']         = $vars['post_title'];
+			$vars['post_excerpt']  = \wp_strip_all_tags( \get_the_excerpt( $context ) );
+			$vars['post_date']     = get_the_date( '', $context );
+			$vars['post_author']   = get_the_author_meta( 'display_name', $context->post_author );
+			$vars['modified']      = get_the_modified_date( '', $context );
+			$vars['post_modified'] = $vars['modified']; // Alias used by Yoast bridge.
+			$vars['id']            = $context->ID;
+			$vars['post_id']       = $vars['id']; // Alias for post_id.
 
 			$cats             = get_the_category( $context->ID );
 			$vars['category'] = ( ! empty( $cats ) && ! is_wp_error( $cats ) ) ? $cats[0]->name : '';
@@ -196,7 +198,8 @@ namespace Saman\SEO\Helpers {
 			$vars['request_url'] = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( home_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) ) : '';
 		} elseif ( is_search() ) {
 			// Search results variables
-			$vars['search_term'] = get_search_query();
+			$vars['search_term']  = get_search_query();
+			$vars['search_query'] = $vars['search_term']; // Alias for search_query.
 		}
 
 		$twiglet  = new \Twiglet\Twiglet();

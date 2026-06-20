@@ -537,6 +537,7 @@
 
 .saman-seo-template-input__container {
     position: relative;
+    min-height: 40px;
     border: 1px solid #dcdcde;
     border-radius: 4px;
     background: #fff;
@@ -544,106 +545,114 @@
     overflow: hidden;
 }
 
+.saman-seo-template-input__container:has(.saman-seo-template-input__field.multiline) {
+    min-height: 72px;
+}
+
 .saman-seo-template-input.is-focused .saman-seo-template-input__container {
     border-color: #2271b1;
     box-shadow: 0 0 0 1px #2271b1;
 }
 
-.saman-seo-template-input__highlight {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 8px 70px 8px 10px;
-    font-size: 13px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    pointer-events: none;
-    overflow: hidden;
-    color: #1e1e1e;
-}
-
-.saman-seo-template-input__highlight.multiline {
-    padding-right: 10px;
-    padding-top: 8px;
-    max-height: 120px;
-    overflow: hidden;
-}
-
 .saman-seo-template-input__field {
     position: relative;
-    width: 100%;
-    padding: 8px 70px 8px 10px;
+    min-height: 40px;
+    padding: 8px 56px 8px 10px;
     font-size: 13px;
     line-height: 1.5;
     border: none;
     background: transparent;
-    color: transparent;
+    color: #1e1e1e;
     caret-color: #1e1e1e;
-    resize: none;
     outline: none;
     font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .saman-seo-template-input__field.multiline {
     min-height: 72px;
     max-height: 120px;
-    padding-right: 10px;
+    padding-bottom: 16px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 .saman-seo-template-input__placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 56px;
+    bottom: 0;
+    padding: 8px 10px;
+    font-size: 13px;
+    line-height: 1.5;
     color: #757575;
+    pointer-events: none;
+    z-index: 1;
 }
 
-/* Variable syntax highlighting */
-.saman-seo-template-input__var {
-    position: relative;
-    display: inline;
-    pointer-events: auto;
-}
-
-.saman-seo-template-input__bracket {
-    opacity: 0.5;
-}
-
+/* Variable tag pills */
 .saman-seo-template-input__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    margin: 0 1px;
+    border-radius: 12px;
+    font-size: 11px;
+    line-height: 1.4;
     font-weight: 500;
+    vertical-align: middle;
+    cursor: default;
+    user-select: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
 }
 
-.saman-seo-template-input__var--global {
+.saman-seo-template-input__tag--global {
+    background: #e7f3ff;
     color: #2271b1;
+    border-color: #b8d6fb;
 }
 
-.saman-seo-template-input__var--post {
-    color: #7c3aed;
-}
-
-.saman-seo-template-input__var--taxonomy {
-    color: #059669;
-}
-
-.saman-seo-template-input__var--author {
-    color: #ea580c;
-}
-
-.saman-seo-template-input__var--archive {
-    color: #0891b2;
-}
-
-.saman-seo-template-input__var--separator {
+.saman-seo-template-input__tag--separator {
+    background: #f0f0f1;
     color: #646970;
+    border-color: #dcdcde;
+}
+
+.saman-seo-template-input__tag--post {
+    background: #f3e8ff;
+    color: #7c3aed;
+    border-color: #d8b4fe;
+}
+
+.saman-seo-template-input__tag--taxonomy {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+
+.saman-seo-template-input__tag--author {
+    background: #fff7ed;
+    color: #ea580c;
+    border-color: #fed7aa;
+}
+
+.saman-seo-template-input__tag--archive {
+    background: #ecfeff;
+    color: #0891b2;
+    border-color: #a5f3fc;
+}
+
+.saman-seo-template-input__tag.is-dragging {
+    opacity: 0.4;
 }
 
 /* Tooltip */
 .saman-seo-template-input__tooltip {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
     padding: 4px 8px;
     background: #1e1e1e;
     color: #fff;
@@ -651,18 +660,11 @@
     font-weight: 400;
     border-radius: 4px;
     white-space: nowrap;
-    z-index: 1000;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 10000;
     pointer-events: none;
-}
-
-.saman-seo-template-input__tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 4px solid transparent;
-    border-top-color: #1e1e1e;
 }
 
 /* Action buttons */
@@ -2095,7 +2097,6 @@
 /* Modal wrapper - large and prominent for modern screens */
 .saman-seo-modal-wrapper {
     max-width: 820px;
-    width: 90vw;
 }
 
 /* Override WordPress modal frame for clean look */
@@ -2109,11 +2110,15 @@
 /* Modal content - fixed height, clean background */
 .saman-seo-modal-wrapper .components-modal__content {
     padding: 0;
-    height: 75vh;
-    max-height: 700px;
+    width: 90vw;
+    max-width: 820px;
+    height: 85vh;
+    max-height: 800px;
+    min-height: 520px;
     display: flex;
     flex-direction: column;
     background: #f6f7f7;
+    overflow: hidden;
 }
 
 /* Modal header - clean and minimal */
@@ -2187,23 +2192,16 @@
     flex: 1 1 auto;
     overflow-y: auto;
     overflow-x: hidden;
-    min-height: 100px;
-    max-height: 450px;
+    min-height: 0;
     padding: 24px;
-    padding-bottom: 32px;
+    padding-bottom: 48px;
     background: #f6f7f7;
 }
 
 /* Larger tab content for bigger screens */
 @media screen and (min-height: 800px) {
     .saman-seo-modal-wrapper .saman-seo-tab-content {
-        max-height: 500px;
-    }
-}
-
-@media screen and (min-height: 900px) {
-    .saman-seo-modal-wrapper .saman-seo-tab-content {
-        max-height: 550px;
+        padding-bottom: 64px;
     }
 }
 

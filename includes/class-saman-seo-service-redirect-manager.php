@@ -1067,7 +1067,7 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	private function execute_redirect( $row, $target, $query, $settings ) {
-		$redirect  = is_array( $row ) ? $row : (array) $row;
+		$redirect    = is_array( $row ) ? $row : (array) $row;
 		$status_code = (int) $redirect['status_code'];
 
 		// Target-less status codes (410 Gone, 451).
