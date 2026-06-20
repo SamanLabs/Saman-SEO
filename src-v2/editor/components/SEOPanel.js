@@ -291,7 +291,126 @@ const SEOPanel = ( {
 			</div>
 
 			{ /* General Tab */ }
-			{ __( 'Enter meta description', 'saman-seo' ) }
+			{ activeTab === 'general' && (
+				<div className="saman-seo-tab-content">
+					{ /* Search Preview */ }
+					<div className="saman-seo-preview-section">
+						<label className="saman-seo-section-label">
+							{ __( 'Search Preview', 'saman-seo' ) }
+						</label>
+						<SearchPreview
+							title={ effectiveTitle }
+							description={ effectiveDescription }
+							url={ postUrl }
+						/>
+					</div>
+
+					{ /* Focus Keyphrase */ }
+					<div className="saman-seo-field">
+						<div className="saman-seo-field-header">
+							<label>
+								{ __( 'Focus Keyphrase', 'saman-seo' ) }
+							</label>
+						</div>
+						<input
+							type="text"
+							className="saman-seo-field-input"
+							value={ seoMeta.focus_keyphrase || '' }
+							onChange={ ( e ) =>
+								updateMeta( 'focus_keyphrase', e.target.value )
+							}
+							placeholder={ __(
+								'Enter your main target keyword',
+								'saman-seo'
+							) }
+						/>
+					</div>
+
+					{ /* Quick Templates */ }
+					<div className="saman-seo-field">
+						<div className="saman-seo-field-header">
+							<label>
+								{ __( 'Quick Templates', 'saman-seo' ) }
+							</label>
+						</div>
+						<div className="saman-seo-templates">
+							<button
+								type="button"
+								className="saman-seo-templates-toggle"
+								onClick={ () =>
+									setShowTemplates( ! showTemplates )
+								}
+							>
+								{ showTemplates
+									? __( 'Hide templates', 'saman-seo' )
+									: __( 'Apply a template', 'saman-seo' ) }
+							</button>
+							{ showTemplates && (
+								<div className="saman-seo-templates-list">
+									{ quickTemplates.map( ( template ) => (
+										<button
+											key={ template.id }
+											type="button"
+											className="saman-seo-template-item"
+											onClick={ () =>
+												applyTemplate( template )
+											}
+										>
+											<strong>{ template.name }</strong>
+											<span>{ template.title }</span>
+										</button>
+									) ) }
+								</div>
+							) }
+						</div>
+					</div>
+
+					{ /* SEO Title */ }
+					<TemplateInput
+						label={ __( 'SEO Title', 'saman-seo' ) }
+						helpText={ __(
+							'Recommended length: 50–60 characters',
+							'saman-seo'
+						) }
+						value={ seoMeta.title || '' }
+						onChange={ ( value ) => updateMeta( 'title', value ) }
+						variables={ variables }
+						variableValues={ variableValues }
+						context="post"
+						maxLength={ 60 }
+						onAiClick={ () =>
+							openAiModal( 'title', ( result ) =>
+								updateMeta( 'title', result )
+							)
+						}
+						aiEnabled={ aiEnabled }
+					/>
+
+					{ /* Meta Description */ }
+					<TemplateInput
+						label={ __( 'Meta Description', 'saman-seo' ) }
+						helpText={ __(
+							'Recommended length: 150–160 characters',
+							'saman-seo'
+						) }
+						value={ seoMeta.description || '' }
+						onChange={ ( value ) =>
+							updateMeta( 'description', value )
+						}
+						variables={ variables }
+						variableValues={ variableValues }
+						context="post"
+						multiline
+						maxLength={ 160 }
+						onAiClick={ () =>
+							openAiModal( 'description', ( result ) =>
+								updateMeta( 'description', result )
+							)
+						}
+						aiEnabled={ aiEnabled }
+					/>
+				</div>
+			) }
 
 			{ /* Analysis Tab */ }
 			{ activeTab === 'analysis' && (

@@ -12,6 +12,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SEOPanel from './components/SEOPanel';
+import { renderTemplatePreview } from '../utils/template';
 import './editor.css';
 
 // Sidebar name constant
@@ -146,7 +147,9 @@ const SEOModalPlugin = () => {
 
 	// Load initial meta from post
 	useEffect( () => {
-		if ( ! postId || ! postType ) return;
+		if ( ! postId || ! postType ) {
+			return;
+		}
 		const restBase = getRestBase( postType );
 		apiFetch( {
 			path: `/wp/v2/${ restBase }/${ postId }`,
@@ -173,7 +176,9 @@ const SEOModalPlugin = () => {
 
 	// Calculate SEO score
 	useEffect( () => {
-		if ( ! postId ) return;
+		if ( ! postId ) {
+			return;
+		}
 		const timer = setTimeout( () => {
 			apiFetch( {
 				path: `/saman-seo/v1/audit/post/${ postId }`,
@@ -238,9 +243,16 @@ const SEOModalPlugin = () => {
 		[ seoMeta, editPost ]
 	);
 
-	// Get effective title and description (with fallbacks)
-	const effectiveTitle = seoMeta.title || postTitle || 'Untitled';
-	const effectiveDescription = seoMeta.description || postExcerpt || '';
+	// Get effective title and description (with fallbacks).
+	// Resolve any {{variables}} so raw template syntax never leaks to previews.
+	const effectiveTitle = renderTemplatePreview(
+		seoMeta.title || postTitle || 'Untitled',
+		variableValues
+	);
+	const effectiveDescription = renderTemplatePreview(
+		seoMeta.description || postExcerpt || '',
+		variableValues
+	);
 	const siteUrl = window.location.origin;
 	const postUrl = postSlug ? `${ siteUrl }/${ postSlug }/` : siteUrl;
 	return (
@@ -272,7 +284,33 @@ const SEOModalPlugin = () => {
 			</PluginSidebarMoreMenuItem>
 
 			{ /* The actual modal with SEO content */ }
-			{ __( 'Saman SEO', 'saman-seo' ) }
+			{ isModalOpen && (
+				<Modal
+					title={ __( 'Saman SEO', 'saman-seo' ) }
+					onRequestClose={ () => setIsModalOpen( false ) }
+					className="saman-seo-modal-wrapper"
+				>
+					<SEOPanel
+						postId={ postId }
+						postType={ postType }
+						seoMeta={ seoMeta }
+						updateMeta={ updateMeta }
+						seoScore={ seoScore }
+						effectiveTitle={ effectiveTitle }
+						effectiveDescription={ effectiveDescription }
+						postUrl={ postUrl }
+						postTitle={ postTitle }
+						postContent={ postContent }
+						featuredImage={ featuredImage }
+						hasChanges={ hasChanges }
+						variables={ variables }
+						variableValues={ variableValues }
+						aiEnabled={ aiEnabled }
+						aiProvider={ aiProvider }
+						aiPilot={ aiPilot }
+					/>
+				</Modal>
+			) }
 		</>
 	);
 };

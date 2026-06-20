@@ -378,6 +378,22 @@ class SearchAppearance_Controller extends REST_Controller {
 			)
 		);
 
+		// Sync to the static front page so the per-page SEO meta and the
+		// homepage settings never drift apart.
+		$front_page_id = (int) get_option( 'page_on_front' );
+		if ( $front_page_id > 0 ) {
+			$existing_meta = get_post_meta( $front_page_id, '_SAMAN_SEO_meta', true );
+			if ( ! is_array( $existing_meta ) ) {
+				$existing_meta = array();
+			}
+
+			$existing_meta['title']       = $meta_title;
+			$existing_meta['description'] = $meta_description;
+			$existing_meta['keywords']    = $meta_keywords;
+
+			update_post_meta( $front_page_id, '_SAMAN_SEO_meta', $existing_meta );
+		}
+
 		return $this->success(
 			array(
 				'meta_title'       => $meta_title,

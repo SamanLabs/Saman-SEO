@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { stripUnreplacedVariables } from '../utils/template';
 /**
  * Search Preview Component
  *
@@ -13,20 +14,22 @@ const SearchPreview = ( {
 	domain = '',
 	favicon = '',
 	maxTitleLength = 60,
-	maxDescriptionLength = 155,
+	maxDescriptionLength = 160,
 } ) => {
-	const titleLength = title.length;
-	const descriptionLength = description.length;
+	const safeTitle = stripUnreplacedVariables( title );
+	const safeDescription = stripUnreplacedVariables( description );
+	const titleLength = safeTitle.length;
+	const descriptionLength = safeDescription.length;
 	const isTitleOverLimit = titleLength > maxTitleLength;
 	const isDescriptionOverLimit = descriptionLength > maxDescriptionLength;
 
 	// Truncate for display if over limit
 	const displayTitle = isTitleOverLimit
-		? title.substring( 0, maxTitleLength ) + '...'
-		: title;
+		? safeTitle.substring( 0, maxTitleLength ) + '...'
+		: safeTitle;
 	const displayDescription = isDescriptionOverLimit
-		? description.substring( 0, maxDescriptionLength ) + '...'
-		: description;
+		? safeDescription.substring( 0, maxDescriptionLength ) + '...'
+		: safeDescription;
 	return (
 		<div className="search-preview">
 			<div className="search-preview__header">

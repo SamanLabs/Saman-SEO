@@ -3,9 +3,17 @@
  *
  * A modern dropdown for inserting template variables.
  * Supports compact mode for inline use within inputs.
+ * The dropdown is rendered in a portal so it is not clipped by
+ * overflow: auto/hidden ancestors (e.g. the Gutenberg SEO modal).
  */
 
-import { useState, useRef, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	createPortal,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 const VariablePicker = ( {
 	variables = {},
@@ -19,33 +27,82 @@ const VariablePicker = ( {
 	// Controlled open state
 	onToggle,
 	// For controlled mode
-	onClose, // For controlled mode
+	onClose,
+	// For controlled mode
+	onMouseDown,
+	// Called before the button takes focus; useful to preserve editor selection
 } ) => {
 	const [ internalOpen, setInternalOpen ] = useState( false );
 	const [ searchTerm, setSearchTerm ] = useState( '' );
+	const [ dropdownStyle, setDropdownStyle ] = useState( {} );
 	const containerRef = useRef( null );
+	const dropdownRef = useRef( null );
 
 	// Use controlled or internal state
 	const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
-	const setIsOpen = ( value ) => {
-		if ( controlledOpen !== undefined ) {
-			if ( value ) {
-				onToggle?.();
+	const setIsOpen = useCallback(
+		( value ) => {
+			if ( controlledOpen !== undefined ) {
+				if ( value ) {
+					onToggle?.();
+				} else {
+					onClose?.();
+				}
 			} else {
-				onClose?.();
+				setInternalOpen( value );
 			}
-		} else {
-			setInternalOpen( value );
-		}
-	};
+		},
+		[ controlledOpen, onToggle, onClose ]
+	);
 
-	// Close on outside click
+	// Position the dropdown when it opens.
+	useEffect( () => {
+		if ( ! isOpen ) {
+			setDropdownStyle( {} );
+			return;
+		}
+		const container = containerRef.current;
+		if ( ! container ) {
+			return;
+		}
+		const rect = container.getBoundingClientRect();
+		const dropdownWidth = compact ? 280 : Math.max( 220, rect.width );
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+
+		let left = rect.left;
+		if ( compact ) {
+			// Align right edge of dropdown with right edge of button.
+			left = rect.right - dropdownWidth;
+		}
+		left = Math.max(
+			8,
+			Math.min( left, viewportWidth - dropdownWidth - 8 )
+		);
+
+		const top = rect.bottom + 4;
+		const maxHeight = Math.min( 360, viewportHeight - top - 16 );
+
+		setDropdownStyle( {
+			position: 'fixed',
+			top,
+			left,
+			width: dropdownWidth,
+			maxHeight,
+			zIndex: 100000,
+		} );
+	}, [ isOpen, compact ] );
+
+	// Close on outside click. The dropdown is portaled to document.body, so we
+	// must check both the trigger container and the dropdown itself.
 	useEffect( () => {
 		const handleClickOutside = ( e ) => {
-			if (
+			const inContainer =
 				containerRef.current &&
-				! containerRef.current.contains( e.target )
-			) {
+				containerRef.current.contains( e.target );
+			const inDropdown =
+				dropdownRef.current && dropdownRef.current.contains( e.target );
+			if ( ! inContainer && ! inDropdown ) {
 				setIsOpen( false );
 			}
 		};
@@ -54,7 +111,30 @@ const VariablePicker = ( {
 		}
 		return () =>
 			document.removeEventListener( 'mousedown', handleClickOutside );
-	}, [ isOpen, controlledOpen ] );
+	}, [ isOpen, controlledOpen, setIsOpen ] );
+
+	// Close dropdown on window resize so the fixed position does not drift away
+	// from its anchor. Scroll events inside the dropdown are stopped below.
+	useEffect( () => {
+		if ( ! isOpen ) {
+			return;
+		}
+		const handleClose = () => setIsOpen( false );
+		window.addEventListener( 'resize', handleClose );
+		return () => window.removeEventListener( 'resize', handleClose );
+	}, [ isOpen, controlledOpen, setIsOpen ] );
+
+	// Stop scroll events inside the portaled dropdown from bubbling to window,
+	// otherwise scrolling the variable list would close the dropdown.
+	useEffect( () => {
+		const dropdown = dropdownRef.current;
+		if ( ! dropdown ) {
+			return;
+		}
+		const stopScroll = ( e ) => e.stopPropagation();
+		dropdown.addEventListener( 'scroll', stopScroll, true );
+		return () => dropdown.removeEventListener( 'scroll', stopScroll, true );
+	}, [ isOpen ] );
 
 	// Filter variables by context and search term
 	const getFilteredVariables = () => {
@@ -71,9 +151,13 @@ const VariablePicker = ( {
 		};
 		const allowedGroups = contextGroups[ context ] || [ 'global' ];
 		Object.entries( variables ).forEach( ( [ groupKey, group ] ) => {
-			if ( ! allowedGroups.includes( groupKey ) ) return;
+			if ( ! allowedGroups.includes( groupKey ) ) {
+				return;
+			}
 			const filteredVars = ( group.vars || [] ).filter( ( v ) => {
-				if ( ! searchTerm ) return true;
+				if ( ! searchTerm ) {
+					return true;
+				}
 				const term = searchTerm.toLowerCase();
 				return (
 					v.tag.toLowerCase().includes( term ) ||
@@ -106,6 +190,82 @@ const VariablePicker = ( {
 	};
 	const filteredVariables = isOpen ? getFilteredVariables() : {};
 
+	const renderDropdown = () => {
+		if ( ! isOpen ) {
+			return null;
+		}
+		const dropdown = (
+			<div
+				ref={ dropdownRef }
+				className="variable-picker__dropdown"
+				style={ dropdownStyle }
+			>
+				<div className="variable-picker__search">
+					<input
+						type="text"
+						value={ searchTerm }
+						onChange={ ( e ) => setSearchTerm( e.target.value ) }
+						placeholder={ __( 'Search variables…', 'saman-seo' ) }
+					/>
+				</div>
+				<div className="variable-picker__groups">
+					{ Object.keys( filteredVariables ).length === 0 ? (
+						<div className="variable-picker__empty">
+							{ __( 'No variables found', 'saman-seo' ) }
+						</div>
+					) : (
+						Object.entries( filteredVariables ).map(
+							( [ groupKey, group ] ) => (
+								<div
+									key={ groupKey }
+									className="variable-picker__group"
+								>
+									<div
+										className={ `variable-picker__group-label variable-picker__group-label--${ groupKey }` }
+									>
+										{ group.label }
+									</div>
+									<div className="variable-picker__items">
+										{ group.vars.map( ( variable ) => (
+											<button
+												key={ variable.tag }
+												type="button"
+												className="variable-picker__item"
+												onMouseDown={ ( event ) =>
+													event.preventDefault()
+												}
+												onClick={ () =>
+													handleSelect( variable )
+												}
+											>
+												<div className="variable-picker__item-header">
+													<span
+														className={ `variable-picker__tag variable-picker__tag--${ groupKey }` }
+													>
+														{ `{{${ variable.tag }}}` }
+													</span>
+													<span className="variable-picker__label">
+														{ variable.label }
+													</span>
+												</div>
+												{ variable.preview && (
+													<div className="variable-picker__preview">
+														{ variable.preview }
+													</div>
+												) }
+											</button>
+										) ) }
+									</div>
+								</div>
+							)
+						)
+					) }
+				</div>
+			</div>
+		);
+		return createPortal( dropdown, document.body );
+	};
+
 	// Compact mode - just an icon button
 	if ( compact ) {
 		return (
@@ -116,6 +276,10 @@ const VariablePicker = ( {
 				<button
 					type="button"
 					className="template-input-v2__action-btn template-input-v2__action-btn--vars"
+					onMouseDown={ ( event ) => {
+						onMouseDown?.( event );
+						event.preventDefault();
+					} }
 					onClick={ handleToggle }
 					disabled={ disabled }
 					title={ __( 'Insert variable', 'saman-seo' ) }
@@ -139,7 +303,7 @@ const VariablePicker = ( {
 					</svg>
 				</button>
 
-				{ __( 'Search variables\u2026', 'saman-seo' ) }
+				{ renderDropdown() }
 			</div>
 		);
 	}
@@ -150,6 +314,10 @@ const VariablePicker = ( {
 			<button
 				type="button"
 				className="variable-picker__trigger"
+				onMouseDown={ ( event ) => {
+					onMouseDown?.( event );
+					event.preventDefault();
+				} }
 				onClick={ handleToggle }
 				disabled={ disabled }
 				title={ __( 'Insert variable', 'saman-seo' ) }
@@ -170,7 +338,7 @@ const VariablePicker = ( {
 				<span>{ buttonLabel }</span>
 			</button>
 
-			{ __( 'Search variables\u2026', 'saman-seo' ) }
+			{ renderDropdown() }
 		</div>
 	);
 };

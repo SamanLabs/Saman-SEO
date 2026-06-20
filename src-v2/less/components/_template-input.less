@@ -45,8 +45,7 @@
     }
 }
 
-// Highlight overlay - shows the styled content
-.template-input-v2__highlight {
+.template-input-v2__placeholder {
     position: absolute;
     top: 0;
     left: 0;
@@ -55,75 +54,71 @@
     padding: 10px 12px;
     font-size: @font-size-base;
     line-height: 1.5;
-    font-family: inherit;
-    white-space: pre;
-    overflow: hidden;
-    pointer-events: none;
-    color: @color-text;
-    z-index: 1;
-
-    &.multiline {
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        min-height: 100px;
-        overflow-y: auto;
-    }
-}
-
-.template-input-v2__placeholder {
     color: @color-muted;
+    pointer-events: none;
+    z-index: 1;
 }
 
-// Variable wrapper - allows hover detection
-.template-input-v2__var {
-    position: relative;
-    display: inline;
-    pointer-events: auto;
+// Variable tag pills
+.template-input-v2__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    margin: 0 1px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: @font-weight-medium;
+    vertical-align: middle;
     cursor: default;
-    border-radius: 3px;
-    transition: background 0.15s ease;
+    user-select: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
 
-    &:hover {
-        background: fade(@var-global, 8%);
+    &--global {
+        background: #e7f3ff;
+        color: #2271b1;
+        border-color: #b8d6fb;
     }
 
-    // Color variants
-    &--global { .template-input-v2__bracket { color: @var-global; } }
-    &--global:hover { background: fade(@var-global, 8%); }
+    &--separator {
+        background: #f0f0f1;
+        color: #646970;
+        border-color: #dcdcde;
+    }
 
-    &--separator { .template-input-v2__bracket { color: @var-separator; } }
-    &--separator:hover { background: fade(@var-separator, 8%); }
+    &--post {
+        background: #f3e8ff;
+        color: #7c3aed;
+        border-color: #d8b4fe;
+    }
 
-    &--post { .template-input-v2__bracket { color: @var-post; } }
-    &--post:hover { background: fade(@var-post, 8%); }
+    &--taxonomy {
+        background: #ecfdf5;
+        color: #059669;
+        border-color: #a7f3d0;
+    }
 
-    &--taxonomy { .template-input-v2__bracket { color: @var-taxonomy; } }
-    &--taxonomy:hover { background: fade(@var-taxonomy, 8%); }
+    &--author {
+        background: #fff7ed;
+        color: #ea580c;
+        border-color: #fed7aa;
+    }
 
-    &--author { .template-input-v2__bracket { color: @var-author; } }
-    &--author:hover { background: fade(@var-author, 8%); }
+    &--archive {
+        background: #ecfeff;
+        color: #0891b2;
+        border-color: #a5f3fc;
+    }
 
-    &--archive { .template-input-v2__bracket { color: @var-archive; } }
-    &--archive:hover { background: fade(@var-archive, 8%); }
-}
-
-// Brackets {{ }} - colored differently
-.template-input-v2__bracket {
-    font-weight: @font-weight-bold;
-    opacity: 0.7;
-}
-
-// Variable tag name - normal weight
-.template-input-v2__tag {
-    color: @color-text;
+    &.is-dragging {
+        opacity: 0.4;
+    }
 }
 
 // Hover tooltip showing preview value
 .template-input-v2__tooltip {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
     padding: 6px 10px;
     background: @color-text;
     color: @color-surface;
@@ -137,41 +132,26 @@
     z-index: @z-tooltip;
     box-shadow: @shadow-lg;
     pointer-events: none;
-
-    // Arrow
-    &::after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border: 5px solid transparent;
-        border-top-color: @color-text;
-    }
 }
 
-// The actual input field - completely invisible text
+// The actual input field - contenteditable div
 .template-input-v2__field {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    padding: 10px 12px;
-    padding-right: 56px;
+    position: relative;
+    min-height: @input-height;
+    padding: 10px 56px 10px 12px;
     font-size: @font-size-base;
     line-height: 1.5;
     font-family: inherit;
     border: none !important;
     border-radius: @radius-md;
     background: transparent !important;
-    color: transparent !important;
+    color: @color-text;
     caret-color: @color-text;
-    resize: none;
     box-shadow: none !important;
     z-index: 2;
+    outline: none !important;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 
     &::selection {
         background: fade(@color-primary, 30%);
@@ -179,8 +159,15 @@
 
     &.multiline {
         min-height: 100px;
-        white-space: pre-wrap;
+        padding-bottom: 24px;
         overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    &:not(.multiline) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     &:focus {
@@ -286,13 +273,11 @@
 // Only target the main field, NOT the variable picker search input
 .settings-control .template-input-v2 {
     > .template-input-v2__container > .template-input-v2__field {
-        position: absolute !important;
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
-        color: transparent !important;
-        padding: 10px 12px !important;
-        padding-right: 56px !important;
+        color: @color-text !important;
+        padding: 10px 56px 10px 12px !important;
 
         &:focus {
             border: none !important;
@@ -304,12 +289,12 @@
 
 // Responsive
 @media (max-width: @breakpoint-sm) {
-    .template-input-v2__highlight {
-        right: 48px;
-    }
-
     .template-input-v2__field {
         padding-right: 52px !important;
+    }
+
+    .template-input-v2__placeholder {
+        right: 52px;
     }
 
     .template-input-v2__action-btn {

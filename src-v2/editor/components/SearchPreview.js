@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { stripUnreplacedVariables } from '../../utils/template';
 /**
  * Google Search Preview Component
  *
@@ -6,15 +7,20 @@ import { __ } from '@wordpress/i18n';
  */
 
 const SearchPreview = ( { title, description, url } ) => {
+	const safeTitle = stripUnreplacedVariables( title );
+	const safeDescription = stripUnreplacedVariables( description );
+
 	// Truncate title if too long (Google shows ~60 chars)
 	const displayTitle =
-		title.length > 60 ? title.substring( 0, 57 ) + '...' : title;
+		safeTitle.length > 60
+			? safeTitle.substring( 0, 57 ) + '...'
+			: safeTitle;
 
 	// Truncate description if too long (Google shows ~160 chars)
 	const displayDesc =
-		description.length > 160
-			? description.substring( 0, 157 ) + '...'
-			: description ||
+		safeDescription.length > 160
+			? safeDescription.substring( 0, 157 ) + '...'
+			: safeDescription ||
 			  'No description provided. Add a meta description to control what appears here.';
 
 	// Format URL for display

@@ -1283,6 +1283,16 @@ class Frontend {
 			return $post instanceof WP_Post ? $post : null;
 		}
 
+		if ( is_front_page() ) {
+			$front_page_id = (int) get_option( 'page_on_front' );
+			if ( $front_page_id ) {
+				$front_page = get_post( $front_page_id );
+				if ( $front_page instanceof WP_Post ) {
+					return $front_page;
+				}
+			}
+		}
+
 		if ( is_home() && ! is_front_page() ) {
 			$posts_page_id = (int) get_option( 'page_for_posts' );
 			if ( $posts_page_id ) {

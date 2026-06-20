@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
 import SearchPreview from '../components/SearchPreview';
+import { renderTemplatePreview as renderTemplatePreviewUtil } from '../utils/template';
 import TemplateInput from '../components/TemplateInput';
 import AiGenerateModal from '../components/AiGenerateModal';
 import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
@@ -438,72 +439,18 @@ const SearchAppearance = () => {
 	useEffect( () => {
 		setVariableValues( ( prev ) => ( {
 			...prev,
-			separator: separator,
+			separator,
 		} ) );
 	}, [ separator ] );
 
-	// Apply modifier to a value (supports: upper, lower, capitalize, etc.)
-	const applyModifier = ( value, modifier ) => {
-		if ( ! value || ! modifier ) return value;
-		const mod = modifier.trim().toLowerCase();
-		switch ( mod ) {
-			case 'upper':
-			case 'uppercase':
-				return String( value ).toUpperCase();
-			case 'lower':
-			case 'lowercase':
-				return String( value ).toLowerCase();
-			case 'capitalize':
-			case 'title':
-				return String( value ).replace( /\b\w/g, ( c ) =>
-					c.toUpperCase()
-				);
-			case 'trim':
-				return String( value ).trim();
-			default:
-				return value;
-		}
-	};
-
-	// Generate preview from template using variable values
+	// Generate preview from template using variable values.
+	// Unreplaced variables are stripped so raw {{...}} never appears.
 	const renderTemplatePreview = useCallback(
 		( template, contextOverrides = {} ) => {
-			if ( ! template ) return '';
-			let preview = template;
-			const allValues = {
+			return renderTemplatePreviewUtil( template, {
 				...variableValues,
 				...contextOverrides,
-			};
-
-			// Replace all {{variable}} or {{variable | modifier}} patterns
-			preview = preview.replace(
-				/\{\{([^}]+)\}\}/g,
-				( match, content ) => {
-					const trimmedContent = content.trim();
-
-					// Check for modifier (e.g., "post_title | upper")
-					const pipeIndex = trimmedContent.indexOf( '|' );
-					if ( pipeIndex > -1 ) {
-						const baseTag = trimmedContent
-							.substring( 0, pipeIndex )
-							.trim();
-						const modifier = trimmedContent
-							.substring( pipeIndex + 1 )
-							.trim();
-						const baseValue = allValues[ baseTag ];
-						if ( baseValue !== undefined ) {
-							return applyModifier( baseValue, modifier );
-						}
-						return match; // Return original if no value found
-					}
-
-					// Simple variable without modifier
-					return allValues[ trimmedContent ] !== undefined
-						? allValues[ trimmedContent ]
-						: match;
-				}
-			);
-			return preview;
+			} );
 		},
 		[ variableValues ]
 	);
@@ -731,7 +678,163 @@ const SearchAppearance = () => {
 			/>
 
 			{ /* Homepage Tab */ }
-			{ __( 'keyword1, keyword2, keyword3', 'saman-seo' ) }
+			{ activeTab === 'homepage' && (
+				<section className="panel">
+					<div className="panel-section">
+						<h3>{ __( 'Homepage SEO', 'saman-seo' ) }</h3>
+						<p className="muted">
+							{ __(
+								'Configure default title and meta description for your homepage.',
+								'saman-seo'
+							) }
+						</p>
+					</div>
+
+					<SearchPreview
+						title={ renderTemplatePreview(
+							homepage.meta_title ||
+								`${
+									siteInfo.name || '{{site_title}}'
+								} ${ separator } ${
+									siteInfo.description || '{{tagline}}'
+								}`
+						) }
+						description={ renderTemplatePreview(
+							homepage.meta_description
+						) }
+						url={ siteInfo.url || '' }
+						domain={ siteInfo.domain || '' }
+						favicon={ siteInfo.favicon || '' }
+					/>
+
+					<TemplateInput
+						label={ __( 'Homepage Title', 'saman-seo' ) }
+						helpText={ __(
+							'The title tag for your homepage.',
+							'saman-seo'
+						) }
+						value={ homepage.meta_title || '' }
+						onChange={ ( value ) =>
+							setHomepage( { ...homepage, meta_title: value } )
+						}
+						variables={ variables }
+						variableValues={ variableValues }
+						context="global"
+						maxLength={ 60 }
+						onAiClick={ () =>
+							openAiModal( 'title', ( result ) =>
+								setHomepage( {
+									...homepage,
+									meta_title: result,
+								} )
+							)
+						}
+						aiEnabled={ aiEnabled }
+					/>
+
+					<TemplateInput
+						label={ __( 'Meta Description', 'saman-seo' ) }
+						helpText={ __(
+							'A brief description of your website (150–160 chars recommended).',
+							'saman-seo'
+						) }
+						value={ homepage.meta_description || '' }
+						onChange={ ( value ) =>
+							setHomepage( {
+								...homepage,
+								meta_description: value,
+							} )
+						}
+						variables={ variables }
+						variableValues={ variableValues }
+						context="global"
+						multiline
+						maxLength={ 160 }
+						onAiClick={ () =>
+							openAiModal( 'description', ( result ) =>
+								setHomepage( {
+									...homepage,
+									meta_description: result,
+								} )
+							)
+						}
+						aiEnabled={ aiEnabled }
+					/>
+
+					<div className="settings-control">
+						<label className="settings-control__label">
+							{ __( 'Title Separator', 'saman-seo' ) }
+						</label>
+						<p className="settings-control__help">
+							{ __(
+								'Character used between title parts across your site.',
+								'saman-seo'
+							) }
+						</p>
+						<div className="separator-selector">
+							{ Object.entries( separatorOptions ).map(
+								( [ value, label ] ) => (
+									<button
+										key={ value }
+										type="button"
+										className={ `separator-option ${
+											separator === value ? 'active' : ''
+										}` }
+										onClick={ () => saveSeparator( value ) }
+										title={ label }
+									>
+										{ value }
+									</button>
+								)
+							) }
+						</div>
+					</div>
+
+					<div className="settings-control">
+						<label
+							className="settings-control__label"
+							htmlFor="homepage-keywords"
+						>
+							{ __( 'Meta Keywords', 'saman-seo' ) }
+						</label>
+						<p className="settings-control__help">
+							{ __(
+								'Comma separated keywords (optional, less relevant for modern SEO).',
+								'saman-seo'
+							) }
+						</p>
+						<input
+							id="homepage-keywords"
+							type="text"
+							className="settings-control__input"
+							value={ homepage.meta_keywords || '' }
+							onChange={ ( e ) =>
+								setHomepage( {
+									...homepage,
+									meta_keywords: e.target.value,
+								} )
+							}
+							placeholder={ __(
+								'keyword1, keyword2, keyword3',
+								'saman-seo'
+							) }
+						/>
+					</div>
+
+					<div className="panel-actions">
+						<button
+							type="button"
+							className="button button-primary"
+							onClick={ saveHomepage }
+							disabled={ saving }
+						>
+							{ saving
+								? __( 'Saving…', 'saman-seo' )
+								: __( 'Save Homepage Settings', 'saman-seo' ) }
+						</button>
+					</div>
+				</section>
+			) }
 
 			{ /* Content Types Tab */ }
 			{ activeTab === 'content-types' && (
@@ -1135,6 +1238,18 @@ const SearchAppearance = () => {
 
 /**
  * Post Type Editor Component
+ * @param root0
+ * @param root0.postType
+ * @param root0.schemaOptions
+ * @param root0.separator
+ * @param root0.siteInfo
+ * @param root0.variables
+ * @param root0.variableValues
+ * @param root0.onSave
+ * @param root0.onCancel
+ * @param root0.saving
+ * @param root0.renderTemplatePreview
+ * @param root0.openAiModal
  */
 const PostTypeEditor = ( {
 	postType,
@@ -1461,6 +1576,17 @@ const PostTypeEditor = ( {
 
 /**
  * Taxonomy Editor Component
+ * @param root0
+ * @param root0.taxonomy
+ * @param root0.separator
+ * @param root0.siteInfo
+ * @param root0.variables
+ * @param root0.variableValues
+ * @param root0.onSave
+ * @param root0.onCancel
+ * @param root0.saving
+ * @param root0.renderTemplatePreview
+ * @param root0.openAiModal
  */
 const TaxonomyEditor = ( {
 	taxonomy,
@@ -1692,6 +1818,16 @@ const TaxonomyEditor = ( {
 
 /**
  * Archive Editor Component
+ * @param root0
+ * @param root0.archive
+ * @param root0.separator
+ * @param root0.siteInfo
+ * @param root0.variables
+ * @param root0.variableValues
+ * @param root0.onSave
+ * @param root0.onCancel
+ * @param root0.renderTemplatePreview
+ * @param root0.openAiModal
  */
 const ArchiveEditor = ( {
 	archive,
