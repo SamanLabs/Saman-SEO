@@ -345,12 +345,7 @@ class Admin_Bar {
 		$content = $post->post_content;
 
 		// Calculate SEO score using the helper function
-		$score_data = calculate_seo_score(
-			$meta['title'] ?? '',
-			$meta['description'] ?? '',
-			$content,
-			$meta['focus_keyphrase'] ?? ''
-		);
+		$score_data = calculate_seo_score( $post );
 
 		// Ensure we return a properly structured array
 		return array(
@@ -387,6 +382,7 @@ class Admin_Bar {
 			'good' => __( 'Good', 'saman-seo' ),
 			'fair' => __( 'Needs Work', 'saman-seo' ),
 			'poor' => __( 'Poor', 'saman-seo' ),
+			'low'  => __( 'Needs attention', 'saman-seo' ),
 		);
 
 		return $texts[ $level ] ?? __( 'Unknown', 'saman-seo' );
