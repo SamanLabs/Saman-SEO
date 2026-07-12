@@ -17,8 +17,29 @@ defined( 'ABSPATH' ) || exit;
  */
 class Link_Health {
 
-	private const SCHEMA_VERSION = 1;
+	private const SCHEMA_VERSION = 2;
 	private const SCHEMA_OPTION  = 'SAMAN_SEO_link_health_schema';
+
+	/**
+	 * Cron hook that processes one scan chunk.
+	 *
+	 * @var string
+	 */
+	private const PROCESS_HOOK = 'SAMAN_SEO_link_health_process';
+
+	/**
+	 * Cron hook that scans a single saved post.
+	 *
+	 * @var string
+	 */
+	private const SINGLE_HOOK = 'SAMAN_SEO_link_health_single';
+
+	/**
+	 * Transient name guarding against overlapping chunk runs.
+	 *
+	 * @var string
+	 */
+	private const LOCK_TRANSIENT = 'SAMAN_SEO_link_scan_lock';
 
 	/**
 	 * Links table name.
@@ -52,6 +73,10 @@ class Link_Health {
 		// Schedule periodic scans if enabled.
 		add_action( 'SAMAN_SEO_link_health_scan', array( $this, 'run_scheduled_scan' ) );
 		$this->maybe_schedule_scan();
+
+		// Background chunk processor and single-post scanner.
+		add_action( self::PROCESS_HOOK, array( $this, 'process_chunk' ) );
+		add_action( self::SINGLE_HOOK, array( $this, 'scan_single_post' ) );
 
 		// Update link data when posts are saved.
 		add_action( 'save_post', array( $this, 'on_post_save' ), 20, 2 );
@@ -100,6 +125,7 @@ class Link_Health {
 			scanned_posts int(11) unsigned NOT NULL DEFAULT 0,
 			total_links int(11) unsigned NOT NULL DEFAULT 0,
 			broken_links int(11) unsigned NOT NULL DEFAULT 0,
+			last_post_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			started_at datetime DEFAULT NULL,
 			completed_at datetime DEFAULT NULL,
 			error_message text DEFAULT NULL,
@@ -126,16 +152,24 @@ class Link_Health {
 	 * Schedule or unschedule scan based on settings.
 	 */
 	public function maybe_schedule_scan() {
-		$settings = get_option( 'SAMAN_SEO_settings', array() );
-		$enabled  = isset( $settings['enable_link_health_scan'] ) ? $settings['enable_link_health_scan'] : false;
-
-		if ( $enabled ) {
+		if ( $this->is_scanning_enabled() ) {
 			if ( ! wp_next_scheduled( 'SAMAN_SEO_link_health_scan' ) ) {
 				wp_schedule_event( time(), 'weekly', 'SAMAN_SEO_link_health_scan' );
 			}
 		} else {
 			$this->unschedule_scan();
 		}
+	}
+
+	/**
+	 * Whether the user has enabled link health scanning.
+	 *
+	 * @return bool
+	 */
+	private function is_scanning_enabled() {
+		$settings = get_option( 'SAMAN_SEO_settings', array() );
+
+		return ! empty( $settings['enable_link_health_scan'] );
 	}
 
 	/**
@@ -156,123 +190,331 @@ class Link_Health {
 	}
 
 	/**
+	 * Post types that scans cover.
+	 *
+	 * @return string[]
+	 */
+	private function get_scan_post_types() {
+		/**
+		 * Filters which post types the link health scanner covers.
+		 *
+		 * @since 0.2.0
+		 *
+		 * @param string[] $post_types Post type slugs. Default post, page.
+		 */
+		$types = saman_seo_apply_filters( 'saman_seo_link_health_post_types', array( 'post', 'page' ) );
+
+		return array_values( array_filter( array_map( 'sanitize_key', (array) $types ) ) );
+	}
+
+	/**
+	 * Number of posts scanned per chunk.
+	 *
+	 * @return int
+	 */
+	private function get_chunk_size() {
+		/**
+		 * Filters how many posts are scanned per background chunk.
+		 *
+		 * @since 0.2.0
+		 *
+		 * @param int $size Posts per chunk. Default 25.
+		 */
+		$size = (int) saman_seo_apply_filters( 'saman_seo_link_health_chunk_size', 25 );
+
+		return max( 1, $size );
+	}
+
+	/**
+	 * Reap scans stuck in 'running' past the stale threshold so a scan killed
+	 * mid-run can never permanently block future scans.
+	 *
+	 * @return void
+	 */
+	private function reap_stale_scans() {
+		global $wpdb;
+
+		/**
+		 * Filters how long (minutes) a scan may stay 'running' before it is
+		 * treated as failed. Shared with the daily maintenance reaper.
+		 *
+		 * @since 0.2.0
+		 *
+		 * @param int $minutes Stale threshold in minutes. Default 60.
+		 */
+		$minutes = (int) saman_seo_apply_filters( 'saman_seo_link_scan_stale_minutes', 60 );
+		if ( $minutes < 1 ) {
+			return;
+		}
+
+		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$minutes} minutes" ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$this->scans_table} SET status = 'failed', completed_at = %s, error_message = %s WHERE status = 'running' AND started_at < %s",
+				current_time( 'mysql' ),
+				'Scan timed out and was reaped.',
+				$cutoff
+			)
+		);
+	}
+
+	/**
+	 * Count published posts across scanned post types.
+	 *
+	 * @return int
+	 */
+	private function count_scan_posts() {
+		$total = 0;
+		foreach ( $this->get_scan_post_types() as $type ) {
+			$counts = wp_count_posts( $type );
+			if ( $counts && isset( $counts->publish ) ) {
+				$total += (int) $counts->publish;
+			}
+		}
+
+		return $total;
+	}
+
+	/**
 	 * Start a new scan.
 	 *
-	 * @param string $type Scan type (full, partial, single).
+	 * Full and partial scans are processed in background chunks via WP-Cron so
+	 * the request that starts them returns immediately, no matter how many
+	 * posts the site has. Single scans (one explicit post) run inline.
+	 *
+	 * @param string $type    Scan type (full, partial, single).
 	 * @param int    $post_id Optional post ID for single scan.
 	 * @return int|false Scan ID or false on failure.
 	 */
 	public function start_scan( $type = 'full', $post_id = 0 ) {
 		global $wpdb;
 
-		// Check if a scan is already running.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$running = $wpdb->get_var(
+		// Clear any scan wedged in 'running' first, then refuse if a genuine
+		// scan is still in progress.
+		$this->reap_stale_scans();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$running = (int) $wpdb->get_var(
 			"SELECT COUNT(*) FROM {$this->scans_table} WHERE status = 'running'"
 		);
-
 		if ( $running > 0 ) {
 			return false;
 		}
 
-		// Get posts to scan.
-		$posts = $this->get_posts_to_scan( $type, $post_id );
-		if ( empty( $posts ) ) {
+		if ( 'single' === $type && $post_id > 0 ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->insert(
+				$this->scans_table,
+				array(
+					'scan_type'    => 'single',
+					'status'       => 'running',
+					'total_posts'  => 1,
+					'started_at'   => current_time( 'mysql' ),
+					'last_post_id' => 0,
+				),
+				array( '%s', '%s', '%d', '%s', '%d' )
+			);
+			$scan_id = (int) $wpdb->insert_id;
+
+			$links = $this->scan_post_links( $post_id );
+			$broken = 0;
+			foreach ( $links as $link ) {
+				if ( 'broken' === $link['status'] ) {
+					++$broken;
+				}
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->update(
+				$this->scans_table,
+				array(
+					'status'        => 'completed',
+					'scanned_posts' => 1,
+					'total_links'   => count( $links ),
+					'broken_links'  => $broken,
+					'completed_at'  => current_time( 'mysql' ),
+				),
+				array( 'id' => $scan_id ),
+				array( '%s', '%d', '%d', '%d', '%s' ),
+				array( '%d' )
+			);
+
+			return $scan_id;
+		}
+
+		$total = $this->count_scan_posts();
+		if ( $total < 1 ) {
 			return false;
 		}
 
-		// Create scan record.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->insert(
 			$this->scans_table,
 			array(
-				'scan_type'     => $type,
-				'status'        => 'running',
-				'total_posts'   => count( $posts ),
+				'scan_type'    => 'full',
+				'status'       => 'running',
+				'total_posts'  => $total,
 				'scanned_posts' => 0,
-				'total_links'   => 0,
-				'broken_links'  => 0,
-				'started_at'    => current_time( 'mysql' ),
+				'total_links'  => 0,
+				'broken_links' => 0,
+				'started_at'   => current_time( 'mysql' ),
+				'last_post_id' => 0,
 			),
-			array( '%s', '%s', '%d', '%d', '%d', '%d', '%s' )
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%d' )
 		);
 
-		$scan_id = $wpdb->insert_id;
+		$scan_id = (int) $wpdb->insert_id;
 
-		// Process in batches to avoid timeouts.
-		$this->process_scan_batch( $scan_id, $posts );
+		// Kick off background processing. The event does the work chunk by
+		// chunk; spawn_cron nudges it to start without waiting for traffic.
+		$this->schedule_next_chunk( $scan_id );
 
 		return $scan_id;
 	}
 
 	/**
-	 * Get posts to scan.
+	 * Schedule the next background chunk for a scan and nudge WP-Cron.
 	 *
-	 * @param string $type    Scan type.
-	 * @param int    $post_id Optional post ID.
-	 * @return array Post IDs.
+	 * @param int $scan_id Scan ID.
+	 * @return void
 	 */
-	private function get_posts_to_scan( $type, $post_id = 0 ) {
-		$args = array(
-			'post_type'      => array( 'post', 'page' ),
-			'post_status'    => 'publish',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-		);
-
-		if ( 'single' === $type && $post_id > 0 ) {
-			return array( $post_id );
+	private function schedule_next_chunk( $scan_id ) {
+		if ( ! wp_next_scheduled( self::PROCESS_HOOK, array( $scan_id ) ) ) {
+			wp_schedule_single_event( time(), self::PROCESS_HOOK, array( $scan_id ) );
 		}
 
-		return get_posts( $args );
+		if ( function_exists( 'spawn_cron' ) ) {
+			spawn_cron();
+		}
 	}
 
 	/**
-	 * Process scan batch.
+	 * Process one chunk of a running scan, then reschedule itself until the
+	 * post list is exhausted. Cursor-based (id > last_post_id) so memory stays
+	 * bounded to one chunk regardless of site size.
 	 *
-	 * @param int   $scan_id Scan ID.
-	 * @param array $posts   Post IDs to scan.
+	 * @param int $scan_id Scan ID.
+	 * @return void
 	 */
-	private function process_scan_batch( $scan_id, $posts ) {
+	public function process_chunk( $scan_id ) {
 		global $wpdb;
 
-		$total_links  = 0;
-		$broken_links = 0;
+		$scan_id = (int) $scan_id;
 
-		foreach ( $posts as $post_id ) {
-			$links        = $this->scan_post_links( $post_id );
-			$total_links += count( $links );
+		// Guard against overlapping runs of the same scan (e.g. a slow chunk
+		// while the next cron event already fired).
+		$lock = get_transient( self::LOCK_TRANSIENT );
+		if ( $lock && (int) $lock !== $scan_id ) {
+			return;
+		}
+		set_transient( self::LOCK_TRANSIENT, $scan_id, 10 * MINUTE_IN_SECONDS );
 
-			foreach ( $links as $link ) {
-				if ( 'broken' === $link['status'] ) {
-					++$broken_links;
-				}
+		try {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$scan = $wpdb->get_row(
+				$wpdb->prepare( "SELECT * FROM {$this->scans_table} WHERE id = %d", $scan_id )
+			);
+
+			if ( ! $scan || 'running' !== $scan->status ) {
+				return;
 			}
 
-			// Update progress.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$post_types = $this->get_scan_post_types();
+			if ( empty( $post_types ) ) {
+				$this->complete_scan( $scan_id );
+				return;
+			}
+
+			$chunk_size   = $this->get_chunk_size();
+			$placeholders = implode( ', ', array_fill( 0, count( $post_types ), '%s' ) );
+			$params       = array_merge( $post_types, array( (int) $scan->last_post_id, $chunk_size ) );
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT ID FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type IN ({$placeholders}) AND ID > %d ORDER BY ID ASC LIMIT %d",
+					$params
+				)
+			);
+
+			if ( empty( $ids ) ) {
+				$this->complete_scan( $scan_id );
+				return;
+			}
+
+			$total_links  = 0;
+			$broken_links = 0;
+			$last_id      = (int) $scan->last_post_id;
+
+			foreach ( $ids as $post_id ) {
+				$post_id = (int) $post_id;
+				$links   = $this->scan_post_links( $post_id );
+				$total_links += count( $links );
+				foreach ( $links as $link ) {
+					if ( 'broken' === $link['status'] ) {
+						++$broken_links;
+					}
+				}
+				$last_id = $post_id;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE {$this->scans_table} SET scanned_posts = scanned_posts + 1, total_links = %d, broken_links = %d WHERE id = %d",
+					"UPDATE {$this->scans_table} SET scanned_posts = scanned_posts + %d, total_links = total_links + %d, broken_links = broken_links + %d, last_post_id = %d WHERE id = %d",
+					count( $ids ),
 					$total_links,
 					$broken_links,
+					$last_id,
 					$scan_id
 				)
 			);
-		}
 
-		// Mark scan as completed.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			if ( count( $ids ) < $chunk_size ) {
+				// Short chunk means we reached the end.
+				$this->complete_scan( $scan_id );
+			} else {
+				delete_transient( self::LOCK_TRANSIENT );
+				$this->schedule_next_chunk( $scan_id );
+				return;
+			}
+		} finally {
+			delete_transient( self::LOCK_TRANSIENT );
+		}
+	}
+
+	/**
+	 * Mark a scan completed.
+	 *
+	 * @param int $scan_id Scan ID.
+	 * @return void
+	 */
+	private function complete_scan( $scan_id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->update(
 			$this->scans_table,
 			array(
 				'status'       => 'completed',
 				'completed_at' => current_time( 'mysql' ),
 			),
-			array( 'id' => $scan_id ),
+			array( 'id' => (int) $scan_id ),
 			array( '%s', '%s' ),
 			array( '%d' )
 		);
+	}
+
+	/**
+	 * Scan a single saved post (deferred cron handler for save_post).
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	public function scan_single_post( $post_id ) {
+		$this->scan_post_links( (int) $post_id );
 	}
 
 	/**
@@ -416,10 +658,26 @@ class Link_Health {
 			'error'        => null,
 		);
 
+		// Refuse to probe URLs that resolve to internal/loopback hosts, so a
+		// scan can never be turned into an SSRF against the local network.
+		if ( ! wp_http_validate_url( $url ) ) {
+			$result['error'] = 'URL failed validation and was not checked.';
+			return $result;
+		}
+
+		/**
+		 * Filters the per-link HTTP timeout (seconds) used during scans.
+		 *
+		 * @since 0.2.0
+		 *
+		 * @param int $timeout Timeout in seconds. Default 5.
+		 */
+		$timeout = (int) saman_seo_apply_filters( 'saman_seo_link_health_timeout', 5 );
+
 		$response = wp_remote_head(
 			$url,
 			array(
-				'timeout'     => 10,
+				'timeout'     => max( 1, $timeout ),
 				'redirection' => 0,
 			)
 		);
@@ -457,8 +715,8 @@ class Link_Health {
 			return;
 		}
 
-		// Skip non-public post types.
-		if ( ! in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
+		// Skip non-scanned post types.
+		if ( ! in_array( $post->post_type, $this->get_scan_post_types(), true ) ) {
 			return;
 		}
 
@@ -467,8 +725,15 @@ class Link_Health {
 			return;
 		}
 
-		// Scan links in this post (in background if possible).
-		$this->scan_post_links( $post_id );
+		// Only keep per-post link data fresh when scanning is enabled.
+		if ( ! $this->is_scanning_enabled() ) {
+			return;
+		}
+
+		// Defer to cron so the editor save never blocks on outbound HTTP.
+		if ( ! wp_next_scheduled( self::SINGLE_HOOK, array( (int) $post_id ) ) ) {
+			wp_schedule_single_event( time() + 10, self::SINGLE_HOOK, array( (int) $post_id ) );
+		}
 	}
 
 	/**
