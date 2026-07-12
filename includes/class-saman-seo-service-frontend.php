@@ -369,6 +369,14 @@ class Frontend {
 			$og_type             = 'website';
 		} else {
 			$raw_title = $meta['title'] ?? '';
+			if ( $is_home_view && empty( $raw_title ) ) {
+				// Prefer the configured homepage SEO title so social titles match
+				// the document <title> instead of falling back to the page title.
+				$homepage_title = get_option( 'SAMAN_SEO_homepage_title', '' );
+				if ( '' !== trim( (string) $homepage_title ) ) {
+					$raw_title = $homepage_title;
+				}
+			}
 			if ( $is_home_view && empty( $raw_title ) && ! empty( $social_defaults['og_title'] ) ) {
 				$raw_title = $social_defaults['og_title'];
 			}

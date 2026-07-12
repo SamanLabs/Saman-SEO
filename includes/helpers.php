@@ -381,6 +381,13 @@ namespace Saman\SEO\Helpers {
 		}
 
 		$content = preg_replace( '/<!--(.|\s)*?-->/', ' ', $content );
+		// Drop script/style contents entirely so their text never leaks in.
+		$content = preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', $content );
+		// Replace remaining tags with a space (rather than removing them) so text in
+		// adjacent block/inline elements keeps a word boundary and does not merge,
+		// e.g. "<p>Venezuelan</p><p>culinary</p>" -> "Venezuelan culinary", not
+		// "Venezuelanculinary". wp_strip_all_tags() alone would produce the latter.
+		$content = preg_replace( '/<[^>]+>/', ' ', $content );
 		$content = \wp_strip_all_tags( $content );
 		$content = trim( preg_replace( '/\s+/', ' ', $content ) );
 
