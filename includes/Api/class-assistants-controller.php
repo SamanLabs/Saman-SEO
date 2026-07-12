@@ -134,7 +134,7 @@ class Assistants_Controller extends REST_Controller {
 			],
 			'is_builtin'        => true,
 			'color'             => '#3b82f6',
-			'icon'              => 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢Ãƒâ€šÃ‚Â¬',
+			'icon'              => '💬',
 		];
 
 		$assistants[] = [
@@ -150,7 +150,7 @@ class Assistants_Controller extends REST_Controller {
 			],
 			'is_builtin'        => true,
 			'color'             => '#8b5cf6',
-			'icon'              => 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â ',
+			'icon'              => '📊',
 		];
 
 		// Add custom assistants.
@@ -167,7 +167,7 @@ class Assistants_Controller extends REST_Controller {
 					'is_custom'         => true,
 					'custom_id'         => $ca['id'],
 					'color'             => $ca['color'] ?? '#6366f1',
-					'icon'              => $ca['icon'] ?? 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“',
+					'icon'              => ! empty( $ca['icon'] ) ? $ca['icon'] : '🤖',
 				];
 			}
 		}
@@ -362,7 +362,7 @@ class Assistants_Controller extends REST_Controller {
 			'system_prompt'     => sanitize_textarea_field( $params['system_prompt'] ),
 			'initial_message'   => sanitize_textarea_field( $params['initial_message'] ?? '' ),
 			'suggested_prompts' => wp_json_encode( $params['suggested_prompts'] ?? [] ),
-			'icon'              => sanitize_text_field( $params['icon'] ?? 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“' ),
+			'icon'              => sanitize_text_field( $params['icon'] ?? '🤖' ),
 			'color'             => sanitize_hex_color( $params['color'] ?? '#6366f1' ) ?: '#6366f1',
 			'model_id'          => sanitize_text_field( $params['model_id'] ?? '' ),
 			'is_active'         => isset( $params['is_active'] ) ? ( $params['is_active'] ? 1 : 0 ) : 1,
@@ -684,10 +684,9 @@ class Assistants_Controller extends REST_Controller {
             system_prompt longtext NOT NULL,
             initial_message text,
             suggested_prompts longtext,
-            icon varchar(50) DEFAULT 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“',
+            icon varchar(50) DEFAULT '',
             color varchar(20) DEFAULT '#6366f1',
             model_id varchar(255) DEFAULT '',
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
             is_active tinyint(1) NOT NULL DEFAULT 1,
             created_at datetime NOT NULL,
             updated_at datetime NOT NULL,

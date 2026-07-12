@@ -192,6 +192,7 @@ class Plugin {
 		$this->register( 'sitemap_settings', new Service\Sitemap_Settings() );
 		$this->register( 'robots', new Service\Robots_Manager() );
 		$this->register( 'monitor', new Service\Request_Monitor() );
+		$this->register( 'maintenance', new Service\Maintenance() );
 		$this->register( 'social_card', new Service\Social_Card_Generator() );
 		$this->register( 'llm_txt', new Service\LLM_TXT_Generator() );
 		$this->register( 'local_seo', new Service\Local_SEO() );
@@ -260,6 +261,9 @@ class Plugin {
 		( new Service\Link_Health() )->create_tables();
 		( new Service\IndexNow() )->create_tables();
 		Service\Internal_Linking::activate();
+
+		// Schedule the shared daily maintenance janitor.
+		( new Service\Maintenance() )->maybe_schedule();
 
 		add_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' );
 		add_option( 'SAMAN_SEO_post_type_title_templates', array() );
@@ -350,6 +354,13 @@ class Plugin {
 	 * @return void
 	 */
 	public static function deactivate() {
+		// Clear every scheduled event so nothing fires against a deactivated
+		// plugin. WP-Cron does not auto-clean these on deactivation.
+		Service\Maintenance::unschedule();
+		wp_clear_scheduled_hook( 'SAMAN_SEO_404_cleanup' );
+		wp_clear_scheduled_hook( 'SAMAN_SEO_link_health_scan' );
+		wp_clear_scheduled_hook( 'SAMAN_SEO_sitemap_cron' );
+
 		flush_rewrite_rules();
 	}
 }

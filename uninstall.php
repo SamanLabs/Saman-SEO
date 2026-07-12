@@ -63,6 +63,14 @@ function saman_seo_uninstall_cleanup() {
 
 	// Clean up scheduled events.
 	wp_clear_scheduled_hook( 'SAMAN_SEO_404_cleanup' );
+	wp_clear_scheduled_hook( 'saman_seo_daily_maintenance' );
+	wp_clear_scheduled_hook( 'SAMAN_SEO_link_health_scan' );
+	wp_clear_scheduled_hook( 'SAMAN_SEO_sitemap_cron' );
+
+	// Delete plugin transients missed by the option LIKE above (the leading
+	// _transient_ / _transient_timeout_ prefixes defeat that match).
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires direct queries.
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_%SAMAN\_SEO\_%' OR option_name LIKE '\_transient\_timeout\_%SAMAN\_SEO\_%' OR option_name LIKE '\_transient\_%saman\_seo\_%' OR option_name LIKE '\_transient\_timeout\_%saman\_seo\_%'" );
 
 	wp_cache_flush();
 }
