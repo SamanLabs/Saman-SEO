@@ -1059,6 +1059,23 @@ class Redirects_Controller extends REST_Controller {
      * @param \WP_REST_Request $request Request object.
      * @return \WP_REST_Response|\WP_Error
      */
+    /**
+     * Escape a value for a CSV cell: neutralize spreadsheet formula triggers
+     * (leading = + - @, tab, CR) with a leading apostrophe, then double quotes.
+     *
+     * @param mixed $value Raw value.
+     * @return string
+     */
+    private function csv_cell( $value ) {
+        $value = (string) $value;
+
+        if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+            $value = "'" . $value;
+        }
+
+        return str_replace( '"', '""', $value );
+    }
+
     public function export_redirects( $request ) {
         global $wpdb;
 
@@ -1072,14 +1089,14 @@ class Redirects_Controller extends REST_Controller {
             foreach ( $redirects as $r ) {
                 $csv .= sprintf(
                     '"%s","%s",%d,%d,"%s","%s","%s","%s"' . "\n",
-                    str_replace( '"', '""', $r->source ),
-                    str_replace( '"', '""', $r->target ),
+                    $this->csv_cell( $r->source ),
+                    $this->csv_cell( $r->target ),
                     $r->status_code,
                     isset( $r->is_regex ) ? $r->is_regex : 0,
-                    str_replace( '"', '""', isset( $r->group_name ) ? $r->group_name : '' ),
+                    $this->csv_cell( isset( $r->group_name ) ? $r->group_name : '' ),
                     isset( $r->start_date ) ? $r->start_date : '',
                     isset( $r->end_date ) ? $r->end_date : '',
-                    str_replace( '"', '""', isset( $r->notes ) ? $r->notes : '' )
+                    $this->csv_cell( isset( $r->notes ) ? $r->notes : '' )
                 );
             }
             return $this->success( [ 'content' => $csv, 'filename' => 'redirects-export.csv' ] );
@@ -1694,13 +1711,13 @@ class Redirects_Controller extends REST_Controller {
             foreach ( $rows as $row ) {
                 $csv .= sprintf(
                     '"%s",%d,"%s","%s","%s",%d,"%s"' . "\n",
-                    str_replace( '"', '""', $row->request_uri ),
+                    $this->csv_cell( $row->request_uri ),
                     (int) $row->hits,
                     $row->last_seen,
                     isset( $row->first_seen ) ? $row->first_seen : '',
-                    str_replace( '"', '""', $row->device_label ?? '' ),
+                    $this->csv_cell( $row->device_label ?? '' ),
                     isset( $row->is_bot ) ? (int) $row->is_bot : 0,
-                    str_replace( '"', '""', isset( $row->referrer ) ? $row->referrer : '' )
+                    $this->csv_cell( isset( $row->referrer ) ? $row->referrer : '' )
                 );
             }
             return $this->success( [ 'content' => $csv, 'filename' => '404-log-export.csv' ] );

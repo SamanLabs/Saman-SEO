@@ -67,6 +67,10 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	public function boot() {
+		// Keep the schema current on any boot, like the other table-backed
+		// services, rather than only on the activation hook.
+		$this->maybe_upgrade_schema();
+
 		if ( ! \Saman\SEO\Helpers\module_enabled( 'redirects' ) ) {
 			return;
 		}
@@ -616,6 +620,18 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Recreate/upgrade the schema when the stored version is behind. Cheap on
+	 * the common path: one option read and an integer comparison.
+	 *
+	 * @return void
+	 */
+	private function maybe_upgrade_schema() {
+		if ( (int) get_option( 'SAMAN_SEO_redirects_schema_version', 0 ) < self::SCHEMA_VERSION ) {
+			$this->create_tables();
+		}
+	}
+
+	/**
 	 * Check and run schema migrations if needed.
 	 *
 	 * @return void
@@ -849,12 +865,17 @@ class Redirect_Manager {
 			$query_matching = 'ignore';
 		}
 
+		// Default the redirect object cache on when a persistent external object
+		// cache is present (where it genuinely saves per-request queries); off
+		// otherwise, since a non-persistent cache adds little and risks staleness.
+		$object_cache_default = wp_using_ext_object_cache() ? '1' : '0';
+
 		return array(
 			'case_insensitive'        => ! empty( get_option( 'SAMAN_SEO_redirect_case_insensitive', '0' ) ),
 			'ignore_trailing_slashes' => ! empty( get_option( 'SAMAN_SEO_redirect_ignore_trailing_slashes', '0' ) ),
 			'query_matching'          => $query_matching,
 			'cache_header_hours'      => (int) get_option( 'SAMAN_SEO_redirect_cache_header_hours', 1 ),
-			'object_cache'            => ! empty( get_option( 'SAMAN_SEO_redirect_object_cache', '0' ) ),
+			'object_cache'            => ! empty( get_option( 'SAMAN_SEO_redirect_object_cache', $object_cache_default ) ),
 		);
 	}
 

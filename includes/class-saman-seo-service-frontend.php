@@ -652,7 +652,7 @@ class Frontend {
 
 		printf(
 			"<script type=\"application/ld+json\">%s</script>\n",
-			wp_json_encode( $payload )
+			wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP )
 		);
 	}
 

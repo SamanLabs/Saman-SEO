@@ -361,6 +361,7 @@ class Plugin {
 		wp_clear_scheduled_hook( 'SAMAN_SEO_link_health_scan' );
 		wp_clear_scheduled_hook( 'SAMAN_SEO_link_health_process' );
 		wp_clear_scheduled_hook( 'SAMAN_SEO_link_health_single' );
+		wp_clear_scheduled_hook( 'SAMAN_SEO_indexnow_submit' );
 		wp_clear_scheduled_hook( 'SAMAN_SEO_sitemap_cron' );
 
 		flush_rewrite_rules();

@@ -307,7 +307,7 @@ class Audit_Controller extends REST_Controller {
 			$title_suggestion = get_the_title( $post );
 		}
 
-		$excerpt = $post->post_excerpt ?: wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+		$excerpt = $post->post_excerpt ?: \Saman\SEO\Helpers\generate_content_snippet( $post, 30 );
 		if ( empty( $excerpt ) && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
 			$excerpt = $post_type_descriptions[ $post->post_type ];
 		}
@@ -540,7 +540,7 @@ class Audit_Controller extends REST_Controller {
 			}
 
 			// Check content length (low priority)
-			$word_count = str_word_count( wp_strip_all_tags( $content ) );
+			$word_count = str_word_count( \Saman\SEO\Helpers\strip_content_to_text( $content ) );
 			if ( $word_count < 300 && $word_count > 0 ) {
 				$data                          = $this->add_issue(
 					$data,
@@ -645,7 +645,7 @@ class Audit_Controller extends REST_Controller {
 		}
 
 		// Word count
-		$word_count = str_word_count( wp_strip_all_tags( $content ) );
+		$word_count = str_word_count( \Saman\SEO\Helpers\strip_content_to_text( $content ) );
 		if ( $word_count < 300 && $word_count > 0 ) {
 			$issues[] = array(
 				'severity' => 'low',
@@ -685,7 +685,7 @@ class Audit_Controller extends REST_Controller {
 				$title_suggestion = get_the_title( $post );
 			}
 
-			$excerpt = $post->post_excerpt ?: wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+			$excerpt = $post->post_excerpt ?: \Saman\SEO\Helpers\generate_content_snippet( $post, 30 );
 			if ( empty( $excerpt ) && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
 				$excerpt = $post_type_descriptions[ $post->post_type ];
 			}
@@ -749,7 +749,7 @@ class Audit_Controller extends REST_Controller {
 			$title_suggestion = get_the_title( $post );
 		}
 
-		$excerpt = $post->post_excerpt ?: wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+		$excerpt = $post->post_excerpt ?: \Saman\SEO\Helpers\generate_content_snippet( $post, 30 );
 		if ( empty( $excerpt ) && ! empty( $type_descriptions[ $post->post_type ] ) ) {
 			$excerpt = $type_descriptions[ $post->post_type ];
 		}

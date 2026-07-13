@@ -53,22 +53,20 @@ class Video_Schema {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_video_schema_to_graph' ), 25, 1 );
+		// Match the sibling schema services: canonical hook, priority 20, two
+		// args ($graph, $post).
+		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_video_schema_to_graph' ), 20, 2 );
 	}
 
 	/**
 	 * Add VideoObject schema to the JSON-LD graph.
 	 *
-	 * @param array $graph The existing JSON-LD graph.
+	 * @param array         $graph The existing JSON-LD graph.
+	 * @param \WP_Post|null $post  The post the graph is built for.
 	 * @return array The modified JSON-LD graph.
 	 */
-	public function add_video_schema_to_graph( $graph ) {
-		if ( ! is_singular() ) {
-			return $graph;
-		}
-
-		global $post;
-		if ( ! $post ) {
+	public function add_video_schema_to_graph( $graph, $post = null ) {
+		if ( ! $post instanceof \WP_Post ) {
 			return $graph;
 		}
 
@@ -149,7 +147,7 @@ class Video_Schema {
 		$schema = array(
 			'@type'       => 'VideoObject',
 			'name'        => get_the_title( $post ),
-			'description' => wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 ),
+			'description' => \Saman\SEO\Helpers\generate_content_snippet( $post, 50 ),
 			'uploadDate'  => get_the_date( 'c', $post ),
 		);
 
@@ -163,12 +161,12 @@ class Video_Schema {
 			$oembed = $this->get_youtube_oembed( $video['id'] );
 			if ( $oembed ) {
 				if ( ! empty( $oembed['title'] ) ) {
-					$schema['name'] = $oembed['title'];
+					$schema['name'] = sanitize_text_field( $oembed['title'] );
 				}
 				if ( ! empty( $oembed['author_name'] ) ) {
 					$schema['author'] = array(
 						'@type' => 'Person',
-						'name'  => $oembed['author_name'],
+						'name'  => sanitize_text_field( $oembed['author_name'] ),
 					);
 				}
 			}
@@ -181,22 +179,22 @@ class Video_Schema {
 			$oembed = $this->get_vimeo_oembed( $video['id'] );
 			if ( $oembed ) {
 				if ( ! empty( $oembed['title'] ) ) {
-					$schema['name'] = $oembed['title'];
+					$schema['name'] = sanitize_text_field( $oembed['title'] );
 				}
 				if ( ! empty( $oembed['description'] ) ) {
-					$schema['description'] = $oembed['description'];
+					$schema['description'] = sanitize_text_field( $oembed['description'] );
 				}
 				if ( ! empty( $oembed['thumbnail_url'] ) ) {
-					$schema['thumbnailUrl'] = $oembed['thumbnail_url'];
+					$schema['thumbnailUrl'] = esc_url_raw( $oembed['thumbnail_url'] );
 				}
 				if ( ! empty( $oembed['author_name'] ) ) {
 					$schema['author'] = array(
 						'@type' => 'Person',
-						'name'  => $oembed['author_name'],
+						'name'  => sanitize_text_field( $oembed['author_name'] ),
 					);
 				}
 				if ( ! empty( $oembed['duration'] ) ) {
-					$schema['duration'] = 'PT' . $oembed['duration'] . 'S';
+					$schema['duration'] = 'PT' . (int) $oembed['duration'] . 'S';
 				}
 			}
 		}
@@ -215,7 +213,8 @@ class Video_Schema {
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
-			return $cached;
+			// 'none' is the sentinel for a previously-failed lookup.
+			return 'none' === $cached ? null : $cached;
 		}
 
 		$url = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json';
@@ -223,6 +222,8 @@ class Video_Schema {
 		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			// Cache the miss so a dead video is not re-fetched on every view.
+			set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
 			return null;
 		}
 
@@ -230,9 +231,11 @@ class Video_Schema {
 
 		if ( $data ) {
 			set_transient( $cache_key, $data, DAY_IN_SECONDS );
+			return $data;
 		}
 
-		return $data;
+		set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
+		return null;
 	}
 
 	/**
@@ -246,7 +249,8 @@ class Video_Schema {
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
-			return $cached;
+			// 'none' is the sentinel for a previously-failed lookup.
+			return 'none' === $cached ? null : $cached;
 		}
 
 		$url = 'https://vimeo.com/api/oembed.json?url=https://vimeo.com/' . $video_id;
@@ -254,6 +258,8 @@ class Video_Schema {
 		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			// Cache the miss so a dead video is not re-fetched on every view.
+			set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
 			return null;
 		}
 
@@ -261,9 +267,11 @@ class Video_Schema {
 
 		if ( $data ) {
 			set_transient( $cache_key, $data, DAY_IN_SECONDS );
+			return $data;
 		}
 
-		return $data;
+		set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
+		return null;
 	}
 
 	/**

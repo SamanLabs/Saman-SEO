@@ -184,7 +184,7 @@ class Audit {
 			$title_suggestion = get_the_title( $post );
 		}
 
-		$excerpt = $post->post_excerpt ?: wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+		$excerpt = $post->post_excerpt ?: \Saman\SEO\Helpers\generate_content_snippet( $post, 30 );
 		if ( empty( $excerpt ) && ! empty( $type_descriptions[ $post->post_type ] ) ) {
 			$excerpt = $type_descriptions[ $post->post_type ];
 		}

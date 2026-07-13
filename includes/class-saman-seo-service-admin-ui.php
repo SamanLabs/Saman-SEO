@@ -656,7 +656,7 @@ class Admin_UI {
 			if ( 'SAMAN_SEO_apply_template' === $action ) {
 				$post                = get_post( $post_id );
 				$meta['title']       = $post ? generate_title_from_template( $post ) : '';
-				$meta['description'] = $post ? wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 ) : '';
+				$meta['description'] = $post ? \Saman\SEO\Helpers\generate_content_snippet( $post, 30 ) : '';
 			}
 
 			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
