@@ -171,6 +171,17 @@ class Post_Meta {
 			return;
 		}
 
+		// Modal posts the full meta object as JSON. Decode and run through the
+		// shared sanitizer so every field (focus keyphrase, schema, social,
+		// secondary keyphrases, etc.) persists for any post type.
+		if ( isset( $_POST['SAMAN_SEO_meta_json'] ) ) {
+			$decoded = json_decode( wp_unslash( $_POST['SAMAN_SEO_meta_json'] ), true );
+			if ( is_array( $decoded ) ) {
+				update_post_meta( $post_id, self::META_KEY, $this->sanitize( $decoded ) );
+				return;
+			}
+		}
+
 		$data = array(
 			'title'         => isset( $_POST['SAMAN_SEO_title'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_title'] ) ) : '',
 			'description'   => isset( $_POST['SAMAN_SEO_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['SAMAN_SEO_description'] ) ) : '',

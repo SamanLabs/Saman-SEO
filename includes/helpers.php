@@ -381,6 +381,13 @@ namespace Saman\SEO\Helpers {
 		}
 
 		$content = preg_replace( '/<!--(.|\s)*?-->/', ' ', $content );
+		// Drop script/style contents entirely so their text never leaks in.
+		$content = preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', $content );
+		// Replace remaining tags with a space (rather than removing them) so text in
+		// adjacent block/inline elements keeps a word boundary and does not merge,
+		// e.g. "<p>Venezuelan</p><p>culinary</p>" -> "Venezuelan culinary", not
+		// "Venezuelanculinary". wp_strip_all_tags() alone would produce the latter.
+		$content = preg_replace( '/<[^>]+>/', ' ', $content );
 		$content = \wp_strip_all_tags( $content );
 		$content = trim( preg_replace( '/\s+/', ' ', $content ) );
 
@@ -881,7 +888,7 @@ namespace Saman\SEO\Helpers {
 				// Add informational metric for the analysis tab.
 				$sec_status = sprintf(
 					/* translators: %1$s: coverage score, %2$.1f: density percentage */
-					\__( 'Coverage: %1$s ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Density: %2$.1f%%', 'saman-seo' ),
+					\__( 'Coverage: %1$s • Density: %2$.1f%%', 'saman-seo' ),
 					$sec_checks_passed . '/4',
 					$sec_density
 				);
@@ -1002,11 +1009,11 @@ namespace Saman\SEO\Helpers {
 			$int_link_status = \__( 'Add internal links to related posts.', 'saman-seo' );
 		} elseif ( 1 === $internal_links ) {
 			$int_link_score  = 4;
-			$int_link_status = \__( '1 internal link found ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â add more.', 'saman-seo' );
+			$int_link_status = \__( '1 internal link found — add more.', 'saman-seo' );
 		} elseif ( $internal_links <= 3 ) {
 			$int_link_score = 6;
 			// translators: %d is the count
-			$int_link_status = sprintf( \__( '%d internal links ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â good start.', 'saman-seo' ), $internal_links );
+			$int_link_status = sprintf( \__( '%d internal links — good start.', 'saman-seo' ), $internal_links );
 		} else {
 			$int_link_score = 8;
 			// translators: %d is the count
@@ -1079,7 +1086,7 @@ namespace Saman\SEO\Helpers {
 				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images (great).', 'saman-seo' ), $images_with_alt, $images_total );
 			} elseif ( $coverage >= 0.5 ) {
 				// translators: Placeholders are numbered parameters
-				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â add more.', 'saman-seo' ), $images_with_alt, $images_total );
+				$alt_status = sprintf( \__( 'Alt text on %1$d of %2$d images — add more.', 'saman-seo' ), $images_with_alt, $images_total );
 			} else {
 				// translators: Placeholders are numbered parameters
 				$alt_status = sprintf( \__( 'Only %1$d of %2$d images have alt text.', 'saman-seo' ), $images_with_alt, $images_total );
@@ -1142,7 +1149,7 @@ namespace Saman\SEO\Helpers {
 				0,
 				3
 			);
-			$summary      = implode( ' ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ', $issue_labels );
+			$summary      = implode( ' • ', $issue_labels );
 			if ( count( $issues ) > 3 ) {
 				$summary .= sprintf( ' (+%d more)', count( $issues ) - 3 );
 			}

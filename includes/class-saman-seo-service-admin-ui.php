@@ -28,8 +28,10 @@ class Admin_UI {
 		$metabox_enabled = saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'metabox' );
 
 		if ( $metabox_enabled ) {
-			add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
+			// Block editor uses the React sidebar/modal.
 			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
+			// Classic editor uses the same modal, opened from the Publish box.
+			add_action( 'post_submitbox_misc_actions', array( $this, 'render_submitbox_seo' ) );
 		}
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
@@ -187,57 +189,121 @@ class Admin_UI {
 	}
 
 	/**
-	 * Register classic meta box (only for classic editor).
+	 * Render the "Edit SEO" trigger inside the Publish meta box (classic editor).
 	 *
-	 * In the block editor, we use the React sidebar instead.
-	 *
-	 * @return void
-	 */
-	public function register_meta_box() {
-		$screen = get_current_screen();
-
-		// Skip registration if we're in the block editor
-		if ( $screen && method_exists( $screen, 'is_block_editor' ) && $screen->is_block_editor() ) {
-			return;
-		}
-
-		add_meta_box(
-			'saman-seo-meta',
-			__( 'Saman SEO', 'saman-seo' ),
-			array( $this, 'render_meta_box' ),
-			array( 'post', 'page' ),
-			'side',
-			'high'
-		);
-	}
-
-	/**
-	 * Render meta box fields + previews.
+	 * Outputs the nonce, the hidden field the React modal writes to, and the
+	 * mount node for the modal. In the block editor this hook does not fire,
+	 * so the Gutenberg sidebar/modal is used there instead.
 	 *
 	 * @param \WP_Post $post Current post.
 	 *
 	 * @return void
 	 */
-	public function render_meta_box( $post ) {
-		$meta = get_post_meta( $post->ID, Post_Meta::META_KEY, true );
-		$meta = wp_parse_args(
-			(array) $meta,
-			array(
-				'title'       => '',
-				'description' => '',
-				'canonical'   => '',
-				'noindex'     => '',
-				'nofollow'    => '',
-				'og_image'    => '',
-			)
-		);
+	public function render_submitbox_seo( $post ) {
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+
+		if ( ! post_type_supports( $post->post_type, 'editor' ) ) {
+			return;
+		}
+
+		$meta = (array) get_post_meta( $post->ID, Post_Meta::META_KEY, true );
 
 		wp_nonce_field( 'SAMAN_SEO_meta', 'SAMAN_SEO_meta_nonce' );
+		?>
+		<div class="misc-pub-section saman-seo-submitbox">
+			<button type="button" class="button button-secondary saman-seo-edit-seo" id="saman-seo-open-modal" style="display:inline-flex;align-items:center;gap:4px;">
+				<span class="dashicons dashicons-search" aria-hidden="true" style="font-size:16px;width:16px;height:16px;"></span>
+				<?php esc_html_e( 'Edit SEO', 'saman-seo' ); ?>
+			</button>
+			<input type="hidden" id="saman-seo-meta-json" name="SAMAN_SEO_meta_json" value="<?php echo esc_attr( wp_json_encode( $meta ) ); ?>" />
+			<div id="saman-seo-classic-root"></div>
+		</div>
+		<?php
+	}
 
-		$ai_enabled = AI_Pilot::is_ready();
-		$seo_score  = calculate_seo_score( $post );
+	/**
+	 * Enqueue the classic-editor SEO modal bundle.
+	 *
+	 * Mirrors the Gutenberg editor data so the shared SEOPanel behaves the same.
+	 *
+	 * @param \WP_Post $post Current post.
+	 *
+	 * @return void
+	 */
+	public function enqueue_classic_seo_assets( $post ) {
+		if ( ! $post instanceof \WP_Post || ! post_type_supports( $post->post_type, 'editor' ) ) {
+			return;
+		}
 
-		include SAMAN_SEO_PATH . 'templates/meta-box.php';
+		$build_dir = SAMAN_SEO_PATH . 'build/classic/';
+		$build_url = SAMAN_SEO_URL . 'build/classic/';
+
+		$asset_file = $build_dir . 'index.asset.php';
+		$asset      = file_exists( $asset_file )
+			? require $asset_file
+			: array(
+				'dependencies' => array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n' ),
+				'version'      => SAMAN_SEO_VERSION,
+			);
+
+		wp_enqueue_script(
+			'saman-seo-classic',
+			$build_url . 'index.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		if ( file_exists( $build_dir . 'index.css' ) ) {
+			wp_enqueue_style(
+				'saman-seo-classic',
+				$build_url . 'index.css',
+				array( 'wp-components' ),
+				$asset['version']
+			);
+		}
+
+		$settings_svc = new Settings();
+		$variables    = $settings_svc->get_context_variables();
+
+		$ai_status   = AI_Pilot::get_status();
+		$ai_enabled  = AI_Pilot::ai_enabled();
+		$ai_provider = AI_Pilot::get_provider();
+
+		$meta = (array) get_post_meta( $post->ID, Post_Meta::META_KEY, true );
+
+		wp_localize_script(
+			'saman-seo-classic',
+			'SamanSEOClassic',
+			array(
+				'postId'       => $post->ID,
+				'postType'     => $post->post_type,
+				'postTitle'    => $post->post_title,
+				'postUrl'      => get_permalink( $post ),
+				'featuredImage' => get_the_post_thumbnail_url( $post, 'large' ) ?: '',
+				'meta'         => $meta,
+				'variables'    => $variables,
+				'aiEnabled'    => $ai_enabled,
+				'aiProvider'   => $ai_provider,
+				'aiPilot'      => array(
+					'installed'   => $ai_status['installed'],
+					'active'      => $ai_status['active'],
+					'ready'       => $ai_status['ready'],
+					'version'     => $ai_status['version'] ?? null,
+					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
+				),
+				'siteTitle'    => get_bloginfo( 'name' ),
+				'tagline'      => get_bloginfo( 'description' ),
+				'separator'    => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'ai'           => array(
+					'enabled' => $ai_enabled,
+					'ajax'    => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -278,6 +344,15 @@ class Admin_UI {
 		// Enqueue React admin list badge for edit.php (posts list).
 		if ( 'edit.php' === $hook || false !== strpos( $hook, 'edit.php' ) ) {
 			$this->enqueue_admin_list_assets();
+		}
+
+		// Enqueue the classic-editor SEO modal on post edit screens (not block editor).
+		if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			$screen = get_current_screen();
+			$is_block_editor = $screen && method_exists( $screen, 'is_block_editor' ) && $screen->is_block_editor();
+			if ( ! $is_block_editor ) {
+				$this->enqueue_classic_seo_assets( get_post() );
+			}
 		}
 	}
 

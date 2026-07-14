@@ -6,7 +6,6 @@
     <file>includes</file>
     <file>saman-seo.php</file>
     <file>blocks</file>
-    <file>templates</file>
 
     <!-- Exclude build artifacts, dependencies, generated files, and vendored code. -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
