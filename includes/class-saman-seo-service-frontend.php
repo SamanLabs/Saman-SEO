@@ -773,6 +773,18 @@ class Frontend {
 		if ( $post instanceof WP_Post ) {
 			$url = get_permalink( $post );
 
+			// Some custom post types (or a `post_type_link` filter) return the
+			// unpretty "plain" permalink (e.g. ?post_type=community&p=123) during
+			// wp_head even when a pretty permalink structure is active. Never emit
+			// that as a canonical; fall back to the request URL WordPress already
+			// resolved, which is the pretty permalink being viewed.
+			if ( $this->is_plain_permalink( $url ) ) {
+				$resolved = $this->get_resolved_request_url();
+				if ( ! empty( $resolved ) ) {
+					$url = $resolved;
+				}
+			}
+
 			$page = (int) get_query_var( 'page' );
 			if ( $page > 1 ) {
 				$url = trailingslashit( $url ) . user_trailingslashit( $page, 'single_paged' );
@@ -797,6 +809,53 @@ class Frontend {
 		}
 
 		return esc_url_raw( $url );
+	}
+
+	/**
+	 * Determine whether a URL is a "plain" (unpretty) permalink.
+	 *
+	 * These carry a post identifier in the query string
+	 * (?p=, ?page_id=, ?post_type=, ?attachment_id=) and must never be used
+	 * as a canonical when a pretty permalink is expected.
+	 *
+	 * @param string $url URL to inspect.
+	 *
+	 * @return bool
+	 */
+	private function is_plain_permalink( $url ) {
+		if ( empty( $url ) ) {
+			return true;
+		}
+
+		$query = wp_parse_url( $url, PHP_URL_QUERY );
+		if ( empty( $query ) ) {
+			return false;
+		}
+
+		parse_str( $query, $args );
+
+		foreach ( array( 'p', 'page_id', 'post_type', 'attachment_id' ) as $var ) {
+			if ( isset( $args[ $var ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Build the canonical URL from the request WordPress already resolved.
+	 *
+	 * @return string Absolute URL, or empty string when the request path is unknown.
+	 */
+	private function get_resolved_request_url() {
+		global $wp;
+
+		if ( isset( $wp->request ) && '' !== $wp->request ) {
+			return home_url( user_trailingslashit( $wp->request ) );
+		}
+
+		return '';
 	}
 
 	/**

@@ -1440,10 +1440,412 @@ const Redirects = () => {
 			</section>
 
 			{ /* Create/Edit Modal */ }
-			{ __( 'e.g., migration, campaign', 'saman-seo' ) }
+			{ showModal && (
+				<div className="modal-overlay">
+					<div
+						className="modal"
+						onClick={ ( e ) => e.stopPropagation() }
+					>
+						<div className="modal-header">
+							<h2>
+								{ editingId ? 'Edit Redirect' : 'Add Redirect' }
+							</h2>
+							<button
+								type="button"
+								className="modal-close"
+								onClick={ closeModal }
+							>
+								&times;
+							</button>
+						</div>
+						<form onSubmit={ handleSaveRedirect }>
+							<div className="modal-body">
+								{ /* Chain/Loop Warnings */ }
+								{ chainWarnings.length > 0 && (
+									<div className="chain-warnings">
+										{ chainWarnings.map( ( warning, i ) => (
+											<div
+												key={ i }
+												className={ `alert-inline ${
+													warning.type === 'loop'
+														? 'danger'
+														: 'warning'
+												}` }
+											>
+												{ warning.message }
+											</div>
+										) ) }
+									</div>
+								) }
+
+								<div className="form-group">
+									<label htmlFor="modal-source">
+										Source Path
+									</label>
+									<input
+										type="text"
+										id="modal-source"
+										placeholder={
+											formData.is_regex
+												? '^/old-path/(.*)$'
+												: '/old-url'
+										}
+										value={ formData.source }
+										onChange={ ( e ) =>
+											updateForm(
+												'source',
+												e.target.value
+											)
+										}
+										required
+									/>
+									<label className="checkbox-label">
+										<input
+											type="checkbox"
+											checked={ formData.is_regex }
+											onChange={ ( e ) =>
+												updateForm(
+													'is_regex',
+													e.target.checked
+												)
+											}
+										/>
+										Use regex pattern
+									</label>
+									{ formData.is_regex && (
+										<p className="field-hint">
+											Use capture groups like (.*) and
+											reference them in target as $1, $2,
+											etc.
+										</p>
+									) }
+								</div>
+
+								<div className="form-group">
+									<label htmlFor="modal-target">
+										Target URL
+									</label>
+									<input
+										type="text"
+										id="modal-target"
+										placeholder={
+											formData.is_regex
+												? 'https://example.com/new-path/$1'
+												: 'https://example.com/new-url'
+										}
+										value={ formData.target }
+										onChange={ ( e ) =>
+											updateForm(
+												'target',
+												e.target.value
+											)
+										}
+										required
+									/>
+								</div>
+
+								<div className="form-row">
+									<div className="form-group">
+										<label htmlFor="modal-status">
+											Status Code
+										</label>
+										<select
+											id="modal-status"
+											value={ formData.status_code }
+											onChange={ ( e ) =>
+												updateForm(
+													'status_code',
+													parseInt(
+														e.target.value,
+														10
+													)
+												)
+											}
+										>
+											{ STATUS_CODES.map( ( code ) => (
+												<option
+													key={ code.value }
+													value={ code.value }
+												>
+													{ code.label }
+												</option>
+											) ) }
+										</select>
+									</div>
+									<div className="form-group">
+										<label htmlFor="modal-group">
+											Group (optional)
+										</label>
+										<input
+											type="text"
+											id="modal-group"
+											placeholder="e.g., migration, campaign"
+											value={ formData.group_name }
+											onChange={ ( e ) =>
+												updateForm(
+													'group_name',
+													e.target.value
+												)
+											}
+											list="group-suggestions"
+										/>
+										<datalist id="group-suggestions">
+											{ groups.map( ( group ) => (
+												<option
+													key={ group }
+													value={ group }
+												/>
+											) ) }
+										</datalist>
+									</div>
+								</div>
+
+								<button
+									type="button"
+									className="link-button advanced-toggle"
+									onClick={ () =>
+										setShowAdvanced( ! showAdvanced )
+									}
+								>
+									{ showAdvanced
+										? 'Hide Advanced Options'
+										: 'Show Advanced Options' }
+								</button>
+
+								{ showAdvanced && (
+									<div className="advanced-options">
+										<div className="form-row">
+											<div className="form-group">
+												<label htmlFor="modal-start-date">
+													Start Date (optional)
+												</label>
+												<input
+													type="datetime-local"
+													id="modal-start-date"
+													value={
+														formData.start_date
+													}
+													onChange={ ( e ) =>
+														updateForm(
+															'start_date',
+															e.target.value
+														)
+													}
+												/>
+												<p className="field-hint">
+													Redirect activates at this
+													time
+												</p>
+											</div>
+											<div className="form-group">
+												<label htmlFor="modal-end-date">
+													End Date (optional)
+												</label>
+												<input
+													type="datetime-local"
+													id="modal-end-date"
+													value={ formData.end_date }
+													onChange={ ( e ) =>
+														updateForm(
+															'end_date',
+															e.target.value
+														)
+													}
+												/>
+												<p className="field-hint">
+													Redirect expires after this
+													time
+												</p>
+											</div>
+										</div>
+
+										<div className="form-group">
+											<label htmlFor="modal-notes">
+												Notes (optional)
+											</label>
+											<textarea
+												id="modal-notes"
+												placeholder="Internal notes about this redirect..."
+												value={ formData.notes }
+												onChange={ ( e ) =>
+													updateForm(
+														'notes',
+														e.target.value
+													)
+												}
+												rows="2"
+											/>
+										</div>
+									</div>
+								) }
+
+								{ formError && (
+									<p className="form-error">{ formError }</p>
+								) }
+							</div>
+							<div className="modal-footer">
+								<button
+									type="button"
+									className="button ghost"
+									onClick={ closeModal }
+								>
+									Cancel
+								</button>
+								<button
+									type="submit"
+									className="button primary"
+									disabled={ formLoading }
+								>
+									{ formLoading
+										? 'Saving...'
+										: editingId
+										? 'Update Redirect'
+										: 'Add Redirect' }
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			) }
 
 			{ /* Import Modal */ }
-			{ __( 'Paste JSON or CSV data here\u2026', 'saman-seo' ) }
+			{ showImport && (
+				<div className="modal-overlay">
+					<div
+						className="modal modal-wide"
+						onClick={ ( e ) => e.stopPropagation() }
+					>
+						<div className="modal-header">
+							<h2>Import Redirects</h2>
+							<button
+								type="button"
+								className="modal-close"
+								onClick={ () => setShowImport( false ) }
+							>
+								&times;
+							</button>
+						</div>
+						<div className="modal-body">
+							<div className="form-group">
+								<label>Upload File</label>
+								<input
+									type="file"
+									ref={ fileInputRef }
+									accept=".json,.csv"
+									onChange={ handleFileUpload }
+								/>
+							</div>
+
+							<div className="form-group">
+								<label>Or paste data directly</label>
+								<textarea
+									value={ importData }
+									onChange={ ( e ) =>
+										setImportData( e.target.value )
+									}
+									placeholder="Paste JSON or CSV data here..."
+									rows="8"
+									className="code-textarea"
+								/>
+							</div>
+
+							<div className="form-row">
+								<div className="form-group">
+									<label>Format</label>
+									<select
+										value={ importFormat }
+										onChange={ ( e ) =>
+											setImportFormat( e.target.value )
+										}
+									>
+										<option value="json">JSON</option>
+										<option value="csv">CSV</option>
+									</select>
+								</div>
+								<div className="form-group">
+									<label
+										className="checkbox-label"
+										style={ { marginTop: '28px' } }
+									>
+										<input
+											type="checkbox"
+											checked={ importOverwrite }
+											onChange={ ( e ) =>
+												setImportOverwrite(
+													e.target.checked
+												)
+											}
+										/>
+										Overwrite existing redirects
+									</label>
+								</div>
+							</div>
+
+							{ importResult && (
+								<div
+									className={ `import-result ${
+										importResult.error ? 'error' : 'success'
+									}` }
+								>
+									{ importResult.error ? (
+										<p>Error: { importResult.error }</p>
+									) : (
+										<>
+											<p>
+												Imported:{ ' ' }
+												{ importResult.imported } |
+												Skipped:{ ' ' }
+												{ importResult.skipped }
+											</p>
+											{ importResult.errors?.length >
+												0 && (
+												<ul className="import-errors">
+													{ importResult.errors
+														.slice( 0, 5 )
+														.map( ( err, i ) => (
+															<li key={ i }>
+																{ err }
+															</li>
+														) ) }
+													{ importResult.errors
+														.length > 5 && (
+														<li>
+															...and{ ' ' }
+															{ importResult
+																.errors.length -
+																5 }{ ' ' }
+															more
+														</li>
+													) }
+												</ul>
+											) }
+										</>
+									) }
+								</div>
+							) }
+						</div>
+						<div className="modal-footer">
+							<button
+								type="button"
+								className="button ghost"
+								onClick={ () => setShowImport( false ) }
+							>
+								Close
+							</button>
+							<button
+								type="button"
+								className="button primary"
+								onClick={ handleImport }
+								disabled={
+									importLoading || ! importData.trim()
+								}
+							>
+								{ importLoading ? 'Importing...' : 'Import' }
+							</button>
+						</div>
+					</div>
+				</div>
+			) }
 		</div>
 	);
 };

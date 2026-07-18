@@ -942,7 +942,14 @@ class Redirect_Manager {
 	private function find_exact_redirect( $path, $query, $settings ) {
 		global $wpdb;
 
-		$lookup = 'exact' === $settings['query_matching'] && $query ? $path . '?' . $this->normalize_query( $query ) : $path;
+		// Stored sources are always saved without a trailing slash (see
+		// add_redirect()/update_redirect()), so mirror that here regardless of
+		// the ignore_trailing_slashes setting. Otherwise a request for "/foo/"
+		// never matches a redirect stored as "/foo" — the redirect appears to
+		// exist yet never fires.
+		$source_path = ( '/' === $path ) ? '/' : rtrim( $path, '/' );
+
+		$lookup = 'exact' === $settings['query_matching'] && $query ? $source_path . '?' . $this->normalize_query( $query ) : $source_path;
 
 		if ( $settings['case_insensitive'] ) {
 			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
