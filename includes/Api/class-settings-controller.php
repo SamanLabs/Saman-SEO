@@ -307,7 +307,7 @@ class Settings_Controller extends REST_Controller {
 			'module_internal_links'            => 'bool',
 			'module_ai_assistant'              => 'bool',
 			'module_llm_txt'                   => 'bool',
-		'module_agents_md'                 => 'bool',
+			'module_agents_md'                 => 'bool',
 
 			// IndexNow.
 			'indexnow_submit_on_publish'       => 'bool',

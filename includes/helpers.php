@@ -49,7 +49,7 @@ namespace Saman\SEO\Helpers {
 			'redirects'      => 'SAMAN_SEO_enable_redirect_manager',
 			'404_log'        => 'SAMAN_SEO_enable_404_logging',
 			'llm_txt'        => 'SAMAN_SEO_enable_llm_txt',
-		'agents_md'      => 'SAMAN_SEO_enable_agents_md',
+			'agents_md'      => 'SAMAN_SEO_enable_agents_md',
 			'local_seo'      => 'SAMAN_SEO_enable_local_seo',
 			'social_cards'   => 'SAMAN_SEO_enable_og_preview',
 			'analytics'      => 'SAMAN_SEO_enable_analytics',
