@@ -195,6 +195,7 @@ class Plugin {
 		$this->register( 'maintenance', new Service\Maintenance() );
 		$this->register( 'social_card', new Service\Social_Card_Generator() );
 		$this->register( 'llm_txt', new Service\LLM_TXT_Generator() );
+		$this->register( 'agents_md', new Service\AGENTS_MD_Generator() );
 		$this->register( 'local_seo', new Service\Local_SEO() );
 		$this->register( 'analytics', new Service\Analytics() );
 		$this->register( 'admin_bar', new Service\Admin_Bar() );
@@ -285,6 +286,8 @@ class Plugin {
 		add_option( 'SAMAN_SEO_llm_txt_title', '' );
 		add_option( 'SAMAN_SEO_llm_txt_description', '' );
 		add_option( 'SAMAN_SEO_llm_txt_include_excerpt', '1' );
+		add_option( 'SAMAN_SEO_enable_agents_md', '1' );
+		add_option( 'SAMAN_SEO_agents_md_guidelines', '' );
 		add_option( 'SAMAN_SEO_enable_analytics', '1' );
 		add_option( 'SAMAN_SEO_enable_admin_bar', '1' );
 
@@ -293,6 +296,7 @@ class Plugin {
 		add_option( 'SAMAN_SEO_module_redirects', '1' );
 		add_option( 'SAMAN_SEO_module_404_log', '1' );
 		add_option( 'SAMAN_SEO_module_llm_txt', '1' );
+		add_option( 'SAMAN_SEO_module_agents_md', '1' );
 		add_option( 'SAMAN_SEO_module_local_seo', '0' );
 		add_option( 'SAMAN_SEO_module_social_cards', '1' );
 		add_option( 'SAMAN_SEO_module_analytics', '1' );
@@ -343,6 +347,10 @@ class Plugin {
 
 		if ( \Saman\SEO\Helpers\module_enabled( 'llm_txt' ) ) {
 			( new Service\LLM_TXT_Generator() )->register_rewrite_rules();
+		}
+
+		if ( \Saman\SEO\Helpers\module_enabled( 'agents_md' ) ) {
+			( new Service\AGENTS_MD_Generator() )->register_rewrite_rules();
 		}
 
 		flush_rewrite_rules();

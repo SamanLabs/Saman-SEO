@@ -78,6 +78,7 @@ const defaultSettings = {
 	// Data cleanup
 	delete_data_on_uninstall: false,
 	module_llm_txt: false,
+	module_agents_md: true,
 	module_local_seo: false,
 	module_internal_linking: true,
 	module_schema: true,

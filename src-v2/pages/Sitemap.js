@@ -76,6 +76,9 @@ const Sitemap = () => {
 		llm_txt_posts_per_type: 50,
 		llm_txt_include_excerpt: '1',
 		llm_txt_url: '',
+		enable_agents_md: '1',
+		agents_md_guidelines: '',
+		agents_md_url: '',
 	} );
 
 	// Available post types and taxonomies
@@ -1016,6 +1019,151 @@ const Sitemap = () => {
 								</div>
 							) }
 						</section>
+
+						{ /* AGENTS.md - Single Panel */ }
+						<section className="panel">
+							<h3>
+								{ __( 'AGENTS.md Configuration', 'saman-seo' ) }
+							</h3>
+							<p className="muted">
+								{ __(
+									'Serve an AGENTS.md file with guidance for AI agents on how to represent your site accurately. It reuses your llm.txt title and description so both files stay consistent.',
+									'saman-seo'
+								) }{ ' ' }
+								<a
+									href="https://agents.md/"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{ __( 'Learn more', 'saman-seo' ) }
+								</a>
+							</p>
+
+							<div className="settings-form">
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __(
+												'Enable AGENTS.md',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Generate and serve the AGENTS.md file.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<label className="toggle">
+											<input
+												type="checkbox"
+												checked={
+													llmSettings.enable_agents_md ===
+													'1'
+												}
+												onChange={ ( e ) =>
+													setLlmSettings(
+														( prev ) => ( {
+															...prev,
+															enable_agents_md: e
+																.target.checked
+																? '1'
+																: '0',
+														} )
+													)
+												}
+											/>
+											<span className="toggle-track" />
+											<span className="toggle-text">
+												{ llmSettings.enable_agents_md ===
+												'1'
+													? __(
+															'Enabled',
+															'saman-seo'
+													  )
+													: __(
+															'Disabled',
+															'saman-seo'
+													  ) }
+											</span>
+										</label>
+									</div>
+								</div>
+
+								{ llmSettings.enable_agents_md === '1' && (
+									<div className="settings-row compact">
+										<div className="settings-label">
+											<label htmlFor="agents-md-guidelines">
+												{ __(
+													'Guidelines for AI agents',
+													'saman-seo'
+												) }
+											</label>
+											<p className="settings-help">
+												{ __(
+													'One guideline per line. Leave empty to use sensible defaults.',
+													'saman-seo'
+												) }
+											</p>
+										</div>
+										<div className="settings-control">
+											<textarea
+												id="agents-md-guidelines"
+												rows={ 5 }
+												value={
+													llmSettings.agents_md_guidelines
+												}
+												onChange={ ( e ) =>
+													setLlmSettings(
+														( prev ) => ( {
+															...prev,
+															agents_md_guidelines:
+																e.target.value,
+														} )
+													)
+												}
+											/>
+										</div>
+									</div>
+								) }
+							</div>
+
+							{ /* Save Button inside panel */ }
+							{ llmSettings.enable_agents_md === '1' && (
+								<div
+									className="form-actions"
+									style={ {
+										marginTop: '24px',
+										paddingTop: '24px',
+										borderTop: '1px solid #e5e7eb',
+									} }
+								>
+									<button
+										type="button"
+										className="button primary"
+										onClick={ handleSaveLlmSettings }
+										disabled={ saving }
+									>
+										{ saving
+											? __( 'Saving\u2026', 'saman-seo' )
+											: __(
+													'Save Changes',
+													'saman-seo'
+											  ) }
+									</button>
+									<a
+										href={ llmSettings.agents_md_url }
+										target="_blank"
+										rel="noopener noreferrer"
+										className="button ghost"
+									>
+										{ __( 'View AGENTS.md', 'saman-seo' ) }
+									</a>
+								</div>
+							) }
+						</section>
 					</div>
 
 					{ /* Sidebar */ }
@@ -1044,6 +1192,36 @@ const Sitemap = () => {
 								<p className="muted">
 									{ __(
 										'Enable llm.txt to generate your file.',
+										'saman-seo'
+									) }
+								</p>
+							) }
+						</div>
+
+						<div className="side-card highlight">
+							<h3>{ __( 'Your AGENTS.md', 'saman-seo' ) }</h3>
+							{ llmSettings.enable_agents_md === '1' ? (
+								<>
+									<code className="url-display">
+										{ llmSettings.agents_md_url }
+									</code>
+									<p
+										className="muted"
+										style={ {
+											marginTop: '12px',
+											fontSize: '13px',
+										} }
+									>
+										{ __(
+											'If not accessible, go to Settings > Permalinks and save to flush rewrite rules.',
+											'saman-seo'
+										) }
+									</p>
+								</>
+							) : (
+								<p className="muted">
+									{ __(
+										'Enable AGENTS.md to generate your file.',
 										'saman-seo'
 									) }
 								</p>
