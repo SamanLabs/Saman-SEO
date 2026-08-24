@@ -395,6 +395,14 @@ class Post_Meta {
 			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? wp_kses_post( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '',
 		);
 
-		update_post_meta( $post_id, self::META_KEY, $data );
+		// The classic form only knows a subset of the meta blob. Merge the
+		// posted fields over the stored meta and run the shared sanitizer so
+		// keys the form does not render (focus_keyphrase, sitemap_exclude,
+		// secondary_keyphrases, recipe/event blocks) survive the save instead
+		// of being silently wiped by an 8-key overwrite.
+		$existing = get_post_meta( $post_id, self::META_KEY, true );
+		$existing = is_array( $existing ) ? $existing : array();
+
+		update_post_meta( $post_id, self::META_KEY, $this->sanitize( array_merge( $existing, $data ) ) );
 	}
 }

@@ -558,6 +558,587 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Validate a redirect before it is saved.
+	 *
+	 * Checks for loops, multi-hop chains, and targets that do not resolve to
+	 * live local content (a redirect to a 404 is worse than no redirect).
+	 *
+	 * @param string     $source      Source path.
+	 * @param string     $target      Target URL or path.
+	 * @param int        $exclude_id  Rule ID to ignore (when editing).
+	 * @param bool|null  $is_regex    Whether the source is a regex pattern.
+	 * @param array|null $rules       Preloaded source=>rule map (avoids DB).
+	 *
+	 * @return array<int,array{type:string,severity:string,message:string,final?:string,hops?:int}>
+	 */
+	public function validate_redirect( $source, $target, $exclude_id = 0, $is_regex = null, array $rules = null ) {
+		$warnings = array();
+
+		$source = (string) $source;
+
+		if ( null === $is_regex ) {
+			$is_regex = false;
+		}
+
+		$normalized_source = $is_regex
+			? $source
+			: $this->normalize_source_path( $source );
+
+		$target_path = $this->target_path( $target );
+
+		// Direct loop: source equals target.
+		if ( '' !== $target_path && $target_path === $normalized_source ) {
+			$warnings[] = array(
+				'type'     => 'loop',
+				'severity' => 'high',
+				'message'  => __( 'Source and target are the same URL. This will create an infinite redirect loop.', 'saman-seo' ),
+			);
+		}
+
+		$rules = is_array( $rules ) ? $rules : $this->get_rules_map();
+
+		// Walk the chain starting at the target.
+		if ( '' !== $target_path ) {
+			$walk = $this->walk_chain( $target_path, $rules, (int) $exclude_id );
+
+			if ( ! empty( $walk['loop'] ) ) {
+				$warnings[] = array(
+					'type'     => 'loop',
+					'severity' => 'high',
+					'message'  => sprintf(
+						// translators: %s is the path where the loop closes.
+						__( 'This redirect closes a loop back to %s and will fail in browsers.', 'saman-seo' ),
+						$walk['loop']
+					),
+				);
+			} elseif ( $walk['hops'] > 0 ) {
+				$warnings[] = array(
+					'type'     => 'chain',
+					'severity' => 'medium',
+					'message'  => sprintf(
+						// translators: 1: number of hops, 2: final destination.
+						__( 'Target is itself redirected (%1$d hop(s)). Redirect directly to the final destination %2$s to avoid a chain.', 'saman-seo' ),
+						$walk['hops'],
+						$walk['final']
+					),
+					'hops'     => $walk['hops'],
+					'final'    => $walk['final'],
+				);
+			}
+		}
+
+		// Target resolution: does anything actually live there?
+		$resolution = $this->inspect_target( (string) $target );
+
+		if ( 'not_found' === $resolution['type'] ) {
+			$warnings[] = array(
+				'type'     => 'dead_target',
+				'severity' => 'high',
+				'message'  => sprintf(
+					// translators: %s is the target path.
+					__( 'Target %s does not resolve to any published content. Redirecting to a 404 is worse than leaving the URL broken.', 'saman-seo' ),
+					$resolution['path']
+				),
+			);
+		} elseif ( 'unpublished' === $resolution['type'] ) {
+			$warnings[] = array(
+				'type'     => 'unpublished_target',
+				'severity' => 'medium',
+				'message'  => __( 'Target exists but is not published. Publish it or pick a different destination.', 'saman-seo' ),
+			);
+		} elseif ( 'external' === $resolution['type'] ) {
+			$warnings[] = array(
+				'type'     => 'external',
+				'severity' => 'info',
+				'message'  => __( 'Target points to an external site.', 'saman-seo' ),
+			);
+		}
+
+		/**
+		 * Filter the validation warnings for a redirect.
+		 *
+		 * @param array  $warnings   Warning list.
+		 * @param string $source     Source path.
+		 * @param string $target     Target URL.
+		 * @param int    $exclude_id Rule being edited (0 when creating).
+		 */
+		return saman_seo_apply_filters( 'saman_seo_redirect_validation_warnings', $warnings, $source, $target, $exclude_id );
+	}
+
+	/**
+	 * Walk a chain of redirects starting at a target path.
+	 *
+	 * Pure function: rules are supplied as a source-path => rule map so it
+	 * is fully unit-testable.
+	 *
+	 * @param string               $target_path    Starting path.
+	 * @param array<string,object> $rules_by_source Rules keyed by normalized source.
+	 * @param int                  $exclude_id     Rule ID to ignore.
+	 * @return array{hops:int,final:string,loop:string}
+	 */
+	public function walk_chain( $target_path, array $rules_by_source, $exclude_id = 0 ) {
+		$hops    = 0;
+		$visited = array();
+		$loop_at = '';
+
+		// Normalize both the cursor and the map keys so callers may supply
+		// keys with or without trailing slashes.
+		$map = array();
+
+		foreach ( $rules_by_source as $key => $rule ) {
+			$map[ $this->normalize_source_path( $key ) ] = $rule;
+		}
+
+		$current = $this->normalize_source_path( $target_path );
+
+		while ( $hops < self::MAX_CHAIN_DEPTH ) {
+			if ( isset( $visited[ $current ] ) ) {
+				$loop_at = $current;
+				break;
+			}
+
+			$visited[ $current ] = true;
+
+			$rule = $map[ $current ] ?? null;
+
+			if ( ! $rule || (int) $rule->id === (int) $exclude_id ) {
+				break;
+			}
+
+			if ( ! empty( $rule->is_regex ) ) {
+				// Regex hops cannot be resolved statically; stop walking.
+				break;
+			}
+
+			$next = $this->target_path( $rule->target );
+
+			if ( '' === $next ) {
+				break;
+			}
+
+			$current = $next;
+			++$hops;
+		}
+
+		return array(
+			'hops'  => $hops,
+			'final' => $current,
+			'loop'  => $loop_at,
+		);
+	}
+
+	/**
+	 * Rewrite a rule's target to the final destination of its chain.
+	 *
+	 * @param int $id Rule ID.
+	 * @return array{hops_removed:int,final:string}|\WP_Error
+	 */
+	public function flatten_chain( $id ) {
+		$rule = $this->get_redirect( $id );
+
+		if ( ! $rule ) {
+			return new \WP_Error( 'not_found', __( 'Redirect not found.', 'saman-seo' ) );
+		}
+
+		$rules = $this->get_rules_map();
+		$start = $this->target_path( $rule->target );
+
+		if ( '' === $start ) {
+			return new \WP_Error( 'nothing_to_flatten', __( 'Target is not a local path, nothing to flatten.', 'saman-seo' ) );
+		}
+
+		$walk = $this->walk_chain( $start, $rules, (int) $id );
+
+		if ( $walk['hops'] < 1 || '' !== $walk['loop'] ) {
+			return new \WP_Error(
+				'nothing_to_flatten',
+				__( 'No safe chain found to flatten (or the chain loops).', 'saman-seo' )
+			);
+		}
+
+		// Preserve scheme/host when the original target was absolute-local.
+		$new_target = $this->to_absolute_if_needed( $rule->target, $walk['final'] );
+
+		$result = $this->update_redirect( $id, array( 'target' => $new_target ) );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return array(
+			'hops_removed' => $walk['hops'],
+			'final'        => $new_target,
+		);
+	}
+
+	/**
+	 * Scan all rules for problems: loops, chains, dead targets, and expired
+	 * date windows.
+	 *
+	 * @param int $limit Maximum rules to inspect.
+	 * @return array{issues:array<int,array>,scanned:int}
+	 */
+	public function health_check( $limit = 2000 ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, health scan requires full table read.
+		$rules = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$this->table} ORDER BY id ASC LIMIT %d", absint( $limit ) )
+		);
+
+		$rules = is_array( $rules ) ? $rules : array();
+
+		$map = array();
+		foreach ( $rules as $rule ) {
+			if ( empty( $rule->is_regex ) ) {
+				$map[ $this->normalize_source_path( $rule->source ) ] = $rule;
+			}
+		}
+
+		$issues  = array();
+		$now_ymd = current_time( 'Ymd' );
+
+		foreach ( $rules as $rule ) {
+			$rule_issues = array();
+
+			if ( empty( $rule->is_regex ) ) {
+				$walk = $this->walk_chain( $this->target_path( $rule->target ), $map, (int) $rule->id );
+
+				if ( '' !== $walk['loop'] ) {
+					$rule_issues[] = array(
+						'type'     => 'loop',
+						'severity' => 'high',
+						'message'  => sprintf(
+							// translators: %s is the path where the loop closes.
+							__( 'Chain loops back at %s.', 'saman-seo' ),
+							$walk['loop']
+						),
+					);
+				} elseif ( $walk['hops'] > 0 ) {
+					$rule_issues[] = array(
+						'type'     => 'chain',
+						'severity' => 'medium',
+						'message'  => sprintf(
+							// translators: %s is the final destination.
+							__( 'Chain of %1$d hop(s); final destination %2$s. Flatten to a single hop.', 'saman-seo' ),
+							$walk['hops'],
+							$walk['final']
+						),
+						'final'    => $walk['final'],
+					);
+				}
+
+				$resolution = $this->inspect_target( (string) $rule->target );
+
+				if ( 'not_found' === $resolution['type'] ) {
+					$rule_issues[] = array(
+						'type'     => 'dead_target',
+						'severity' => 'high',
+						'message'  => sprintf(
+							// translators: %s is the target path.
+							__( 'Target %s resolves to a 404.', 'saman-seo' ),
+							$resolution['path']
+						),
+					);
+				} elseif ( 'unpublished' === $resolution['type'] ) {
+					$rule_issues[] = array(
+						'type'     => 'unpublished_target',
+						'severity' => 'medium',
+						'message'  => __( 'Target is not published.', 'saman-seo' ),
+					);
+				}
+			}
+
+			// Date-window sanity.
+			if ( ! empty( $rule->end_date ) ) {
+				$end = (int) preg_replace( '/[^0-9]/', '', (string) $rule->end_date );
+
+				if ( $end && $end < $now_ymd ) {
+					$rule_issues[] = array(
+						'type'     => 'expired',
+						'severity' => 'low',
+						'message'  => __( 'End date has passed; the rule is inert.', 'saman-seo' ),
+					);
+				}
+			}
+
+			if ( ! empty( $rule_issues ) ) {
+				$issues[] = array(
+					'id'          => (int) $rule->id,
+					'source'      => $rule->source,
+					'target'      => $rule->target,
+					'status_code' => (int) $rule->status_code,
+					'issues'      => $rule_issues,
+				);
+			}
+		}
+
+		return array(
+			'issues'  => $issues,
+			'scanned' => count( $rules ),
+		);
+	}
+
+	/**
+	 * Load all non-regex rules into a normalized source => rule map.
+	 *
+	 * @return array<string,object>
+	 */
+	public function get_rules_map() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, chain analysis requires full table read.
+		$rows = $wpdb->get_results( "SELECT id, source, target, is_regex FROM {$this->table}" );
+
+		$map = array();
+
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				if ( ! empty( $row->is_regex ) ) {
+					continue;
+				}
+
+				$map[ $this->normalize_source_path( $row->source ) ] = $row;
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * Normalize a source path the same way create/update does.
+	 *
+	 * @param string $path Raw path.
+	 * @return string Normalized path.
+	 */
+	private function normalize_source_path( $path ) {
+		$normalized = '/' . ltrim( (string) $path, '/' );
+
+		return '/' === $normalized ? '/' : rtrim( $normalized, '/' );
+	}
+
+	/**
+	 * Extract and normalize the path portion of a target.
+	 *
+	 * @param string $target Target URL or path.
+	 * @return string Normalized path, or empty string when not local/parseable.
+	 */
+	private function target_path( $target ) {
+		$path = wp_parse_url( trim( (string) $target ), PHP_URL_PATH );
+
+		// Plain relative paths parse without a host; parse_url returns the
+		// string itself for "path" inputs. Missing path on an absolute URL
+		// means the site root.
+		if ( null === $path ) {
+			$host = wp_parse_url( trim( (string) $target ), PHP_URL_HOST );
+
+			return $host ? '/' : '';
+		}
+
+		$path = '/' . ltrim( (string) $path, '/' );
+
+		return '/' === $path ? '/' : rtrim( $path, '/' );
+	}
+
+	/**
+	 * Resolve where a target leads.
+	 *
+	 * @param string $target Target URL or path.
+	 * @return array{type:string,path?:string,post_id?:int,url?:string}
+	 */
+	public function inspect_target( $target ) {
+		$target = trim( (string) $target );
+
+		if ( '' === $target ) {
+			return array( 'type' => 'empty' );
+		}
+
+		$target_host = wp_parse_url( $target, PHP_URL_HOST );
+		$home_host   = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		$same_host = null === $target_host
+			|| $this->canonical_host( (string) $target_host ) === $this->canonical_host( (string) $home_host );
+
+		if ( ! $same_host ) {
+			return array(
+				'type' => 'external',
+				'url'  => $target,
+			);
+		}
+
+		$path = $this->target_path( $target );
+
+		if ( '' === $path ) {
+			return array( 'type' => 'unknown' );
+		}
+
+		return $this->resolve_local_path( $path );
+	}
+
+	/**
+	 * Resolve whether a local path maps to live content.
+	 *
+	 * @param string $path Normalized local path.
+	 * @return array{type:string,path:string,post_id?:int}
+	 */
+	public function resolve_local_path( $path ) {
+		if ( '/' === $path ) {
+			return array(
+				'type' => 'home',
+				'path' => $path,
+			);
+		}
+
+		// Strip pagination and feed suffixes before resolving the base.
+		$base = (string) preg_replace( '#(/page/\d+|/feed/?|/comment-page-\d+)/?$#', '/', $path );
+		$base = '/' === $base ? '/' : rtrim( $base, '/' );
+
+		if ( '/' !== $base ) {
+			// Posts page (blog archive).
+			$posts_page_id = (int) get_option( 'page_for_posts' );
+
+			if ( $posts_page_id ) {
+				$posts_page_path = wp_parse_url( get_permalink( $posts_page_id ), PHP_URL_PATH );
+
+				if ( $posts_page_path && $this->normalize_source_path( $posts_page_path ) === $base ) {
+					return array(
+						'type'    => 'post',
+						'post_id' => $posts_page_id,
+						'path'    => $base,
+					);
+				}
+			}
+
+			// Core post/lookup (posts, pages, CPT items).
+			$post_id = url_to_postid( home_url( $base ) );
+
+			if ( $post_id ) {
+				$status = get_post_status( $post_id );
+
+				return array(
+					'type'    => in_array( $status, array( 'publish', 'inherit' ), true ) ? 'post' : 'unpublished',
+					'post_id' => (int) $post_id,
+					'path'    => $base,
+				);
+			}
+
+			// Date archives: /YYYY/, /YYYY/MM/, /YYYY/MM/DD/.
+			if ( preg_match( '#^/\d{4}(/\d{1,2}){0,2}/?$#', $base ) ) {
+				return array(
+					'type' => 'archive',
+					'path' => $base,
+				);
+			}
+
+			// Post type archives (compare against registered rewrite slugs).
+			foreach ( get_post_types( array( 'has_archive' => true ), 'objects' ) as $post_type ) {
+				$archive_slug = $post_type->has_archive;
+
+				if ( true !== $archive_slug ) {
+					$archive_slug = is_string( $archive_slug ) ? $archive_slug : $post_type->name;
+				} else {
+					$archive_slug = $post_type->name;
+				}
+
+				if ( trim( $archive_slug, '/' ) === trim( $base, '/' ) ) {
+					return array(
+						'type' => 'archive',
+						'path' => $base,
+					);
+				}
+			}
+
+			// Taxonomy term archives: match the last path segment as a slug.
+			$segments = array_filter( explode( '/', trim( $base, '/' ) ) );
+			$slug     = end( $segments );
+
+			if ( false !== $slug && '' !== $slug ) {
+				$terms = get_terms(
+					array(
+						'slug'       => sanitize_title( $slug ),
+						'hide_empty' => false,
+						'fields'     => 'all',
+						'number'     => 5,
+					)
+				);
+
+				if ( ! is_wp_error( $terms ) ) {
+					foreach ( $terms as $term ) {
+						$link = get_term_link( $term );
+
+						if ( ! is_wp_error( $link ) ) {
+							$term_path = wp_parse_url( $link, PHP_URL_PATH );
+
+							if ( $term_path && $this->normalize_source_path( $term_path ) === $base ) {
+								return array(
+									'type' => 'term',
+									'path' => $base,
+								);
+							}
+						}
+					}
+				}
+			}
+
+			$not_found = array(
+				'type' => 'not_found',
+				'path' => $base,
+			);
+
+			/**
+			 * Filter the resolution of a local redirect target path.
+			 *
+			 * Lets integrations teach the validator about custom rewrite
+			 * endpoints (e.g. virtual pages, REST-driven routes).
+			 *
+			 * @param array  $not_found Default resolution (type not_found).
+			 * @param string $base      Normalized base path being resolved.
+			 */
+			return saman_seo_apply_filters( 'saman_seo_redirect_target_resolution', $not_found, $base );
+		}
+
+		return array(
+			'type' => 'home',
+			'path' => $base,
+		);
+	}
+
+	/**
+	 * Compare hosts without their www prefix.
+	 *
+	 * @param string $host Hostname.
+	 * @return string Lowercase host without leading www.
+	 */
+	private function canonical_host( $host ) {
+		return strtolower( preg_replace( '/^www\./i', '', trim( (string) $host ) ) );
+	}
+
+	/**
+	 * Keep the absolute form of a target when the original was absolute.
+	 *
+	 * @param string $original_target Original rule target.
+	 * @param string $final_path      Final normalized path from the chain walk.
+	 * @return string Final target preserving the original absolute/relative form.
+	 */
+	private function to_absolute_if_needed( $original_target, $final_path ) {
+		$original = trim( (string) $original_target );
+
+		// Relative path targets stay relative.
+		if ( null === wp_parse_url( $original, PHP_URL_HOST ) ) {
+			return $final_path;
+		}
+
+		return home_url( $final_path );
+	}
+
+	/**
+	 * Maximum hops followed when walking a redirect chain.
+	 *
+	 * @var int
+	 */
+	public const MAX_CHAIN_DEPTH = 10;
+
+	/**
 	 * AJAX handler to create the redirect.
 	 *
 	 * @return void
