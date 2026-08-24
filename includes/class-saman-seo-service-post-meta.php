@@ -73,6 +73,12 @@ class Post_Meta {
 				'custom_schema'        => array(
 					'type' => 'string',
 				),
+				'recipe'               => array(
+					'type' => 'object',
+				),
+				'event'                => array(
+					'type' => 'object',
+				),
 			),
 		);
 
@@ -145,6 +151,198 @@ class Post_Meta {
 					$clean['secondary_keyphrases'][] = $sanitized;
 				}
 			}
+		}
+
+		// Rich-result data blocks.
+		if ( isset( $value['recipe'] ) && is_array( $value['recipe'] ) ) {
+			$recipe = $this->sanitize_recipe( $value['recipe'] );
+
+			if ( ! empty( $recipe ) ) {
+				$clean['recipe'] = $recipe;
+			}
+		}
+
+		if ( isset( $value['event'] ) && is_array( $value['event'] ) ) {
+			$event = $this->sanitize_event( $value['event'] );
+
+			if ( ! empty( $event ) ) {
+				$clean['event'] = $event;
+			}
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Sanitize the Recipe rich-result data block.
+	 *
+	 * @param array $recipe Raw recipe values.
+	 * @return array<string,mixed> Empty when no usable name is present.
+	 */
+	public function sanitize_recipe( array $recipe ): array {
+		$clean = array();
+
+		$text_fields = array(
+			'name',
+			'description',
+			'recipeYield',
+			'keywords',
+			'recipeCategory',
+			'recipeCuisine',
+			'nutrition_calories',
+			'prepTime',
+			'cookTime',
+			'totalTime',
+		);
+
+		foreach ( $text_fields as $field ) {
+			if ( isset( $recipe[ $field ] ) ) {
+				$value = sanitize_text_field( (string) $recipe[ $field ] );
+
+				if ( '' !== $value ) {
+					$clean[ $field ] = $value;
+				}
+			}
+		}
+
+		if ( isset( $recipe['image'] ) ) {
+			$image = esc_url_raw( (string) $recipe['image'] );
+			if ( '' !== $image ) {
+				$clean['image'] = $image;
+			}
+		} elseif ( isset( $recipe['images'] ) ) {
+			$images = array_filter( array_map( 'esc_url_raw', (array) $recipe['images'] ) );
+			if ( ! empty( $images ) ) {
+				$clean['images'] = array_values( $images );
+			}
+		}
+
+		if ( isset( $recipe['rating_value'] ) && is_numeric( $recipe['rating_value'] ) ) {
+			$clean['rating_value'] = min( 5.0, max( 0.0, (float) $recipe['rating_value'] ) );
+		}
+		if ( isset( $recipe['rating_count'] ) ) {
+			$count = absint( $recipe['rating_count'] );
+			if ( $count > 0 ) {
+				$clean['rating_count'] = $count;
+			}
+		}
+
+		if ( isset( $recipe['recipeIngredient'] ) && is_array( $recipe['recipeIngredient'] ) ) {
+			$ingredients = array();
+			foreach ( $recipe['recipeIngredient'] as $ingredient ) {
+				$value = sanitize_text_field( (string) $ingredient );
+				if ( '' !== $value ) {
+					$ingredients[] = $value;
+				}
+			}
+
+			if ( ! empty( $ingredients ) ) {
+				$clean['recipeIngredient'] = $ingredients;
+			}
+		}
+
+		if ( isset( $recipe['recipeInstructions'] ) && is_array( $recipe['recipeInstructions'] ) ) {
+			$steps = array();
+
+			foreach ( $recipe['recipeInstructions'] as $step ) {
+				if ( is_array( $step ) ) {
+					$name = isset( $step['name'] ) ? sanitize_text_field( (string) $step['name'] ) : '';
+					$text = isset( $step['text'] ) ? sanitize_textarea_field( (string) $step['text'] ) : '';
+
+					if ( '' !== $name || '' !== $text ) {
+						$steps[] = array(
+							'name' => $name,
+							'text' => $text,
+						);
+					}
+				} else {
+					$value = sanitize_textarea_field( (string) $step );
+					if ( '' !== $value ) {
+						$steps[] = $value;
+					}
+				}
+			}
+
+			if ( ! empty( $steps ) ) {
+				$clean['recipeInstructions'] = $steps;
+			}
+		}
+
+		// A recipe without a name cannot generate valid schema.
+		if ( empty( $clean['name'] ) ) {
+			return array();
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Sanitize the Event rich-result data block.
+	 *
+	 * @param array $event Raw event values.
+	 * @return array<string,mixed> Empty when no usable name/date pair exists.
+	 */
+	public function sanitize_event( array $event ): array {
+		$clean = array();
+
+		$text_fields = array(
+			'name',
+			'description',
+			'venue_name',
+			'venue_street_address',
+			'venue_city',
+			'venue_region',
+			'venue_postal_code',
+			'venue_country',
+			'performer_name',
+			'organizer_name',
+			'price',
+			'valid_from',
+			'start_date',
+			'end_date',
+		);
+
+		foreach ( $text_fields as $field ) {
+			if ( isset( $event[ $field ] ) ) {
+				$value = sanitize_text_field( (string) $event[ $field ] );
+
+				if ( '' !== $value ) {
+					$clean[ $field ] = $value;
+				}
+			}
+		}
+
+		foreach ( array( 'image', 'online_url', 'offer_url', 'organizer_url' ) as $url_field ) {
+			if ( isset( $event[ $url_field ] ) ) {
+				$url = esc_url_raw( (string) $event[ $url_field ] );
+				if ( '' !== $url ) {
+					$clean[ $url_field ] = $url;
+				}
+			}
+		}
+
+		if ( isset( $event['status'] ) && in_array( $event['status'], \Saman\SEO\Schema\Types\Event_Schema::STATUSES, true ) ) {
+			$clean['status'] = $event['status'];
+		}
+		if ( isset( $event['attendance_mode'] ) && in_array( $event['attendance_mode'], \Saman\SEO\Schema\Types\Event_Schema::ATTENDANCE_MODES, true ) ) {
+			$clean['attendance_mode'] = $event['attendance_mode'];
+		}
+		if ( isset( $event['availability'] ) && in_array( $event['availability'], \Saman\SEO\Schema\Types\Event_Schema::AVAILABILITIES, true ) ) {
+			$clean['availability'] = $event['availability'];
+		}
+		if ( isset( $event['performer_type'] ) && 'Organization' === $event['performer_type'] ) {
+			$clean['performer_type'] = 'Organization';
+		}
+		if ( isset( $event['price_currency'] ) ) {
+			$currency = strtoupper( substr( preg_replace( '/[^A-Za-z]/', '', (string) $event['price_currency'] ), 0, 3 ) );
+			if ( '' !== $currency ) {
+				$clean['price_currency'] = $currency;
+			}
+		}
+
+		// An event without a name or start date cannot generate valid schema.
+		if ( empty( $clean['name'] ) || empty( $clean['start_date'] ) ) {
+			return array();
 		}
 
 		return $clean;

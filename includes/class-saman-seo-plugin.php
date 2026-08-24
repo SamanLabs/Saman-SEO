@@ -20,6 +20,8 @@ use Saman\SEO\Schema\Types\Product_Schema;
 use Saman\SEO\Schema\Types\FAQPage_Schema;
 use Saman\SEO\Schema\Types\HowTo_Schema;
 use Saman\SEO\Schema\Types\LocalBusiness_Schema;
+use Saman\SEO\Schema\Types\Recipe_Schema;
+use Saman\SEO\Schema\Types\Event_Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -144,6 +146,25 @@ class Plugin {
 			)
 		);
 
+		// Data-driven rich result schemas (post meta supplied).
+		$registry->register(
+			'recipe',
+			Recipe_Schema::class,
+			array(
+				'label'    => 'Recipe',
+				'priority' => 18,
+			)
+		);
+
+		$registry->register(
+			'event',
+			Event_Schema::class,
+			array(
+				'label'    => 'Event',
+				'priority' => 18,
+			)
+		);
+
 		$registry->register( 'breadcrumb', Breadcrumb_Schema::class, array( 'priority' => 20 ) );
 
 		/**
@@ -211,6 +232,7 @@ class Plugin {
 		$this->register( 'restaurant_schema', new Service\Restaurant_Schema() );
 		$this->register( 'service_schema', new Service\Service_Schema() );
 		$this->register( 'job_posting_schema', new Service\Job_Posting_Schema() );
+		$this->register( 'image_seo', new Service\Image_SEO() );
 		$this->register( 'indexnow', new Service\IndexNow() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {

@@ -128,4 +128,24 @@ class Schema_IDs {
 	public static function product( string $url ): string {
 		return $url . '#product';
 	}
+
+	/**
+	 * Get the Recipe schema @id for a specific URL.
+	 *
+	 * @param string $url The canonical URL of the recipe.
+	 * @return string URL#recipe identifier.
+	 */
+	public static function recipe( string $url ): string {
+		return $url . '#recipe';
+	}
+
+	/**
+	 * Get the Event schema @id for a specific URL.
+	 *
+	 * @param string $url The canonical URL of the event page.
+	 * @return string URL#event identifier.
+	 */
+	public static function event( string $url ): string {
+		return $url . '#event';
+	}
 }

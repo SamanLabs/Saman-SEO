@@ -84,6 +84,13 @@ class Settings {
 		'SAMAN_SEO_module_internal_links'            => '1',
 		'SAMAN_SEO_module_ai_assistant'              => '1',
 		'SAMAN_SEO_module_breadcrumbs'               => '0',
+		'SAMAN_SEO_module_image_seo'                 => '1',
+
+		// Image SEO settings.
+		'SAMAN_SEO_image_seo_settings'               => array(
+			'auto_alt'       => true,
+			'min_alt_length' => 10,
+		),
 
 		// Redirect settings.
 		'SAMAN_SEO_redirect_case_insensitive'        => '0',
@@ -291,6 +298,8 @@ class Settings {
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_internal_links', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_ai_assistant', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_breadcrumbs', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_image_seo', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_image_seo_settings', array( $this, 'sanitize_image_seo_settings' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_breadcrumb_settings', array( $this, 'sanitize_breadcrumb_settings' ) );
 
 		// Schema output toggles (master + per-type).
@@ -1001,6 +1010,26 @@ class Settings {
 			'layout'           => in_array( $value['layout'] ?? '', array( 'default', 'centered', 'minimal', 'bold' ), true )
 									? $value['layout']
 									: 'default',
+		);
+	}
+
+	/**
+	 * Sanitize Image SEO settings.
+	 *
+	 * @param mixed $value Values.
+	 *
+	 * @return array
+	 */
+	public function sanitize_image_seo_settings( $value ) {
+		$defaults = $this->defaults['SAMAN_SEO_image_seo_settings'];
+
+		if ( ! is_array( $value ) ) {
+			return $defaults;
+		}
+
+		return array(
+			'auto_alt'       => ! empty( $value['auto_alt'] ),
+			'min_alt_length' => max( 1, min( 100, absint( $value['min_alt_length'] ?? $defaults['min_alt_length'] ) ) ),
 		);
 	}
 

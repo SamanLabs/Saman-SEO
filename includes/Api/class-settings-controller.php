@@ -308,6 +308,7 @@ class Settings_Controller extends REST_Controller {
 			'module_ai_assistant'              => 'bool',
 			'module_llm_txt'                   => 'bool',
 			'module_agents_md'                 => 'bool',
+			'module_image_seo'                 => 'bool',
 
 			// Schema output toggles (master + per-type).
 			'module_schema'                    => 'bool',
