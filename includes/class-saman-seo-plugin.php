@@ -266,80 +266,10 @@ class Plugin {
 		// Schedule the shared daily maintenance janitor.
 		( new Service\Maintenance() )->maybe_schedule();
 
-		add_option( 'SAMAN_SEO_default_title_template', '{{post_title}} | {{site_title}}' );
-		add_option( 'SAMAN_SEO_post_type_title_templates', array() );
-		add_option( 'SAMAN_SEO_post_type_meta_descriptions', array() );
-		add_option( 'SAMAN_SEO_post_type_keywords', array() );
-		// AI prompt customization (API keys and model selection handled by Saman Labs AI plugin)
-		add_option( 'SAMAN_SEO_ai_prompt_system', 'You are an SEO assistant generating concise metadata. Respond with plain text only.' );
-		add_option( 'SAMAN_SEO_ai_prompt_title', 'Write an SEO meta title (max 60 characters) that is compelling and includes the primary topic.' );
-		add_option( 'SAMAN_SEO_ai_prompt_description', 'Write a concise SEO meta description (max 155 characters) summarizing the content and inviting clicks.' );
-		add_option( 'SAMAN_SEO_default_meta_description', '' );
-		add_option( 'SAMAN_SEO_default_og_image', '' );
-		add_option( 'SAMAN_SEO_show_tour', '1' );
-		// Legacy enable options (kept for backward compatibility).
-		add_option( 'SAMAN_SEO_enable_sitemap_enhancer', '1' );
-		add_option( 'SAMAN_SEO_enable_redirect_manager', '1' );
-		add_option( 'SAMAN_SEO_enable_404_logging', '1' );
-		add_option( 'SAMAN_SEO_enable_llm_txt', '1' );
-		add_option( 'SAMAN_SEO_llm_txt_posts_per_type', 50 );
-		add_option( 'SAMAN_SEO_llm_txt_title', '' );
-		add_option( 'SAMAN_SEO_llm_txt_description', '' );
-		add_option( 'SAMAN_SEO_llm_txt_include_excerpt', '1' );
-		add_option( 'SAMAN_SEO_enable_agents_md', '1' );
-		add_option( 'SAMAN_SEO_agents_md_guidelines', '' );
-		add_option( 'SAMAN_SEO_enable_analytics', '1' );
-		add_option( 'SAMAN_SEO_enable_admin_bar', '1' );
-
-		// New module toggle options (used by React UI).
-		add_option( 'SAMAN_SEO_module_sitemap', '1' );
-		add_option( 'SAMAN_SEO_module_redirects', '1' );
-		add_option( 'SAMAN_SEO_module_404_log', '1' );
-		add_option( 'SAMAN_SEO_module_llm_txt', '1' );
-		add_option( 'SAMAN_SEO_module_agents_md', '1' );
-		add_option( 'SAMAN_SEO_module_local_seo', '0' );
-		add_option( 'SAMAN_SEO_module_social_cards', '1' );
-		add_option( 'SAMAN_SEO_module_analytics', '1' );
-		add_option( 'SAMAN_SEO_module_admin_bar', '1' );
-		add_option( 'SAMAN_SEO_module_internal_links', '1' );
-		add_option( 'SAMAN_SEO_module_ai_assistant', '1' );
-		add_option( 'SAMAN_SEO_module_breadcrumbs', '0' );
-
-		// Breadcrumb settings defaults.
-		add_option(
-			'SAMAN_SEO_breadcrumb_settings',
-			array(
-				'enabled'          => false,
-				'separator'        => '>',
-				'separator_custom' => '',
-				'show_home'        => true,
-				'home_label'       => '',
-				'show_current'     => true,
-				'link_current'     => false,
-				'truncate_length'  => 0,
-				'show_on_front'    => false,
-				'style_preset'     => 'default',
-				'post_type_labels' => array(),
-				'taxonomy_labels'  => array(),
-			)
-		);
-
-		// Sitemap settings defaults
-		add_option( 'SAMAN_SEO_sitemap_enabled', '1' );
-		add_option( 'SAMAN_SEO_sitemap_max_urls', 1000 );
-		add_option( 'SAMAN_SEO_sitemap_enable_index', '1' );
-		add_option( 'SAMAN_SEO_sitemap_dynamic_generation', '1' );
-		add_option( 'SAMAN_SEO_sitemap_schedule_updates', '' );
-		add_option( 'SAMAN_SEO_sitemap_post_types', array() );
-		add_option( 'SAMAN_SEO_sitemap_taxonomies', array() );
-		add_option( 'SAMAN_SEO_sitemap_include_author_pages', '0' );
-		add_option( 'SAMAN_SEO_sitemap_include_date_archives', '0' );
-		add_option( 'SAMAN_SEO_sitemap_exclude_images', '0' );
-		add_option( 'SAMAN_SEO_sitemap_enable_rss', '0' );
-		add_option( 'SAMAN_SEO_sitemap_enable_google_news', '0' );
-		add_option( 'SAMAN_SEO_sitemap_google_news_name', get_bloginfo( 'name' ) );
-		add_option( 'SAMAN_SEO_sitemap_google_news_post_types', array() );
-		add_option( 'SAMAN_SEO_sitemap_additional_pages', array() );
+		// Seed every known option with its default value. The Settings
+		// service owns this map, so activation and runtime defaults can
+		// never drift apart.
+		( new Service\Settings() )->install_default_options();
 
 		if ( \Saman\SEO\Helpers\module_enabled( 'sitemap' ) ) {
 			( new Service\Sitemap_Enhancer() )->register_custom_sitemap();

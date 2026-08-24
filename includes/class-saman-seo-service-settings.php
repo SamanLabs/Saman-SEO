@@ -129,6 +129,32 @@ class Settings {
 			'logo_position'    => 'bottom-left',
 			'layout'           => 'default',
 		),
+
+		// LLM.txt / AGENTS.md generator settings.
+		'SAMAN_SEO_llm_txt_posts_per_type'           => 50,
+		'SAMAN_SEO_llm_txt_title'                    => '',
+		'SAMAN_SEO_llm_txt_description'              => '',
+		'SAMAN_SEO_llm_txt_include_excerpt'          => '1',
+		'SAMAN_SEO_enable_agents_md'                 => '1',
+		'SAMAN_SEO_agents_md_guidelines'             => '',
+		'SAMAN_SEO_enable_admin_bar'                 => '1',
+		'SAMAN_SEO_show_tour'                        => '1',
+
+		// Sitemap settings.
+		'SAMAN_SEO_sitemap_enabled'                  => '1',
+		'SAMAN_SEO_sitemap_max_urls'                 => 1000,
+		'SAMAN_SEO_sitemap_enable_index'             => '1',
+		'SAMAN_SEO_sitemap_dynamic_generation'       => '1',
+		'SAMAN_SEO_sitemap_schedule_updates'         => '',
+		'SAMAN_SEO_sitemap_post_types'               => array(),
+		'SAMAN_SEO_sitemap_taxonomies'               => array(),
+		'SAMAN_SEO_sitemap_include_author_pages'     => '0',
+		'SAMAN_SEO_sitemap_include_date_archives'    => '0',
+		'SAMAN_SEO_sitemap_exclude_images'           => '0',
+		'SAMAN_SEO_sitemap_enable_rss'               => '0',
+		'SAMAN_SEO_sitemap_enable_google_news'       => '0',
+		'SAMAN_SEO_sitemap_google_news_post_types'   => array(),
+		'SAMAN_SEO_sitemap_additional_pages'         => array(),
 	);
 
 	/**
@@ -154,14 +180,29 @@ class Settings {
 	}
 
 	/**
+	 * Create any missing options from the defaults map.
+	 *
+	 * Called on activation and defensively on every admin_init so options
+	 * exist even when the plugin was activated before a default was added.
+	 *
+	 * @return void
+	 */
+	public function install_default_options() {
+		foreach ( $this->defaults as $key => $default ) {
+			add_option( $key, $default );
+		}
+
+		// Dynamic default: evaluated at install time, not class load time.
+		add_option( 'SAMAN_SEO_sitemap_google_news_name', get_bloginfo( 'name' ) );
+	}
+
+	/**
 	 * Register settings + fields.
 	 *
 	 * @return void
 	 */
 	public function register_settings() {
-		foreach ( $this->defaults as $key => $default ) {
-			add_option( $key, $default );
-		}
+		$this->install_default_options();
 
 		register_setting( 'saman-seo', 'SAMAN_SEO_default_title_template', array( $this, 'sanitize_template' ) );
 
