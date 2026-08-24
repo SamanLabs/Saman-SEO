@@ -89,6 +89,14 @@ class Social_Card_Generator {
 		$design               = wp_parse_args( $design_settings, $design_defaults );
 		$this->current_design = $design;
 
+		// Serve a previously-rendered card straight from disk when possible, so
+		// crawlers hammering this endpoint never re-run GD.
+		$cache = $this->card_cache_target( $title, $design, $width, $height );
+		if ( $cache && file_exists( $cache['path'] ) ) {
+			$this->serve_card_file( $cache['path'] );
+			// serve_card_file() exits.
+		}
+
 		// Convert hex colors to RGB
 		$bg_rgb     = $this->hex_to_rgb( $design['background_color'] );
 		$accent_rgb = $this->hex_to_rgb( $design['accent_color'] );
@@ -108,10 +116,70 @@ class Social_Card_Generator {
 			$this->add_logo( $img, $design['logo_url'], $design['logo_position'], $width, $height );
 		}
 
-		nocache_headers();
+		$this->send_card_cache_headers();
 		header( 'Content-Type: image/png' );
-		imagepng( $img );
-		imagedestroy( $img );
+
+		// Write to the cache file and serve it; fall back to direct output if the
+		// cache directory is not writable.
+		if ( $cache && wp_mkdir_p( dirname( $cache['path'] ) ) && false !== imagepng( $img, $cache['path'] ) ) {
+			imagedestroy( $img );
+			readfile( $cache['path'] );
+		} else {
+			imagepng( $img );
+			imagedestroy( $img );
+		}
+
+		exit;
+	}
+
+	/**
+	 * Resolve the on-disk cache location for a rendered card, or null if the
+	 * uploads directory is unavailable.
+	 *
+	 * @param string $title  Card title.
+	 * @param array  $design Design settings.
+	 * @param int    $width  Image width.
+	 * @param int    $height Image height.
+	 * @return array{path:string,url:string}|null
+	 */
+	private function card_cache_target( $title, $design, $width, $height ) {
+		$uploads = wp_upload_dir();
+		if ( ! empty( $uploads['error'] ) || empty( $uploads['basedir'] ) ) {
+			return null;
+		}
+
+		$signature = md5( wp_json_encode( array( $title, $design, $width, $height ) ) );
+		$dir       = trailingslashit( $uploads['basedir'] ) . 'saman-seo-cards';
+		$filename  = 'card-' . $signature . '.png';
+
+		return array(
+			'path' => $dir . '/' . $filename,
+			'url'  => trailingslashit( $uploads['baseurl'] ) . 'saman-seo-cards/' . $filename,
+		);
+	}
+
+	/**
+	 * Send long-lived cache headers so generated cards are cached by browsers,
+	 * crawlers, and CDNs.
+	 *
+	 * @return void
+	 */
+	private function send_card_cache_headers() {
+		$max_age = (int) saman_seo_apply_filters( 'saman_seo_social_card_cache_max_age', WEEK_IN_SECONDS );
+		header( 'Cache-Control: public, max-age=' . max( 0, $max_age ) );
+	}
+
+	/**
+	 * Stream a cached card file to the browser and exit.
+	 *
+	 * @param string $path File path.
+	 * @return void
+	 */
+	private function serve_card_file( $path ) {
+		$this->send_card_cache_headers();
+		header( 'Content-Type: image/png' );
+		header( 'Content-Length: ' . (string) filesize( $path ) );
+		readfile( $path );
 		exit;
 	}
 

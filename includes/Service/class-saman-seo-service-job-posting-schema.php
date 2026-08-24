@@ -20,6 +20,10 @@ class Job_Posting_Schema {
 	 * @return void
 	 */
 	public function boot() {
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema_job_posting' ) ) {
+			return;
+		}
+
 		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_job_posting_schema_to_graph' ), 20, 2 );
 	}
 

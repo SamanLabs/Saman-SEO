@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class Request_Monitor {
 
-	private const SCHEMA_VERSION = 6;
+	private const SCHEMA_VERSION = 7;
 	private const SCHEMA_OPTION  = 'SAMAN_SEO_404_log_schema';
 
 	/**
@@ -220,7 +220,8 @@ class Request_Monitor {
 			PRIMARY KEY (id),
 			KEY request_uri (request_uri),
 			KEY is_bot (is_bot),
-			KEY is_ignored (is_ignored)
+			KEY is_ignored (is_ignored),
+			KEY last_seen (last_seen)
 		) {$charset};";
 
 		dbDelta( $sql );
@@ -270,13 +271,9 @@ class Request_Monitor {
 				$this->migrate_to_version_6();
 			}
 
-			return;
-		}
-
-		if ( ! $this->has_column( 'device_label' ) ) {
-			global $wpdb;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Schema corrections require direct queries.
-			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN device_label varchar(80) DEFAULT ''" );
+			if ( $current > 0 && $current < 7 ) {
+				$this->migrate_to_version_7();
+			}
 		}
 	}
 
@@ -316,6 +313,23 @@ class Request_Monitor {
 		if ( ! $this->has_column( 'ip_address' ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Schema migration requires direct queries.
 			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN ip_address varchar(100) DEFAULT ''" );
+		}
+	}
+
+	/**
+	 * Migrate data for version 7 schema.
+	 *
+	 * Ensures the device_label column exists. Previously this was checked on
+	 * every request via SHOW COLUMNS; it now runs only through the version gate.
+	 *
+	 * @return void
+	 */
+	private function migrate_to_version_7() {
+		global $wpdb;
+
+		if ( ! $this->has_column( 'device_label' ) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Schema migration requires direct queries.
+			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN device_label varchar(80) DEFAULT ''" );
 		}
 	}
 
@@ -435,7 +449,7 @@ class Request_Monitor {
 			'ip_level'    => $ip_level,
 			'ip_header'   => get_option( 'SAMAN_SEO_404_log_ip_header', 'REMOTE_ADDR' ),
 			'log_referer' => ! empty( get_option( 'SAMAN_SEO_404_log_referer', '1' ) ),
-			'ignore_bots' => ! empty( get_option( 'SAMAN_SEO_404_log_ignore_bots', '0' ) ),
+			'ignore_bots' => ! empty( get_option( 'SAMAN_SEO_404_log_ignore_bots', '1' ) ),
 		);
 	}
 

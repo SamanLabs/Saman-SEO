@@ -23,6 +23,15 @@ defined( 'ABSPATH' ) || exit;
 class Frontend {
 
 	/**
+	 * Whether the active theme already rendered a <title> during template
+	 * load (e.g. a hardcoded wp_title()/wp_get_document_title() call in
+	 * header.php). When true, our own fallback renderer stays silent.
+	 *
+	 * @var bool
+	 */
+	private $theme_renders_title = false;
+
+	/**
 	 * Boot frontend hooks.
 	 *
 	 * @return void
@@ -32,14 +41,25 @@ class Frontend {
 			return;
 		}
 
-		// Initialize title handling immediately since we're already past after_setup_theme
-		$this->init_title_handling();
+		// Title handling must run after themes register their title-tag
+		// support (during after_setup_theme), otherwise we cannot detect
+		// how the theme renders <title> and risk emitting a duplicate tag.
+		if ( did_action( 'after_setup_theme' ) ) {
+			$this->init_title_handling();
+		} else {
+			add_action( 'after_setup_theme', array( $this, 'init_title_handling' ), 999 );
+		}
 
 		add_action( 'wp_head', array( $this, 'render_head_tags' ), 1 );
 		add_action( 'wp_head', array( $this, 'render_social_tags' ), 5 );
 		add_action( 'wp_head', array( $this, 'render_json_ld' ), 20 );
 		add_action( 'wp_head', array( $this, 'render_hreflang' ), 8 );
 		add_action( 'wp_head', array( $this, 'render_pagination_links' ), 9 );
+
+		// Inject SEO robot directives through the core wp_robots API so our
+		// directives merge with (instead of replace) everything else that is
+		// registered on the same filter by themes or other plugins.
+		add_filter( 'wp_robots', array( $this, 'filter_wp_robots' ) );
 
 		if ( \Saman\SEO\Helpers\module_enabled( 'breadcrumbs' ) ) {
 			add_shortcode( 'SAMAN_SEO_breadcrumbs', array( $this, 'breadcrumbs_shortcode' ) );
@@ -49,24 +69,28 @@ class Frontend {
 	/**
 	 * Initialize title tag handling.
 	 *
+	 * The plugin never prints its own <title> unless the theme provides no
+	 * mechanism at all. Exactly one of these paths produces the single tag:
+	 *
+	 * 1. Theme declares title-tag support -> core's _wp_render_title_tag()
+	 *    calls wp_get_document_title(), which receives the SEO title from
+	 *    the pre_get_document_title filter below.
+	 * 2. Legacy theme calls wp_title() in header.php -> the wp_title filter
+	 *    supplies the full SEO title.
+	 * 3. Neither -> our wp_head fallback renderer outputs one tag.
+	 *
 	 * @return void
 	 */
 	public function init_title_handling() {
-		// Remove WordPress default title tag generation so we don't end up
-		// with duplicate <title> tags when our own renderer fires.
-		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
-
-		// Remove WordPress default robots tag so we can emit a single,
-		// feature-complete robots directive set.
-		remove_action( 'wp_head', 'wp_robots', 1 );
-
 		// Supply the real SEO title to WordPress's document-title API.
 		// Themes and plugins that call wp_get_document_title() will now
 		// receive the optimized title instead of the default one.
 		add_filter( 'pre_get_document_title', array( $this, 'filter_document_title' ), 1 );
 
-		// Render our own <title> tag as a fallback for themes that do not
-		// declare title-tag support or that render it too late.
+		// Legacy shim for themes calling wp_title() directly in header.php.
+		add_filter( 'wp_title', array( $this, 'filter_wp_title' ), 1, 3 );
+
+		// Last-resort renderer for themes with neither mechanism.
 		add_action( 'wp_head', array( $this, 'render_plugin_title_tag' ), 0 );
 	}
 
@@ -77,6 +101,11 @@ class Frontend {
 	 * @return string
 	 */
 	public function filter_document_title( $title ) {
+		// Someone (usually the theme template) requested the document title
+		// before wp_head ran — remember it so our fallback renderer stays
+		// quiet and no duplicate <title> is emitted.
+		$this->theme_renders_title = true;
+
 		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
 			return $title;
 		}
@@ -84,6 +113,39 @@ class Frontend {
 		$post = $this->get_context_post();
 		$meta = $this->get_meta( $post );
 
+		$computed = $this->build_document_title( $post, $meta );
+
+		if ( '' === trim( $computed ) ) {
+			return $title;
+		}
+
+		return $computed;
+	}
+
+	/**
+	 * Filter wp_title() output for legacy themes.
+	 *
+	 * Old themes print `<title><?php wp_title( '|', true, 'right' ); ?></title>`
+	 * directly in header.php. Return the full computed SEO title so the tag
+	 * contains exactly one title instead of a concatenated duplicate.
+	 *
+	 * @param string $title       Current title passed by wp_title().
+	 * @param string $sep         Separator argument (unused, kept for signature).
+	 * @param string $seplocation Separator location (unused, kept for signature).
+	 * @return string
+	 */
+	public function filter_wp_title( $title, $sep = '', $seplocation = '' ) {
+		unset( $sep, $seplocation );
+
+		// The theme renders its own <title> around this call; never add ours.
+		$this->theme_renders_title = true;
+
+		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
+			return $title;
+		}
+
+		$post     = $this->get_context_post();
+		$meta     = $this->get_meta( $post );
 		$computed = $this->build_document_title( $post, $meta );
 
 		if ( '' === trim( $computed ) ) {
@@ -120,17 +182,7 @@ class Frontend {
 
 		// Handle archive pages (404, search, author, date).
 		$archive_defaults = $this->get_archive_defaults();
-		$archive_type     = null;
-
-		if ( is_404() ) {
-			$archive_type = '404';
-		} elseif ( is_search() ) {
-			$archive_type = 'search';
-		} elseif ( is_author() ) {
-			$archive_type = 'author';
-		} elseif ( is_date() ) {
-			$archive_type = 'date';
-		}
+		$archive_type     = $this->get_archive_type();
 
 		if ( $archive_type ) {
 			$title_template = $archive_defaults[ $archive_type ]['title_template'] ?? '';
@@ -245,17 +297,7 @@ class Frontend {
 		// Add archive page description support
 		if ( empty( $description ) ) {
 			$archive_defaults = $this->get_archive_defaults();
-			$archive_type     = null;
-
-			if ( is_404() ) {
-				$archive_type = '404';
-			} elseif ( is_search() ) {
-				$archive_type = 'search';
-			} elseif ( is_author() ) {
-				$archive_type = 'author';
-			} elseif ( is_date() ) {
-				$archive_type = 'date';
-			}
+			$archive_type     = $this->get_archive_type();
 
 			if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['description_template'] ) ) {
 				$description = $archive_defaults[ $archive_type ]['description_template'];
@@ -291,7 +333,6 @@ class Frontend {
 		$canonical = $this->get_canonical( $post, $meta );
 		$canonical = saman_seo_apply_filters( 'saman_seo_canonical', $canonical, $post );
 
-		$robots   = $this->get_robots( $meta );
 		$keywords = $homepage_keywords;
 		if ( empty( $keywords ) && $post instanceof WP_Post && ! empty( $post_type_keywords[ $post->post_type ] ) ) {
 			$keywords = $post_type_keywords[ $post->post_type ];
@@ -326,10 +367,6 @@ class Frontend {
 
 		if ( ! empty( $canonical ) ) {
 			printf( "<link rel=\"canonical\" href=\"%s\" />\n", esc_url( $canonical ) );
-		}
-
-		if ( ! empty( $robots ) ) {
-			printf( "<meta name=\"robots\" content=\"%s\" />\n", esc_attr( $robots ) );
 		}
 
 		if ( ! empty( $keywords ) ) {
@@ -441,8 +478,14 @@ class Frontend {
 			} elseif ( $post instanceof WP_Post && 'post' === $post->post_type ) {
 				$og_type = 'article';
 			} else {
-				// For other post types, check schema_itemtype from defaults.
-				$og_type = sanitize_text_field( $social_defaults['schema_itemtype'] ?? 'website' );
+				// For other post types, map the configured schema_itemtype to
+				// a valid og:type. Only 'article' and 'website' are legal
+				// values; anything else (e.g. full IRI strings) falls back to
+				// 'website'.
+				$og_type = strtolower( trim( (string) ( $social_defaults['schema_itemtype'] ?? '' ) ) );
+				if ( ! in_array( $og_type, array( 'article', 'website' ), true ) ) {
+					$og_type = 'website';
+				}
 			}
 
 			// Allow override via filter.
@@ -494,9 +537,22 @@ class Frontend {
 	/**
 	 * Render the plugin's generated <title> tag.
 	 *
+	 * Only used as a last resort: when the theme neither declares title-tag
+	 * support nor calls wp_title()/wp_get_document_title() on its own. In
+	 * every other case the theme's single tag carries the SEO title via the
+	 * document-title filters, and this stays silent to avoid duplicates.
+	 *
 	 * @return void
 	 */
 	public function render_plugin_title_tag() {
+		if ( $this->theme_renders_title ) {
+			return;
+		}
+
+		if ( current_theme_supports( 'title-tag' ) || wp_is_block_theme() ) {
+			return;
+		}
+
 		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
 			return;
 		}
@@ -520,15 +576,7 @@ class Frontend {
 	 */
 	private function get_archive_social_title() {
 		$archive_defaults = $this->get_archive_defaults();
-		$archive_type     = null;
-
-		if ( is_search() ) {
-			$archive_type = 'search';
-		} elseif ( is_author() ) {
-			$archive_type = 'author';
-		} elseif ( is_date() ) {
-			$archive_type = 'date';
-		}
+		$archive_type     = $this->get_archive_type();
 
 		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['title_template'] ) ) {
 			$title = render_template_safely( $archive_defaults[ $archive_type ]['title_template'], null );
@@ -601,15 +649,7 @@ class Frontend {
 	 */
 	private function get_archive_social_description() {
 		$archive_defaults = $this->get_archive_defaults();
-		$archive_type     = null;
-
-		if ( is_search() ) {
-			$archive_type = 'search';
-		} elseif ( is_author() ) {
-			$archive_type = 'author';
-		} elseif ( is_date() ) {
-			$archive_type = 'date';
-		}
+		$archive_type     = $this->get_archive_type();
 
 		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['description_template'] ) ) {
 			$description = render_template_safely( $archive_defaults[ $archive_type ]['description_template'], null );
@@ -642,6 +682,13 @@ class Frontend {
 	 * @return void
 	 */
 	public function render_json_ld() {
+		// Master switch for structured data output. Admin-side schema
+		// previews keep working because they build graphs via REST instead
+		// of going through wp_head.
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema' ) ) {
+			return;
+		}
+
 		$post = get_post();
 
 		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post );
@@ -652,7 +699,7 @@ class Frontend {
 
 		printf(
 			"<script type=\"application/ld+json\">%s</script>\n",
-			wp_json_encode( $payload )
+			wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP )
 		);
 	}
 
@@ -859,28 +906,72 @@ class Frontend {
 	}
 
 	/**
-	 * Compose robots meta.
+	 * Merge SEO robot directives into WordPress's wp_robots API.
+	 *
+	 * Core prints a single <meta name="robots"> tag from everything
+	 * registered on the wp_robots filter. Injecting here keeps directives
+	 * added by themes and other plugins intact instead of replacing the tag
+	 * with our own.
+	 *
+	 * @param array $robots Directives registered via the wp_robots API.
+	 *
+	 * @return array
+	 */
+	public function filter_wp_robots( $robots ) {
+		$robots = is_array( $robots ) ? $robots : array();
+
+		if ( ! is_singular() && ! is_home() && ! is_archive() && ! is_search() && ! is_404() ) {
+			return $robots;
+		}
+
+		$post = $this->get_context_post();
+		$meta = $this->get_meta( $post );
+
+		foreach ( $this->get_robots_directives( $meta ) as $directive ) {
+			// index/follow are implicit defaults; emitting them explicitly
+			// only creates conflict pairs inside the merged tag.
+			if ( 'index' === $directive || 'follow' === $directive ) {
+				continue;
+			}
+
+			$robots[ $directive ] = true;
+		}
+
+		// Negative directives win over any positive ones registered earlier.
+		if ( ! empty( $robots['noindex'] ) ) {
+			unset( $robots['index'] );
+		}
+		if ( ! empty( $robots['nofollow'] ) ) {
+			unset( $robots['follow'] );
+		}
+
+		return $robots;
+	}
+
+	/**
+	 * Compose robots meta string (legacy string path).
 	 *
 	 * @param array $meta Meta.
 	 *
 	 * @return string
 	 */
 	private function get_robots( $meta ) {
+		return implode( ', ', $this->get_robots_directives( $meta ) );
+	}
+
+	/**
+	 * Build the sanitized list of robots directives for the current request.
+	 *
+	 * @param array $meta Meta.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_robots_directives( $meta ) {
 		$directives = array();
 
 		// Check archive defaults for noindex (404, search, author, date)
 		$archive_defaults = $this->get_archive_defaults();
-		$archive_type     = null;
-
-		if ( is_404() ) {
-			$archive_type = '404';
-		} elseif ( is_search() ) {
-			$archive_type = 'search';
-		} elseif ( is_author() ) {
-			$archive_type = 'author';
-		} elseif ( is_date() ) {
-			$archive_type = 'date';
-		}
+		$archive_type     = $this->get_archive_type();
 
 		if ( $archive_type && ! empty( $archive_defaults[ $archive_type ]['noindex'] ) ) {
 			$directives[] = 'noindex';
@@ -955,7 +1046,7 @@ class Frontend {
 			$final_directives = array_diff( $final_directives, array( 'follow' ) );
 		}
 
-		return implode( ', ', array_values( $final_directives ) );
+		return array_values( $final_directives );
 	}
 
 	/**
@@ -1266,6 +1357,29 @@ class Frontend {
 		);
 
 		return wp_parse_args( $meta, $defaults );
+	}
+
+	/**
+	 * Resolve the current archive-like context.
+	 *
+	 * @return string|null One of '404', 'search', 'author', 'date', or null
+	 *                     when the request is not one of these contexts.
+	 */
+	private function get_archive_type() {
+		if ( is_404() ) {
+			return '404';
+		}
+		if ( is_search() ) {
+			return 'search';
+		}
+		if ( is_author() ) {
+			return 'author';
+		}
+		if ( is_date() ) {
+			return 'date';
+		}
+
+		return null;
 	}
 
 	/**

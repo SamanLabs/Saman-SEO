@@ -188,42 +188,6 @@ add_action(
 			\Saman\SEO\Admin_V2::get_instance();
 		}
 
-		if ( class_exists( '\Saman\SEO\Service\Video_Schema' ) ) {
-			new \Saman\SEO\Service\Video_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Course_Schema' ) ) {
-			new \Saman\SEO\Service\Course_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Software_Schema' ) ) {
-			new \Saman\SEO\Service\Software_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Book_Schema' ) ) {
-			new \Saman\SEO\Service\Book_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Music_Schema' ) ) {
-			new \Saman\SEO\Service\Music_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Movie_Schema' ) ) {
-			new \Saman\SEO\Service\Movie_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Restaurant_Schema' ) ) {
-			new \Saman\SEO\Service\Restaurant_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Service_Schema' ) ) {
-			new \Saman\SEO\Service\Service_Schema();
-		}
-
-		if ( class_exists( '\Saman\SEO\Service\Job_Posting_Schema' ) ) {
-			new \Saman\SEO\Service\Job_Posting_Schema();
-		}
-
 		// Initialize Schema Blocks (FAQ and HowTo Gutenberg blocks with schema).
 		if ( class_exists( '\Saman\SEO\Service\Schema_Blocks' ) ) {
 			( new \Saman\SEO\Service\Schema_Blocks() )->boot();

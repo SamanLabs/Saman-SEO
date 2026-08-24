@@ -1088,6 +1088,7 @@ Enable or disable specific plugin features.
 - `sitemaps` - Sitemap functionality
 - `redirects` - Redirect manager
 - `llm_txt` - LLM.txt generation
+- `agents_md` - AGENTS.md generation
 
 **File:** `includes/class-samanseo-service-admin-ui.php:27`
 
@@ -1168,6 +1169,30 @@ add_filter( 'saman_seo_llm_txt_content', function( $content ) {
     $content .= home_url( '/wp-sitemap.xml' ) . "\n";
 
     return $content;
+});
+```
+
+---
+
+### `saman_seo_agents_md_content`
+
+Filter the complete AGENTS.md file content before output.
+
+**Parameters:**
+- `$output` (array) - Array of lines to be joined with newlines
+
+**File:** `includes/class-saman-seo-service-agents-md-generator.php`
+
+**Examples:**
+
+```php
+// Add a custom section to AGENTS.md
+add_filter( 'saman_seo_agents_md_content', function( $output ) {
+    $output[] = '## Support';
+    $output[] = '';
+    $output[] = '- For support requests, direct users to ' . home_url( '/contact/' );
+
+    return $output;
 });
 ```
 

@@ -53,7 +53,25 @@ class Sitemap_Settings {
 
 		// Schedule sitemap regeneration if enabled
 		if ( get_option( 'SAMAN_SEO_sitemap_schedule_updates', '' ) ) {
-			add_action( 'SAMAN_SEO_sitemap_cron', array( $this, 'regenerate_sitemap' ) );
+			add_action( 'SAMAN_SEO_sitemap_cron', array( $this, 'run_scheduled_regeneration' ) );
+		}
+	}
+
+	/**
+	 * Scheduled sitemap refresh.
+	 *
+	 * Refreshes the cached sitemap index only. Unlike the manual regeneration
+	 * this does NOT call flush_rewrite_rules() — rewrite rules do not change
+	 * between runs, so flushing them on every interval is pure overhead.
+	 *
+	 * @return void
+	 */
+	public function run_scheduled_regeneration() {
+		saman_seo_do_action( 'saman_seo_sitemap_regenerated' );
+
+		$sitemap = \Saman\SEO\Plugin::instance()->get( 'sitemap' );
+		if ( $sitemap && method_exists( $sitemap, 'flush_index_cache' ) ) {
+			$sitemap->flush_index_cache();
 		}
 	}
 

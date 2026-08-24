@@ -51,6 +51,8 @@ class Sitemap_Controller extends REST_Controller {
 		'SAMAN_SEO_llm_txt_description',
 		'SAMAN_SEO_llm_txt_posts_per_type',
 		'SAMAN_SEO_llm_txt_include_excerpt',
+		'SAMAN_SEO_enable_agents_md',
+		'SAMAN_SEO_agents_md_guidelines',
 	);
 
 	/**
@@ -356,6 +358,9 @@ class Sitemap_Controller extends REST_Controller {
 		// Add LLM.txt URL
 		$settings['llm_txt_url'] = home_url( '/llm.txt' );
 
+		// Add AGENTS.md URL
+		$settings['agents_md_url'] = home_url( '/AGENTS.md' );
+
 		return $this->success( $settings );
 	}
 
@@ -379,7 +384,7 @@ class Sitemap_Controller extends REST_Controller {
 				// Sanitize based on type
 				if ( is_numeric( $value ) ) {
 					$value = absint( $value );
-				} elseif ( 'llm_txt_description' === $key ) {
+				} elseif ( 'llm_txt_description' === $key || 'agents_md_guidelines' === $key ) {
 					$value = sanitize_textarea_field( $value );
 				} else {
 					$value = sanitize_text_field( $value );
@@ -491,6 +496,8 @@ class Sitemap_Controller extends REST_Controller {
 			'SAMAN_SEO_llm_txt_description'     => get_bloginfo( 'description' ),
 			'SAMAN_SEO_llm_txt_posts_per_type'  => 50,
 			'SAMAN_SEO_llm_txt_include_excerpt' => '1',
+			'SAMAN_SEO_enable_agents_md'        => '1',
+			'SAMAN_SEO_agents_md_guidelines'    => '',
 		);
 
 		return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';

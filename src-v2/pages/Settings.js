@@ -78,9 +78,20 @@ const defaultSettings = {
 	// Data cleanup
 	delete_data_on_uninstall: false,
 	module_llm_txt: false,
+	module_agents_md: true,
 	module_local_seo: false,
 	module_internal_linking: true,
 	module_schema: true,
+	// Schema per-type toggles
+	module_schema_video: true,
+	module_schema_course: true,
+	module_schema_software: true,
+	module_schema_book: true,
+	module_schema_music: true,
+	module_schema_movie: true,
+	module_schema_restaurant: true,
+	module_schema_service: true,
+	module_schema_job_posting: true,
 	module_breadcrumbs: false,
 	// Breadcrumbs settings
 	breadcrumb_separator: '>',
@@ -797,10 +808,79 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 			key: 'module_schema',
 			name: __( 'Schema Markup', 'saman-seo' ),
 			desc: __(
-				'Add structured data for rich search results.',
+				'Master switch for all structured data output.',
 				'saman-seo'
 			),
 			icon: '📊',
+		},
+		{
+			key: 'module_schema_video',
+			name: __( 'Video Schema', 'saman-seo' ),
+			desc: __(
+				'VideoObject schema for embedded YouTube/Vimeo videos.',
+				'saman-seo'
+			),
+			icon: '🎬',
+		},
+		{
+			key: 'module_schema_course',
+			name: __( 'Course Schema', 'saman-seo' ),
+			desc: __( 'Course schema for the course post type.', 'saman-seo' ),
+			icon: '🎓',
+		},
+		{
+			key: 'module_schema_software',
+			name: __( 'Software Schema', 'saman-seo' ),
+			desc: __(
+				'SoftwareApplication schema for the software post type.',
+				'saman-seo'
+			),
+			icon: '💿',
+		},
+		{
+			key: 'module_schema_book',
+			name: __( 'Book Schema', 'saman-seo' ),
+			desc: __( 'Book schema for the book post type.', 'saman-seo' ),
+			icon: '📚',
+		},
+		{
+			key: 'module_schema_music',
+			name: __( 'Music Schema', 'saman-seo' ),
+			desc: __( 'MusicGroup schema for the music post type.', 'saman-seo' ),
+			icon: '🎵',
+		},
+		{
+			key: 'module_schema_movie',
+			name: __( 'Movie Schema', 'saman-seo' ),
+			desc: __( 'Movie schema for the movie post type.', 'saman-seo' ),
+			icon: '🍿',
+		},
+		{
+			key: 'module_schema_restaurant',
+			name: __( 'Restaurant Schema', 'saman-seo' ),
+			desc: __(
+				'Restaurant schema for the restaurant post type.',
+				'saman-seo'
+			),
+			icon: '🍽️',
+		},
+		{
+			key: 'module_schema_service',
+			name: __( 'Service Schema', 'saman-seo' ),
+			desc: __(
+				'Service schema for the service post type.',
+				'saman-seo'
+			),
+			icon: '🛠️',
+		},
+		{
+			key: 'module_schema_job_posting',
+			name: __( 'Job Posting Schema', 'saman-seo' ),
+			desc: __(
+				'JobPosting schema for the job posting post type.',
+				'saman-seo'
+			),
+			icon: '💼',
 		},
 		{
 			key: 'module_social_cards',

@@ -15,6 +15,13 @@ defined( 'ABSPATH' ) || exit;
 class Sitemap_Enhancer {
 
 	/**
+	 * Transient key caching the computed sitemap index items.
+	 *
+	 * @var string
+	 */
+	private const INDEX_CACHE_KEY = 'SAMAN_SEO_sitemap_index_cache';
+
+	/**
 	 * Internal flag allowing temporary access to WP core sitemaps.
 	 *
 	 * @var bool
@@ -34,6 +41,13 @@ class Sitemap_Enhancer {
 	 * @var array<int,array<string,mixed>>
 	 */
 	private $sitemap_map = array();
+
+	/**
+	 * Per-request cache of newest modification timestamp per post type.
+	 *
+	 * @var array<string,int>
+	 */
+	private $post_type_lastmod = array();
 
 	/**
 	 * Cache for generated sitemap page URL lists.
@@ -103,6 +117,11 @@ class Sitemap_Enhancer {
 		add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'filter_stylesheet_url' ) );
 		add_action( 'init', array( $this, 'register_custom_sitemap' ) );
 		add_action( 'template_redirect', array( $this, 'render_custom_sitemap' ), 0 );
+
+		// Invalidate the cached sitemap index when content changes.
+		add_action( 'save_post', array( $this, 'flush_index_cache' ) );
+		add_action( 'deleted_post', array( $this, 'flush_index_cache' ) );
+		add_action( 'trashed_post', array( $this, 'flush_index_cache' ) );
 	}
 
 	/**
@@ -427,6 +446,11 @@ class Sitemap_Enhancer {
 	 * @return array<int,array<string,string>>
 	 */
 	private function get_sitemap_index_items() {
+		$cached = get_transient( self::INDEX_CACHE_KEY );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		$groups = $this->get_sitemap_map();
 
 		if ( empty( $groups ) ) {
@@ -465,7 +489,20 @@ class Sitemap_Enhancer {
 			);
 		}
 
-		return saman_seo_apply_filters( 'saman_seo_sitemap_index_items', $items );
+		$items = saman_seo_apply_filters( 'saman_seo_sitemap_index_items', $items );
+
+		set_transient( self::INDEX_CACHE_KEY, $items, DAY_IN_SECONDS );
+
+		return $items;
+	}
+
+	/**
+	 * Invalidate the cached sitemap index when content changes.
+	 *
+	 * @return void
+	 */
+	public function flush_index_cache() {
+		delete_transient( self::INDEX_CACHE_KEY );
 	}
 
 	/**
@@ -788,6 +825,14 @@ class Sitemap_Enhancer {
 		$filtered_lastmod = saman_seo_apply_filters( 'saman_seo_sitemap_lastmod', '', $group, $page );
 		$timestamp        = $this->parse_lastmod_timestamp( $filtered_lastmod );
 
+		// For post-type groups, use a single MAX(post_modified_gmt) query
+		// instead of hydrating every URL on the page. The index only needs the
+		// newest modification for the group, so the same value serves every
+		// page of that group.
+		if ( ! $timestamp && 'posts' === ( $group['provider'] ?? '' ) && ! empty( $group['subtype'] ) ) {
+			$timestamp = $this->get_post_type_lastmod( $group['subtype'] );
+		}
+
 		if ( ! $timestamp ) {
 			$url_list  = $this->fetch_sitemap_urls( $group, $page );
 			$timestamp = $this->get_latest_lastmod_from_list( $url_list );
@@ -798,6 +843,35 @@ class Sitemap_Enhancer {
 		}
 
 		return $this->format_lastmod_timestamp( $timestamp );
+	}
+
+	/**
+	 * Newest post_modified_gmt for a post type, as a Unix timestamp. Memoized
+	 * per request; a single indexed aggregate query rather than loading rows.
+	 *
+	 * @param string $post_type Post type slug.
+	 * @return int
+	 */
+	private function get_post_type_lastmod( $post_type ) {
+		global $wpdb;
+
+		if ( isset( $this->post_type_lastmod[ $post_type ] ) ) {
+			return $this->post_type_lastmod[ $post_type ];
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$value = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT MAX(post_modified_gmt) FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'",
+				$post_type
+			)
+		);
+
+		$timestamp = $value ? (int) strtotime( $value . ' GMT' ) : 0;
+
+		$this->post_type_lastmod[ $post_type ] = $timestamp;
+
+		return $timestamp;
 	}
 
 	/**
@@ -1491,7 +1565,7 @@ class Sitemap_Enhancer {
 		// Google News sitemaps accept up to 1,000 URLs per file. Allow filtering
 		// for sites with heavier recent publishing volumes.
 		// phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Google News max URLs.
-		$posts_per_page = apply_filters( 'saman_seo_news_sitemap_posts_per_page', 1000 );
+		$posts_per_page = saman_seo_apply_filters( 'saman_seo_news_sitemap_posts_per_page', 1000 );
 
 		$posts = get_posts(
 			array(
@@ -1574,7 +1648,7 @@ class Sitemap_Enhancer {
 			foreach ( $videos as $video ) :
 				$thumbnail   = '';
 				$title       = get_the_title( $post );
-				$description = wp_trim_words( wp_strip_all_tags( $post->post_content ), 50 );
+				$description = \Saman\SEO\Helpers\generate_content_snippet( $post, 50 );
 
 				if ( 'youtube' === $video['platform'] ) {
 					$thumbnail   = $this->get_youtube_thumbnail_url( $video['id'] );

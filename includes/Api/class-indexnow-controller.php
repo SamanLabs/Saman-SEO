@@ -289,11 +289,14 @@ class IndexNow_Controller extends REST_Controller {
 
 		$settings = $service->get_settings();
 
-		// Mask API key for display (show first 8 and last 4 chars).
+		// Never return the raw key in the API response; expose only a masked
+		// display value and a boolean the UI can use.
+		$settings['has_api_key'] = ! empty( $settings['api_key'] );
 		if ( ! empty( $settings['api_key'] ) ) {
 			$key                         = $settings['api_key'];
 			$settings['api_key_display'] = substr( $key, 0, 8 ) . '...' . substr( $key, -4 );
 		}
+		unset( $settings['api_key'] );
 
 		return $this->success( $settings );
 	}

@@ -15,14 +15,31 @@ defined( 'ABSPATH' ) || exit;
 class Compatibility {
 
 	/**
-	 * Conflicting plugin slugs.
+	 * Conflicting plugins.
 	 *
-	 * @var array<string,string>
+	 * Detection relies on version constants, which conflicting SEO plugins
+	 * define while their main file loads (before plugins_loaded). Their
+	 * classes are autoloaded lazily, so class_exists() alone misses active
+	 * installs depending on plugin load order.
+	 *
+	 * @var array<string,array{label:string,constant:string,class:string}>
 	 */
 	private $conflicts = array(
-		'yoast'     => 'WPSEO_Frontend',
-		'rank-math' => 'RankMath',
-		'aioseo'    => 'All_in_One_SEO_Pack',
+		'yoast'     => array(
+			'label'    => 'Yoast SEO',
+			'constant' => 'WPSEO_VERSION',
+			'class'    => 'WPSEO_Frontend',
+		),
+		'rank-math' => array(
+			'label'    => 'Rank Math SEO',
+			'constant' => 'RANK_MATH_VERSION',
+			'class'    => 'RankMath',
+		),
+		'aioseo'    => array(
+			'label'    => 'All in One SEO',
+			'constant' => 'AIOSEO_VERSION',
+			'class'    => 'All_in_One_SEO_Pack',
+		),
 	);
 
 	/**
@@ -38,10 +55,8 @@ class Compatibility {
 	 * @return void
 	 */
 	public function boot() {
-		include_once ABSPATH . 'wp-admin/includes/plugin.php';
-
-		foreach ( $this->conflicts as $slug => $class ) {
-			if ( class_exists( $class ) ) {
+		foreach ( $this->conflicts as $slug => $marker ) {
+			if ( defined( $marker['constant'] ) || class_exists( $marker['class'] ) ) {
 				$this->active_conflict = $slug;
 				break;
 			}
@@ -145,13 +160,19 @@ class Compatibility {
 			return;
 		}
 
+		if ( ! function_exists( 'get_plugin_data' ) ) {
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$label = $this->conflicts[ $this->active_conflict ]['label'] ?? $this->active_conflict;
+
 		printf(
 			'<div class="notice notice-warning"><p>%s</p></div>',
 			wp_kses_post(
 				sprintf(
 					/* translators: %s: plugin name. */
 					__( 'Saman SEO detected another SEO plugin. Some overlapping features are disabled until you deactivate %s or run the migration.', 'saman-seo' ),
-					esc_html( $this->active_conflict )
+					esc_html( $label )
 				)
 			)
 		);

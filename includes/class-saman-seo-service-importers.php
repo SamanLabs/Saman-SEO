@@ -94,21 +94,25 @@ class Importers {
 	 * @return array
 	 */
 	private function export_meta() {
-		$posts = get_posts(
-			array(
-				'post_type'      => 'any',
-				'post_status'    => 'any',
-				'posts_per_page' => -1,
-				'fields'         => 'ids',
+		global $wpdb;
+
+		// One indexed query over postmeta instead of loading every post ID and
+		// issuing a separate get_post_meta() per post (which does not prime the
+		// meta cache with fields => ids).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				Post_Meta::META_KEY
 			)
 		);
 
 		$meta = array();
 
-		foreach ( $posts as $post_id ) {
-			$value = get_post_meta( $post_id, Post_Meta::META_KEY, true );
+		foreach ( $rows as $row ) {
+			$value = maybe_unserialize( $row->meta_value );
 			if ( $value ) {
-				$meta[ $post_id ] = $value;
+				$meta[ (int) $row->post_id ] = $value;
 			}
 		}
 

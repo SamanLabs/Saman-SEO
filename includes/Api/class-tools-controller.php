@@ -531,7 +531,7 @@ class Tools_Controller extends REST_Controller {
 				continue;
 			}
 
-			$content = wp_strip_all_tags( $post->post_content );
+			$content = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
 			$content = substr( $content, 0, 2000 ); // Limit content
 
 			$suggestion = array(
@@ -821,7 +821,7 @@ class Tools_Controller extends REST_Controller {
 			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
-		$content = wp_strip_all_tags( $post->post_content );
+		$content = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
 		$content = substr( $content, 0, 1500 );
 
 		$prompt  = "Analyze this content and determine the best Schema.org type:\n\n";
@@ -884,7 +884,7 @@ class Tools_Controller extends REST_Controller {
 			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
-		$content        = wp_strip_all_tags( $post->post_content );
+		$content        = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
 		$content        = substr( $content, 0, 2000 );
 		$featured_image = get_the_post_thumbnail_url( $post_id, 'full' );
 		$author         = get_the_author_meta( 'display_name', $post->post_author );

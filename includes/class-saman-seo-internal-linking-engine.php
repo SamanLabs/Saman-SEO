@@ -94,11 +94,10 @@ class Engine {
 		$post = $args['post'] ?? get_post();
 		$url  = $args['url'] ?? ( $post instanceof WP_Post ? get_permalink( $post ) : '' );
 
-		$rules = $this->get_prepared_rules( $post, $url, $context_type );
-		if ( empty( $rules ) ) {
-			return $content;
-		}
-
+		// Check the rendered-content cache BEFORE preparing rules. Rule
+		// preparation resolves a permalink per rule, so paying it on cache hits
+		// (the common case) is pure waste — the cache key only needs the post
+		// and the repository version.
 		$cache_enabled = ( 'content' === $context_type ) && ! empty( $this->get_settings()['cache_rendered_content'] ) && $post instanceof WP_Post;
 		if ( $cache_enabled ) {
 			$cache_key = $this->get_cache_key( $post->ID );
@@ -107,6 +106,11 @@ class Engine {
 			if ( is_array( $cached ) && isset( $cached['version'], $cached['content'] ) && $cached['version'] === $this->repository->get_version() ) {
 				return $cached['content'];
 			}
+		}
+
+		$rules = $this->get_prepared_rules( $post, $url, $context_type );
+		if ( empty( $rules ) ) {
+			return $content;
 		}
 
 		$this->reset_report();

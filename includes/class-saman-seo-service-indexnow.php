@@ -63,12 +63,20 @@ class IndexNow {
 	 * @return void
 	 */
 	public function boot() {
+		// Keep the schema current on any boot, like the other table-backed
+		// services, rather than only on the activation hook.
+		$this->maybe_upgrade_schema();
+
 		$settings = $this->get_settings();
 
 		// Register rewrite rule for key file verification.
 		add_action( 'init', array( $this, 'register_rewrite_rules' ) );
 		add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
 		add_action( 'template_redirect', array( $this, 'serve_key_file' ) );
+
+		// Deferred submission handler — always registered so queued events fire
+		// even if the feature is toggled between scheduling and running.
+		add_action( 'SAMAN_SEO_indexnow_submit', array( $this, 'cron_submit' ), 10, 2 );
 
 		// Only register submission hooks if enabled.
 		if ( empty( $settings['enabled'] ) ) {
@@ -119,7 +127,7 @@ class IndexNow {
 			'submit_on_publish' => ! empty( $settings['submit_on_publish'] ),
 			'submit_on_update'  => ! empty( $settings['submit_on_update'] ),
 			'post_types'        => $this->sanitize_post_types( $settings['post_types'] ?? $current['post_types'] ),
-			'search_engine'     => sanitize_text_field( $settings['search_engine'] ?? $current['search_engine'] ),
+			'search_engine'     => $this->sanitize_search_engine( $settings['search_engine'] ?? $current['search_engine'] ),
 		);
 
 		// Generate API key if enabled and none exists.
@@ -151,6 +159,23 @@ class IndexNow {
 		$valid_types = get_post_types( array( 'public' => true ) );
 
 		return array_values( array_intersect( $post_types, $valid_types ) );
+	}
+
+	/**
+	 * Constrain the search engine host to the known allowlist so the URL list
+	 * and API key can only ever be POSTed to a trusted endpoint.
+	 *
+	 * @param string $engine Requested search engine host.
+	 * @return string A host guaranteed to be in $search_engines.
+	 */
+	private function sanitize_search_engine( $engine ) {
+		$engine = sanitize_text_field( $engine );
+
+		if ( isset( $this->search_engines[ $engine ] ) ) {
+			return $engine;
+		}
+
+		return 'api.indexnow.org';
 	}
 
 	/**
@@ -302,7 +327,24 @@ class IndexNow {
 
 		$url = get_permalink( $post->ID );
 
-		return $this->submit_url( $url, $post->ID );
+		// Defer the outbound submission to cron so publishing/updating a post
+		// never blocks on IndexNow's HTTP response.
+		if ( ! wp_next_scheduled( 'SAMAN_SEO_indexnow_submit', array( $url, $post->ID ) ) ) {
+			wp_schedule_single_event( time(), 'SAMAN_SEO_indexnow_submit', array( $url, $post->ID ) );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Deferred cron handler: perform the actual IndexNow submission.
+	 *
+	 * @param string   $url     URL to submit.
+	 * @param int|null $post_id Optional post ID for logging.
+	 * @return void
+	 */
+	public function cron_submit( $url, $post_id = null ) {
+		$this->submit_url( $url, $post_id );
 	}
 
 	/**
@@ -339,7 +381,9 @@ class IndexNow {
 
 		$host          = wp_parse_url( home_url(), PHP_URL_HOST );
 		$api_key       = $settings['api_key'];
-		$search_engine = $settings['search_engine'] ?? 'api.indexnow.org';
+		// Defensive: constrain to the allowlist even if the option was written
+		// directly, so the key/URL list can never be sent to a rogue host.
+		$search_engine = $this->sanitize_search_engine( $settings['search_engine'] ?? 'api.indexnow.org' );
 
 		$endpoint = sprintf( 'https://%s/indexnow', $search_engine );
 
@@ -536,6 +580,18 @@ class IndexNow {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, truncate requires direct query.
 		return $wpdb->query( "TRUNCATE TABLE {$table}" );
+	}
+
+	/**
+	 * Recreate the table when the stored schema version is behind. Cheap on the
+	 * common path: one option read and an integer comparison.
+	 *
+	 * @return void
+	 */
+	private function maybe_upgrade_schema() {
+		if ( (int) get_option( 'SAMAN_SEO_indexnow_schema_version', 0 ) < self::SCHEMA_VERSION ) {
+			$this->create_tables();
+		}
 	}
 
 	/**

@@ -37,7 +37,7 @@ class Schema_Validator_Controller extends REST_Controller {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'validate_url' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'permission_check' ),
 				'args'                => array(
 					'url' => array(
 						'required'          => true,
@@ -58,7 +58,7 @@ class Schema_Validator_Controller extends REST_Controller {
 	public function validate_url( $request ) {
 		$url = $request->get_param( 'url' );
 
-		if ( empty( $url ) ) {
+		if ( empty( $url ) || ! wp_http_validate_url( $url ) ) {
 			return $this->error( 'Please provide a valid URL' );
 		}
 
@@ -68,7 +68,6 @@ class Schema_Validator_Controller extends REST_Controller {
 			array(
 				'timeout'    => 15,
 				'user-agent' => 'Saman SEO Schema Validator/1.0',
-				'sslverify'  => false,
 			)
 		);
 

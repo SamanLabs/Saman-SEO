@@ -20,6 +20,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Plugin_Installer {
 
 	/**
+	 * Whether a download URL points at a trusted source (GitHub).
+	 *
+	 * @param string $download_url Download URL.
+	 * @return bool
+	 */
+	private static function is_trusted_source( string $download_url ): bool {
+		$host = wp_parse_url( $download_url, PHP_URL_HOST );
+		if ( ! $host ) {
+			return false;
+		}
+
+		$host = strtolower( $host );
+
+		/**
+		 * Filters the trusted host suffixes for plugin installation.
+		 *
+		 * @since 0.2.0
+		 *
+		 * @param string[] $suffixes Allowed host suffixes.
+		 */
+		$allowed = saman_seo_apply_filters(
+			'saman_seo_plugin_install_trusted_hosts',
+			array( 'github.com', 'githubusercontent.com' )
+		);
+
+		foreach ( $allowed as $suffix ) {
+			$suffix = strtolower( $suffix );
+			if ( $host === $suffix || substr( $host, -strlen( '.' . $suffix ) ) === '.' . $suffix ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Load required WordPress admin files.
 	 */
 	private static function load_wp_admin_files() {
@@ -39,6 +75,16 @@ class Plugin_Installer {
 	 * @return array Result with success status and message.
 	 */
 	public static function install( string $download_url, string $plugin_file ): array {
+		// Only ever install from trusted sources. This method has no caller
+		// today, but constrain the download host now so it cannot be wired up
+		// later into an arbitrary-source install.
+		if ( ! self::is_trusted_source( $download_url ) ) {
+			return array(
+				'success' => false,
+				'message' => __( 'Refusing to install from an untrusted source.', 'saman-seo' ),
+			);
+		}
+
 		self::load_wp_admin_files();
 
 		// Create upgrader with skin that captures output.

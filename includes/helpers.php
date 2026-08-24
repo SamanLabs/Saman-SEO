@@ -49,6 +49,7 @@ namespace Saman\SEO\Helpers {
 			'redirects'      => 'SAMAN_SEO_enable_redirect_manager',
 			'404_log'        => 'SAMAN_SEO_enable_404_logging',
 			'llm_txt'        => 'SAMAN_SEO_enable_llm_txt',
+			'agents_md'      => 'SAMAN_SEO_enable_agents_md',
 			'local_seo'      => 'SAMAN_SEO_enable_local_seo',
 			'social_cards'   => 'SAMAN_SEO_enable_og_preview',
 			'analytics'      => 'SAMAN_SEO_enable_analytics',
@@ -361,6 +362,33 @@ namespace Saman\SEO\Helpers {
 	}
 
 	/**
+	 * Strip HTML to plain text without merging words across block/inline tags.
+	 *
+	 * `wp_strip_all_tags()` alone turns "<p>Venezuelan</p><p>culinary</p>" into
+	 * "Venezuelanculinary". This drops script/style contents entirely and
+	 * replaces every remaining tag with a space first, so adjacent elements keep
+	 * a word boundary. Returns the full collapsed text (no word trimming).
+	 *
+	 * @param string $content Raw HTML content.
+	 * @return string
+	 */
+	function strip_content_to_text( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return '';
+		}
+
+		$content = preg_replace( '/<!--(.|\s)*?-->/', ' ', $content );
+		// Drop script/style contents entirely so their text never leaks in.
+		$content = preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', $content );
+		// Replace remaining tags with a space so text in adjacent block/inline
+		// elements keeps a word boundary and does not merge.
+		$content = preg_replace( '/<[^>]+>/', ' ', $content );
+		$content = \wp_strip_all_tags( $content );
+
+		return trim( preg_replace( '/\s+/', ' ', $content ) );
+	}
+
+	/**
 	 * Generate a trimmed snippet from post content.
 	 *
 	 * @param WP_Post|int $post  Post object or ID.
@@ -380,16 +408,7 @@ namespace Saman\SEO\Helpers {
 			$content = \strip_shortcodes( $content );
 		}
 
-		$content = preg_replace( '/<!--(.|\s)*?-->/', ' ', $content );
-		// Drop script/style contents entirely so their text never leaks in.
-		$content = preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', $content );
-		// Replace remaining tags with a space (rather than removing them) so text in
-		// adjacent block/inline elements keeps a word boundary and does not merge,
-		// e.g. "<p>Venezuelan</p><p>culinary</p>" -> "Venezuelan culinary", not
-		// "Venezuelanculinary". wp_strip_all_tags() alone would produce the latter.
-		$content = preg_replace( '/<[^>]+>/', ' ', $content );
-		$content = \wp_strip_all_tags( $content );
-		$content = trim( preg_replace( '/\s+/', ' ', $content ) );
+		$content = strip_content_to_text( $content );
 
 		if ( empty( $content ) ) {
 			$content = \wp_strip_all_tags( $post->post_excerpt ?: \get_the_excerpt( $post ) );

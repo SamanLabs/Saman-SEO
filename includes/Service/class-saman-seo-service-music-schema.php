@@ -20,6 +20,10 @@ class Music_Schema {
 	 * @return void
 	 */
 	public function boot() {
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema_music' ) ) {
+			return;
+		}
+
 		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_music_schema_to_graph' ), 20, 2 );
 	}
 
