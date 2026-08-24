@@ -498,6 +498,29 @@ const SEOPanel = ( {
 							/>
 							<span className="saman-seo-toggle-slider"></span>
 						</label>
+
+						<label className="saman-seo-toggle">
+							<span className="saman-seo-toggle-label">
+								{ __( 'Hide from XML sitemap', 'saman-seo' ) }
+								<small>
+									{ __(
+										'Exclude this page from sitemap files',
+										'saman-seo'
+									) }
+								</small>
+							</span>
+							<input
+								type="checkbox"
+								checked={ seoMeta.sitemap_exclude || false }
+								onChange={ ( e ) =>
+									updateMeta(
+										'sitemap_exclude',
+										e.target.checked
+									)
+								}
+							/>
+							<span className="saman-seo-toggle-slider"></span>
+						</label>
 					</div>
 
 					{ /* Robots Preview */ }

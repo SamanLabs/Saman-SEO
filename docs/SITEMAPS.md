@@ -200,6 +200,43 @@ update_option( 'samanseo_sitemap_exclude_images', '0' ); // Include images
 update_option( 'samanseo_sitemap_exclude_images', '1' ); // Exclude images
 ```
 
+### Excluding Individual Posts
+
+Three complementary ways to keep a single published URL out of the sitemaps
+(XML, RSS, and Google News all respect these):
+
+1. **Per-post toggle (editor UI).** In the Saman SEO panel of the block editor,
+   enable **Hide from XML sitemap** under Search Engine Visibility. This stores
+   `sitemap_exclude` inside `_SAMAN_SEO_meta`.
+
+2. **Automatic noindex exclusion.** When `SAMAN_SEO_sitemap_exclude_noindex`
+   is enabled (default), any post whose SEO meta has noindex set is dropped
+   from sitemaps automatically. A URL listed in a sitemap should always be
+   indexable.
+
+   ```php
+   update_option( 'SAMAN_SEO_sitemap_exclude_noindex', '1' );
+   ```
+
+3. **Manual ID blocklist.** Comma-separated post IDs excluded everywhere —
+   useful for utility pages (search results, thank-you pages) without editing
+   each one.
+
+   ```php
+   update_option( 'SAMAN_SEO_sitemap_excluded_post_ids', '878, 1043' );
+   ```
+
+Developers can extend or replace the blocklist programmatically:
+
+```php
+add_filter( 'saman_seo_sitemap_excluded_post_ids', function( $ids, $post_type ) {
+    if ( 'page' === $post_type ) {
+        $ids[] = 878; // Hide a single page.
+    }
+    return $ids;
+}, 10, 2 );
+```
+
 ---
 
 ## Sitemap Types

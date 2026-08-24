@@ -162,6 +162,8 @@ class Settings {
 		'SAMAN_SEO_sitemap_enable_google_news'       => '0',
 		'SAMAN_SEO_sitemap_google_news_post_types'   => array(),
 		'SAMAN_SEO_sitemap_additional_pages'         => array(),
+		'SAMAN_SEO_sitemap_exclude_noindex'          => '1',
+		'SAMAN_SEO_sitemap_excluded_post_ids'        => '',
 
 		// Schema output: master toggle plus per-type toggles.
 		'SAMAN_SEO_module_schema'                    => '1',
@@ -300,6 +302,8 @@ class Settings {
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_breadcrumbs', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_image_seo', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_image_seo_settings', array( $this, 'sanitize_image_seo_settings' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_sitemap_exclude_noindex', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_sitemap_excluded_post_ids', array( $this, 'sanitize_post_id_list' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_breadcrumb_settings', array( $this, 'sanitize_breadcrumb_settings' ) );
 
 		// Schema output toggles (master + per-type).
@@ -1011,6 +1015,27 @@ class Settings {
 									? $value['layout']
 									: 'default',
 		);
+	}
+
+	/**
+	 * Sanitize a comma/space separated list of post IDs.
+	 *
+	 * @param mixed $value Raw value.
+	 *
+	 * @return string Normalized comma-separated ID list.
+	 */
+	public function sanitize_post_id_list( $value ) {
+		if ( is_array( $value ) ) {
+			$value = implode( ',', $value );
+		}
+
+		$parts = preg_split( '/[\s,]+/', (string) $value, -1, PREG_SPLIT_NO_EMPTY );
+
+		$ids = array_filter(
+			array_map( 'absint', is_array( $parts ) ? $parts : array() )
+		);
+
+		return implode( ', ', array_unique( $ids ) );
 	}
 
 	/**

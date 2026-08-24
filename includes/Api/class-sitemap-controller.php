@@ -38,6 +38,8 @@ class Sitemap_Controller extends REST_Controller {
 		'SAMAN_SEO_sitemap_google_news_name',
 		'SAMAN_SEO_sitemap_google_news_post_types',
 		'SAMAN_SEO_sitemap_additional_pages',
+		'SAMAN_SEO_sitemap_exclude_noindex',
+		'SAMAN_SEO_sitemap_excluded_post_ids',
 	);
 
 	/**
