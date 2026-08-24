@@ -59,6 +59,34 @@ jobs:
       - name: Run PHPCS
         run: composer run lint
 
+  phpunit:
+    name: Unit Tests (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.1', '8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+          tools: composer
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Dump autoload (pick up new classmap files)
+        run: composer dump-autoload -o
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --testdox
+
   js-build:
     name: JavaScript Build
     runs-on: ubuntu-latest

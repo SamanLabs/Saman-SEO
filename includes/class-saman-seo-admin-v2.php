@@ -392,6 +392,7 @@ class Admin_V2 {
 			'Htaccess'         => 'class-htaccess-controller.php',
 			'Mobile_Test'      => 'class-mobile-test-controller.php',
 			'Schema_Preview'   => 'class-schema-preview-controller.php',
+			'Image_SEO'        => 'class-image-seo-controller.php',
 		);
 
 		foreach ( $controllers as $controller => $file ) {

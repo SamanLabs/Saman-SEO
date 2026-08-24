@@ -30,3 +30,4 @@ nul
 /jsonld_examples
 squirrel.toml
 *.png
+.phpunit.result.cache
