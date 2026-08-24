@@ -64,6 +64,9 @@ class Post_Meta {
 				'nofollow'             => array(
 					'type' => 'string',
 				),
+				'sitemap_exclude'      => array(
+					'type' => 'string',
+				),
 				'og_image'             => array(
 					'type' => 'string',
 				),
@@ -137,6 +140,7 @@ class Post_Meta {
 		$clean['canonical']       = isset( $value['canonical'] ) ? esc_url_raw( $value['canonical'] ) : '';
 		$clean['noindex']         = ! empty( $value['noindex'] ) ? '1' : '';
 		$clean['nofollow']        = ! empty( $value['nofollow'] ) ? '1' : '';
+		$clean['sitemap_exclude'] = ! empty( $value['sitemap_exclude'] ) ? '1' : '';
 		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
 		$clean['schema_type']     = isset( $value['schema_type'] ) ? sanitize_text_field( $value['schema_type'] ) : '';
 		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? wp_kses_post( wp_unslash( $value['custom_schema'] ) ) : '';

@@ -304,6 +304,8 @@ class Sitemap_Enhancer {
 	 * @return array
 	 */
 	public function filter_posts_query_args( $args, $post_type ) {
+		$args = $this->apply_post_exclusions( $args, $post_type );
+
 		/**
 		 * Filter the WP_Query args for sitemap generation.
 		 *
@@ -311,6 +313,158 @@ class Sitemap_Enhancer {
 		 * @param string $post_type Post type slug.
 		 */
 		return saman_seo_apply_filters( 'saman_seo_sitemap_post_query_args', $args, $post_type );
+	}
+
+	/**
+	 * Apply per-post sitemap exclusions to a posts query.
+	 *
+	 * Three sources, all optional:
+	 * - The per-post "exclude from sitemap" toggle stored in plugin meta.
+	 * - Posts marked noindex (when SAMAN_SEO_sitemap_exclude_noindex is on).
+	 * - A manual ID blocklist (option + saman_seo_sitemap_excluded_post_ids).
+	 *
+	 * @param array  $args      Query args.
+	 * @param string $post_type Post type.
+	 *
+	 * @return array
+	 */
+	public function apply_post_exclusions( $args, $post_type = '' ) {
+		if ( ! is_array( $args ) ) {
+			$args = array();
+		}
+
+		// Manual ID blocklist.
+		$excluded_ids = $this->get_manually_excluded_post_ids( $post_type );
+
+		if ( ! empty( $excluded_ids ) ) {
+			$args['post__not_in'] = array_values(
+				array_unique(
+					array_merge( (array) ( $args['post__not_in'] ?? array() ), $excluded_ids )
+				)
+			);
+		}
+
+		// Meta-based exclusions: each is an OR-pair so posts without any
+		// plugin meta at all are still matched (a bare NOT LIKE would drop them).
+		$exclusion_pairs = array(
+			array(
+				'relation' => 'OR',
+				array(
+					'key'     => Post_Meta::META_KEY,
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => Post_Meta::META_KEY,
+					'value'   => $this->serialized_flag( 'sitemap_exclude' ),
+					'compare' => 'NOT LIKE',
+				),
+			),
+		);
+
+		if ( $this->should_exclude_noindexed() ) {
+			$exclusion_pairs[] = array(
+				'relation' => 'OR',
+				array(
+					'key'     => Post_Meta::META_KEY,
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => Post_Meta::META_KEY,
+					'value'   => $this->serialized_flag( 'noindex' ),
+					'compare' => 'NOT LIKE',
+				),
+			);
+		}
+
+		$args = $this->merge_meta_query( $args, $exclusion_pairs );
+
+		return $args;
+	}
+
+	/**
+	 * Whether noindexed posts should be dropped from sitemaps.
+	 *
+	 * Enabled by default: URLs listed in a sitemap should be indexable, and
+	 * this matches user expectations set by other SEO plugins.
+	 *
+	 * @return bool
+	 */
+	private function should_exclude_noindexed() {
+		return saman_seo_apply_filters(
+			'saman_seo_sitemap_exclude_noindex',
+			'1' === get_option( 'SAMAN_SEO_sitemap_exclude_noindex', '1' )
+		);
+	}
+
+	/**
+	 * Resolve the manually excluded post ID list for a post type.
+	 *
+	 * Combines the SAMAN_SEO_sitemap_excluded_post_ids option (comma
+	 * separated IDs) with the saman_seo_sitemap_excluded_post_ids filter so
+	 * developers can hard-code exclusions without touching content.
+	 *
+	 * @param string $post_type Post type context passed to the filter.
+	 * @return array<int,int>
+	 */
+	public function get_manually_excluded_post_ids( $post_type = '' ) {
+		$raw = (string) get_option( 'SAMAN_SEO_sitemap_excluded_post_ids', '' );
+
+		$ids = array_map( 'absint', preg_split( '/[\s,]+/', $raw, -1, PREG_SPLIT_NO_EMPTY ) ?: array() );
+
+		/**
+		 * Filter programmatically excluded post IDs.
+		 *
+		 * @param array<int,int> $ids       Excluded post IDs.
+		 * @param string         $post_type Post type being queried.
+		 */
+		$filtered = saman_seo_apply_filters( 'saman_seo_sitemap_excluded_post_ids', $ids, $post_type );
+
+		$merged = array_unique( array_merge( $ids, array_map( 'absint', (array) $filtered ) ) );
+
+		return array_values( array_filter( $merged ) );
+	}
+
+	/**
+	 * Build the serialized substring that matches a "1" flag inside the
+	 * plugin's serialized meta blob.
+	 *
+	 * Serialization is deterministic for simple string values, so a LIKE
+	 * match on e.g. s:7:"noindex";s:1:"1" is reliable regardless of where
+	 * the key appears inside the array.
+	 *
+	 * @param string $key Flag key name.
+	 * @return string Serialized fragment.
+	 */
+	private function serialized_flag( $key ) {
+		return sprintf( 's:%d:"%s";s:1:"1";', strlen( $key ), $key );
+	}
+
+	/**
+	 * Merge exclusion clauses into existing query args.
+	 *
+	 * Preserves any meta_query already present (e.g. from another plugin on
+	 * the same hook) by nesting it under an AND relation.
+	 *
+	 * @param array            $args            Query args.
+	 * @param array<int,array> $exclusion_pairs Top-level ANDed clauses.
+	 * @return array
+	 */
+	private function merge_meta_query( $args, $exclusion_pairs ) {
+		$existing = $args['meta_query'] ?? array();
+
+		if ( empty( $existing ) || ! is_array( $existing ) ) {
+			$args['meta_query'] = array_merge( array( 'relation' => 'AND' ), $exclusion_pairs );
+
+			return $args;
+		}
+
+		// Nest the pre-existing clause set so its own relation survives.
+		$clauses   = $exclusion_pairs;
+		$clauses[] = $existing;
+
+		$args['meta_query'] = array_merge( array( 'relation' => 'AND' ), $clauses );
+
+		return $args;
 	}
 
 	/**
@@ -1504,11 +1658,14 @@ class Sitemap_Enhancer {
 		}
 
 		$posts = get_posts(
-			array(
-				'posts_per_page' => 50,
-				'post_status'    => 'publish',
-				'orderby'        => 'date',
-				'order'          => 'DESC',
+			$this->apply_post_exclusions(
+				array(
+					'posts_per_page' => 50,
+					'post_status'    => 'publish',
+					'orderby'        => 'date',
+					'order'          => 'DESC',
+				),
+				'post'
 			)
 		);
 
@@ -1568,17 +1725,19 @@ class Sitemap_Enhancer {
 		$posts_per_page = saman_seo_apply_filters( 'saman_seo_news_sitemap_posts_per_page', 1000 );
 
 		$posts = get_posts(
-			array(
-				'post_type'      => $post_types,
-				'posts_per_page' => absint( $posts_per_page ),
-				'post_status'    => 'publish',
-				'date_query'     => array(
-					array(
-						'after' => '2 days ago',
+			$this->apply_post_exclusions(
+				array(
+					'post_type'      => $post_types,
+					'posts_per_page' => absint( $posts_per_page ),
+					'post_status'    => 'publish',
+					'date_query'     => array(
+						array(
+							'after' => '2 days ago',
+						),
 					),
-				),
-				'orderby'        => 'date',
-				'order'          => 'DESC',
+					'orderby'        => 'date',
+					'order'          => 'DESC',
+				)
 			)
 		);
 
