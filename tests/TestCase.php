@@ -471,6 +471,14 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase {
 				return strtolower( preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) ) );
 			}
 		);
+		Functions\when( 'sanitize_title' )->alias(
+			static function ( $title ) {
+				$title = strtolower( trim( (string) $title ) );
+				$title = preg_replace( '/[^a-z0-9]+/', '-', $title );
+
+				return trim( $title, '-' );
+			}
+		);
 		Functions\when( 'wp_kses_post' )->alias(
 			static function ( $content ) {
 				return (string) $content;

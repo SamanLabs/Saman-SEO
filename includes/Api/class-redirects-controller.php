@@ -230,8 +230,7 @@ class Redirects_Controller extends REST_Controller {
         ] );
 
         // Chain detection endpoint
-        register_rest_route( $this->namespace, '/redirects/validate-chain', [
-            [
+        register_rest_route( $this->namespace, '/redirects/validate-chain', [            [
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => [ $this, 'validate_chain' ],
                 'permission_callback' => [ $this, 'permission_check' ],
@@ -248,6 +247,44 @@ class Redirects_Controller extends REST_Controller {
                     ],
                     'exclude_id' => [
                         'required'          => false,
+                        'type'              => 'integer',
+                        'sanitize_callback' => 'absint',
+                    ],
+                    'is_regex' => [
+                        'required' => false,
+                        'type'     => 'boolean',
+                        'default'  => false,
+                    ],
+                ],
+            ],
+        ] );
+
+        // Redirect health scan: loops, chains, dead targets, expired windows.
+        register_rest_route( $this->namespace, '/redirects/health', [
+            [
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => [ $this, 'get_redirect_health' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+                'args'                => [
+                    'limit' => [
+                        'required'          => false,
+                        'type'              => 'integer',
+                        'default'           => 2000,
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
+            ],
+        ] );
+
+        // Flatten a chain: rewrite a rule's target to the final destination.
+        register_rest_route( $this->namespace, '/redirects/flatten', [
+            [
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => [ $this, 'flatten_redirect_chain' ],
+                'permission_callback' => [ $this, 'permission_check' ],
+                'args'                => [
+                    'id' => [
+                        'required'          => true,
                         'type'              => 'integer',
                         'sanitize_callback' => 'absint',
                     ],
@@ -946,106 +983,20 @@ class Redirects_Controller extends REST_Controller {
      * @return \WP_REST_Response|\WP_Error
      */
     public function validate_chain( $request ) {
-        global $wpdb;
+        $service = \Saman\SEO\Plugin::instance()->get( 'redirects' );
+
+        if ( ! $service ) {
+            $service = new \Saman\SEO\Service\Redirect_Manager();
+        }
 
         $source     = $request->get_param( 'source' );
         $target     = $request->get_param( 'target' );
-        $exclude_id = $request->get_param( 'exclude_id' );
+        $exclude_id = (int) $request->get_param( 'exclude_id' );
+        $is_regex   = (bool) $request->get_param( 'is_regex' );
 
-        // Normalize source
-        $source = '/' . ltrim( $source, '/' );
-        $source = '/' === $source ? '/' : rtrim( $source, '/' );
-
-        // Extract path from target
-        $target_path = wp_parse_url( $target, PHP_URL_PATH );
-        if ( $target_path ) {
-            $target_path = '/' === $target_path ? '/' : rtrim( $target_path, '/' );
-        }
-
-        $warnings = [];
-
-        // Check for direct loop (A ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ A)
-        if ( $source === $target_path ) {
-            $warnings[] = [
-                'type'    => 'loop',
-                'message' => __( 'Source and target are the same URL. This will create an infinite loop.', 'saman-seo' ),
-            ];
-        }
-
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // Check for reverse redirect (B ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ A when creating A ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ B)
-        if ( $target_path ) {
-            if ( $exclude_id ) {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-                $reverse = $wpdb->get_row(
-                    $wpdb->prepare(
-                        "SELECT * FROM {$this->redirects_table} WHERE source = %s AND id != %d LIMIT 1",
-                        $target_path,
-                        $exclude_id
-                    )
-                );
-            } else {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-                $reverse = $wpdb->get_row(
-                    $wpdb->prepare(
-                        "SELECT * FROM {$this->redirects_table} WHERE source = %s LIMIT 1",
-                        $target_path
-                    )
-                );
-            }
-
-            if ( $reverse ) {
-                // Check if reverse target points back to our source (loop)
-                $reverse_target_path = wp_parse_url( $reverse->target, PHP_URL_PATH );
-                if ( $reverse_target_path ) {
-                    $reverse_target_path = '/' === $reverse_target_path ? '/' : rtrim( $reverse_target_path, '/' );
-                }
-
-                if ( $reverse_target_path === $source ) {
-                    $warnings[] = [
-                        'type'    => 'loop',
-                        'message' => sprintf(
-                            // translators: %1$s is the first parameter
-                            __( 'This will create a redirect loop: %1$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %2$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %1$s', 'saman-seo' ),
-                            $source,
-                            $target_path
-                        ),
-                    ];
-                } else {
-                    // It's a chain
-                    $warnings[] = [
-                        'type'    => 'chain',
-                        'message' => sprintf(
-                            // translators: %1$s is the first parameter
-                            __( 'This creates a redirect chain: %1$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %2$s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ %3$s. Consider redirecting directly to the final destination.', 'saman-seo' ),
-                            $source,
-                            $target_path,
-                            $reverse->target
-                        ),
-                    ];
-                }
-            }
-        }
-
-        // Check if source already has a redirect pointing to it
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, chain detection requires direct query.
-        $incoming = $wpdb->get_results( $wpdb->prepare(
-            "SELECT source, target FROM {$this->redirects_table} WHERE target LIKE %s LIMIT 5",
-            '%' . $wpdb->esc_like( $source ) . '%'
-        ) );
-
-        if ( $incoming ) {
-            foreach ( $incoming as $redirect ) {
-                $warnings[] = [
-                    'type'    => 'chain',
-                    'message' => sprintf(
-                        // translators: %s is the value
-                        __( 'Note: %s already redirects to this source. After adding this redirect, it will become a chain.', 'saman-seo' ),
-                        $redirect->source
-                    ),
-                ];
-            }
-        }
+        // The service performs loop, multi-hop chain, and target resolution
+        // checks; warning types are additive over the previous response.
+        $warnings = $service->validate_redirect( $source, $target, $exclude_id, $is_regex );
 
         return $this->success( [
             'valid'    => empty( array_filter( $warnings, function( $w ) { return 'loop' === $w['type']; } ) ),
@@ -1054,6 +1005,74 @@ class Redirects_Controller extends REST_Controller {
     }
 
     /**
+     * Scan all redirects for health problems.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function get_redirect_health( $request ) {
+        $service = \Saman\SEO\Plugin::instance()->get( 'redirects' );
+
+        if ( ! $service ) {
+            $service = new \Saman\SEO\Service\Redirect_Manager();
+        }
+
+        $result = $service->health_check( (int) $request->get_param( 'limit' ) );
+
+        $counts = [
+            'loop'               => 0,
+            'chain'              => 0,
+            'dead_target'        => 0,
+            'unpublished_target' => 0,
+            'expired'            => 0,
+        ];
+
+        foreach ( $result['issues'] as $issue ) {
+            foreach ( $issue['issues'] as $single ) {
+                if ( isset( $counts[ $single['type'] ] ) ) {
+                    ++$counts[ $single['type'] ];
+                }
+            }
+        }
+
+        return $this->success(
+            [
+                'issues'  => $result['issues'],
+                'scanned' => $result['scanned'],
+                'counts'  => $counts,
+            ]
+        );
+    }
+
+    /**
+     * Flatten a redirect chain to a single hop.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function flatten_redirect_chain( $request ) {
+        $service = \Saman\SEO\Plugin::instance()->get( 'redirects' );
+
+        if ( ! $service ) {
+            $service = new \Saman\SEO\Service\Redirect_Manager();
+        }
+
+        $result = $service->flatten_chain( (int) $request->get_param( 'id' ) );
+
+        if ( is_wp_error( $result ) ) {
+            return $this->error( $result->get_error_message(), $result->get_error_code(), 422 );
+        }
+
+        return $this->success(
+            $result,
+            sprintf(
+                // translators: %d is the number of hops removed.
+                __( 'Chain flattened. Removed %1$d hop(s); target now points at the final destination.', 'saman-seo' ),
+                $result['hops_removed']
+            )
+        );
+    }
+/**
      * Export redirects.
      *
      * @param \WP_REST_Request $request Request object.

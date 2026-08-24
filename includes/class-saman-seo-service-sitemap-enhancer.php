@@ -428,9 +428,12 @@ class Sitemap_Enhancer {
 	 * Build the serialized substring that matches a "1" flag inside the
 	 * plugin's serialized meta blob.
 	 *
-	 * Serialization is deterministic for simple string values, so a LIKE
-	 * match on e.g. s:7:"noindex";s:1:"1" is reliable regardless of where
-	 * the key appears inside the array.
+	 * PHP serialization is deterministic for simple string values, so the
+	 * fragment is stable regardless of where the key sits inside the array.
+	 * Note that serialize() does not escape quotes (it relies on byte-length
+	 * prefixes), so the practical safety of a LIKE match comes from the fact
+	 * that no realistic meta value contains serialized-PHP text — not from
+	 * any escaping behaviour.
 	 *
 	 * @param string $key Flag key name.
 	 * @return string Serialized fragment.

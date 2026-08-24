@@ -106,6 +106,54 @@ if ( ! class_exists( 'WP_Error' ) ) {
 	}
 }
 
+if ( ! class_exists( 'wpdb' ) ) {
+	/**
+	 * Minimal wpdb replacement: enough for services that only build table
+	 * names in their constructors. Queries return harmless defaults.
+	 */
+	final class wpdb {
+		public $prefix         = 'wp_';
+		public $posts          = 'wp_posts';
+		public $postmeta       = 'wp_postmeta';
+		public $options        = 'wp_options';
+		public $terms          = 'wp_terms';
+		public $term_taxonomy  = 'wp_term_taxonomy';
+		public $term_relationships = 'wp_term_relationships';
+		public $users          = 'wp_users';
+		public $usermeta       = 'wp_usermeta';
+		public $insert_id      = 0;
+
+		public function prepare( $query, ...$args ) {
+			return $query;
+		}
+
+		public function get_results( $query = null ) {
+			return array();
+		}
+
+		public function get_row( $query = null ) {
+			return null;
+		}
+
+		public function get_var( $query = null ) {
+			return null;
+		}
+
+		public function get_col( $query = null ) {
+			return array();
+		}
+
+		public function esc_like( $text ) {
+			return addcslashes( (string) $text, '_%\\' );
+		}
+	}
+}
+
+// Provide the global $wpdb handle used by service constructors.
+if ( ! isset( $GLOBALS['wpdb'] ) ) {
+	$GLOBALS['wpdb'] = new wpdb();
+}
+
 // Load plugin helpers (namespace Saman\SEO\Helpers + global shims).
 require_once SAMAN_SEO_PATH . 'includes/helpers.php';
 
