@@ -155,6 +155,18 @@ class Settings {
 		'SAMAN_SEO_sitemap_enable_google_news'       => '0',
 		'SAMAN_SEO_sitemap_google_news_post_types'   => array(),
 		'SAMAN_SEO_sitemap_additional_pages'         => array(),
+
+		// Schema output: master toggle plus per-type toggles.
+		'SAMAN_SEO_module_schema'                    => '1',
+		'SAMAN_SEO_module_schema_video'              => '1',
+		'SAMAN_SEO_module_schema_course'             => '1',
+		'SAMAN_SEO_module_schema_software'           => '1',
+		'SAMAN_SEO_module_schema_book'               => '1',
+		'SAMAN_SEO_module_schema_music'              => '1',
+		'SAMAN_SEO_module_schema_movie'              => '1',
+		'SAMAN_SEO_module_schema_restaurant'         => '1',
+		'SAMAN_SEO_module_schema_service'            => '1',
+		'SAMAN_SEO_module_schema_job_posting'        => '1',
 	);
 
 	/**
@@ -280,6 +292,18 @@ class Settings {
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_ai_assistant', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_breadcrumbs', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_breadcrumb_settings', array( $this, 'sanitize_breadcrumb_settings' ) );
+
+		// Schema output toggles (master + per-type).
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_video', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_course', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_software', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_book', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_music', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_movie', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_restaurant', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_service', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_job_posting', array( $this, 'sanitize_bool' ) );
 
 		// Redirect settings.
 		register_setting( 'saman-seo', 'SAMAN_SEO_redirect_case_insensitive', array( $this, 'sanitize_bool' ) );

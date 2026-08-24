@@ -20,6 +20,10 @@ class Software_Schema {
 	 * @return void
 	 */
 	public function boot() {
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema_software' ) ) {
+			return;
+		}
+
 		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_software_schema_to_graph' ), 20, 2 );
 	}
 

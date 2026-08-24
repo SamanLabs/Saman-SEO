@@ -53,6 +53,10 @@ class Video_Schema {
 	 * @return void
 	 */
 	public function boot() {
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema_video' ) ) {
+			return;
+		}
+
 		// Match the sibling schema services: canonical hook, priority 20, two
 		// args ($graph, $post).
 		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_video_schema_to_graph' ), 20, 2 );

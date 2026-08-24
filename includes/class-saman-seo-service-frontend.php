@@ -682,6 +682,13 @@ class Frontend {
 	 * @return void
 	 */
 	public function render_json_ld() {
+		// Master switch for structured data output. Admin-side schema
+		// previews keep working because they build graphs via REST instead
+		// of going through wp_head.
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema' ) ) {
+			return;
+		}
+
 		$post = get_post();
 
 		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post );

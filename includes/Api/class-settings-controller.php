@@ -309,6 +309,18 @@ class Settings_Controller extends REST_Controller {
 			'module_llm_txt'                   => 'bool',
 			'module_agents_md'                 => 'bool',
 
+			// Schema output toggles (master + per-type).
+			'module_schema'                    => 'bool',
+			'module_schema_video'              => 'bool',
+			'module_schema_course'             => 'bool',
+			'module_schema_software'           => 'bool',
+			'module_schema_book'               => 'bool',
+			'module_schema_music'              => 'bool',
+			'module_schema_movie'              => 'bool',
+			'module_schema_restaurant'         => 'bool',
+			'module_schema_service'            => 'bool',
+			'module_schema_job_posting'        => 'bool',
+
 			// IndexNow.
 			'indexnow_submit_on_publish'       => 'bool',
 			'indexnow_submit_on_update'        => 'bool',

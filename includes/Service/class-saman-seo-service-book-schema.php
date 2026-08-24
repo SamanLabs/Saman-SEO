@@ -20,6 +20,10 @@ class Book_Schema {
 	 * @return void
 	 */
 	public function boot() {
+		if ( ! \Saman\SEO\Helpers\module_enabled( 'schema_book' ) ) {
+			return;
+		}
+
 		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_book_schema_to_graph' ), 20, 2 );
 	}
 
