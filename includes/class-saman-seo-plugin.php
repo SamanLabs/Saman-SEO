@@ -234,6 +234,7 @@ class Plugin {
 		$this->register( 'job_posting_schema', new Service\Job_Posting_Schema() );
 		$this->register( 'image_seo', new Service\Image_SEO() );
 		$this->register( 'indexnow', new Service\IndexNow() );
+		$this->register( 'search_console', new Service\Search_Console() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->register( 'cli', new Service\CLI() );

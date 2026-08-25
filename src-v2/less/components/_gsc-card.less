@@ -1,0 +1,265 @@
+// ==========================================================================
+// Google Search Console card (Dashboard)
+// ==========================================================================
+
+.gsc-card {
+	display: flex;
+	flex-direction: column;
+
+	.card-header {
+		.pill {
+			font-size: @font-size-xs;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: @color-text-secondary;
+			background: @color-surface-muted;
+
+			&.success {
+				color: @color-success;
+				background: @color-success-bg;
+			}
+		}
+	}
+}
+
+.gsc-loading {
+	padding: @spacing-xl 0;
+	color: @color-text-secondary;
+	font-size: @font-size-base;
+}
+
+.gsc-alert {
+	position: relative;
+	margin-bottom: @spacing-md;
+	padding: @spacing-sm @spacing-lg;
+	border-radius: @radius-md;
+	font-size: @font-size-sm;
+	line-height: @line-height-normal;
+
+	&--error {
+		background: @color-danger-bg;
+		border-left: 3px solid @color-danger;
+		color: #8a1f21;
+	}
+
+	&--info {
+		background: @color-primary-lighter;
+		border-left: 3px solid @color-primary;
+		color: @color-text;
+	}
+
+	&__close {
+		position: absolute;
+		top: 2px;
+		right: 4px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: inherit;
+		font-size: @font-size-lg;
+		line-height: 1;
+		padding: 2px 6px;
+	}
+}
+
+// --- Connect / setup ------------------------------------------------------
+
+.gsc-digest-toggle {
+	display: flex;
+	align-items: center;
+	gap: @spacing-sm;
+	margin-bottom: @spacing-md;
+
+	input[type='checkbox'] {
+		margin: 0;
+	}
+}
+
+.gsc-connect,
+.gsc-setup {
+	p:first-child {
+		margin-top: 0;
+		color: @color-text-secondary;
+	}
+}
+
+.gsc-howto {
+	margin: 0 0 @spacing-md;
+	font-size: @font-size-sm;
+	color: @color-text-secondary;
+
+	summary {
+		cursor: pointer;
+		color: @color-primary;
+	}
+
+	ol {
+		margin: @spacing-sm 0 0 @spacing-lg;
+		padding-left: @spacing-md;
+
+		li {
+			margin-bottom: @spacing-xs;
+		}
+	}
+}
+
+.gsc-redirect-uri {
+	display: block;
+	margin-top: @spacing-xs;
+	padding: @spacing-xs @spacing-sm;
+	background: @color-surface-muted;
+	border: 1px solid @color-border-light;
+	border-radius: @radius-sm;
+	font-family: @font-family-mono;
+	font-size: @font-size-xs;
+	word-break: break-all;
+	user-select: all;
+}
+
+.gsc-field {
+	display: block;
+	margin-bottom: @spacing-md;
+
+	span {
+		display: block;
+		margin-bottom: @spacing-xs;
+		font-weight: @font-weight-medium;
+		font-size: @font-size-sm;
+	}
+
+	input {
+		width: 100%;
+	}
+}
+
+.gsc-setup-actions {
+	display: flex;
+	gap: @spacing-sm;
+}
+
+.gsc-fineprint {
+	margin: @spacing-md 0 0;
+	font-size: @font-size-xs;
+	color: @color-muted;
+}
+
+// --- Connected state ------------------------------------------------------
+
+.gsc-metrics {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: @spacing-sm;
+	margin-bottom: @spacing-md;
+
+	@media (max-width: @breakpoint-sm) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.gsc-metric {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: @spacing-sm @spacing-md;
+	background: @color-surface-muted;
+	border-radius: @radius-lg;
+
+	&__value {
+		font-size: @font-size-2xl;
+		font-weight: @font-weight-bold;
+		line-height: @line-height-tight;
+		font-variant-numeric: tabular-nums;
+	}
+
+	&__label {
+		font-size: @font-size-xs;
+		color: @color-text-secondary;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+}
+
+.gsc-sparkline {
+	display: flex;
+	align-items: flex-end;
+	gap: 2px;
+	height: 48px;
+	margin-bottom: @spacing-md;
+}
+
+.gsc-bar {
+	flex: 1;
+	min-height: 4px;
+	background: var(--color-accent, #5a84ff);
+	opacity: 0.75;
+	border-radius: 1px 1px 0 0;
+	transition: opacity @transition-fast;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+.gsc-queries {
+	width: 100%;
+	font-size: @font-size-sm;
+
+	th,
+	td {
+		padding: @spacing-xs 0;
+		border-bottom: 1px solid @color-border-light;
+		text-align: left;
+	}
+
+	th.num,
+	td.num {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	th {
+		font-size: @font-size-xs;
+		font-weight: @font-weight-medium;
+		color: @color-text-secondary;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.gsc-query-text {
+		max-width: 200px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	tbody tr:last-child td {
+		border-bottom: none;
+	}
+}
+
+.gsc-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: @spacing-sm;
+	margin-top: @spacing-md;
+}
+
+.gsc-site-select {
+	max-width: 65%;
+	height: @button-height;
+}
+
+.gsc-link-button {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	color: @color-danger;
+	font-size: @font-size-sm;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}

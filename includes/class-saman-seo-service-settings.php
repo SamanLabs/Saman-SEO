@@ -176,6 +176,10 @@ class Settings {
 		'SAMAN_SEO_module_schema_restaurant'         => '1',
 		'SAMAN_SEO_module_schema_service'            => '1',
 		'SAMAN_SEO_module_schema_job_posting'        => '1',
+
+		// Google Search Console (client secret + tokens are stored separately,
+		// non-autoloaded, by the Search_Console service).
+		'SAMAN_SEO_gsc_client_id'                    => '',
 	);
 
 	/**
@@ -308,6 +312,7 @@ class Settings {
 
 		// Schema output toggles (master + per-type).
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_gsc_client_id', 'sanitize_text_field' );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_video', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_course', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_software', array( $this, 'sanitize_bool' ) );
