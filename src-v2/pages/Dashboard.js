@@ -203,6 +203,13 @@ const Dashboard = ( { onNavigate } ) => {
 				</div>
 				<button
 					type="button"
+					className="button"
+					onClick={ () => handleNavigation( 'improvements' ) }
+				>
+					{ __( 'Improvements', 'saman-seo' ) }
+				</button>
+				<button
+					type="button"
 					className="button primary"
 					onClick={ handleRunAudit }
 				>
