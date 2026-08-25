@@ -335,6 +335,9 @@ const Dashboard = ( { onNavigate } ) => {
 				{ /* Google Search Console - real search traffic */ }
 				<GscCard />
 
+				{ /* Scheduled weekly email digest */ }
+				<WeeklyDigestCard />
+
 				{ /* Content Coverage Card - Large */ }
 				<div className="dashboard-card content-coverage-card">
 					<div className="card-header">
