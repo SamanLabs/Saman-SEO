@@ -127,6 +127,10 @@ if ( ! class_exists( 'wpdb' ) ) {
 			return $query;
 		}
 
+		public function query( $query = null ) {
+			return 0;
+		}
+
 		public function get_results( $query = null ) {
 			return array();
 		}
@@ -163,3 +167,43 @@ require_once SAMAN_SEO_PATH . 'includes/helpers.php';
  * stubbed lazily via Brain Monkey inside the base TestCase.
  */
 when( 'wp_load_alloptions' )->justReturn( array() );
+
+/*
+ * Fallback classloader mirroring the SPL autoloader in saman-seo.php. The
+ * Composer classmap only refreshes on `composer install`, so freshly added
+ * plugin classes would be unresolvable until it is regenerated.
+ */
+spl_autoload_register(
+	static function ( $classname ) {
+		$classname = ltrim( $classname, '\\' );
+
+		if ( 0 !== strpos( $classname, 'Saman\SEO\\' ) ) {
+			return;
+		}
+
+		if ( 0 === strpos( $classname, 'Saman\SEO\Api\\' ) ) {
+			$slug = strtolower( str_replace( '_', '-', str_replace( 'Saman\SEO\Api\\', '', $classname ) ) );
+			$file = SAMAN_SEO_PATH . 'includes/Api/class-' . $slug . '.php';
+
+			if ( file_exists( $file ) ) {
+				require_once $file;
+			}
+
+			return;
+		}
+
+		if ( 0 === strpos( $classname, 'Saman\SEO\Service\\' ) ) {
+			$slug = strtolower( str_replace( '_', '-', str_replace( 'Saman\SEO\Service\\', '', $classname ) ) );
+
+			foreach ( array(
+				SAMAN_SEO_PATH . 'includes/class-saman-seo-service-' . $slug . '.php',
+				SAMAN_SEO_PATH . 'includes/Service/class-saman-seo-service-' . $slug . '.php',
+			) as $file ) {
+				if ( file_exists( $file ) ) {
+					require_once $file;
+					return;
+				}
+			}
+		}
+	}
+);

@@ -278,26 +278,26 @@ class Admin_UI {
 			'saman-seo-classic',
 			'SamanSEOClassic',
 			array(
-				'postId'       => $post->ID,
-				'postType'     => $post->post_type,
-				'postTitle'    => $post->post_title,
-				'postUrl'      => get_permalink( $post ),
+				'postId'        => $post->ID,
+				'postType'      => $post->post_type,
+				'postTitle'     => $post->post_title,
+				'postUrl'       => get_permalink( $post ),
 				'featuredImage' => get_the_post_thumbnail_url( $post, 'large' ) ?: '',
-				'meta'         => $meta,
-				'variables'    => $variables,
-				'aiEnabled'    => $ai_enabled,
-				'aiProvider'   => $ai_provider,
-				'aiPilot'      => array(
+				'meta'          => $meta,
+				'variables'     => $variables,
+				'aiEnabled'     => $ai_enabled,
+				'aiProvider'    => $ai_provider,
+				'aiPilot'       => array(
 					'installed'   => $ai_status['installed'],
 					'active'      => $ai_status['active'],
 					'ready'       => $ai_status['ready'],
 					'version'     => $ai_status['version'] ?? null,
 					'settingsUrl' => admin_url( 'admin.php?page=Saman-ai' ),
 				),
-				'siteTitle'    => get_bloginfo( 'name' ),
-				'tagline'      => get_bloginfo( 'description' ),
-				'separator'    => get_option( 'SAMAN_SEO_title_separator', '|' ),
-				'ai'           => array(
+				'siteTitle'     => get_bloginfo( 'name' ),
+				'tagline'       => get_bloginfo( 'description' ),
+				'separator'     => get_option( 'SAMAN_SEO_title_separator', '|' ),
+				'ai'            => array(
 					'enabled' => $ai_enabled,
 					'ajax'    => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'SAMAN_SEO_ai_generate' ),
@@ -348,7 +348,7 @@ class Admin_UI {
 
 		// Enqueue the classic-editor SEO modal on post edit screens (not block editor).
 		if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
-			$screen = get_current_screen();
+			$screen          = get_current_screen();
 			$is_block_editor = $screen && method_exists( $screen, 'is_block_editor' ) && $screen->is_block_editor();
 			if ( ! $is_block_editor ) {
 				$this->enqueue_classic_seo_assets( get_post() );

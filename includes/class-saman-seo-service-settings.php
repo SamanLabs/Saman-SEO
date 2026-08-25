@@ -176,6 +176,15 @@ class Settings {
 		'SAMAN_SEO_module_schema_restaurant'         => '1',
 		'SAMAN_SEO_module_schema_service'            => '1',
 		'SAMAN_SEO_module_schema_job_posting'        => '1',
+
+		// Google Search Console (client secret + tokens are stored separately,
+		// non-autoloaded, by the Search_Console service).
+		'SAMAN_SEO_gsc_client_id'                    => '',
+
+		// Weekly digest email report.
+		'SAMAN_SEO_weekly_report_enabled'            => '0',
+		'SAMAN_SEO_weekly_report_email'              => '',
+		'SAMAN_SEO_weekly_report_day'                => 'monday',
 	);
 
 	/**
@@ -308,6 +317,7 @@ class Settings {
 
 		// Schema output toggles (master + per-type).
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_gsc_client_id', 'sanitize_text_field' );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_video', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_course', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_software', array( $this, 'sanitize_bool' ) );
@@ -1145,6 +1155,17 @@ class Settings {
 	public function sanitize_404_log_ip_level( $value ) {
 		$value = sanitize_key( $value );
 		return in_array( $value, array( 'none', 'anonymized', 'full' ), true ) ? $value : 'none';
+	}
+
+	/**
+	 * Sanitize a weekday name.
+	 *
+	 * @param string $value Submitted value.
+	 * @return string
+	 */
+	public function sanitize_weekday( $value ) {
+		$value = sanitize_key( $value );
+		return in_array( $value, array( 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ), true ) ? $value : 'monday';
 	}
 
 	/**

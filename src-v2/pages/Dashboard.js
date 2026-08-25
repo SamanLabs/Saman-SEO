@@ -3,6 +3,8 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Score level configuration
 import { __, sprintf } from '@wordpress/i18n';
+import GscCard from '../components/GscCard';
+import WeeklyDigestCard from '../components/WeeklyDigestCard';
 const SCORE_LEVELS = {
 	excellent: {
 		label: __( 'Excellent', 'saman-seo' ),
@@ -329,6 +331,9 @@ const Dashboard = ( { onNavigate } ) => {
 						</p>
 					) }
 				</div>
+
+				{ /* Google Search Console - real search traffic */ }
+				<GscCard />
 
 				{ /* Content Coverage Card - Large */ }
 				<div className="dashboard-card content-coverage-card">
