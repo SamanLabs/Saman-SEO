@@ -185,6 +185,13 @@ class Settings {
 		'SAMAN_SEO_weekly_report_enabled'            => '0',
 		'SAMAN_SEO_weekly_report_email'              => '',
 		'SAMAN_SEO_weekly_report_day'                => 'monday',
+
+		// Static page cache (strictly opt-in; conflicts with other cache
+		// plugins are detected before activation).
+		'SAMAN_SEO_module_page_cache'                => '0',
+		'SAMAN_SEO_page_cache_ttl'                   => 24,
+		'SAMAN_SEO_page_cache_purge_on_save'         => '1',
+		'SAMAN_SEO_page_cache_excluded_urls'         => '',
 	);
 
 	/**
@@ -318,6 +325,13 @@ class Settings {
 		// Schema output toggles (master + per-type).
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_gsc_client_id', 'sanitize_text_field' );
+		register_setting( 'saman-seo', 'SAMAN_SEO_weekly_report_enabled', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_weekly_report_email', 'sanitize_email' );
+		register_setting( 'saman-seo', 'SAMAN_SEO_weekly_report_day', array( $this, 'sanitize_weekday' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_module_page_cache', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_page_cache_ttl', 'absint' );
+		register_setting( 'saman-seo', 'SAMAN_SEO_page_cache_purge_on_save', array( $this, 'sanitize_bool' ) );
+		register_setting( 'saman-seo', 'SAMAN_SEO_page_cache_excluded_urls', 'sanitize_textarea_field' );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_video', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_course', array( $this, 'sanitize_bool' ) );
 		register_setting( 'saman-seo', 'SAMAN_SEO_module_schema_software', array( $this, 'sanitize_bool' ) );

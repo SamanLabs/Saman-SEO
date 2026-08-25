@@ -236,6 +236,7 @@ class Plugin {
 		$this->register( 'indexnow', new Service\IndexNow() );
 		$this->register( 'search_console', new Service\Search_Console() );
 		$this->register( 'weekly_report', new Service\Weekly_Report() );
+		$this->register( 'page_cache', new Service\Page_Cache() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->register( 'cli', new Service\CLI() );
@@ -326,6 +327,11 @@ class Plugin {
 		wp_clear_scheduled_hook( 'SAMAN_SEO_indexnow_submit' );
 		wp_clear_scheduled_hook( 'SAMAN_SEO_sitemap_cron' );
 		Service\Weekly_Report::unschedule();
+
+		// Remove cache artifacts so a deactivated plugin never serves pages.
+		if ( class_exists( 'Saman\SEO\Service\Page_Cache' ) ) {
+			( new Service\Page_Cache() )->disable();
+		}
 
 		flush_rewrite_rules();
 	}

@@ -318,6 +318,7 @@ class Admin_V2 {
 			'admin_bar'      => \Saman\SEO\Helpers\module_enabled( 'admin_bar' ),
 			'internal_links' => \Saman\SEO\Helpers\module_enabled( 'internal_links' ),
 			'ai_assistant'   => \Saman\SEO\Helpers\module_enabled( 'ai_assistant' ),
+			'page_cache'     => \Saman\SEO\Helpers\module_enabled( 'page_cache' ),
 		);
 
 		// Pass configuration to React app
@@ -395,6 +396,7 @@ class Admin_V2 {
 			'Image_SEO'        => 'class-image-seo-controller.php',
 			'Search_Console'   => 'class-search-console-controller.php',
 			'Reports'          => 'class-reports-controller.php',
+			'Page_Cache'       => 'class-page-cache-controller.php',
 		);
 
 		foreach ( $controllers as $controller => $file ) {
