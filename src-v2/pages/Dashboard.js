@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import GscCard from '../components/GscCard';
 import WeeklyDigestCard from '../components/WeeklyDigestCard';
+import PageCacheCard from '../components/PageCacheCard';
 const SCORE_LEVELS = {
 	excellent: {
 		label: __( 'Excellent', 'saman-seo' ),
@@ -337,6 +338,9 @@ const Dashboard = ( { onNavigate } ) => {
 
 				{ /* Scheduled weekly email digest */ }
 				<WeeklyDigestCard />
+
+				{ /* Static page cache with before/after TTFB */ }
+				<PageCacheCard />
 
 				{ /* Content Coverage Card - Large */ }
 				<div className="dashboard-card content-coverage-card">
