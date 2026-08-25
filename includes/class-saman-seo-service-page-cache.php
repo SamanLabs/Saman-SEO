@@ -127,9 +127,11 @@ class Page_Cache {
 		add_action( 'saman_seo_daily_maintenance_complete', array( $this, 'gc' ) );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * State & conflicts
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Whether the module toggle is on.
@@ -149,31 +151,31 @@ class Page_Cache {
 		$conflicts = array();
 
 		$known = array(
-			'w3tc'      => array(
+			'w3tc'         => array(
 				'label' => 'W3 Total Cache',
 				'check' => static function () {
 					return defined( 'W3TC' );
 				},
 			),
-			'supercache'=> array(
+			'supercache'   => array(
 				'label' => 'WP Super Cache',
 				'check' => static function () {
 					return defined( 'WPCACHEHOME' );
 				},
 			),
-			'wp-rocket' => array(
+			'wp-rocket'    => array(
 				'label' => 'WP Rocket',
 				'check' => static function () {
 					return defined( 'WP_ROCKET_VERSION' );
 				},
 			),
-			'litespeed' => array(
+			'litespeed'    => array(
 				'label' => 'LiteSpeed Cache',
 				'check' => static function () {
 					return defined( 'LSCACHE_VERSION' ) || class_exists( '\LiteSpeed\Core' );
 				},
 			),
-			'breeze'    => array(
+			'breeze'       => array(
 				'label' => 'Breeze',
 				'check' => static function () {
 					return defined( 'BREEZE_VERSION' );
@@ -238,9 +240,11 @@ class Page_Cache {
 		return 'late';
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Enable / disable
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Turn the cache on. Refuses when conflicts are detected.
@@ -295,9 +299,11 @@ class Page_Cache {
 		$this->flush_storage();
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Drop-in management
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Attempt to install the early-serving drop-in plus WP_CACHE constant.
@@ -470,9 +476,9 @@ PHP;
 			if ( preg_match( $pattern, $contents ) ) {
 				$updated = preg_replace( $pattern, "define( 'WP_CACHE', true );", $contents );
 			} else {
-				$marker  = "// Added by Saman SEO page cache\n";
-				$line    = "define( 'WP_CACHE', true ); {$marker}";
-				$anchor  = "/* That's all, stop editing! Happy publishing. */";
+				$marker = "// Added by Saman SEO page cache\n";
+				$line   = "define( 'WP_CACHE', true ); {$marker}";
+				$anchor = "/* That's all, stop editing! Happy publishing. */";
 
 				if ( false === strpos( $contents, $anchor ) ) {
 					return false;
@@ -512,9 +518,11 @@ PHP;
 		return null;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Serving & generation
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Late-tier serve: emit the cached page instead of rendering the theme.
@@ -617,7 +625,7 @@ PHP;
 			return false;
 		}
 
-		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'GET' !== strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) ) {
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'GET' !== strtoupper( (string) wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) {
 			return false;
 		}
 
@@ -704,9 +712,11 @@ PHP;
 		return false;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Storage
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Cache directory (under wp-content, survives plugin updates).
@@ -746,7 +756,7 @@ PHP;
 	 * @return string
 	 */
 	public function make_key( $url ) {
-		$parts = wp_parse_url( $url );
+		$parts  = wp_parse_url( $url );
 		$scheme = strtolower( $parts['scheme'] ?? 'http' );
 		$host   = strtolower( $parts['host'] ?? '' );
 		$path   = $parts['path'] ?? '/';
@@ -765,8 +775,8 @@ PHP;
 	 */
 	private function make_key_from_request() {
 		$scheme = is_ssl() ? 'https://' : 'http://';
-		$host   = strtolower( (string) ( $_SERVER['HTTP_HOST'] ?? '' ) );
-		$uri    = (string) ( $_SERVER['REQUEST_URI'] ?? '/' );
+		$host   = strtolower( (string) wp_unslash( $_SERVER['HTTP_HOST'] ?? '' ) );
+		$uri    = (string) wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' );
 		$path   = (string) ( wp_parse_url( $uri, PHP_URL_PATH ) ?: '/' );
 
 		return md5( $scheme . $host . $path );
@@ -813,9 +823,9 @@ PHP;
 		$ttl_hours = max( 1, min( 168, absint( get_option( self::OPTION_TTL, 24 ) ) ) );
 
 		$meta = array(
-			'expires'  => time() + $ttl_hours * HOUR_IN_SECONDS,
-			'ms'       => round( $render_ms, 1 ),
-			'bytes'    => strlen( $html ),
+			'expires' => time() + $ttl_hours * HOUR_IN_SECONDS,
+			'ms'      => round( $render_ms, 1 ),
+			'bytes'   => strlen( $html ),
 		);
 
 		if ( ! is_dir( dirname( $paths['html'] ) ) ) {
@@ -872,9 +882,11 @@ PHP;
 		);
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Invalidation
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Delete every stored page.
@@ -923,8 +935,8 @@ PHP;
 	/**
 	 * Purge everything related to a saved/deleted post.
 	 *
-	 * @param int     $post_id Post ID.
-	 * @param mixed   $post    Post object when available.
+	 * @param int   $post_id Post ID.
+	 * @param mixed $post    Post object when available.
 	 *
 	 * @return void
 	 */
@@ -998,7 +1010,7 @@ PHP;
 	/**
 	 * Purge a post page when its comments change approval state.
 	 *
-	 * @param string     $new_status New comment status.
+	 * @param string      $new_status New comment status.
 	 * @param \WP_Comment $comment   Comment object.
 	 *
 	 * @return void
@@ -1048,9 +1060,11 @@ PHP;
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Measurement
-	 * ------------------------------------------------------------------- */
+	 * -------------------------------------------------------------------
+	 */
 
 	/**
 	 * Fresh zeroed totals structure.
