@@ -39,6 +39,12 @@ class WeeklyReportTest extends TestCase {
 			}
 		);
 
+		Functions\when( 'wp_timezone' )->alias(
+			static function () {
+				return new \DateTimeZone( date_default_timezone_get() );
+			}
+		);
+
 		Functions\when( 'is_email' )->alias(
 			static function ( $email ) {
 				return filter_var( (string) $email, FILTER_VALIDATE_EMAIL ) ? $email : false;

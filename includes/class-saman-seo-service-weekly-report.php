@@ -123,17 +123,16 @@ class Weekly_Report {
 			'saturday'  => 6,
 		);
 
-		$target    = $map[ strtolower( (string) $day ) ] ?? 1;
-		$now       = current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Site-relative scheduling is intentional for digests.
-		$today_dow = (int) current_time( 'w' );
+		$target = $map[ strtolower( (string) $day ) ] ?? 1;
+		$now    = new \DateTimeImmutable( 'now', wp_timezone() );
 
-		$days_ahead = ( $target - $today_dow + 7 ) % 7;
-		if ( 0 === $days_ahead ) {
+		$days_ahead = ( $target - (int) $now->format( 'w' ) + 7 ) % 7;
+		if ( 0 === $days_ahead && (int) $now->format( 'G' ) >= 9 ) {
 			// Today already past 09:00? Ship next week.
-			$days_ahead = (int) current_time( 'H' ) >= 9 ? 7 : 0;
+			$days_ahead = 7;
 		}
 
-		return strtotime( "+{$days_ahead} days", mktime( 9, 0, 0, (int) current_time( 'n' ), (int) current_time( 'j' ), (int) current_time( 'Y' ) ) );
+		return $now->setTime( 9, 0, 0 )->modify( "+{$days_ahead} days" )->getTimestamp();
 	}
 
 	/*
@@ -512,11 +511,11 @@ class Weekly_Report {
 
 		$top_queries = is_array( $gsc['top_queries'] ?? null ) ? array_slice( $gsc['top_queries'], 0, 5 ) : array();
 
-		foreach ( $top_queries as $index => $query_row ) {
-			$position = (string) $query_row['query'];
+		foreach ( $top_queries as $query_row ) {
+			$query = (string) ( $query_row['query'] ?? '' );
 
 			$top_queries_html .= '<tr>'
-				. '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:#333;">' . esc_html( $position ) . '</td>'
+				. '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:#333;">' . esc_html( $query ) . '</td>'
 				. '<td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:right;">' . number_format_i18n( $query_row['clicks'] ) . '</td>'
 				. '<td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:right;">' . number_format_i18n( $query_row['impressions'] ) . '</td>'
 				. '<td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:right;">#' . esc_html( $query_row['position'] ) . '</td>'

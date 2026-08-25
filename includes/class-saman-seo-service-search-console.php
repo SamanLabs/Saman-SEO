@@ -262,10 +262,10 @@ class Search_Console {
 		return add_query_arg(
 			array_filter(
 				array(
-					'client_id'              => rawurlencode( $this->get_client_id() ),
-					'redirect_uri'           => rawurlencode( $this->get_redirect_uri() ),
+					'client_id'              => $this->get_client_id(),
+					'redirect_uri'           => $this->get_redirect_uri(),
 					'response_type'          => 'code',
-					'scope'                  => rawurlencode( self::SCOPE ),
+					'scope'                  => self::SCOPE,
 					'access_type'            => 'offline',
 					'prompt'                 => 'consent',
 					'include_granted_scopes' => 'true',
@@ -797,13 +797,26 @@ class Search_Console {
 			array(
 				'start_date' => gmdate( 'Y-m-d', strtotime( '-7 days' ) ),
 				'end_date'   => gmdate( 'Y-m-d', strtotime( '-1 day' ) ),
-				'dimensions' => array( 'query' ),
-				'row_limit'  => 5,
+				'dimensions' => array(),
+				'row_limit'  => 1,
 			)
 		);
 
 		if ( is_wp_error( $this_week ) ) {
 			return $this_week;
+		}
+
+		$top_queries = $this->query_search_analytics(
+			array(
+				'start_date' => gmdate( 'Y-m-d', strtotime( '-7 days' ) ),
+				'end_date'   => gmdate( 'Y-m-d', strtotime( '-1 day' ) ),
+				'dimensions' => array( 'query' ),
+				'row_limit'  => 5,
+			)
+		);
+
+		if ( is_wp_error( $top_queries ) ) {
+			return $top_queries;
 		}
 
 		$last_week = $this->query_search_analytics(
@@ -821,7 +834,7 @@ class Search_Console {
 
 		return array(
 			'current'     => $this->first_row_metrics( $this_week ),
-			'top_queries' => $this->normalize_dimension_rows( $this_week, 'query' ),
+			'top_queries' => $this->normalize_dimension_rows( $top_queries, 'query' ),
 			'previous'    => $this->first_row_metrics( $last_week ),
 		);
 	}
@@ -966,7 +979,7 @@ class Search_Console {
 		$payload = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code < 200 || $code >= 300 ) {
-			$message = $payload['error']['message'] ?? sprintf( 'Search Console API error (HTTP %d).', $code );
+			$message = $payload['error']['message'] ?? sprintf( /* translators: %d: HTTP status code. */ __( 'Search Console API error (HTTP %d).', 'saman-seo' ), $code );
 
 			return new \WP_Error( 'saman_seo_gsc_api', sanitize_text_field( (string) $message ), array( 'status' => $code ) );
 		}
