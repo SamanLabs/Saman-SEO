@@ -73,6 +73,29 @@ class Compatibility {
 		// timeout for same-domain requests so the suite can finish reliably.
 		add_filter( 'http_request_args', array( $this, 'extend_local_timeout' ), 10, 2 );
 		add_action( 'http_api_curl', array( $this, 'force_fast_local_resolve' ), 10, 3 );
+
+		// WordPress core only ships hourly/twicedaily/daily. Services in this
+		// plugin (Link Health scan, Weekly digest) schedule 'weekly' events,
+		// which silently never fire unless this interval exists.
+		add_filter( 'cron_schedules', array( $this, 'register_cron_schedules' ) );
+	}
+
+	/**
+	 * Register shared cron intervals.
+	 *
+	 * @param array<string,array> $schedules Core schedules.
+	 *
+	 * @return array<string,array>
+	 */
+	public function register_cron_schedules( $schedules ) {
+		if ( ! isset( $schedules['weekly'] ) ) {
+			$schedules['weekly'] = array(
+				'interval' => WEEK_IN_SECONDS,
+				'display'  => __( 'Once Weekly', 'saman-seo' ),
+			);
+		}
+
+		return $schedules;
 	}
 
 	/**
