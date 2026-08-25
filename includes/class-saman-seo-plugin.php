@@ -235,6 +235,7 @@ class Plugin {
 		$this->register( 'image_seo', new Service\Image_SEO() );
 		$this->register( 'indexnow', new Service\IndexNow() );
 		$this->register( 'search_console', new Service\Search_Console() );
+		$this->register( 'weekly_report', new Service\Weekly_Report() );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->register( 'cli', new Service\CLI() );
@@ -324,6 +325,7 @@ class Plugin {
 		wp_clear_scheduled_hook( 'SAMAN_SEO_link_health_single' );
 		wp_clear_scheduled_hook( 'SAMAN_SEO_indexnow_submit' );
 		wp_clear_scheduled_hook( 'SAMAN_SEO_sitemap_cron' );
+		Service\Weekly_Report::unschedule();
 
 		flush_rewrite_rules();
 	}

@@ -4,6 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 // Score level configuration
 import { __, sprintf } from '@wordpress/i18n';
 import GscCard from '../components/GscCard';
+import WeeklyDigestCard from '../components/WeeklyDigestCard';
 const SCORE_LEVELS = {
 	excellent: {
 		label: __( 'Excellent', 'saman-seo' ),

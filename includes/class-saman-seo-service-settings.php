@@ -180,6 +180,11 @@ class Settings {
 		// Google Search Console (client secret + tokens are stored separately,
 		// non-autoloaded, by the Search_Console service).
 		'SAMAN_SEO_gsc_client_id'                    => '',
+
+		// Weekly digest email report.
+		'SAMAN_SEO_weekly_report_enabled'            => '0',
+		'SAMAN_SEO_weekly_report_email'              => '',
+		'SAMAN_SEO_weekly_report_day'                => 'monday',
 	);
 
 	/**
@@ -1150,6 +1155,17 @@ class Settings {
 	public function sanitize_404_log_ip_level( $value ) {
 		$value = sanitize_key( $value );
 		return in_array( $value, array( 'none', 'anonymized', 'full' ), true ) ? $value : 'none';
+	}
+
+	/**
+	 * Sanitize a weekday name.
+	 *
+	 * @param string $value Submitted value.
+	 * @return string
+	 */
+	public function sanitize_weekday( $value ) {
+		$value = sanitize_key( $value );
+		return in_array( $value, array( 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ), true ) ? $value : 'monday';
 	}
 
 	/**
