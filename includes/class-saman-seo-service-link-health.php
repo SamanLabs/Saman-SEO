@@ -318,7 +318,7 @@ class Link_Health {
 			);
 			$scan_id = (int) $wpdb->insert_id;
 
-			$links = $this->scan_post_links( $post_id );
+			$links  = $this->scan_post_links( $post_id );
 			$broken = 0;
 			foreach ( $links as $link ) {
 				if ( 'broken' === $link['status'] ) {
@@ -353,14 +353,14 @@ class Link_Health {
 		$wpdb->insert(
 			$this->scans_table,
 			array(
-				'scan_type'    => 'full',
-				'status'       => 'running',
-				'total_posts'  => $total,
+				'scan_type'     => 'full',
+				'status'        => 'running',
+				'total_posts'   => $total,
 				'scanned_posts' => 0,
-				'total_links'  => 0,
-				'broken_links' => 0,
-				'started_at'   => current_time( 'mysql' ),
-				'last_post_id' => 0,
+				'total_links'   => 0,
+				'broken_links'  => 0,
+				'started_at'    => current_time( 'mysql' ),
+				'last_post_id'  => 0,
 			),
 			array( '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%d' )
 		);
@@ -449,8 +449,8 @@ class Link_Health {
 			$last_id      = (int) $scan->last_post_id;
 
 			foreach ( $ids as $post_id ) {
-				$post_id = (int) $post_id;
-				$links   = $this->scan_post_links( $post_id );
+				$post_id      = (int) $post_id;
+				$links        = $this->scan_post_links( $post_id );
 				$total_links += count( $links );
 				foreach ( $links as $link ) {
 					if ( 'broken' === $link['status'] ) {

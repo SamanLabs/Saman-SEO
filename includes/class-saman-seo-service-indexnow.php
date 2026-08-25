@@ -379,8 +379,8 @@ class IndexNow {
 		// Limit to 10,000 URLs per request (IndexNow limit).
 		$urls = array_slice( $urls, 0, 10000 );
 
-		$host          = wp_parse_url( home_url(), PHP_URL_HOST );
-		$api_key       = $settings['api_key'];
+		$host    = wp_parse_url( home_url(), PHP_URL_HOST );
+		$api_key = $settings['api_key'];
 		// Defensive: constrain to the allowlist even if the option was written
 		// directly, so the key/URL list can never be sent to a rogue host.
 		$search_engine = $this->sanitize_search_engine( $settings['search_engine'] ?? 'api.indexnow.org' );

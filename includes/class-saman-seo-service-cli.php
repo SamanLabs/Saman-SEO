@@ -178,8 +178,8 @@ class CLI {
 				 * [--all-plugins]
 				 * : Include options from every plugin, not just Saman SEO.
 				 *
-				 * @param array       $args       Positional args.
-				 * @param array       $assoc_args Associative args.
+				 * @param array $args       Positional args.
+				 * @param array $assoc_args Associative args.
 				 */
 				public function __invoke( $args, $assoc_args ) {
 					global $wpdb;
@@ -204,7 +204,7 @@ class CLI {
 								|| 0 === strpos( (string) $row['option_name'], 'saman_seo_' );
 						}
 					);
-					$ours_bytes = array_sum( array_column( $ours, 'bytes' ) );
+					$ours_bytes  = array_sum( array_column( $ours, 'bytes' ) );
 
 					\WP_CLI::log(
 						sprintf(
@@ -233,7 +233,7 @@ class CLI {
 						\WP_CLI\Utils\format_items( 'table', $items, array( 'option', 'size' ) );
 					}
 
-					$cron = _get_cron_array();
+					$cron   = _get_cron_array();
 					$events = array();
 
 					foreach ( $cron as $timestamp => $hooks ) {
