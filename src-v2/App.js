@@ -38,6 +38,7 @@ const InstantIndexing = lazy( () => import( './pages/InstantIndexing' ) );
 const SchemaValidator = lazy( () => import( './pages/SchemaValidator' ) );
 const HtaccessEditor = lazy( () => import( './pages/HtaccessEditor' ) );
 const MobileFriendly = lazy( () => import( './pages/MobileFriendly' ) );
+const Improvements = lazy( () => import( './pages/Improvements' ) );
 
 // Component prefetch registry: maps view id to its lazy import factory.
 const prefetchRegistry = {
@@ -61,6 +62,7 @@ const prefetchRegistry = {
 	'schema-validator': () => import( './pages/SchemaValidator' ),
 	'htaccess-editor': () => import( './pages/HtaccessEditor' ),
 	'mobile-friendly': () => import( './pages/MobileFriendly' ),
+	improvements: () => import( './pages/Improvements' ),
 };
 
 // Loading spinner for lazy-loaded components
@@ -93,6 +95,7 @@ const viewToPage = {
 	'schema-validator': 'saman-seo-schema-validator',
 	'htaccess-editor': 'saman-seo-htaccess-editor',
 	'mobile-friendly': 'saman-seo-mobile-friendly',
+	improvements: 'saman-seo-improvements',
 };
 const pageToView = Object.entries( viewToPage ).reduce(
 	( acc, [ view, page ] ) => {
@@ -284,6 +287,8 @@ const App = ( { initialView = 'dashboard' } ) => {
 				return <HtaccessEditor onNavigate={ handleNavigate } />;
 			case 'mobile-friendly':
 				return <MobileFriendly onNavigate={ handleNavigate } />;
+			case 'improvements':
+				return <Improvements onNavigate={ handleNavigate } />;
 			default:
 				return <Dashboard onNavigate={ handleNavigate } />;
 		}

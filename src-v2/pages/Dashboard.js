@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import GscCard from '../components/GscCard';
 import WeeklyDigestCard from '../components/WeeklyDigestCard';
+import PageCacheCard from '../components/PageCacheCard';
 const SCORE_LEVELS = {
 	excellent: {
 		label: __( 'Excellent', 'saman-seo' ),
@@ -202,6 +203,13 @@ const Dashboard = ( { onNavigate } ) => {
 				</div>
 				<button
 					type="button"
+					className="button"
+					onClick={ () => handleNavigation( 'improvements' ) }
+				>
+					{ __( 'Improvements', 'saman-seo' ) }
+				</button>
+				<button
+					type="button"
 					className="button primary"
 					onClick={ handleRunAudit }
 				>
@@ -334,6 +342,12 @@ const Dashboard = ( { onNavigate } ) => {
 
 				{ /* Google Search Console - real search traffic */ }
 				<GscCard />
+
+				{ /* Scheduled weekly email digest */ }
+				<WeeklyDigestCard />
+
+				{ /* Static page cache with before/after TTFB */ }
+				<PageCacheCard />
 
 				{ /* Content Coverage Card - Large */ }
 				<div className="dashboard-card content-coverage-card">

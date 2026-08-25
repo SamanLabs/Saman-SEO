@@ -67,6 +67,7 @@ class Admin_V2 {
 		'saman-seo-schema-validator'     => 'schema-validator',
 		'saman-seo-htaccess-editor'      => 'htaccess-editor',
 		'saman-seo-mobile-friendly'      => 'mobile-friendly',
+		'saman-seo-improvements'         => 'improvements',
 		// Legacy V2 URLs (backwards compatibility)
 		'saman-seo-v2'                   => 'dashboard',
 		'saman-seo-v2-dashboard'         => 'dashboard',
@@ -233,6 +234,7 @@ class Admin_V2 {
 			'local-seo'        => __( 'Local SEO', 'saman-seo' ),
 			'ai-assistant'     => __( 'AI Assistant', 'saman-seo' ),
 			'assistants'       => __( 'AI Assistants', 'saman-seo' ),
+			'improvements'     => __( 'Improvements', 'saman-seo' ),
 		);
 
 		foreach ( $hidden_subpages as $slug => $title ) {
@@ -318,6 +320,7 @@ class Admin_V2 {
 			'admin_bar'      => \Saman\SEO\Helpers\module_enabled( 'admin_bar' ),
 			'internal_links' => \Saman\SEO\Helpers\module_enabled( 'internal_links' ),
 			'ai_assistant'   => \Saman\SEO\Helpers\module_enabled( 'ai_assistant' ),
+			'page_cache'     => \Saman\SEO\Helpers\module_enabled( 'page_cache' ),
 		);
 
 		// Pass configuration to React app
@@ -395,6 +398,8 @@ class Admin_V2 {
 			'Image_SEO'        => 'class-image-seo-controller.php',
 			'Search_Console'   => 'class-search-console-controller.php',
 			'Reports'          => 'class-reports-controller.php',
+			'Page_Cache'       => 'class-page-cache-controller.php',
+			'Improvements'     => 'class-improvements-controller.php',
 		);
 
 		foreach ( $controllers as $controller => $file ) {
