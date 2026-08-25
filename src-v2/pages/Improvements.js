@@ -107,6 +107,14 @@ const Improvements = ( { onNavigate } ) => {
 				<div className="improvements-summary__bar">
 					<div
 						className="improvements-summary__fill"
+						role="progressbar"
+						aria-valuenow={ pct }
+						aria-valuemin={ 0 }
+						aria-valuemax={ 100 }
+						aria-label={ __(
+							'Optimizations fully active',
+							'saman-seo'
+						) }
 						style={ { width: `${ pct }%` } }
 					/>
 				</div>

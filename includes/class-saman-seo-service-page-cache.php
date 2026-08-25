@@ -202,8 +202,8 @@ class Page_Cache {
 		// Universal check: WP_CACHE is on and the existing drop-in is not ours.
 		if ( ! isset( $conflicts['occupied'] )
 			&& defined( 'WP_CACHE' ) && WP_CACHE
-			&& file_exists( WP_CONTENT_DIR . '/advanced-cache.php' )
-			&& false === strpos( (string) file_get_contents( WP_CONTENT_DIR . '/advanced-cache.php' ), self::DROPIN_MARKER )
+			&& is_readable( WP_CONTENT_DIR . '/advanced-cache.php' )
+			&& false === strpos( (string) @file_get_contents( WP_CONTENT_DIR . '/advanced-cache.php' ), self::DROPIN_MARKER ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.PHP.NoSilencedErrors.Discouraged -- Local drop-in inspection; unreadable file must not break admin loads.
 		) {
 			$conflicts['occupied'] = __( 'Another plugin already owns advanced-cache.php', 'saman-seo' );
 		}
@@ -261,6 +261,10 @@ class Page_Cache {
 					/* translators: %s: comma-separated plugin list */
 					__( 'Another caching layer is active (%s). Disable it first — stacking caches causes stale-page bugs.', 'saman-seo' ),
 					implode( ', ', array_values( $conflicts ) )
+				),
+				array(
+					'status'    => 409,
+					'conflicts' => $conflicts,
 				)
 			);
 		}
@@ -676,7 +680,7 @@ PHP;
 	public function is_excluded_path() {
 		global $wp;
 
-		$path = isset( $wp->request ) ? '/' . trim( (string) $wp->request, '/' ) . '/' : '/';
+		$path = isset( $wp->request ) ? strtolower( '/' . trim( (string) $wp->request, '/' ) . '/' ) : '/';
 
 		$defaults = array(
 			'/cart/',
@@ -1144,7 +1148,7 @@ PHP;
 
 		// Window consumed: reset the log.
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations__file_put_contents -- Rotating our own append-only log.
-		@file_put_contents( $log, '' );
+		@file_put_contents( $log, '', LOCK_EX );
 	}
 
 	/**

@@ -175,11 +175,20 @@ class Page_Cache_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function save_settings( $request ) {
-		$ttl = max( 1, min( 168, (int) $request->get_param( 'ttl' ) ) );
+		$ttl = $request->get_param( 'ttl' );
+		if ( null !== $ttl ) {
+			update_option( Page_Cache::OPTION_TTL, max( 1, min( 168, (int) $ttl ) ) );
+		}
 
-		update_option( Page_Cache::OPTION_TTL, $ttl );
-		update_option( Page_Cache::OPTION_PURGE_ON_SAVE, $request->get_param( 'purge_on_save' ) ? '1' : '0' );
-		update_option( Page_Cache::OPTION_EXCLUSIONS, (string) $request->get_param( 'excluded_urls' ), false );
+		$purge_on_save = $request->get_param( 'purge_on_save' );
+		if ( null !== $purge_on_save ) {
+			update_option( Page_Cache::OPTION_PURGE_ON_SAVE, $purge_on_save ? '1' : '0' );
+		}
+
+		$excluded_urls = $request->get_param( 'excluded_urls' );
+		if ( null !== $excluded_urls ) {
+			update_option( Page_Cache::OPTION_EXCLUSIONS, (string) $excluded_urls, false );
+		}
 
 		return $this->success( $this->get_status_data(), __( 'Cache settings saved.', 'saman-seo' ) );
 	}

@@ -150,7 +150,7 @@ class Improvements_Controller extends REST_Controller {
 
 					$metrics[] = array(
 						'label' => __( 'TTFB', 'saman-seo' ),
-						/* translators: 1: before ms, 2: after ms */
+						/* translators: 1: before ms, 2: after ms, 3: speed multiplier */
 						'value' => sprintf( __( '%1$dms → %2$dms (%3$d×)', 'saman-seo' ), (int) $stats['ttfb_cold_ms'], (int) $stats['ttfb_warm_ms'], (int) $speedup ),
 					);
 				}
