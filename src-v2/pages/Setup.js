@@ -1,5 +1,20 @@
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import {
+	IconFileText,
+	IconBuilding,
+	IconShoppingCart,
+	IconPalette,
+	IconBriefcase,
+	IconHeart,
+	IconTrendingUp,
+	IconClipboardList,
+	IconDollarSign,
+	IconStar,
+	IconRocket,
+	IconActivity,
+	IconWrench,
+} from '../components/Icons';
 
 /**
  * Setup Wizard - First-time plugin configuration
@@ -88,54 +103,54 @@ const Setup = ( { onComplete, onSkip } ) => {
 		{
 			value: 'blog',
 			label: __( 'Blog / News', 'saman-seo' ),
-			icon: '📝',
+			icon: <IconFileText />,
 		},
 		{
 			value: 'business',
 			label: __( 'Business / Company', 'saman-seo' ),
-			icon: '🏢',
+			icon: <IconBuilding />,
 		},
 		{
 			value: 'ecommerce',
 			label: __( 'E-commerce / Store', 'saman-seo' ),
-			icon: '🛒',
+			icon: <IconShoppingCart />,
 		},
 		{
 			value: 'portfolio',
 			label: __( 'Portfolio / Personal', 'saman-seo' ),
-			icon: '🎨',
+			icon: <IconPalette />,
 		},
 		{
 			value: 'agency',
 			label: __( 'Agency / Services', 'saman-seo' ),
-			icon: '💼',
+			icon: <IconBriefcase />,
 		},
 		{
 			value: 'nonprofit',
 			label: __( 'Non-profit / Charity', 'saman-seo' ),
-			icon: '❤️',
+			icon: <IconHeart />,
 		},
 	];
 	const goals = [
 		{
 			value: 'traffic',
 			label: __( 'Get more traffic', 'saman-seo' ),
-			icon: '📈',
+			icon: <IconTrendingUp />,
 		},
 		{
 			value: 'leads',
 			label: __( 'Generate leads', 'saman-seo' ),
-			icon: '📋',
+			icon: <IconClipboardList />,
 		},
 		{
 			value: 'sales',
 			label: __( 'Increase sales', 'saman-seo' ),
-			icon: '💰',
+			icon: <IconDollarSign />,
 		},
 		{
 			value: 'brand',
 			label: __( 'Build brand awareness', 'saman-seo' ),
-			icon: '🌟',
+			icon: <IconStar />,
 		},
 	];
 	return (
@@ -174,7 +189,9 @@ const Setup = ( { onComplete, onSkip } ) => {
 
 						<div className="setup-features">
 							<div className="setup-feature">
-								<span className="setup-feature__icon">🚀</span>
+								<span className="setup-feature__icon">
+									<IconRocket />
+								</span>
 								<span>
 									{ __(
 										'AI-powered optimization',
@@ -183,7 +200,9 @@ const Setup = ( { onComplete, onSkip } ) => {
 								</span>
 							</div>
 							<div className="setup-feature">
-								<span className="setup-feature__icon">📊</span>
+								<span className="setup-feature__icon">
+									<IconActivity />
+								</span>
 								<span>
 									{ __(
 										'Real-time SEO analysis',
@@ -192,7 +211,9 @@ const Setup = ( { onComplete, onSkip } ) => {
 								</span>
 							</div>
 							<div className="setup-feature">
-								<span className="setup-feature__icon">🔧</span>
+								<span className="setup-feature__icon">
+									<IconWrench />
+								</span>
 								<span>
 									{ __( 'Easy-to-use tools', 'saman-seo' ) }
 								</span>

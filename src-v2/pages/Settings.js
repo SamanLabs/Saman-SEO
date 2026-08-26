@@ -2,6 +2,29 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
 import AnalyticsNotice from '../components/AnalyticsNotice';
+import {
+	IconSitemap,
+	IconCornerUpLeft,
+	IconAlertCircle,
+	IconLink,
+	IconBarChart,
+	IconVideo,
+	IconGraduationCap,
+	IconMonitor,
+	IconBookOpen,
+	IconMusic,
+	IconFilm,
+	IconUtensils,
+	IconWrench,
+	IconBriefcase,
+	IconImage,
+	IconChevronsRight,
+	IconBot,
+	IconMapPin,
+	IconSparkles,
+	IconZap,
+	IconSearch,
+} from '../components/Icons';
 import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
 import useUrlTab from '../hooks/useUrlTab';
 import { analytics } from '../utils/analytics';
@@ -775,7 +798,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Generate and manage XML sitemaps for search engines.',
 				'saman-seo'
 			),
-			icon: '🗺️',
+			icon: <IconSitemap />,
 		},
 		{
 			key: 'module_redirects',
@@ -784,7 +807,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Create and manage URL redirects (301, 302, 307).',
 				'saman-seo'
 			),
-			icon: '↪️',
+			icon: <IconCornerUpLeft />,
 		},
 		{
 			key: 'module_404_log',
@@ -793,7 +816,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Track and monitor 404 errors on your site.',
 				'saman-seo'
 			),
-			icon: '🚫',
+			icon: <IconAlertCircle />,
 		},
 		{
 			key: 'module_internal_linking',
@@ -802,7 +825,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Automatic internal link suggestions and management.',
 				'saman-seo'
 			),
-			icon: '🔗',
+			icon: <IconLink />,
 		},
 		{
 			key: 'module_schema',
@@ -811,7 +834,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Master switch for all structured data output.',
 				'saman-seo'
 			),
-			icon: '📊',
+			icon: <IconBarChart />,
 		},
 		{
 			key: 'module_schema_video',
@@ -820,13 +843,13 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'VideoObject schema for embedded YouTube/Vimeo videos.',
 				'saman-seo'
 			),
-			icon: '🎬',
+			icon: <IconVideo />,
 		},
 		{
 			key: 'module_schema_course',
 			name: __( 'Course Schema', 'saman-seo' ),
 			desc: __( 'Course schema for the course post type.', 'saman-seo' ),
-			icon: '🎓',
+			icon: <IconGraduationCap />,
 		},
 		{
 			key: 'module_schema_software',
@@ -835,25 +858,25 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'SoftwareApplication schema for the software post type.',
 				'saman-seo'
 			),
-			icon: '💿',
+			icon: <IconMonitor />,
 		},
 		{
 			key: 'module_schema_book',
 			name: __( 'Book Schema', 'saman-seo' ),
 			desc: __( 'Book schema for the book post type.', 'saman-seo' ),
-			icon: '📚',
+			icon: <IconBookOpen />,
 		},
 		{
 			key: 'module_schema_music',
 			name: __( 'Music Schema', 'saman-seo' ),
 			desc: __( 'MusicGroup schema for the music post type.', 'saman-seo' ),
-			icon: '🎵',
+			icon: <IconMusic />,
 		},
 		{
 			key: 'module_schema_movie',
 			name: __( 'Movie Schema', 'saman-seo' ),
 			desc: __( 'Movie schema for the movie post type.', 'saman-seo' ),
-			icon: '🍿',
+			icon: <IconFilm />,
 		},
 		{
 			key: 'module_schema_restaurant',
@@ -862,7 +885,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Restaurant schema for the restaurant post type.',
 				'saman-seo'
 			),
-			icon: '🍽️',
+			icon: <IconUtensils />,
 		},
 		{
 			key: 'module_schema_service',
@@ -871,7 +894,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Service schema for the service post type.',
 				'saman-seo'
 			),
-			icon: '🛠️',
+			icon: <IconWrench />,
 		},
 		{
 			key: 'module_schema_job_posting',
@@ -880,7 +903,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'JobPosting schema for the job posting post type.',
 				'saman-seo'
 			),
-			icon: '💼',
+			icon: <IconBriefcase />,
 		},
 		{
 			key: 'module_social_cards',
@@ -889,13 +912,13 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Dynamic Open Graph and Twitter Card generation.',
 				'saman-seo'
 			),
-			icon: '🃏',
+			icon: <IconImage />,
 		},
 		{
 			key: 'module_breadcrumbs',
 			name: __( 'Breadcrumbs', 'saman-seo' ),
 			desc: __( 'SEO-friendly breadcrumb navigation.', 'saman-seo' ),
-			icon: '🥖',
+			icon: <IconChevronsRight />,
 		},
 		{
 			key: 'module_llm_txt',
@@ -904,7 +927,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Generate llm.txt file for AI crawlers and LLMs.',
 				'saman-seo'
 			),
-			icon: '🤖',
+			icon: <IconBot />,
 		},
 		{
 			key: 'module_local_seo',
@@ -913,7 +936,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Local business schema and location pages.',
 				'saman-seo'
 			),
-			icon: '📍',
+			icon: <IconMapPin />,
 		},
 		{
 			key: 'module_ai_assistant',
@@ -922,7 +945,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'AI-powered content optimization suggestions.',
 				'saman-seo'
 			),
-			icon: '✨',
+			icon: <IconSparkles />,
 		},
 		{
 			key: 'module_indexnow',
@@ -931,13 +954,13 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				'Instant URL submission to search engines (Bing, Yandex).',
 				'saman-seo'
 			),
-			icon: '⚡',
+			icon: <IconZap />,
 		},
 		{
 			key: 'module_search_console',
 			name: __( 'Search Console', 'saman-seo' ),
 			desc: __( 'Google Search Console integration.', 'saman-seo' ),
-			icon: '🔍',
+			icon: <IconSearch />,
 		},
 	];
 	const enabledCount = modules.filter( ( m ) => settings[ m.key ] ).length;

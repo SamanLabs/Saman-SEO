@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	IconFacebook,
+	IconXBrand,
+	IconInstagram,
+	IconLinkedin,
+	IconYoutube,
+	IconLink,
+} from '../components/Icons';
 const businessTypes = [
 	{
 		value: 'LocalBusiness',
@@ -288,13 +296,13 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 	// Parse social profiles
 	const getSocialIcon = ( url ) => {
 		if ( ! url ) return null;
-		if ( url.includes( 'facebook.com' ) ) return '📘';
+		if ( url.includes( 'facebook.com' ) ) return <IconFacebook />;
 		if ( url.includes( 'twitter.com' ) || url.includes( 'x.com' ) )
-			return '𝕏';
-		if ( url.includes( 'instagram.com' ) ) return '📷';
-		if ( url.includes( 'linkedin.com' ) ) return '💼';
-		if ( url.includes( 'youtube.com' ) ) return '▶️';
-		return '🔗';
+			return <IconXBrand />;
+		if ( url.includes( 'instagram.com' ) ) return <IconInstagram />;
+		if ( url.includes( 'linkedin.com' ) ) return <IconLinkedin />;
+		if ( url.includes( 'youtube.com' ) ) return <IconYoutube />;
+		return <IconLink />;
 	};
 	const socialLinks = ( socialProfiles || [] )
 		.filter( Boolean )
