@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { AssistantProvider, AssistantChat } from '../assistants';
+import { assistantIconKeys, resolveAssistantIcon } from '../components/Icons';
 
 // Get AI status from global settings
 import { __ } from '@wordpress/i18n';
@@ -8,6 +9,20 @@ const globalSettings = window.samanSeoV2Settings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
 const aiProvider = globalSettings.aiProvider || 'none';
 const aiPilot = globalSettings.aiPilot || null;
+
+/**
+ * Renders an assistant's stored icon key as an SVG
+ * (legacy emoji values are resolved to their SVG equivalent).
+ *
+ * @param {Object} props      Component props.
+ * @param {string} props.icon Icon key or legacy emoji value.
+ *
+ * @return {*} The resolved icon element.
+ */
+const AssistantIcon = ( { icon } ) => {
+	const IconComponent = resolveAssistantIcon( icon );
+	return <IconComponent />;
+};
 
 /**
  * Assistants page - Management view with create + stats.
@@ -28,7 +43,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 		description: '',
 		system_prompt: '',
 		initial_message: '',
-		icon: '🤖',
+		icon: 'bot',
 		color: '#6366f1',
 		model_id: '',
 		is_active: true,
@@ -89,7 +104,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 			description: '',
 			system_prompt: '',
 			initial_message: '',
-			icon: '🤖',
+			icon: 'bot',
 			color: '#6366f1',
 			model_id: '',
 			is_active: true,
@@ -101,7 +116,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 			description: '',
 			system_prompt: '',
 			initial_message: '',
-			icon: '🤖',
+			icon: 'bot',
 			color: '#6366f1',
 			model_id: '',
 			is_active: true,
@@ -115,7 +130,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 			description: assistant.description || '',
 			system_prompt: assistant.system_prompt || '',
 			initial_message: assistant.initial_message || '',
-			icon: assistant.icon || '🤖',
+			icon: assistant.icon || 'bot',
 			color: assistant.color || '#6366f1',
 			model_id: assistant.model_id || '',
 			is_active: assistant.is_active !== false,
@@ -179,18 +194,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 			[ key ]: value,
 		} ) );
 	};
-	const icons = [
-		'🤖',
-		'💬',
-		'📊',
-		'🎯',
-		'✨',
-		'🔍',
-		'📝',
-		'💡',
-		'🚀',
-		'⚡',
-	];
+	const icons = assistantIconKeys;
 	const colors = [
 		'#3b82f6',
 		'#8b5cf6',
@@ -239,7 +243,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 								color: selectedAssistant.color,
 							} }
 						>
-							{ selectedAssistant.icon }
+							<AssistantIcon icon={ selectedAssistant.icon } />
 						</div>
 						<div>
 							<h1>{ selectedAssistant.name }</h1>
@@ -355,7 +359,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 											updateForm( 'icon', icon )
 										}
 									>
-										{ icon }
+										<AssistantIcon icon={ icon } />
 									</button>
 								) ) }
 							</div>
@@ -662,7 +666,7 @@ const Assistants = ( { initialAssistant = null } ) => {
 										color: assistant.color,
 									} }
 								>
-									{ assistant.icon }
+									<AssistantIcon icon={ assistant.icon } />
 								</div>
 								<div className="assistant-card__content">
 									<h3 className="assistant-card__name">
