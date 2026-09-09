@@ -262,8 +262,8 @@ class RedirectValidationTest extends TestCase {
 	 * A draft target is flagged unpublished rather than dead.
 	 */
 	public function test_validate_flags_unpublished_target(): void {
-		self::$url_posts['/draft-page']     = 31;
-		self::$post_statuses[31]           = 'draft';
+		self::$url_posts['/draft-page'] = 31;
+		self::$post_statuses[31]        = 'draft';
 
 		$warnings = $this->service->validate_redirect( '/old/', '/draft-page/', 0, false, array() );
 
@@ -319,8 +319,8 @@ class RedirectValidationTest extends TestCase {
 	 * Term archives resolve via the slug scan.
 	 */
 	public function test_resolve_term_archive(): void {
-		self::$terms       = array( (object) array( 'slug' => 'coffee' ) );
-		self::$term_links  = array( 'coffee' => '/category/coffee/' );
+		self::$terms      = array( (object) array( 'slug' => 'coffee' ) );
+		self::$term_links = array( 'coffee' => '/category/coffee/' );
 
 		$result = $this->service->resolve_local_path( '/category/coffee/' );
 
@@ -350,6 +350,34 @@ class RedirectValidationTest extends TestCase {
 		$result = $this->service->resolve_local_path( '/nope/' );
 
 		$this->assertSame( 'not_found', $result['type'] );
+	}
+
+	/**
+	 * Priority defaults to the last slot so an upgrade cannot reorder existing rules.
+	 */
+	public function test_priority_default_is_the_last_slot(): void {
+		$this->assertSame( 10, Redirect_Manager::PRIORITY_MAX );
+		$this->assertSame( 1, Redirect_Manager::PRIORITY_MIN );
+	}
+
+	/**
+	 * Priority is clamped into range, so a bad value can never reorder the table.
+	 */
+	public function test_clamp_priority_bounds_every_input(): void {
+		$this->assertSame( 1, Redirect_Manager::clamp_priority( 1 ) );
+		$this->assertSame( 5, Redirect_Manager::clamp_priority( 5 ) );
+		$this->assertSame( 10, Redirect_Manager::clamp_priority( 10 ) );
+
+		// Out of range in both directions.
+		$this->assertSame( 1, Redirect_Manager::clamp_priority( 0 ) );
+		$this->assertSame( 1, Redirect_Manager::clamp_priority( -99 ) );
+		$this->assertSame( 10, Redirect_Manager::clamp_priority( 11 ) );
+		$this->assertSame( 10, Redirect_Manager::clamp_priority( 9999 ) );
+
+		// Non-integer input.
+		$this->assertSame( 3, Redirect_Manager::clamp_priority( '3' ) );
+		$this->assertSame( 1, Redirect_Manager::clamp_priority( 'abc' ) );
+		$this->assertSame( 1, Redirect_Manager::clamp_priority( null ) );
 	}
 
 	/**

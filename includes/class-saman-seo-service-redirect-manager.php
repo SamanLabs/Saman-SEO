@@ -17,7 +17,7 @@ class Redirect_Manager {
 	/**
 	 * Schema version for migrations.
 	 */
-	public const SCHEMA_VERSION = 2;
+	public const SCHEMA_VERSION = 3;
 
 	/**
 	 * Cache settings shared with CLI helpers.
@@ -275,7 +275,7 @@ class Redirect_Manager {
 	 * @param string $source      Source URL path.
 	 * @param string $target      Target URL.
 	 * @param int    $status_code HTTP status code (301, 302, 307, 410).
-	 * @param array  $extra       Optional extra fields (is_regex, group_name, start_date, end_date, notes).
+	 * @param array  $extra       Optional extra fields (is_regex, priority, group_name, start_date, end_date, notes).
 	 *
 	 * @return int|\WP_Error Inserted redirect ID or WP_Error on failure.
 	 */
@@ -324,6 +324,7 @@ class Redirect_Manager {
 			'target'      => $target,
 			'status_code' => $status_code,
 			'is_regex'    => $is_regex ? 1 : 0,
+			'priority'    => isset( $extra['priority'] ) ? self::clamp_priority( $extra['priority'] ) : self::PRIORITY_MAX,
 			'group_name'  => isset( $extra['group_name'] ) ? sanitize_text_field( $extra['group_name'] ) : '',
 			'start_date'  => ! empty( $extra['start_date'] ) ? sanitize_text_field( $extra['start_date'] ) : null,
 			'end_date'    => ! empty( $extra['end_date'] ) ? sanitize_text_field( $extra['end_date'] ) : null,
@@ -331,7 +332,8 @@ class Redirect_Manager {
 			'created_at'  => current_time( 'mysql' ),
 		);
 
-		$formats = array( '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s' );
+		// Positional, one per $data key in order.
+		$formats = array( '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$inserted = $wpdb->insert( $this->table, $data, $formats );
@@ -424,6 +426,12 @@ class Redirect_Manager {
 		// Is regex.
 		if ( isset( $data['is_regex'] ) ) {
 			$update['is_regex'] = ! empty( $data['is_regex'] ) ? 1 : 0;
+			$formats[]          = '%d';
+		}
+
+		// Priority.
+		if ( isset( $data['priority'] ) ) {
+			$update['priority'] = self::clamp_priority( $data['priority'] );
 			$formats[]          = '%d';
 		}
 
@@ -783,7 +791,7 @@ class Redirect_Manager {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, health scan requires full table read.
 		$rules = $wpdb->get_results(
-			$wpdb->prepare( "SELECT * FROM {$this->table} ORDER BY id ASC LIMIT %d", absint( $limit ) )
+			$wpdb->prepare( "SELECT * FROM {$this->table} ORDER BY priority ASC, id ASC LIMIT %d", absint( $limit ) )
 		);
 
 		$rules = is_array( $rules ) ? $rules : array();
@@ -1183,6 +1191,7 @@ class Redirect_Manager {
 			hits bigint(20) unsigned NOT NULL DEFAULT 0,
 			last_hit datetime DEFAULT NULL,
 			is_regex tinyint(1) NOT NULL DEFAULT 0,
+			priority tinyint(3) unsigned NOT NULL DEFAULT 10,
 			group_name varchar(100) DEFAULT '',
 			start_date datetime DEFAULT NULL,
 			end_date datetime DEFAULT NULL,
@@ -1191,6 +1200,7 @@ class Redirect_Manager {
 			PRIMARY KEY  (id),
 			KEY source (source),
 			KEY is_regex (is_regex),
+			KEY priority (priority),
 			KEY group_name (group_name)
 		) $charset;";
 
@@ -1266,6 +1276,18 @@ class Redirect_Manager {
 
 			// Extend target column to 500 chars if needed.
 			$wpdb->query( "ALTER TABLE {$this->table} MODIFY COLUMN target varchar(500) NOT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		}
+
+		// Migration from version 2 to 3: rule ordering.
+		if ( $current_version < 3 ) {
+			$columns = $wpdb->get_col( "DESCRIBE {$this->table}", 0 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+			// Add priority column if missing. Existing rules all land on the
+			// default, so their relative order is unchanged by the upgrade.
+			if ( ! in_array( 'priority', $columns, true ) ) {
+				$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN priority tinyint(3) unsigned NOT NULL DEFAULT 10" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->query( "ALTER TABLE {$this->table} ADD KEY priority (priority)" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
 		}
 
 		update_option( 'SAMAN_SEO_redirects_schema_version', self::SCHEMA_VERSION );
@@ -1513,6 +1535,39 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Lowest allowed priority value (runs first).
+	 */
+	public const PRIORITY_MIN = 1;
+
+	/**
+	 * Highest allowed priority value, and the default (runs last).
+	 */
+	public const PRIORITY_MAX = 10;
+
+	/**
+	 * Clamp a priority into the allowed range.
+	 *
+	 * Priority works like a WordPress hook priority: a LOWER number is evaluated
+	 * EARLIER. Every rule starts at PRIORITY_MAX, so existing rules keep their
+	 * relative (id) order and you promote a rule by lowering its number - which is
+	 * how you put a specific pattern in front of a broad catch-all.
+	 *
+	 * @param mixed $priority Raw priority value.
+	 * @return int Priority between PRIORITY_MIN and PRIORITY_MAX.
+	 */
+	public static function clamp_priority( $priority ) {
+		$priority = (int) $priority;
+
+		if ( $priority < self::PRIORITY_MIN ) {
+			$priority = self::PRIORITY_MIN;
+		} elseif ( $priority > self::PRIORITY_MAX ) {
+			$priority = self::PRIORITY_MAX;
+		}
+
+		return $priority;
+	}
+
+	/**
 	 * Find a non-regex redirect matching the request.
 	 *
 	 * @param string $path    Normalized request path.
@@ -1536,7 +1591,7 @@ class Redirect_Manager {
 			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
 			$row = $wpdb->get_row(
 				$wpdb->prepare(
-					'SELECT * FROM ' . $this->table . ' WHERE LOWER(source) = LOWER(%s) AND is_regex = 0 LIMIT 1',
+					'SELECT * FROM ' . $this->table . ' WHERE LOWER(source) = LOWER(%s) AND is_regex = 0 ORDER BY priority ASC, id ASC LIMIT 1',
 					$lookup
 				)
 			);
@@ -1545,7 +1600,7 @@ class Redirect_Manager {
 			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
 			$row = $wpdb->get_row(
 				$wpdb->prepare(
-					'SELECT * FROM ' . $this->table . ' WHERE source = %s AND is_regex = 0 LIMIT 1',
+					'SELECT * FROM ' . $this->table . ' WHERE source = %s AND is_regex = 0 ORDER BY priority ASC, id ASC LIMIT 1',
 					$lookup
 				)
 			);
@@ -1571,8 +1626,13 @@ class Redirect_Manager {
 		global $wpdb;
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
+		// Ordered so the winner between two overlapping patterns is both stable and
+		// controllable: priority first (lower runs earlier), then id to break ties.
+		// Without an ORDER BY the rows arrive in whatever order the storage engine
+		// happens to return, which can change after a restore or OPTIMIZE TABLE and
+		// silently hand the request to a different rule.
 		$regex_redirects = $wpdb->get_results(
-			'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1'
+			'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1 ORDER BY priority ASC, id ASC'
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 
