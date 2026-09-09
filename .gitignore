@@ -6,6 +6,8 @@ composer-setup.php
 
 # Build output (all created by npm run build)
 # Contains: css/, v2/, editor/, admin-list/
+# NOT COMMITTED: never hand-edit anything in here. There is no committed copy to
+# restore from, and the next `npm run build` overwrites it. Edit src-v2/ instead.
 /build
 /src-v2/index.css
 

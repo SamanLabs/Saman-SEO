@@ -20,12 +20,32 @@ const STATUS_CODES = [
 	},
 ];
 
+// Match-priority levels, lowest (checked first) to highest (checked last).
+const PRIORITY_LEVELS = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+
+/**
+ * Label a match-priority level, naming the two ends of the range.
+ *
+ * @param {number} level Priority level.
+ * @return {string} Option label.
+ */
+const priorityLabel = ( level ) => {
+	if ( 1 === level ) {
+		return __( '1 - checked first', 'saman-seo' );
+	}
+	if ( 10 === level ) {
+		return __( '10 - checked last (default)', 'saman-seo' );
+	}
+	return String( level );
+};
+
 // Empty form state
 const emptyForm = {
 	source: '',
 	target: '',
 	status_code: 301,
 	is_regex: false,
+	priority: 10,
 	group_name: '',
 	start_date: '',
 	end_date: '',
@@ -609,6 +629,7 @@ const Redirects = () => {
 			target: redirect.target || '',
 			status_code: redirect.status_code || 301,
 			is_regex: redirect.is_regex || false,
+			priority: redirect.priority || 10,
 			group_name: redirect.group_name || '',
 			start_date: redirect.start_date
 				? redirect.start_date.slice( 0, 16 )
@@ -620,7 +641,10 @@ const Redirects = () => {
 		setShowModal( true );
 		setChainWarnings( [] );
 		setShowAdvanced(
-			!! redirect.start_date || !! redirect.end_date || !! redirect.notes
+			!! redirect.start_date ||
+				!! redirect.end_date ||
+				!! redirect.notes ||
+				( !! redirect.priority && 10 !== Number( redirect.priority ) )
 		);
 		setFormError( '' );
 	};
@@ -1295,6 +1319,27 @@ const Redirects = () => {
 															) }
 														</span>
 													) }
+													{ !! redirect.priority &&
+														10 !==
+															Number(
+																redirect.priority
+															) && (
+															<span
+																className="pill warning small"
+																title={ __(
+																	'Match priority: lower is checked first',
+																	'saman-seo'
+																) }
+															>
+																{ __(
+																	'Priority',
+																	'saman-seo'
+																) }{ ' ' }
+																{
+																	redirect.priority
+																}
+															</span>
+														) }
 													{ redirect.group_name && (
 														<span className="pill muted small">
 															{
@@ -1614,6 +1659,47 @@ const Redirects = () => {
 
 								{ showAdvanced && (
 									<div className="advanced-options">
+										<div className="form-row">
+											<div className="form-group">
+												<label htmlFor="modal-priority">
+													{ __(
+														'Match Priority',
+														'saman-seo'
+													) }
+												</label>
+												<select
+													id="modal-priority"
+													value={ formData.priority }
+													onChange={ ( e ) =>
+														updateForm(
+															'priority',
+															Number(
+																e.target.value
+															)
+														)
+													}
+												>
+													{ PRIORITY_LEVELS.map(
+														( level ) => (
+															<option
+																key={ level }
+																value={ level }
+															>
+																{ priorityLabel(
+																	level
+																) }
+															</option>
+														)
+													) }
+												</select>
+												<p className="field-hint">
+													{ __(
+														'Decides which rule wins when more than one pattern matches the same URL. Lower is checked first, so give a specific pattern a lower number than the broad catch-all it needs to beat. Exact (non-regex) paths always win over regex regardless of this.',
+														'saman-seo'
+													) }
+												</p>
+											</div>
+										</div>
 										<div className="form-row">
 											<div className="form-group">
 												<label htmlFor="modal-start-date">
