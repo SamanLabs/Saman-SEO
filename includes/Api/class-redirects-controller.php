@@ -108,6 +108,13 @@ class Redirects_Controller extends REST_Controller {
                         'type'     => 'boolean',
                         'default'  => false,
                     ],
+                    'priority' => [
+                        'required'          => false,
+                        'type'              => 'integer',
+                        'minimum'           => 1,
+                        'maximum'           => 10,
+                        'sanitize_callback' => 'absint',
+                    ],
                     'group_name' => [
                         'required'          => false,
                         'type'              => 'string',
@@ -174,6 +181,13 @@ class Redirects_Controller extends REST_Controller {
                         'required' => false,
                         'type'     => 'boolean',
                         'default'  => false,
+                    ],
+                    'priority' => [
+                        'required'          => false,
+                        'type'              => 'integer',
+                        'minimum'           => 1,
+                        'maximum'           => 10,
+                        'sanitize_callback' => 'absint',
                     ],
                     'group_name' => [
                         'required'          => false,
@@ -749,6 +763,7 @@ class Redirects_Controller extends REST_Controller {
             'hits'        => (int) $redirect->hits,
             'last_hit'    => $redirect->last_hit,
             'is_regex'    => isset( $redirect->is_regex ) ? (bool) $redirect->is_regex : false,
+            'priority'    => isset( $redirect->priority ) ? (int) $redirect->priority : \Saman\SEO\Service\Redirect_Manager::PRIORITY_MAX,
             'group_name'  => isset( $redirect->group_name ) ? $redirect->group_name : '',
             'start_date'  => isset( $redirect->start_date ) ? $redirect->start_date : null,
             'end_date'    => isset( $redirect->end_date ) ? $redirect->end_date : null,
@@ -793,6 +808,7 @@ class Redirects_Controller extends REST_Controller {
 
         $extra = [
             'is_regex'   => $request->get_param( 'is_regex' ),
+            'priority'   => $request->get_param( 'priority' ),
             'group_name' => $request->get_param( 'group_name' ),
             'start_date' => $request->get_param( 'start_date' ),
             'end_date'   => $request->get_param( 'end_date' ),
@@ -823,7 +839,7 @@ class Redirects_Controller extends REST_Controller {
         $data = [];
 
         // Collect all provided fields
-        $fields = [ 'source', 'target', 'status_code', 'is_regex', 'group_name', 'start_date', 'end_date', 'notes' ];
+        $fields = [ 'source', 'target', 'status_code', 'is_regex', 'priority', 'group_name', 'start_date', 'end_date', 'notes' ];
         foreach ( $fields as $field ) {
             $value = $request->get_param( $field );
             if ( null !== $value ) {
