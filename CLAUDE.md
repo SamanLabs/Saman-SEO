@@ -40,3 +40,20 @@ Canonical hook names use the `saman_seo_*` prefix (e.g., `saman_seo_title`). Whe
 ## Build
 
 React app lives in `src-v2/` and builds to `build/v2/` via `@wordpress/scripts`.
+
+**Never edit anything under `build/`.** It is compiled output AND it is
+gitignored, which is a bad combination: an edit there is silently replaced by the
+next `npm run build`, and because nothing in `build/` is committed there is no
+copy to diff against or restore from. The change is simply gone. Edit the source
+in `src-v2/` (or `assets/less/` for CSS) and run `npm run build`.
+
+Every generated bundle carries a `GENERATED FILE, DO NOT EDIT` banner, stamped by
+`scripts/prepend-build-banner.js` as the last step of `npm run build`. It runs
+after minification because wp-scripts configures Terser with an
+`output.comments` regex that keeps translator comments and strips everything
+else, so webpack's own `BannerPlugin` output does not survive.
+
+The same trap applies to **replacing an installed plugin's `build/` directory**
+(for example, dropping a locally built bundle onto a site to test a change): the
+bundle you overwrite cannot be recovered from git, and the plugin header version
+will not tell you what that bundle was built from. Copy it somewhere first.

@@ -127,6 +127,14 @@ npm run watch
 npm run build
 ```
 
+> **Never edit files under `build/`.** They are compiled output and `build/` is
+> gitignored, so an edit there is lost at the next `npm run build` with no
+> committed copy to restore from. Change the source in `src-v2/` (or
+> `assets/less/` for CSS) and rebuild. Each generated bundle carries a
+> `GENERATED FILE, DO NOT EDIT` banner as a reminder. If you overwrite an
+> installed site's `build/` directory to test a bundle, back up the one you are
+> replacing first -- git cannot give it back.
+
 ### 2. Commit Your Changes
 
 **Commit Message Format:**
