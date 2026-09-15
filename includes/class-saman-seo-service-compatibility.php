@@ -71,13 +71,43 @@ class Compatibility {
 		// causing the validation suite's wp_remote_get calls to timeout.
 		// Force IPv4, a static host-to-127.0.0.1 resolution, and a longer
 		// timeout for same-domain requests so the suite can finish reliably.
-		add_filter( 'http_request_args', array( $this, 'extend_local_timeout' ), 10, 2 );
-		add_action( 'http_api_curl', array( $this, 'force_fast_local_resolve' ), 10, 3 );
+		//
+		// Local and development environments only. On hosts where the web
+		// server does not listen on loopback (Plesk behind an nginx proxy,
+		// some LiteSpeed setups) pinning the site host to 127.0.0.1 makes
+		// every same-domain request fail instantly with cURL error 7:
+		// WP-Cron spawning, Gravity Forms background tasks and notifications,
+		// REST self-calls, plugin updater checks.
+		if ( $this->should_pin_loopback() ) {
+			add_filter( 'http_request_args', array( $this, 'extend_local_timeout' ), 10, 2 );
+			add_action( 'http_api_curl', array( $this, 'force_fast_local_resolve' ), 10, 3 );
+		}
 
 		// WordPress core only ships hourly/twicedaily/daily. Services in this
 		// plugin (Link Health scan, Weekly digest) schedule 'weekly' events,
 		// which silently never fire unless this interval exists.
 		add_filter( 'cron_schedules', array( $this, 'register_cron_schedules' ) );
+	}
+
+	/**
+	 * Whether same-domain requests should be pinned to 127.0.0.1.
+	 *
+	 * True on local/development installs (WP_ENVIRONMENT_TYPE, as Local WP
+	 * sets) or when the site host uses a non-routable dev suffix. Never on
+	 * production by default. Override with the saman_seo_pin_loopback filter.
+	 *
+	 * @return bool
+	 */
+	public function should_pin_loopback() {
+		$env = function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production';
+		$pin = in_array( $env, array( 'local', 'development' ), true );
+
+		if ( ! $pin ) {
+			$host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+			$pin  = is_string( $host ) && (bool) preg_match( '/(^|\.)(localhost|local|test)$/i', $host );
+		}
+
+		return (bool) saman_seo_apply_filters( 'saman_seo_pin_loopback', $pin );
 	}
 
 	/**
