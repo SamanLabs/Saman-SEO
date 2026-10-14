@@ -161,7 +161,7 @@ class Sitemap_Settings {
 				if ( ! empty( $page['url'] ) ) {
 					$additional_pages[] = array(
 						'url'      => esc_url_raw( $page['url'] ),
-						'priority' => isset( $page['priority'] ) ? floatval( $page['priority'] ) : 0.5,
+						'priority' => isset( $page['priority'] ) ? min( 1.0, max( 0.0, floatval( $page['priority'] ) ) ) : 0.5,
 					);
 				}
 			}
@@ -294,7 +294,8 @@ class Sitemap_Settings {
 
 			$sanitized[] = array(
 				'url'      => esc_url_raw( $page['url'] ),
-				'priority' => floatval( $page['priority'] ?? 0.5 ),
+				// User-set value; the sitemaps protocol allows 0.0-1.0.
+				'priority' => min( 1.0, max( 0.0, floatval( $page['priority'] ?? 0.5 ) ) ),
 			);
 		}
 

@@ -22,6 +22,13 @@ const schemaIconMap = {
 	VideoObject: 'video',
 };
 
+// Info notices (e.g. types Google no longer shows as rich results) use the
+// schema-issues layout with a neutral blue palette.
+const infoIssueStyle = {
+	background: '#f0f6fc',
+	color: '#135e96',
+};
+
 const SchemaValidator = ( { onNavigate } ) => {
 	const [ url, setUrl ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
@@ -319,7 +326,10 @@ const SchemaValidator = ( { onNavigate } ) => {
 									>
 										<div className="schema-card__type">
 											<div className="schema-card__icon">
-												{ getSchemaIcon( schema.type ) }
+												{ getSchemaIcon(
+													schema.types?.[ 0 ] ||
+														schema.type
+												) }
 											</div>
 											<div className="schema-card__info">
 												<h4>{ schema.type }</h4>
@@ -347,6 +357,14 @@ const SchemaValidator = ( { onNavigate } ) => {
 												/>
 											) : (
 												<StatusBadge status="valid" />
+											) }
+											{ schema.notices?.length > 0 && (
+												<span className="pill info">
+													{ __(
+														'No Google rich result',
+														'saman-seo'
+													) }
+												</span>
 											) }
 											<svg
 												className={ `schema-card__toggle ${
@@ -401,6 +419,30 @@ const SchemaValidator = ( { onNavigate } ) => {
 															( warn, i ) => (
 																<li key={ i }>
 																	{ warn }
+																</li>
+															)
+														) }
+													</ul>
+												</div>
+											) }
+
+											{ /* Info notices */ }
+											{ schema.notices?.length > 0 && (
+												<div
+													className="schema-issues schema-issues--info"
+													style={ infoIssueStyle }
+												>
+													<h5>
+														{ __(
+															'Info',
+															'saman-seo'
+														) }
+													</h5>
+													<ul>
+														{ schema.notices.map(
+															( notice, i ) => (
+																<li key={ i }>
+																	{ notice }
 																</li>
 															)
 														) }
@@ -510,6 +552,12 @@ const SchemaValidator = ( { onNavigate } ) => {
 							<li>
 								{ __(
 									'Common issues: missing required properties, incorrect data types, invalid URLs',
+									'saman-seo'
+								) }
+							</li>
+							<li>
+								{ __(
+									'Info notices mark markup that is valid schema.org but no longer produces a Google rich result (for example FAQ and HowTo). It is safe to keep.',
 									'saman-seo'
 								) }
 							</li>

@@ -10,7 +10,7 @@ const sitemapTabs = [
 	},
 	{
 		id: 'llm-txt',
-		label: __( 'LLM.txt', 'saman-seo' ),
+		label: __( 'llms.txt', 'saman-seo' ),
 	},
 ];
 const SCHEDULE_OPTIONS = [
@@ -80,6 +80,13 @@ const Sitemap = () => {
 		agents_md_guidelines: '',
 		agents_md_url: '',
 	} );
+
+	// The file is served at /llms.txt; the legacy /llm.txt path redirects
+	// there, so normalize any older URL the API may still return.
+	const llmsTxtUrl = ( llmSettings.llm_txt_url || '' ).replace(
+		/\/llm\.txt$/,
+		'/llms.txt'
+	);
 
 	// Available post types and taxonomies
 	const [ postTypes, setPostTypes ] = useState( [] );
@@ -340,12 +347,12 @@ const Sitemap = () => {
 					</a>
 					{ llmSettings.enable_llm_txt === '1' && (
 						<a
-							href={ llmSettings.llm_txt_url }
+							href={ llmsTxtUrl }
 							target="_blank"
 							rel="noopener noreferrer"
 							className="button ghost"
 						>
-							{ __( 'Open llm.txt', 'saman-seo' ) }
+							{ __( 'Open llms.txt', 'saman-seo' ) }
 						</a>
 					) }
 				</div>
@@ -1010,14 +1017,14 @@ const Sitemap = () => {
 			) : (
 				<div className="page-body two-column">
 					<div className="main-column">
-						{ /* LLM.txt - Single Panel */ }
+						{ /* llms.txt - Single Panel */ }
 						<section className="panel">
 							<h3>
-								{ __( 'LLM.txt Configuration', 'saman-seo' ) }
+								{ __( 'llms.txt Configuration', 'saman-seo' ) }
 							</h3>
 							<p className="muted">
 								{ __(
-									'Help AI engines discover your content. Similar to XML sitemaps for search engines, llm.txt guides AI crawlers like ChatGPT and Claude.',
+									'An optional Markdown index of your site that some AI tools read. Google Search does not use llms.txt, so it has no effect on your Google rankings or rich results.',
 									'saman-seo'
 								) }{ ' ' }
 								<a
@@ -1034,13 +1041,13 @@ const Sitemap = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Enable llm.txt',
+												'Enable llms.txt',
 												'saman-seo'
 											) }
 										</label>
 										<p className="settings-help">
 											{ __(
-												'Generate and serve the llm.txt file.',
+												'Generate and serve the llms.txt file.',
 												'saman-seo'
 											) }
 										</p>
@@ -1094,7 +1101,7 @@ const Sitemap = () => {
 												</label>
 												<p className="settings-help">
 													{ __(
-														'Main title in your llm.txt file.',
+														'Main title in your llms.txt file.',
 														'saman-seo'
 													) }
 												</p>
@@ -1256,7 +1263,7 @@ const Sitemap = () => {
 												</label>
 												<p className="settings-help">
 													{ __(
-														'Post types in your llm.txt file.',
+														'Post types in your llms.txt file.',
 														'saman-seo'
 													) }
 												</p>
@@ -1331,12 +1338,12 @@ const Sitemap = () => {
 											  ) }
 									</button>
 									<a
-										href={ llmSettings.llm_txt_url }
+										href={ llmsTxtUrl }
 										target="_blank"
 										rel="noopener noreferrer"
 										className="button ghost"
 									>
-										{ __( 'View llm.txt', 'saman-seo' ) }
+										{ __( 'View llms.txt', 'saman-seo' ) }
 									</a>
 								</div>
 							) }
@@ -1349,7 +1356,7 @@ const Sitemap = () => {
 							</h3>
 							<p className="muted">
 								{ __(
-									'Serve an AGENTS.md file with guidance for AI agents on how to represent your site accurately. It reuses your llm.txt title and description so both files stay consistent.',
+									'Serve an AGENTS.md file with guidance for AI agents on how to represent your site accurately. It reuses your llms.txt title and description so both files stay consistent.',
 									'saman-seo'
 								) }{ ' ' }
 								<a
@@ -1491,11 +1498,11 @@ const Sitemap = () => {
 					{ /* Sidebar */ }
 					<aside className="side-panel">
 						<div className="side-card highlight">
-							<h3>{ __( 'Your llm.txt', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Your llms.txt', 'saman-seo' ) }</h3>
 							{ llmSettings.enable_llm_txt === '1' ? (
 								<>
 									<code className="url-display">
-										{ llmSettings.llm_txt_url }
+										{ llmsTxtUrl }
 									</code>
 									<p
 										className="muted"
@@ -1513,7 +1520,7 @@ const Sitemap = () => {
 							) : (
 								<p className="muted">
 									{ __(
-										'Enable llm.txt to generate your file.',
+										'Enable llms.txt to generate your file.',
 										'saman-seo'
 									) }
 								</p>
@@ -1551,10 +1558,10 @@ const Sitemap = () => {
 						</div>
 
 						<div className="side-card">
-							<h3>{ __( 'What is llm.txt?', 'saman-seo' ) }</h3>
+							<h3>{ __( 'What is llms.txt?', 'saman-seo' ) }</h3>
 							<p className="muted">
 								{ __(
-									'A standardized file that helps AI language models like ChatGPT, Claude, and Gemini discover and understand your content structure.',
+									'A proposed, optional file that lists your key pages in Markdown. Some AI tools and LLM services read it; support varies and it is not an official standard.',
 									'saman-seo'
 								) }
 							</p>
@@ -1565,7 +1572,7 @@ const Sitemap = () => {
 								} }
 							>
 								{ __(
-									'This improves how AI systems reference and cite your content when answering questions.',
+									'Google Search does not use llms.txt. Keep it only if other services you care about read it. The old /llm.txt address redirects here.',
 									'saman-seo'
 								) }
 							</p>

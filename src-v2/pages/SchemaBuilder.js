@@ -711,6 +711,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 	const [ formData, setFormData ] = useState( {} );
 	const [ generatedSchema, setGeneratedSchema ] = useState( null );
 	const [ validation, setValidation ] = useState( null );
+	const [ generateNotices, setGenerateNotices ] = useState( [] );
 	const [ generating, setGenerating ] = useState( false );
 	const [ validating, setValidating ] = useState( false );
 	const [ saving, setSaving ] = useState( false );
@@ -773,6 +774,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 	const handleGenerateSchema = async () => {
 		if ( ! selectedType ) return;
 		setGenerating( true );
+		setGenerateNotices( [] );
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/tools/schema/generate',
@@ -780,13 +782,20 @@ const SchemaBuilder = ( { onNavigate } ) => {
 				data: {
 					type: selectedType,
 					data: formData,
+					url: postUrl,
 				},
 			} );
 			if ( response.success ) {
 				setGeneratedSchema( response.data.schema );
+				setGenerateNotices( response.data.notices || [] );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to generate:', error );
+			// eslint-disable-next-line no-alert
+			window.alert(
+				error?.message ||
+					__( 'Failed to generate schema.', 'saman-seo' )
+			);
 		} finally {
 			setGenerating( false );
 		}
@@ -889,6 +898,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 					post_id: new URLSearchParams( window.location.search ).get(
 						'post'
 					),
+					url: postUrl,
 				},
 			} );
 			if ( response.success ) {
@@ -896,6 +906,10 @@ const SchemaBuilder = ( { onNavigate } ) => {
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save schema:', error );
+			// eslint-disable-next-line no-alert
+			window.alert(
+				error?.message || __( 'Failed to save schema.', 'saman-seo' )
+			);
 		} finally {
 			setSaving( false );
 		}
@@ -1336,6 +1350,28 @@ const SchemaBuilder = ( { onNavigate } ) => {
 							<ul className="validation-errors">
 								{ validation.errors.map( ( err, idx ) => (
 									<li key={ idx }>{ err }</li>
+								) ) }
+							</ul>
+						) }
+
+						{ validation?.warnings?.length > 0 && (
+							<ul
+								className="validation-errors validation-warnings"
+								style={ { color: '#92400e' } }
+							>
+								{ validation.warnings.map( ( warn, idx ) => (
+									<li key={ idx }>{ warn }</li>
+								) ) }
+							</ul>
+						) }
+
+						{ generateNotices.length > 0 && (
+							<ul
+								className="validation-errors validation-notices"
+								style={ { color: '#135e96' } }
+							>
+								{ generateNotices.map( ( notice, idx ) => (
+									<li key={ idx }>{ notice }</li>
 								) ) }
 							</ul>
 						) }

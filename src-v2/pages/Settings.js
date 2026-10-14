@@ -1168,7 +1168,10 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		{
 			key: 'module_schema_music',
 			name: __( 'Music Schema', 'saman-seo' ),
-			desc: __( 'MusicGroup schema for the music post type.', 'saman-seo' ),
+			desc: __(
+				'MusicGroup schema for the music post type.',
+				'saman-seo'
+			),
 			icon: <IconMusic />,
 		},
 		{
@@ -1221,9 +1224,9 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_llm_txt',
-			name: __( 'LLM.txt', 'saman-seo' ),
+			name: __( 'llms.txt', 'saman-seo' ),
 			desc: __(
-				'Generate llm.txt file for AI crawlers and LLMs.',
+				'Serve an optional llms.txt file that some AI tools read. Google Search does not use it.',
 				'saman-seo'
 			),
 			icon: <IconBot />,
