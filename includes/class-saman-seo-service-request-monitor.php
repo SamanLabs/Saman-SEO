@@ -14,8 +14,45 @@ defined( 'ABSPATH' ) || exit;
  */
 class Request_Monitor {
 
-	private const SCHEMA_VERSION = 7;
+	private const SCHEMA_VERSION = 8;
 	private const SCHEMA_OPTION  = 'SAMAN_SEO_404_log_schema';
+
+	/**
+	 * Transient that serialises schema upgrades and backs off after a failure.
+	 */
+	private const MIGRATION_LOCK = 'SAMAN_SEO_404_log_migrating';
+
+	/**
+	 * Non-autoloaded option holding the compiled ignore-pattern list.
+	 */
+	public const PATTERNS_CACHE_OPTION = 'SAMAN_SEO_404_ignore_patterns_cache';
+
+	/**
+	 * Daily cleanup cron hook.
+	 */
+	public const CLEANUP_HOOK = 'SAMAN_SEO_404_cleanup';
+
+	/**
+	 * Retention used when the cleanup settings have never been saved.
+	 */
+	public const DEFAULT_RETENTION_DAYS = 30;
+
+	/**
+	 * Default hard cap on stored rows (filter: saman_seo_404_log_max_rows).
+	 */
+	public const DEFAULT_MAX_ROWS = 10000;
+
+	/**
+	 * Column lengths, mirrored from create_tables(). Values are truncated
+	 * before writing so strict SQL modes never reject a hit.
+	 */
+	private const FIELD_LENGTHS = array(
+		'request_uri'  => 255,
+		'user_agent'   => 255,
+		'device_label' => 80,
+		'referrer'     => 500,
+		'ip_address'   => 100,
+	);
 
 	/**
 	 * Main log table name.
@@ -49,13 +86,14 @@ class Request_Monitor {
 		$this->maybe_upgrade_schema();
 
 		if ( ! \Saman\SEO\Helpers\module_enabled( '404_log' ) ) {
+			$this->unschedule_cleanup();
 			return;
 		}
 
 		add_action( 'template_redirect', array( $this, 'maybe_log_404' ) );
 
-		// Setup scheduled cleanup
-		add_action( 'SAMAN_SEO_404_cleanup', array( $this, 'run_scheduled_cleanup' ) );
+		// Setup scheduled cleanup.
+		add_action( self::CLEANUP_HOOK, array( $this, 'run_scheduled_cleanup' ) );
 		$this->maybe_schedule_cleanup();
 	}
 
@@ -95,19 +133,16 @@ class Request_Monitor {
 	}
 
 	/**
-	 * Schedule or unschedule cleanup based on settings.
+	 * Keep the daily cleanup scheduled while the 404 log is active.
+	 *
+	 * The cron always runs: even when age-based retention is switched off, it
+	 * enforces the hard row cap so the table cannot grow without bound.
 	 *
 	 * @return void
 	 */
 	public function maybe_schedule_cleanup() {
-		$enabled = $this->get_404_option( 'enable_404_cleanup', false );
-
-		if ( $enabled ) {
-			if ( ! wp_next_scheduled( 'SAMAN_SEO_404_cleanup' ) ) {
-				wp_schedule_event( time(), 'daily', 'SAMAN_SEO_404_cleanup' );
-			}
-		} else {
-			$this->unschedule_cleanup();
+		if ( ! wp_next_scheduled( self::CLEANUP_HOOK ) ) {
+			wp_schedule_event( time(), 'daily', self::CLEANUP_HOOK );
 		}
 	}
 
@@ -117,26 +152,68 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function unschedule_cleanup() {
-		$timestamp = wp_next_scheduled( 'SAMAN_SEO_404_cleanup' );
+		$timestamp = wp_next_scheduled( self::CLEANUP_HOOK );
 		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, 'SAMAN_SEO_404_cleanup' );
+			wp_unschedule_event( $timestamp, self::CLEANUP_HOOK );
 		}
 	}
 
 	/**
-	 * Run scheduled cleanup.
+	 * Run scheduled cleanup: age-based retention, then the row cap.
 	 *
 	 * @return void
 	 */
 	public function run_scheduled_cleanup() {
-		$enabled = $this->get_404_option( 'enable_404_cleanup', false );
+		$days = $this->get_retention_days();
 
-		if ( ! $enabled ) {
-			return;
+		if ( $days > 0 ) {
+			$this->cleanup_old_entries( $days );
 		}
 
-		$days = (int) $this->get_404_option( 'cleanup_404_days', 30 );
-		$this->cleanup_old_entries( $days );
+		$this->enforce_row_cap();
+	}
+
+	/**
+	 * Resolve how many days of 404 history to keep.
+	 *
+	 * When the cleanup settings have never been saved (neither the individual
+	 * option nor the legacy consolidated array holds them), retention defaults
+	 * to DEFAULT_RETENTION_DAYS. An explicitly saved "off" is respected.
+	 *
+	 * @return int Days to keep, or 0 when age-based cleanup is disabled.
+	 */
+	public function get_retention_days() {
+		$enabled = $this->get_404_option( 'enable_404_cleanup', null );
+		$days    = (int) $this->get_404_option( 'cleanup_404_days', self::DEFAULT_RETENTION_DAYS );
+
+		if ( $days < 1 ) {
+			$days = self::DEFAULT_RETENTION_DAYS;
+		}
+
+		if ( null === $enabled ) {
+			return $days;
+		}
+
+		return $this->is_truthy( $enabled ) ? $days : 0;
+	}
+
+	/**
+	 * Hard cap on stored 404 rows.
+	 *
+	 * @return int Maximum rows, or 0 to disable the cap.
+	 */
+	public function get_max_rows() {
+		/**
+		 * Filter the maximum number of rows kept in the 404 log.
+		 *
+		 * The daily cleanup deletes the least recently seen rows beyond this
+		 * count. Return 0 to disable the cap.
+		 *
+		 * @param int $max_rows Maximum rows. Default 10000.
+		 */
+		$max = (int) saman_seo_apply_filters( 'saman_seo_404_log_max_rows', self::DEFAULT_MAX_ROWS );
+
+		return max( 0, $max );
 	}
 
 	/**
@@ -148,15 +225,73 @@ class Request_Monitor {
 	public function cleanup_old_entries( $days = 30 ) {
 		global $wpdb;
 
-		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+		$days = max( 1, (int) $days );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $wpdb->query(
+		// last_seen is written with current_time( 'mysql' ) (site time), so
+		// the cutoff must be in site time too.
+		$cutoff = wp_date( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table maintenance, table name is safe.
+		return (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$this->table} WHERE last_seen < %s", $cutoff ) );
+	}
+
+	/**
+	 * Trim the log to the configured row cap, dropping the least recently
+	 * seen rows first.
+	 *
+	 * @return int Number of deleted entries.
+	 */
+	public function enforce_row_cap() {
+		global $wpdb;
+
+		$max = $this->get_max_rows();
+		if ( $max < 1 ) {
+			return 0;
+		}
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table maintenance, table name is safe.
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->table}" );
+		if ( $total <= $max ) {
+			return 0;
+		}
+
+		// First row past the cap, in "most recently seen first" order.
+		$cut = $wpdb->get_row(
 			$wpdb->prepare(
-				"DELETE FROM {$this->table} WHERE last_seen < %s",
-				$cutoff
+				"SELECT id, last_seen FROM {$this->table} ORDER BY last_seen DESC, id DESC LIMIT 1 OFFSET %d",
+				$max
 			)
 		);
+
+		if ( ! $cut || empty( $cut->last_seen ) ) {
+			return 0;
+		}
+
+		$deleted = $wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$this->table} WHERE last_seen < %s OR ( last_seen = %s AND id <= %d )",
+				$cut->last_seen,
+				$cut->last_seen,
+				(int) $cut->id
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		return (int) $deleted;
+	}
+
+	/**
+	 * Interpret a stored boolean-ish option value.
+	 *
+	 * @param mixed $value Stored value.
+	 * @return bool
+	 */
+	private function is_truthy( $value ) {
+		if ( is_string( $value ) ) {
+			return ! in_array( strtolower( trim( $value ) ), array( '', '0', 'false', 'no', 'off' ), true );
+		}
+
+		return ! empty( $value );
 	}
 
 	/**
@@ -239,10 +374,13 @@ class Request_Monitor {
 
 		$charset = $wpdb->get_charset_collate();
 
-		// Main 404 log table
+		// Main 404 log table. The UNIQUE KEY on uri_hash is deliberately not
+		// part of this definition: dbDelta would try to add it before existing
+		// duplicates are merged. migrate_to_version_8() adds it afterwards.
 		$sql = "CREATE TABLE {$this->table} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			request_uri varchar(255) NOT NULL,
+			uri_hash char(32) NOT NULL DEFAULT '',
 			user_agent varchar(255) DEFAULT '',
 			device_label varchar(80) DEFAULT '',
 			hits bigint(20) unsigned NOT NULL DEFAULT 1,
@@ -274,7 +412,10 @@ class Request_Monitor {
 
 		dbDelta( $patterns_sql );
 
-		update_option( self::SCHEMA_OPTION, (string) self::SCHEMA_VERSION );
+		$this->flush_ignore_patterns_cache();
+
+		// The stored schema version is bumped by maybe_upgrade_schema() once
+		// the data migrations (including the uri_hash unique index) succeed.
 	}
 
 	/**
@@ -292,24 +433,41 @@ class Request_Monitor {
 	 * @return void
 	 */
 	private function maybe_upgrade_schema() {
+		// Common path: one autoloaded option read, no SHOW TABLES / dbDelta.
 		$current = (int) get_option( self::SCHEMA_OPTION, 0 );
 
-		if ( $current < self::SCHEMA_VERSION ) {
-			$this->create_tables();
-
-			// Migrate existing entries: backfill first_seen = last_seen for old entries
-			if ( $current > 0 && $current < 5 ) {
-				$this->migrate_to_version_5();
-			}
-
-			if ( $current > 0 && $current < 6 ) {
-				$this->migrate_to_version_6();
-			}
-
-			if ( $current > 0 && $current < 7 ) {
-				$this->migrate_to_version_7();
-			}
+		if ( $current >= self::SCHEMA_VERSION ) {
+			return;
 		}
+
+		// One upgrade at a time; after a failure the lock doubles as a
+		// back-off so a broken migration is not retried on every request.
+		if ( get_transient( self::MIGRATION_LOCK ) ) {
+			return;
+		}
+		set_transient( self::MIGRATION_LOCK, 1, 10 * MINUTE_IN_SECONDS );
+
+		$this->create_tables();
+
+		// Migrate existing entries: backfill first_seen = last_seen for old entries
+		if ( $current > 0 && $current < 5 ) {
+			$this->migrate_to_version_5();
+		}
+
+		if ( $current > 0 && $current < 6 ) {
+			$this->migrate_to_version_6();
+		}
+
+		if ( $current > 0 && $current < 7 ) {
+			$this->migrate_to_version_7();
+		}
+
+		if ( ! $this->migrate_to_version_8() ) {
+			return;
+		}
+
+		update_option( self::SCHEMA_OPTION, (string) self::SCHEMA_VERSION );
+		delete_transient( self::MIGRATION_LOCK );
 	}
 
 	/**
@@ -369,6 +527,123 @@ class Request_Monitor {
 	}
 
 	/**
+	 * Migrate data for version 8 schema: one row per URI.
+	 *
+	 * The request_uri column has no unique key, so concurrent hits on the
+	 * same URL used to insert duplicate rows. This backfills uri_hash, merges duplicates
+	 * into the earliest row (summed hits, latest last_seen, earliest
+	 * first_seen, sticky bot/ignored flags) and only then adds the UNIQUE
+	 * index that lets maybe_log_404() write with a single upsert.
+	 *
+	 * The hash is case-folded to keep the old dedupe semantics: lookups used
+	 * `request_uri = %s` on a case-insensitive collation.
+	 *
+	 * Idempotent; safe to re-run after a partial failure.
+	 *
+	 * @return bool Whether the unique index is in place.
+	 */
+	private function migrate_to_version_8() {
+		global $wpdb;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Schema migration on the plugin's own table, table name is safe.
+		if ( ! $this->has_column( 'uri_hash' ) ) {
+			$wpdb->query( "ALTER TABLE {$this->table} ADD COLUMN uri_hash char(32) NOT NULL DEFAULT '' AFTER request_uri" );
+		}
+
+		if ( $this->has_uri_hash_index() ) {
+			return true;
+		}
+
+		$wpdb->query( "UPDATE {$this->table} SET uri_hash = MD5(LOWER(request_uri)) WHERE uri_hash = ''" );
+
+		// Fold duplicate rows into the earliest one. Derived tables with
+		// GROUP BY are materialised, so self-joins are allowed here.
+		$wpdb->query(
+			"UPDATE {$this->table} AS keep_row
+			INNER JOIN (
+				SELECT uri_hash,
+					MIN(id) AS keep_id,
+					SUM(hits) AS total_hits,
+					MAX(last_seen) AS latest_seen,
+					MIN(COALESCE(first_seen, last_seen)) AS earliest_seen,
+					MAX(is_bot) AS any_bot,
+					MAX(is_ignored) AS any_ignored
+				FROM {$this->table}
+				GROUP BY uri_hash
+				HAVING COUNT(*) > 1
+			) AS dupes ON keep_row.id = dupes.keep_id
+			SET keep_row.hits = dupes.total_hits,
+				keep_row.last_seen = dupes.latest_seen,
+				keep_row.first_seen = dupes.earliest_seen,
+				keep_row.is_bot = dupes.any_bot,
+				keep_row.is_ignored = dupes.any_ignored"
+		);
+
+		$wpdb->query(
+			"DELETE extra_row FROM {$this->table} AS extra_row
+			INNER JOIN (
+				SELECT uri_hash, MIN(id) AS keep_id
+				FROM {$this->table}
+				GROUP BY uri_hash
+				HAVING COUNT(*) > 1
+			) AS dupes ON extra_row.uri_hash = dupes.uri_hash AND extra_row.id <> dupes.keep_id"
+		);
+
+		$wpdb->query( "ALTER TABLE {$this->table} ADD UNIQUE KEY uri_hash (uri_hash)" );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+		return $this->has_uri_hash_index();
+	}
+
+	/**
+	 * Whether the unique uri_hash index exists.
+	 *
+	 * @return bool
+	 */
+	private function has_uri_hash_index() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Inspecting table schema requires a direct query, table name is safe.
+		$index = $wpdb->get_row( "SHOW INDEX FROM {$this->table} WHERE Key_name = 'uri_hash'" );
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- MySQL column name.
+		return $index && isset( $index->Non_unique ) && 0 === (int) $index->Non_unique;
+	}
+
+	/**
+	 * Dedupe key for a logged request path.
+	 *
+	 * Case-folded so "/Foo" and "/foo" share a row, matching how the log
+	 * deduplicated under the table's case-insensitive collation before the
+	 * uri_hash column existed. Must stay in step with the MD5(LOWER())
+	 * backfill in migrate_to_version_8().
+	 *
+	 * @param string $request_uri Normalised request path.
+	 * @return string 32-char hex hash.
+	 */
+	public static function uri_hash( $request_uri ) {
+		return md5( strtolower( (string) $request_uri ) );
+	}
+
+	/**
+	 * Truncate a value to a column's length.
+	 *
+	 * @param string $field Column name (key of FIELD_LENGTHS).
+	 * @param string $value Value.
+	 * @return string
+	 */
+	private function fit_column( $field, $value ) {
+		$value  = (string) $value;
+		$length = self::FIELD_LENGTHS[ $field ];
+
+		if ( function_exists( 'mb_substr' ) ) {
+			return mb_substr( $value, 0, $length, 'UTF-8' );
+		}
+
+		return substr( $value, 0, $length );
+	}
+
+	/**
 	 * Maybe log a 404 event.
 	 *
 	 * @return void
@@ -397,80 +672,73 @@ class Request_Monitor {
 			}
 		}
 
-		$settings   = $this->get_404_log_settings();
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-		$referrer   = ! empty( $settings['log_referer'] ) && isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
-		$device     = $this->describe_device_from_user_agent( $user_agent );
-		$is_bot     = $this->detect_is_bot( $user_agent ) ? 1 : 0;
-		$now        = current_time( 'mysql' );
-		$ip_address = $this->get_client_ip( $settings );
+		$request = $this->fit_column( 'request_uri', $request );
 
-		// Do not log URLs that match an ignore pattern.
+		// Do not log URLs that match an ignore pattern (cached list, no query
+		// once warm).
 		if ( $this->is_url_ignored( $request ) ) {
 			return;
 		}
+
+		$settings   = $this->get_404_log_settings();
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$is_bot     = $this->detect_is_bot( $user_agent ) ? 1 : 0;
 
 		// Optionally skip bot requests entirely.
 		if ( $settings['ignore_bots'] && $is_bot ) {
 			return;
 		}
 
+		$referrer   = ! empty( $settings['log_referer'] ) && isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+		$device     = $this->describe_device_from_user_agent( $user_agent );
+		$now        = current_time( 'mysql' );
+		$ip_address = $this->get_client_ip( $settings );
+		$uri_hash   = self::uri_hash( $request );
+
 		global $wpdb;
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Each request URI must be checked against the custom 404 log table directly, table name is safe.
-		$row = $wpdb->get_row(
+
+		// One atomic upsert keyed on the unique uri_hash: concurrent hits on
+		// the same URL increment a single row instead of racing a
+		// SELECT-then-INSERT into duplicates. Existing user agent / referrer
+		// are kept when this hit has none; the bot flag is sticky.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Writing the custom 404 log table, table name is safe.
+		$wpdb->query(
 			$wpdb->prepare(
-				'SELECT id, hits, user_agent, is_bot FROM ' . $this->table . ' WHERE request_uri = %s LIMIT 1',
-				$request
+				"INSERT INTO {$this->table}
+					(request_uri, uri_hash, user_agent, device_label, hits, last_seen, first_seen, is_bot, referrer, ip_address)
+				VALUES (%s, %s, %s, %s, 1, %s, %s, %d, %s, %s)
+				ON DUPLICATE KEY UPDATE
+					hits = hits + 1,
+					last_seen = VALUES(last_seen),
+					user_agent = IF(VALUES(user_agent) = '', user_agent, VALUES(user_agent)),
+					device_label = VALUES(device_label),
+					ip_address = VALUES(ip_address),
+					referrer = IF(VALUES(referrer) = '', referrer, VALUES(referrer)),
+					is_bot = GREATEST(is_bot, VALUES(is_bot))",
+				$request,
+				$uri_hash,
+				$this->fit_column( 'user_agent', $user_agent ),
+				$this->fit_column( 'device_label', $device ),
+				$now,
+				$now,
+				$is_bot,
+				$this->fit_column( 'referrer', $referrer ),
+				$this->fit_column( 'ip_address', $ip_address )
 			)
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+
+		// Only read the row back when a notification could be due.
+		if ( ! $this->get_404_option( 'enable_404_notifications', false ) ) {
+			return;
+		}
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare( "SELECT id, hits FROM {$this->table} WHERE uri_hash = %s ORDER BY id ASC LIMIT 1", $uri_hash )
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if ( $row ) {
-			$update_data = array(
-				'hits'         => (int) $row->hits + 1,
-				'last_seen'    => $now,
-				'user_agent'   => $user_agent ?: $row->user_agent,
-				'device_label' => $device,
-				'ip_address'   => $ip_address,
-			);
-
-			// Update referrer if not empty and we don't have one yet
-			if ( $referrer ) {
-				$update_data['referrer'] = $referrer;
-			}
-
-			// If this hit is from a bot and the entry wasn't already marked as bot, update it
-			if ( $is_bot && ! (int) $row->is_bot ) {
-				$update_data['is_bot'] = 1;
-			}
-
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Updating the custom 404 log table requires a direct query.
-			$wpdb->update(
-				$this->table,
-				$update_data,
-				array( 'id' => $row->id )
-			);
-
-			// Check if we should send a notification
-			$new_hits = (int) $row->hits + 1;
-			$this->maybe_send_notification( $request, $new_hits, (int) $row->id );
-		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Inserting new 404 rows requires writing to the custom table directly.
-			$wpdb->insert(
-				$this->table,
-				array(
-					'request_uri'  => $request,
-					'user_agent'   => $user_agent,
-					'device_label' => $device,
-					'hits'         => 1,
-					'last_seen'    => $now,
-					'first_seen'   => $now,
-					'is_bot'       => $is_bot,
-					'referrer'     => $referrer,
-					'ip_address'   => $ip_address,
-				),
-				array( '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s', '%s' )
-			);
+			$this->maybe_send_notification( $request, (int) $row->hits, (int) $row->id );
 		}
 	}
 
@@ -935,49 +1203,104 @@ class Request_Monitor {
 	 * @return bool
 	 */
 	public function is_url_ignored( $request_uri ) {
-		global $wpdb;
+		$request_uri = (string) $request_uri;
 
-		// Check if patterns table exists
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$has_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $this->patterns_table ) );
-		if ( $this->patterns_table !== $has_table ) {
-			return false;
-		}
-
-		// Get all patterns
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$patterns = $wpdb->get_results( "SELECT pattern, is_regex FROM {$this->patterns_table}" );
-
-		if ( ! $patterns ) {
-			return false;
-		}
-
-		foreach ( $patterns as $p ) {
-			$pattern = isset( $p->pattern ) ? (string) $p->pattern : '';
-
-			if ( '' === $pattern ) {
+		foreach ( $this->get_compiled_ignore_patterns() as $rule ) {
+			if ( 'exact' === $rule['type'] ) {
+				if ( $request_uri === $rule['value'] ) {
+					return true;
+				}
 				continue;
 			}
 
-			if ( ! empty( $p->is_regex ) ) {
-				// Regex pattern.
-				$regex = '/' . str_replace( '/', '\\/', $pattern ) . '/i';
-				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
-					return true;
-				}
-			} elseif ( false !== strpos( $pattern, '*' ) ) {
-				// Simple wildcard pattern - convert * to regex.
-				$regex = '/^' . str_replace( array( '\\*', '/' ), array( '.*', '\\/' ), preg_quote( $pattern, '/' ) ) . '$/i';
-				if ( $this->regex_matches_safely( $regex, $request_uri ) ) {
-					return true;
-				}
-			} elseif ( $request_uri === $pattern ) {
-				// Exact match.
+			if ( $this->regex_matches_safely( $rule['value'], $request_uri ) ) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Ignore patterns compiled for matching, cached in a non-autoloaded option.
+	 *
+	 * The table's existence is guaranteed by the schema version gate, so no
+	 * SHOW TABLES probe is needed. The cache is dropped whenever a pattern is
+	 * added or deleted, or the tables are (re)created.
+	 *
+	 * @return array<int,array{type:string,value:string}>
+	 */
+	public function get_compiled_ignore_patterns() {
+		$cached = get_option( self::PATTERNS_CACHE_OPTION, false );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Rebuilding the pattern cache from the plugin's own table, table name is safe.
+		$rows = $wpdb->get_results( "SELECT pattern, is_regex FROM {$this->patterns_table} ORDER BY id ASC" );
+
+		$compiled = self::compile_ignore_patterns( is_array( $rows ) ? $rows : array() );
+
+		update_option( self::PATTERNS_CACHE_OPTION, $compiled, false );
+
+		return $compiled;
+	}
+
+	/**
+	 * Turn stored ignore pattern rows into ready-to-run matchers.
+	 *
+	 * - regex rows:   `/pattern/i`
+	 * - wildcards:    `*` becomes `.*`, anchored, case-insensitive
+	 * - anything else is an exact, case-sensitive comparison
+	 *
+	 * @param array<int,object|array> $rows Rows with pattern and is_regex.
+	 * @return array<int,array{type:string,value:string}>
+	 */
+	public static function compile_ignore_patterns( array $rows ) {
+		$compiled = array();
+
+		foreach ( $rows as $row ) {
+			$row     = (array) $row;
+			$pattern = isset( $row['pattern'] ) ? (string) $row['pattern'] : '';
+
+			if ( '' === $pattern ) {
+				continue;
+			}
+
+			if ( ! empty( $row['is_regex'] ) ) {
+				$compiled[] = array(
+					'type'  => 'regex',
+					'value' => '/' . str_replace( '/', '\\/', $pattern ) . '/i',
+				);
+			} elseif ( false !== strpos( $pattern, '*' ) ) {
+				// preg_quote() already escapes the "/" delimiter. The old code
+				// escaped it a second time, which ended the regex early, so
+				// wildcards containing "/" (e.g. "/old/*") never matched.
+				$compiled[] = array(
+					'type'  => 'regex',
+					'value' => '/^' . str_replace( '\\*', '.*', preg_quote( $pattern, '/' ) ) . '$/i',
+				);
+			} else {
+				$compiled[] = array(
+					'type'  => 'exact',
+					'value' => $pattern,
+				);
+			}
+		}
+
+		return $compiled;
+	}
+
+	/**
+	 * Drop the compiled ignore-pattern cache.
+	 *
+	 * @return void
+	 */
+	public function flush_ignore_patterns_cache() {
+		delete_option( self::PATTERNS_CACHE_OPTION );
 	}
 
 	/**
@@ -1070,15 +1393,10 @@ class Request_Monitor {
 	public function get_ignore_patterns() {
 		global $wpdb;
 
-		// Check if patterns table exists
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$has_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $this->patterns_table ) );
-		if ( $this->patterns_table !== $has_table ) {
-			return array();
-		}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Admin listing of the plugin's own table, table name is safe.
+		$rows = $wpdb->get_results( "SELECT * FROM {$this->patterns_table} ORDER BY created_at DESC" );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $wpdb->get_results( "SELECT * FROM {$this->patterns_table} ORDER BY created_at DESC" );
+		return is_array( $rows ) ? $rows : array();
 	}
 
 	/**
@@ -1104,6 +1422,8 @@ class Request_Monitor {
 			array( '%s', '%d', '%s', '%s' )
 		);
 
+		$this->flush_ignore_patterns_cache();
+
 		if ( false === $result ) {
 			return false;
 		}
@@ -1121,11 +1441,15 @@ class Request_Monitor {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return (bool) $wpdb->delete(
+		$deleted = (bool) $wpdb->delete(
 			$this->patterns_table,
 			array( 'id' => $id ),
 			array( '%d' )
 		);
+
+		$this->flush_ignore_patterns_cache();
+
+		return $deleted;
 	}
 
 	/**

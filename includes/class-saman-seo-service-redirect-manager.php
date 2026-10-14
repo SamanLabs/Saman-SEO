@@ -28,6 +28,26 @@ class Redirect_Manager {
 	public const CACHE_TTL       = 30;
 
 	/**
+	 * Non-autoloaded option holding the regex rule list used on the front
+	 * end, so a request without a persistent object cache does not run
+	 * `SELECT * ... WHERE is_regex = 1` every time. Dropped by flush_cache(),
+	 * which every write path calls.
+	 */
+	public const RULES_CACHE_OPTION = 'SAMAN_SEO_redirects_regex_rules';
+
+	/**
+	 * Maximum age of the regex rule cache in seconds (12 hours). A safety net
+	 * for rows written outside the plugin's own write paths.
+	 */
+	public const RULES_CACHE_MAX_AGE = 43200;
+
+	/**
+	 * Option recording whether the `source` column compares case-insensitively
+	 * ('1'), case-sensitively ('0'), or has not been inspected yet (absent).
+	 */
+	public const SOURCE_CI_OPTION = 'SAMAN_SEO_redirects_source_ci';
+
+	/**
 	 * Table name.
 	 *
 	 * @var string
@@ -50,6 +70,7 @@ class Redirect_Manager {
 	public static function flush_cache() {
 		wp_cache_delete( self::CACHE_KEY_ADMIN, self::CACHE_GROUP );
 		wp_cache_delete( self::CACHE_KEY_CLI, self::CACHE_GROUP );
+		delete_option( self::RULES_CACHE_OPTION );
 	}
 
 	/**
@@ -1208,6 +1229,11 @@ class Redirect_Manager {
 
 		// Run migrations for existing installations.
 		$this->maybe_migrate_schema();
+
+		// Re-inspect the source column collation and rebuild the rule cache
+		// against the (possibly changed) table.
+		delete_option( self::SOURCE_CI_OPTION );
+		self::flush_cache();
 	}
 
 	/**
@@ -1386,7 +1412,7 @@ class Redirect_Manager {
 	 * @return void
 	 */
 	public function maybe_redirect() {
-		if ( is_admin() ) {
+		if ( self::is_non_frontend_request() ) {
 			return;
 		}
 
@@ -1441,7 +1467,6 @@ class Redirect_Manager {
 			$cache_row = array(
 				'id'                => (int) $row->id,
 				'status_code'       => (int) $row->status_code,
-				'hits'              => (int) $row->hits,
 				'configured_target' => isset( $row->configured_target ) ? (string) $row->configured_target : (string) $row->target,
 			);
 			wp_cache_set(
@@ -1456,6 +1481,34 @@ class Redirect_Manager {
 		}
 
 		$this->execute_redirect( $row, $target, $request_query, $settings );
+	}
+
+	/**
+	 * Whether this request can never execute a front-end redirect.
+	 *
+	 * The template_redirect hook does not normally fire in these contexts;
+	 * the guard keeps a stray call from touching the database.
+	 *
+	 * @return bool
+	 */
+	public static function is_non_frontend_request() {
+		if ( is_admin() ) {
+			return true;
+		}
+
+		if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
+			return true;
+		}
+
+		if ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) {
+			return true;
+		}
+
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return true;
+		}
+
+		return defined( 'WP_CLI' ) && WP_CLI;
 	}
 
 	/**
@@ -1588,7 +1641,27 @@ class Redirect_Manager {
 
 		$lookup = 'exact' === $settings['query_matching'] && $query ? $source_path . '?' . $this->normalize_query( $query ) : $source_path;
 
-		if ( $settings['case_insensitive'] ) {
+		/*
+		 * Case handling and index use.
+		 *
+		 * The table is created with $wpdb->get_charset_collate(), which on
+		 * every supported MySQL/MariaDB setup is a case-insensitive `_ci`
+		 * collation (utf8mb4_unicode_ci, utf8mb4_unicode_520_ci,
+		 * utf8mb4_0900_ai_ci). Under such a collation a plain `source = %s`
+		 * already matches regardless of case and can use the `source` index,
+		 * whereas `LOWER(source) = LOWER(%s)` forces a full table scan on
+		 * every front-end request. So the case-insensitive setting uses the
+		 * plain comparison whenever the column collation is `_ci`, and only
+		 * falls back to LOWER() on a case-sensitive (`_bin` / `_cs`) column.
+		 *
+		 * The case-sensitive branch is unchanged: it has always been
+		 * `source = %s`, so its matching follows the column collation exactly
+		 * as before. Normalising sources at write time (a lowercased shadow
+		 * column) was rejected: it would need a migration plus every writer,
+		 * including the WP-CLI importer that inserts rows directly, to keep
+		 * that column in step, for no gain on `_ci` tables.
+		 */
+		if ( $settings['case_insensitive'] && ! $this->source_column_is_case_insensitive() ) {
 			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
 			$row = $wpdb->get_row(
 				$wpdb->prepare(
@@ -1616,6 +1689,142 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Whether the `source` column compares case-insensitively.
+	 *
+	 * Inspected once and remembered in an option; create_tables() clears it
+	 * so a schema change triggers a fresh inspection. When the collation
+	 * cannot be determined the answer is "no", which keeps the slower but
+	 * always-correct LOWER() comparison.
+	 *
+	 * @return bool
+	 */
+	public function source_column_is_case_insensitive() {
+		$stored = get_option( self::SOURCE_CI_OPTION, '' );
+
+		if ( '1' === $stored || '0' === $stored ) {
+			return '1' === $stored;
+		}
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-off schema inspection, result stored in an option; table name is safe.
+		$column = $wpdb->get_row( $wpdb->prepare( 'SHOW FULL COLUMNS FROM ' . $this->table . ' LIKE %s', 'source' ) );
+
+		if ( ! $column ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- MySQL column name.
+		$collation = isset( $column->Collation ) ? strtolower( (string) $column->Collation ) : '';
+		$is_ci     = self::collation_is_case_insensitive( $collation );
+
+		update_option( self::SOURCE_CI_OPTION, $is_ci ? '1' : '0', true );
+
+		return $is_ci;
+	}
+
+	/**
+	 * Whether a MySQL collation name is case-insensitive.
+	 *
+	 * @param string $collation Collation name, e.g. utf8mb4_unicode_ci.
+	 * @return bool
+	 */
+	public static function collation_is_case_insensitive( $collation ) {
+		$collation = strtolower( trim( (string) $collation ) );
+
+		return '' !== $collation && '_ci' === substr( $collation, -3 );
+	}
+
+	/**
+	 * Regex rules for front-end matching, cached in a non-autoloaded option.
+	 *
+	 * Only the fields matching and execution need are kept, already in
+	 * evaluation order (priority, then id), with patterns that do not compile
+	 * dropped up front. flush_cache() discards the list on every write.
+	 *
+	 * @return array<int,array{id:int,source:string,target:string,status_code:int,start_date:?string,end_date:?string}>
+	 */
+	public function get_regex_rules() {
+		$cached = get_option( self::RULES_CACHE_OPTION, false );
+
+		if (
+			is_array( $cached )
+			&& isset( $cached['built'], $cached['rules'] )
+			&& is_array( $cached['rules'] )
+			&& ( time() - (int) $cached['built'] ) < self::RULES_CACHE_MAX_AGE
+		) {
+			return $cached['rules'];
+		}
+
+		global $wpdb;
+
+		// Ordered so the winner between two overlapping patterns is both stable and
+		// controllable: priority first (lower runs earlier), then id to break ties.
+		// Without an ORDER BY the rows arrive in whatever order the storage engine
+		// happens to return, which can change after a restore or OPTIMIZE TABLE and
+		// silently hand the request to a different rule.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Rebuilding the rule cache, table name is safe.
+		$rows = $wpdb->get_results(
+			'SELECT id, source, target, status_code, start_date, end_date FROM ' . $this->table . ' WHERE is_regex = 1 ORDER BY priority ASC, id ASC'
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+		$rules = array();
+
+		foreach ( is_array( $rows ) ? $rows : array() as $row ) {
+			$source = isset( $row->source ) ? (string) $row->source : '';
+
+			if ( '' === $source || ! self::regex_compiles( $source ) ) {
+				continue;
+			}
+
+			$rules[] = array(
+				'id'          => (int) $row->id,
+				'source'      => $source,
+				'target'      => isset( $row->target ) ? (string) $row->target : '',
+				'status_code' => isset( $row->status_code ) ? (int) $row->status_code : 301,
+				'start_date'  => isset( $row->start_date ) ? (string) $row->start_date : null,
+				'end_date'    => isset( $row->end_date ) ? (string) $row->end_date : null,
+			);
+		}
+
+		update_option(
+			self::RULES_CACHE_OPTION,
+			array(
+				'built' => time(),
+				'rules' => $rules,
+			),
+			false
+		);
+
+		return $rules;
+	}
+
+	/**
+	 * Whether an admin-supplied redirect pattern compiles.
+	 *
+	 * @param string $pattern Pattern without delimiters.
+	 * @return bool
+	 */
+	private static function regex_compiles( $pattern ) {
+		set_error_handler(
+			static function () {
+				return true;
+			}
+		);
+
+		try {
+			$result = preg_match( '#' . $pattern . '#', '' );
+		} catch ( \Throwable $e ) {
+			$result = false;
+		} finally {
+			restore_error_handler();
+		}
+
+		return false !== $result;
+	}
+
+	/**
 	 * Find a regex redirect matching the request.
 	 *
 	 * @param string $path     Normalized request path.
@@ -1624,18 +1833,7 @@ class Redirect_Manager {
 	 * @return object|null
 	 */
 	private function find_regex_redirect( $path, $query, $settings ) {
-		global $wpdb;
-
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Table name is safe, built from $wpdb->prefix.
-		// Ordered so the winner between two overlapping patterns is both stable and
-		// controllable: priority first (lower runs earlier), then id to break ties.
-		// Without an ORDER BY the rows arrive in whatever order the storage engine
-		// happens to return, which can change after a restore or OPTIMIZE TABLE and
-		// silently hand the request to a different rule.
-		$regex_redirects = $wpdb->get_results(
-			'SELECT * FROM ' . $this->table . ' WHERE is_regex = 1 ORDER BY priority ASC, id ASC'
-		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+		$regex_redirects = $this->get_regex_rules();
 
 		if ( ! $regex_redirects ) {
 			return null;
@@ -1643,7 +1841,9 @@ class Redirect_Manager {
 
 		$lookup = 'exact' === $settings['query_matching'] && $query ? $path . '?' . $this->normalize_query( $query ) : $path;
 
-		foreach ( $regex_redirects as $regex_row ) {
+		foreach ( $regex_redirects as $rule ) {
+			$regex_row = (object) $rule;
+
 			if ( ! $this->is_redirect_active( $regex_row ) ) {
 				continue;
 			}
@@ -1862,15 +2062,16 @@ class Redirect_Manager {
 		global $wpdb;
 
 		// Update hit stats, except for browser prefetches (still redirected below).
+		// Incremented in SQL: the matched row may come from a cache, and a
+		// read-modify-write would lose concurrent hits anyway.
 		if ( ! Request_Monitor::is_speculative_request() ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update(
-				$this->table,
-				array(
-					'hits'     => (int) $redirect['hits'] + 1,
-					'last_hit' => current_time( 'mysql' ),
-				),
-				array( 'id' => $redirect['id'] )
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Hit counter on the plugin's own table, table name is safe.
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$this->table} SET hits = hits + 1, last_hit = %s WHERE id = %d",
+					current_time( 'mysql' ),
+					(int) $redirect['id']
+				)
 			);
 		}
 
