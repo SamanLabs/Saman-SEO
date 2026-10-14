@@ -866,6 +866,7 @@ class Breadcrumbs {
 			SAMAN_SEO_VERSION,
 			true
 		);
+		wp_set_script_translations( 'saman-seo-breadcrumbs-block', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		$args = array(
 			'editor_script'   => 'saman-seo-breadcrumbs-block',

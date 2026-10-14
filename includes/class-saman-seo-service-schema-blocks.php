@@ -59,6 +59,8 @@ class Schema_Blocks {
 
 		wp_register_script( 'saman-seo-faq-block', SAMAN_SEO_URL . 'blocks/faq/index.js', $deps, SAMAN_SEO_VERSION, true );
 		wp_register_script( 'saman-seo-howto-block', SAMAN_SEO_URL . 'blocks/howto/index.js', $deps, SAMAN_SEO_VERSION, true );
+		wp_set_script_translations( 'saman-seo-faq-block', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
+		wp_set_script_translations( 'saman-seo-howto-block', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		wp_register_style( self::STYLE_HANDLE, SAMAN_SEO_URL . 'build/css/schema-blocks.css', array(), SAMAN_SEO_VERSION );
 		wp_register_style( self::EDITOR_STYLE_HANDLE, SAMAN_SEO_URL . 'build/css/schema-blocks-editor.css', array(), SAMAN_SEO_VERSION );

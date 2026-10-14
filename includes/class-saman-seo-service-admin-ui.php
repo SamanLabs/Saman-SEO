@@ -285,6 +285,7 @@ class Admin_UI {
 			$asset['version'],
 			true
 		);
+		wp_set_script_translations( 'saman-seo-classic', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		if ( file_exists( $build_dir . 'index.css' ) ) {
 			wp_enqueue_style(
@@ -450,6 +451,7 @@ class Admin_UI {
 			$asset['version'],
 			true
 		);
+		wp_set_script_translations( 'saman-seo-editor-v2', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		wp_enqueue_style(
 			'saman-seo-editor-v2',

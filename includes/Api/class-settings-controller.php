@@ -300,6 +300,7 @@ class Settings_Controller extends REST_Controller {
 			'module_redirects'                 => 'bool',
 			'module_404_log'                   => 'bool',
 			'module_indexnow'                  => 'bool',
+			'module_search_console'            => 'bool',
 			'module_local_seo'                 => 'bool',
 			'module_social_cards'              => 'bool',
 			'module_analytics'                 => 'bool',
