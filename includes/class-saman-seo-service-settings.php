@@ -70,7 +70,7 @@ class Settings {
 		'SAMAN_SEO_enable_og_preview'                => '1',
 		'SAMAN_SEO_enable_llm_txt'                   => '1',
 		'SAMAN_SEO_enable_local_seo'                 => '0',
-		'SAMAN_SEO_enable_analytics'                 => '1',
+		'SAMAN_SEO_enable_analytics'                 => '0',
 
 		// New module toggle options (used by React UI).
 		'SAMAN_SEO_module_sitemap'                   => '1',
@@ -79,7 +79,7 @@ class Settings {
 		'SAMAN_SEO_module_llm_txt'                   => '1',
 		'SAMAN_SEO_module_local_seo'                 => '0',
 		'SAMAN_SEO_module_social_cards'              => '1',
-		'SAMAN_SEO_module_analytics'                 => '1',
+		'SAMAN_SEO_module_analytics'                 => '0',
 		'SAMAN_SEO_module_admin_bar'                 => '1',
 		'SAMAN_SEO_module_internal_links'            => '1',
 		'SAMAN_SEO_module_ai_assistant'              => '1',
@@ -200,7 +200,33 @@ class Settings {
 	 * @return void
 	 */
 	public function boot() {
+		self::maybe_migrate_analytics_opt_in();
+
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+	}
+
+	/**
+	 * Option recording that the analytics opt-in migration has run.
+	 */
+	public const ANALYTICS_OPT_IN_MIGRATION = 'SAMAN_SEO_analytics_opt_in_migrated';
+
+	/**
+	 * One-time upgrade: switch usage analytics off on existing installs.
+	 *
+	 * Older versions shipped admin usage tracking enabled by default, so no
+	 * site ever actually opted in. Turn it off once; afterwards the toggle
+	 * in Settings is the only thing that changes it.
+	 *
+	 * @return void
+	 */
+	public static function maybe_migrate_analytics_opt_in() {
+		if ( get_option( self::ANALYTICS_OPT_IN_MIGRATION ) ) {
+			return;
+		}
+
+		update_option( 'SAMAN_SEO_module_analytics', '0' );
+		update_option( 'SAMAN_SEO_enable_analytics', '0' );
+		update_option( self::ANALYTICS_OPT_IN_MIGRATION, '1' );
 	}
 
 	/**

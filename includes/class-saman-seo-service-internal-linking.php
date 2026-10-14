@@ -102,10 +102,27 @@ class Internal_Linking {
 		add_action( 'admin_post_SAMAN_SEO_save_link_settings', array( $this, 'handle_save_settings' ) );
 		add_action( 'wp_ajax_SAMAN_SEO_link_destination_search', array( $this, 'ajax_destination_search' ) );
 		add_action( 'wp_ajax_SAMAN_SEO_link_preview', array( $this, 'handle_preview' ) );
+		add_action( 'save_post', array( $this, 'invalidate_post_cache' ), 10, 2 );
 		add_filter( 'the_content', array( $this, 'filter_frontend_content' ), 20 );
 		add_filter( 'widget_text', array( $this, 'filter_widget_content' ), 20, 3 );
 		add_filter( 'widget_text_content', array( $this, 'filter_widget_content' ), 20, 2 );
 		add_filter( 'widget_block_content', array( $this, 'filter_widget_content' ), 20, 2 );
+	}
+
+	/**
+	 * Drop cached link renders for a post when it is saved.
+	 *
+	 * @param int           $post_id Post ID.
+	 * @param \WP_Post|null $post    Post object.
+	 *
+	 * @return void
+	 */
+	public function invalidate_post_cache( $post_id, $post = null ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+
+		Linking_Engine::invalidate_post_cache( $post_id );
 	}
 
 	/**

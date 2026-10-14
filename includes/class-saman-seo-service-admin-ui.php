@@ -588,7 +588,7 @@ class Admin_UI {
 						),
 						admin_url( 'admin-post.php' )
 					),
-					'SAMAN_SEO_toggle_noindex'
+					'SAMAN_SEO_toggle_noindex_' . $post->ID
 				)
 			),
 			esc_html__( 'Toggle noindex', 'saman-seo' )
@@ -642,7 +642,15 @@ class Admin_UI {
 			return $redirect;
 		}
 
+		$updated = 0;
+
 		foreach ( $post_ids as $post_id ) {
+			$post_id = absint( $post_id );
+
+			if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+				continue;
+			}
+
 			$meta = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 
 			if ( in_array( $action, array( 'SAMAN_SEO_noindex', 'SAMAN_SEO_index' ), true ) ) {
@@ -660,9 +668,10 @@ class Admin_UI {
 			}
 
 			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+			++$updated;
 		}
 
-		return add_query_arg( 'SAMAN_SEO_bulk_updated', count( $post_ids ), $redirect );
+		return add_query_arg( 'SAMAN_SEO_bulk_updated', $updated, $redirect );
 	}
 
 	/**
@@ -671,20 +680,14 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function handle_toggle_noindex() {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'saman-seo' ) );
-		}
-
-		check_admin_referer( 'SAMAN_SEO_toggle_noindex' );
-
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is verified below, bound to this post ID.
 		$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 
-		if ( ! $post_id ) {
-			$redirect_url = wp_get_referer();
-			$redirect_url = $redirect_url ? $redirect_url : admin_url();
-			wp_safe_redirect( $redirect_url );
-			exit;
+		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'saman-seo' ), '', array( 'response' => 403 ) );
 		}
+
+		check_admin_referer( 'SAMAN_SEO_toggle_noindex_' . $post_id );
 
 		$meta            = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 		$meta['noindex'] = empty( $meta['noindex'] ) ? '1' : '';

@@ -579,7 +579,7 @@ class Redirect_Manager {
 	 *
 	 * @return array<int,array{type:string,severity:string,message:string,final?:string,hops?:int}>
 	 */
-	public function validate_redirect( $source, $target, $exclude_id = 0, $is_regex = null, array $rules = null ) {
+	public function validate_redirect( $source, $target, $exclude_id = 0, $is_regex = null, ?array $rules = null ) {
 		$warnings = array();
 
 		$source = (string) $source;
@@ -1439,9 +1439,10 @@ class Redirect_Manager {
 		if ( $settings['object_cache'] ) {
 			// Store a snapshot so backreference replacements are not cached.
 			$cache_row = array(
-				'id'          => (int) $row->id,
-				'status_code' => (int) $row->status_code,
-				'hits'        => (int) $row->hits,
+				'id'                => (int) $row->id,
+				'status_code'       => (int) $row->status_code,
+				'hits'              => (int) $row->hits,
+				'configured_target' => isset( $row->configured_target ) ? (string) $row->configured_target : (string) $row->target,
 			);
 			wp_cache_set(
 				$lookup_key,
@@ -1649,33 +1650,145 @@ class Redirect_Manager {
 
 			$modifiers = $settings['case_insensitive'] ? 'i' : '';
 
-			$matched = false;
+			$result  = false;
 			$matches = array();
+
+			// Patterns are admin-supplied: a broken one (or one that hits the
+			// backtrack limit) must skip the rule, never fatal the request.
 			set_error_handler(
 				static function () {
 					return true;
 				}
 			);
 			try {
-				$matched = (bool) preg_match( '#' . $regex_row->source . '#' . $modifiers, $lookup, $matches );
+				$result = preg_match( '#' . $regex_row->source . '#' . $modifiers, $lookup, $matches );
 			} catch ( \Throwable $e ) {
-				$matched = false;
+				$result = false;
 			} finally {
 				restore_error_handler();
 			}
 
-			if ( $matched ) {
-				$match_count = count( $matches );
-				if ( $match_count > 1 ) {
-					for ( $i = 1; $i < $match_count; $i++ ) {
-						$regex_row->target = str_replace( '$' . $i, $matches[ $i ], $regex_row->target );
-					}
+			if ( false === $result || PREG_NO_ERROR !== preg_last_error() ) {
+				continue;
+			}
+
+			if ( 1 === $result ) {
+				$target = $this->apply_regex_captures( (string) $regex_row->target, $matches );
+
+				if ( '' === $target ) {
+					continue;
 				}
+
+				$regex_row->configured_target = $regex_row->target;
+				$regex_row->target            = $target;
+
 				return $regex_row;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Substitute regex captures ($1, $2, ...) into a redirect target.
+	 *
+	 * Captures come from the visitor's request path, so they are untrusted.
+	 * When the configured target is a same-site relative path, the result is
+	 * forced to stay one: a capture can never turn "/$1" into "//evil.com"
+	 * or "/\\evil.com" (protocol-relative) or an absolute URL.
+	 *
+	 * @param string $target  Configured target, possibly containing $N tokens.
+	 * @param array  $matches preg_match() captures.
+	 *
+	 * @return string Resolved target, or '' when it cannot be made safe.
+	 */
+	public function apply_regex_captures( $target, array $matches ) {
+		$target = (string) $target;
+
+		$resolved = preg_replace_callback(
+			'/\$(\d+)/',
+			static function ( $token ) use ( $matches ) {
+				$index = (int) $token[1];
+
+				return ( $index > 0 && isset( $matches[ $index ] ) ) ? (string) $matches[ $index ] : '';
+			},
+			$target
+		);
+
+		if ( null === $resolved ) {
+			return '';
+		}
+
+		if ( self::is_relative_path( $target ) ) {
+			return self::force_relative_path( $resolved );
+		}
+
+		return $resolved;
+	}
+
+	/**
+	 * Whether a target is a same-site relative path ("/foo", not "//host").
+	 *
+	 * @param string $target Target.
+	 *
+	 * @return bool
+	 */
+	private static function is_relative_path( $target ) {
+		$target = (string) $target;
+
+		return '' !== $target
+			&& '/' === $target[0]
+			&& ( ! isset( $target[1] ) || ( '/' !== $target[1] && '\\' !== $target[1] ) );
+	}
+
+	/**
+	 * Collapse any string into a same-site relative path.
+	 *
+	 * Removes control characters and whitespace that browsers strip while
+	 * parsing, treats backslashes as slashes, drops a leading scheme a
+	 * capture smuggled in, and collapses leading slashes into one.
+	 *
+	 * @param string $path Candidate path.
+	 *
+	 * @return string
+	 */
+	public static function force_relative_path( $path ) {
+		$path = (string) preg_replace( '/[\x00-\x1f\x7f]+/', '', (string) $path );
+		$path = ltrim( $path, ' ' );
+		$path = str_replace( '\\', '/', $path );
+
+		// Strip a scheme ("https:", "javascript:") that ended up at the front.
+		$path = (string) preg_replace( '#^[a-z][a-z0-9+.\-]*:#i', '', $path );
+
+		return '/' . ltrim( $path, '/' );
+	}
+
+	/**
+	 * Host an admin explicitly configured as an external redirect target.
+	 *
+	 * Only a literal host in an absolute http(s) target counts. Hosts built
+	 * from regex captures ("https://$1.example.com") are never trusted.
+	 *
+	 * @param string $configured_target Target as saved by the admin.
+	 *
+	 * @return string Host, or '' when none should be allowed.
+	 */
+	public function configured_redirect_host( $configured_target ) {
+		$configured_target = (string) $configured_target;
+
+		if ( ! preg_match( '#^https?://([^/?\#]+)#i', $configured_target, $parts ) ) {
+			return '';
+		}
+
+		$authority = $parts[1];
+
+		if ( false !== strpos( $authority, '$' ) || false !== strpos( $authority, '@' ) ) {
+			return '';
+		}
+
+		$host = wp_parse_url( $configured_target, PHP_URL_HOST );
+
+		return is_string( $host ) ? strtolower( $host ) : '';
 	}
 
 	/**
@@ -1770,7 +1883,36 @@ class Redirect_Manager {
 			exit;
 		}
 
+		$configured = isset( $redirect['configured_target'] )
+			? (string) $redirect['configured_target']
+			: ( isset( $redirect['target'] ) ? (string) $redirect['target'] : (string) $target );
+
 		$target = esc_url_raw( $target );
+
+		// esc_url_raw() drops characters, which can glue slashes together; a
+		// relative rule must still produce a relative path afterwards.
+		if ( self::is_relative_path( $configured ) ) {
+			$target = self::force_relative_path( $target );
+		}
+
+		// Only the exact host an admin typed into the rule is trusted, never a
+		// host derived from the request.
+		$allowed_host = $this->configured_redirect_host( $configured );
+		$allow_host   = static function ( $hosts ) use ( $allowed_host ) {
+			if ( '' !== $allowed_host && ! in_array( $allowed_host, $hosts, true ) ) {
+				$hosts[] = $allowed_host;
+			}
+			return $hosts;
+		};
+
+		add_filter( 'allowed_redirect_hosts', $allow_host );
+
+		$target = wp_validate_redirect( $target, '' );
+
+		if ( '' === $target ) {
+			remove_filter( 'allowed_redirect_hosts', $allow_host );
+			return;
+		}
 
 		// Send Expires header for 301 redirects.
 		if ( 301 === $status_code && $settings['cache_header_hours'] > 0 ) {
@@ -1778,17 +1920,6 @@ class Redirect_Manager {
 			header( 'Expires: ' . $expires );
 			header( 'Cache-Control: max-age=' . ( $settings['cache_header_hours'] * HOUR_IN_SECONDS ) );
 		}
-
-		add_filter(
-			'allowed_redirect_hosts',
-			static function ( $hosts ) use ( $target ) {
-				$host = wp_parse_url( $target, PHP_URL_HOST );
-				if ( $host && ! in_array( $host, $hosts, true ) ) {
-					$hosts[] = $host;
-				}
-				return $hosts;
-			}
-		);
 
 		wp_safe_redirect( $target, $status_code );
 		exit;

@@ -401,7 +401,7 @@ class Tools_Controller extends REST_Controller {
 			return $this->error( __( 'Invalid or unsafe URL.', 'saman-seo' ), 'invalid_url', 400 );
 		}
 
-		$response = wp_remote_get( $url );
+		$response = wp_safe_remote_get( $url, array( 'timeout' => 15 ) );
 
 		if ( is_wp_error( $response ) ) {
 			return $this->error( $response->get_error_message(), 'remote_error', 500 );

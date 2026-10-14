@@ -7,14 +7,16 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Analytics Service
  *
- * Tracks anonymous usage data to help improve the plugin.
+ * Tracks anonymous usage data to help improve the plugin. Opt-in only:
+ * off by default, nothing is loaded or contacted until a site admin
+ * enables it in Settings > Modules.
  *
  * Privacy measures:
  * - No cookies used (disableCookies)
  * - No personal data collected
  * - Visitor ID is hashed from site URL (not identifiable)
  * - Only tracks within plugin admin pages
- * - Can be disabled in Settings > Modules
+ * - Disabled by default; enabled only from Settings > Modules
  *
  * Data collected:
  * - Page views within the plugin
@@ -49,11 +51,22 @@ class Analytics {
 
 	/**
 	 * Check if analytics tracking is enabled.
+	 *
+	 * Opt-in: only an explicit '1' enables it. Unlike module_enabled(), a
+	 * missing option means off, never on.
+	 *
+	 * @return bool
 	 */
 	public function is_enabled() {
-		$enabled = \Saman\SEO\Helpers\module_enabled( 'analytics' );
+		$value = get_option( 'SAMAN_SEO_module_analytics', false );
 
-		return saman_seo_apply_filters( 'saman_seo_analytics_enabled', $enabled );
+		if ( false === $value ) {
+			$value = get_option( 'SAMAN_SEO_enable_analytics', '0' );
+		}
+
+		$enabled = '1' === (string) $value;
+
+		return (bool) saman_seo_apply_filters( 'saman_seo_analytics_enabled', $enabled );
 	}
 
 	/**
@@ -210,7 +223,9 @@ class Analytics {
 	 * Add preconnect hint for faster loading
 	 */
 	public function add_resource_hints( $urls, $relation_type ) {
-		if ( 'preconnect' === $relation_type ) {
+		// Only hint when the tracker is actually being loaded on this page,
+		// never on the front end or when analytics is off.
+		if ( 'preconnect' === $relation_type && is_admin() && wp_script_is( 'saman-seo-matomo', 'enqueued' ) ) {
 			$urls[] = $this->matomo_url;
 		}
 		return $urls;
