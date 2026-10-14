@@ -64,7 +64,7 @@ This is SEO without secrets—because better SEO comes from better collaboration
 ## Features
 
 ### Core SEO Management
-- **Per-Post SEO Fields**: Complete meta control stored in `_samanseo_meta` with Gutenberg sidebar and classic editor support
+- **Per-Post SEO Fields**: Complete meta control stored in `_SAMAN_SEO_meta` with Gutenberg sidebar and classic editor support
 - **Server-Rendered Output**: `<title>`, meta descriptions, canonical URLs, robots directives, Open Graph, Twitter Cards, and JSON-LD structured data
 - **Site-Wide Templates**: Centralized defaults for titles, descriptions, social images, robots directives, and hreflang attributes
 - **Post-Type Granularity**: Dedicated defaults for each content type—no more one-size-fits-all configurations
