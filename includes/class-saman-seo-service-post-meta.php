@@ -27,7 +27,7 @@ class Post_Meta {
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'init', array( $this, 'register_meta' ) );
+		add_action( 'init', array( $this, 'register_meta' ), 99 );
 		add_action( 'save_post', array( $this, 'save_meta' ), 10, 2 );
 	}
 
@@ -100,39 +100,54 @@ class Post_Meta {
 			),
 		);
 
-		register_post_meta(
-			'post',
-			self::META_KEY,
+		// Register for every post type the editor panel appears on, not just
+		// posts and pages, so block-editor saves on custom post types persist.
+		// The REST API only exposes meta for types supporting custom-fields.
+		foreach ( self::get_supported_post_types() as $post_type ) {
+			if ( ! post_type_supports( $post_type, 'custom-fields' ) ) {
+				add_post_type_support( $post_type, 'custom-fields' );
+			}
+
+			register_post_meta(
+				$post_type,
+				self::META_KEY,
+				array(
+					'type'              => 'object',
+					'single'            => true,
+					'show_in_rest'      => array(
+						'schema' => $schema,
+					),
+					'default'           => array(),
+					'auth_callback'     => static function ( $allowed, $meta_key, $object_id ) {
+						return current_user_can( 'edit_post', $object_id );
+					},
+					'sanitize_callback' => array( $this, 'sanitize' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Post types that get the SEO meta field (public, with an admin UI).
+	 *
+	 * Mirrors the editor panel's post types and honours the same filter.
+	 *
+	 * @return string[]
+	 */
+	public static function get_supported_post_types() {
+		$post_types = get_post_types(
 			array(
-				'type'              => 'object',
-				'single'            => true,
-				'show_in_rest'      => array(
-					'schema' => $schema,
-				),
-				'default'           => array(),
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_posts' );
-				},
-				'sanitize_callback' => array( $this, 'sanitize' ),
-			)
+				'public'  => true,
+				'show_ui' => true,
+			),
+			'names'
 		);
 
-		register_post_meta(
-			'page',
-			self::META_KEY,
-			array(
-				'type'              => 'object',
-				'single'            => true,
-				'show_in_rest'      => array(
-					'schema' => $schema,
-				),
-				'default'           => array(),
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_pages' );
-				},
-				'sanitize_callback' => array( $this, 'sanitize' ),
-			)
-		);
+		unset( $post_types['attachment'] );
+
+		$post_types = array_values( array_unique( array_merge( array( 'post', 'page' ), $post_types ) ) );
+
+		return (array) saman_seo_apply_filters( 'saman_seo_editor_post_types', $post_types );
 	}
 
 	/**

@@ -344,7 +344,7 @@ class Improvements_Controller extends REST_Controller {
 		return array(
 			'id'          => 'sitemap',
 			'title'       => __( 'XML Sitemap', 'saman-seo' ),
-			'description' => __( 'Help search engines discover every important page, with automatic pings on publish.', 'saman-seo' ),
+			'description' => __( 'Help search engines discover every important page with an always-current XML sitemap.', 'saman-seo' ),
 			'impact'      => 'high',
 			'status'      => $enabled ? 'on' : 'off',
 			'metrics'     => $metrics,

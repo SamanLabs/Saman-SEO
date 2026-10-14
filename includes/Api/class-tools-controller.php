@@ -812,6 +812,11 @@ class Tools_Controller extends REST_Controller {
 
 		$post_id = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
 
+		// The Schema Builder page sends a URL rather than a post ID.
+		if ( ! $post_id && ! empty( $params['url'] ) ) {
+			$post_id = url_to_postid( esc_url_raw( $params['url'] ) );
+		}
+
 		if ( ! $post_id ) {
 			return $this->error( __( 'Post ID is required.', 'saman-seo' ), 'missing_post_id', 400 );
 		}
@@ -819,6 +824,10 @@ class Tools_Controller extends REST_Controller {
 		$post = get_post( $post_id );
 		if ( ! $post ) {
 			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return $this->error( __( 'You cannot edit this post.', 'saman-seo' ), 'forbidden', 403 );
 		}
 
 		$content = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
@@ -847,13 +856,16 @@ class Tools_Controller extends REST_Controller {
 		}
 
 		if ( ! $data ) {
-			return $this->success(
-				array(
-					'primary_type' => 'Article',
-					'confidence'   => 'low',
-					'reason'       => 'Could not determine schema type.',
-				)
+			$data = array(
+				'primary_type' => 'Article',
+				'confidence'   => 'low',
+				'reason'       => 'Could not determine schema type.',
 			);
+		}
+
+		// The Schema Builder reads `suggested_type`; keep `primary_type` for other callers.
+		if ( empty( $data['suggested_type'] ) && ! empty( $data['primary_type'] ) ) {
+			$data['suggested_type'] = $data['primary_type'];
 		}
 
 		return $this->success( $data );
