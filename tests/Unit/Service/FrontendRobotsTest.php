@@ -27,9 +27,9 @@ class FrontendRobotsTest extends TestCase {
 		// index/follow are implicit defaults — never emitted explicitly.
 		$this->assertArrayNotHasKey( 'noindex', $robots );
 		$this->assertArrayNotHasKey( 'nofollow', $robots );
-		$this->assertTrue( $robots['max-snippet:-1'] );
-		$this->assertTrue( $robots['max-image-preview:large'] );
-		$this->assertTrue( $robots['max-video-preview:-1'] );
+		$this->assertSame( '-1', $robots['max-snippet'] );
+		$this->assertSame( 'large', $robots['max-image-preview'] );
+		$this->assertSame( '-1', $robots['max-video-preview'] );
 	}
 
 	/**
@@ -128,7 +128,7 @@ class FrontendRobotsTest extends TestCase {
 		$frontend = new Frontend();
 		$robots   = $frontend->filter_wp_robots( array() );
 
-		$this->assertArrayHasKey( 'max-snippet:50', $robots );
-		$this->assertArrayNotHasKey( 'max-image-preview:large', $robots );
+		$this->assertSame( '50', $robots['max-snippet'] );
+		$this->assertArrayNotHasKey( 'max-image-preview', $robots );
 	}
 }
