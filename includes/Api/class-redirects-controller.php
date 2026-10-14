@@ -1185,7 +1185,7 @@ class Redirects_Controller extends REST_Controller {
                 }
 
                 // Parse CSV line
-                $row = str_getcsv( $line );
+                $row = self::parse_csv_line( $line );
 
                 // First non-empty line is header
                 if ( null === $header ) {
@@ -1249,6 +1249,23 @@ class Redirects_Controller extends REST_Controller {
             'errors'   => $errors,
             /* translators: 1: number of imported redirects, 2: number of skipped redirects */
         ], sprintf( __( 'Imported %1$d redirects, skipped %2$d.', 'saman-seo' ), $imported, $skipped ) );
+    }
+
+    /**
+     * Parse one CSV record.
+     *
+     * All str_getcsv() arguments are passed explicitly: PHP 8.4 deprecates
+     * relying on the default escape character. The escape is disabled ('')
+     * because export_redirects() follows RFC 4180 and escapes quotes by
+     * doubling them; with the legacy backslash escape a value ending in a
+     * backslash (common in regex sources) would swallow its closing quote.
+     * An empty escape is supported since PHP 7.4.
+     *
+     * @param string $line CSV line.
+     * @return array<int,string|null>
+     */
+    public static function parse_csv_line( $line ) {
+        return str_getcsv( (string) $line, ',', '"', '' );
     }
 
     /**
@@ -1395,14 +1412,13 @@ class Redirects_Controller extends REST_Controller {
             }
         }
 
-        // Bot filter - check if column exists first
-        if ( $hide_bots && $this->has_column( $this->log_table, 'is_bot' ) ) {
+        // is_bot / is_ignored are guaranteed by the 404 log schema version
+        // gate (Request_Monitor), so no per-request SHOW COLUMNS probes.
+        if ( $hide_bots ) {
             $filters[] = 'is_bot = 0';
         }
 
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safe, built from $wpdb->prefix.
-        // Ignored filter - check if column exists first
-        if ( $hide_ignored && $this->has_column( $this->log_table, 'is_ignored' ) ) {
+        if ( $hide_ignored ) {
             $filters[] = 'is_ignored = 0';
         }
 
@@ -1419,19 +1435,11 @@ class Redirects_Controller extends REST_Controller {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, pagination requires direct query.
         $total_count = (int) $wpdb->get_var( $count_sql );
 
-        // Get bot count for stats
-        $bot_count = 0;
-        if ( $this->has_column( $this->log_table, 'is_bot' ) ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, stats require direct query.
-            $bot_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table} WHERE is_bot = 1" );
-        }
-
-        // Get ignored count for stats
-        $ignored_count = 0;
-        if ( $this->has_column( $this->log_table, 'is_ignored' ) ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, stats require direct query.
-            $ignored_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->log_table} WHERE is_ignored = 1" );
-        }
+        // Bot and ignored totals for the stats header, in one pass.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, stats require direct query.
+        $flag_counts   = $wpdb->get_row( "SELECT COALESCE(SUM(is_bot = 1), 0) AS bots, COALESCE(SUM(is_ignored = 1), 0) AS ignored FROM {$this->log_table}" );
+        $bot_count     = $flag_counts ? (int) $flag_counts->bots : 0;
+        $ignored_count = $flag_counts ? (int) $flag_counts->ignored : 0;
 
         // Get rows
         $sql = "SELECT * FROM {$this->log_table}{$where_sql} ORDER BY {$order_by} DESC LIMIT %d OFFSET %d";
@@ -1473,25 +1481,6 @@ class Redirects_Controller extends REST_Controller {
             'bot_count'     => $bot_count,
             'ignored_count' => $ignored_count,
         ] );
-    }
-
-    /**
-     * Check if a table has a specific column.
-     *
-     * @param string $table  Table name.
-     * @param string $column Column name.
-     * @return bool
-     */
-    private function has_column( $table, $column ) {
-        global $wpdb;
-
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, schema check requires direct query.
-        $result = $wpdb->get_var( $wpdb->prepare(
-            'SHOW COLUMNS FROM ' . $table . ' LIKE %s',
-            $column
-        ) );
-
-        return ! empty( $result );
     }
 
     /**
@@ -1727,7 +1716,7 @@ class Redirects_Controller extends REST_Controller {
             }
         }
 
-        if ( $hide_bots && $this->has_column( $this->log_table, 'is_bot' ) ) {
+        if ( $hide_bots ) {
             $filters[] = 'is_bot = 0';
         }
 

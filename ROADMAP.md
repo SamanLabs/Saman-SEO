@@ -1,7 +1,19 @@
 # Saman SEO - Development Roadmap
 
-> Last Updated: January 2025
-> Current Version: 0.2.0
+> Last Updated: October 2026
+> Current Version: 2.0.32
+
+---
+
+## Recently Done
+
+- [x] Restored admin JSX deleted by the earlier i18n codemod (codemod fixed)
+- [x] Security hardening: redirects, .htaccess editing, link cache, noindex handling
+- [x] Usage analytics is now strictly opt-in (existing installs switched off once)
+- [x] Schema: placeholder data removed; post schema output on singular views only
+- [x] WordPress 7.1 compatibility: block editor, admin toolbar, PHP 8.5 updates
+- [x] Google 2026 updates: FAQ/HowTo rich-result copy, llms.txt path, AI crawler robots presets, per-post snippet controls
+- [x] 404 log and redirect lookup performance improvements
 
 ---
 

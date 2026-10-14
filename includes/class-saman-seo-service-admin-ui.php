@@ -168,6 +168,20 @@ class Admin_UI {
 			return;
 		}
 
+		$post_types = saman_seo_apply_filters( 'saman_seo_score_post_types', $this->get_seo_post_types() );
+
+		foreach ( $post_types as $post_type ) {
+			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_posts_column' ) );
+			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'render_posts_column' ), 10, 2 );
+		}
+	}
+
+	/**
+	 * Public, UI-enabled post types the plugin manages SEO for.
+	 *
+	 * @return string[]
+	 */
+	private function get_seo_post_types() {
 		$post_types = get_post_types(
 			array(
 				'public'  => true,
@@ -176,16 +190,32 @@ class Admin_UI {
 			'names'
 		);
 
-		if ( isset( $post_types['attachment'] ) ) {
-			unset( $post_types['attachment'] );
+		unset( $post_types['attachment'] );
+
+		return array_values( $post_types );
+	}
+
+	/**
+	 * Whether the current screen is the block post editor for a post type
+	 * the plugin supports (not the site, widgets or Customizer editors).
+	 *
+	 * @return bool
+	 */
+	public function is_supported_post_editor() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( ! $screen || 'post' !== $screen->base || empty( $screen->post_type ) ) {
+			return false;
 		}
 
-		$post_types = saman_seo_apply_filters( 'saman_seo_score_post_types', array_values( $post_types ) );
+		/**
+		 * Filters the post types that get the SEO panel in the block editor.
+		 *
+		 * @param string[] $post_types Post type names.
+		 */
+		$post_types = (array) saman_seo_apply_filters( 'saman_seo_editor_post_types', $this->get_seo_post_types() );
 
-		foreach ( $post_types as $post_type ) {
-			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_posts_column' ) );
-			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'render_posts_column' ), 10, 2 );
-		}
+		return in_array( $screen->post_type, $post_types, true );
 	}
 
 	/**
@@ -255,6 +285,7 @@ class Admin_UI {
 			$asset['version'],
 			true
 		);
+		wp_set_script_translations( 'saman-seo-classic', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		if ( file_exists( $build_dir . 'index.css' ) ) {
 			wp_enqueue_style(
@@ -395,6 +426,12 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function enqueue_editor_assets() {
+		// enqueue_block_editor_assets also fires in the site editor, widgets
+		// editor and Customizer; the SEO modal only belongs in the post editor.
+		if ( ! $this->is_supported_post_editor() ) {
+			return;
+		}
+
 		// Load V2 React editor sidebar
 		$build_dir = SAMAN_SEO_PATH . 'build/editor/';
 		$build_url = SAMAN_SEO_URL . 'build/editor/';
@@ -403,7 +440,7 @@ class Admin_UI {
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
 			: array(
-				'dependencies' => array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch' ),
+				'dependencies' => array( 'wp-plugins', 'wp-editor', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n' ),
 				'version'      => SAMAN_SEO_VERSION,
 			);
 
@@ -414,6 +451,7 @@ class Admin_UI {
 			$asset['version'],
 			true
 		);
+		wp_set_script_translations( 'saman-seo-editor-v2', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		wp_enqueue_style(
 			'saman-seo-editor-v2',
@@ -588,7 +626,7 @@ class Admin_UI {
 						),
 						admin_url( 'admin-post.php' )
 					),
-					'SAMAN_SEO_toggle_noindex'
+					'SAMAN_SEO_toggle_noindex_' . $post->ID
 				)
 			),
 			esc_html__( 'Toggle noindex', 'saman-seo' )
@@ -642,7 +680,15 @@ class Admin_UI {
 			return $redirect;
 		}
 
+		$updated = 0;
+
 		foreach ( $post_ids as $post_id ) {
+			$post_id = absint( $post_id );
+
+			if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+				continue;
+			}
+
 			$meta = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 
 			if ( in_array( $action, array( 'SAMAN_SEO_noindex', 'SAMAN_SEO_index' ), true ) ) {
@@ -659,10 +705,12 @@ class Admin_UI {
 				$meta['description'] = $post ? \Saman\SEO\Helpers\generate_content_snippet( $post, 30 ) : '';
 			}
 
-			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+			// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+			update_post_meta( $post_id, Post_Meta::META_KEY, wp_slash( $meta ) );
+			++$updated;
 		}
 
-		return add_query_arg( 'SAMAN_SEO_bulk_updated', count( $post_ids ), $redirect );
+		return add_query_arg( 'SAMAN_SEO_bulk_updated', $updated, $redirect );
 	}
 
 	/**
@@ -671,24 +719,18 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function handle_toggle_noindex() {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Permission denied.', 'saman-seo' ) );
-		}
-
-		check_admin_referer( 'SAMAN_SEO_toggle_noindex' );
-
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is verified below, bound to this post ID.
 		$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 
-		if ( ! $post_id ) {
-			$redirect_url = wp_get_referer();
-			$redirect_url = $redirect_url ? $redirect_url : admin_url();
-			wp_safe_redirect( $redirect_url );
-			exit;
+		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'saman-seo' ), '', array( 'response' => 403 ) );
 		}
+
+		check_admin_referer( 'SAMAN_SEO_toggle_noindex_' . $post_id );
 
 		$meta            = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 		$meta['noindex'] = empty( $meta['noindex'] ) ? '1' : '';
-		update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+		update_post_meta( $post_id, Post_Meta::META_KEY, wp_slash( $meta ) );
 
 		$redirect_url = wp_get_referer();
 		$redirect_url = $redirect_url ? $redirect_url : admin_url();

@@ -151,7 +151,7 @@ class AGENTS_MD_Generator {
 		$resources = array();
 
 		if ( \Saman\SEO\Helpers\module_enabled( 'llm_txt' ) ) {
-			$resources[] = '- [llms.txt](' . home_url( '/llm.txt' ) . '): Markdown sitemap for LLMs.';
+			$resources[] = '- [llms.txt](' . LLM_TXT_Generator::get_url() . '): Markdown sitemap for LLMs.';
 		}
 
 		if ( '1' === get_option( 'SAMAN_SEO_enable_sitemap_enhancer', '0' ) ) {

@@ -205,9 +205,20 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 											) }
 										</span>
 									</label>
-									{ __(
-										'https://example.com/page',
-										'saman-seo'
+									{ selectedUrl === 'custom' && (
+										<input
+											type="url"
+											className="custom-url-input"
+											placeholder={ __(
+												'https://example.com/page',
+												'saman-seo'
+											) }
+											value={ customUrl }
+											onChange={ ( e ) =>
+												setCustomUrl( e.target.value )
+											}
+											autoFocus
+										/>
 									) }
 								</div>
 							</>

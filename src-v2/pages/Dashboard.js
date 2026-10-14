@@ -220,7 +220,129 @@ const Dashboard = ( { onNavigate } ) => {
 			{ /* Notifications */ }
 			{ visibleNotifications.length > 0 && (
 				<div className="dashboard-notifications">
-					{ __( 'Dismiss', 'saman-seo' ) }
+					{ visibleNotifications.map( ( notif ) => (
+						<div
+							key={ notif.id }
+							className={ `notification-banner notification-banner--${ notif.type }` }
+						>
+							<div className="notification-icon">
+								{ notif.type === 'error' && (
+									<svg
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+									>
+										<circle
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											strokeWidth="2"
+										/>
+										<path
+											d="M12 8v4M12 16h.01"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+										/>
+									</svg>
+								) }
+								{ notif.type === 'warning' && (
+									<svg
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+									>
+										<path
+											d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
+								) }
+								{ notif.type === 'info' && (
+									<svg
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+									>
+										<circle
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											strokeWidth="2"
+										/>
+										<path
+											d="M12 16v-4m0-4h.01"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+										/>
+									</svg>
+								) }
+							</div>
+							<div className="notification-content">
+								<strong>{ notif.title }</strong>
+								<span>{ notif.message }</span>
+							</div>
+							<div className="notification-actions">
+								{ notif.action && (
+									<button
+										type="button"
+										className="button ghost small notification-action"
+										onClick={ () =>
+											handleNavigation(
+												ACTION_VIEW_MAP[
+													notif.category
+												] || 'tools'
+											)
+										}
+									>
+										{ notif.action.label }
+									</button>
+								) }
+								<button
+									type="button"
+									className="button ghost small notification-action notification-action--dismiss"
+									onClick={ () =>
+										handleDismissNotification( notif.id )
+									}
+									disabled={ dismissing === notif.id }
+									aria-label={ __(
+										'Dismiss notification',
+										'saman-seo'
+									) }
+									title={ __( 'Dismiss', 'saman-seo' ) }
+								>
+									{ dismissing === notif.id ? (
+										<span className="loading-dots">
+											...
+										</span>
+									) : (
+										<svg
+											width="16"
+											height="16"
+											viewBox="0 0 24 24"
+											fill="none"
+										>
+											<path
+												d="M18 6L6 18M6 6l12 12"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+											/>
+										</svg>
+									) }
+								</button>
+							</div>
+						</div>
+					) ) }
 					{ hasMoreNotifications && (
 						<button
 							type="button"

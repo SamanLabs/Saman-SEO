@@ -236,7 +236,7 @@ class Settings_Controller extends REST_Controller {
 			}
 
 			$sanitized[ $key ] = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
-			update_option( 'SAMAN_SEO_' . $key, $sanitized[ $key ] );
+			update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $sanitized[ $key ], $allowed[ $key ] ) );
 		}
 
 		// Sync breadcrumb settings to consolidated option for the service.
@@ -300,6 +300,7 @@ class Settings_Controller extends REST_Controller {
 			'module_redirects'                 => 'bool',
 			'module_404_log'                   => 'bool',
 			'module_indexnow'                  => 'bool',
+			'module_search_console'            => 'bool',
 			'module_local_seo'                 => 'bool',
 			'module_social_cards'              => 'bool',
 			'module_analytics'                 => 'bool',
@@ -340,6 +341,13 @@ class Settings_Controller extends REST_Controller {
 			'redirect_auto_generate_url'       => 'text',
 			'redirect_monitor_post_types'      => 'array',
 			'redirect_monitor_trash'           => 'bool',
+
+			// 404 log retention and notifications.
+			'enable_404_cleanup'               => 'bool',
+			'cleanup_404_days'                 => 'int',
+			'enable_404_notifications'         => 'bool',
+			'notification_404_threshold'       => 'int',
+			'notification_404_email'           => 'text',
 
 			// 404 log privacy/logging settings.
 			'404_log_ip_level'                 => 'text',
@@ -399,6 +407,27 @@ class Settings_Controller extends REST_Controller {
 			default:
 				return sanitize_text_field( $value );
 		}
+	}
+
+	/**
+	 * Convert a sanitized setting to the value written to its option.
+	 *
+	 * Booleans are stored as '1' / '' rather than true / false: update_option()
+	 * treats false as "unchanged" when the option does not exist yet, so
+	 * switching off a setting whose default is on would silently do nothing.
+	 * '' is what WordPress already writes for false, so readers (empty(),
+	 * '1' === checks, and the React UI) see the same values as before.
+	 *
+	 * @param mixed  $value Sanitized value.
+	 * @param string $type  Registered type.
+	 * @return mixed
+	 */
+	private function to_option_value( $value, $type ) {
+		if ( 'bool' === $type ) {
+			return $value ? '1' : '';
+		}
+
+		return $value;
 	}
 
 	/**
@@ -496,7 +525,7 @@ class Settings_Controller extends REST_Controller {
 
 		$value = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
 
-		update_option( 'SAMAN_SEO_' . $key, $value );
+		update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $value, $allowed[ $key ] ) );
 
 		return $this->success(
 			array(

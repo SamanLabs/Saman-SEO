@@ -71,13 +71,22 @@ class WebPage_Schema extends Abstract_Schema {
 			'isPartOf'      => array(
 				'@id' => Schema_IDs::website(),
 			),
+			// Dropped by Schema_Graph_Manager when no BreadcrumbList with this
+			// @id ends up in the graph.
 			'breadcrumb'    => array(
 				'@id' => Schema_IDs::breadcrumb( $this->context->canonical ),
 			),
 		);
 
-		// Add primaryImageOfPage.
-		$image_url = get_the_post_thumbnail_url( $post, 'full' );
+		// Add primaryImageOfPage: per-post social image override, then the
+		// featured image, then the site default (same order as og:image).
+		$image_url = '';
+		if ( ! empty( $this->context->meta['og_image'] ) && is_string( $this->context->meta['og_image'] ) ) {
+			$image_url = esc_url_raw( $this->context->meta['og_image'] );
+		}
+		if ( empty( $image_url ) ) {
+			$image_url = get_the_post_thumbnail_url( $post, 'full' );
+		}
 		if ( empty( $image_url ) ) {
 			$image_url = get_option( 'SAMAN_SEO_default_og_image', '' );
 		}

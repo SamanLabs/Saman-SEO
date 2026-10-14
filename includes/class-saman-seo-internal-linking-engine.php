@@ -30,6 +30,11 @@ class Engine {
 	private const CACHE_TTL = HOUR_IN_SECONDS;
 
 	/**
+	 * Post meta key holding the per-post cache generation.
+	 */
+	public const CACHE_VERSION_META = '_SAMAN_SEO_link_cache_ver';
+
+	/**
 	 * Data store.
 	 *
 	 * @var Repository
@@ -96,11 +101,15 @@ class Engine {
 
 		// Check the rendered-content cache BEFORE preparing rules. Rule
 		// preparation resolves a permalink per rule, so paying it on cache hits
-		// (the common case) is pure waste — the cache key only needs the post
-		// and the repository version.
-		$cache_enabled = ( 'content' === $context_type ) && ! empty( $this->get_settings()['cache_rendered_content'] ) && $post instanceof WP_Post;
+		// (the common case) is pure waste. The key covers the post, its cache
+		// generation, the page number and the exact input content, so a cached
+		// render can never be served for different (e.g. protected) content.
+		$cache_enabled = ( 'content' === $context_type )
+			&& ! empty( $this->get_settings()['cache_rendered_content'] )
+			&& $post instanceof WP_Post
+			&& $this->is_cacheable_post( $post );
 		if ( $cache_enabled ) {
-			$cache_key = $this->get_cache_key( $post->ID );
+			$cache_key = $this->get_cache_key( $post->ID, $content );
 			$cached    = get_transient( $cache_key );
 
 			if ( is_array( $cached ) && isset( $cached['version'], $cached['content'] ) && $cached['version'] === $this->repository->get_version() ) {
@@ -1120,14 +1129,66 @@ class Engine {
 	}
 
 	/**
-	 * Build cache key per post.
+	 * Build the rendered-content cache key.
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int    $post_id Post ID.
+	 * @param string $content Input content being filtered.
 	 *
 	 * @return string
 	 */
-	private function get_cache_key( $post_id ) {
-		return 'SAMAN_SEO_linked_' . absint( $post_id );
+	private function get_cache_key( $post_id, $content ) {
+		$post_id    = absint( $post_id );
+		$generation = (string) get_post_meta( $post_id, self::CACHE_VERSION_META, true );
+		$page       = function_exists( 'get_query_var' ) ? absint( get_query_var( 'page' ) ) : 0;
+
+		return 'SAMAN_SEO_linked_' . $post_id . '_' . md5( $generation . '|' . $page . '|' . $content );
+	}
+
+	/**
+	 * Whether a post's rendered output may be stored in the shared cache.
+	 *
+	 * Password-protected, non-public and unpublished posts are rendered
+	 * fresh every time so their content never lands in a shared transient.
+	 *
+	 * @param WP_Post $post Post object.
+	 *
+	 * @return bool
+	 */
+	private function is_cacheable_post( WP_Post $post ) {
+		if ( 'publish' !== $post->post_status ) {
+			return false;
+		}
+
+		if ( '' !== (string) $post->post_password || post_password_required( $post ) ) {
+			return false;
+		}
+
+		if ( function_exists( 'is_preview' ) && is_preview() ) {
+			return false;
+		}
+
+		if ( function_exists( 'is_post_publicly_viewable' ) && ! is_post_publicly_viewable( $post ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Invalidate every cached render of a post by bumping its generation.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return void
+	 */
+	public static function invalidate_post_cache( $post_id ) {
+		$post_id = absint( $post_id );
+
+		if ( ! $post_id ) {
+			return;
+		}
+
+		update_post_meta( $post_id, self::CACHE_VERSION_META, uniqid( '', true ) );
 	}
 
 	/**

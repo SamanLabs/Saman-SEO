@@ -401,7 +401,7 @@ class Tools_Controller extends REST_Controller {
 			return $this->error( __( 'Invalid or unsafe URL.', 'saman-seo' ), 'invalid_url', 400 );
 		}
 
-		$response = wp_remote_get( $url );
+		$response = wp_safe_remote_get( $url, array( 'timeout' => 15 ) );
 
 		if ( is_wp_error( $response ) ) {
 			return $this->error( $response->get_error_message(), 'remote_error', 500 );
@@ -645,7 +645,8 @@ class Tools_Controller extends REST_Controller {
 			$meta['description'] = sanitize_textarea_field( $data['description'] );
 		}
 
-		update_post_meta( $post_id, '_SAMAN_SEO_meta', $meta );
+		// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+		update_post_meta( $post_id, '_SAMAN_SEO_meta', wp_slash( $meta ) );
 	}
 
 	// =========================================================================
@@ -812,6 +813,11 @@ class Tools_Controller extends REST_Controller {
 
 		$post_id = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
 
+		// The Schema Builder page sends a URL rather than a post ID.
+		if ( ! $post_id && ! empty( $params['url'] ) ) {
+			$post_id = url_to_postid( esc_url_raw( $params['url'] ) );
+		}
+
 		if ( ! $post_id ) {
 			return $this->error( __( 'Post ID is required.', 'saman-seo' ), 'missing_post_id', 400 );
 		}
@@ -821,6 +827,10 @@ class Tools_Controller extends REST_Controller {
 			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return $this->error( __( 'You cannot edit this post.', 'saman-seo' ), 'forbidden', 403 );
+		}
+
 		$content = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
 		$content = substr( $content, 0, 1500 );
 
@@ -828,7 +838,7 @@ class Tools_Controller extends REST_Controller {
 		$prompt .= "Title: {$post->post_title}\n";
 		$prompt .= "Content: {$content}\n\n";
 		$prompt .= "Return a JSON object with this structure:\n";
-		$prompt .= '{"primary_type":"Article|Recipe|HowTo|FAQPage|Product|LocalBusiness|Event|Review","confidence":"high|medium|low","reason":"Brief explanation","suggested_types":["Type1","Type2"],"detected_elements":{"has_recipe":false,"has_steps":false,"has_faq":false,"has_review":false}}';
+		$prompt .= '{"primary_type":"Article|Recipe|HowTo|FAQPage|Product|LocalBusiness|Event","confidence":"high|medium|low","reason":"Brief explanation","suggested_types":["Type1","Type2"],"detected_elements":{"has_recipe":false,"has_steps":false,"has_faq":false}}';
 
 		$system = 'You are a Schema.org expert. Detect the best schema type for content. Always respond with valid JSON only.';
 
@@ -847,13 +857,16 @@ class Tools_Controller extends REST_Controller {
 		}
 
 		if ( ! $data ) {
-			return $this->success(
-				array(
-					'primary_type' => 'Article',
-					'confidence'   => 'low',
-					'reason'       => 'Could not determine schema type.',
-				)
+			$data = array(
+				'primary_type' => 'Article',
+				'confidence'   => 'low',
+				'reason'       => 'Could not determine schema type.',
 			);
+		}
+
+		// The Schema Builder reads `suggested_type`; keep `primary_type` for other callers.
+		if ( empty( $data['suggested_type'] ) && ! empty( $data['primary_type'] ) ) {
+			$data['suggested_type'] = $data['primary_type'];
 		}
 
 		return $this->success( $data );
@@ -872,24 +885,43 @@ class Tools_Controller extends REST_Controller {
 		}
 
 		$post_id     = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
-		$schema_type = isset( $params['schema_type'] ) ? sanitize_text_field( $params['schema_type'] ) : 'Article';
+		$schema_type = isset( $params['schema_type'] ) ? sanitize_text_field( $params['schema_type'] ) : '';
 		$custom_data = isset( $params['custom_data'] ) ? $params['custom_data'] : array();
 
-		if ( ! $post_id ) {
-			return $this->error( __( 'Post ID is required.', 'saman-seo' ), 'missing_post_id', 400 );
+		// The Schema Builder page sends `type`, `data` and an optional `url`.
+		if ( '' === $schema_type && isset( $params['type'] ) && is_string( $params['type'] ) ) {
+			$schema_type = sanitize_text_field( $params['type'] );
+		}
+		if ( '' === $schema_type ) {
+			$schema_type = 'Article';
+		}
+		if ( empty( $custom_data ) && isset( $params['data'] ) && is_array( $params['data'] ) ) {
+			$custom_data = $params['data'];
+		}
+		if ( ! $post_id && ! empty( $params['url'] ) && is_string( $params['url'] ) ) {
+			$post_id = (int) url_to_postid( esc_url_raw( $params['url'] ) );
 		}
 
-		$post = get_post( $post_id );
-		if ( ! $post ) {
+		if ( self::is_review_type( $schema_type ) ) {
+			return $this->error(
+				__( 'AI generation of Review or AggregateRating markup is not supported. Google requires reviews and ratings to come from real, disclosed customer feedback; add them from your actual review data instead.', 'saman-seo' ),
+				'review_generation_refused',
+				400
+			);
+		}
+
+		$post = $post_id ? get_post( $post_id ) : null;
+
+		if ( $post_id && ! $post ) {
 			return $this->error( __( 'Post not found.', 'saman-seo' ), 'not_found', 404 );
 		}
 
-		$content        = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
-		$content        = substr( $content, 0, 2000 );
-		$featured_image = get_the_post_thumbnail_url( $post_id, 'full' );
-		$author         = get_the_author_meta( 'display_name', $post->post_author );
-		$date_published = get_the_date( 'c', $post );
-		$date_modified  = get_the_modified_date( 'c', $post );
+		// Without a post, the schema is built from the submitted form data only.
+		if ( ! $post && ( empty( $custom_data ) || ! is_array( $custom_data ) ) ) {
+			return $this->error( __( 'Post ID is required.', 'saman-seo' ), 'missing_post_id', 400 );
+		}
+
+		$notices = array();
 
 		// Build base schema
 		$schema = array(
@@ -897,15 +929,25 @@ class Tools_Controller extends REST_Controller {
 			'@type'    => $schema_type,
 		);
 
-		// Add common fields
-		$schema['headline'] = $post->post_title;
-		$schema['url']      = get_permalink( $post_id );
+		if ( $post ) {
+			$content        = \Saman\SEO\Helpers\strip_content_to_text( $post->post_content );
+			$content        = substr( $content, 0, 2000 );
+			$featured_image = get_the_post_thumbnail_url( $post_id, 'full' );
 
-		if ( $featured_image ) {
-			$schema['image'] = $featured_image;
+			// Add common fields
+			$schema['headline'] = $post->post_title;
+			$schema['url']      = get_permalink( $post_id );
+
+			if ( $featured_image ) {
+				$schema['image'] = $featured_image;
+			}
 		}
 
-		if ( $schema_type === 'Article' || $schema_type === 'BlogPosting' || $schema_type === 'NewsArticle' ) {
+		if ( $post && ( $schema_type === 'Article' || $schema_type === 'BlogPosting' || $schema_type === 'NewsArticle' ) ) {
+			$author         = get_the_author_meta( 'display_name', $post->post_author );
+			$date_published = get_the_date( 'c', $post );
+			$date_modified  = get_the_modified_date( 'c', $post );
+
 			$schema['author']        = array(
 				'@type' => 'Person',
 				'name'  => $author,
@@ -926,23 +968,40 @@ class Tools_Controller extends REST_Controller {
 			$schema['publisher'] = $publisher;
 		}
 
-		// For other types, use AI to fill in
-		if ( in_array( $schema_type, array( 'Recipe', 'HowTo', 'FAQPage', 'Product', 'Review' ), true ) ) {
+		// For other types, use AI to fill in. Review/AggregateRating are never
+		// requested from the AI: Google's review snippet guidelines prohibit
+		// fabricated or undisclosed incentivized reviews.
+		if ( $post && in_array( $schema_type, array( 'Recipe', 'HowTo', 'FAQPage', 'Product' ), true ) ) {
 			$prompt  = "Generate Schema.org {$schema_type} markup for this content:\n\n";
 			$prompt .= "Title: {$post->post_title}\n";
 			$prompt .= "Content: {$content}\n\n";
-			$prompt .= "Return ONLY valid JSON-LD schema. Include all required properties for {$schema_type}.";
+			$prompt .= "Return ONLY valid JSON-LD schema. Include all required properties for {$schema_type}. ";
+			$prompt .= 'Do not include review, aggregateRating, or Review objects, and do not invent ratings or reviews.';
 
-			$system = 'You are a Schema.org expert. Generate valid, complete schema markup. Return only JSON, no explanation.';
+			$system = 'You are a Schema.org expert. Generate valid, complete schema markup from the given content only. Never fabricate reviews or ratings. Return only JSON, no explanation.';
 
 			$result = $this->call_ai( $system, $prompt );
 
 			if ( ! is_wp_error( $result ) ) {
 				$ai_schema = json_decode( $result, true );
 				if ( $ai_schema && is_array( $ai_schema ) ) {
+					$stripped  = 0;
+					$ai_schema = self::strip_review_markup( $ai_schema, $stripped );
+
+					if ( $stripped > 0 ) {
+						$notices[] = __( 'Review and rating markup suggested by the AI was removed. Only mark up reviews and ratings that come from real, disclosed customer feedback.', 'saman-seo' );
+					}
+
+					// Never let the AI response change the requested type.
+					unset( $ai_schema['@type'], $ai_schema['@context'] );
+
 					$schema = array_merge( $schema, $ai_schema );
 				}
 			}
+		}
+
+		if ( in_array( $schema_type, array( 'FAQPage', 'HowTo' ), true ) ) {
+			$notices[] = __( 'FAQPage and HowTo are valid schema.org types, but Google Search no longer shows FAQ or HowTo rich results.', 'saman-seo' );
 		}
 
 		// Merge custom data
@@ -956,8 +1015,68 @@ class Tools_Controller extends REST_Controller {
 				'json_ld'     => wp_json_encode( $schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
 				'post_id'     => $post_id,
 				'schema_type' => $schema_type,
-			)
+				'notices'     => $notices,
+			),
+			implode( ' ', $notices )
 		);
+	}
+
+	/**
+	 * Whether a schema type is a review or rating type.
+	 *
+	 * @param mixed $type Schema type (string or list).
+	 * @return bool
+	 */
+	public static function is_review_type( $type ) {
+		foreach ( (array) $type as $single ) {
+			if ( ! is_string( $single ) ) {
+				continue;
+			}
+
+			$single = preg_replace( '#^(?:https?://schema\.org/|schema:)#i', '', trim( $single ) );
+
+			if ( in_array( $single, array( 'Review', 'AggregateRating', 'Rating', 'CriticReview', 'UserReview', 'EmployerReview', 'EmployerAggregateRating' ), true ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Recursively remove review and rating markup from AI-generated schema.
+	 *
+	 * Drops review / aggregateRating properties and any node typed as a
+	 * review or rating, so the AI can never invent reviews.
+	 *
+	 * @param array $data     Schema data.
+	 * @param int   $stripped Number of removed items (by reference).
+	 * @return array
+	 */
+	public static function strip_review_markup( array $data, &$stripped = 0 ) {
+		$is_list = array_values( $data ) === $data;
+
+		foreach ( $data as $key => $value ) {
+			if ( ! $is_list && in_array( $key, array( 'review', 'reviews', 'aggregateRating' ), true ) ) {
+				unset( $data[ $key ] );
+				++$stripped;
+				continue;
+			}
+
+			if ( ! is_array( $value ) ) {
+				continue;
+			}
+
+			if ( isset( $value['@type'] ) && self::is_review_type( $value['@type'] ) ) {
+				unset( $data[ $key ] );
+				++$stripped;
+				continue;
+			}
+
+			$data[ $key ] = self::strip_review_markup( $value, $stripped );
+		}
+
+		return $is_list ? array_values( $data ) : $data;
 	}
 
 	/**
@@ -1010,7 +1129,7 @@ class Tools_Controller extends REST_Controller {
 
 		if ( $type === 'Article' || $type === 'BlogPosting' || $type === 'NewsArticle' ) {
 			if ( empty( $schema['headline'] ) ) {
-				$errors[] = __( 'Missing headline (required for Article).', 'saman-seo' );
+				$warnings[] = __( 'Missing headline (recommended for Article).', 'saman-seo' );
 			}
 			if ( empty( $schema['image'] ) ) {
 				$warnings[] = __( 'Missing image (recommended for Article).', 'saman-seo' );
@@ -1035,10 +1154,27 @@ class Tools_Controller extends REST_Controller {
 			}
 		}
 
+		// FAQ and HowTo rich results are retired in Google Search, so gaps in
+		// that markup are warnings, never blocking errors.
 		if ( $type === 'FAQPage' ) {
 			if ( empty( $schema['mainEntity'] ) ) {
-				$errors[] = __( 'Missing mainEntity (required for FAQPage).', 'saman-seo' );
+				$warnings[] = __( 'Missing mainEntity (questions) for FAQPage.', 'saman-seo' );
 			}
+			$warnings[] = __( 'Google Search no longer shows FAQ rich results. FAQPage is still valid schema.org markup.', 'saman-seo' );
+		}
+
+		if ( $type === 'HowTo' ) {
+			if ( empty( $schema['name'] ) ) {
+				$warnings[] = __( 'Missing name for HowTo.', 'saman-seo' );
+			}
+			if ( empty( $schema['step'] ) ) {
+				$warnings[] = __( 'Missing step for HowTo.', 'saman-seo' );
+			}
+			$warnings[] = __( 'Google Search no longer shows HowTo rich results. HowTo is still valid schema.org markup.', 'saman-seo' );
+		}
+
+		if ( $type === 'VideoObject' && empty( $schema['thumbnailUrl'] ) ) {
+			$errors[] = __( 'Missing thumbnailUrl (required for VideoObject).', 'saman-seo' );
 		}
 
 		return $this->success(
@@ -1065,22 +1201,120 @@ class Tools_Controller extends REST_Controller {
 		$post_id = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
 		$schema  = isset( $params['schema'] ) ? $params['schema'] : '';
 
-		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			return $this->error( __( 'Invalid post or permission denied.', 'saman-seo' ), 'permission_denied', 403 );
+		// The builder page has no ?post= param; fall back to the post URL field.
+		if ( ! $post_id && ! empty( $params['url'] ) && is_string( $params['url'] ) ) {
+			$post_id = (int) url_to_postid( esc_url_raw( $params['url'] ) );
+		}
+
+		if ( ! $post_id || ! get_post( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+			return $this->error( __( 'Invalid post or permission denied. Enter the URL of a post on this site to save the schema to it.', 'saman-seo' ), 'permission_denied', 403 );
 		}
 
 		if ( empty( $schema ) ) {
 			return $this->error( __( 'Schema is required.', 'saman-seo' ), 'missing_schema', 400 );
 		}
 
-		// Store as JSON string
-		if ( is_array( $schema ) ) {
-			$schema = wp_json_encode( $schema );
+		if ( is_string( $schema ) ) {
+			$schema = json_decode( wp_unslash( $schema ), true );
 		}
 
-		update_post_meta( $post_id, '_SAMAN_SEO_schema', $schema );
+		if ( ! is_array( $schema ) || empty( $schema ) ) {
+			return $this->error( __( 'Schema must be a valid JSON-LD object or array.', 'saman-seo' ), 'invalid_schema', 400 );
+		}
 
-		return $this->success( null, __( 'Schema saved successfully.', 'saman-seo' ) );
+		$result = self::store_custom_schema( $post_id, $schema );
+
+		if ( true !== $result ) {
+			return $this->error( __( 'The schema could not be stored as valid JSON.', 'saman-seo' ), 'save_failed', 500 );
+		}
+
+		return $this->success(
+			array( 'post_id' => $post_id ),
+			__( 'Schema saved successfully.', 'saman-seo' )
+		);
+	}
+
+	/**
+	 * Store custom JSON-LD on a post where the front end reads it.
+	 *
+	 * The JSON-LD service injects `custom_schema` from the `_SAMAN_SEO_meta`
+	 * array (see Service\JsonLD::build_payload()). The value is merged into
+	 * the existing array so other SEO fields are kept.
+	 *
+	 * update_post_meta() unslashes its value once, so the whole array is
+	 * slashed (as every other writer of this key does). Post_Meta::sanitize()
+	 * does not unslash again, so the first write normally round-trips. In
+	 * case a third-party sanitize filter unslashes custom_schema a second
+	 * time, the write is retried with one extra slash level. If neither
+	 * write reproduces the schema exactly but the first one stored valid
+	 * JSON (a filter altered string content), that first result is kept
+	 * rather than the over-slashed retry.
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $schema  Decoded schema.
+	 * @return bool True when valid JSON was stored.
+	 */
+	public static function store_custom_schema( $post_id, array $schema ) {
+		$meta_key = \Saman\SEO\Service\Post_Meta::META_KEY;
+		$json     = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
+		if ( ! is_string( $json ) || '' === $json ) {
+			return false;
+		}
+
+		$meta = get_post_meta( $post_id, $meta_key, true );
+		$meta = is_array( $meta ) ? $meta : array();
+
+		$meta['custom_schema'] = $json;
+		update_post_meta( $post_id, $meta_key, wp_slash( $meta ) );
+
+		if ( self::stored_schema_matches( $post_id, $meta_key, $schema ) ) {
+			return true;
+		}
+
+		$first = get_post_meta( $post_id, $meta_key, true );
+
+		$meta['custom_schema'] = wp_slash( $json );
+		update_post_meta( $post_id, $meta_key, wp_slash( $meta ) );
+
+		if ( self::stored_schema_matches( $post_id, $meta_key, $schema ) ) {
+			return true;
+		}
+
+		if ( self::has_valid_custom_schema( $first ) ) {
+			update_post_meta( $post_id, $meta_key, wp_slash( $first ) );
+		}
+
+		return self::has_valid_custom_schema( get_post_meta( $post_id, $meta_key, true ) );
+	}
+
+	/**
+	 * Whether a stored meta array holds custom_schema that decodes to JSON.
+	 *
+	 * @param mixed $stored Stored meta value.
+	 * @return bool
+	 */
+	private static function has_valid_custom_schema( $stored ) {
+		return is_array( $stored ) && isset( $stored['custom_schema'] ) && is_string( $stored['custom_schema'] )
+			&& is_array( json_decode( $stored['custom_schema'], true ) );
+	}
+
+	/**
+	 * Whether the stored custom_schema decodes to the given schema.
+	 *
+	 * @param int    $post_id  Post ID.
+	 * @param string $meta_key Meta key.
+	 * @param array  $schema   Expected schema.
+	 * @return bool
+	 */
+	private static function stored_schema_matches( $post_id, $meta_key, array $schema ) {
+		$stored = get_post_meta( $post_id, $meta_key, true );
+
+		if ( ! is_array( $stored ) || ! isset( $stored['custom_schema'] ) || ! is_string( $stored['custom_schema'] ) ) {
+			return false;
+		}
+
+		return json_decode( $stored['custom_schema'], true ) === $schema;
 	}
 
 	// =========================================================================

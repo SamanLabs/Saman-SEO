@@ -148,4 +148,15 @@ class Schema_IDs {
 	public static function event( string $url ): string {
 		return $url . '#event';
 	}
+
+	/**
+	 * Get a URL#fragment @id for any other node type on a page.
+	 *
+	 * @param string $url      The canonical URL of the page.
+	 * @param string $fragment Fragment without the leading '#' (e.g. 'course').
+	 * @return string URL#fragment identifier.
+	 */
+	public static function fragment( string $url, string $fragment ): string {
+		return $url . '#' . $fragment;
+	}
 }

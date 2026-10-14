@@ -2,6 +2,18 @@
 /**
  * Service Schema service for service schema optimization.
  *
+ * Emits a Service node for posts of the `service` post type. Optional
+ * fields are read from post meta and omitted when empty:
+ *
+ * - `_saman_seo_service_type`         serviceType.
+ * - `_saman_seo_service_area_served`  areaServed.
+ * - `_saman_seo_service_provider`     Provider name. Defaults to the site's
+ *                                     Organization when the site is set up
+ *                                     as an organization.
+ * - `_saman_seo_service_provider_url` Provider URL (sameAs).
+ *
+ * Use the `saman_seo_schema_service` filter to supply or change data.
+ *
  * @package Saman\SEO
  */
 
@@ -12,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Service Schema controller.
  */
-class Service_Schema {
+class Service_Schema extends Abstract_Post_Type_Schema {
 
 	/**
 	 * Boot hooks.
@@ -30,54 +42,50 @@ class Service_Schema {
 	/**
 	 * Add Service schema to the JSON-LD graph.
 	 *
-	 * @param array    $graph The existing JSON-LD graph.
-	 * @param \WP_Post $post  The current post object.
+	 * @param array         $graph The existing JSON-LD graph.
+	 * @param \WP_Post|null $post  The current post object.
 	 * @return array The modified JSON-LD graph.
 	 */
-	public function add_service_schema_to_graph( $graph, $post ) {
-		if ( ! $post || 'service' !== get_post_type( $post ) ) {
-			return $graph;
-		}
+	public function add_service_schema_to_graph( $graph, $post = null ) {
+		return $this->add_node_to_graph( $graph, $post );
+	}
 
-		$schema = $this->build_schema( $post );
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function get_post_type(): string {
+		return 'service';
+	}
 
-		if ( ! empty( $schema ) ) {
-			$graph[] = $schema;
-		}
-
-		return $graph;
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function get_schema_slug(): string {
+		return 'service';
 	}
 
 	/**
 	 * Build Service schema.
 	 *
 	 * @param \WP_Post $post The current post object.
-	 * @return array|null
+	 * @return array
 	 */
-	private function build_schema( $post ) {
-		$service_name  = get_the_title( $post );
-		$provider_name = get_bloginfo( 'name' );
-
-		// In a real implementation, these would come from post meta.
-		$service_type = 'Web Development';
-		$area_served  = 'Worldwide';
-
-		if ( empty( $service_name ) ) {
-			return null;
+	protected function build_node( \WP_Post $post ): array {
+		$provider = $this->get_entity( $post, 'Organization', 'provider', 'provider_url' );
+		if ( empty( $provider ) ) {
+			$provider = $this->get_site_organization();
 		}
 
-		$schema = array(
-			'@context'    => 'https://schema.org',
+		return array(
 			'@type'       => 'Service',
-			'name'        => $service_name,
-			'serviceType' => $service_type,
-			'provider'    => array(
-				'@type' => 'Organization',
-				'name'  => $provider_name,
-			),
-			'areaServed'  => $area_served,
+			'@id'         => $this->get_node_id( $post ),
+			'name'        => wp_strip_all_tags( (string) get_the_title( $post ) ),
+			'description' => $this->get_description( $post ),
+			'url'         => $this->get_url( $post ),
+			'image'       => $this->get_image( $post ),
+			'serviceType' => $this->get_field( $post, 'type' ),
+			'provider'    => $provider,
+			'areaServed'  => $this->get_field( $post, 'area_served' ),
 		);
-
-		return $schema;
 	}
 }

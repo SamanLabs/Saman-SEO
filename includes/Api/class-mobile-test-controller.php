@@ -79,7 +79,7 @@ class Mobile_Test_Controller extends REST_Controller {
 		}
 
 		// Fetch the page content.
-		$response = wp_remote_get(
+		$response = wp_safe_remote_get(
 			$url,
 			array(
 				'timeout'    => 15,

@@ -29,6 +29,30 @@ class Breadcrumbs {
 	private $rendered = false;
 
 	/**
+	 * Whether a core/breadcrumbs block (WP 7.0+) rendered a trail on this request.
+	 *
+	 * Only suppresses the automatic the_content / wp_footer output, never an
+	 * explicit shortcode or saman-seo/breadcrumbs block.
+	 *
+	 * @var bool
+	 */
+	private $core_block_rendered = false;
+
+	/**
+	 * Attributes and context of the core/breadcrumbs block being rendered.
+	 *
+	 * @var array|null
+	 */
+	private $core_block = null;
+
+	/**
+	 * Frontend/editor style handle.
+	 *
+	 * @var string
+	 */
+	const STYLE_HANDLE = 'saman-seo-breadcrumbs';
+
+	/**
 	 * Default settings.
 	 *
 	 * @var array
@@ -90,8 +114,14 @@ class Breadcrumbs {
 		// Register Gutenberg block.
 		add_action( 'init', array( $this, 'register_block' ) );
 
-		// Enqueue frontend styles.
+		// Enqueue frontend styles for the automatic and shortcode output.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+
+		// WP 7.0+ core/breadcrumbs block. These hooks never fire on older
+		// versions, so they are inert there.
+		add_filter( 'render_block_context', array( $this, 'capture_core_block' ), 10, 2 );
+		add_filter( 'block_core_breadcrumbs_items', array( $this, 'filter_core_block_items' ) );
+		add_filter( 'render_block_core/breadcrumbs', array( $this, 'mark_core_block_rendered' ) );
 	}
 
 	/**
@@ -715,6 +745,10 @@ class Breadcrumbs {
 			return $content;
 		}
 
+		if ( $this->core_block_present() ) {
+			return $content;
+		}
+
 		if ( ! saman_seo_apply_filters( 'saman_seo_auto_breadcrumbs', true ) ) {
 			return $content;
 		}
@@ -739,6 +773,10 @@ class Breadcrumbs {
 	 */
 	public function maybe_footer_breadcrumbs() {
 		if ( $this->rendered || \is_admin() || \is_feed() || \is_front_page() ) {
+			return;
+		}
+
+		if ( $this->core_block_present() ) {
 			return;
 		}
 
@@ -818,6 +856,8 @@ class Breadcrumbs {
 
 		$block_json = SAMAN_SEO_PATH . 'blocks/breadcrumbs/block.json';
 
+		$this->register_styles();
+
 		// Register the editor script.
 		wp_register_script(
 			'saman-seo-breadcrumbs-block',
@@ -826,9 +866,12 @@ class Breadcrumbs {
 			SAMAN_SEO_VERSION,
 			true
 		);
+		wp_set_script_translations( 'saman-seo-breadcrumbs-block', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		$args = array(
 			'editor_script'   => 'saman-seo-breadcrumbs-block',
+			// Core loads block styles in the iframed editor and wherever the block renders.
+			'style'           => self::STYLE_HANDLE,
 			'render_callback' => array( $this, 'render_block' ),
 		);
 
@@ -933,7 +976,30 @@ class Breadcrumbs {
 	}
 
 	/**
+	 * Register the breadcrumbs stylesheet.
+	 *
+	 * Compiled from assets/less/breadcrumbs.less by `npm run build:less`.
+	 *
+	 * @return void
+	 */
+	public function register_styles() {
+		if ( wp_style_is( self::STYLE_HANDLE, 'registered' ) ) {
+			return;
+		}
+
+		wp_register_style(
+			self::STYLE_HANDLE,
+			SAMAN_SEO_URL . 'build/css/breadcrumbs.css',
+			array(),
+			SAMAN_SEO_VERSION
+		);
+	}
+
+	/**
 	 * Enqueue frontend styles.
+	 *
+	 * The saman-seo/breadcrumbs block gets the stylesheet through its block
+	 * registration; this covers the automatic and shortcode output.
 	 *
 	 * @return void
 	 */
@@ -944,12 +1010,127 @@ class Breadcrumbs {
 			return;
 		}
 
-		wp_enqueue_style(
-			'saman-seo-breadcrumbs',
-			SAMAN_SEO_URL . 'build/css/breadcrumbs.css',
-			array(),
-			SAMAN_SEO_VERSION
+		$this->register_styles();
+		wp_enqueue_style( self::STYLE_HANDLE );
+	}
+
+	/**
+	 * Remember the attributes and context of a core/breadcrumbs block about to render.
+	 *
+	 * The block_core_breadcrumbs_items filter only receives the items, so the
+	 * block's own toggles and the post it renders for are captured here.
+	 *
+	 * @param array $context      Block context.
+	 * @param array $parsed_block Parsed block.
+	 * @return array Unchanged context.
+	 */
+	public function capture_core_block( $context, $parsed_block ) {
+		if ( is_array( $parsed_block ) && isset( $parsed_block['blockName'] ) && 'core/breadcrumbs' === $parsed_block['blockName'] ) {
+			$this->core_block = array(
+				'attrs'   => isset( $parsed_block['attrs'] ) && is_array( $parsed_block['attrs'] ) ? $parsed_block['attrs'] : array(),
+				'post_id' => is_array( $context ) && ! empty( $context['postId'] ) ? (int) $context['postId'] : 0,
+			);
+		}
+
+		return $context;
+	}
+
+	/**
+	 * Feed this plugin's trail into the core/breadcrumbs block (WP 7.0+).
+	 *
+	 * Keeps the core block, the plugin's own trail and the BreadcrumbList schema
+	 * in agreement. Falls back to core's items whenever the plugin has no trail
+	 * for the request, e.g. breadcrumbs disabled in settings or the front page
+	 * with show_on_front off.
+	 *
+	 * @param array $items Core breadcrumb items (label, url, allow_html).
+	 * @return array
+	 */
+	public function filter_core_block_items( $items ) {
+		$block            = $this->core_block;
+		$this->core_block = null;
+
+		if ( ! is_array( $items ) || \is_admin() || \is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return $items;
+		}
+
+		/**
+		 * Filter whether the plugin's trail replaces the core/breadcrumbs block's items.
+		 *
+		 * @param bool $enabled Default true.
+		 */
+		if ( ! saman_seo_apply_filters( 'saman_seo_core_breadcrumbs_integration', true ) ) {
+			return $items;
+		}
+
+		// The plugin trail describes the main query. A core block rendering for
+		// another post (e.g. inside a Query Loop) keeps its own items.
+		if ( \is_singular() ) {
+			$post_id = ! empty( $block['post_id'] ) ? (int) $block['post_id'] : (int) \get_the_ID();
+			if ( $post_id && (int) \get_queried_object_id() !== $post_id ) {
+				return $items;
+			}
+		}
+
+		$attrs  = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$crumbs = $this->get_breadcrumbs(
+			array(
+				'show_home'    => isset( $attrs['showHomeItem'] ) ? (bool) $attrs['showHomeItem'] : true,
+				'show_current' => isset( $attrs['showCurrentItem'] ) ? (bool) $attrs['showCurrentItem'] : true,
+				'link_current' => false,
+			)
 		);
+
+		$core_items = array();
+		foreach ( (array) $crumbs as $crumb ) {
+			if ( ! is_array( $crumb ) || ! isset( $crumb['title'] ) || '' === trim( (string) $crumb['title'] ) ) {
+				continue;
+			}
+
+			$item = array( 'label' => (string) $crumb['title'] );
+			if ( ! empty( $crumb['url'] ) && is_string( $crumb['url'] ) ) {
+				$item['url'] = $crumb['url'];
+			}
+
+			$core_items[] = $item;
+		}
+
+		return empty( $core_items ) ? $items : $core_items;
+	}
+
+	/**
+	 * Record that a core/breadcrumbs block rendered a trail.
+	 *
+	 * @param string $block_content Rendered block HTML.
+	 * @return string Unchanged HTML.
+	 */
+	public function mark_core_block_rendered( $block_content ) {
+		$this->core_block = null;
+
+		if ( is_string( $block_content ) && '' !== trim( $block_content ) ) {
+			$this->core_block_rendered = true;
+		}
+
+		return $block_content;
+	}
+
+	/**
+	 * Whether a core/breadcrumbs block already shows (or will show) a trail.
+	 *
+	 * Covers a block that has already rendered (header template part, post
+	 * content) and a block theme template that contains one directly.
+	 *
+	 * @return bool
+	 */
+	private function core_block_present() {
+		global $_wp_current_template_content;
+
+		if ( $this->core_block_rendered ) {
+			return true;
+		}
+
+		return is_string( $_wp_current_template_content )
+			&& false !== strpos( $_wp_current_template_content, '<!-- wp:breadcrumbs' );
 	}
 
 	/**

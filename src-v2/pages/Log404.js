@@ -557,13 +557,33 @@ const Log404 = ( { onNavigate } ) => {
 															) }
 														</span>
 													) }
-													{ __(
-														'Bot/crawler request',
-														'saman-seo'
+													{ entry.is_bot && (
+														<span
+															className="badge muted"
+															title={ __(
+																'Bot/crawler request',
+																'saman-seo'
+															) }
+														>
+															{ __(
+																'Bot',
+																'saman-seo'
+															) }
+														</span>
 													) }
-													{ __(
-														'This URL is ignored',
-														'saman-seo'
+													{ entry.is_ignored && (
+														<span
+															className="badge warning"
+															title={ __(
+																'This URL is ignored',
+																'saman-seo'
+															) }
+														>
+															{ __(
+																'Ignored',
+																'saman-seo'
+															) }
+														</span>
 													) }
 												</span>
 											</td>
@@ -593,13 +613,74 @@ const Log404 = ( { onNavigate } ) => {
 											</td>
 											<td className="action-cell">
 												<div className="table-actions">
-													{ __(
-														'Create redirect',
-														'saman-seo'
+													{ ! entry.redirect_exists && (
+														<button
+															type="button"
+															className="table-actions__primary"
+															onClick={ () =>
+																handleCreateFrom404(
+																	entry
+																)
+															}
+															title={ __(
+																'Create redirect',
+																'saman-seo'
+															) }
+														>
+															{ __(
+																'Redirect',
+																'saman-seo'
+															) }
+														</button>
 													) }
-													{ __(
-														'Ignore this URL',
-														'saman-seo'
+													{ entry.is_ignored ? (
+														<button
+															type="button"
+															className="table-actions__secondary"
+															onClick={ () =>
+																handleUnignoreEntry(
+																	entry
+																)
+															}
+															disabled={
+																ignoringEntry ===
+																entry.id
+															}
+														>
+															{ ignoringEntry ===
+															entry.id
+																? '...'
+																: __(
+																		'Unignore',
+																		'saman-seo'
+																  ) }
+														</button>
+													) : (
+														<button
+															type="button"
+															className="table-actions__secondary"
+															onClick={ () =>
+																handleIgnoreEntry(
+																	entry
+																)
+															}
+															disabled={
+																ignoringEntry ===
+																entry.id
+															}
+															title={ __(
+																'Ignore this URL',
+																'saman-seo'
+															) }
+														>
+															{ ignoringEntry ===
+															entry.id
+																? '...'
+																: __(
+																		'Ignore',
+																		'saman-seo'
+																  ) }
+														</button>
 													) }
 												</div>
 											</td>

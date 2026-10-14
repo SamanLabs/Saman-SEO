@@ -6,7 +6,7 @@
   "title": "FAQ",
   "category": "widgets",
   "icon": "editor-help",
-  "description": "Add frequently asked questions with automatic schema markup for rich results.",
+  "description": "Adds questions and answers with FAQPage structured data (valid schema.org markup; Google no longer shows FAQ rich results).",
   "keywords": [ "faq", "questions", "answers", "schema", "seo" ],
   "textdomain": "saman-seo",
   "supports": {
@@ -14,6 +14,7 @@
   },
   "attributes": {
     "faqs": {
+      "role": "content",
       "type": "array",
       "default": [
         {

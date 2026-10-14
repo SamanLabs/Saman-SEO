@@ -24,7 +24,7 @@ class JsonLD {
 	 * @return void
 	 */
 	public function boot() {
-		add_filter( 'SAMAN_SEO_jsonld', array( $this, 'build_payload' ), 10, 2 );
+		add_filter( 'SAMAN_SEO_jsonld', array( $this, 'build_payload' ), 10, 3 );
 	}
 
 	/**
@@ -33,13 +33,22 @@ class JsonLD {
 	 * Delegates to Schema_Graph_Manager for graph construction.
 	 * The new schema engine handles all registered types and applies filters.
 	 *
-	 * @param array         $payload Existing payload (ignored, kept for filter signature).
-	 * @param \WP_Post|null $post    Post.
+	 * @param array         $payload   Existing payload (ignored, kept for filter signature).
+	 * @param \WP_Post|null $post      Post the page describes; null on archives,
+	 *                                 the blog home and search results.
+	 * @param string        $canonical Canonical URL the head tag printed. When
+	 *                                 given it replaces the context URL so
+	 *                                 WebPage url/@id match <link rel="canonical">.
 	 *
 	 * @return array Complete JSON-LD structure with @context and @graph.
 	 */
-	public function build_payload( $payload, $post ) {
-		$context  = $post ? Schema_Context::from_post( $post ) : Schema_Context::from_current();
+	public function build_payload( $payload, $post, $canonical = '' ) {
+		$context = $post instanceof \WP_Post ? Schema_Context::from_post( $post ) : Schema_Context::from_current();
+
+		if ( is_string( $canonical ) && '' !== $canonical ) {
+			$context->canonical = $canonical;
+		}
+
 		$registry = Schema_Registry::instance();
 		$manager  = new Schema_Graph_Manager( $registry );
 
@@ -78,15 +87,31 @@ class JsonLD {
 
 		// Support both a single object and an array of objects.
 		if ( isset( $decoded['@type'] ) ) {
-			$graph['@graph'][] = $decoded;
+			$graph['@graph'][] = $this->strip_schema_context( $decoded );
 		} elseif ( is_array( $decoded ) ) {
 			foreach ( $decoded as $item ) {
 				if ( is_array( $item ) && isset( $item['@type'] ) ) {
-					$graph['@graph'][] = $item;
+					$graph['@graph'][] = $this->strip_schema_context( $item );
 				}
 			}
 		}
 
 		return $graph;
+	}
+
+	/**
+	 * Remove a schema.org @context from a piece placed inside @graph; the
+	 * root object already declares it.
+	 *
+	 * @param array $item Graph piece.
+	 * @return array
+	 */
+	private function strip_schema_context( array $item ): array {
+		if ( isset( $item['@context'] ) && is_string( $item['@context'] )
+			&& preg_match( '#^https?://schema\.org/?$#i', $item['@context'] ) ) {
+			unset( $item['@context'] );
+		}
+
+		return $item;
 	}
 }

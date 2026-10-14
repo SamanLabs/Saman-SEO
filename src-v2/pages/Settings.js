@@ -80,7 +80,7 @@ const defaultSettings = {
 	module_social_cards: true,
 	// 404 Monitor settings
 	show_404_dashboard_widget: true,
-	enable_404_cleanup: false,
+	enable_404_cleanup: true,
 	cleanup_404_days: 30,
 	enable_404_notifications: false,
 	notification_404_threshold: 10,
@@ -379,6 +379,7 @@ const Settings = () => {
 				<GeneralTab
 					settings={ settings }
 					updateSetting={ updateSetting }
+					openMediaLibrary={ openMediaLibrary }
 				/>
 			) }
 
@@ -429,7 +430,7 @@ const Settings = () => {
 };
 
 // General Tab
-const GeneralTab = ( { settings, updateSetting } ) => {
+const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 	const separators = [
 		{
 			value: '-',
@@ -590,9 +591,293 @@ const GeneralTab = ( { settings, updateSetting } ) => {
 						</div>
 					</div>
 
-					{ __(
-						'https://twitter.com/johndoe https://linkedin.com/in/johndoe',
-						'saman-seo'
+					{ settings.homepage_knowledge_type === 'organization' ? (
+						<>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label htmlFor="org-name">
+										{ __(
+											'Organization Name',
+											'saman-seo'
+										) }
+									</label>
+								</div>
+								<div className="settings-control">
+									<input
+										id="org-name"
+										type="text"
+										value={
+											settings.homepage_organization_name
+										}
+										onChange={ ( e ) =>
+											updateSetting(
+												'homepage_organization_name',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'Acme Corporation',
+											'saman-seo'
+										) }
+									/>
+								</div>
+							</div>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label>{ __( 'Logo', 'saman-seo' ) }</label>
+									<p className="settings-help">
+										{ __(
+											'Recommended: 112x112px minimum.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<div className="image-picker">
+										{ settings.homepage_organization_logo ? (
+											<div className="image-preview">
+												<img
+													src={
+														settings.homepage_organization_logo
+													}
+													alt={ __(
+														'Logo',
+														'saman-seo'
+													) }
+												/>
+												<button
+													className="image-remove"
+													onClick={ () =>
+														updateSetting(
+															'homepage_organization_logo',
+															''
+														)
+													}
+												>
+													×
+												</button>
+											</div>
+										) : (
+											<button
+												className="button ghost"
+												onClick={ () =>
+													openMediaLibrary(
+														'homepage_organization_logo'
+													)
+												}
+											>
+												{ __(
+													'Select Logo',
+													'saman-seo'
+												) }
+											</button>
+										) }
+									</div>
+								</div>
+							</div>
+							<div className="settings-info-box settings-info-box--cta">
+								<strong>
+									{ __(
+										'Need more business details?',
+										'saman-seo'
+									) }
+								</strong>
+								<p>
+									{ __(
+										'Add address, phone, opening hours, and social profiles in Local SEO for a complete Google Knowledge Panel.',
+										'saman-seo'
+									) }
+								</p>
+								<a
+									href={ `${
+										window.samanSeoV2Settings?.adminUrl ||
+										''
+									}admin.php?page=saman-seo-local-seo` }
+									className="button ghost small"
+								>
+									{ __(
+										'Configure Local SEO \u2192',
+										'saman-seo'
+									) }
+								</a>
+							</div>
+						</>
+					) : (
+						<>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label htmlFor="person-name">
+										{ __( 'Person Name', 'saman-seo' ) }
+									</label>
+								</div>
+								<div className="settings-control">
+									<input
+										id="person-name"
+										type="text"
+										value={ settings.homepage_person_name }
+										onChange={ ( e ) =>
+											updateSetting(
+												'homepage_person_name',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'John Doe',
+											'saman-seo'
+										) }
+									/>
+								</div>
+							</div>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label>
+										{ __( 'Photo', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Your profile photo for search results.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<div className="image-picker">
+										{ settings.homepage_person_image ? (
+											<div className="image-preview">
+												<img
+													src={
+														settings.homepage_person_image
+													}
+													alt={ __(
+														'Photo',
+														'saman-seo'
+													) }
+												/>
+												<button
+													className="image-remove"
+													onClick={ () =>
+														updateSetting(
+															'homepage_person_image',
+															''
+														)
+													}
+												>
+													×
+												</button>
+											</div>
+										) : (
+											<button
+												className="button ghost"
+												onClick={ () =>
+													openMediaLibrary(
+														'homepage_person_image'
+													)
+												}
+											>
+												{ __(
+													'Select Photo',
+													'saman-seo'
+												) }
+											</button>
+										) }
+									</div>
+								</div>
+							</div>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label htmlFor="person-job">
+										{ __( 'Job Title', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Your profession or role.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<input
+										id="person-job"
+										type="text"
+										value={
+											settings.homepage_person_job_title
+										}
+										onChange={ ( e ) =>
+											updateSetting(
+												'homepage_person_job_title',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'Software Engineer',
+											'saman-seo'
+										) }
+									/>
+								</div>
+							</div>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label htmlFor="person-url">
+										{ __( 'Website URL', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Your personal website or portfolio.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<input
+										id="person-url"
+										type="url"
+										value={ settings.homepage_person_url }
+										onChange={ ( e ) =>
+											updateSetting(
+												'homepage_person_url',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'https://johndoe.com',
+											'saman-seo'
+										) }
+									/>
+								</div>
+							</div>
+							<div className="settings-row">
+								<div className="settings-label">
+									<label htmlFor="social-profiles">
+										{ __( 'Social Profiles', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'One URL per line (Facebook, Twitter, LinkedIn, etc.)',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<textarea
+										id="social-profiles"
+										rows={ 4 }
+										value={
+											settings.homepage_social_profiles
+										}
+										onChange={ ( e ) =>
+											updateSetting(
+												'homepage_social_profiles',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'https://twitter.com/johndoe https://linkedin.com/in/johndoe',
+											'saman-seo'
+										) }
+									/>
+								</div>
+							</div>
+						</>
 					) }
 				</section>
 
@@ -748,7 +1033,21 @@ const GeneralTab = ( { settings, updateSetting } ) => {
 									'saman-seo'
 								) }
 							/>
-							{ __( 'Logo preview', 'saman-seo' ) }
+							{ settings.sidebar_logo && (
+								<div className="settings-preview-row">
+									<span>
+										{ __( 'Preview:', 'saman-seo' ) }
+									</span>
+									<img
+										className="settings-logo-preview"
+										src={ settings.sidebar_logo }
+										alt={ __(
+											'Logo preview',
+											'saman-seo'
+										) }
+									/>
+								</div>
+							) }
 						</div>
 					</div>
 
@@ -869,7 +1168,10 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		{
 			key: 'module_schema_music',
 			name: __( 'Music Schema', 'saman-seo' ),
-			desc: __( 'MusicGroup schema for the music post type.', 'saman-seo' ),
+			desc: __(
+				'MusicGroup schema for the music post type.',
+				'saman-seo'
+			),
 			icon: <IconMusic />,
 		},
 		{
@@ -922,9 +1224,9 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_llm_txt',
-			name: __( 'LLM.txt', 'saman-seo' ),
+			name: __( 'llms.txt', 'saman-seo' ),
 			desc: __(
-				'Generate llm.txt file for AI crawlers and LLMs.',
+				'Serve an optional llms.txt file that some AI tools read. Google Search does not use it.',
 				'saman-seo'
 			),
 			icon: <IconBot />,
@@ -1217,7 +1519,43 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 								</div>
 							</div>
 
-							{ __( 'e.g., \u2022', 'saman-seo' ) }
+							{ settings.breadcrumb_separator === 'custom' && (
+								<div className="settings-row">
+									<div className="settings-label">
+										<label htmlFor="breadcrumb-separator-custom">
+											{ __(
+												'Custom Separator',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Enter your custom separator character or HTML.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<input
+											id="breadcrumb-separator-custom"
+											type="text"
+											value={
+												settings.breadcrumb_separator_custom
+											}
+											onChange={ ( e ) =>
+												updateSetting(
+													'breadcrumb_separator_custom',
+													e.target.value
+												)
+											}
+											placeholder={ __(
+												'e.g., \u2022',
+												'saman-seo'
+											) }
+										/>
+									</div>
+								</div>
+							) }
 
 							<div className="settings-row">
 								<div className="settings-label">
@@ -1333,7 +1671,40 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 								</div>
 							</div>
 
-							{ __( 'Home', 'saman-seo' ) }
+							{ settings.breadcrumb_show_home && (
+								<div className="settings-row">
+									<div className="settings-label">
+										<label htmlFor="breadcrumb-home-label">
+											{ __( 'Home Label', 'saman-seo' ) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Text for the home link. Leave empty for "Home".',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<input
+											id="breadcrumb-home-label"
+											type="text"
+											value={
+												settings.breadcrumb_home_label
+											}
+											onChange={ ( e ) =>
+												updateSetting(
+													'breadcrumb_home_label',
+													e.target.value
+												)
+											}
+											placeholder={ __(
+												'Home',
+												'saman-seo'
+											) }
+										/>
+									</div>
+								</div>
+							) }
 						</section>
 
 						{ /* Current Page Settings */ }
@@ -1543,7 +1914,37 @@ const SocialTab = ( { settings, updateSetting } ) => {
 						</div>
 						<div className="settings-control">
 							<div className="image-uploader">
-								{ __( 'Remove image', 'saman-seo' ) }
+								{ settings.default_og_image ? (
+									<div className="image-preview">
+										<img
+											src={ settings.default_og_image }
+											alt={ __(
+												'Default social',
+												'saman-seo'
+											) }
+										/>
+										<button
+											type="button"
+											className="image-preview__remove"
+											onClick={ () =>
+												updateSetting(
+													'default_og_image',
+													''
+												)
+											}
+											title={ __(
+												'Remove image',
+												'saman-seo'
+											) }
+										>
+											×
+										</button>
+									</div>
+								) : (
+									<div className="image-placeholder">
+										{ __( 'No image', 'saman-seo' ) }
+									</div>
+								) }
 								<button
 									type="button"
 									className="button"
@@ -2784,7 +3185,81 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						</div>
 					</div>
 
-					{ __( 'admin@example.com', 'saman-seo' ) }
+					{ settings.enable_404_notifications && (
+						<>
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __( 'Hit Threshold', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Send notification when a 404 URL reaches this many hits.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<input
+										type="number"
+										min="1"
+										max="1000"
+										value={
+											settings.notification_404_threshold ||
+											10
+										}
+										onChange={ ( e ) =>
+											updateSetting(
+												'notification_404_threshold',
+												parseInt(
+													e.target.value,
+													10
+												) || 10
+											)
+										}
+										className="input--narrow"
+									/>
+								</div>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __(
+											'Notification Email',
+											'saman-seo'
+										) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Leave empty to use admin email.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<input
+										type="email"
+										value={
+											settings.notification_404_email ||
+											''
+										}
+										onChange={ ( e ) =>
+											updateSetting(
+												'notification_404_email',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'admin@example.com',
+											'saman-seo'
+										) }
+										className="input--medium"
+									/>
+								</div>
+							</div>
+						</>
+					) }
 
 					<div className="settings-row compact">
 						<div className="settings-label">
@@ -2824,7 +3299,42 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						</div>
 					</div>
 
-					{ __( 'REMOTE_ADDR', 'saman-seo' ) }
+					{ settings[ '404_log_ip_level' ] !== 'none' && (
+						<div className="settings-row compact">
+							<div className="settings-label">
+								<label htmlFor="404-ip-header">
+									{ __( 'IP Address Header', 'saman-seo' ) }
+								</label>
+								<p className="settings-help">
+									{ __(
+										'Only change if your server uses a custom header for the client IP.',
+										'saman-seo'
+									) }
+								</p>
+							</div>
+							<div className="settings-control">
+								<input
+									id="404-ip-header"
+									type="text"
+									value={
+										settings[ '404_log_ip_header' ] ||
+										'REMOTE_ADDR'
+									}
+									onChange={ ( e ) =>
+										updateSetting(
+											'404_log_ip_header',
+											e.target.value
+										)
+									}
+									placeholder={ __(
+										'REMOTE_ADDR',
+										'saman-seo'
+									) }
+									className="input--medium"
+								/>
+							</div>
+						</div>
+					) }
 
 					<div className="settings-row compact">
 						<div className="settings-label">

@@ -15,9 +15,19 @@ import MetricsBreakdown from './MetricsBreakdown';
 import SchemaTypeSelector from './SchemaTypeSelector';
 import SchemaPreview from './SchemaPreview';
 import useSchemaPreview from '../hooks/useSchemaPreview';
+import SnippetControls, {
+	useSnippetMeta,
+	getSnippetDirectives,
+} from './SnippetControls';
+import { registerNoSnippetFormat } from '../formats/nosnippet';
 
 // Quick template presets for the editor
 import { __, sprintf } from '@wordpress/i18n';
+
+// "Exclude from snippets" (data-nosnippet) toolbar format. No-op outside the
+// block editor, so the classic bundle can share this module.
+registerNoSnippetFormat();
+
 const quickTemplates = [
 	{
 		id: 'standard',
@@ -73,6 +83,8 @@ const SEOPanel = ( {
 	aiPilot = null,
 } ) => {
 	const [ activeTab, setActiveTab ] = useState( 'general' );
+	const snippet = useSnippetMeta( seoMeta, updateMeta );
+	const snippetDirectives = getSnippetDirectives( snippet.values );
 	const [ showTemplates, setShowTemplates ] = useState( false );
 	const [ aiModal, setAiModal ] = useState( {
 		isOpen: false,
@@ -305,110 +317,300 @@ const SEOPanel = ( {
 						/>
 					</div>
 
-					{ /* Focus Keyphrase */ }
-					<div className="saman-seo-field">
+					{ /* Focus Keyphrases - Multi-keyword support */ }
+					<div className="saman-seo-field saman-seo-field--keyphrases">
 						<div className="saman-seo-field-header">
 							<label>
-								{ __( 'Focus Keyphrase', 'saman-seo' ) }
+								{ __( 'Focus Keyphrases', 'saman-seo' ) }
 							</label>
+							<span className="saman-seo-field-count">
+								{ 1 +
+									( seoMeta.secondary_keyphrases?.length ||
+										0 ) }
+								/5
+							</span>
 						</div>
-						<input
-							type="text"
-							className="saman-seo-field-input"
-							value={ seoMeta.focus_keyphrase || '' }
-							onChange={ ( e ) =>
-								updateMeta( 'focus_keyphrase', e.target.value )
-							}
-							placeholder={ __(
-								'Enter your main target keyword',
+
+						{ /* Primary Keyphrase */ }
+						<div className="saman-seo-keyphrase-item saman-seo-keyphrase-primary">
+							<span className="saman-seo-keyphrase-badge">
+								{ __( 'Primary', 'saman-seo' ) }
+							</span>
+							<input
+								type="text"
+								className="saman-seo-field-input"
+								value={ seoMeta.focus_keyphrase || '' }
+								onChange={ ( e ) =>
+									updateMeta(
+										'focus_keyphrase',
+										e.target.value
+									)
+								}
+								placeholder={ __(
+									'Enter your main target keyword',
+									'saman-seo'
+								) }
+							/>
+						</div>
+
+						{ /* Secondary Keyphrases */ }
+						{ ( seoMeta.secondary_keyphrases || [] ).map(
+							( keyphrase, index ) => (
+								<div
+									key={ index }
+									className="saman-seo-keyphrase-item saman-seo-keyphrase-secondary"
+								>
+									<span className="saman-seo-keyphrase-badge">
+										#{ index + 2 }
+									</span>
+									<input
+										type="text"
+										className="saman-seo-field-input"
+										value={ keyphrase }
+										onChange={ ( e ) => {
+											const updated = [
+												...( seoMeta.secondary_keyphrases ||
+													[] ),
+											];
+											updated[ index ] = e.target.value;
+											updateMeta(
+												'secondary_keyphrases',
+												updated
+											);
+										} }
+										placeholder={ sprintf(
+											/* translators: %s: placeholder */ __(
+												'Secondary keyword %s',
+												'saman-seo'
+											),
+											index + 1
+										) }
+									/>
+									<button
+										type="button"
+										className="saman-seo-keyphrase-remove"
+										onClick={ () => {
+											const updated = (
+												seoMeta.secondary_keyphrases ||
+												[]
+											).filter( ( _, i ) => i !== index );
+											updateMeta(
+												'secondary_keyphrases',
+												updated
+											);
+										} }
+										aria-label={ __(
+											'Remove keyphrase',
+											'saman-seo'
+										) }
+									>
+										×
+									</button>
+								</div>
+							)
+						) }
+
+						{ /* Add Button - Max 4 secondary (5 total) */ }
+						{ ( seoMeta.secondary_keyphrases?.length || 0 ) < 4 && (
+							<button
+								type="button"
+								className="saman-seo-keyphrase-add"
+								onClick={ () => {
+									const current =
+										seoMeta.secondary_keyphrases || [];
+									updateMeta( 'secondary_keyphrases', [
+										...current,
+										'',
+									] );
+								} }
+							>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+								>
+									<line x1="12" y1="5" x2="12" y2="19"></line>
+									<line x1="5" y1="12" x2="19" y2="12"></line>
+								</svg>
+								{ __( 'Add Secondary Keyphrase', 'saman-seo' ) }
+							</button>
+						) }
+
+						<p className="saman-seo-field-help">
+							{ __(
+								'Add up to 5 keyphrases to optimize your content for multiple search terms',
 								'saman-seo'
 							) }
-						/>
+						</p>
 					</div>
 
 					{ /* Quick Templates */ }
-					<div className="saman-seo-field">
-						<div className="saman-seo-field-header">
-							<label>
-								{ __( 'Quick Templates', 'saman-seo' ) }
-							</label>
-						</div>
-						<div className="saman-seo-templates">
+					<div className="saman-seo-field saman-seo-field--templates">
+						<div className="saman-seo-templates-header">
 							<button
 								type="button"
-								className="saman-seo-templates-toggle"
+								className={ `saman-seo-templates-toggle ${
+									showTemplates ? 'active' : ''
+								}` }
 								onClick={ () =>
 									setShowTemplates( ! showTemplates )
 								}
 							>
-								{ showTemplates
-									? __( 'Hide templates', 'saman-seo' )
-									: __( 'Apply a template', 'saman-seo' ) }
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+								>
+									<rect
+										x="3"
+										y="3"
+										width="18"
+										height="18"
+										rx="2"
+									/>
+									<path d="M7 7h10M7 12h10M7 17h6" />
+								</svg>
+								{ __( 'Quick Templates', 'saman-seo' ) }
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									style={ {
+										transform: showTemplates
+											? 'rotate(180deg)'
+											: 'none',
+										transition: 'transform 0.15s',
+									} }
+								>
+									<polyline points="6 9 12 15 18 9" />
+								</svg>
 							</button>
-							{ showTemplates && (
-								<div className="saman-seo-templates-list">
-									{ quickTemplates.map( ( template ) => (
-										<button
-											key={ template.id }
-											type="button"
-											className="saman-seo-template-item"
-											onClick={ () =>
-												applyTemplate( template )
-											}
-										>
-											<strong>{ template.name }</strong>
-											<span>{ template.title }</span>
-										</button>
-									) ) }
-								</div>
-							) }
 						</div>
+						{ showTemplates && (
+							<div className="saman-seo-templates-list">
+								{ quickTemplates.map( ( template ) => (
+									<button
+										key={ template.id }
+										type="button"
+										className="saman-seo-template-item"
+										onClick={ () =>
+											applyTemplate( template )
+										}
+									>
+										<span className="saman-seo-template-name">
+											{ template.name }
+										</span>
+										<span className="saman-seo-template-preview">
+											{ template.title }
+										</span>
+									</button>
+								) ) }
+							</div>
+						) }
 					</div>
 
-					{ /* SEO Title */ }
+					{ /* SEO Title with AI and Variables */ }
 					<TemplateInput
 						label={ __( 'SEO Title', 'saman-seo' ) }
-						helpText={ __(
-							'Recommended length: 50–60 characters',
-							'saman-seo'
-						) }
+						id="saman-seo-seo-title"
 						value={ seoMeta.title || '' }
 						onChange={ ( value ) => updateMeta( 'title', value ) }
+						placeholder={
+							postTitle || __( 'Enter SEO title', 'saman-seo' )
+						}
+						maxLength={ TITLE_MAX }
 						variables={ variables }
 						variableValues={ variableValues }
 						context="post"
-						maxLength={ 60 }
+						showAiButton={ true }
+						aiEnabled={ aiEnabled }
 						onAiClick={ () =>
-							openAiModal( 'title', ( result ) =>
-								updateMeta( 'title', result )
+							openAiModal( 'title', ( val ) =>
+								updateMeta( 'title', val )
 							)
 						}
-						aiEnabled={ aiEnabled }
 					/>
 
-					{ /* Meta Description */ }
+					{ /* Meta Description with AI and Variables */ }
 					<TemplateInput
 						label={ __( 'Meta Description', 'saman-seo' ) }
-						helpText={ __(
-							'Recommended length: 150–160 characters',
-							'saman-seo'
-						) }
+						id="saman-seo-meta-desc"
 						value={ seoMeta.description || '' }
 						onChange={ ( value ) =>
 							updateMeta( 'description', value )
 						}
+						placeholder={ __(
+							'Enter meta description',
+							'saman-seo'
+						) }
+						maxLength={ DESC_MAX }
+						multiline
 						variables={ variables }
 						variableValues={ variableValues }
 						context="post"
-						multiline
-						maxLength={ 160 }
+						showAiButton={ true }
+						aiEnabled={ aiEnabled }
 						onAiClick={ () =>
-							openAiModal( 'description', ( result ) =>
-								updateMeta( 'description', result )
+							openAiModal( 'description', ( val ) =>
+								updateMeta( 'description', val )
 							)
 						}
-						aiEnabled={ aiEnabled }
 					/>
+
+					{ /* Quick Analysis */ }
+					{ seoScore?.issues?.length > 0 && (
+						<div className="saman-seo-issues">
+							<label className="saman-seo-section-label">
+								{ __( 'Issues', 'saman-seo' ) }
+							</label>
+							<ul className="saman-seo-issues-list">
+								{ seoScore.issues
+									.slice( 0, 5 )
+									.map( ( issue, idx ) => (
+										<li
+											key={ idx }
+											className={ `saman-seo-issue saman-seo-issue--${
+												issue.severity || 'warning'
+											}` }
+										>
+											<span className="saman-seo-issue-icon">
+												{ issue.severity === 'high'
+													? '!'
+													: '?' }
+											</span>
+											<span className="saman-seo-issue-text">
+												{ issue.message }
+											</span>
+										</li>
+									) ) }
+							</ul>
+							{ seoScore.issues.length > 5 && (
+								<button
+									type="button"
+									className="saman-seo-view-all-link"
+									onClick={ () => setActiveTab( 'analysis' ) }
+								>
+									{ sprintf(
+										/* translators: %d: number of SEO issues */
+										__(
+											'View all %d issues \u2192',
+											'saman-seo'
+										),
+										seoScore.issues.length
+									) }
+								</button>
+							) }
+						</div>
+					) }
 				</div>
 			) }
 
@@ -523,22 +725,29 @@ const SEOPanel = ( {
 						</label>
 					</div>
 
+					{ /* Snippet controls (nosnippet, max-snippet, ...) */ }
+					<SnippetControls
+						values={ snippet.values }
+						setValue={ snippet.setValue }
+						isBlockEditor={ snippet.isBlockEditor }
+					/>
+
 					{ /* Robots Preview */ }
 					<div className="saman-seo-robots-preview">
 						<label className="saman-seo-section-label">
 							{ __( 'Robots Meta', 'saman-seo' ) }
 						</label>
 						<code className="saman-seo-robots-code">
-							{ seoMeta.noindex || seoMeta.nofollow
-								? `${
-										seoMeta.noindex
-											? __( 'noindex', 'saman-seo' )
-											: __( 'index', 'saman-seo' )
-								  }, ${
+							{ seoMeta.noindex ||
+							seoMeta.nofollow ||
+							snippetDirectives.length
+								? [
+										seoMeta.noindex ? 'noindex' : 'index',
 										seoMeta.nofollow
-											? __( 'nofollow', 'saman-seo' )
-											: __( 'follow', 'saman-seo' )
-								  }`
+											? 'nofollow'
+											: 'follow',
+										...snippetDirectives,
+								  ].join( ', ' )
 								: __( 'index, follow (default)', 'saman-seo' ) }
 						</code>
 					</div>
@@ -830,7 +1039,63 @@ const SEOPanel = ( {
 									</label>
 								</div>
 								<div className="saman-seo-image-picker">
-									{ __( 'Remove image', 'saman-seo' ) }
+									{ seoMeta.og_image ? (
+										<div className="saman-seo-image-preview">
+											<img
+												src={ seoMeta.og_image }
+												alt=""
+											/>
+											<button
+												type="button"
+												className="saman-seo-image-remove"
+												onClick={ () =>
+													updateMeta( 'og_image', '' )
+												}
+												aria-label={ __(
+													'Remove image',
+													'saman-seo'
+												) }
+											>
+												×
+											</button>
+										</div>
+									) : (
+										<div className="saman-seo-image-placeholder">
+											<svg
+												width="24"
+												height="24"
+												viewBox="0 0 24 24"
+												fill="none"
+											>
+												<rect
+													x="3"
+													y="3"
+													width="18"
+													height="18"
+													rx="2"
+													stroke="currentColor"
+													strokeWidth="2"
+												/>
+												<circle
+													cx="8.5"
+													cy="8.5"
+													r="1.5"
+													fill="currentColor"
+												/>
+												<path
+													d="M21 15l-5-5L5 21"
+													stroke="currentColor"
+													strokeWidth="2"
+												/>
+											</svg>
+											<span>
+												{ __(
+													'No image',
+													'saman-seo'
+												) }
+											</span>
+										</div>
+									) }
 								</div>
 								<Button
 									variant="secondary"

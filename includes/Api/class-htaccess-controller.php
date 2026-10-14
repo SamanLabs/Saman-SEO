@@ -44,6 +44,68 @@ class Htaccess_Controller extends REST_Controller {
 	}
 
 	/**
+	 * Read access: site administrators (super admins on multisite).
+	 *
+	 * The .htaccess file is shared by every site in a network, so a
+	 * per-site administrator must not be able to touch it.
+	 *
+	 * @return bool
+	 */
+	public function permission_check() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return false;
+		}
+
+		if ( is_multisite() && ! is_super_admin() ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Write access: read access plus file modifications being allowed.
+	 *
+	 * Honors DISALLOW_FILE_MODS (via wp_is_file_mod_allowed()) and
+	 * DISALLOW_FILE_EDIT, which site owners set precisely to stop admins
+	 * from changing executable server configuration from the dashboard.
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function write_permission_check() {
+		if ( ! $this->permission_check() ) {
+			return false;
+		}
+
+		if ( ! self::file_mods_allowed() ) {
+			return new \WP_Error(
+				'saman_seo_file_mods_disabled',
+				__( 'File editing is disabled on this site (DISALLOW_FILE_MODS or DISALLOW_FILE_EDIT), so .htaccess cannot be changed from the dashboard.', 'saman-seo' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether the site allows file modifications from the dashboard.
+	 *
+	 * @return bool
+	 */
+	public static function file_mods_allowed() {
+		if ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) {
+			return false;
+		}
+
+		if ( function_exists( 'wp_is_file_mod_allowed' ) ) {
+			return (bool) wp_is_file_mod_allowed( 'saman_seo_htaccess' );
+		}
+
+		return ! ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS );
+	}
+
+	/**
 	 * Register routes.
 	 */
 	public function register_routes() {
@@ -65,7 +127,7 @@ class Htaccess_Controller extends REST_Controller {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'save_content' ),
-				'permission_callback' => array( $this, 'permission_check' ),
+				'permission_callback' => array( $this, 'write_permission_check' ),
 				'args'                => array(
 					'content' => array(
 						'required' => true,
@@ -82,7 +144,7 @@ class Htaccess_Controller extends REST_Controller {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'restore_backup' ),
-				'permission_callback' => array( $this, 'permission_check' ),
+				'permission_callback' => array( $this, 'write_permission_check' ),
 				'args'                => array(
 					'backup' => array(
 						'required'          => true,
@@ -142,9 +204,10 @@ class Htaccess_Controller extends REST_Controller {
 
 		return $this->success(
 			array(
-				'content' => $content,
-				'backups' => $this->get_backups(),
-				'exists'  => true,
+				'content'  => $content,
+				'backups'  => $this->get_backups(),
+				'exists'   => true,
+				'writable' => self::file_mods_allowed(),
 			)
 		);
 	}
@@ -175,10 +238,10 @@ class Htaccess_Controller extends REST_Controller {
 			return $this->error( $validation->get_error_message() );
 		}
 
-		// Write to file.
-		$result = $wp_filesystem->put_contents( $this->htaccess_path, $content, FS_CHMOD_FILE );
-		if ( false === $result ) {
-			return $this->error( 'Failed to write to .htaccess file. Check file permissions.' );
+		// Write to file, rolling back if the site stops responding.
+		$result = $this->write_and_verify( $wp_filesystem, $content );
+		if ( is_wp_error( $result ) ) {
+			return $this->error( $result->get_error_message(), $result->get_error_code() );
 		}
 
 		return $this->success(
@@ -230,10 +293,10 @@ class Htaccess_Controller extends REST_Controller {
 			return $this->error( 'Backup content failed validation: ' . $validation->get_error_message() );
 		}
 
-		// Restore.
-		$result = $wp_filesystem->put_contents( $this->htaccess_path, $content, FS_CHMOD_FILE );
-		if ( false === $result ) {
-			return $this->error( 'Failed to restore backup' );
+		// Restore, rolling back if the site stops responding.
+		$result = $this->write_and_verify( $wp_filesystem, $content );
+		if ( is_wp_error( $result ) ) {
+			return $this->error( $result->get_error_message(), $result->get_error_code() );
 		}
 
 		return $this->success(
@@ -242,6 +305,130 @@ class Htaccess_Controller extends REST_Controller {
 				'message' => 'Backup restored successfully',
 			)
 		);
+	}
+
+	/**
+	 * Write .htaccess and confirm the site still responds.
+	 *
+	 * The site is probed before and after the write. If the front page
+	 * answered before but returns a 5xx or fails after, the previous
+	 * content is put back. Hosts that block loopback requests entirely
+	 * (probe fails before the write) skip verification instead of being
+	 * locked out of the editor.
+	 *
+	 * @param \WP_Filesystem_Base $wp_filesystem Filesystem object.
+	 * @param string              $content       New content.
+	 * @return true|\WP_Error
+	 */
+	private function write_and_verify( $wp_filesystem, $content ) {
+		$existed  = $wp_filesystem->exists( $this->htaccess_path );
+		$previous = $existed ? $wp_filesystem->get_contents( $this->htaccess_path ) : '';
+
+		if ( $existed && false === $previous ) {
+			return new \WP_Error( 'read_failed', __( 'Unable to read the current .htaccess file. Check file permissions.', 'saman-seo' ) );
+		}
+
+		$baseline_ok = self::site_responds( $this->loopback() );
+
+		$result = $wp_filesystem->put_contents( $this->htaccess_path, $content, FS_CHMOD_FILE );
+		if ( false === $result ) {
+			return new \WP_Error( 'write_failed', __( 'Failed to write to .htaccess file. Check file permissions.', 'saman-seo' ) );
+		}
+
+		if ( ! $baseline_ok || self::site_responds( $this->loopback() ) ) {
+			return true;
+		}
+
+		if ( $existed ) {
+			$restored = $wp_filesystem->put_contents( $this->htaccess_path, $previous, FS_CHMOD_FILE );
+		} else {
+			$restored = $wp_filesystem->delete( $this->htaccess_path );
+		}
+
+		if ( false === $restored ) {
+			return new \WP_Error(
+				'rollback_failed',
+				__( 'The new .htaccess rules made the site stop responding and the previous file could not be restored automatically. Restore the latest backup from wp-content/saman-seo-backups/htaccess/ via FTP or your hosting file manager.', 'saman-seo' )
+			);
+		}
+
+		return new \WP_Error(
+			'rolled_back',
+			__( 'The new .htaccess rules made the site return a server error, so the previous version was restored automatically. Check the rules for typos or modules your server does not have.', 'saman-seo' )
+		);
+	}
+
+	/**
+	 * Request the front page from the server itself.
+	 *
+	 * @return array|\WP_Error
+	 */
+	private function loopback() {
+		return wp_remote_get(
+			home_url( '/' ),
+			array(
+				'timeout'     => 10,
+				'redirection' => 0,
+				'sslverify'   => false,
+				'headers'     => array( 'Cache-Control' => 'no-cache' ),
+			)
+		);
+	}
+
+	/**
+	 * Whether a loopback response means the site is up.
+	 *
+	 * @param array|\WP_Error $response HTTP response.
+	 * @return bool False on transport errors and 5xx responses.
+	 */
+	public static function site_responds( $response ) {
+		if ( is_wp_error( $response ) ) {
+			return false;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+
+		return $code > 0 && $code < 500;
+	}
+
+	/**
+	 * Create the backup directory and stop it being served over HTTP.
+	 *
+	 * @param \WP_Filesystem_Base $wp_filesystem Filesystem object.
+	 * @return true|\WP_Error
+	 */
+	private function ensure_backup_dir( $wp_filesystem ) {
+		if ( ! $wp_filesystem->exists( $this->backup_dir ) && ! wp_mkdir_p( $this->backup_dir ) ) {
+			return new \WP_Error( 'backup_failed', __( 'Failed to create the backup directory.', 'saman-seo' ) );
+		}
+
+		$root = trailingslashit( dirname( $this->backup_dir ) );
+
+		$deny = "# Saman SEO backups: never serve these files.\n"
+			. "<IfModule mod_authz_core.c>\n"
+			. "\tRequire all denied\n"
+			. "</IfModule>\n"
+			. "<IfModule !mod_authz_core.c>\n"
+			. "\tOrder deny,allow\n"
+			. "\tDeny from all\n"
+			. "</IfModule>\n";
+
+		$silence = "<?php\n// Silence is golden.\n";
+
+		$files = array(
+			$root . '.htaccess'             => $deny,
+			$root . 'index.php'             => $silence,
+			$this->backup_dir . '.htaccess' => $deny,
+			$this->backup_dir . 'index.php' => $silence,
+		);
+
+		foreach ( $files as $path => $body ) {
+			if ( ! $wp_filesystem->exists( $path ) ) {
+				$wp_filesystem->put_contents( $path, $body, FS_CHMOD_FILE );
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -255,9 +442,10 @@ class Htaccess_Controller extends REST_Controller {
 			return true; // Nothing to backup.
 		}
 
-		// Ensure backup directory exists.
-		if ( ! $wp_filesystem->exists( $this->backup_dir ) ) {
-			wp_mkdir_p( $this->backup_dir );
+		// Ensure the backup directory exists and is not web-readable.
+		$dir_result = $this->ensure_backup_dir( $wp_filesystem );
+		if ( is_wp_error( $dir_result ) ) {
+			return $dir_result;
 		}
 
 		// Create backup filename with timestamp.
@@ -348,19 +536,14 @@ class Htaccess_Controller extends REST_Controller {
 	 * @param string $content Content to validate.
 	 * @return true|\WP_Error
 	 */
-	private function validate_content( $content ) {
-		// Reject directives that can change PHP execution or handlers.
-		$dangerous = array(
-			'php_value',
-			'php_flag',
-			'php_admin_value',
-			'php_admin_flag',
-			'addhandler',
-			'sethandler',
-			'action',
-		);
+	public function validate_content( $content ) {
+		$content = (string) $content;
 
-		$lines = preg_split( '/\r\n|\r|\n/', $content );
+		// Apache joins lines ending in a backslash; do the same so a
+		// directive cannot be split across lines to dodge the checks.
+		$joined = preg_replace( '/\\\\[ \t]*(\r\n|\r|\n)/', '', $content );
+
+		$lines = preg_split( '/\r\n|\r|\n/', (string) $joined );
 		foreach ( $lines as $line ) {
 			$trimmed = trim( $line );
 
@@ -369,18 +552,16 @@ class Htaccess_Controller extends REST_Controller {
 				continue;
 			}
 
-			$lower = strtolower( $trimmed );
-			foreach ( $dangerous as $directive ) {
-				if ( 0 === strpos( $lower, $directive ) ) {
-					return new \WP_Error(
-						'unsafe_directive',
-						sprintf(
-							/* translators: %s: Apache directive name */
-							__( 'Unsafe directive detected: %s', 'saman-seo' ),
-							esc_html( $directive )
-						)
-					);
-				}
+			$directive = self::find_unsafe_directive( $trimmed );
+			if ( '' !== $directive ) {
+				return new \WP_Error(
+					'unsafe_directive',
+					sprintf(
+						/* translators: %s: Apache directive name */
+						__( 'Unsafe directive detected: %s', 'saman-seo' ),
+						esc_html( $directive )
+					)
+				);
 			}
 		}
 
@@ -408,5 +589,65 @@ class Htaccess_Controller extends REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Identify a directive that could enable code execution.
+	 *
+	 * @param string $line Trimmed, non-comment .htaccess line.
+	 * @return string Offending directive label, or '' when the line is fine.
+	 */
+	private static function find_unsafe_directive( $line ) {
+		$lower = strtolower( $line );
+
+		// Directives blocked outright: PHP ini overrides (auto_prepend_file,
+		// auto_append_file, ...), handler mapping and CGI actions.
+		$blocked = array(
+			'php_value',
+			'php_flag',
+			'php_admin_value',
+			'php_admin_flag',
+			'addhandler',
+			'sethandler',
+			'forcetype',
+			'action',
+			'scriptalias',
+			'scriptaliasmatch',
+		);
+
+		$name = preg_match( '/^([a-z_]+)/', $lower, $m ) ? $m[1] : '';
+
+		if ( in_array( $name, $blocked, true ) ) {
+			return $name;
+		}
+
+		// Ini settings smuggled in another way.
+		if ( preg_match( '/\bauto_(prepend|append)_file\b/', $lower ) ) {
+			return 'auto_prepend_file/auto_append_file';
+		}
+
+		// AddType mapping files to PHP or CGI.
+		if ( 'addtype' === $name && preg_match( '/(php|cgi|phtml|phar)/', $lower ) ) {
+			return 'addtype';
+		}
+
+		// Options enabling CGI execution or server-side includes with exec.
+		if ( 'options' === $name && preg_match( '/(^|[\s+])(execcgi|includes)\b/', substr( $lower, 7 ) ) ) {
+			return 'options execcgi';
+		}
+
+		// RewriteRule with a handler flag ([H=...] / [handler=...]) or a
+		// MIME type flag that maps the target to PHP or CGI ([T=...php]).
+		if ( 'rewriterule' === $name ) {
+			if ( preg_match( '/\[[^\]]*\b(h|handler)\s*=/', $lower ) ) {
+				return 'rewriterule handler';
+			}
+
+			if ( preg_match( '/\[[^\]]*\b(t|type)\s*=[^,\]]*(php|cgi)/', $lower ) ) {
+				return 'rewriterule type';
+			}
+		}
+
+		return '';
 	}
 }

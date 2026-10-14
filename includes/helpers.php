@@ -51,17 +51,25 @@ namespace Saman\SEO\Helpers {
 	 *
 	 * Uses the new `SAMAN_SEO_module_*` option keys that match the React UI.
 	 * Falls back to legacy `SAMAN_SEO_enable_*` options for backward compatibility.
+	 * When neither option exists the module's shipped default applies: modules
+	 * that are opt-in (default '0' in the Settings defaults map) stay off, every
+	 * other module is on.
 	 *
 	 * @param string $module Module slug (e.g., 'sitemap', 'redirects', '404_log').
 	 *
 	 * @return bool True if the module is enabled, false otherwise.
 	 */
 	function module_enabled( string $module ): bool {
+		// Modules whose `SAMAN_SEO_module_*` default is '0' in
+		// Service\Settings::$defaults. Keep in sync with that map.
+		$opt_in_modules = array( 'local_seo', 'analytics', 'breadcrumbs', 'page_cache' );
+		$default        = in_array( $module, $opt_in_modules, true ) ? '0' : '1';
+
 		$value = \get_option( 'SAMAN_SEO_module_' . $module );
 
 		// If the new option exists, use it.
 		if ( false !== $value ) {
-			return '1' === $value;
+			return '1' === (string) $value;
 		}
 
 		// Fall back to legacy option if new one doesn't exist.
@@ -80,13 +88,10 @@ namespace Saman\SEO\Helpers {
 		);
 
 		if ( isset( $legacy_map[ $module ] ) ) {
-			// Local SEO defaults to disabled ('0'), others default to enabled ('1')
-			$default = ( 'local_seo' === $module ) ? '0' : '1';
-			return '1' === \get_option( $legacy_map[ $module ], $default );
+			return '1' === (string) \get_option( $legacy_map[ $module ], $default );
 		}
 
-		// Default enabled for new/unknown modules.
-		return true;
+		return '1' === $default;
 	}
 
 	/**

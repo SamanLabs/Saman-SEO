@@ -99,6 +99,7 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_sku( $schema, $product );
 		$this->add_brand( $schema, $product );
 		$this->add_identifiers( $schema, $product );
+		$this->add_category( $schema, $product );
 		$this->add_condition( $schema, $product );
 
 		// Reviews and ratings (REVW-01 through REVW-06).
@@ -313,6 +314,44 @@ class Product_Schema extends Abstract_Schema {
 	}
 
 	/**
+	 * Add category from the product's primary product_cat term.
+	 *
+	 * Uses the primary term chosen in Saman SEO or Yoast when set, otherwise
+	 * the first assigned category that is not the store's default
+	 * ("Uncategorized") one. Nothing is added when no such term exists.
+	 *
+	 * @param array       $schema  Schema array by reference.
+	 * @param \WC_Product $product WooCommerce product.
+	 */
+	protected function add_category( array &$schema, \WC_Product $product ): void {
+		$product_id = $product->get_id();
+
+		foreach ( array( '_SAMAN_SEO_primary_product_cat', '_yoast_wpseo_primary_product_cat' ) as $meta_key ) {
+			$term_id = (int) get_post_meta( $product_id, $meta_key, true );
+			if ( $term_id > 0 ) {
+				$term = get_term( $term_id, 'product_cat' );
+				if ( $term instanceof \WP_Term && '' !== $term->name ) {
+					$schema['category'] = wp_strip_all_tags( $term->name );
+					return;
+				}
+			}
+		}
+
+		$terms = get_the_terms( $product_id, 'product_cat' );
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			return;
+		}
+
+		$default_id = (int) get_option( 'default_product_cat', 0 );
+		foreach ( $terms as $term ) {
+			if ( $term instanceof \WP_Term && (int) $term->term_id !== $default_id && '' !== $term->name ) {
+				$schema['category'] = wp_strip_all_tags( $term->name );
+				return;
+			}
+		}
+	}
+
+	/**
 	 * Add itemCondition with full schema.org URL format.
 	 *
 	 * Defaults to NewCondition if not specified.
@@ -424,8 +463,8 @@ class Product_Schema extends Abstract_Schema {
 	/**
 	 * Build a single Review schema from a WP_Comment.
 	 *
-	 * Validates that review has required author and rating (1-5).
-	 * Optionally includes reviewBody if comment content exists.
+	 * Validates that review has required author, rating (1-5) and a
+	 * non-empty review body; rating-only entries are skipped.
 	 *
 	 * @param \WP_Comment $comment WordPress comment object.
 	 * @return array Review schema array, empty if invalid.
@@ -443,6 +482,12 @@ class Product_Schema extends Abstract_Schema {
 			return array();
 		}
 
+		// Rating-only reviews carry no reviewBody; skip them.
+		$review_body = trim( wp_strip_all_tags( (string) $comment->comment_content ) );
+		if ( '' === $review_body ) {
+			return array();
+		}
+
 		$review = array(
 			'@type'         => 'Review',
 			'author'        => array(
@@ -456,13 +501,8 @@ class Product_Schema extends Abstract_Schema {
 				'worstRating' => 1,
 			),
 			'datePublished' => gmdate( 'Y-m-d', strtotime( $comment->comment_date_gmt ) ),
+			'reviewBody'    => $review_body,
 		);
-
-		// Optionally add review body if content exists.
-		$review_body = trim( $comment->comment_content );
-		if ( ! empty( $review_body ) ) {
-			$review['reviewBody'] = wp_strip_all_tags( $review_body );
-		}
 
 		return $review;
 	}
@@ -479,7 +519,7 @@ class Product_Schema extends Abstract_Schema {
 		$map = array(
 			'instock'     => 'https://schema.org/InStock',
 			'outofstock'  => 'https://schema.org/OutOfStock',
-			'onbackorder' => 'https://schema.org/PreOrder',
+			'onbackorder' => 'https://schema.org/BackOrder',
 		);
 
 		return $map[ $status ] ?? 'https://schema.org/InStock';
@@ -507,10 +547,19 @@ class Product_Schema extends Abstract_Schema {
 			'url'           => $this->context->canonical,
 		);
 
-		// priceValidUntil from sale end date (OFFR-03).
-		$sale_end = $product->get_date_on_sale_to();
-		if ( $sale_end instanceof \WC_DateTime ) {
-			$offer['priceValidUntil'] = $sale_end->format( 'Y-m-d' );
+		// Sale window (OFFR-03). Only describe it while the sale price is the
+		// price being offered; a future scheduled sale does not bound today's
+		// regular price.
+		if ( $product->is_on_sale() ) {
+			$sale_start = $product->get_date_on_sale_from();
+			if ( $sale_start instanceof \WC_DateTime ) {
+				$offer['validFrom'] = $sale_start->format( DATE_W3C );
+			}
+
+			$sale_end = $product->get_date_on_sale_to();
+			if ( $sale_end instanceof \WC_DateTime ) {
+				$offer['priceValidUntil'] = $sale_end->format( 'Y-m-d' );
+			}
 		}
 
 		// Seller reference to Organization (OFFR-06).

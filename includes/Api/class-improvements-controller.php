@@ -344,7 +344,7 @@ class Improvements_Controller extends REST_Controller {
 		return array(
 			'id'          => 'sitemap',
 			'title'       => __( 'XML Sitemap', 'saman-seo' ),
-			'description' => __( 'Help search engines discover every important page, with automatic pings on publish.', 'saman-seo' ),
+			'description' => __( 'Help search engines discover every important page with an always-current XML sitemap.', 'saman-seo' ),
 			'impact'      => 'high',
 			'status'      => $enabled ? 'on' : 'off',
 			'metrics'     => $metrics,
@@ -353,15 +353,15 @@ class Improvements_Controller extends REST_Controller {
 	}
 
 	/**
-	 * LLM.txt generator for AI crawlers.
+	 * Optional llms.txt file for AI tools (not used by Google Search).
 	 *
 	 * @return array<string,mixed>
 	 */
 	private function item_llm_txt() {
 		return array(
 			'id'          => 'llm_txt',
-			'title'       => __( 'LLM.txt for AI Search', 'saman-seo' ),
-			'description' => __( 'Publish a curated, markdown index of your site for AI assistants and answer engines.', 'saman-seo' ),
+			'title'       => __( 'llms.txt for AI Tools', 'saman-seo' ),
+			'description' => __( 'Publish an optional Markdown index of your site that some AI tools read. Google Search does not use llms.txt.', 'saman-seo' ),
 			'impact'      => 'low',
 			'status'      => \Saman\SEO\Helpers\module_enabled( 'llm_txt' ) ? 'on' : 'off',
 			'metrics'     => array(),
@@ -654,7 +654,7 @@ class Improvements_Controller extends REST_Controller {
 		return array(
 			'id'          => 'schema',
 			'title'       => __( 'Schema Markup (JSON-LD)', 'saman-seo' ),
-			'description' => __( 'Structured data that unlocks rich results: articles, FAQs, products, recipes, events, and more.', 'saman-seo' ),
+			'description' => __( 'Structured data that can make pages eligible for Google rich results such as products, recipes, events, and breadcrumbs. Markup alone does not guarantee a rich result.', 'saman-seo' ),
 			'impact'      => 'high',
 			'status'      => $master ? ( $org ? 'on' : 'partial' ) : 'off',
 			'metrics'     => $master

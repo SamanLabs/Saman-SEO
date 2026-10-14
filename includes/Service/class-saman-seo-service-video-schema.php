@@ -155,33 +155,30 @@ class Video_Schema {
 			'uploadDate'  => get_the_date( 'c', $post ),
 		);
 
+		// contentUrl is meant for the media file itself. YouTube and Vimeo
+		// watch pages are HTML players, so only embedUrl is emitted.
 		if ( 'youtube' === $video['platform'] ) {
-			$schema['@id']          = get_permalink( $post ) . '#video-youtube-' . $video['id'];
-			$schema['embedUrl']     = 'https://www.youtube.com/embed/' . $video['id'];
-			$schema['contentUrl']   = 'https://www.youtube.com/watch?v=' . $video['id'];
-			$schema['thumbnailUrl'] = 'https://img.youtube.com/vi/' . $video['id'] . '/maxresdefault.jpg';
+			$schema['@id']      = get_permalink( $post ) . '#video-youtube-' . $video['id'];
+			$schema['embedUrl'] = 'https://www.youtube.com/embed/' . $video['id'];
 
 			// Try to get additional metadata from oEmbed.
 			$oembed = $this->get_youtube_oembed( $video['id'] );
-			if ( $oembed ) {
+
+			$schema['thumbnailUrl'] = $this->get_youtube_thumbnail_url( $video['id'], $oembed );
+
+			if ( is_array( $oembed ) ) {
 				if ( ! empty( $oembed['title'] ) ) {
 					$schema['name'] = sanitize_text_field( $oembed['title'] );
 				}
-				if ( ! empty( $oembed['author_name'] ) ) {
-					$schema['author'] = array(
-						'@type' => 'Person',
-						'name'  => sanitize_text_field( $oembed['author_name'] ),
-					);
-				}
+				$this->add_author( $schema, $oembed );
 			}
 		} elseif ( 'vimeo' === $video['platform'] ) {
-			$schema['@id']        = get_permalink( $post ) . '#video-vimeo-' . $video['id'];
-			$schema['embedUrl']   = 'https://player.vimeo.com/video/' . $video['id'];
-			$schema['contentUrl'] = 'https://vimeo.com/' . $video['id'];
+			$schema['@id']      = get_permalink( $post ) . '#video-vimeo-' . $video['id'];
+			$schema['embedUrl'] = 'https://player.vimeo.com/video/' . $video['id'];
 
 			// Try to get additional metadata from oEmbed.
 			$oembed = $this->get_vimeo_oembed( $video['id'] );
-			if ( $oembed ) {
+			if ( is_array( $oembed ) ) {
 				if ( ! empty( $oembed['title'] ) ) {
 					$schema['name'] = sanitize_text_field( $oembed['title'] );
 				}
@@ -191,12 +188,7 @@ class Video_Schema {
 				if ( ! empty( $oembed['thumbnail_url'] ) ) {
 					$schema['thumbnailUrl'] = esc_url_raw( $oembed['thumbnail_url'] );
 				}
-				if ( ! empty( $oembed['author_name'] ) ) {
-					$schema['author'] = array(
-						'@type' => 'Person',
-						'name'  => sanitize_text_field( $oembed['author_name'] ),
-					);
-				}
+				$this->add_author( $schema, $oembed );
 				if ( ! empty( $oembed['duration'] ) ) {
 					$schema['duration'] = 'PT' . (int) $oembed['duration'] . 'S';
 				}
@@ -204,6 +196,68 @@ class Video_Schema {
 		}
 
 		return $schema;
+	}
+
+	/**
+	 * Add author and creator from oEmbed channel data.
+	 *
+	 * The oEmbed response only names who published the video, not whether that is a
+	 * person or a company, so the entity stays a Person. VideoObject.creator mirrors
+	 * it for consumers that read creator instead of author.
+	 *
+	 * @param array $schema Schema array by reference.
+	 * @param array $oembed oEmbed response data.
+	 * @return void
+	 */
+	private function add_author( array &$schema, array $oembed ) {
+		if ( empty( $oembed['author_name'] ) ) {
+			return;
+		}
+
+		$author = array(
+			'@type' => 'Person',
+			'name'  => sanitize_text_field( $oembed['author_name'] ),
+		);
+
+		if ( ! empty( $oembed['author_url'] ) ) {
+			$author_url = esc_url_raw( $oembed['author_url'] );
+			if ( '' !== $author_url ) {
+				$author['url'] = $author_url;
+			}
+		}
+
+		$schema['author']  = $author;
+		$schema['creator'] = $author;
+	}
+
+	/**
+	 * Resolve a YouTube thumbnail that is known to exist.
+	 *
+	 * The maxresdefault.jpg size is missing for many videos (YouTube returns a 404
+	 * for it), while hqdefault.jpg is always generated. Only use maxres when
+	 * the sitemap enhancer has already confirmed it for this video; never
+	 * make a request from here, since this runs while the page renders.
+	 *
+	 * @param string     $video_id YouTube video ID.
+	 * @param array|null $oembed   oEmbed response data, if any.
+	 * @return string
+	 */
+	private function get_youtube_thumbnail_url( $video_id, $oembed = null ) {
+		$video_id = sanitize_text_field( (string) $video_id );
+
+		// Shared with the sitemap enhancer's HEAD-checked lookup.
+		if ( 'maxres' === get_transient( 'saman_seo_yt_thumb_' . md5( $video_id ) ) ) {
+			return 'https://img.youtube.com/vi/' . $video_id . '/maxresdefault.jpg';
+		}
+
+		if ( is_array( $oembed ) && ! empty( $oembed['thumbnail_url'] ) ) {
+			$thumbnail = esc_url_raw( $oembed['thumbnail_url'] );
+			if ( '' !== $thumbnail ) {
+				return $thumbnail;
+			}
+		}
+
+		return 'https://img.youtube.com/vi/' . $video_id . '/hqdefault.jpg';
 	}
 
 	/**

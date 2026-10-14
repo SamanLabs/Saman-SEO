@@ -291,6 +291,9 @@ class Admin_V2 {
 			true
 		);
 
+		// Load JS translations for the __() strings bundled in the SPA.
+		wp_set_script_translations( 'saman-seo-admin-v2', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
+
 		// Enqueue React app styles (bundled by webpack)
 		wp_enqueue_style(
 			'saman-seo-admin-v2',

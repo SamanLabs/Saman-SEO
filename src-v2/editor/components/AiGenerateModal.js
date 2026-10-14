@@ -369,10 +369,17 @@ const AiGenerateModal = ( {
 							onChange={ ( e ) =>
 								setCustomPrompt( e.target.value )
 							}
-							placeholder={ __(
-								'highlighting benefits',
-								'saman-seo'
-							) }
+							placeholder={
+								fieldType === 'title'
+									? __(
+											'e.g., "Focus on including keywords"',
+											'saman-seo'
+									  )
+									: __(
+											'e.g., "Focus on highlighting benefits"',
+											'saman-seo'
+									  )
+							}
 							rows={ 2 }
 						/>
 					</div>

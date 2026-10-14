@@ -66,6 +66,14 @@ class Admin_Bar {
 		$post             = $this->get_current_post();
 		$has_post_context = $post instanceof WP_Post;
 
+		// Block editors (post, site, widgets) show the toolbar persistently
+		// since WP 7.1. A score computed here would go stale while editing,
+		// so they get the plain menu plus a link that opens the SEO modal.
+		if ( $this->is_block_editor_screen() ) {
+			$this->add_general_menu( $wp_admin_bar, $has_post_context ? $post : null );
+			return;
+		}
+
 		// Build menu based on context
 		if ( $has_post_context ) {
 			$this->add_post_seo_menu( $wp_admin_bar, $post );
@@ -188,33 +196,56 @@ class Admin_Bar {
 			)
 		);
 
-		// Add edit link
-		$wp_admin_bar->add_node(
-			array(
-				'id'     => 'saman-seo-seo-edit',
-				'parent' => 'saman-seo-seo',
-				'title'  => sprintf(
-					'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> %s',
-					__( 'Edit SEO Settings', 'saman-seo' )
-				),
-				'href'   => get_edit_post_link( $post->ID ) . '#saman-seo-seo-panel',
-				'meta'   => array( 'class' => 'saman-seo-ab-action-link' ),
-			)
-		);
+		$this->add_post_action_links( $wp_admin_bar, $post );
 
-		// Add view full analysis link
-		$wp_admin_bar->add_node(
-			array(
-				'id'     => 'saman-seo-seo-analyze',
-				'parent' => 'saman-seo-seo',
-				'title'  => sprintf(
-					'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> %s',
-					__( 'Full Analysis', 'saman-seo' )
-				),
-				'href'   => admin_url( 'admin.php?page=saman-seo-audit&post_id=' . $post->ID ),
-				'meta'   => array( 'class' => 'saman-seo-ab-action-link' ),
-			)
-		);
+		// Add quick navigation links
+		$this->add_nav_links( $wp_admin_bar );
+	}
+
+	/**
+	 * Add "Edit SEO Settings" / "Full Analysis" links plus a separator.
+	 *
+	 * The edit link carries a hash the editor scripts react to: the block
+	 * editor bundle opens its SEO modal (and intercepts clicks on this node
+	 * while the editor is open); the classic editor scrolls to its button.
+	 *
+	 * @param \WP_Admin_Bar $wp_admin_bar Admin bar instance.
+	 * @param WP_Post       $post         Current post.
+	 * @return void
+	 */
+	private function add_post_action_links( $wp_admin_bar, $post ) {
+		$edit_link = get_edit_post_link( $post->ID, 'raw' );
+
+		if ( $edit_link ) {
+			$wp_admin_bar->add_node(
+				array(
+					'id'     => 'saman-seo-seo-edit',
+					'parent' => 'saman-seo-seo',
+					'title'  => sprintf(
+						'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> %s',
+						__( 'Edit SEO Settings', 'saman-seo' )
+					),
+					'href'   => $edit_link . '#saman-seo-open-modal',
+					'meta'   => array( 'class' => 'saman-seo-ab-action-link' ),
+				)
+			);
+		}
+
+		// An unsaved draft has nothing to analyze yet.
+		if ( 'auto-draft' !== $post->post_status ) {
+			$wp_admin_bar->add_node(
+				array(
+					'id'     => 'saman-seo-seo-analyze',
+					'parent' => 'saman-seo-seo',
+					'title'  => sprintf(
+						'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> %s',
+						__( 'Full Analysis', 'saman-seo' )
+					),
+					'href'   => admin_url( 'admin.php?page=saman-seo-audit&post_id=' . $post->ID ),
+					'meta'   => array( 'class' => 'saman-seo-ab-action-link' ),
+				)
+			);
+		}
 
 		// Add separator before navigation
 		$wp_admin_bar->add_node(
@@ -225,18 +256,35 @@ class Admin_Bar {
 				'meta'   => array( 'class' => 'saman-seo-ab-separator-item' ),
 			)
 		);
-
-		// Add quick navigation links
-		$this->add_nav_links( $wp_admin_bar );
 	}
 
 	/**
-	 * Add general navigation menu (no post context).
+	 * Whether the current admin screen is a block editor (post, site or
+	 * widgets editor).
+	 *
+	 * @return bool
+	 */
+	private function is_block_editor_screen() {
+		if ( ! is_admin() || ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$screen = get_current_screen();
+
+		return $screen && ( 'site-editor' === $screen->id || $screen->is_block_editor() );
+	}
+
+	/**
+	 * Add general navigation menu.
+	 *
+	 * In the block post editor, $post adds the "Edit SEO Settings" link when
+	 * the SEO editor bundle is loaded on the screen.
 	 *
 	 * @param \WP_Admin_Bar $wp_admin_bar Admin bar instance.
+	 * @param WP_Post|null  $post         Post being edited, if any.
 	 * @return void
 	 */
-	private function add_general_menu( $wp_admin_bar ) {
+	private function add_general_menu( $wp_admin_bar, $post = null ) {
 		// Build the main menu item (just branding)
 		$wp_admin_bar->add_node(
 			array(
@@ -249,6 +297,12 @@ class Admin_Bar {
 				),
 			)
 		);
+
+		// The link is handled by the editor bundle, so only offer it where that
+		// bundle runs (enqueue_block_editor_assets fires before the toolbar).
+		if ( $post instanceof WP_Post && wp_script_is( 'saman-seo-editor-v2', 'enqueued' ) ) {
+			$this->add_post_action_links( $wp_admin_bar, $post );
+		}
 
 		// Add quick navigation links
 		$this->add_nav_links( $wp_admin_bar );

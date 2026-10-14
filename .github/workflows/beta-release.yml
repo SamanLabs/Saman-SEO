@@ -110,10 +110,12 @@ jobs:
           # Copy only production files (whitelist approach)
           cp -r assets saman-seo/
           cp -r build saman-seo/
+          cp -r blocks saman-seo/
           cp -r includes saman-seo/
           cp -r languages saman-seo/ 2>/dev/null || mkdir -p saman-seo/languages
           cp -r vendor saman-seo/
           cp saman-seo.php saman-seo/
+          cp uninstall.php saman-seo/
           cp readme.txt saman-seo/ 2>/dev/null || true
           cp LICENSE saman-seo/ 2>/dev/null || true
           cp composer.json saman-seo/ 2>/dev/null || true

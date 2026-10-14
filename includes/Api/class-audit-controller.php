@@ -349,7 +349,8 @@ class Audit_Controller extends REST_Controller {
 		}
 
 		if ( $updated ) {
-			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+			// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+			update_post_meta( $post_id, Post_Meta::META_KEY, wp_slash( $meta ) );
 
 			// Clear audit cache
 			delete_transient( 'SAMAN_SEO_audit_results' );

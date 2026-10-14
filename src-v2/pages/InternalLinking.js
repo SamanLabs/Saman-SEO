@@ -1681,7 +1681,86 @@ const RuleModal = ( { rule, categories, templates, onClose, onSave } ) => {
 									</span>
 								</label>
 							</div>
-							{ __( 'https://example.com', 'saman-seo' ) }
+							{ formData.destination.type === 'post' ? (
+								selectedPost ? (
+									<div className="selected-post">
+										<span>{ selectedPost.title }</span>
+										<button
+											type="button"
+											className="link-button"
+											onClick={ () => {
+												setSelectedPost( null );
+												updateNested(
+													'destination',
+													'post',
+													0
+												);
+											} }
+										>
+											{ __( 'Change', 'saman-seo' ) }
+										</button>
+									</div>
+								) : (
+									<div className="post-search">
+										<input
+											type="text"
+											placeholder={ __(
+												'Search posts\u2026',
+												'saman-seo'
+											) }
+											value={ postSearchQuery }
+											onChange={ ( e ) =>
+												setPostSearchQuery(
+													e.target.value
+												)
+											}
+										/>
+										{ postSearchResults.length > 0 && (
+											<ul className="post-search__results">
+												{ postSearchResults.map(
+													( post ) => (
+														<li key={ post.id }>
+															<button
+																type="button"
+																onClick={ () =>
+																	selectPost(
+																		post
+																	)
+																}
+															>
+																{ post.title }{ ' ' }
+																<span className="muted">
+																	(
+																	{
+																		post.post_type
+																	}
+																	)
+																</span>
+															</button>
+														</li>
+													)
+												) }
+											</ul>
+										) }
+									</div>
+								)
+							) : (
+								<input
+									type="url"
+									value={ formData.destination.url }
+									onChange={ ( e ) =>
+										updateNested(
+											'destination',
+											'url',
+											e.target.value
+										)
+									}
+									placeholder={ __(
+										'https://example.com',
+										'saman-seo'
+									) }
+								/>
+							) }
 						</div>
 
 						<div className="form-field">

@@ -357,8 +357,8 @@ class Sitemap_Controller extends REST_Controller {
 			$settings[ $short_key ] = $value;
 		}
 
-		// Add LLM.txt URL
-		$settings['llm_txt_url'] = home_url( '/llm.txt' );
+		// Add llms.txt URL
+		$settings['llm_txt_url'] = \Saman\SEO\Service\LLM_TXT_Generator::get_url();
 
 		// Add AGENTS.md URL
 		$settings['agents_md_url'] = home_url( '/AGENTS.md' );

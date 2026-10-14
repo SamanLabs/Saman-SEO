@@ -64,13 +64,13 @@ This is SEO without secrets—because better SEO comes from better collaboration
 ## Features
 
 ### Core SEO Management
-- **Per-Post SEO Fields**: Complete meta control stored in `_samanseo_meta` with Gutenberg sidebar and classic editor support
+- **Per-Post SEO Fields**: Complete meta control stored in `_SAMAN_SEO_meta` with Gutenberg sidebar and classic editor support
 - **Server-Rendered Output**: `<title>`, meta descriptions, canonical URLs, robots directives, Open Graph, Twitter Cards, and JSON-LD structured data
 - **Site-Wide Templates**: Centralized defaults for titles, descriptions, social images, robots directives, and hreflang attributes
 - **Post-Type Granularity**: Dedicated defaults for each content type—no more one-size-fits-all configurations
 
 ### Advanced Capabilities
-- **AI-Powered Suggestions**: OpenAI integration for intelligent title and meta description generation with customizable prompts and models
+- **AI-Powered Suggestions**: Title and meta description generation through the separate Saman Labs AI plugin (optional)
 - **Internal Linking Engine**: Automated keyword-to-link conversion with rule-based controls, category targeting, and comprehensive previews
 - **Advanced Sitemap Manager**: Full XML sitemap control with dedicated admin UI, post type/taxonomy selection, archive support, RSS & Google News sitemaps, custom pages, and scheduled regeneration
 - **Audit Dashboard**: Visual severity graphs, issue logging, and automatic fallback generation for missing metadata
@@ -202,9 +202,9 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for guidelines.
 
 ## Privacy & Security
 
-- **404 Logging**: Opt-in feature that stores only hashed referrers
-- **No Telemetry**: Zero external tracking or analytics
-- **No External Requests**: All processing happens on your server (except optional AI features when explicitly enabled)
+- **404 Logging**: On by default; stores the requested URL and the full referrer URL. Referrer logging and the 404 log itself can be turned off in settings
+- **Usage Analytics Are Opt-In**: Anonymous admin usage tracking (Matomo) is off by default and only runs if you enable it in Settings > Modules
+- **External Requests Only for Features You Use**: IndexNow pings, Google Search Console, link health checks and video thumbnail/metadata lookups contact third-party services when those features are used; AI features run through the separate Saman Labs AI plugin
 
 ---
 

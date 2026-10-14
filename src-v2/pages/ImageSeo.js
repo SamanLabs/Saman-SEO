@@ -409,7 +409,170 @@ const ImageSeo = () => {
 								</th>
 							</tr>
 						</thead>
-						<tbody>{ __( 'Edit alt text', 'saman-seo' ) }</tbody>
+						<tbody>
+							{ images.map( ( image ) => (
+								<tr
+									key={ image.id }
+									className={
+										! image.alt ? 'row--warning' : ''
+									}
+								>
+									<td>
+										<div className="image-preview">
+											<img
+												src={
+													image.thumbnail || image.url
+												}
+												alt={ image.alt || '' }
+											/>
+										</div>
+									</td>
+									<td>
+										<div className="image-filename">
+											<span className="filename">
+												{ image.filename }
+											</span>
+											<span className="dimensions">
+												{ image.width }x{ image.height }
+											</span>
+										</div>
+									</td>
+									<td>
+										{ editingId === image.id ? (
+											<div className="inline-edit">
+												<input
+													type="text"
+													value={ editValue }
+													onChange={ ( e ) =>
+														setEditValue(
+															e.target.value
+														)
+													}
+													placeholder={ __(
+														'Enter alt text\u2026',
+														'saman-seo'
+													) }
+													autoFocus
+												/>
+												<div className="inline-edit-actions">
+													<button
+														type="button"
+														className="button primary small"
+														onClick={ () =>
+															handleSaveAlt(
+																image.id,
+																editValue
+															)
+														}
+														disabled={
+															saving[ image.id ]
+														}
+													>
+														{ saving[ image.id ]
+															? __(
+																	'Saving\u2026',
+																	'saman-seo'
+															  )
+															: __(
+																	'Save',
+																	'saman-seo'
+															  ) }
+													</button>
+													<button
+														type="button"
+														className="button ghost small"
+														onClick={
+															cancelEditing
+														}
+													>
+														{ __(
+															'Cancel',
+															'saman-seo'
+														) }
+													</button>
+												</div>
+											</div>
+										) : (
+											<div className="alt-text-display">
+												{ image.alt ? (
+													<span className="alt-text">
+														{ image.alt }
+													</span>
+												) : (
+													<span className="alt-text alt-text--missing">
+														{ __(
+															'No alt text',
+															'saman-seo'
+														) }
+													</span>
+												) }
+											</div>
+										) }
+									</td>
+									<td>
+										<div className="action-buttons">
+											<button
+												type="button"
+												className="button ghost small"
+												onClick={ () =>
+													startEditing( image )
+												}
+												title={ __(
+													'Edit alt text',
+													'saman-seo'
+												) }
+											>
+												<svg
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+													width="14"
+													height="14"
+												>
+													<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+													<path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+												</svg>
+												{ __( 'Edit', 'saman-seo' ) }
+											</button>
+											{ ! image.alt && (
+												<button
+													type="button"
+													className="button ghost small"
+													onClick={ () =>
+														handleGenerateAlt(
+															image.id
+														)
+													}
+													disabled={
+														saving[ image.id ]
+													}
+													title={ __(
+														'Generate from filename',
+														'saman-seo'
+													) }
+												>
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														width="14"
+														height="14"
+													>
+														<path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1v3h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2v-3h1a7 7 0 017-7h1V5.73A2 2 0 0112 2z" />
+													</svg>
+													{ __(
+														'Auto',
+														'saman-seo'
+													) }
+												</button>
+											) }
+										</div>
+									</td>
+								</tr>
+							) ) }
+						</tbody>
 					</table>
 				) }
 
