@@ -1861,16 +1861,18 @@ class Redirect_Manager {
 
 		global $wpdb;
 
-		// Update hit stats.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->update(
-			$this->table,
-			array(
-				'hits'     => (int) $redirect['hits'] + 1,
-				'last_hit' => current_time( 'mysql' ),
-			),
-			array( 'id' => $redirect['id'] )
-		);
+		// Update hit stats, except for browser prefetches (still redirected below).
+		if ( ! Request_Monitor::is_speculative_request() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$this->table,
+				array(
+					'hits'     => (int) $redirect['hits'] + 1,
+					'last_hit' => current_time( 'mysql' ),
+				),
+				array( 'id' => $redirect['id'] )
+			);
+		}
 
 		// Bail if output has already started.
 		if ( headers_sent() ) {

@@ -122,11 +122,11 @@ class Social_Card_Generator {
 		// Write to the cache file and serve it; fall back to direct output if the
 		// cache directory is not writable.
 		if ( $cache && wp_mkdir_p( dirname( $cache['path'] ) ) && false !== imagepng( $img, $cache['path'] ) ) {
-			imagedestroy( $img );
+			self::free_image( $img );
 			readfile( $cache['path'] );
 		} else {
 			imagepng( $img );
-			imagedestroy( $img );
+			self::free_image( $img );
 		}
 
 		exit;
@@ -482,6 +482,23 @@ class Social_Card_Generator {
 		}
 
 		imagecopyresampled( $img, $logo, $x, $y, 0, 0, $new_width, $new_height, $logo_width, $logo_height );
-		imagedestroy( $logo );
+		self::free_image( $logo );
+	}
+
+	/**
+	 * Release a GD image.
+	 *
+	 * Since PHP 8.0 imagedestroy() is a no-op (GdImage objects are freed
+	 * when they go out of scope) and is deprecated in PHP 8.5, so it is only
+	 * called for PHP 7 resources.
+	 *
+	 * @param resource|\GdImage|false $image GD image.
+	 *
+	 * @return void
+	 */
+	private static function free_image( $image ) {
+		if ( PHP_VERSION_ID < 80000 && is_resource( $image ) ) {
+			imagedestroy( $image );
+		}
 	}
 }

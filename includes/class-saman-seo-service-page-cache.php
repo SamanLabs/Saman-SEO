@@ -74,7 +74,7 @@ class Page_Cache {
 	 *
 	 * @var int
 	 */
-	public const DROPIN_VERSION = 1;
+	public const DROPIN_VERSION = 2;
 
 	/**
 	 * Whether the current request is being captured.
@@ -125,6 +125,40 @@ class Page_Cache {
 
 		// Ride the shared daily janitor for expiry cleanup.
 		add_action( 'saman_seo_daily_maintenance_complete', array( $this, 'gc' ) );
+
+		// Rewrite an outdated drop-in after a plugin update.
+		add_action( 'admin_init', array( $this, 'maybe_refresh_drop_in' ) );
+	}
+
+	/**
+	 * Regenerate our drop-in when it was written by an older plugin version.
+	 *
+	 * Only touches advanced-cache.php when it carries our marker.
+	 *
+	 * @return void
+	 */
+	public function maybe_refresh_drop_in() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$dropin = WP_CONTENT_DIR . '/advanced-cache.php';
+
+		if ( ! is_readable( $dropin ) ) {
+			return;
+		}
+
+		$source = (string) file_get_contents( $dropin ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local drop-in inspection.
+
+		if ( false === strpos( $source, self::DROPIN_MARKER ) ) {
+			return;
+		}
+
+		$installed = preg_match( '/@version\s+(\d+)/', $source, $m ) ? (int) $m[1] : 0;
+
+		if ( $installed < self::DROPIN_VERSION ) {
+			$this->install_drop_in();
+		}
 	}
 
 	/*
@@ -449,7 +483,18 @@ if ( ! is_readable( \$html_file ) ) {
 @header( 'Content-Type: text/html; charset=UTF-8' );
 @header( 'X-Saman-Cache: hit' );
 
-@file_put_contents( '{$dir}/hits.log', gmdate( 'YmdHis' ) . ' ' . number_format( \$ttfb * 1000, 1, '.', '' ) . PHP_EOL, FILE_APPEND | LOCK_EX );
+// Browser prefetches (speculative loading) are served but not counted as hits.
+\$is_prefetch = false;
+foreach ( array( 'HTTP_SEC_PURPOSE', 'HTTP_PURPOSE', 'HTTP_X_PURPOSE', 'HTTP_X_MOZ' ) as \$purpose_header ) {
+	if ( isset( \$_SERVER[ \$purpose_header ] ) && preg_match( '/(?:^|[\s,;])prefetch(?:\$|[\s,;])/i', (string) \$_SERVER[ \$purpose_header ] ) ) {
+		\$is_prefetch = true;
+		break;
+	}
+}
+
+if ( ! \$is_prefetch ) {
+	@file_put_contents( '{$dir}/hits.log', gmdate( 'YmdHis' ) . ' ' . number_format( \$ttfb * 1000, 1, '.', '' ) . PHP_EOL, FILE_APPEND | LOCK_EX );
+}
 
 readfile( \$html_file );
 exit;
@@ -553,7 +598,9 @@ PHP;
 			header( 'X-Saman-Cache: hit-late' );
 		}
 
-		$this->record_hit( microtime( true ) - $this->request_start() );
+		if ( ! Request_Monitor::is_speculative_request() ) {
+			$this->record_hit( microtime( true ) - $this->request_start() );
+		}
 
 		echo $entry['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Cached full HTML snapshot of a previously rendered trusted response.
 
@@ -843,6 +890,11 @@ PHP;
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations__file_put_contents -- Writing our own cache artifact.
 		@file_put_contents( $paths['meta'], wp_json_encode( $meta ), LOCK_EX );
+
+		// A prefetch still warms the cache but is not a visitor miss.
+		if ( Request_Monitor::is_speculative_request() ) {
+			return;
+		}
 
 		$this->bump_totals( 'misses' );
 		$this->bump_totals( 'cold_sum', (float) $render_ms );

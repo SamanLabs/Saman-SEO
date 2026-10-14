@@ -4,6 +4,8 @@
  * Plugin URI:  https://github.com/SamanLabs/saman-seo
  * Description: Opinionated all-in-one SEO toolkit that keeps titles, metadata, structured data, redirects, and audits in sync with WordPress.
  * Version:     2.0.32
+ * Requires at least: 6.6
+ * Requires PHP: 7.4
  * Author:      SamanLabs
  * Author URI:  https://github.com/SamanLabs
  * Text Domain: saman-seo

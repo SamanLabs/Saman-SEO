@@ -168,6 +168,20 @@ class Admin_UI {
 			return;
 		}
 
+		$post_types = saman_seo_apply_filters( 'saman_seo_score_post_types', $this->get_seo_post_types() );
+
+		foreach ( $post_types as $post_type ) {
+			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_posts_column' ) );
+			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'render_posts_column' ), 10, 2 );
+		}
+	}
+
+	/**
+	 * Public, UI-enabled post types the plugin manages SEO for.
+	 *
+	 * @return string[]
+	 */
+	private function get_seo_post_types() {
 		$post_types = get_post_types(
 			array(
 				'public'  => true,
@@ -176,16 +190,32 @@ class Admin_UI {
 			'names'
 		);
 
-		if ( isset( $post_types['attachment'] ) ) {
-			unset( $post_types['attachment'] );
+		unset( $post_types['attachment'] );
+
+		return array_values( $post_types );
+	}
+
+	/**
+	 * Whether the current screen is the block post editor for a post type
+	 * the plugin supports (not the site, widgets or Customizer editors).
+	 *
+	 * @return bool
+	 */
+	public function is_supported_post_editor() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( ! $screen || 'post' !== $screen->base || empty( $screen->post_type ) ) {
+			return false;
 		}
 
-		$post_types = saman_seo_apply_filters( 'saman_seo_score_post_types', array_values( $post_types ) );
+		/**
+		 * Filters the post types that get the SEO panel in the block editor.
+		 *
+		 * @param string[] $post_types Post type names.
+		 */
+		$post_types = (array) saman_seo_apply_filters( 'saman_seo_editor_post_types', $this->get_seo_post_types() );
 
-		foreach ( $post_types as $post_type ) {
-			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_posts_column' ) );
-			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'render_posts_column' ), 10, 2 );
-		}
+		return in_array( $screen->post_type, $post_types, true );
 	}
 
 	/**
@@ -395,6 +425,12 @@ class Admin_UI {
 	 * @return void
 	 */
 	public function enqueue_editor_assets() {
+		// enqueue_block_editor_assets also fires in the site editor, widgets
+		// editor and Customizer; the SEO modal only belongs in the post editor.
+		if ( ! $this->is_supported_post_editor() ) {
+			return;
+		}
+
 		// Load V2 React editor sidebar
 		$build_dir = SAMAN_SEO_PATH . 'build/editor/';
 		$build_url = SAMAN_SEO_URL . 'build/editor/';
@@ -403,7 +439,7 @@ class Admin_UI {
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
 			: array(
-				'dependencies' => array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch' ),
+				'dependencies' => array( 'wp-plugins', 'wp-editor', 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n' ),
 				'version'      => SAMAN_SEO_VERSION,
 			);
 

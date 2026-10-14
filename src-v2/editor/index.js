@@ -6,7 +6,7 @@
  */
 
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
@@ -15,9 +15,15 @@ import SEOPanel from './components/SEOPanel';
 import { renderTemplatePreview } from '../utils/template';
 import './editor.css';
 
-// Sidebar name constant
 import { __ } from '@wordpress/i18n';
+
+// Complementary area identifier: `${ plugin name }/${ sidebar name }`.
 const SIDEBAR_NAME = 'saman-seo/seo-sidebar';
+// Complementary area scope shared by the post and site editors (WP 6.6+).
+const SIDEBAR_SCOPE = 'core';
+// Hash and admin bar node that open the modal ("Edit SEO Settings" link).
+const OPEN_MODAL_HASH = '#saman-seo-open-modal';
+const ADMIN_BAR_EDIT_LINK = '#wp-admin-bar-saman-seo-seo-edit a';
 
 // Get localized data
 const editorData = window.SamanSEOEditor || {};
@@ -83,24 +89,54 @@ const SEOModalPlugin = () => {
 	const wasOpenRef = useRef( false );
 
 	// Check if our sidebar is active
-	const isSidebarActive = useSelect( ( select ) => {
-		const activeGeneralSidebar =
-			select( 'core/edit-post' ).getActiveGeneralSidebarName();
-		return activeGeneralSidebar === SIDEBAR_NAME;
-	}, [] );
+	const isSidebarActive = useSelect(
+		( select ) =>
+			select( 'core/interface' ).getActiveComplementaryArea(
+				SIDEBAR_SCOPE
+			) === SIDEBAR_NAME,
+		[]
+	);
 
 	// Get sidebar controls
-	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const { disableComplementaryArea } = useDispatch( 'core/interface' );
 
 	// When sidebar becomes active, close it and open modal instead
 	useEffect( () => {
 		if ( isSidebarActive && ! wasOpenRef.current ) {
 			// Sidebar was just activated - close it and open modal
-			closeGeneralSidebar();
+			disableComplementaryArea( SIDEBAR_SCOPE );
 			setIsModalOpen( true );
 		}
 		wasOpenRef.current = isSidebarActive;
-	}, [ isSidebarActive, closeGeneralSidebar ] );
+	}, [ isSidebarActive, disableComplementaryArea ] );
+
+	// Open the modal from the admin bar "Edit SEO Settings" link, or when the
+	// editor was reached through that link from another screen.
+	useEffect( () => {
+		const { location, history } = window;
+		if ( location.hash === OPEN_MODAL_HASH ) {
+			setIsModalOpen( true );
+			history.replaceState(
+				history.state,
+				'',
+				location.pathname + location.search
+			);
+		}
+
+		const onClick = ( event ) => {
+			const target = event.target;
+			if ( ! target || ! target.closest ) {
+				return;
+			}
+			if ( target.closest( ADMIN_BAR_EDIT_LINK ) ) {
+				event.preventDefault();
+				setIsModalOpen( true );
+			}
+		};
+
+		document.addEventListener( 'click', onClick );
+		return () => document.removeEventListener( 'click', onClick );
+	}, [] );
 
 	// Get post data from editor
 	const {

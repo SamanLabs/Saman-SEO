@@ -60,6 +60,41 @@ class Request_Monitor {
 	}
 
 	/**
+	 * Whether the current request is a browser prefetch/prerender.
+	 *
+	 * Speculative loading (core since WP 6.8) makes browsers fetch links the
+	 * visitor may never open. Those requests should still be answered
+	 * normally but must not count as visits in 404 logs, redirect hits or
+	 * cache statistics.
+	 *
+	 * Recognised headers: `Sec-Purpose` (e.g. `prefetch`,
+	 * `prefetch;prerender`), the legacy `Purpose` and `X-Purpose`, and
+	 * Firefox's `X-Moz`.
+	 *
+	 * @param array|null $server Server vars to inspect. Defaults to $_SERVER.
+	 *
+	 * @return bool
+	 */
+	public static function is_speculative_request( $server = null ) {
+		if ( ! is_array( $server ) ) {
+			$server = $_SERVER; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only matched against a fixed token below.
+		}
+
+		foreach ( array( 'HTTP_SEC_PURPOSE', 'HTTP_PURPOSE', 'HTTP_X_PURPOSE', 'HTTP_X_MOZ' ) as $header ) {
+			if ( empty( $server[ $header ] ) || ! is_string( $server[ $header ] ) ) {
+				continue;
+			}
+
+			// Structured-field list: items separated by commas, parameters by semicolons.
+			if ( preg_match( '/(?:^|[\s,;])prefetch(?:$|[\s,;])/i', $server[ $header ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Schedule or unschedule cleanup based on settings.
 	 *
 	 * @return void
@@ -340,6 +375,11 @@ class Request_Monitor {
 	 */
 	public function maybe_log_404() {
 		if ( ! is_404() ) {
+			return;
+		}
+
+		// Prefetches are not visits; the 404 response itself is still sent.
+		if ( self::is_speculative_request() ) {
 			return;
 		}
 

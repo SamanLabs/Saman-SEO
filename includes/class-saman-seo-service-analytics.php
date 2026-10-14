@@ -45,7 +45,6 @@ class Analytics {
 
 	public function boot() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_matomo_tracking' ) );
-		add_filter( 'script_loader_tag', array( $this, 'add_async_defer_attribute' ), 10, 2 );
 		add_filter( 'wp_resource_hints', array( $this, 'add_resource_hints' ), 10, 2 );
 	}
 
@@ -130,13 +129,19 @@ class Analytics {
 			return;
 		}
 
-		wp_enqueue_script(
+		// Loading strategy (WP 6.3+) replaces the old script_loader_tag rewrite.
+		// The inline config is added 'before', which keeps the strategy intact.
+		wp_register_script(
 			'saman-seo-matomo',
 			$this->matomo_url . '/matomo.js',
 			array(),
 			SAMAN_SEO_VERSION,
-			true
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
 		);
+		wp_enqueue_script( 'saman-seo-matomo' );
 
 		$activation_time = get_option( 'SAMAN_SEO_track_activation', 0 );
 		$page_name       = str_replace( 'saman-seo-', '', $page );
@@ -207,16 +212,6 @@ class Analytics {
 		}
 
 		wp_add_inline_script( 'saman-seo-matomo', $matomo_config, 'before' );
-	}
-
-	/**
-	 * Add async/defer to Matomo script for performance
-	 */
-	public function add_async_defer_attribute( $tag, $handle ) {
-		if ( 'saman-seo-matomo' !== $handle ) {
-			return $tag;
-		}
-		return str_replace( ' src', ' defer async src', $tag );
 	}
 
 	/**

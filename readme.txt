@@ -1,8 +1,8 @@
 === Saman SEO ===
 Contributors: juandenis
 Tags: seo, meta tags, sitemap, redirects, schema
-Requires at least: 5.8
-Tested up to: 6.9
+Requires at least: 6.6
+Tested up to: 7.1
 Stable tag: 2.0.32
 Requires PHP: 7.4
 License: GPLv2 or later
