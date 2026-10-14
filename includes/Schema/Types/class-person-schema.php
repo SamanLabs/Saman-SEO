@@ -104,12 +104,9 @@ class Person_Schema extends Abstract_Schema {
 		$profiles = array();
 
 		// Try Local SEO social profiles first.
-		$local_social = get_option( 'SAMAN_SEO_local_social_profiles', '' );
+		$local_social = \Saman\SEO\Helpers\get_array_option( 'SAMAN_SEO_local_social_profiles' );
 		if ( ! empty( $local_social ) ) {
-			$parsed = json_decode( $local_social, true );
-			if ( is_array( $parsed ) ) {
-				$profiles = array_merge( $profiles, array_filter( $parsed ) );
-			}
+			$profiles = array_merge( $profiles, array_filter( $local_social ) );
 		}
 
 		// Also check homepage social profiles (Person schema).
