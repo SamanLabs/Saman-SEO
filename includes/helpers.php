@@ -26,6 +26,27 @@ namespace Saman\SEO\Helpers {
 	}
 
 	/**
+	 * Read an option that holds a list or map, whichever way it was stored.
+	 *
+	 * The Local SEO screen saves opening hours and social profiles as JSON
+	 * strings, while the registered settings sanitizers (and anything writing
+	 * through update_option) store real arrays. Readers must accept both.
+	 *
+	 * @param string $key Option name.
+	 *
+	 * @return array Decoded array, or an empty array when unset or invalid.
+	 */
+	function get_array_option( $key ) {
+		$value = \get_option( $key, array() );
+
+		if ( is_string( $value ) && '' !== $value ) {
+			$value = json_decode( $value, true );
+		}
+
+		return is_array( $value ) ? $value : array();
+	}
+
+	/**
 	 * Check if a module is enabled.
 	 *
 	 * Uses the new `SAMAN_SEO_module_*` option keys that match the React UI.
