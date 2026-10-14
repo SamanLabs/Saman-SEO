@@ -25,6 +25,7 @@
       "default": true
     },
     "homeLabel": {
+      "role": "content",
       "type": "string",
       "default": ""
     },

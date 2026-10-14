@@ -1,0 +1,154 @@
+/**
+ * Saman SEO FAQ and HowTo block styles.
+ *
+ * Registered as the blocks' `style` handle, so WordPress loads it on the front
+ * end where the blocks render and inside the (iframed) block editor.
+ *
+ * Selectors follow the markup the blocks save (`samanseo-*`). Everything is
+ * scoped to the saved wrappers (`.samanseo-faq`, `.samanseo-howto`) so it does
+ * not leak into the editor UI, which uses `.samanseo-*-block` wrappers.
+ */
+
+@border: #e0e0e0;
+@surface: #f9f9f9;
+@accent: #2271b1;
+
+/* FAQ block */
+.samanseo-faq {
+	margin: 2em 0;
+
+	.samanseo-faq-list {
+		border: 1px solid @border;
+		border-radius: 8px;
+		overflow: hidden;
+	}
+
+	.samanseo-faq-item {
+		border-bottom: 1px solid @border;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	.samanseo-faq-question {
+		display: block;
+		position: relative;
+		padding: 16px 40px 16px 16px;
+		font-weight: 600;
+		cursor: pointer;
+		list-style: none;
+		background: @surface;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+
+		&::after {
+			content: "+";
+			position: absolute;
+			right: 16px;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 20px;
+			color: #666;
+		}
+	}
+
+	details[open] > .samanseo-faq-question::after {
+		content: "\2212";
+	}
+
+	.samanseo-faq-answer {
+		padding: 16px;
+		background: #fff;
+	}
+}
+
+/* HowTo block */
+.samanseo-howto {
+	margin: 2em 0;
+
+	.samanseo-howto-content {
+		padding: 24px;
+		border: 1px solid @border;
+		border-radius: 8px;
+		background: #fff;
+	}
+
+	.samanseo-howto-title {
+		margin: 0 0 12px;
+		font-size: 24px;
+	}
+
+	.samanseo-howto-description {
+		margin: 0 0 20px;
+		color: #666;
+	}
+
+	.samanseo-howto-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin-bottom: 24px;
+		padding: 16px;
+		border-radius: 6px;
+		background: #f5f5f5;
+		font-size: 14px;
+
+		> * {
+			flex: 1 1 auto;
+		}
+	}
+
+	.samanseo-howto-steps {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		counter-reset: samanseo-howto-step;
+	}
+
+	.samanseo-howto-step {
+		position: relative;
+		margin-bottom: 16px;
+		padding: 20px 20px 20px 60px;
+		border-radius: 8px;
+		background: @surface;
+		counter-increment: samanseo-howto-step;
+
+		&::before {
+			content: counter(samanseo-howto-step);
+			position: absolute;
+			left: 16px;
+			top: 20px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			background: @accent;
+			color: #fff;
+			font-weight: 700;
+		}
+	}
+
+	.samanseo-howto-step-title {
+		display: block;
+		margin-bottom: 8px;
+		font-weight: 600;
+		font-size: 16px;
+	}
+
+	.samanseo-howto-step-description {
+		color: #444;
+	}
+
+	.samanseo-howto-step-image {
+		display: block;
+		max-width: 100%;
+		height: auto;
+		margin-bottom: 12px;
+		border-radius: 6px;
+	}
+}

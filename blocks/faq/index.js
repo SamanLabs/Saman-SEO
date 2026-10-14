@@ -15,7 +15,7 @@
 
 	registerBlockType( 'saman-seo/faq', {
 		title: __( 'FAQ', 'saman-seo' ),
-		description: __( 'Add frequently asked questions with automatic schema markup for rich results.', 'saman-seo' ),
+		description: __( 'Adds questions and answers with FAQPage structured data (valid schema.org markup; Google no longer shows FAQ rich results).', 'saman-seo' ),
 		category: 'widgets',
 		icon: 'editor-help',
 		keywords: [ 'faq', 'questions', 'answers', 'schema', 'seo' ],
@@ -24,6 +24,7 @@
 		},
 		attributes: {
 			faqs: {
+				role: 'content',
 				type: 'array',
 				default: [
 					{ question: '', answer: '' }
@@ -83,7 +84,7 @@
 						{ title: __( 'FAQ Settings', 'saman-seo' ), initialOpen: true },
 						el( ToggleControl, {
 							label: __( 'Include FAQPage Schema', 'saman-seo' ),
-							help: __( 'Add structured data for Google rich results.', 'saman-seo' ),
+							help: __( 'Outputs FAQPage structured data (valid schema.org, read by search engines and AI tools). Google no longer shows FAQ rich results.', 'saman-seo' ),
 							checked: showSchema,
 							onChange: function( value ) {
 								setAttributes( { showSchema: value } );

@@ -15,7 +15,7 @@
 
 	registerBlockType( 'saman-seo/howto', {
 		title: __( 'How To', 'saman-seo' ),
-		description: __( 'Create step-by-step instructions with automatic schema markup for rich results.', 'saman-seo' ),
+		description: __( 'Adds step-by-step instructions with HowTo structured data (valid schema.org markup; Google no longer shows HowTo rich results).', 'saman-seo' ),
 		category: 'widgets',
 		icon: 'list-view',
 		keywords: [ 'howto', 'how to', 'steps', 'instructions', 'schema', 'seo', 'tutorial' ],
@@ -24,18 +24,22 @@
 		},
 		attributes: {
 			title: {
+				role: 'content',
 				type: 'string',
 				default: '',
 			},
 			description: {
+				role: 'content',
 				type: 'string',
 				default: '',
 			},
 			totalTime: {
+				role: 'content',
 				type: 'string',
 				default: '',
 			},
 			estimatedCost: {
+				role: 'content',
 				type: 'string',
 				default: '',
 			},
@@ -44,16 +48,19 @@
 				default: 'USD',
 			},
 			steps: {
+				role: 'content',
 				type: 'array',
 				default: [
 					{ title: '', description: '', image: null }
 				],
 			},
 			tools: {
+				role: 'content',
 				type: 'array',
 				default: [],
 			},
 			supplies: {
+				role: 'content',
 				type: 'array',
 				default: [],
 			},
@@ -115,7 +122,7 @@
 						{ title: __( 'HowTo Settings', 'saman-seo' ), initialOpen: true },
 						el( ToggleControl, {
 							label: __( 'Include HowTo Schema', 'saman-seo' ),
-							help: __( 'Add structured data for Google rich results.', 'saman-seo' ),
+							help: __( 'Outputs HowTo structured data (valid schema.org, read by search engines and AI tools). Google no longer shows HowTo rich results.', 'saman-seo' ),
 							checked: showSchema,
 							onChange: function( value ) {
 								setAttributes( { showSchema: value } );

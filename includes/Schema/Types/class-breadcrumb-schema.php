@@ -74,7 +74,8 @@ class Breadcrumb_Schema extends Abstract_Schema {
 	/**
 	 * Generate BreadcrumbList schema.
 	 *
-	 * Includes: @type, @id, and itemListElement array with:
+	 * The itemListElement mirrors the visible breadcrumb trail when the schema
+	 * describes the queried post. Otherwise it falls back to:
 	 * - Home crumb (position 1)
 	 * - Ancestors in order (if hierarchical)
 	 * - Current page (last position)
@@ -83,35 +84,11 @@ class Breadcrumb_Schema extends Abstract_Schema {
 	 */
 	public function generate(): array {
 		$post   = $this->context->post;
-		$crumbs = array();
-		$rank   = 1;
+		$crumbs = $this->crumbs_from_service( $post );
 
-		// Home crumb first.
-		$crumbs[] = array(
-			'@type'    => 'ListItem',
-			'position' => $rank++,
-			'name'     => get_bloginfo( 'name' ),
-			'item'     => home_url( '/' ),
-		);
-
-		// Ancestors in reverse order (parent -> grandparent becomes grandparent -> parent).
-		$ancestors = array_reverse( get_post_ancestors( $post ) );
-		foreach ( $ancestors as $ancestor_id ) {
-			$crumbs[] = array(
-				'@type'    => 'ListItem',
-				'position' => $rank++,
-				'name'     => get_the_title( $ancestor_id ),
-				'item'     => get_permalink( $ancestor_id ),
-			);
+		if ( empty( $crumbs ) ) {
+			$crumbs = $this->fallback_crumbs( $post );
 		}
-
-		// Current page last.
-		$crumbs[] = array(
-			'@type'    => 'ListItem',
-			'position' => $rank,
-			'name'     => get_the_title( $post ),
-			'item'     => get_permalink( $post ),
-		);
 
 		/**
 		 * Filter the breadcrumb trail before it is written into the graph.
@@ -142,5 +119,101 @@ class Breadcrumb_Schema extends Abstract_Schema {
 			'@id'             => Schema_IDs::breadcrumb( $this->context->canonical ),
 			'itemListElement' => $crumbs,
 		);
+	}
+
+	/**
+	 * Build ListItems from the visible breadcrumb trail.
+	 *
+	 * Uses the breadcrumbs service's get_breadcrumbs(), the same source as the
+	 * on-page trail (and the core/breadcrumbs block on WP 7.0+), so the schema
+	 * includes categories, CPT archives and per-post overrides exactly as shown.
+	 * That trail is built from the main query, so it is only used when the
+	 * schema is generated for the queried post; anything else falls back.
+	 *
+	 * @param \WP_Post $post Post the schema describes.
+	 * @return array List of ListItem arrays, empty when unavailable.
+	 */
+	private function crumbs_from_service( $post ): array {
+		$service = \Saman\SEO\Plugin::instance()->get( 'breadcrumbs' );
+		if ( ! $service || ! method_exists( $service, 'get_breadcrumbs' ) ) {
+			return array();
+		}
+
+		if ( ! $post instanceof \WP_Post || ! is_singular() || (int) get_queried_object_id() !== (int) $post->ID ) {
+			return array();
+		}
+
+		$trail = $service->get_breadcrumbs(
+			array(
+				'show_current'    => true,
+				'link_current'    => true,
+				'truncate_length' => 0,
+			)
+		);
+
+		$crumbs = array();
+		foreach ( (array) $trail as $crumb ) {
+			if ( ! is_array( $crumb ) || ! isset( $crumb['title'] ) ) {
+				continue;
+			}
+
+			$name = trim( wp_strip_all_tags( (string) $crumb['title'] ) );
+			if ( '' === $name ) {
+				continue;
+			}
+
+			$item = array(
+				'@type' => 'ListItem',
+				'name'  => $name,
+			);
+
+			if ( ! empty( $crumb['url'] ) && is_string( $crumb['url'] ) ) {
+				$item['item'] = $crumb['url'];
+			}
+
+			$crumbs[] = $item;
+		}
+
+		return $crumbs;
+	}
+
+	/**
+	 * Build ListItems from the post hierarchy: Home, ancestors, current post.
+	 *
+	 * @param \WP_Post $post Post the schema describes.
+	 * @return array List of ListItem arrays.
+	 */
+	private function fallback_crumbs( $post ): array {
+		$crumbs = array();
+		$rank   = 1;
+
+		// Home crumb first.
+		$crumbs[] = array(
+			'@type'    => 'ListItem',
+			'position' => $rank++,
+			'name'     => get_bloginfo( 'name' ),
+			'item'     => home_url( '/' ),
+		);
+
+		// Ancestors in reverse order (parent -> grandparent becomes grandparent -> parent).
+		$ancestors = array_reverse( get_post_ancestors( $post ) );
+		foreach ( $ancestors as $ancestor_id ) {
+			$crumbs[] = array(
+				'@type'    => 'ListItem',
+				'position' => $rank++,
+				'name'     => get_the_title( $ancestor_id ),
+				'item'     => get_permalink( $ancestor_id ),
+			);
+		}
+
+		// Current page last.
+		$crumbs[] = array(
+			'@type'    => 'ListItem',
+			'position' => $rank,
+			'name'     => get_the_title( $post ),
+			'item'     => get_permalink( $post ),
+		);
+
+		return $crumbs;
 	}
 }

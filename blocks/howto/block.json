@@ -6,7 +6,7 @@
   "title": "How To",
   "category": "widgets",
   "icon": "list-view",
-  "description": "Create step-by-step instructions with automatic schema markup for rich results.",
+  "description": "Adds step-by-step instructions with HowTo structured data (valid schema.org markup; Google no longer shows HowTo rich results).",
   "keywords": [ "howto", "how to", "steps", "instructions", "schema", "seo", "tutorial" ],
   "textdomain": "saman-seo",
   "supports": {
@@ -14,18 +14,22 @@
   },
   "attributes": {
     "title": {
+      "role": "content",
       "type": "string",
       "default": ""
     },
     "description": {
+      "role": "content",
       "type": "string",
       "default": ""
     },
     "totalTime": {
+      "role": "content",
       "type": "string",
       "default": ""
     },
     "estimatedCost": {
+      "role": "content",
       "type": "string",
       "default": ""
     },
@@ -34,6 +38,7 @@
       "default": "USD"
     },
     "steps": {
+      "role": "content",
       "type": "array",
       "default": [
         {
@@ -44,10 +49,12 @@
       ]
     },
     "tools": {
+      "role": "content",
       "type": "array",
       "default": []
     },
     "supplies": {
+      "role": "content",
       "type": "array",
       "default": []
     },

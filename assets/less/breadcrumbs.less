@@ -2,10 +2,15 @@
  * Saman SEO Breadcrumbs Styles
  *
  * Style presets: default, minimal, rounded, pills, none
+ *
+ * Selectors follow the markup Breadcrumbs::render() outputs
+ * (`saman-seo-breadcrumbs`, `saman-seo-breadcrumbs--{preset}`). The stylesheet
+ * is also the saman-seo/breadcrumbs block's `style` handle, so it loads inside
+ * the iframed block editor as well.
  */
 
 /* Base styles */
-.samanseo-breadcrumbs {
+.saman-seo-breadcrumbs {
 	margin: 0 0 20px;
 	padding: 0;
 	font-size: 14px;
@@ -64,12 +69,12 @@
 }
 
 /* Default preset */
-.samanseo-breadcrumbs--default {
+.saman-seo-breadcrumbs--default {
 	background: #f7f7f7;
 	padding: 12px 16px;
 	border-radius: 6px;
 
-	.samanseo-breadcrumbs__link {
+	.saman-seo-breadcrumbs__link {
 		color: #2271b1;
 
 		&:hover {
@@ -77,18 +82,18 @@
 		}
 	}
 
-	.samanseo-breadcrumbs__current {
+	.saman-seo-breadcrumbs__current {
 		color: #1e1e1e;
 		font-weight: 500;
 	}
 }
 
 /* Minimal preset */
-.samanseo-breadcrumbs--minimal {
+.saman-seo-breadcrumbs--minimal {
 	padding: 0;
 	background: transparent;
 
-	.samanseo-breadcrumbs__link {
+	.saman-seo-breadcrumbs__link {
 		color: #666;
 
 		&:hover {
@@ -96,25 +101,25 @@
 		}
 	}
 
-	.samanseo-breadcrumbs__current {
+	.saman-seo-breadcrumbs__current {
 		color: #333;
 	}
 
-	.samanseo-breadcrumbs__separator {
+	.saman-seo-breadcrumbs__separator {
 		margin: 0 6px;
 	}
 }
 
 /* Rounded preset */
-.samanseo-breadcrumbs--rounded {
+.saman-seo-breadcrumbs--rounded {
 	padding: 0;
 	background: transparent;
 
-	.samanseo-breadcrumbs__list {
+	.saman-seo-breadcrumbs__list {
 		gap: 8px;
 	}
 
-	.samanseo-breadcrumbs__item {
+	.saman-seo-breadcrumbs__item {
 		background: #f0f0f0;
 		border-radius: 20px;
 		padding: 6px 14px;
@@ -125,7 +130,7 @@
 		}
 	}
 
-	.samanseo-breadcrumbs__link {
+	.saman-seo-breadcrumbs__link {
 		color: #333;
 
 		&:hover {
@@ -134,26 +139,26 @@
 		}
 	}
 
-	.samanseo-breadcrumbs__current {
+	.saman-seo-breadcrumbs__current {
 		opacity: 1;
 		color: inherit;
 	}
 
-	.samanseo-breadcrumbs__separator {
+	.saman-seo-breadcrumbs__separator {
 		display: none;
 	}
 }
 
 /* Pills preset */
-.samanseo-breadcrumbs--pills {
+.saman-seo-breadcrumbs--pills {
 	padding: 0;
 	background: transparent;
 
-	.samanseo-breadcrumbs__list {
+	.saman-seo-breadcrumbs__list {
 		gap: 4px;
 	}
 
-	.samanseo-breadcrumbs__item {
+	.saman-seo-breadcrumbs__item {
 		position: relative;
 		background: #e9ecef;
 		padding: 8px 16px 8px 24px;
@@ -171,7 +176,7 @@
 		}
 	}
 
-	.samanseo-breadcrumbs__link {
+	.saman-seo-breadcrumbs__link {
 		color: #495057;
 
 		&:hover {
@@ -180,50 +185,63 @@
 		}
 	}
 
-	.samanseo-breadcrumbs__current {
+	.saman-seo-breadcrumbs__current {
 		opacity: 1;
 		color: inherit;
 	}
 
-	.samanseo-breadcrumbs__separator {
+	.saman-seo-breadcrumbs__separator {
 		display: none;
 	}
 }
 
 /* No styling preset */
-.samanseo-breadcrumbs--none {
+.saman-seo-breadcrumbs--none {
 	padding: 0;
 	background: transparent;
 
-	.samanseo-breadcrumbs__link {
+	.saman-seo-breadcrumbs__link {
 		color: inherit;
 	}
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-	.samanseo-breadcrumbs {
+	.saman-seo-breadcrumbs {
 		font-size: 13px;
 	}
 
-	.samanseo-breadcrumbs--default {
+	.saman-seo-breadcrumbs--default {
 		padding: 10px 12px;
 	}
 
-	.samanseo-breadcrumbs__separator {
+	.saman-seo-breadcrumbs__separator {
 		margin: 0 6px;
 	}
 
-	.samanseo-breadcrumbs--rounded .samanseo-breadcrumbs__item,
-	.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item {
+	.saman-seo-breadcrumbs--rounded .saman-seo-breadcrumbs__item,
+	.saman-seo-breadcrumbs--pills .saman-seo-breadcrumbs__item {
 		padding: 5px 10px;
 	}
 
-	.samanseo-breadcrumbs--pills .samanseo-breadcrumbs__item {
+	.saman-seo-breadcrumbs--pills .saman-seo-breadcrumbs__item {
 		padding-left: 18px;
 
 		&:first-child {
 			padding-left: 12px;
 		}
+	}
+}
+
+/* Block editor placeholder preview (blocks/breadcrumbs/index.js) */
+.samanseo-breadcrumbs-preview {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	font-size: 14px;
+
+	&__sep {
+		opacity: 0.5;
 	}
 }
