@@ -367,6 +367,8 @@ class Frontend {
 
 		if ( ! empty( $canonical ) ) {
 			printf( "<link rel=\"canonical\" href=\"%s\" />\n", esc_url( $canonical ) );
+			// Core prints its own canonical later in wp_head; keep only ours.
+			remove_action( 'wp_head', 'rel_canonical' );
 		}
 
 		if ( ! empty( $keywords ) ) {
@@ -931,6 +933,14 @@ class Frontend {
 			// index/follow are implicit defaults; emitting them explicitly
 			// only creates conflict pairs inside the merged tag.
 			if ( 'index' === $directive || 'follow' === $directive ) {
+				continue;
+			}
+
+			// "max-snippet:-1" style directives map to key => value so they
+			// merge with core's identical keys instead of duplicating them.
+			if ( false !== strpos( $directive, ':' ) ) {
+				list( $key, $value ) = array_map( 'trim', explode( ':', $directive, 2 ) );
+				$robots[ $key ]      = $value;
 				continue;
 			}
 
