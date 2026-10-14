@@ -330,8 +330,7 @@ class Frontend {
 		$description = render_template_safely( $description, $post );
 		$description = saman_seo_apply_filters( 'saman_seo_description', $description, $post );
 
-		$canonical = $this->get_canonical( $post, $meta );
-		$canonical = saman_seo_apply_filters( 'saman_seo_canonical', $canonical, $post );
+		$canonical = $this->resolve_canonical_url( $post, $meta );
 
 		$keywords = $homepage_keywords;
 		if ( empty( $keywords ) && $post instanceof WP_Post && ! empty( $post_type_keywords[ $post->post_type ] ) ) {
@@ -391,8 +390,7 @@ class Frontend {
 
 		$post          = $this->get_context_post();
 		$meta          = $this->get_meta( $post );
-		$canonical_url = $this->get_canonical( $post, $meta );
-		$canonical_url = saman_seo_apply_filters( 'saman_seo_canonical', $canonical_url, $post );
+		$canonical_url = $this->resolve_canonical_url( $post, $meta );
 
 		// OG URL should match canonical URL by default.
 		$url                    = saman_seo_apply_filters( 'saman_seo_og_url', $canonical_url, $post );
@@ -691,9 +689,21 @@ class Frontend {
 			return;
 		}
 
-		$post = get_post();
+		// Only a singular view describes a single post. On archives, the blog
+		// home and search results get_post() is merely the first post of the
+		// loop, so post-specific nodes (Article, FAQ, HowTo, Recipe, Video,
+		// Breadcrumb, ...) must not be built from it.
+		$post      = is_singular() ? $this->get_context_post() : null;
+		$canonical = '';
 
-		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post );
+		if ( is_singular() || is_home() || is_archive() || is_search() || is_404() ) {
+			// Same URL the <link rel="canonical"> tag prints, so WebPage
+			// url/@id follow the per-post canonical override.
+			$canonical_post = $this->get_context_post();
+			$canonical      = $this->resolve_canonical_url( $canonical_post, $this->get_meta( $canonical_post ) );
+		}
+
+		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post, (string) $canonical );
 
 		if ( empty( $payload ) ) {
 			return;
@@ -804,6 +814,23 @@ class Frontend {
 		}
 
 		return breadcrumbs( null, false );
+	}
+
+	/**
+	 * Resolve the canonical URL exactly as the head tag prints it.
+	 *
+	 * Shared by the canonical <link>, og:url and the JSON-LD graph so all
+	 * three agree, including the per-post canonical override.
+	 *
+	 * @param WP_Post|null $post Post.
+	 * @param array        $meta Meta.
+	 *
+	 * @return string
+	 */
+	private function resolve_canonical_url( $post, $meta ) {
+		$canonical = $this->get_canonical( $post, $meta );
+
+		return saman_seo_apply_filters( 'saman_seo_canonical', $canonical, $post );
 	}
 
 	/**
@@ -955,6 +982,12 @@ class Frontend {
 			unset( $robots['follow'] );
 		}
 
+		// nosnippet forbids snippets outright; a max-snippet length beside it
+		// is contradictory.
+		if ( ! empty( $robots['nosnippet'] ) ) {
+			unset( $robots['max-snippet'] );
+		}
+
 		return $robots;
 	}
 
@@ -1000,14 +1033,18 @@ class Frontend {
 			$directives[] = 'nofollow';
 		}
 
+		$directives = array_values( array_filter( array_unique( array_map( 'trim', $directives ) ) ) );
+
+		// Precedence: per-post / request directives (above) > global setting >
+		// hard-coded defaults. A lower tier never overrides a key an upper tier
+		// already set, so a global "max-snippet:50" survives the default
+		// "max-snippet:-1".
 		$global = get_option( 'SAMAN_SEO_global_robots' );
-		if ( $global ) {
-			$directives = array_merge( $directives, array_map( 'trim', explode( ',', $global ) ) );
+		if ( $global && is_string( $global ) ) {
+			$directives = $this->merge_robots_directives( $directives, explode( ',', $global ) );
 		}
 
-		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
-
-		// Add default advanced directives (can be filtered or disabled via global option).
+		// Default advanced directives (can be filtered or disabled).
 		$advanced = saman_seo_apply_filters(
 			'saman_seo_robots_advanced',
 			array(
@@ -1017,12 +1054,7 @@ class Frontend {
 			)
 		);
 		if ( is_array( $advanced ) ) {
-			foreach ( $advanced as $directive ) {
-				$directive = trim( (string) $directive );
-				if ( '' !== $directive && ! in_array( $directive, $directives, true ) ) {
-					$directives[] = $directive;
-				}
-			}
+			$directives = $this->merge_robots_directives( $directives, $advanced );
 		}
 
 		// Filter the array of directives (e.g. ['noindex', 'nofollow']).
@@ -1055,8 +1087,66 @@ class Frontend {
 		if ( in_array( 'nofollow', $final_directives, true ) ) {
 			$final_directives = array_diff( $final_directives, array( 'follow' ) );
 		}
+		if ( in_array( 'nosnippet', $final_directives, true ) ) {
+			$final_directives = array_filter(
+				$final_directives,
+				static function ( $directive ) {
+					return 'max-snippet' !== self::robots_directive_key( $directive );
+				}
+			);
+		}
 
 		return array_values( $final_directives );
+	}
+
+	/**
+	 * Append lower-precedence robots directives without overriding keys
+	 * already present.
+	 *
+	 * "max-snippet:50" and "max-snippet:-1" share the key "max-snippet", so
+	 * only the first (higher-precedence) one is kept.
+	 *
+	 * @param array<int,string> $directives Higher-precedence directives.
+	 * @param array             $additional Lower-precedence directives.
+	 *
+	 * @return array<int,string>
+	 */
+	private function merge_robots_directives( array $directives, array $additional ) {
+		$keys = array();
+		foreach ( $directives as $directive ) {
+			$keys[ self::robots_directive_key( $directive ) ] = true;
+		}
+
+		foreach ( $additional as $directive ) {
+			$directive = trim( (string) $directive );
+			if ( '' === $directive ) {
+				continue;
+			}
+
+			$key = self::robots_directive_key( $directive );
+			if ( isset( $keys[ $key ] ) ) {
+				continue;
+			}
+
+			$keys[ $key ] = true;
+			$directives[] = $directive;
+		}
+
+		return $directives;
+	}
+
+	/**
+	 * Key of a robots directive: the part before ':' ("max-snippet" for
+	 * "max-snippet:50"), lowercased.
+	 *
+	 * @param string $directive Directive.
+	 *
+	 * @return string
+	 */
+	private static function robots_directive_key( $directive ) {
+		$parts = explode( ':', (string) $directive, 2 );
+
+		return strtolower( trim( $parts[0] ) );
 	}
 
 	/**

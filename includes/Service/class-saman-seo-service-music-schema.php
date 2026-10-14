@@ -2,6 +2,15 @@
 /**
  * Music Schema service for music schema optimization.
  *
+ * Emits a MusicAlbum node for posts of the `music` post type. Optional
+ * fields are read from post meta and omitted when empty:
+ *
+ * - `_saman_seo_music_artist`     Artist / group name (byArtist).
+ * - `_saman_seo_music_artist_url` Artist URL (sameAs).
+ * - `_saman_seo_music_num_tracks` Number of tracks.
+ *
+ * Use the `saman_seo_schema_music` filter to supply or change data.
+ *
  * @package Saman\SEO
  */
 
@@ -12,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Music Schema controller.
  */
-class Music_Schema {
+class Music_Schema extends Abstract_Post_Type_Schema {
 
 	/**
 	 * Boot hooks.
@@ -28,55 +37,48 @@ class Music_Schema {
 	}
 
 	/**
-	 * Add MusicGroup schema to the JSON-LD graph.
+	 * Add MusicAlbum schema to the JSON-LD graph.
 	 *
-	 * @param array    $graph The existing JSON-LD graph.
-	 * @param \WP_Post $post  The current post object.
+	 * @param array         $graph The existing JSON-LD graph.
+	 * @param \WP_Post|null $post  The current post object.
 	 * @return array The modified JSON-LD graph.
 	 */
-	public function add_music_schema_to_graph( $graph, $post ) {
-
-		if ( ! $post || 'music' !== get_post_type( $post ) ) {
-			return $graph;
-		}
-
-		$schema = $this->build_schema( $post );
-
-		if ( ! empty( $schema ) ) {
-			$graph[] = $schema;
-		}
-
-		return $graph;
+	public function add_music_schema_to_graph( $graph, $post = null ) {
+		return $this->add_node_to_graph( $graph, $post );
 	}
 
 	/**
-	 * Build MusicGroup schema.
+	 * {@inheritDoc}
+	 */
+	protected function get_post_type(): string {
+		return 'music';
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function get_schema_slug(): string {
+		return 'music';
+	}
+
+	/**
+	 * Build MusicAlbum schema.
 	 *
 	 * @param \WP_Post $post The current post object.
-	 * @return array|null
+	 * @return array
 	 */
-	private function build_schema( $post ) {
-		$album_name  = get_the_title( $post );
-		$artist_name = get_the_author_meta( 'display_name', $post->post_author );
+	protected function build_node( \WP_Post $post ): array {
+		$num_tracks = absint( $this->get_field( $post, 'num_tracks' ) );
 
-		// In a real implementation, these would come from post meta.
-		$num_tracks = 12;
-
-		if ( empty( $album_name ) ) {
-			return null;
-		}
-
-		$schema = array(
-			'@context'  => 'https://schema.org',
-			'@type'     => 'MusicAlbum',
-			'name'      => $album_name,
-			'byArtist'  => array(
-				'@type' => 'MusicGroup',
-				'name'  => $artist_name,
-			),
-			'numTracks' => $num_tracks,
+		return array(
+			'@type'       => 'MusicAlbum',
+			'@id'         => $this->get_node_id( $post ),
+			'name'        => wp_strip_all_tags( (string) get_the_title( $post ) ),
+			'description' => $this->get_description( $post ),
+			'url'         => $this->get_url( $post ),
+			'image'       => $this->get_image( $post ),
+			'byArtist'    => $this->get_entity( $post, 'MusicGroup', 'artist', 'artist_url' ),
+			'numTracks'   => $num_tracks > 0 ? $num_tracks : null,
 		);
-
-		return $schema;
 	}
 }

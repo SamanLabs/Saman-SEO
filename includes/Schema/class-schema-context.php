@@ -79,31 +79,25 @@ class Schema_Context {
 	 * Captures the current environment (URL, post, site info) for use
 	 * in schema generation without requiring global state access.
 	 *
+	 * The post is only taken on singular views. On archives, the blog home
+	 * and search results get_post() returns the first post of the loop,
+	 * whose Article/WebPage/FAQ nodes do not describe the page being viewed.
+	 *
 	 * @return Schema_Context Populated context object.
 	 */
 	public static function from_current(): Schema_Context {
 		$context = new self();
 
+		$post = is_singular() ? get_post() : null;
+
 		$context->site_url  = home_url( '/' );
 		$context->site_name = get_bloginfo( 'name' );
-		$context->post      = get_post();
+		$context->post      = $post instanceof \WP_Post ? $post : null;
 		$context->post_type = $context->post instanceof \WP_Post ? get_post_type( $context->post ) : '';
-		$context->canonical = $context->post instanceof \WP_Post ? get_permalink( $context->post ) : $context->site_url;
-
-		// Get post meta, ensure array.
-		$raw_meta = array();
-		if ( $context->post instanceof \WP_Post ) {
-			$raw_meta = get_post_meta( $context->post->ID, '_SAMAN_SEO_meta', true );
-
-			// Backward compatibility with the previous WP SEO Pilot meta key.
-			if ( empty( $raw_meta ) ) {
-				$legacy = get_post_meta( $context->post->ID, '_wpseopilot_meta', true );
-				if ( ! empty( $legacy ) && is_array( $legacy ) ) {
-					$raw_meta = $legacy;
-				}
-			}
-		}
-		$context->meta = is_array( $raw_meta ) ? $raw_meta : array();
+		$context->meta      = $context->post instanceof \WP_Post ? self::get_seo_meta( $context->post ) : array();
+		$context->canonical = $context->post instanceof \WP_Post
+			? self::resolve_canonical( $context->post, $context->meta )
+			: $context->site_url;
 
 		// Determine schema type: post meta > post type settings > default.
 		$context->schema_type = self::determine_schema_type( $context );
@@ -127,9 +121,22 @@ class Schema_Context {
 		$context->site_name = get_bloginfo( 'name' );
 		$context->post      = $post;
 		$context->post_type = get_post_type( $post );
-		$context->canonical = get_permalink( $post );
+		$context->meta      = self::get_seo_meta( $post );
+		$context->canonical = self::resolve_canonical( $post, $context->meta );
 
-		// Get post meta, ensure array.
+		// Determine schema type: post meta > post type settings > default.
+		$context->schema_type = self::determine_schema_type( $context );
+
+		return $context;
+	}
+
+	/**
+	 * Read the post's SEO meta array.
+	 *
+	 * @param \WP_Post $post Post.
+	 * @return array
+	 */
+	private static function get_seo_meta( \WP_Post $post ): array {
 		$raw_meta = get_post_meta( $post->ID, '_SAMAN_SEO_meta', true );
 
 		// Backward compatibility with the previous WP SEO Pilot meta key.
@@ -140,12 +147,31 @@ class Schema_Context {
 			}
 		}
 
-		$context->meta = is_array( $raw_meta ) ? $raw_meta : array();
+		return is_array( $raw_meta ) ? $raw_meta : array();
+	}
 
-		// Determine schema type: post meta > post type settings > default.
-		$context->schema_type = self::determine_schema_type( $context );
+	/**
+	 * Resolve the canonical URL for a post.
+	 *
+	 * Honors the per-post canonical override, the same value the
+	 * <link rel="canonical"> tag prints, so WebPage url/@id and every
+	 * URL#fragment @id built from it point at the canonical page. On the
+	 * front end the JSON-LD service replaces this with the exact URL the
+	 * head tag resolved (pagination, filters).
+	 *
+	 * @param \WP_Post $post Post.
+	 * @param array    $meta Post SEO meta.
+	 * @return string
+	 */
+	public static function resolve_canonical( \WP_Post $post, array $meta = array() ): string {
+		if ( ! empty( $meta['canonical'] ) && is_string( $meta['canonical'] ) ) {
+			$canonical = esc_url_raw( $meta['canonical'] );
+			if ( '' !== $canonical ) {
+				return $canonical;
+			}
+		}
 
-		return $context;
+		return (string) get_permalink( $post );
 	}
 
 	/**
