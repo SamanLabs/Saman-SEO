@@ -517,8 +517,8 @@ class Frontend {
 		$twitter_image = saman_seo_apply_filters( 'saman_seo_twitter_image', $image, $post );
 
 		// Width/height/type/alt are only known for local attachments.
-		$image_details   = $this->get_social_image_details( (string) $image );
-		$twitter_details = ( $twitter_image === $image ) ? $image_details : $this->get_social_image_details( (string) $twitter_image );
+		$image_details   = $this->get_social_image_details( self::social_image_url( $image ) );
+		$twitter_details = ( $twitter_image === $image ) ? $image_details : $this->get_social_image_details( self::social_image_url( $twitter_image ) );
 
 		$tags = array(
 			'og:title'            => $title,
@@ -1308,6 +1308,28 @@ class Frontend {
 		 * @param array   $social_defaults Social default settings.
 		 */
 		return saman_seo_apply_filters( 'saman_seo_og_image', $image, $post, $meta, $social_defaults );
+	}
+
+	/**
+	 * Single image URL from a (possibly filtered) social image value.
+	 *
+	 * The image filters may return something other than a string. An array
+	 * with a 'url' key is accepted; anything else yields '' so no image
+	 * details are looked up.
+	 *
+	 * @param mixed $image Image value.
+	 * @return string
+	 */
+	private static function social_image_url( $image ) {
+		if ( is_string( $image ) ) {
+			return $image;
+		}
+
+		if ( is_array( $image ) && isset( $image['url'] ) && is_string( $image['url'] ) ) {
+			return $image['url'];
+		}
+
+		return '';
 	}
 
 	/**

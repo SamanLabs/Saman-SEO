@@ -1992,6 +1992,33 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Host spellings to add to allowed_redirect_hosts for a configured target.
+	 *
+	 * WordPress compares hosts case-sensitively in wp_validate_redirect(), so
+	 * the host is allowed exactly as typed in the rule as well as lowercased.
+	 *
+	 * @param string $configured_target Target as saved by the admin.
+	 *
+	 * @return string[] Empty when no host should be allowed.
+	 */
+	public function configured_redirect_hosts( $configured_target ) {
+		$lower = $this->configured_redirect_host( $configured_target );
+
+		if ( '' === $lower ) {
+			return array();
+		}
+
+		$hosts  = array( $lower );
+		$parsed = wp_parse_url( (string) $configured_target, PHP_URL_HOST );
+
+		if ( is_string( $parsed ) && $parsed !== $lower ) {
+			$hosts[] = $parsed;
+		}
+
+		return $hosts;
+	}
+
+	/**
 	 * Resolve the final target URL for a matched redirect.
 	 *
 	 * @param object $row     Matched redirect row.
@@ -2100,10 +2127,12 @@ class Redirect_Manager {
 
 		// Only the exact host an admin typed into the rule is trusted, never a
 		// host derived from the request.
-		$allowed_host = $this->configured_redirect_host( $configured );
-		$allow_host   = static function ( $hosts ) use ( $allowed_host ) {
-			if ( '' !== $allowed_host && ! in_array( $allowed_host, $hosts, true ) ) {
-				$hosts[] = $allowed_host;
+		$allowed_hosts = $this->configured_redirect_hosts( $configured );
+		$allow_host    = static function ( $hosts ) use ( $allowed_hosts ) {
+			foreach ( $allowed_hosts as $allowed_host ) {
+				if ( ! in_array( $allowed_host, $hosts, true ) ) {
+					$hosts[] = $allowed_host;
+				}
 			}
 			return $hosts;
 		};

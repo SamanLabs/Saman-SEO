@@ -202,6 +202,57 @@ class SitemapVideoEntriesTest extends TestCase {
 	}
 
 	/**
+	 * Entity-encoded titles (as get_the_title() returns them) are encoded
+	 * exactly once in the XML.
+	 */
+	public function test_titles_are_not_double_encoded(): void {
+		$this->make_post(
+			array(
+				'ID'           => 11,
+				'post_title'   => 'Tom &amp; Jerry&#8217;s <em>big</em> day',
+				'post_excerpt' => 'Fish &amp; chips &hellip;',
+				'post_content' => 'https://youtu.be/dQw4w9WgXcQ',
+			)
+		);
+
+		$entry = $this->enhancer->include_media_fields( array( 'loc' => 'https://example.org/tj/' ), 11, 'post' );
+		$video = $entry['video:video'];
+
+		$this->assertSame( "Tom & Jerry\u{2019}s big day", $video['video:title'] );
+		$this->assertSame( "Fish & chips \u{2026}", $video['video:description'] );
+
+		$xml = $this->enhancer->build_urlset_xml( array( $entry ) );
+
+		$this->assertNotFalse( simplexml_load_string( $xml ) );
+		$this->assertStringContainsString( "<video:title>Tom &amp; Jerry\u{2019}s big day</video:title>", $xml );
+		$this->assertStringNotContainsString( '&amp;amp;', $xml );
+		$this->assertStringNotContainsString( '&amp;#8217;', $xml );
+	}
+
+	/**
+	 * Characters XML 1.0 forbids are dropped instead of breaking the file.
+	 */
+	public function test_invalid_xml_characters_are_stripped(): void {
+		$xml = $this->enhancer->build_urlset_xml(
+			array(
+				array(
+					'loc'         => 'https://example.org/c/',
+					'video:video' => array(
+						'video:thumbnail_loc' => 'https://example.org/t.jpg',
+						'video:title'         => "Bell\x07 and form\x0C feed\tok",
+						'video:description'   => "Bad \xC3\x28 bytes",
+						'video:content_loc'   => 'https://example.org/c.mp4',
+					),
+				),
+			)
+		);
+
+		$this->assertNotFalse( simplexml_load_string( $xml ), 'urlset must be well-formed XML' );
+		$this->assertStringContainsString( "<video:title>Bell and form feed\tok</video:title>", $xml );
+		$this->assertStringContainsString( '<video:description>Bad ', $xml );
+	}
+
+	/**
 	 * The background check caches the maxres result long-term.
 	 */
 	public function test_background_thumbnail_check_caches_result(): void {

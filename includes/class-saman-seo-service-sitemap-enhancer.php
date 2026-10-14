@@ -217,7 +217,7 @@ class Sitemap_Enhancer {
 			$thumbnail = (string) get_the_post_thumbnail_url( $post_id, 'full' );
 		}
 
-		$title       = trim( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+		$title       = self::plain_text( get_the_title( $post_id ) );
 		$description = $this->get_video_description( $post_id, $title );
 
 		if ( '' === $thumbnail || '' === $title || '' === $description ) {
@@ -258,7 +258,7 @@ class Sitemap_Enhancer {
 			$description = \Saman\SEO\Helpers\generate_content_snippet( $post_id, 50 );
 		}
 
-		$description = trim( wp_strip_all_tags( (string) $description ) );
+		$description = self::plain_text( $description );
 
 		if ( '' === $description ) {
 			$description = $title;
@@ -297,8 +297,9 @@ class Sitemap_Enhancer {
 				'image:loc' => $url,
 			);
 
-			if ( $caption ) {
-				$image_entry['image:caption'] = wp_strip_all_tags( $caption );
+			$caption = self::plain_text( $caption );
+			if ( '' !== $caption ) {
+				$image_entry['image:caption'] = $caption;
 			}
 
 			$images[] = $image_entry;
@@ -934,11 +935,36 @@ class Sitemap_Enhancer {
 	/**
 	 * Escape a value for XML text or attribute content.
 	 *
+	 * Characters XML 1.0 does not allow (most C0 controls, U+FFFE/U+FFFF)
+	 * are dropped and invalid UTF-8 is substituted, so one bad title cannot
+	 * make the whole sitemap unparseable. Values must be plain text: entities
+	 * are escaped, not interpreted (see plain_text()).
+	 *
 	 * @param mixed $value Value.
 	 * @return string
 	 */
 	private static function xml_escape( $value ) {
-		return htmlspecialchars( (string) $value, ENT_QUOTES | ENT_XML1, 'UTF-8' );
+		$value = htmlspecialchars( (string) $value, ENT_QUOTES | ENT_XML1 | ENT_SUBSTITUTE, 'UTF-8' );
+		$clean = preg_replace( '/[^\x{9}\x{A}\x{D}\x{20}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', '', $value );
+
+		return is_string( $clean ) ? $clean : '';
+	}
+
+	/**
+	 * Turn a WordPress display string into plain text for XML output.
+	 *
+	 * Titles and excerpts from WordPress are HTML: texturized and entity-encoded
+	 * ("&#8217;", "&amp;"). Tags are stripped and entities decoded so that
+	 * xml_escape() encodes each character exactly once.
+	 *
+	 * @param mixed $value HTML-ish text.
+	 * @return string
+	 */
+	private static function plain_text( $value ) {
+		$value = wp_strip_all_tags( (string) $value );
+		$value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+		return trim( $value );
 	}
 
 	/**
@@ -2078,7 +2104,7 @@ class Sitemap_Enhancer {
 				<news:language><?php echo esc_attr( get_locale() ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php echo esc_html( get_post_time( DATE_W3C, true, $post ) ); ?></news:publication_date>
-			<news:title><?php echo esc_html( get_the_title( $post ) ); ?></news:title>
+			<news:title><?php echo self::xml_escape( self::plain_text( get_the_title( $post ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML-escaped. ?></news:title>
 		</news:news>
 	</url>
 	<?php endforeach; ?>
@@ -2122,7 +2148,7 @@ class Sitemap_Enhancer {
 			$post   = $item['post'];
 			$videos = $item['videos'];
 			foreach ( $videos as $video ) :
-				$title       = trim( wp_strip_all_tags( (string) get_the_title( $post ) ) );
+				$title       = self::plain_text( get_the_title( $post ) );
 				$description = $this->get_video_description( $post->ID, $title );
 				$thumbnail   = '';
 
@@ -2150,8 +2176,8 @@ class Sitemap_Enhancer {
 		<loc><?php echo esc_url( get_permalink( $post ) ); ?></loc>
 		<video:video>
 			<video:thumbnail_loc><?php echo esc_url( $thumbnail ); ?></video:thumbnail_loc>
-			<video:title><?php echo esc_html( $title ); ?></video:title>
-			<video:description><?php echo esc_html( $description ); ?></video:description>
+			<video:title><?php echo self::xml_escape( $title ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML-escaped. ?></video:title>
+			<video:description><?php echo self::xml_escape( $description ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML-escaped. ?></video:description>
 			<video:player_loc><?php echo esc_url( $player_loc ); ?></video:player_loc>
 			<video:publication_date><?php echo esc_html( get_post_time( DATE_W3C, true, $post ) ); ?></video:publication_date>
 		</video:video>

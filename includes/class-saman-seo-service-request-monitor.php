@@ -83,7 +83,12 @@ class Request_Monitor {
 	 * @return void
 	 */
 	public function boot() {
-		$this->maybe_upgrade_schema();
+		// Schema migrations (ALTER TABLE, data backfills) never run on a
+		// visitor's request. Until they succeed, logging uses the legacy
+		// write path, see maybe_log_404().
+		if ( self::is_maintenance_context() ) {
+			$this->maybe_upgrade_schema();
+		}
 
 		if ( ! \Saman\SEO\Helpers\module_enabled( '404_log' ) ) {
 			$this->unschedule_cleanup();
@@ -95,6 +100,30 @@ class Request_Monitor {
 		// Setup scheduled cleanup.
 		add_action( self::CLEANUP_HOOK, array( $this, 'run_scheduled_cleanup' ) );
 		$this->maybe_schedule_cleanup();
+	}
+
+	/**
+	 * Whether this request may run schema migrations: admin screens, cron
+	 * and WP-CLI.
+	 *
+	 * @return bool
+	 */
+	public static function is_maintenance_context() {
+		if ( is_admin() || wp_doing_cron() ) {
+			return true;
+		}
+
+		return defined( 'WP_CLI' ) && WP_CLI;
+	}
+
+	/**
+	 * Whether the unique uri_hash index is in place, so 404s can be written
+	 * with a single upsert.
+	 *
+	 * @return bool
+	 */
+	private function has_upsert_schema() {
+		return (int) get_option( self::SCHEMA_OPTION, 0 ) >= self::SCHEMA_VERSION;
 	}
 
 	/**
@@ -178,7 +207,8 @@ class Request_Monitor {
 	 *
 	 * When the cleanup settings have never been saved (neither the individual
 	 * option nor the legacy consolidated array holds them), retention defaults
-	 * to DEFAULT_RETENTION_DAYS. An explicitly saved "off" is respected.
+	 * to DEFAULT_RETENTION_DAYS. An explicitly saved "off" ('', '0' or false)
+	 * is respected.
 	 *
 	 * @return int Days to keep, or 0 when age-based cleanup is disabled.
 	 */
@@ -695,6 +725,14 @@ class Request_Monitor {
 		$ip_address = $this->get_client_ip( $settings );
 		$uri_hash   = self::uri_hash( $request );
 
+		// Before the v8 migration has added uri_hash and its unique index,
+		// the upsert would fail (or insert duplicates), so use the old
+		// read-then-write path until then.
+		if ( ! $this->has_upsert_schema() ) {
+			$this->log_404_legacy( $request, $user_agent, $device, $now, $is_bot, $referrer, $ip_address );
+			return;
+		}
+
 		global $wpdb;
 
 		// One atomic upsert keyed on the unique uri_hash: concurrent hits on
@@ -743,6 +781,75 @@ class Request_Monitor {
 	}
 
 	/**
+	 * Legacy 404 write: look the row up by request_uri, then update or insert.
+	 *
+	 * Used only while the v8 schema migration is pending. It does not touch
+	 * uri_hash (the column may not exist yet); the migration backfills it.
+	 *
+	 * @param string $request    Normalised request path.
+	 * @param string $user_agent User agent.
+	 * @param string $device     Device label.
+	 * @param string $now        Current site time (mysql format).
+	 * @param int    $is_bot     Bot flag.
+	 * @param string $referrer   Referrer.
+	 * @param string $ip_address Client IP (possibly anonymized or empty).
+	 * @return void
+	 */
+	private function log_404_legacy( $request, $user_agent, $device, $now, $is_bot, $referrer, $ip_address ) {
+		global $wpdb;
+
+		$user_agent = $this->fit_column( 'user_agent', $user_agent );
+		$device     = $this->fit_column( 'device_label', $device );
+		$referrer   = $this->fit_column( 'referrer', $referrer );
+		$ip_address = $this->fit_column( 'ip_address', $ip_address );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Reading the custom 404 log table, table name is safe.
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT id, hits, user_agent, is_bot FROM {$this->table} WHERE request_uri = %s LIMIT 1", $request ) );
+
+		if ( ! $row ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Inserting into the custom 404 log table.
+			$wpdb->insert(
+				$this->table,
+				array(
+					'request_uri'  => $request,
+					'user_agent'   => $user_agent,
+					'device_label' => $device,
+					'hits'         => 1,
+					'last_seen'    => $now,
+					'first_seen'   => $now,
+					'is_bot'       => $is_bot,
+					'referrer'     => $referrer,
+					'ip_address'   => $ip_address,
+				),
+				array( '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s', '%s' )
+			);
+			return;
+		}
+
+		$hits = (int) $row->hits + 1;
+		$data = array(
+			'hits'         => $hits,
+			'last_seen'    => $now,
+			'user_agent'   => '' !== $user_agent ? $user_agent : (string) ( $row->user_agent ?? '' ),
+			'device_label' => $device,
+			'ip_address'   => $ip_address,
+		);
+
+		if ( '' !== $referrer ) {
+			$data['referrer'] = $referrer;
+		}
+
+		if ( $is_bot && empty( $row->is_bot ) ) {
+			$data['is_bot'] = 1;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Updating the custom 404 log table.
+		$wpdb->update( $this->table, $data, array( 'id' => (int) $row->id ) );
+
+		$this->maybe_send_notification( $request, $hits, (int) $row->id );
+	}
+
+	/**
 	 * Get 404 log privacy/logging settings.
 	 *
 	 * @return array
@@ -770,8 +877,10 @@ class Request_Monitor {
 	 * @return mixed
 	 */
 	private function get_404_option( $key, $default = false ) {
-		$individual = get_option( 'SAMAN_SEO_' . $key );
-		if ( false !== $individual ) {
+		// A null default tells "never saved" apart from a stored false,
+		// which is an explicit "off" and must not fall through.
+		$individual = get_option( 'SAMAN_SEO_' . $key, null );
+		if ( null !== $individual ) {
 			return $individual;
 		}
 

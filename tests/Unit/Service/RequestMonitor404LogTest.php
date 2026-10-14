@@ -182,6 +182,19 @@ class RequestMonitor404LogTest extends TestCase {
 			}
 
 			/**
+			 * Record update.
+			 *
+			 * @param string $table Table.
+			 * @param array  $data  Data.
+			 * @param array  $where Where.
+			 * @return int
+			 */
+			public function update( $table, $data, $where ) {
+				$this->calls[] = array( 'update', $data, $where );
+				return 1;
+			}
+
+			/**
 			 * Record delete.
 			 *
 			 * @param string $table Table.
@@ -239,6 +252,16 @@ class RequestMonitor404LogTest extends TestCase {
 	 */
 	public function test_retention_respects_legacy_disable(): void {
 		self::$options['SAMAN_SEO_settings'] = array( 'enable_404_cleanup' => false );
+
+		$this->assertSame( 0, ( new Request_Monitor() )->get_retention_days() );
+	}
+
+	/**
+	 * A boolean false still cached after update_option( ..., false ) is an
+	 * explicit "off", not "never saved".
+	 */
+	public function test_retention_respects_stored_boolean_false(): void {
+		self::$options['SAMAN_SEO_enable_404_cleanup'] = false;
 
 		$this->assertSame( 0, ( new Request_Monitor() )->get_retention_days() );
 	}
@@ -439,6 +462,7 @@ class RequestMonitor404LogTest extends TestCase {
 	 */
 	public function test_logging_a_404_is_a_single_upsert(): void {
 		$this->set_context( 'is_404', true );
+		self::$options['SAMAN_SEO_404_log_schema']                = '8';
 		self::$options[ Request_Monitor::PATTERNS_CACHE_OPTION ] = array();
 
 		$_SERVER['REQUEST_URI']     = '/Missing/Page/?utm=1';
@@ -461,6 +485,7 @@ class RequestMonitor404LogTest extends TestCase {
 	 */
 	public function test_long_values_are_truncated(): void {
 		$this->set_context( 'is_404', true );
+		self::$options['SAMAN_SEO_404_log_schema']                = '8';
 		self::$options[ Request_Monitor::PATTERNS_CACHE_OPTION ] = array();
 
 		$_SERVER['REQUEST_URI'] = '/' . str_repeat( 'a', 400 );
@@ -477,6 +502,7 @@ class RequestMonitor404LogTest extends TestCase {
 	 */
 	public function test_notifications_read_back_the_row(): void {
 		$this->set_context( 'is_404', true );
+		self::$options['SAMAN_SEO_404_log_schema']                = '8';
 		self::$options[ Request_Monitor::PATTERNS_CACHE_OPTION ] = array();
 		self::$options['SAMAN_SEO_enable_404_notifications']     = '1';
 		self::$options['SAMAN_SEO_notification_404_threshold']   = 99;
@@ -515,5 +541,111 @@ class RequestMonitor404LogTest extends TestCase {
 		( new Request_Monitor() )->maybe_log_404();
 
 		$this->assertSame( array(), $this->db->calls );
+	}
+
+	// ------------------------------------------------------------------
+	// Schema migration gating.
+	// ------------------------------------------------------------------
+
+	/**
+	 * Before the v8 migration, a new URL is inserted the old way, without
+	 * touching uri_hash.
+	 */
+	public function test_legacy_write_inserts_before_v8(): void {
+		$this->set_context( 'is_404', true );
+		self::$options['SAMAN_SEO_404_log_schema']                = '7';
+		self::$options[ Request_Monitor::PATTERNS_CACHE_OPTION ] = array();
+
+		$_SERVER['REQUEST_URI'] = '/Missing/';
+
+		( new Request_Monitor() )->maybe_log_404();
+
+		$this->assertCount( 0, $this->db->calls_of( 'query' ), 'No upsert against a missing unique index.' );
+
+		$reads = $this->db->calls_of( 'get_row' );
+		$this->assertCount( 1, $reads );
+		$this->assertStringContainsString( 'WHERE request_uri = %s', $reads[0][1]['sql'] );
+		$this->assertSame( array( '/Missing' ), $reads[0][1]['args'] );
+
+		$inserts = $this->db->calls_of( 'insert' );
+		$this->assertCount( 1, $inserts );
+		$this->assertSame( '/Missing', $inserts[0][1]['request_uri'] );
+		$this->assertSame( 1, $inserts[0][1]['hits'] );
+		$this->assertArrayNotHasKey( 'uri_hash', $inserts[0][1] );
+	}
+
+	/**
+	 * Before the v8 migration, a known URL has its row incremented.
+	 */
+	public function test_legacy_write_updates_existing_row(): void {
+		$this->set_context( 'is_404', true );
+		self::$options[ Request_Monitor::PATTERNS_CACHE_OPTION ] = array();
+
+		$_SERVER['REQUEST_URI'] = '/gone';
+		$this->db->rows         = array(
+			(object) array(
+				'id'         => 9,
+				'hits'       => 4,
+				'user_agent' => 'Old UA',
+				'is_bot'     => 0,
+			),
+		);
+
+		( new Request_Monitor() )->maybe_log_404();
+
+		$updates = $this->db->calls_of( 'update' );
+		$this->assertCount( 1, $updates );
+		$this->assertSame( 5, $updates[0][1]['hits'] );
+		$this->assertSame( 'Old UA', $updates[0][1]['user_agent'] );
+		$this->assertSame( array( 'id' => 9 ), $updates[0][2] );
+		$this->assertCount( 0, $this->db->calls_of( 'insert' ) );
+		$this->assertCount( 0, $this->db->calls_of( 'query' ) );
+	}
+
+	/**
+	 * Front-end requests never start the schema migration.
+	 */
+	public function test_boot_skips_migration_on_front_end(): void {
+		$transients = array();
+		Functions\when( 'is_admin' )->justReturn( false );
+		Functions\when( 'wp_doing_cron' )->justReturn( false );
+		Functions\when( 'get_transient' )->alias(
+			static function ( $key ) use ( &$transients ) {
+				$transients[] = $key;
+				return false;
+			}
+		);
+		Functions\when( 'set_transient' )->justReturn( true );
+		self::$options['SAMAN_SEO_module_404_log'] = '0';
+		Functions\when( 'wp_next_scheduled' )->justReturn( false );
+
+		( new Request_Monitor() )->boot();
+
+		$this->assertSame( array(), $transients, 'Migration lock never checked.' );
+		$this->assertSame( array(), $this->db->calls );
+		$this->assertFalse( Request_Monitor::is_maintenance_context() );
+	}
+
+	/**
+	 * Admin and cron requests run the migration (here: blocked by the lock).
+	 */
+	public function test_boot_runs_migration_in_admin_and_cron(): void {
+		foreach ( array( array( true, false ), array( false, true ) ) as $context ) {
+			$transients = array();
+			Functions\when( 'is_admin' )->justReturn( $context[0] );
+			Functions\when( 'wp_doing_cron' )->justReturn( $context[1] );
+			Functions\when( 'get_transient' )->alias(
+				static function ( $key ) use ( &$transients ) {
+					$transients[] = $key;
+					return 1;
+				}
+			);
+			self::$options['SAMAN_SEO_module_404_log'] = '0';
+			Functions\when( 'wp_next_scheduled' )->justReturn( false );
+
+			( new Request_Monitor() )->boot();
+
+			$this->assertSame( array( 'SAMAN_SEO_404_log_migrating' ), $transients );
+		}
 	}
 }

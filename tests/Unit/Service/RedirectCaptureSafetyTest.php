@@ -120,6 +120,20 @@ class RedirectCaptureSafetyTest extends TestCase {
 	}
 
 	/**
+	 * The configured host is allowed as typed and lowercased, because
+	 * wp_validate_redirect() compares hosts case-sensitively.
+	 */
+	public function test_configured_redirect_hosts_keep_original_case(): void {
+		$this->assertSame(
+			array( 'shop.example.com', 'Shop.Example.com' ),
+			$this->service->configured_redirect_hosts( 'https://Shop.Example.com/x' )
+		);
+		$this->assertSame( array( 'shop.example.com' ), $this->service->configured_redirect_hosts( 'https://shop.example.com/x' ) );
+		$this->assertSame( array(), $this->service->configured_redirect_hosts( 'https://$1.Example.com/' ) );
+		$this->assertSame( array(), $this->service->configured_redirect_hosts( '/relative/' ) );
+	}
+
+	/**
 	 * A broken admin regex is skipped instead of breaking the request.
 	 */
 	public function test_invalid_regex_is_skipped(): void {

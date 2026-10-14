@@ -22,12 +22,27 @@ class Post_Meta {
 	const META_KEY = '_SAMAN_SEO_meta';
 
 	/**
+	 * Post types the meta field has been registered for.
+	 *
+	 * @var array<string,bool>
+	 */
+	private $registered_types = array();
+
+	/**
+	 * Whether the init-time registration has run.
+	 *
+	 * @var bool
+	 */
+	private $initial_registration_done = false;
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
 	 */
 	public function boot() {
 		add_action( 'init', array( $this, 'register_meta' ), 99 );
+		add_action( 'registered_post_type', array( $this, 'register_meta_for_late_post_type' ), 10, 1 );
 		add_action( 'save_post', array( $this, 'save_meta' ), 10, 2 );
 	}
 
@@ -37,9 +52,92 @@ class Post_Meta {
 	 * @return void
 	 */
 	public function register_meta() {
-		$schema = array(
-			'type'       => 'object',
-			'properties' => array(
+		// Register for every post type the editor panel appears on, not just
+		// posts and pages, so block-editor saves on custom post types persist.
+		foreach ( self::get_supported_post_types() as $post_type ) {
+			$this->register_meta_for_post_type( $post_type );
+		}
+
+		$this->initial_registration_done = true;
+	}
+
+	/**
+	 * Register the meta field for a post type registered after init:99.
+	 *
+	 * Types registered earlier are covered by register_meta(). Later ones
+	 * (late init callbacks, wp_loaded, ...) go through the same eligibility
+	 * rules and filter via get_supported_post_types().
+	 *
+	 * @param string $post_type Post type name.
+	 * @return void
+	 */
+	public function register_meta_for_late_post_type( $post_type ) {
+		if ( ! $this->initial_registration_done ) {
+			return;
+		}
+
+		$post_type = (string) $post_type;
+
+		if ( isset( $this->registered_types[ $post_type ] ) ) {
+			return;
+		}
+
+		if ( in_array( $post_type, self::get_supported_post_types(), true ) ) {
+			$this->register_meta_for_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Register the SEO meta field for one post type.
+	 *
+	 * The REST API only exposes meta for types supporting custom-fields, so
+	 * support is added when missing.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return void
+	 */
+	public function register_meta_for_post_type( $post_type ) {
+		if ( ! post_type_supports( $post_type, 'custom-fields' ) ) {
+			add_post_type_support( $post_type, 'custom-fields' );
+		}
+
+		register_post_meta(
+			$post_type,
+			self::META_KEY,
+			array(
+				'type'              => 'object',
+				'single'            => true,
+				'show_in_rest'      => array(
+					'schema' => self::get_rest_schema(),
+				),
+				'default'           => array(),
+				'auth_callback'     => static function ( $allowed, $meta_key, $object_id ) {
+					return current_user_can( 'edit_post', $object_id );
+				},
+				'sanitize_callback' => array( $this, 'sanitize' ),
+			)
+		);
+
+		$this->registered_types[ $post_type ] = true;
+	}
+
+	/**
+	 * REST schema for the meta object.
+	 *
+	 * Every object level sets additionalProperties explicitly: core defaults
+	 * it to false for registered meta, and a stored value with a key the
+	 * schema does not list (recipe/event fields, keys written by older
+	 * versions) would then fail validation and the whole field would be
+	 * returned as null. The editor would save that null back over the data.
+	 * sanitize() decides what is persisted, not the REST schema.
+	 *
+	 * @return array
+	 */
+	public static function get_rest_schema() {
+		return array(
+			'type'                 => 'object',
+			'additionalProperties' => true,
+			'properties'           => array(
 				'title'                => array(
 					'type' => 'string',
 				),
@@ -92,39 +190,15 @@ class Post_Meta {
 					'type' => 'string',
 				),
 				'recipe'               => array(
-					'type' => 'object',
+					'type'                 => 'object',
+					'additionalProperties' => true,
 				),
 				'event'                => array(
-					'type' => 'object',
+					'type'                 => 'object',
+					'additionalProperties' => true,
 				),
 			),
 		);
-
-		// Register for every post type the editor panel appears on, not just
-		// posts and pages, so block-editor saves on custom post types persist.
-		// The REST API only exposes meta for types supporting custom-fields.
-		foreach ( self::get_supported_post_types() as $post_type ) {
-			if ( ! post_type_supports( $post_type, 'custom-fields' ) ) {
-				add_post_type_support( $post_type, 'custom-fields' );
-			}
-
-			register_post_meta(
-				$post_type,
-				self::META_KEY,
-				array(
-					'type'              => 'object',
-					'single'            => true,
-					'show_in_rest'      => array(
-						'schema' => $schema,
-					),
-					'default'           => array(),
-					'auth_callback'     => static function ( $allowed, $meta_key, $object_id ) {
-						return current_user_can( 'edit_post', $object_id );
-					},
-					'sanitize_callback' => array( $this, 'sanitize' ),
-				)
-			);
-		}
 	}
 
 	/**

@@ -645,7 +645,8 @@ class Tools_Controller extends REST_Controller {
 			$meta['description'] = sanitize_textarea_field( $data['description'] );
 		}
 
-		update_post_meta( $post_id, '_SAMAN_SEO_meta', $meta );
+		// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+		update_post_meta( $post_id, '_SAMAN_SEO_meta', wp_slash( $meta ) );
 	}
 
 	// =========================================================================
@@ -1240,11 +1241,14 @@ class Tools_Controller extends REST_Controller {
 	 * array (see Service\JsonLD::build_payload()). The value is merged into
 	 * the existing array so other SEO fields are kept.
 	 *
-	 * update_post_meta() unslashes its value, and the registered sanitize
-	 * callback for that key may unslash custom_schema a second time, which
-	 * would strip the backslashes JSON escapes rely on. The stored value is
-	 * read back and the write repeated with one extra slash level when that
-	 * happened, so the saved JSON always decodes to the submitted schema.
+	 * update_post_meta() unslashes its value once, so the whole array is
+	 * slashed (as every other writer of this key does). Post_Meta::sanitize()
+	 * does not unslash again, so the first write normally round-trips. In
+	 * case a third-party sanitize filter unslashes custom_schema a second
+	 * time, the write is retried with one extra slash level. If neither
+	 * write reproduces the schema exactly but the first one stored valid
+	 * JSON (a filter altered string content), that first result is kept
+	 * rather than the over-slashed retry.
 	 *
 	 * @param int   $post_id Post ID.
 	 * @param array $schema  Decoded schema.
@@ -1268,6 +1272,8 @@ class Tools_Controller extends REST_Controller {
 			return true;
 		}
 
+		$first = get_post_meta( $post_id, $meta_key, true );
+
 		$meta['custom_schema'] = wp_slash( $json );
 		update_post_meta( $post_id, $meta_key, wp_slash( $meta ) );
 
@@ -1275,10 +1281,20 @@ class Tools_Controller extends REST_Controller {
 			return true;
 		}
 
-		// The sanitize callback may still alter string content (kses); accept
-		// the result as long as it is valid JSON the front end can inject.
-		$stored = get_post_meta( $post_id, $meta_key, true );
+		if ( self::has_valid_custom_schema( $first ) ) {
+			update_post_meta( $post_id, $meta_key, wp_slash( $first ) );
+		}
 
+		return self::has_valid_custom_schema( get_post_meta( $post_id, $meta_key, true ) );
+	}
+
+	/**
+	 * Whether a stored meta array holds custom_schema that decodes to JSON.
+	 *
+	 * @param mixed $stored Stored meta value.
+	 * @return bool
+	 */
+	private static function has_valid_custom_schema( $stored ) {
 		return is_array( $stored ) && isset( $stored['custom_schema'] ) && is_string( $stored['custom_schema'] )
 			&& is_array( json_decode( $stored['custom_schema'], true ) );
 	}

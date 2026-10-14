@@ -236,7 +236,7 @@ class Settings_Controller extends REST_Controller {
 			}
 
 			$sanitized[ $key ] = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
-			update_option( 'SAMAN_SEO_' . $key, $sanitized[ $key ] );
+			update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $sanitized[ $key ], $allowed[ $key ] ) );
 		}
 
 		// Sync breadcrumb settings to consolidated option for the service.
@@ -410,6 +410,27 @@ class Settings_Controller extends REST_Controller {
 	}
 
 	/**
+	 * Convert a sanitized setting to the value written to its option.
+	 *
+	 * Booleans are stored as '1' / '' rather than true / false: update_option()
+	 * treats false as "unchanged" when the option does not exist yet, so
+	 * switching off a setting whose default is on would silently do nothing.
+	 * '' is what WordPress already writes for false, so readers (empty(),
+	 * '1' === checks, and the React UI) see the same values as before.
+	 *
+	 * @param mixed  $value Sanitized value.
+	 * @param string $type  Registered type.
+	 * @return mixed
+	 */
+	private function to_option_value( $value, $type ) {
+		if ( 'bool' === $type ) {
+			return $value ? '1' : '';
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Sync breadcrumb settings to the consolidated option.
 	 *
 	 * @param array $settings All settings from request.
@@ -504,7 +525,7 @@ class Settings_Controller extends REST_Controller {
 
 		$value = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
 
-		update_option( 'SAMAN_SEO_' . $key, $value );
+		update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $value, $allowed[ $key ] ) );
 
 		return $this->success(
 			array(

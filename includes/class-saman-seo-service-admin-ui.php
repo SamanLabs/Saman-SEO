@@ -705,7 +705,8 @@ class Admin_UI {
 				$meta['description'] = $post ? \Saman\SEO\Helpers\generate_content_snippet( $post, 30 ) : '';
 			}
 
-			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+			// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+			update_post_meta( $post_id, Post_Meta::META_KEY, wp_slash( $meta ) );
 			++$updated;
 		}
 
@@ -729,7 +730,7 @@ class Admin_UI {
 
 		$meta            = (array) get_post_meta( $post_id, Post_Meta::META_KEY, true );
 		$meta['noindex'] = empty( $meta['noindex'] ) ? '1' : '';
-		update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+		update_post_meta( $post_id, Post_Meta::META_KEY, wp_slash( $meta ) );
 
 		$redirect_url = wp_get_referer();
 		$redirect_url = $redirect_url ? $redirect_url : admin_url();

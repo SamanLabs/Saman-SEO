@@ -108,6 +108,12 @@ class Settings {
 		'SAMAN_SEO_404_log_referer'                  => '1',
 		'SAMAN_SEO_404_log_ignore_bots'              => '0',
 
+		// 404 log retention. Stored up front so switching cleanup off is a
+		// real option change (update_option() ignores false on a missing
+		// option, which made the toggle snap back on).
+		'SAMAN_SEO_enable_404_cleanup'               => '1',
+		'SAMAN_SEO_cleanup_404_days'                 => '30',
+
 		// Data cleanup.
 		'SAMAN_SEO_delete_data_on_uninstall'         => '0',
 
@@ -251,6 +257,21 @@ class Settings {
 	 * @return void
 	 */
 	public function install_default_options() {
+		// 404 retention may only exist in the legacy consolidated array.
+		// Carry it over first so an old "off" is not replaced by the default.
+		$legacy = get_option( 'SAMAN_SEO_settings', array() );
+		if ( is_array( $legacy ) ) {
+			if ( isset( $legacy['enable_404_cleanup'] ) ) {
+				$enabled = $legacy['enable_404_cleanup'];
+				$enabled = is_string( $enabled ) ? filter_var( $enabled, FILTER_VALIDATE_BOOLEAN ) : ! empty( $enabled );
+				add_option( 'SAMAN_SEO_enable_404_cleanup', $enabled ? '1' : '' );
+			}
+
+			if ( isset( $legacy['cleanup_404_days'] ) && absint( $legacy['cleanup_404_days'] ) > 0 ) {
+				add_option( 'SAMAN_SEO_cleanup_404_days', (string) absint( $legacy['cleanup_404_days'] ) );
+			}
+		}
+
 		foreach ( $this->defaults as $key => $default ) {
 			add_option( $key, $default );
 		}

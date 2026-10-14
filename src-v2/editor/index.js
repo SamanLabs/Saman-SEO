@@ -88,6 +88,9 @@ const SEOModalPlugin = () => {
 	const [ hasChanges, setHasChanges ] = useState( false );
 	const [ variableValues, setVariableValues ] = useState( {} );
 	const wasOpenRef = useRef( false );
+	// Post ID whose stored meta has been copied into local state. Until it
+	// matches, edits are ignored so blank fields never overwrite stored meta.
+	const loadedPostIdRef = useRef( null );
 
 	// Check if our sidebar is active
 	const isSidebarActive = useSelect(
@@ -148,9 +151,12 @@ const SEOModalPlugin = () => {
 		postType,
 		postSlug,
 		featuredImage,
+		storedSeoMeta,
+		isMetaReady,
 	} = useSelect( ( select ) => {
 		const editor = select( 'core/editor' );
 		const post = editor.getCurrentPost();
+		const editedMeta = editor.getEditedPostAttribute( 'meta' );
 		const featuredImageId =
 			editor.getEditedPostAttribute( 'featured_media' );
 		let featuredImageUrl = '';
@@ -168,55 +174,42 @@ const SEOModalPlugin = () => {
 			postType: editor.getCurrentPostType(),
 			postSlug: post?.slug || '',
 			featuredImage: featuredImageUrl,
+			// The editor already holds the post's meta (whatever its REST
+			// base), so read it from the store instead of refetching.
+			storedSeoMeta: editedMeta?._SAMAN_SEO_meta,
+			isMetaReady:
+				!! editor.getCurrentPostId() &&
+				( !! editedMeta || !! post?.id ),
 		};
 	}, [] );
 	const { editPost } = useDispatch( 'core/editor' );
 
-	// Get post type REST base
-	const getRestBase = ( type ) => {
-		// Common post type mappings
-		const bases = {
-			post: 'posts',
-			page: 'pages',
-			attachment: 'media',
-		};
-		return bases[ type ] || type;
-	};
-
-	// Load initial meta from post
+	// Load initial meta from the editor store, once per post. Later store
+	// changes come from updateMeta() itself, so local state is not reset.
 	useEffect( () => {
-		if ( ! postId || ! postType ) {
+		if ( ! isMetaReady || loadedPostIdRef.current === postId ) {
 			return;
 		}
-		const restBase = getRestBase( postType );
-		apiFetch( {
-			path: `/wp/v2/${ restBase }/${ postId }`,
-		} )
-			.then( ( post ) => {
-				if ( post.meta && post.meta._SAMAN_SEO_meta ) {
-					const meta = post.meta._SAMAN_SEO_meta;
-					setSeoMeta( {
-						title: meta.title || '',
-						description: meta.description || '',
-						canonical: meta.canonical || '',
-						noindex: meta.noindex === '1',
-						nofollow: meta.nofollow === '1',
-						sitemap_exclude: meta.sitemap_exclude === '1',
-						og_image: meta.og_image || '',
-						focus_keyphrase: meta.focus_keyphrase || '',
-						schema_type: meta.schema_type || '',
-						secondary_keyphrases: Array.isArray(
-							meta.secondary_keyphrases
-						)
-							? meta.secondary_keyphrases
-							: [],
-					} );
-				}
-			} )
-			.catch( () => {
-				// Post meta might not exist yet
-			} );
-	}, [ postId, postType ] );
+		const meta =
+			storedSeoMeta && typeof storedSeoMeta === 'object'
+				? storedSeoMeta
+				: {};
+		setSeoMeta( {
+			title: meta.title || '',
+			description: meta.description || '',
+			canonical: meta.canonical || '',
+			noindex: meta.noindex === '1',
+			nofollow: meta.nofollow === '1',
+			sitemap_exclude: meta.sitemap_exclude === '1',
+			og_image: meta.og_image || '',
+			focus_keyphrase: meta.focus_keyphrase || '',
+			schema_type: meta.schema_type || '',
+			secondary_keyphrases: Array.isArray( meta.secondary_keyphrases )
+				? meta.secondary_keyphrases
+				: [],
+		} );
+		loadedPostIdRef.current = postId;
+	}, [ isMetaReady, postId, storedSeoMeta ] );
 
 	// Calculate SEO score
 	useEffect( () => {
@@ -255,6 +248,12 @@ const SEOModalPlugin = () => {
 	// Update meta field
 	const updateMeta = useCallback(
 		( field, value ) => {
+			// Never write before the stored meta is loaded: the local state
+			// is still blank and would overwrite it.
+			if ( ! postId || loadedPostIdRef.current !== postId ) {
+				return;
+			}
+
 			setSeoMeta( ( prev ) => ( {
 				...prev,
 				[ field ]: value,
@@ -299,7 +298,7 @@ const SEOModalPlugin = () => {
 				},
 			} );
 		},
-		[ seoMeta, editPost ]
+		[ seoMeta, editPost, postId ]
 	);
 
 	// Get effective title and description (with fallbacks).

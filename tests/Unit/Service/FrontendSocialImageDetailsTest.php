@@ -245,5 +245,48 @@ class FrontendSocialImageDetailsTest extends TestCase {
 		$this->assertArrayNotHasKey( 'twitter:image:alt', $tags );
 		$this->assertArrayNotHasKey( 'og:image:alt', $tags );
 	}
+
+	/**
+	 * A filter returning an array with a 'url' key still gets details,
+	 * without an "Array to string conversion" notice.
+	 */
+	public function test_filtered_array_image_with_url_gets_details(): void {
+		$this->make_post();
+		add_filter(
+			'saman_seo_og_image',
+			static function () {
+				return array( 'url' => 'https://example.org/wp-content/uploads/cover.jpg' );
+			}
+		);
+
+		$tags = $this->render();
+
+		$this->assertSame( '1200', $tags['og:image:width'] );
+	}
+
+	/**
+	 * Other non-string filter results are skipped for details.
+	 */
+	public function test_filtered_non_string_image_skips_details(): void {
+		$this->make_post();
+		add_filter(
+			'saman_seo_og_image',
+			static function () {
+				return array( 'https://example.org/wp-content/uploads/cover.jpg', 'https://example.org/b.jpg' );
+			}
+		);
+		add_filter(
+			'saman_seo_twitter_image',
+			static function () {
+				return 42;
+			}
+		);
+
+		$tags = $this->render();
+
+		$this->assertArrayNotHasKey( 'og:image:width', $tags );
+		$this->assertArrayNotHasKey( 'twitter:image:alt', $tags );
+		$this->assertSame( 0, $this->lookups );
+	}
 }
 }
