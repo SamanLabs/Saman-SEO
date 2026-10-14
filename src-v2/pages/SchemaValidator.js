@@ -430,10 +430,7 @@ const SchemaValidator = ( { onNavigate } ) => {
 																</span>
 																<span className="schema-property__value">
 																	{ typeof value ===
-																	__(
-																		'object',
-																		'saman-seo'
-																	)
+																	'object'
 																		? JSON.stringify(
 																				value,
 																				null,

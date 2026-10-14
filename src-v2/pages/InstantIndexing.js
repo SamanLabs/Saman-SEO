@@ -358,7 +358,199 @@ const InstantIndexing = ( { onNavigate } ) => {
 			</div>
 
 			{ /* Posts Tab */ }
-			{ __( 'Search posts\u2026', 'saman-seo' ) }
+			{ activeTab === 'posts' && (
+				<>
+					{ /* Filters */ }
+					<div className="table-toolbar">
+						<div className="table-toolbar-filters">
+							<select
+								value={ postType }
+								onChange={ ( e ) => {
+									setPostType( e.target.value );
+									setPage( 1 );
+								} }
+							>
+								{ postTypes.map( ( pt ) => (
+									<option key={ pt.name } value={ pt.name }>
+										{ pt.label }
+									</option>
+								) ) }
+							</select>
+							<select
+								value={ statusFilter }
+								onChange={ ( e ) => {
+									setStatusFilter( e.target.value );
+									setPage( 1 );
+								} }
+							>
+								<option value="">
+									{ __( 'All Status', 'saman-seo' ) }
+								</option>
+								<option value="never">
+									{ __( 'Not Submitted', 'saman-seo' ) }
+								</option>
+								<option value="indexed">
+									{ __( 'Indexed', 'saman-seo' ) }
+								</option>
+								<option value="failed">
+									{ __( 'Failed', 'saman-seo' ) }
+								</option>
+							</select>
+							<input
+								type="search"
+								className="search-input"
+								placeholder={ __(
+									'Search posts\u2026',
+									'saman-seo'
+								) }
+								value={ search }
+								onChange={ ( e ) => {
+									setSearch( e.target.value );
+									setPage( 1 );
+								} }
+							/>
+						</div>
+					</div>
+
+					{ /* Posts Table */ }
+					<table className="data-table">
+						<thead>
+							<tr>
+								<th className="checkbox-col">
+									<input
+										type="checkbox"
+										checked={
+											posts.length > 0 &&
+											selectedPosts.length ===
+												posts.length
+										}
+										onChange={ handleSelectAll }
+									/>
+								</th>
+								<th>{ __( 'Title', 'saman-seo' ) }</th>
+								<th>{ __( 'Status', 'saman-seo' ) }</th>
+								<th>{ __( 'Last Indexed', 'saman-seo' ) }</th>
+								<th>{ __( 'Actions', 'saman-seo' ) }</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ loading ? (
+								<tr>
+									<td colSpan="5" className="loading-cell">
+										{ __( 'Loading\u2026', 'saman-seo' ) }
+									</td>
+								</tr>
+							) : posts.length === 0 ? (
+								<tr>
+									<td colSpan="5" className="empty-cell">
+										{ __( 'No posts found.', 'saman-seo' ) }
+									</td>
+								</tr>
+							) : (
+								posts.map( ( post ) => (
+									<tr key={ post.id }>
+										<td className="checkbox-col">
+											<input
+												type="checkbox"
+												checked={ selectedPosts.includes(
+													post.id
+												) }
+												onChange={ () =>
+													handleSelectPost( post.id )
+												}
+											/>
+										</td>
+										<td>
+											<div className="post-cell">
+												<strong>
+													{ post.title ||
+														__(
+															'(no title)',
+															'saman-seo'
+														) }
+												</strong>
+												<a
+													href={ post.url }
+													target="_blank"
+													rel="noopener noreferrer"
+													className="post-cell__url"
+												>
+													{ post.url }
+												</a>
+											</div>
+										</td>
+										<td>
+											<StatusBadge
+												status={ post.indexing_status }
+											/>
+										</td>
+										<td>
+											{ post.last_indexed_ago || '-' }
+										</td>
+										<td>
+											<button
+												type="button"
+												className="button ghost small"
+												onClick={ () =>
+													handleSubmitSingle(
+														post.id
+													)
+												}
+												title={ __(
+													'Submit for indexing',
+													'saman-seo'
+												) }
+											>
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+												>
+													<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+												</svg>
+												{ __( 'Submit', 'saman-seo' ) }
+											</button>
+										</td>
+									</tr>
+								) )
+							) }
+						</tbody>
+					</table>
+
+					{ /* Pagination */ }
+					{ totalPages > 1 && (
+						<div className="pagination">
+							<button
+								type="button"
+								className="button ghost small"
+								disabled={ page === 1 }
+								onClick={ () => setPage( ( p ) => p - 1 ) }
+							>
+								{ __( 'Previous', 'saman-seo' ) }
+							</button>
+							<span className="pagination-info">
+								{ sprintf(
+									/* translators: 1: current page number, 2: total number of pages */
+									__( 'Page %1$d of %2$d', 'saman-seo' ),
+									page,
+									totalPages
+								) }
+							</span>
+							<button
+								type="button"
+								className="button ghost small"
+								disabled={ page === totalPages }
+								onClick={ () => setPage( ( p ) => p + 1 ) }
+							>
+								{ __( 'Next', 'saman-seo' ) }
+							</button>
+						</div>
+					) }
+				</>
+			) }
 
 			{ /* Logs Tab */ }
 			{ activeTab === 'logs' && (
