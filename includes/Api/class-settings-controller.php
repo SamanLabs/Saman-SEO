@@ -342,6 +342,13 @@ class Settings_Controller extends REST_Controller {
 			'redirect_monitor_post_types'      => 'array',
 			'redirect_monitor_trash'           => 'bool',
 
+			// 404 log retention and notifications.
+			'enable_404_cleanup'               => 'bool',
+			'cleanup_404_days'                 => 'int',
+			'enable_404_notifications'         => 'bool',
+			'notification_404_threshold'       => 'int',
+			'notification_404_email'           => 'text',
+
 			// 404 log privacy/logging settings.
 			'404_log_ip_level'                 => 'text',
 			'404_log_ip_header'                => 'text',

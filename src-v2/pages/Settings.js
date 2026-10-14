@@ -80,7 +80,7 @@ const defaultSettings = {
 	module_social_cards: true,
 	// 404 Monitor settings
 	show_404_dashboard_widget: true,
-	enable_404_cleanup: false,
+	enable_404_cleanup: true,
 	cleanup_404_days: 30,
 	enable_404_notifications: false,
 	notification_404_threshold: 10,
