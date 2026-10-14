@@ -15,9 +15,19 @@ import MetricsBreakdown from './MetricsBreakdown';
 import SchemaTypeSelector from './SchemaTypeSelector';
 import SchemaPreview from './SchemaPreview';
 import useSchemaPreview from '../hooks/useSchemaPreview';
+import SnippetControls, {
+	useSnippetMeta,
+	getSnippetDirectives,
+} from './SnippetControls';
+import { registerNoSnippetFormat } from '../formats/nosnippet';
 
 // Quick template presets for the editor
 import { __, sprintf } from '@wordpress/i18n';
+
+// "Exclude from snippets" (data-nosnippet) toolbar format. No-op outside the
+// block editor, so the classic bundle can share this module.
+registerNoSnippetFormat();
+
 const quickTemplates = [
 	{
 		id: 'standard',
@@ -73,6 +83,8 @@ const SEOPanel = ( {
 	aiPilot = null,
 } ) => {
 	const [ activeTab, setActiveTab ] = useState( 'general' );
+	const snippet = useSnippetMeta( seoMeta, updateMeta );
+	const snippetDirectives = getSnippetDirectives( snippet.values );
 	const [ showTemplates, setShowTemplates ] = useState( false );
 	const [ aiModal, setAiModal ] = useState( {
 		isOpen: false,
@@ -713,22 +725,29 @@ const SEOPanel = ( {
 						</label>
 					</div>
 
+					{ /* Snippet controls (nosnippet, max-snippet, ...) */ }
+					<SnippetControls
+						values={ snippet.values }
+						setValue={ snippet.setValue }
+						isBlockEditor={ snippet.isBlockEditor }
+					/>
+
 					{ /* Robots Preview */ }
 					<div className="saman-seo-robots-preview">
 						<label className="saman-seo-section-label">
 							{ __( 'Robots Meta', 'saman-seo' ) }
 						</label>
 						<code className="saman-seo-robots-code">
-							{ seoMeta.noindex || seoMeta.nofollow
-								? `${
-										seoMeta.noindex
-											? __( 'noindex', 'saman-seo' )
-											: __( 'index', 'saman-seo' )
-								  }, ${
+							{ seoMeta.noindex ||
+							seoMeta.nofollow ||
+							snippetDirectives.length
+								? [
+										seoMeta.noindex ? 'noindex' : 'index',
 										seoMeta.nofollow
-											? __( 'nofollow', 'saman-seo' )
-											: __( 'follow', 'saman-seo' )
-								  }`
+											? 'nofollow'
+											: 'follow',
+										...snippetDirectives,
+								  ].join( ', ' )
 								: __( 'index, follow (default)', 'saman-seo' ) }
 						</code>
 					</div>

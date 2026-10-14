@@ -8,7 +8,7 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { Modal } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { select as dataSelect, useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SEOPanel from './components/SEOPanel';
@@ -81,6 +81,7 @@ const SEOModalPlugin = () => {
 		og_image: '',
 		focus_keyphrase: '',
 		schema_type: '',
+		secondary_keyphrases: [],
 	} );
 	const [ seoScore, setSeoScore ] = useState( null );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -204,6 +205,11 @@ const SEOModalPlugin = () => {
 						og_image: meta.og_image || '',
 						focus_keyphrase: meta.focus_keyphrase || '',
 						schema_type: meta.schema_type || '',
+						secondary_keyphrases: Array.isArray(
+							meta.secondary_keyphrases
+						)
+							? meta.secondary_keyphrases
+							: [],
 					} );
 				}
 			} )
@@ -261,8 +267,22 @@ const SEOModalPlugin = () => {
 				[ field ]: value,
 			};
 
+			// Start from the meta the editor already holds so keys this
+			// panel doesn't manage (secondary keyphrases, custom schema,
+			// snippet controls, recipe/event data) survive the save.
+			const editedMeta =
+				dataSelect( 'core/editor' ).getEditedPostAttribute( 'meta' )
+					?._SAMAN_SEO_meta || {};
+
 			// Convert booleans to strings for storage
 			const metaForSave = {
+				...editedMeta,
+				...( newMeta.secondary_keyphrases !== undefined && {
+					secondary_keyphrases: newMeta.secondary_keyphrases,
+				} ),
+				...( newMeta.custom_schema !== undefined && {
+					custom_schema: newMeta.custom_schema,
+				} ),
 				title: newMeta.title,
 				description: newMeta.description,
 				canonical: newMeta.canonical,

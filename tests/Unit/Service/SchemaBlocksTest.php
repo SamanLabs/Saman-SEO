@@ -24,6 +24,7 @@ class SchemaBlocksTest extends TestCase {
 		$blocks = array();
 
 		Functions\when( 'wp_register_script' )->justReturn( true );
+		Functions\when( 'wp_set_script_translations' )->justReturn( true );
 		Functions\when( 'wp_register_style' )->alias(
 			static function ( $handle, $src ) use ( &$styles ) {
 				$styles[ $handle ] = $src;

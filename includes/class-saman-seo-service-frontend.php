@@ -32,6 +32,24 @@ class Frontend {
 	private $theme_renders_title = false;
 
 	/**
+	 * Attachment the unfiltered social image was resolved from, as
+	 * array( 'url' => string, 'id' => int ).
+	 *
+	 * @var array{url:string,id:int}
+	 */
+	private $social_image_source = array(
+		'url' => '',
+		'id'  => 0,
+	);
+
+	/**
+	 * Per-request cache of image URL => attachment ID (0 = not local).
+	 *
+	 * @var array<string,int>
+	 */
+	private $attachment_id_cache = array();
+
+	/**
 	 * Boot frontend hooks.
 	 *
 	 * @return void
@@ -498,6 +516,10 @@ class Frontend {
 		$image         = $this->get_social_image( $post, $meta, $social_defaults );
 		$twitter_image = saman_seo_apply_filters( 'saman_seo_twitter_image', $image, $post );
 
+		// Width/height/type/alt are only known for local attachments.
+		$image_details   = $this->get_social_image_details( (string) $image );
+		$twitter_details = ( $twitter_image === $image ) ? $image_details : $this->get_social_image_details( (string) $twitter_image );
+
 		$tags = array(
 			'og:title'            => $title,
 			'og:description'      => $description,
@@ -506,11 +528,17 @@ class Frontend {
 			'og:site_name'        => get_bloginfo( 'name' ),
 			'og:locale'           => get_locale(),
 			'og:image'            => $image,
+			'og:image:width'      => $image_details['width'],
+			'og:image:height'     => $image_details['height'],
+			'og:image:type'       => $image_details['type'],
+			'og:image:alt'        => $image_details['alt'],
 			'twitter:card'        => 'summary_large_image',
 			'twitter:title'       => $twitter_title,
 			'twitter:description' => $twitter_description,
 			'twitter:image'       => $twitter_image,
-			'twitter:image:alt'   => $twitter_title,
+			// The alt text describes the image, not the page: omit it
+			// rather than repeat the title when the image has none.
+			'twitter:image:alt'   => $twitter_details['alt'],
 		);
 
 		$tags = saman_seo_apply_filters( 'saman_seo_social_tags', $tags, $post, $meta, $social_defaults );
@@ -1033,6 +1061,11 @@ class Frontend {
 			$directives[] = 'nofollow';
 		}
 
+		// Per-post snippet controls. These also govern how the page may be
+		// shown in Google AI Overviews / AI Mode, so they sit at the top
+		// precedence tier and override the global setting.
+		$directives = array_merge( $directives, $this->get_post_snippet_directives( $meta ) );
+
 		$directives = array_values( array_filter( array_unique( array_map( 'trim', $directives ) ) ) );
 
 		// Precedence: per-post / request directives (above) > global setting >
@@ -1100,11 +1133,43 @@ class Frontend {
 	}
 
 	/**
+	 * Robots directives from the per-post snippet controls.
+	 *
+	 * Empty values inherit the global setting and add nothing here.
+	 *
+	 * @param array $meta Post SEO meta.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_post_snippet_directives( $meta ) {
+		$directives = array();
+
+		if ( ! empty( $meta['nosnippet'] ) ) {
+			$directives[] = 'nosnippet';
+		} elseif ( isset( $meta['max_snippet'] ) && is_numeric( $meta['max_snippet'] ) && '' !== trim( (string) $meta['max_snippet'] ) ) {
+			$directives[] = 'max-snippet:' . max( -1, (int) $meta['max_snippet'] );
+		}
+
+		$preview = isset( $meta['max_image_preview'] ) ? strtolower( trim( (string) $meta['max_image_preview'] ) ) : '';
+		if ( in_array( $preview, array( 'none', 'standard', 'large' ), true ) ) {
+			$directives[] = 'max-image-preview:' . $preview;
+		}
+
+		if ( ! empty( $meta['noimageindex'] ) ) {
+			$directives[] = 'noimageindex';
+		}
+
+		return $directives;
+	}
+
+	/**
 	 * Append lower-precedence robots directives without overriding keys
 	 * already present.
 	 *
 	 * "max-snippet:50" and "max-snippet:-1" share the key "max-snippet", so
-	 * only the first (higher-precedence) one is kept.
+	 * only the first (higher-precedence) one is kept. Within one tier,
+	 * nosnippet and max-snippet may both appear; the final sanitization lets
+	 * nosnippet win.
 	 *
 	 * @param array<int,string> $directives Higher-precedence directives.
 	 * @param array             $additional Lower-precedence directives.
@@ -1112,11 +1177,12 @@ class Frontend {
 	 * @return array<int,string>
 	 */
 	private function merge_robots_directives( array $directives, array $additional ) {
-		$keys = array();
+		$upper = array();
 		foreach ( $directives as $directive ) {
-			$keys[ self::robots_directive_key( $directive ) ] = true;
+			$upper[ self::robots_precedence_key( $directive ) ] = true;
 		}
 
+		$seen = array();
 		foreach ( $additional as $directive ) {
 			$directive = trim( (string) $directive );
 			if ( '' === $directive ) {
@@ -1124,11 +1190,11 @@ class Frontend {
 			}
 
 			$key = self::robots_directive_key( $directive );
-			if ( isset( $keys[ $key ] ) ) {
+			if ( isset( $upper[ self::robots_precedence_key( $directive ) ] ) || isset( $seen[ $key ] ) ) {
 				continue;
 			}
 
-			$keys[ $key ] = true;
+			$seen[ $key ] = true;
 			$directives[] = $directive;
 		}
 
@@ -1150,6 +1216,24 @@ class Frontend {
 	}
 
 	/**
+	 * Key used to decide which precedence tier owns a directive.
+	 *
+	 * The nosnippet and max-snippet directives control the same thing
+	 * (snippet length), so they share a key: a per-post "max-snippet:160"
+	 * overrides a global "nosnippet" and a per-post "nosnippet" overrides a
+	 * global "max-snippet:50".
+	 *
+	 * @param string $directive Directive.
+	 *
+	 * @return string
+	 */
+	private static function robots_precedence_key( $directive ) {
+		$key = self::robots_directive_key( $directive );
+
+		return 'nosnippet' === $key ? 'max-snippet' : $key;
+	}
+
+	/**
 	 * Determine OG/Twitter image.
 	 *
 	 * @param WP_Post|null $post Post.
@@ -1160,6 +1244,11 @@ class Frontend {
 	 */
 	private function get_social_image( $post, $meta, $social_defaults = array() ) {
 		$image = '';
+
+		$this->social_image_source = array(
+			'url' => '',
+			'id'  => 0,
+		);
 
 		// 1. Check direct post meta override
 		if ( ! empty( $meta['og_image'] ) ) {
@@ -1173,6 +1262,12 @@ class Frontend {
 				$url = wp_get_attachment_image_url( $image_id, 'full' );
 				if ( $url ) {
 					$image = $url;
+
+					// Known attachment: no URL lookup needed later.
+					$this->social_image_source = array(
+						'url' => (string) $url,
+						'id'  => (int) $image_id,
+					);
 				}
 			}
 		}
@@ -1213,6 +1308,157 @@ class Frontend {
 		 * @param array   $social_defaults Social default settings.
 		 */
 		return saman_seo_apply_filters( 'saman_seo_og_image', $image, $post, $meta, $social_defaults );
+	}
+
+	/**
+	 * Width, height, MIME type and alt text of a social image.
+	 *
+	 * Only local attachments are resolved; for anything else (external
+	 * URLs, the dynamic social card) every value is empty so the tags are
+	 * omitted.
+	 *
+	 * @param string $url Image URL.
+	 *
+	 * @return array{width:string,height:string,type:string,alt:string}
+	 */
+	private function get_social_image_details( $url ) {
+		$details = array(
+			'width'  => '',
+			'height' => '',
+			'type'   => '',
+			'alt'    => '',
+		);
+
+		$attachment_id = $this->get_image_attachment_id( $url );
+		if ( ! $attachment_id || ! function_exists( 'wp_get_attachment_image_src' ) ) {
+			return $details;
+		}
+
+		$width  = 0;
+		$height = 0;
+		$type   = (string) get_post_mime_type( $attachment_id );
+
+		$full = wp_get_attachment_image_src( $attachment_id, 'full' );
+		if ( is_array( $full ) && ! empty( $full[0] ) && $this->same_image_url( (string) $full[0], $url ) ) {
+			$width  = isset( $full[1] ) ? (int) $full[1] : 0;
+			$height = isset( $full[2] ) ? (int) $full[2] : 0;
+		} else {
+			// The URL may point at an intermediate size (image-1024x576.jpg).
+			$metadata = wp_get_attachment_metadata( $attachment_id );
+			$basename = wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+
+			if ( is_array( $metadata ) && ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
+				foreach ( $metadata['sizes'] as $size ) {
+					if ( is_array( $size ) && isset( $size['file'] ) && $basename === $size['file'] ) {
+						$width  = isset( $size['width'] ) ? (int) $size['width'] : 0;
+						$height = isset( $size['height'] ) ? (int) $size['height'] : 0;
+						if ( ! empty( $size['mime-type'] ) ) {
+							$type = (string) $size['mime-type'];
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		if ( $width > 0 && $height > 0 ) {
+			$details['width']  = (string) $width;
+			$details['height'] = (string) $height;
+		}
+
+		if ( 0 === strpos( $type, 'image/' ) ) {
+			$details['type'] = $type;
+		}
+
+		$alt            = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+		$details['alt'] = is_string( $alt ) ? trim( wp_strip_all_tags( $alt ) ) : '';
+
+		return $details;
+	}
+
+	/**
+	 * Resolve the attachment ID behind an image URL.
+	 *
+	 * Reuses the ID the image was resolved from when available, skips URLs
+	 * outside the uploads directory, and caches lookups (per request and in
+	 * the object cache) because attachment_url_to_postid() runs a query.
+	 *
+	 * @param string $url Image URL.
+	 *
+	 * @return int Attachment ID, or 0.
+	 */
+	private function get_image_attachment_id( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return 0;
+		}
+
+		if ( $this->social_image_source['id'] && $url === $this->social_image_source['url'] ) {
+			return (int) $this->social_image_source['id'];
+		}
+
+		if ( isset( $this->attachment_id_cache[ $url ] ) ) {
+			return $this->attachment_id_cache[ $url ];
+		}
+
+		$this->attachment_id_cache[ $url ] = 0;
+
+		if ( ! function_exists( 'attachment_url_to_postid' ) || ! function_exists( 'wp_get_upload_dir' ) ) {
+			return 0;
+		}
+
+		$uploads = wp_get_upload_dir();
+		$baseurl = isset( $uploads['baseurl'] ) ? (string) $uploads['baseurl'] : '';
+		if ( '' === $baseurl || 0 !== strpos( $this->strip_url_scheme( $url ), $this->strip_url_scheme( trailingslashit( $baseurl ) ) ) ) {
+			return 0;
+		}
+
+		$cache_key = 'social_image_id_' . md5( $url );
+		$cached    = wp_cache_get( $cache_key, 'saman_seo' );
+		if ( false !== $cached ) {
+			$this->attachment_id_cache[ $url ] = (int) $cached;
+
+			return (int) $cached;
+		}
+
+		$attachment_id = (int) attachment_url_to_postid( $url );
+
+		// Intermediate sizes (image-1024x576.jpg) are not stored as the
+		// attached file; retry with the original file name.
+		if ( ! $attachment_id ) {
+			$original = preg_replace( '/-\d+x\d+(\.[a-z0-9]+)$/i', '$1', $url );
+			if ( is_string( $original ) && $original !== $url ) {
+				$attachment_id = (int) attachment_url_to_postid( $original );
+			}
+		}
+
+		wp_cache_set( $cache_key, $attachment_id, 'saman_seo', DAY_IN_SECONDS );
+		$this->attachment_id_cache[ $url ] = $attachment_id;
+
+		return $attachment_id;
+	}
+
+	/**
+	 * Compare two image URLs ignoring the scheme.
+	 *
+	 * @param string $a First URL.
+	 * @param string $b Second URL.
+	 *
+	 * @return bool
+	 */
+	private function same_image_url( $a, $b ) {
+		return $this->strip_url_scheme( $a ) === $this->strip_url_scheme( $b );
+	}
+
+	/**
+	 * Remove the scheme from a URL ("https://x" => "//x").
+	 *
+	 * @param string $url URL.
+	 *
+	 * @return string
+	 */
+	private function strip_url_scheme( $url ) {
+		return (string) preg_replace( '#^https?:#i', '', (string) $url );
 	}
 
 	/**

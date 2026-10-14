@@ -67,6 +67,21 @@ class Post_Meta {
 				'sitemap_exclude'      => array(
 					'type' => 'string',
 				),
+				// Snippet controls. Loose types so a boolean/integer sent
+				// by the editor is normalized by sanitize() instead of
+				// failing REST validation and blocking the post save.
+				'nosnippet'            => array(
+					'type' => array( 'string', 'boolean' ),
+				),
+				'max_snippet'          => array(
+					'type' => array( 'string', 'integer' ),
+				),
+				'max_image_preview'    => array(
+					'type' => 'string',
+				),
+				'noimageindex'         => array(
+					'type' => array( 'string', 'boolean' ),
+				),
 				'og_image'             => array(
 					'type' => 'string',
 				),
@@ -143,7 +158,13 @@ class Post_Meta {
 		$clean['sitemap_exclude'] = ! empty( $value['sitemap_exclude'] ) ? '1' : '';
 		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
 		$clean['schema_type']     = isset( $value['schema_type'] ) ? sanitize_text_field( $value['schema_type'] ) : '';
-		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? wp_kses_post( wp_unslash( $value['custom_schema'] ) ) : '';
+		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? self::sanitize_custom_schema( $value['custom_schema'] ) : '';
+
+		// Snippet controls (also govern Google AI Overviews / AI Mode).
+		$clean['nosnippet']         = self::sanitize_flag( $value['nosnippet'] ?? '' );
+		$clean['max_snippet']       = self::sanitize_max_snippet( $value['max_snippet'] ?? '' );
+		$clean['max_image_preview'] = self::sanitize_max_image_preview( $value['max_image_preview'] ?? '' );
+		$clean['noimageindex']      = self::sanitize_flag( $value['noimageindex'] ?? '' );
 
 		// Handle secondary keyphrases (max 4 additional keywords).
 		$clean['secondary_keyphrases'] = array();
@@ -175,6 +196,96 @@ class Post_Meta {
 		}
 
 		return $clean;
+	}
+
+	/**
+	 * Normalize a boolean-ish flag to the stored '1' / '' format.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_flag( $value ): string {
+		if ( is_string( $value ) ) {
+			$value = strtolower( trim( $value ) );
+
+			return ( '' === $value || '0' === $value || 'false' === $value ) ? '' : '1';
+		}
+
+		return empty( $value ) ? '' : '1';
+	}
+
+	/**
+	 * Normalize the per-post max-snippet value.
+	 *
+	 * Empty means "inherit the global setting"; -1 means no limit; 0 and up
+	 * is a character limit.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_max_snippet( $value ): string {
+		if ( is_bool( $value ) || null === $value || is_array( $value ) || is_object( $value ) ) {
+			return '';
+		}
+
+		$value = trim( (string) $value );
+		if ( '' === $value || ! preg_match( '/^-?\d+$/', $value ) ) {
+			return '';
+		}
+
+		return (string) max( -1, (int) $value );
+	}
+
+	/**
+	 * Normalize the per-post max-image-preview value.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string One of none|standard|large, or '' to inherit.
+	 */
+	public static function sanitize_max_image_preview( $value ): string {
+		$value = is_string( $value ) ? strtolower( trim( $value ) ) : '';
+
+		return in_array( $value, array( 'none', 'standard', 'large' ), true ) ? $value : '';
+	}
+
+	/**
+	 * Validate and canonicalize the custom JSON-LD schema.
+	 *
+	 * The value is JSON, not HTML: running it through an HTML sanitizer
+	 * turns "&" into "&amp;" inside URLs and can corrupt the document.
+	 * Decode it, reject anything that is not a JSON object/array, and store
+	 * the re-encoded canonical JSON. Output escaping (JSON_HEX_TAG etc.)
+	 * happens when the graph is printed.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string Canonical JSON, or '' when the input is not valid JSON.
+	 */
+	public static function sanitize_custom_schema( $value ): string {
+		if ( is_array( $value ) ) {
+			$decoded = $value;
+		} else {
+			if ( ! is_string( $value ) ) {
+				return '';
+			}
+
+			$value = trim( $value );
+			if ( '' === $value ) {
+				return '';
+			}
+
+			$decoded = json_decode( $value, true );
+			if ( JSON_ERROR_NONE !== json_last_error() ) {
+				return '';
+			}
+		}
+
+		if ( ! is_array( $decoded ) || empty( $decoded ) ) {
+			return '';
+		}
+
+		$encoded = wp_json_encode( $decoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+
+		return is_string( $encoded ) ? $encoded : '';
 	}
 
 	/**
@@ -377,9 +488,16 @@ class Post_Meta {
 		// shared sanitizer so every field (focus keyphrase, schema, social,
 		// secondary keyphrases, etc.) persists for any post type.
 		if ( isset( $_POST['SAMAN_SEO_meta_json'] ) ) {
-			$decoded = json_decode( wp_unslash( $_POST['SAMAN_SEO_meta_json'] ), true );
+			$decoded = json_decode( wp_unslash( $_POST['SAMAN_SEO_meta_json'] ), true ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON is decoded here and every field is sanitized by sanitize().
 			if ( is_array( $decoded ) ) {
-				update_post_meta( $post_id, self::META_KEY, $this->sanitize( $decoded ) );
+				// Merge over the stored meta so keys the modal does not
+				// send (recipe/event blocks, ...) survive the save.
+				$existing = get_post_meta( $post_id, self::META_KEY, true );
+				$existing = is_array( $existing ) ? $existing : array();
+
+				// update_post_meta() unslashes its value; slash it so the
+				// backslashes inside JSON strings (custom schema) survive.
+				update_post_meta( $post_id, self::META_KEY, wp_slash( $this->sanitize( array_merge( $existing, $decoded ) ) ) );
 				return;
 			}
 		}
@@ -392,7 +510,7 @@ class Post_Meta {
 			'nofollow'      => ! empty( $_POST['SAMAN_SEO_nofollow'] ) ? '1' : '',
 			'og_image'      => isset( $_POST['SAMAN_SEO_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_og_image'] ) ) : '',
 			'schema_type'   => isset( $_POST['SAMAN_SEO_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_schema_type'] ) ) : '',
-			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? wp_kses_post( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '',
+			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? self::sanitize_custom_schema( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON validated and re-encoded by sanitize_custom_schema().
 		);
 
 		// The classic form only knows a subset of the meta blob. Merge the
@@ -403,6 +521,6 @@ class Post_Meta {
 		$existing = get_post_meta( $post_id, self::META_KEY, true );
 		$existing = is_array( $existing ) ? $existing : array();
 
-		update_post_meta( $post_id, self::META_KEY, $this->sanitize( array_merge( $existing, $data ) ) );
+		update_post_meta( $post_id, self::META_KEY, wp_slash( $this->sanitize( array_merge( $existing, $data ) ) ) );
 	}
 }
