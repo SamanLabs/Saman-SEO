@@ -746,9 +746,64 @@ const Sitemap = () => {
 											</span>
 										</label>
 
-										{ __(
-											'Publication Name',
-											'saman-seo'
+										{ settings.enable_google_news ===
+											'1' && (
+											<div
+												style={ {
+													marginTop: '12px',
+												} }
+											>
+												<input
+													type="text"
+													value={
+														settings.google_news_name
+													}
+													onChange={ ( e ) =>
+														setSettings(
+															( prev ) => ( {
+																...prev,
+																google_news_name:
+																	e.target
+																		.value,
+															} )
+														)
+													}
+													placeholder={ __(
+														'Publication Name',
+														'saman-seo'
+													) }
+													style={ {
+														width: '100%',
+														marginBottom: '8px',
+													} }
+												/>
+												<div className="checkbox-grid">
+													{ postTypes.map( ( pt ) => (
+														<label
+															key={ pt.name }
+															className="checkbox-row"
+														>
+															<input
+																type="checkbox"
+																checked={ (
+																	settings.google_news_post_types ||
+																	[]
+																).includes(
+																	pt.name
+																) }
+																onChange={ () =>
+																	toggleNewsPostType(
+																		pt.name
+																	)
+																}
+															/>
+															<span>
+																{ pt.label }
+															</span>
+														</label>
+													) ) }
+												</div>
+											</div>
 										) }
 									</div>
 								</div>
@@ -771,10 +826,58 @@ const Sitemap = () => {
 									</div>
 									<div className="settings-control">
 										<div className="additional-pages-list">
-											{ __(
-												'https://example.com/page',
-												'saman-seo'
-											) }
+											{ (
+												settings.additional_pages || []
+											).map( ( page, index ) => (
+												<div
+													key={ index }
+													className="additional-page-row"
+												>
+													<input
+														type="url"
+														value={ page.url }
+														onChange={ ( e ) =>
+															updateAdditionalPage(
+																index,
+																'url',
+																e.target.value
+															)
+														}
+														placeholder={ __(
+															'https://example.com/page',
+															'saman-seo'
+														) }
+														className="page-url-input"
+													/>
+													<input
+														type="text"
+														value={ page.priority }
+														onChange={ ( e ) =>
+															updateAdditionalPage(
+																index,
+																'priority',
+																e.target.value
+															)
+														}
+														placeholder="0.5"
+														className="page-priority-input"
+													/>
+													<button
+														type="button"
+														className="button ghost small"
+														onClick={ () =>
+															removeAdditionalPage(
+																index
+															)
+														}
+													>
+														{ __(
+															'Remove',
+															'saman-seo'
+														) }
+													</button>
+												</div>
+											) ) }
 										</div>
 										<button
 											type="button"
@@ -979,9 +1082,228 @@ const Sitemap = () => {
 									</div>
 								</div>
 
-								{ __(
-									'Defaults to site tagline',
-									'saman-seo'
+								{ llmSettings.enable_llm_txt === '1' && (
+									<>
+										<div className="settings-row compact">
+											<div className="settings-label">
+												<label>
+													{ __(
+														'Title',
+														'saman-seo'
+													) }
+												</label>
+												<p className="settings-help">
+													{ __(
+														'Main title in your llm.txt file.',
+														'saman-seo'
+													) }
+												</p>
+											</div>
+											<div className="settings-control">
+												<input
+													type="text"
+													value={
+														llmSettings.llm_txt_title
+													}
+													onChange={ ( e ) =>
+														setLlmSettings(
+															( prev ) => ( {
+																...prev,
+																llm_txt_title:
+																	e.target
+																		.value,
+															} )
+														)
+													}
+													placeholder={ __(
+														'Defaults to site name',
+														'saman-seo'
+													) }
+												/>
+											</div>
+										</div>
+
+										<div className="settings-row compact">
+											<div className="settings-label">
+												<label>
+													{ __(
+														'Description',
+														'saman-seo'
+													) }
+												</label>
+												<p className="settings-help">
+													{ __(
+														'Brief description below the title.',
+														'saman-seo'
+													) }
+												</p>
+											</div>
+											<div className="settings-control">
+												<textarea
+													value={
+														llmSettings.llm_txt_description
+													}
+													onChange={ ( e ) =>
+														setLlmSettings(
+															( prev ) => ( {
+																...prev,
+																llm_txt_description:
+																	e.target
+																		.value,
+															} )
+														)
+													}
+													placeholder={ __(
+														'Defaults to site tagline',
+														'saman-seo'
+													) }
+													rows="3"
+												/>
+											</div>
+										</div>
+
+										<div className="settings-row compact">
+											<div className="settings-label">
+												<label>
+													{ __(
+														'Max Posts Per Type',
+														'saman-seo'
+													) }
+												</label>
+												<p className="settings-help">
+													{ __(
+														'Limit posts included per type (1–500).',
+														'saman-seo'
+													) }
+												</p>
+											</div>
+											<div className="settings-control">
+												<input
+													type="number"
+													value={
+														llmSettings.llm_txt_posts_per_type
+													}
+													onChange={ ( e ) =>
+														setLlmSettings(
+															( prev ) => ( {
+																...prev,
+																llm_txt_posts_per_type:
+																	parseInt(
+																		e.target
+																			.value,
+																		10
+																	) || 50,
+															} )
+														)
+													}
+													min="1"
+													max="500"
+													style={ {
+														width: '120px',
+													} }
+												/>
+											</div>
+										</div>
+
+										<div className="settings-row compact">
+											<div className="settings-label">
+												<label>
+													{ __(
+														'Options',
+														'saman-seo'
+													) }
+												</label>
+											</div>
+											<div className="settings-control">
+												<label className="checkbox-row">
+													<input
+														type="checkbox"
+														checked={
+															llmSettings.llm_txt_include_excerpt ===
+															'1'
+														}
+														onChange={ ( e ) =>
+															setLlmSettings(
+																( prev ) => ( {
+																	...prev,
+																	llm_txt_include_excerpt:
+																		e.target
+																			.checked
+																			? '1'
+																			: '0',
+																} )
+															)
+														}
+													/>
+													<span>
+														{ __(
+															'Include post excerpts/descriptions',
+															'saman-seo'
+														) }
+													</span>
+												</label>
+											</div>
+										</div>
+
+										{ /* Content Types Preview */ }
+										<div className="settings-row compact">
+											<div className="settings-label">
+												<label>
+													{ __(
+														'Content Included',
+														'saman-seo'
+													) }
+												</label>
+												<p className="settings-help">
+													{ __(
+														'Post types in your llm.txt file.',
+														'saman-seo'
+													) }
+												</p>
+											</div>
+											<div className="settings-control">
+												<div className="post-types-preview">
+													{ postTypes.map( ( pt ) => {
+														const willInclude =
+															Math.min(
+																pt.count,
+																llmSettings.llm_txt_posts_per_type
+															);
+														return (
+															<div
+																key={ pt.name }
+																className="post-type-preview-item"
+															>
+																<div className="post-type-info">
+																	<strong>
+																		{
+																			pt.label
+																		}
+																	</strong>
+																	<span className="muted">
+																		{
+																			willInclude
+																		}{ ' ' }
+																		{ __(
+																			'of',
+																			'saman-seo'
+																		) }{ ' ' }
+																		{
+																			pt.count
+																		}{ ' ' }
+																		{ __(
+																			'posts',
+																			'saman-seo'
+																		) }
+																	</span>
+																</div>
+															</div>
+														);
+													} ) }
+												</div>
+											</div>
+										</div>
+									</>
 								) }
 							</div>
 

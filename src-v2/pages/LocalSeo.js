@@ -858,7 +858,524 @@ const LocalSeo = () => {
 					</div>
 
 					{ /* Business Information Tab */ }
-					{ __( 'US', 'saman-seo' ) }
+					{ activeTab === 'business' && (
+						<div className="tab-content">
+							{ /* Business Identity */ }
+							<div className="card">
+								<div className="card-header">
+									<h2>
+										{ __(
+											'Business Identity',
+											'saman-seo'
+										) }
+									</h2>
+								</div>
+								<div className="card-body">
+									<div className="form-grid">
+										<div className="form-field">
+											<label>
+												{ __(
+													'Business Name',
+													'saman-seo'
+												) }
+											</label>
+											<input
+												type="text"
+												value={ business.name }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'name',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'Your Business Name',
+													'saman-seo'
+												) }
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __(
+													'Business Type',
+													'saman-seo'
+												) }
+											</label>
+											<select
+												value={ business.type }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'type',
+														e.target.value
+													)
+												}
+											>
+												{ businessTypes.map(
+													( type ) => (
+														<option
+															key={ type.value }
+															value={ type.value }
+														>
+															{ type.label }
+														</option>
+													)
+												) }
+											</select>
+										</div>
+										<div className="form-field full-width">
+											<label>
+												{ __(
+													'Description',
+													'saman-seo'
+												) }
+											</label>
+											<textarea
+												value={ business.description }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'description',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'Brief description of your business',
+													'saman-seo'
+												) }
+												rows={ 3 }
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __( 'Logo', 'saman-seo' ) }
+											</label>
+											<div className="image-picker">
+												{ business.logo ? (
+													<div className="image-preview">
+														<img
+															src={
+																business.logo
+															}
+															alt={ __(
+																'Logo',
+																'saman-seo'
+															) }
+														/>
+														<button
+															className="image-remove"
+															onClick={ () =>
+																handleBusinessChange(
+																	'logo',
+																	''
+																)
+															}
+														>
+															×
+														</button>
+													</div>
+												) : (
+													<button
+														className="button ghost"
+														onClick={ () =>
+															openMediaLibrary(
+																'logo'
+															)
+														}
+													>
+														{ __(
+															'Select Logo',
+															'saman-seo'
+														) }
+													</button>
+												) }
+											</div>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __(
+													'Cover Image',
+													'saman-seo'
+												) }
+											</label>
+											<div className="image-picker">
+												{ business.image ? (
+													<div className="image-preview">
+														<img
+															src={
+																business.image
+															}
+															alt={ __(
+																'Cover',
+																'saman-seo'
+															) }
+														/>
+														<button
+															className="image-remove"
+															onClick={ () =>
+																handleBusinessChange(
+																	'image',
+																	''
+																)
+															}
+														>
+															×
+														</button>
+													</div>
+												) : (
+													<button
+														className="button ghost"
+														onClick={ () =>
+															openMediaLibrary(
+																'image'
+															)
+														}
+													>
+														{ __(
+															'Select Image',
+															'saman-seo'
+														) }
+													</button>
+												) }
+											</div>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __(
+													'Price Range',
+													'saman-seo'
+												) }
+											</label>
+											<select
+												value={ business.priceRange }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'priceRange',
+														e.target.value
+													)
+												}
+											>
+												<option value="">
+													{ __(
+														'Select\u2026',
+														'saman-seo'
+													) }
+												</option>
+												<option value="$">
+													{ __(
+														'$ (Budget)',
+														'saman-seo'
+													) }
+												</option>
+												<option value="$$">
+													{ __(
+														'$$ (Moderate)',
+														'saman-seo'
+													) }
+												</option>
+												<option value="$$$">
+													{ __(
+														'$$$ (Expensive)',
+														'saman-seo'
+													) }
+												</option>
+												<option value="$$$$">
+													{ __(
+														'$$$$ (Luxury)',
+														'saman-seo'
+													) }
+												</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{ /* Contact Information */ }
+							<div className="card">
+								<div className="card-header">
+									<h2>
+										{ __(
+											'Contact Information',
+											'saman-seo'
+										) }
+									</h2>
+								</div>
+								<div className="card-body">
+									<div className="form-grid">
+										<div className="form-field">
+											<label>
+												{ __( 'Phone', 'saman-seo' ) }
+											</label>
+											<input
+												type="tel"
+												value={ business.phone }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'phone',
+														e.target.value
+													)
+												}
+												placeholder="+1 (555) 123-4567"
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __( 'Email', 'saman-seo' ) }
+											</label>
+											<input
+												type="email"
+												value={ business.email }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'email',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'contact@yourbusiness.com',
+													'saman-seo'
+												) }
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{ /* Address */ }
+							<div className="card">
+								<div className="card-header">
+									<h2>{ __( 'Address', 'saman-seo' ) }</h2>
+								</div>
+								<div className="card-body">
+									<div className="form-grid">
+										<div className="form-field full-width">
+											<label>
+												{ __(
+													'Street Address',
+													'saman-seo'
+												) }
+											</label>
+											<input
+												type="text"
+												value={ business.street }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'street',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'123 Main Street',
+													'saman-seo'
+												) }
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __( 'City', 'saman-seo' ) }
+											</label>
+											<input
+												type="text"
+												value={ business.city }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'city',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'New York',
+													'saman-seo'
+												) }
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __(
+													'State/Province',
+													'saman-seo'
+												) }
+											</label>
+											<input
+												type="text"
+												value={ business.state }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'state',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'NY',
+													'saman-seo'
+												) }
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __(
+													'ZIP/Postal Code',
+													'saman-seo'
+												) }
+											</label>
+											<input
+												type="text"
+												value={ business.zip }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'zip',
+														e.target.value
+													)
+												}
+												placeholder="10001"
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __( 'Country', 'saman-seo' ) }
+											</label>
+											<input
+												type="text"
+												value={ business.country }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'country',
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'US',
+													'saman-seo'
+												) }
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{ /* Geo Coordinates */ }
+							<div className="card">
+								<div className="card-header">
+									<h2>
+										{ __( 'Geo Coordinates', 'saman-seo' ) }
+									</h2>
+									<p>
+										{ __(
+											'Optional but recommended for precise location in search results.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="card-body">
+									<div className="form-grid">
+										<div className="form-field">
+											<label>
+												{ __(
+													'Latitude',
+													'saman-seo'
+												) }
+											</label>
+											<input
+												type="text"
+												value={ business.latitude }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'latitude',
+														e.target.value
+													)
+												}
+												placeholder="40.7128"
+											/>
+										</div>
+										<div className="form-field">
+											<label>
+												{ __(
+													'Longitude',
+													'saman-seo'
+												) }
+											</label>
+											<input
+												type="text"
+												value={ business.longitude }
+												onChange={ ( e ) =>
+													handleBusinessChange(
+														'longitude',
+														e.target.value
+													)
+												}
+												placeholder="-74.0060"
+											/>
+										</div>
+									</div>
+									<p className="form-help">
+										<a
+											href={ `https://www.google.com/maps/search/${ encodeURIComponent(
+												[
+													business.street,
+													business.city,
+													business.state,
+													business.zip,
+												]
+													.filter( Boolean )
+													.join( ', ' )
+											) }` }
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{ __(
+												'Find coordinates on Google Maps \u2192',
+												'saman-seo'
+											) }
+										</a>
+									</p>
+								</div>
+							</div>
+
+							{ /* Social Profiles */ }
+							<div className="card">
+								<div className="card-header">
+									<h2>
+										{ __( 'Social Profiles', 'saman-seo' ) }
+									</h2>
+									<p>
+										{ __(
+											'Add your social media profile URLs for rich search results.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="card-body">
+									<div className="social-profiles">
+										{ socialProfiles.map(
+											( url, index ) => (
+												<div
+													key={ index }
+													className="form-field"
+												>
+													<input
+														type="url"
+														value={ url }
+														onChange={ ( e ) =>
+															handleSocialChange(
+																index,
+																e.target.value
+															)
+														}
+														placeholder={ sprintf(
+															/* translators: %s: placeholder */ __(
+																'Social profile URL %s',
+																'saman-seo'
+															),
+															index + 1
+														) }
+													/>
+												</div>
+											)
+										) }
+									</div>
+								</div>
+							</div>
+						</div>
+					) }
 
 					{ /* Opening Hours Tab */ }
 					{ activeTab === 'hours' && (
@@ -975,9 +1492,32 @@ const LocalSeo = () => {
 															}
 															className="hours-time"
 														/>
-														{ __(
-															'Copy to all weekdays',
-															'saman-seo'
+														{ [
+															'monday',
+															'tuesday',
+															'wednesday',
+															'thursday',
+															'friday',
+														].includes(
+															day.key
+														) && (
+															<button
+																className="button ghost small"
+																onClick={ () =>
+																	copyToWeekdays(
+																		day.key
+																	)
+																}
+																title={ __(
+																	'Copy to all weekdays',
+																	'saman-seo'
+																) }
+															>
+																{ __(
+																	'Copy to weekdays',
+																	'saman-seo'
+																) }
+															</button>
 														) }
 													</>
 												) : (
