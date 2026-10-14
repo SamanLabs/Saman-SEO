@@ -1,5 +1,16 @@
 # Saman SEO – Architecture Rules
 
+## Branching
+
+Work flows **dev → main**. Branch features and fixes off `dev`, merge them back
+into `dev`, then open a single PR from `dev` into `main` to release. Never commit
+or open PRs straight to `main`. Pushing `dev` builds a beta release; merging into
+`main` builds the stable release and bumps the version on `main`, so
+fast-forward `dev` to `origin/main` before starting new work.
+
+Commit messages, PR titles and PR bodies describe the change itself. Never name
+client sites, domains or the project that prompted a fix.
+
 ## Admin Pages
 
 All admin pages are rendered by the **Admin_V2 React SPA** (`includes/class-saman-seo-admin-v2.php`).
