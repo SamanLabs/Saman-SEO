@@ -398,9 +398,9 @@ class LocalBusiness_Schema extends Abstract_Schema {
 	 * @param array $schema Schema array by reference.
 	 */
 	private function add_opening_hours( array &$schema ): void {
-		$hours = get_option( 'SAMAN_SEO_local_opening_hours', array() );
+		$hours = \Saman\SEO\Helpers\get_array_option( 'SAMAN_SEO_local_opening_hours' );
 
-		if ( empty( $hours ) || ! is_array( $hours ) ) {
+		if ( empty( $hours ) ) {
 			return;
 		}
 
@@ -468,9 +468,9 @@ class LocalBusiness_Schema extends Abstract_Schema {
 	 * @param array $schema Schema array by reference.
 	 */
 	private function add_social_profiles( array &$schema ): void {
-		$profiles = get_option( 'SAMAN_SEO_local_social_profiles', array() );
+		$profiles = \Saman\SEO\Helpers\get_array_option( 'SAMAN_SEO_local_social_profiles' );
 
-		if ( ! empty( $profiles ) && is_array( $profiles ) ) {
+		if ( ! empty( $profiles ) ) {
 			$filtered = array_values( array_filter( $profiles ) );
 			if ( ! empty( $filtered ) ) {
 				$schema['sameAs'] = $filtered;
