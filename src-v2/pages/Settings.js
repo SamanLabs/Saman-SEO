@@ -103,7 +103,7 @@ const defaultSettings = {
 	module_llm_txt: false,
 	module_agents_md: true,
 	module_local_seo: false,
-	module_internal_linking: true,
+	module_internal_links: true,
 	module_schema: true,
 	// Schema per-type toggles
 	module_schema_video: true,
@@ -140,7 +140,7 @@ const defaultSettings = {
 	facebook_app_id: '',
 	facebook_admin_id: '',
 	// Advanced
-	enable_admin_bar: true,
+	module_admin_bar: true,
 	output_clean_head: true,
 	remove_shortlinks: true,
 	remove_rsd_link: true,
@@ -176,6 +176,9 @@ const Settings = () => {
 	const [ loading, setLoading ] = useState( true );
 	const [ saving, setSaving ] = useState( false );
 	const [ saved, setSaved ] = useState( false );
+	// Saving after a failed load would overwrite every real setting with the defaults above.
+	const [ loadFailed, setLoadFailed ] = useState( false );
+	const [ pageError, setPageError ] = useState( '' );
 	const [ importFile, setImportFile ] = useState( null );
 	const [ resettingWizard, setResettingWizard ] = useState( false );
 	const [ systemInfo, setSystemInfo ] = useState( {} );
@@ -197,8 +200,14 @@ const Settings = () => {
 					setSystemInfo( system_info );
 				}
 			}
-		} catch ( error ) {
-			console.error( 'Failed to fetch settings:', error );
+		} catch {
+			setLoadFailed( true );
+			setPageError(
+				__(
+					'Settings could not be loaded, so saving is disabled to keep your current settings. Reload the page to try again.',
+					'saman-seo'
+				)
+			);
 		} finally {
 			setLoading( false );
 		}
@@ -218,7 +227,11 @@ const Settings = () => {
 
 	// Save settings
 	const handleSave = async () => {
+		if ( loadFailed ) {
+			return;
+		}
 		setSaving( true );
+		setPageError( '' );
 		try {
 			await apiFetch( {
 				path: '/saman-seo/v1/settings',
@@ -227,8 +240,11 @@ const Settings = () => {
 			} );
 			setSaved( true );
 			setTimeout( () => setSaved( false ), 3000 );
-		} catch ( error ) {
-			console.error( 'Failed to save settings:', error );
+		} catch ( saveError ) {
+			setPageError(
+				saveError?.message ||
+					__( 'Settings could not be saved.', 'saman-seo' )
+			);
 		} finally {
 			setSaving( false );
 		}
@@ -359,7 +375,7 @@ const Settings = () => {
 						type="button"
 						className="button primary"
 						onClick={ handleSave }
-						disabled={ saving }
+						disabled={ saving || loadFailed }
 					>
 						{ saving
 							? __( 'Saving\u2026', 'saman-seo' )
@@ -367,6 +383,12 @@ const Settings = () => {
 					</button>
 				</div>
 			</div>
+
+			{ pageError && (
+				<div className="notice notice-error" role="alert">
+					<p>{ pageError }</p>
+				</div>
+			) }
 
 			<SubTabs
 				tabs={ settingsTabs }
@@ -1118,7 +1140,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 			icon: <IconAlertCircle />,
 		},
 		{
-			key: 'module_internal_linking',
+			key: 'module_internal_links',
 			name: __( 'Internal Linking', 'saman-seo' ),
 			desc: __(
 				'Automatic internal link suggestions and management.',
@@ -2492,10 +2514,10 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 							<label className="toggle">
 								<input
 									type="checkbox"
-									checked={ settings.enable_admin_bar }
+									checked={ settings.module_admin_bar }
 									onChange={ ( e ) =>
 										updateSetting(
-											'enable_admin_bar',
+											'module_admin_bar',
 											e.target.checked
 										)
 									}

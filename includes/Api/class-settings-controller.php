@@ -274,6 +274,33 @@ class Settings_Controller extends REST_Controller {
 			'homepage_social_profiles'         => 'textarea',
 			'local_social_profiles'            => 'textarea',
 
+			// Knowledge Graph: who the site represents in schema.
+			'homepage_knowledge_type'          => 'text',
+			'homepage_organization_name'       => 'text',
+			'homepage_organization_logo'       => 'url',
+			'homepage_person_name'             => 'text',
+			'homepage_person_image'            => 'url',
+			'homepage_person_job_title'        => 'text',
+			'homepage_person_url'              => 'url',
+
+			// Local SEO business details.
+			'local_business_name'              => 'text',
+			'local_business_type'              => 'text',
+			'local_description'                => 'textarea',
+			'local_phone'                      => 'text',
+			'local_email'                      => 'email',
+			'local_street'                     => 'text',
+			'local_city'                       => 'text',
+			'local_state'                      => 'text',
+			'local_zip'                        => 'text',
+			'local_country'                    => 'text',
+			'local_latitude'                   => 'text',
+			'local_longitude'                  => 'text',
+			'local_price_range'                => 'text',
+			'local_logo'                       => 'url',
+			'local_image'                      => 'url',
+			'local_opening_hours'              => 'textarea',
+
 			// Per-post-type options.
 			'post_type_title_templates'        => 'array',
 			'post_type_meta_descriptions'      => 'array',
@@ -383,6 +410,9 @@ class Settings_Controller extends REST_Controller {
 
 			case 'textarea':
 				return sanitize_textarea_field( $value );
+
+			case 'email':
+				return sanitize_email( $value );
 
 			case 'array':
 				if ( ! is_array( $value ) ) {

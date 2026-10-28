@@ -202,7 +202,7 @@ const moreTools = [
 			</svg>
 		),
 		color: '#0891b2',
-		moduleKey: 'module_internal_linking',
+		moduleKey: 'module_internal_links',
 	},
 	{
 		id: 'link-health',
