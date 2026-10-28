@@ -1802,6 +1802,13 @@ class Tools_Controller extends REST_Controller {
 			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 		}
 
+		// Turn the page cache off first, as deactivation does: once its option is gone the
+		// purge hooks stop, but the drop-in would keep serving its snapshots.
+		$page_cache = new \Saman\SEO\Service\Page_Cache();
+		if ( $page_cache->is_enabled() ) {
+			$page_cache->disable();
+		}
+
 		// Delete all SAMAN_SEO options.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct option removal required.
 		$options = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'SAMAN_SEO_%'" );

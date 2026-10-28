@@ -77,6 +77,14 @@ class Page_Cache {
 	public const DROPIN_VERSION = 2;
 
 	/**
+	 * Cookie prefixes that mark a personalised page: logged in, a returning commenter
+	 * (pre-filled comment form) or an unlocked password post. The drop-in skips the same ones.
+	 *
+	 * @var string[]
+	 */
+	public const NO_CACHE_COOKIES = array( 'wordpress_logged_in_', 'comment_author_', 'wp-postpass_' );
+
+	/**
 	 * Whether the current request is being captured.
 	 *
 	 * @var bool
@@ -116,6 +124,7 @@ class Page_Cache {
 		// Invalidation.
 		if ( '1' === (string) get_option( self::OPTION_PURGE_ON_SAVE, '1' ) ) {
 			add_action( 'save_post', array( $this, 'purge_post_cache' ), 20, 2 );
+			add_action( 'post_updated', array( $this, 'purge_previous_url' ), 20, 3 );
 			add_action( 'delete_post', array( $this, 'purge_post_cache' ), 20, 2 );
 			add_action( 'edited_term', array( $this, 'purge_term_cache' ), 20, 3 );
 			add_action( 'delete_term', array( $this, 'purge_term_cache' ), 20, 3 );
@@ -684,6 +693,15 @@ PHP;
 			return false;
 		}
 
+		// A page rendered for one of these visitors carries their data and must never reach the shared cache.
+		foreach ( array_keys( $_COOKIE ) as $cookie_name ) {
+			foreach ( self::NO_CACHE_COOKIES as $prefix ) {
+				if ( 0 === strpos( (string) $cookie_name, $prefix ) ) {
+					return false;
+				}
+			}
+		}
+
 		if ( is_feed() || is_404() || is_search() || is_preview() ) {
 			return false;
 		}
@@ -1039,6 +1057,32 @@ PHP;
 
 		foreach ( array_unique( $urls ) as $url ) {
 			$this->purge_url( $url );
+		}
+	}
+
+	/**
+	 * Purge the address a published post had before this save.
+	 *
+	 * Unpublishing, trashing or changing the slug moves the permalink, so purge_post_cache()
+	 * no longer reaches the old URL and its snapshot would keep serving until it expires.
+	 *
+	 * @param int      $post_id     Post ID (unused).
+	 * @param \WP_Post $post_after  Post after the update.
+	 * @param \WP_Post $post_before Post before the update.
+	 *
+	 * @return void
+	 */
+	public function purge_previous_url( $post_id, $post_after, $post_before ) {
+		unset( $post_id );
+
+		if ( ! $post_before instanceof \WP_Post || 'publish' !== $post_before->post_status ) {
+			return;
+		}
+
+		$old = get_permalink( $post_before );
+
+		if ( $old && get_permalink( $post_after ) !== $old ) {
+			$this->purge_url( $old );
 		}
 	}
 

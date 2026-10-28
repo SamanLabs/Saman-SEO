@@ -157,6 +157,90 @@ class PageCacheTest extends TestCase {
 		$this->assertStringContainsString( 'X-Saman-Cache', $source );
 	}
 
+	public function test_drop_in_skips_every_no_cache_cookie() {
+		$source = ( new Page_Cache() )->build_drop_in_source();
+
+		foreach ( Page_Cache::NO_CACHE_COOKIES as $prefix ) {
+			$this->assertStringContainsString( "'{$prefix}'", $source );
+		}
+	}
+
+	/**
+	 * A page rendered for a returning commenter (form pre-filled with their name and email) or
+	 * for a visitor who unlocked a password post must not be stored, or the drop-in serves it to all.
+	 */
+	public function test_visitor_cookies_keep_a_page_out_of_the_cache() {
+		self::$options[ Page_Cache::OPTION_ENABLED ] = '1';
+		$_SERVER['REQUEST_METHOD']                   = 'GET';
+		Functions\when( 'wp_unslash' )->returnArg();
+		Functions\when( 'is_user_logged_in' )->justReturn( false );
+		Functions\when( 'is_feed' )->justReturn( false );
+		Functions\when( 'is_preview' )->justReturn( false );
+		self::$context['singular'] = false;
+
+		$cache = new Page_Cache();
+		$saved = $_COOKIE;
+		try {
+			$_COOKIE = array( 'theme_pref' => 'dark' );
+			$this->assertTrue( $cache->is_cacheable_request(), 'an ordinary anonymous visit is cached' );
+
+			foreach ( array( 'comment_author_abc', 'wp-postpass_abc', 'wordpress_logged_in_abc' ) as $cookie ) {
+				$_COOKIE = array( $cookie => 'x' );
+				$this->assertFalse( $cache->is_cacheable_request(), $cookie );
+			}
+		} finally {
+			$_COOKIE = $saved;
+			unset( $_SERVER['REQUEST_METHOD'] );
+		}
+	}
+
+	/**
+	 * Unpublishing or a new slug moves the permalink, so the old address is purged explicitly.
+	 */
+	public function test_moving_a_published_post_purges_its_old_address() {
+		Functions\when( 'get_permalink' )->alias(
+			static function ( $post ) {
+				return 'publish' === $post->post_status
+					? 'https://example.org/' . $post->post_name . '/'
+					: 'https://example.org/?p=' . $post->ID;
+			}
+		);
+		$cache = new class() extends Page_Cache {
+			/**
+			 * Purged URLs.
+			 *
+			 * @var string[]
+			 */
+			public $purged = array();
+
+			/**
+			 * Record instead of touching the disk.
+			 *
+			 * @param string $url URL.
+			 * @return void
+			 */
+			public function purge_url( $url ) {
+				$this->purged[] = $url;
+			}
+		};
+
+		$before = $this->make_post( array( 'post_name' => 'old-slug' ) );
+		$cases  = array(
+			'draft'   => array( 'post_status' => 'draft' ),
+			'renamed' => array( 'post_name' => 'new-slug' ),
+		);
+		foreach ( $cases as $label => $change ) {
+			$cache->purged = array();
+			$after         = new \WP_Post( array_merge( (array) $before, $change ) );
+			$cache->purge_previous_url( $before->ID, $after, $before );
+			$this->assertSame( array( 'https://example.org/old-slug/' ), $cache->purged, $label );
+		}
+
+		$cache->purged = array();
+		$cache->purge_previous_url( $before->ID, $before, $before );
+		$this->assertSame( array(), $cache->purged, 'an edit that keeps the address purges nothing extra' );
+	}
+
 	/*
 	---------------------------------------------------------------------
 	 * Totals & stats math

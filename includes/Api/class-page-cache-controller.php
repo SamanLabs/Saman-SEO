@@ -60,7 +60,7 @@ class Page_Cache_Controller extends REST_Controller {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'toggle' ),
-					'permission_callback' => array( $this, 'permission_check' ),
+					'permission_callback' => array( $this, 'toggle_permission_check' ),
 					'args'                => array(
 						'enabled' => array(
 							'required'          => true,
@@ -79,7 +79,7 @@ class Page_Cache_Controller extends REST_Controller {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'purge' ),
-					'permission_callback' => array( $this, 'permission_check' ),
+					'permission_callback' => array( $this, 'network_permission_check' ),
 				),
 			)
 		);
@@ -112,6 +112,38 @@ class Page_Cache_Controller extends REST_Controller {
 				),
 			)
 		);
+	}
+
+	/**
+	 * The cache folder, advanced-cache.php and wp-config.php are shared by every site in a
+	 * network, so on multisite only a super admin may change them (as for the .htaccess editor).
+	 *
+	 * @return bool
+	 */
+	public function network_permission_check() {
+		return $this->permission_check() && ( ! is_multisite() || is_super_admin() );
+	}
+
+	/**
+	 * Toggling writes advanced-cache.php and wp-config.php, so it also honors
+	 * DISALLOW_FILE_MODS and DISALLOW_FILE_EDIT.
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function toggle_permission_check() {
+		if ( ! $this->network_permission_check() ) {
+			return false;
+		}
+
+		if ( ! Htaccess_Controller::file_mods_allowed() ) {
+			return new \WP_Error(
+				'saman_seo_file_mods_disabled',
+				__( 'File editing is disabled on this site (DISALLOW_FILE_MODS or DISALLOW_FILE_EDIT), so the page cache cannot be switched from the dashboard.', 'saman-seo' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		return true;
 	}
 
 	/**
