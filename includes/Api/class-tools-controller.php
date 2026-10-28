@@ -444,8 +444,8 @@ class Tools_Controller extends REST_Controller {
 	 */
 	public function get_posts_for_bulk_edit( $request ) {
 		$post_type = sanitize_text_field( $request->get_param( 'post_type' ) ?? 'post' );
-		$per_page  = intval( $request->get_param( 'per_page' ) ?? 50 );
-		$page      = intval( $request->get_param( 'page' ) ?? 1 );
+		$per_page  = max( 1, min( 100, intval( $request->get_param( 'per_page' ) ?? 50 ) ) );
+		$page      = max( 1, intval( $request->get_param( 'page' ) ?? 1 ) );
 		$filter    = sanitize_text_field( $request->get_param( 'filter' ) ?? 'all' );
 		$search    = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
 
@@ -462,21 +462,52 @@ class Tools_Controller extends REST_Controller {
 			$args['s'] = $search;
 		}
 
-		$query = new \WP_Query( $args );
+		$missing = array(
+			'missing_title'       => 'title',
+			'missing_description' => 'description',
+		);
+
+		if ( isset( $missing[ $filter ] ) ) {
+			// The meta is a serialized array that may be bridged from another plugin, so the
+			// filter can't be a SQL condition. Filtering the fetched page instead hid every match
+			// beyond it; walk all posts in batches of 100 and paginate the matches.
+			$matching = array();
+			$batch    = 1;
+			do {
+				$chunk = new \WP_Query(
+					array_merge(
+						$args,
+						array(
+							'posts_per_page' => 100,
+							'paged'          => $batch,
+							'no_found_rows'  => true,
+						)
+					)
+				);
+				foreach ( $chunk->posts as $post ) {
+					if ( '' === $this->get_canonical_seo_meta( $post->ID )[ $missing[ $filter ] ] ) {
+						$matching[] = $post;
+					}
+				}
+				++$batch;
+			} while ( 100 === count( $chunk->posts ) );
+
+			$total       = count( $matching );
+			$total_pages = (int) ceil( $total / $per_page );
+			$page_posts  = array_slice( $matching, ( $page - 1 ) * $per_page, $per_page );
+		} else {
+			$query       = new \WP_Query( $args );
+			$total       = (int) $query->found_posts;
+			$total_pages = (int) $query->max_num_pages;
+			$page_posts  = $query->posts;
+		}
+
 		$posts = array();
 
-		foreach ( $query->posts as $post ) {
+		foreach ( $page_posts as $post ) {
 			$meta      = $this->get_canonical_seo_meta( $post->ID );
 			$seo_title = $meta['title'];
 			$seo_desc  = $meta['description'];
-
-			// Apply filters after reading canonical meta.
-			if ( 'missing_title' === $filter && ! empty( $seo_title ) ) {
-				continue;
-			}
-			if ( 'missing_description' === $filter && ! empty( $seo_desc ) ) {
-				continue;
-			}
 
 			$posts[] = array(
 				'id'              => $post->ID,
@@ -497,8 +528,8 @@ class Tools_Controller extends REST_Controller {
 		return $this->success(
 			array(
 				'posts'        => $posts,
-				'total'        => $query->found_posts,
-				'pages'        => $query->max_num_pages,
+				'total'        => $total,
+				'pages'        => $total_pages,
 				'current_page' => $page,
 			)
 		);

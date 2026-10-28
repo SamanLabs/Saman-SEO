@@ -18,6 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Settings_Controller extends REST_Controller {
 
 	/**
+	 * Credentials never sent to the browser: the Google refresh token grants Search Console
+	 * access on its own. The Search Console card uses its own routes and never reads these.
+	 *
+	 * @var string[]
+	 */
+	private const PRIVATE_OPTIONS = array( 'gsc_tokens', 'gsc_client_secret' );
+
+	/**
 	 * Register routes.
 	 */
 	public function register_routes() {
@@ -111,7 +119,10 @@ class Settings_Controller extends REST_Controller {
 
 		$settings = array();
 		foreach ( $options as $opt ) {
-			$key              = str_replace( 'SAMAN_SEO_', '', $opt->option_name );
+			$key = str_replace( 'SAMAN_SEO_', '', $opt->option_name );
+			if ( in_array( $key, self::PRIVATE_OPTIONS, true ) ) {
+				continue;
+			}
 			$settings[ $key ] = maybe_unserialize( $opt->option_value );
 		}
 
@@ -201,7 +212,10 @@ class Settings_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function get_setting( $request ) {
-		$key   = $request->get_param( 'key' );
+		$key = $request->get_param( 'key' );
+		if ( in_array( $key, self::PRIVATE_OPTIONS, true ) ) {
+			return $this->error( __( 'This setting is not available here.', 'saman-seo' ), 'private_setting', 403 );
+		}
 		$value = get_option( 'SAMAN_SEO_' . $key );
 
 		return $this->success(

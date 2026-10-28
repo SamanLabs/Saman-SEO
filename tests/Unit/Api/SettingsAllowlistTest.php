@@ -91,6 +91,25 @@ class SettingsAllowlistTest extends TestCase {
 	}
 
 	/**
+	 * The Search Console refresh token and client secret never go to the browser.
+	 */
+	public function test_search_console_credentials_are_not_readable() {
+		self::$options['SAMAN_SEO_gsc_tokens'] = array( 'refresh_token' => 'secret' );
+		$request = new class() {
+			/**
+			 * Read a param.
+			 *
+			 * @return string
+			 */
+			public function get_param() {
+				return 'gsc_tokens';
+			}
+		};
+
+		$this->assertInstanceOf( \WP_Error::class, ( new Settings_Controller() )->get_setting( $request ) );
+	}
+
+	/**
 	 * A module key the admin uses but the API does not accept is a toggle that never saves
 	 * (module_internal_linking vs module_internal_links).
 	 */
