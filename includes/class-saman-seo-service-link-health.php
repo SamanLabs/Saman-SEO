@@ -247,7 +247,8 @@ class Link_Health {
 			return;
 		}
 
-		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$minutes} minutes" ) );
+		// started_at is written with current_time( 'mysql' ), which is site-local time, so the cutoff is too.
+		$cutoff = wp_date( 'Y-m-d H:i:s', time() - $minutes * MINUTE_IN_SECONDS );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
@@ -542,13 +543,22 @@ class Link_Health {
 		$now     = current_time( 'mysql' );
 
 		foreach ( $links as $link ) {
-			$link_data                   = $this->check_link( $link['url'] );
-			$link_data['source_post_id'] = $post_id;
-			$link_data['link_text']      = $link['text'];
-			$link_data['created_at']     = $now;
-			$link_data['last_checked']   = $now;
+			$check     = $this->check_link( $link['url'] );
+			$link_data = array(
+				'source_post_id' => $post_id,
+				'target_url'     => $check['target_url'],
+				'target_post_id' => $check['target_post_id'],
+				'link_text'      => $link['text'],
+				'link_type'      => $check['link_type'],
+				'status'         => $check['status'],
+				'http_code'      => $check['http_code'],
+				'redirect_url'   => $check['redirect_url'],
+				'error_message'  => $check['error_message'],
+				'created_at'     => $now,
+				'last_checked'   => $now,
+			);
 
-			// Insert into database.
+			// Formats are matched by position, so they follow the keys above one for one.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->insert(
 				$this->links_table,
