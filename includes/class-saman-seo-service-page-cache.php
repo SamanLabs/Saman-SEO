@@ -1137,6 +1137,9 @@ PHP;
 			return;
 		}
 
+		// The hit log grows with every cached view; fold it in daily, not only when an admin opens the stats.
+		$this->aggregate_hits();
+
 		$root = $this->cache_dir() . '/c';
 
 		if ( ! is_dir( $root ) ) {
@@ -1330,9 +1333,10 @@ PHP;
 	 * @return void
 	 */
 	private function record_hit( $seconds ) {
-		$this->bump_totals( 'hits', 1, true );
-		$this->bump_totals( 'warm_sum', $seconds * 1000 );
-		$this->bump_totals( 'warm_count', 1, true );
+		// Same append-only log as the drop-in: three option writes per hit made concurrent
+		// visitors queue on one row and lose counts. aggregate_hits() folds it into the totals.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Appending to our own hit log.
+		@file_put_contents( $this->cache_dir() . '/hits.log', gmdate( 'YmdHis' ) . ' ' . number_format( $seconds * 1000, 1, '.', '' ) . PHP_EOL, FILE_APPEND | LOCK_EX );
 	}
 
 	/**

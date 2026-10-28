@@ -1290,13 +1290,7 @@ class Frontend {
 
 		// 5. Dynamic Card Generation (last resort)
 		if ( empty( $image ) && $post instanceof WP_Post ) {
-			$image = add_query_arg(
-				array(
-					'SAMAN_SEO_social_card' => 1,
-					'title'                 => rawurlencode( get_the_title( $post ) ),
-				),
-				home_url( '/' )
-			);
+			$image = Social_Card_Generator::card_url( get_the_title( $post ) );
 		}
 
 		/**

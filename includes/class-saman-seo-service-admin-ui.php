@@ -635,15 +635,7 @@ class Admin_UI {
 		if ( '1' === get_option( 'SAMAN_SEO_enable_og_preview', '1' ) ) {
 			$actions['SAMAN_SEO_og_preview'] = sprintf(
 				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
-				esc_url(
-					add_query_arg(
-						array(
-							'SAMAN_SEO_social_card' => 1,
-							'title'                 => $post->post_title,
-						),
-						home_url( '/' )
-					)
-				),
+				esc_url( Social_Card_Generator::card_url( $post->post_title ) ),
 				esc_html__( 'OG preview', 'saman-seo' )
 			);
 		}

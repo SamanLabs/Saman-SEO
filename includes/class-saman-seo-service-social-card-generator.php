@@ -41,6 +41,54 @@ class Social_Card_Generator {
 	}
 
 	/**
+	 * URL of the generated card for a title.
+	 *
+	 * @param string $title Card title.
+	 * @return string
+	 */
+	public static function card_url( $title ) {
+		$title = sanitize_text_field( (string) $title );
+
+		return add_query_arg(
+			array(
+				'SAMAN_SEO_social_card' => 1,
+				'title'                 => rawurlencode( $title ),
+				'sig'                   => self::sign( $title ),
+			),
+			home_url( '/' )
+		);
+	}
+
+	/**
+	 * Short signature proving a card title came from this site.
+	 *
+	 * @param string $title Sanitized card title.
+	 * @return string
+	 */
+	private static function sign( $title ) {
+		return substr( hash_hmac( 'sha256', $title, wp_salt( 'auth' ) ), 0, 16 );
+	}
+
+	/**
+	 * The title to draw: only one signed by card_url(). Anyone can request the card URL, and
+	 * every new title used to render and store another PNG; an unsigned one gets the site name.
+	 *
+	 * @return string
+	 */
+	private function requested_title() {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public image URL, authenticated by its signature.
+		$title = sanitize_text_field( wp_unslash( $_GET['title'] ?? '' ) );
+		$sig   = sanitize_text_field( wp_unslash( $_GET['sig'] ?? '' ) );
+		// phpcs:enable
+
+		if ( '' === $title || ! hash_equals( self::sign( $title ), $sig ) ) {
+			return sanitize_text_field( get_bloginfo( 'name' ) );
+		}
+
+		return $title;
+	}
+
+	/**
 	 * Output dynamic PNG when requested.
 	 *
 	 * @return void
@@ -55,7 +103,7 @@ class Social_Card_Generator {
 			exit;
 		}
 
-		$title  = sanitize_text_field( wp_unslash( $_GET['title'] ?? get_bloginfo( 'name' ) ) );
+		$title  = $this->requested_title();
 		$width  = (int) get_option( 'SAMAN_SEO_default_social_width', 1200 );
 		$height = (int) get_option( 'SAMAN_SEO_default_social_height', 630 );
 

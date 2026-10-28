@@ -241,6 +241,64 @@ class PageCacheTest extends TestCase {
 		$this->assertSame( array(), $cache->purged, 'an edit that keeps the address purges nothing extra' );
 	}
 
+	/**
+	 * Late-tier hits go to the same log as the drop-in's instead of three option writes per
+	 * view, and the daily cleanup folds that log into the totals so it cannot grow unread.
+	 */
+	public function test_hits_are_logged_and_folded_in_daily() {
+		$dir = sys_get_temp_dir() . '/saman-cache-' . uniqid();
+		mkdir( $dir . '/c', 0777, true );
+		self::$options[ Page_Cache::OPTION_ENABLED ] = '1';
+
+		$cache = new class( $dir ) extends Page_Cache {
+			/**
+			 * Storage root.
+			 *
+			 * @var string
+			 */
+			private $root;
+
+			/**
+			 * Constructor.
+			 *
+			 * @param string $root Storage root.
+			 */
+			public function __construct( $root ) {
+				$this->root = $root;
+			}
+
+			/**
+			 * Temp storage root.
+			 *
+			 * @return string
+			 */
+			public function cache_dir() {
+				return $this->root;
+			}
+		};
+
+		try {
+			$record = new \ReflectionMethod( Page_Cache::class, 'record_hit' );
+			$record->setAccessible( true );
+			$record->invoke( $cache, 0.010 );
+			$record->invoke( $cache, 0.030 );
+
+			$this->assertArrayNotHasKey( Page_Cache::OPTION_TOTALS, self::$options, 'no option write per hit' );
+			$this->assertCount( 2, file( $dir . '/hits.log' ) );
+
+			$cache->gc();
+
+			$totals = self::$options[ Page_Cache::OPTION_TOTALS ];
+			$this->assertSame( 2, $totals['hits'] );
+			$this->assertEqualsWithDelta( 40.0, $totals['warm_sum'], 0.01 );
+			$this->assertSame( '', file_get_contents( $dir . '/hits.log' ) );
+		} finally {
+			@unlink( $dir . '/hits.log' );
+			@rmdir( $dir . '/c' );
+			@rmdir( $dir );
+		}
+	}
+
 	/*
 	---------------------------------------------------------------------
 	 * Totals & stats math
