@@ -7,6 +7,7 @@
 
 namespace Saman\SEO\Tests\Unit\Helpers;
 
+use Brain\Monkey\Functions;
 use Saman\SEO\Tests\TestCase;
 use function Saman\SEO\Helpers\calculate_keyphrase_density;
 use function Saman\SEO\Helpers\contains_keyphrase;
@@ -66,6 +67,54 @@ class TemplatesTest extends TestCase {
 	public function test_strip_unreplaced_variables(): void {
 		$this->assertSame( '', strip_unreplaced_variables( '{{missing}}' ) );
 		$this->assertSame( 'My Site', strip_unreplaced_variables( '{{missing}} My Site %gone%' ) );
+	}
+
+	/**
+	 * Percent signs in real text are not template tokens.
+	 */
+	public function test_strip_unreplaced_variables_keeps_percentages(): void {
+		$this->assertSame( 'Get 10%-20% off', strip_unreplaced_variables( 'Get 10%-20% off' ) );
+	}
+
+	/**
+	 * {{cf_*}} reads the post's own custom fields (not the plugin's SEO meta helper).
+	 */
+	public function test_custom_field_variables_read_post_meta(): void {
+		$post                            = $this->make_post();
+		self::$post_meta[42]['subtitle'] = 'Brewing at home';
+
+		$this->assertSame( 'Brewing at home', replace_template_variables( '{{cf_subtitle}}', $post ) );
+	}
+
+	/**
+	 * The excerpt (the whole the_content filter when none is set) is built only when used.
+	 */
+	public function test_excerpt_is_built_only_when_the_template_uses_it(): void {
+		$post  = $this->make_post();
+		$calls = 0;
+		Functions\when( 'get_the_excerpt' )->alias(
+			static function () use ( &$calls ) {
+				++$calls;
+				return 'Short summary';
+			}
+		);
+
+		$this->assertSame( 'Sample Post', replace_template_variables( '{{post_title}}', $post ) );
+		$this->assertSame( 0, $calls );
+		$this->assertSame( 'Short summary', replace_template_variables( '{{post_excerpt}}', $post ) );
+		$this->assertSame( 1, $calls );
+	}
+
+	/**
+	 * A year archive's {{date}} is the year, not the first post's full date.
+	 */
+	public function test_year_archive_date_is_the_year(): void {
+		$this->make_post( array( 'post_date' => '2024-12-30 10:00:00' ) );
+		self::$context = array( 'date' => true );
+		Functions\when( 'is_year' )->justReturn( true );
+		Functions\when( 'get_the_archive_title' )->justReturn( 'Year: 2024' );
+
+		$this->assertSame( '2024 Archives', replace_template_variables( '{{date}} Archives' ) );
 	}
 
 	/**

@@ -391,7 +391,8 @@ class SearchAppearance_Controller extends REST_Controller {
 			$existing_meta['description'] = $meta_description;
 			$existing_meta['keywords']    = $meta_keywords;
 
-			update_post_meta( $front_page_id, '_SAMAN_SEO_meta', $existing_meta );
+			// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+			update_post_meta( $front_page_id, '_SAMAN_SEO_meta', wp_slash( $existing_meta ) );
 		}
 
 		return $this->success(

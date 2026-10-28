@@ -555,14 +555,14 @@ const SearchAppearance = () => {
 		}
 	};
 
-	// Save archives
-	const saveArchives = async () => {
+	// Save archives: takes the updated list, since state set just before would still be stale here.
+	const saveArchives = async ( list ) => {
 		setSaving( true );
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/search-appearance/archives',
 				method: 'POST',
-				data: archives,
+				data: list,
 			} );
 			if ( response.success ) {
 				setArchives( response.data );
@@ -787,6 +787,28 @@ const SearchAppearance = () => {
 									</button>
 								)
 							) }
+							<div className="separator-custom">
+								<input
+									type="text"
+									className="separator-custom__input"
+									value={
+										! Object.keys(
+											separatorOptions
+										).includes( separator )
+											? separator
+											: ''
+									}
+									onChange={ ( e ) =>
+										saveSeparator( e.target.value )
+									}
+									placeholder={ __( 'Custom', 'saman-seo' ) }
+									aria-label={ __(
+										'Custom title separator',
+										'saman-seo'
+									) }
+									maxLength={ 5 }
+								/>
+							</div>
 						</div>
 					</div>
 
@@ -1099,12 +1121,11 @@ const SearchAppearance = () => {
 							variables={ variables }
 							variableValues={ variableValues }
 							onSave={ ( updated ) => {
-								setArchives( ( prev ) =>
-									prev.map( ( a ) =>
-										a.slug === updated.slug ? updated : a
-									)
+								const next = archives.map( ( a ) =>
+									a.slug === updated.slug ? updated : a
 								);
-								setEditingArchive( null );
+								setArchives( next );
+								saveArchives( next );
 							} }
 							onCancel={ () => setEditingArchive( null ) }
 							renderTemplatePreview={ renderTemplatePreview }
@@ -1216,7 +1237,962 @@ const SearchAppearance = () => {
 						</div>
 					</div>
 
-					{ __( '{{tagline}}', 'saman-seo' ) }
+					{ editingPostTypeSocial ? (
+						<div className="settings-form">
+							<div className="type-editor__header">
+								<h4>
+									{ __( 'Edit', 'saman-seo' ) }{ ' ' }
+									{ editingPostTypeSocial.name }{ ' ' }
+									{ __( 'Social Settings', 'saman-seo' ) }
+								</h4>
+								<button
+									type="button"
+									className="link-button"
+									onClick={ () =>
+										setEditingPostTypeSocial( null )
+									}
+								>
+									{ __( 'Cancel', 'saman-seo' ) }
+								</button>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __( 'OG Title', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Open Graph title for Facebook shares.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<TemplateInput
+										value={
+											editingPostTypeSocial.og_title || ''
+										}
+										onChange={ ( val ) =>
+											setEditingPostTypeSocial( {
+												...editingPostTypeSocial,
+												og_title: val,
+											} )
+										}
+										placeholder={ __(
+											'{{post_title}} {{separator}} {{site_title}}',
+											'saman-seo'
+										) }
+										variables={ variables }
+										variableValues={ variableValues }
+										context="post"
+										maxLength={ 60 }
+										onAiClick={ () =>
+											openAiModal(
+												'title',
+												( val ) =>
+													setEditingPostTypeSocial( {
+														...editingPostTypeSocial,
+														og_title: val,
+													} ),
+												{
+													type: editingPostTypeSocial.name,
+													name: __(
+														'OG Title',
+														'saman-seo'
+													),
+												}
+											)
+										}
+									/>
+								</div>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __( 'OG Description', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Open Graph description for Facebook shares.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<TemplateInput
+										value={
+											editingPostTypeSocial.og_description ||
+											''
+										}
+										onChange={ ( val ) =>
+											setEditingPostTypeSocial( {
+												...editingPostTypeSocial,
+												og_description: val,
+											} )
+										}
+										placeholder={ __(
+											'{{post_excerpt}}',
+											'saman-seo'
+										) }
+										variables={ variables }
+										variableValues={ variableValues }
+										context="post"
+										multiline
+										maxLength={ 160 }
+										onAiClick={ () =>
+											openAiModal(
+												'description',
+												( val ) =>
+													setEditingPostTypeSocial( {
+														...editingPostTypeSocial,
+														og_description: val,
+													} ),
+												{
+													type: editingPostTypeSocial.name,
+													name: __(
+														'OG Description',
+														'saman-seo'
+													),
+												}
+											)
+										}
+									/>
+								</div>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __( 'Twitter Title', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Twitter card title.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<TemplateInput
+										value={
+											editingPostTypeSocial.twitter_title ||
+											''
+										}
+										onChange={ ( val ) =>
+											setEditingPostTypeSocial( {
+												...editingPostTypeSocial,
+												twitter_title: val,
+											} )
+										}
+										placeholder={ __(
+											'{{post_title}} {{separator}} {{site_title}}',
+											'saman-seo'
+										) }
+										variables={ variables }
+										variableValues={ variableValues }
+										context="post"
+										maxLength={ 60 }
+										onAiClick={ () =>
+											openAiModal(
+												'title',
+												( val ) =>
+													setEditingPostTypeSocial( {
+														...editingPostTypeSocial,
+														twitter_title: val,
+													} ),
+												{
+													type: editingPostTypeSocial.name,
+													name: __(
+														'Twitter Title',
+														'saman-seo'
+													),
+												}
+											)
+										}
+									/>
+								</div>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __(
+											'Twitter Description',
+											'saman-seo'
+										) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Twitter card description.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<TemplateInput
+										value={
+											editingPostTypeSocial.twitter_description ||
+											''
+										}
+										onChange={ ( val ) =>
+											setEditingPostTypeSocial( {
+												...editingPostTypeSocial,
+												twitter_description: val,
+											} )
+										}
+										placeholder={ __(
+											'{{post_excerpt}}',
+											'saman-seo'
+										) }
+										variables={ variables }
+										variableValues={ variableValues }
+										context="post"
+										multiline
+										maxLength={ 160 }
+										onAiClick={ () =>
+											openAiModal(
+												'description',
+												( val ) =>
+													setEditingPostTypeSocial( {
+														...editingPostTypeSocial,
+														twitter_description:
+															val,
+													} ),
+												{
+													type: editingPostTypeSocial.name,
+													name: __(
+														'Twitter Description',
+														'saman-seo'
+													),
+												}
+											)
+										}
+									/>
+								</div>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __( 'Fallback Image', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Fallback image for social sharing.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<div className="image-uploader">
+										{ editingPostTypeSocial.image_source ? (
+											<div className="image-preview">
+												<img
+													src={
+														editingPostTypeSocial.image_source
+													}
+													alt={ __(
+														'Social fallback',
+														'saman-seo'
+													) }
+												/>
+												<button
+													type="button"
+													className="image-preview__remove"
+													onClick={ () =>
+														setEditingPostTypeSocial(
+															{
+																...editingPostTypeSocial,
+																image_source:
+																	'',
+															}
+														)
+													}
+													title={ __(
+														'Remove image',
+														'saman-seo'
+													) }
+												>
+													×
+												</button>
+											</div>
+										) : (
+											<div className="image-placeholder">
+												{ __(
+													'No image',
+													'saman-seo'
+												) }
+											</div>
+										) }
+										<button
+											type="button"
+											className="button"
+											onClick={ () => {
+												const frame = wp.media( {
+													title: __(
+														'Select Fallback Image',
+														'saman-seo'
+													),
+													button: {
+														text: __(
+															'Use Image',
+															'saman-seo'
+														),
+													},
+													multiple: false,
+													library: {
+														type: 'image',
+													},
+												} );
+												frame.on( 'select', () => {
+													const attachment = frame
+														.state()
+														.get( 'selection' )
+														.first()
+														.toJSON();
+													setEditingPostTypeSocial( {
+														...editingPostTypeSocial,
+														image_source:
+															attachment.url,
+													} );
+												} );
+												frame.open();
+											} }
+										>
+											{ editingPostTypeSocial.image_source
+												? __(
+														'Change Image',
+														'saman-seo'
+												  )
+												: __(
+														'Select Image',
+														'saman-seo'
+												  ) }
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div className="settings-row compact">
+								<div className="settings-label">
+									<label>
+										{ __( 'Schema Type', 'saman-seo' ) }
+									</label>
+									<p className="settings-help">
+										{ __(
+											'Schema.org type for this post type.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="settings-control">
+									<select
+										className="input"
+										value={
+											editingPostTypeSocial.schema_itemtype ||
+											''
+										}
+										onChange={ ( e ) =>
+											setEditingPostTypeSocial( {
+												...editingPostTypeSocial,
+												schema_itemtype: e.target.value,
+											} )
+										}
+									>
+										{ schemaTypeOptions.map( ( opt ) => (
+											<option
+												key={ opt.value }
+												value={ opt.value }
+											>
+												{ opt.label }
+											</option>
+										) ) }
+									</select>
+								</div>
+							</div>
+
+							<div className="form-actions">
+								<button
+									type="button"
+									className="button primary"
+									onClick={ () =>
+										savePostTypeSocial(
+											editingPostTypeSocial.slug,
+											editingPostTypeSocial
+										)
+									}
+									disabled={ saving }
+								>
+									{ saving
+										? __( 'Saving\u2026', 'saman-seo' )
+										: __( 'Save Settings', 'saman-seo' ) }
+								</button>
+								<button
+									type="button"
+									className="button"
+									onClick={ () =>
+										setEditingPostTypeSocial( null )
+									}
+								>
+									{ __( 'Cancel', 'saman-seo' ) }
+								</button>
+							</div>
+						</div>
+					) : (
+						<>
+							{ /* Social Preview Cards */ }
+							<div className="preview-panel">
+								<h4 className="form-section__title">
+									{ __( 'Social Preview', 'saman-seo' ) }
+								</h4>
+								<p className="preview-panel__description">
+									{ __(
+										'Preview how your content will appear when shared on social media.',
+										'saman-seo'
+									) }
+								</p>
+								<div className="preview-grid">
+									<FacebookPreview
+										image={ socialDefaults.image_source }
+										title={
+											renderTemplatePreview(
+												socialDefaults.og_title
+											) || siteInfo.name
+										}
+										description={
+											renderTemplatePreview(
+												socialDefaults.og_description
+											) || siteInfo.description
+										}
+										domain={ siteInfo.domain }
+									/>
+									<TwitterPreview
+										image={ socialDefaults.image_source }
+										title={
+											renderTemplatePreview(
+												socialDefaults.twitter_title ||
+													socialDefaults.og_title
+											) || siteInfo.name
+										}
+										description={
+											renderTemplatePreview(
+												socialDefaults.twitter_description ||
+													socialDefaults.og_description
+											) || siteInfo.description
+										}
+										domain={ siteInfo.domain }
+										cardType="summary_large_image"
+									/>
+								</div>
+							</div>
+
+							{ /* Global Social Defaults */ }
+							<div className="settings-form form-section">
+								<h4 className="form-section__title">
+									{ __(
+										'Global Social Defaults',
+										'saman-seo'
+									) }
+								</h4>
+								<p className="form-section__description">
+									{ __(
+										"These defaults apply when posts don't have custom social values.",
+										'saman-seo'
+									) }
+								</p>
+
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __( 'OG Title', 'saman-seo' ) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Default Open Graph title for Facebook.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<TemplateInput
+											value={
+												socialDefaults.og_title || ''
+											}
+											onChange={ ( val ) =>
+												setSocialDefaults( {
+													...socialDefaults,
+													og_title: val,
+												} )
+											}
+											placeholder={ __(
+												'{{site_title}} {{separator}} {{tagline}}',
+												'saman-seo'
+											) }
+											variables={ variables }
+											variableValues={ variableValues }
+											context="global"
+											maxLength={ 60 }
+											onAiClick={ () =>
+												openAiModal(
+													'title',
+													( val ) =>
+														setSocialDefaults( {
+															...socialDefaults,
+															og_title: val,
+														} ),
+													{
+														type: 'Social',
+														name: __(
+															'Open Graph Title',
+															'saman-seo'
+														),
+													}
+												)
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __(
+												'OG Description',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Default Open Graph description.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<TemplateInput
+											value={
+												socialDefaults.og_description ||
+												''
+											}
+											onChange={ ( val ) =>
+												setSocialDefaults( {
+													...socialDefaults,
+													og_description: val,
+												} )
+											}
+											placeholder={ __(
+												'{{tagline}}',
+												'saman-seo'
+											) }
+											variables={ variables }
+											variableValues={ variableValues }
+											context="global"
+											multiline
+											maxLength={ 160 }
+											onAiClick={ () =>
+												openAiModal(
+													'description',
+													( val ) =>
+														setSocialDefaults( {
+															...socialDefaults,
+															og_description: val,
+														} ),
+													{
+														type: 'Social',
+														name: __(
+															'Open Graph Description',
+															'saman-seo'
+														),
+													}
+												)
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __(
+												'Twitter Title',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Default Twitter card title.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<TemplateInput
+											value={
+												socialDefaults.twitter_title ||
+												''
+											}
+											onChange={ ( val ) =>
+												setSocialDefaults( {
+													...socialDefaults,
+													twitter_title: val,
+												} )
+											}
+											placeholder={ __(
+												'{{site_title}} {{separator}} {{tagline}}',
+												'saman-seo'
+											) }
+											variables={ variables }
+											variableValues={ variableValues }
+											context="global"
+											maxLength={ 60 }
+											onAiClick={ () =>
+												openAiModal(
+													'title',
+													( val ) =>
+														setSocialDefaults( {
+															...socialDefaults,
+															twitter_title: val,
+														} ),
+													{
+														type: 'Social',
+														name: __(
+															'Twitter Card Title',
+															'saman-seo'
+														),
+													}
+												)
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __(
+												'Twitter Description',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Default Twitter card description.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<TemplateInput
+											value={
+												socialDefaults.twitter_description ||
+												''
+											}
+											onChange={ ( val ) =>
+												setSocialDefaults( {
+													...socialDefaults,
+													twitter_description: val,
+												} )
+											}
+											placeholder={ __(
+												'{{tagline}}',
+												'saman-seo'
+											) }
+											variables={ variables }
+											variableValues={ variableValues }
+											context="global"
+											multiline
+											maxLength={ 160 }
+											onAiClick={ () =>
+												openAiModal(
+													'description',
+													( val ) =>
+														setSocialDefaults( {
+															...socialDefaults,
+															twitter_description:
+																val,
+														} ),
+													{
+														type: 'Social',
+														name: __(
+															'Twitter Card Description',
+															'saman-seo'
+														),
+													}
+												)
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __(
+												'Fallback Image',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												"Used when posts don't have a featured image (1200x630px recommended).",
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<div className="image-uploader">
+											{ socialDefaults.image_source ? (
+												<div className="image-preview">
+													<img
+														src={
+															socialDefaults.image_source
+														}
+														alt={ __(
+															'Social fallback',
+															'saman-seo'
+														) }
+													/>
+													<button
+														type="button"
+														className="image-preview__remove"
+														onClick={ () =>
+															setSocialDefaults( {
+																...socialDefaults,
+																image_source:
+																	'',
+															} )
+														}
+														title={ __(
+															'Remove image',
+															'saman-seo'
+														) }
+													>
+														×
+													</button>
+												</div>
+											) : (
+												<div className="image-placeholder">
+													{ __(
+														'No image',
+														'saman-seo'
+													) }
+												</div>
+											) }
+											<button
+												type="button"
+												className="button"
+												onClick={ () => {
+													const frame = wp.media( {
+														title: __(
+															'Select Fallback Image',
+															'saman-seo'
+														),
+														button: {
+															text: __(
+																'Use Image',
+																'saman-seo'
+															),
+														},
+														multiple: false,
+														library: {
+															type: 'image',
+														},
+													} );
+													frame.on( 'select', () => {
+														const attachment = frame
+															.state()
+															.get( 'selection' )
+															.first()
+															.toJSON();
+														setSocialDefaults( {
+															...socialDefaults,
+															image_source:
+																attachment.url,
+														} );
+													} );
+													frame.open();
+												} }
+											>
+												{ socialDefaults.image_source
+													? __(
+															'Change Image',
+															'saman-seo'
+													  )
+													: __(
+															'Select Image',
+															'saman-seo'
+													  ) }
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<div className="settings-row compact">
+									<div className="settings-label">
+										<label>
+											{ __(
+												'Default Schema Type',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Controls the og:type meta tag for content.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<select
+											className="input"
+											value={
+												socialDefaults.schema_itemtype ||
+												''
+											}
+											onChange={ ( e ) =>
+												setSocialDefaults( {
+													...socialDefaults,
+													schema_itemtype:
+														e.target.value,
+												} )
+											}
+										>
+											{ schemaTypeOptions.map(
+												( opt ) => (
+													<option
+														key={ opt.value }
+														value={ opt.value }
+													>
+														{ opt.label }
+													</option>
+												)
+											) }
+										</select>
+									</div>
+								</div>
+
+								<div className="form-actions">
+									<button
+										type="button"
+										className="button primary"
+										onClick={ saveSocialDefaults }
+										disabled={ saving }
+									>
+										{ saving
+											? __( 'Saving\u2026', 'saman-seo' )
+											: __(
+													'Save Global Defaults',
+													'saman-seo'
+											  ) }
+									</button>
+								</div>
+							</div>
+
+							{ /* Post Type Specific Settings */ }
+							<div className="form-section">
+								<h4 className="form-section__title">
+									{ __(
+										'Post Type Specific Settings',
+										'saman-seo'
+									) }
+								</h4>
+								<p className="form-section__description">
+									{ __(
+										'Override default social settings for specific post types.',
+										'saman-seo'
+									) }
+								</p>
+
+								<table className="data-table">
+									<thead>
+										<tr>
+											<th>
+												{ __(
+													'Post Type',
+													'saman-seo'
+												) }
+											</th>
+											<th>
+												{ __(
+													'OG Title',
+													'saman-seo'
+												) }
+											</th>
+											<th>
+												{ __(
+													'Schema Type',
+													'saman-seo'
+												) }
+											</th>
+											<th>
+												{ __( 'Action', 'saman-seo' ) }
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{ postTypes.map( ( pt ) => {
+											const socialSettings =
+												postTypeSocialDefaults[
+													pt.slug
+												] || {};
+											return (
+												<tr key={ pt.slug }>
+													<td>
+														<strong>
+															{ pt.name }
+														</strong>
+														<span className="muted-block">
+															{ pt.slug }
+														</span>
+													</td>
+													<td>
+														<span className="muted">
+															{ socialSettings.og_title ||
+																__(
+																	'Using global default',
+																	'saman-seo'
+																) }
+														</span>
+													</td>
+													<td>
+														<span className="muted">
+															{ socialSettings.schema_itemtype ||
+																__(
+																	'Article',
+																	'saman-seo'
+																) }
+														</span>
+													</td>
+													<td>
+														<button
+															type="button"
+															className="link-button"
+															onClick={ () =>
+																setEditingPostTypeSocial(
+																	{
+																		slug: pt.slug,
+																		name: pt.name,
+																		...socialSettings,
+																	}
+																)
+															}
+														>
+															{ __(
+																'Edit',
+																'saman-seo'
+															) }
+														</button>
+													</td>
+												</tr>
+											);
+										} ) }
+									</tbody>
+								</table>
+							</div>
+						</>
+					) }
 				</section>
 			) }
 
@@ -1231,7 +2207,885 @@ const SearchAppearance = () => {
 			/>
 
 			{ /* Social Cards Tab */ }
-			{ __( 'Enter a sample title\u2026', 'saman-seo' ) }
+			{ activeTab === 'social-cards' && (
+				<section className="panel">
+					<div className="table-toolbar">
+						<div>
+							<h3>{ __( 'Social Cards', 'saman-seo' ) }</h3>
+							<p className="muted">
+								{ __(
+									'Customize the appearance of dynamically generated social card images.',
+									'saman-seo'
+								) }
+							</p>
+						</div>
+						<div>
+							<span
+								className={ `pill ${
+									cardModuleEnabled ? 'success' : 'warning'
+								}` }
+							>
+								{ cardModuleEnabled
+									? __( 'Active', 'saman-seo' )
+									: __( 'Disabled', 'saman-seo' ) }
+							</span>
+						</div>
+					</div>
+
+					<div className="settings-form">
+						{ /* Live Preview */ }
+						<div className="preview-panel">
+							<div className="preview-panel__header">
+								<h4>{ __( 'Live Preview', 'saman-seo' ) }</h4>
+							</div>
+
+							{ /* Preview Title Input */ }
+							<div className="inline-fields">
+								<div className="field-group grow">
+									<label className="field-group__label">
+										{ __( 'Preview Title', 'saman-seo' ) }
+									</label>
+									<input
+										type="text"
+										className="input"
+										value={ cardPreviewTitle }
+										onChange={ ( e ) =>
+											setCardPreviewTitle(
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'Enter a sample title\u2026',
+											'saman-seo'
+										) }
+									/>
+								</div>
+								{ Object.keys( previewPosts ).length > 0 && (
+									<>
+										<div className="field-group fixed-sm">
+											<label className="field-group__label">
+												{ __(
+													'Content type',
+													'saman-seo'
+												) }
+											</label>
+											<select
+												className="input"
+												value={ previewPostType }
+												onChange={ ( e ) => {
+													setPreviewPostType(
+														e.target.value
+													);
+													setSelectedPreviewPost(
+														''
+													);
+												} }
+											>
+												{ Object.entries(
+													previewPosts
+												).map( ( [ slug, data ] ) => (
+													<option
+														key={ slug }
+														value={ slug }
+													>
+														{ data.label }
+													</option>
+												) ) }
+											</select>
+										</div>
+										<div className="field-group fixed-md">
+											<label className="field-group__label">
+												{ __(
+													'Select content',
+													'saman-seo'
+												) }
+											</label>
+											<select
+												className="input"
+												value={
+													selectedPreviewPost || ''
+												}
+												onChange={ ( e ) => {
+													const postId =
+														e.target.value;
+													setSelectedPreviewPost(
+														postId
+													);
+													if (
+														postId &&
+														previewPosts[
+															previewPostType
+														]
+													) {
+														const post =
+															previewPosts[
+																previewPostType
+															].posts.find(
+																( p ) =>
+																	String(
+																		p.id
+																	) === postId
+															);
+														if ( post ) {
+															setCardPreviewTitle(
+																post.title
+															);
+														}
+													}
+												} }
+											>
+												<option value="">
+													{ __(
+														'Custom text',
+														'saman-seo'
+													) }
+												</option>
+												{ previewPosts[
+													previewPostType
+												]?.posts?.map( ( post ) => (
+													<option
+														key={ post.id }
+														value={ post.id }
+													>
+														{ post.title }
+													</option>
+												) ) }
+											</select>
+										</div>
+									</>
+								) }
+							</div>
+
+							{ /* Card Preview */ }
+							<div
+								className="social-card-preview"
+								style={ {
+									background:
+										cardDesign.layout === 'gradient'
+											? `linear-gradient(135deg, ${ cardDesign.background_color } 0%, ${ cardDesign.accent_color }44 100%)`
+											: cardDesign.background_color,
+									justifyContent:
+										cardDesign.layout === 'centered'
+											? 'center'
+											: cardDesign.layout === 'magazine'
+											? 'flex-end'
+											: 'flex-end',
+									alignItems:
+										cardDesign.layout === 'centered'
+											? 'center'
+											: 'flex-start',
+									padding:
+										cardDesign.layout === 'magazine'
+											? '40px 32px'
+											: '32px',
+								} }
+							>
+								{ /* Layout-specific accent elements */ }
+								{ cardDesign.layout === 'default' && (
+									<div
+										className="social-card-preview__accent"
+										style={ {
+											bottom: 0,
+											left: 0,
+											right: 0,
+											height: '4px',
+											background: cardDesign.accent_color,
+										} }
+									/>
+								) }
+								{ cardDesign.layout === 'magazine' && (
+									<div
+										className="social-card-preview__accent"
+										style={ {
+											top: 0,
+											left: 0,
+											right: 0,
+											height: '4px',
+											background: cardDesign.accent_color,
+										} }
+									/>
+								) }
+								{ cardDesign.layout === 'corner' && (
+									<>
+										<div
+											className="social-card-preview__accent"
+											style={ {
+												top: 0,
+												left: 0,
+												width: '80px',
+												height: '80px',
+												background:
+													cardDesign.accent_color,
+												clipPath:
+													'polygon(0 0, 100% 0, 0 100%)',
+											} }
+										/>
+										<div
+											className="social-card-preview__accent"
+											style={ {
+												bottom: 0,
+												right: 0,
+												width: '120px',
+												height: '120px',
+												background:
+													cardDesign.accent_color,
+												clipPath:
+													'polygon(100% 100%, 0 100%, 100% 0)',
+												opacity: 0.5,
+											} }
+										/>
+									</>
+								) }
+								{ cardDesign.layout === 'gradient' && (
+									<div
+										className="social-card-preview__accent"
+										style={ {
+											bottom: 0,
+											left: 0,
+											right: 0,
+											height: '50%',
+											background: `linear-gradient(to top, ${ cardDesign.background_color } 0%, transparent 100%)`,
+										} }
+									/>
+								) }
+
+								{ /* Logo */ }
+								{ cardDesign.logo_url && (
+									<img
+										className="social-card-preview__logo"
+										src={ cardDesign.logo_url }
+										alt={ __( 'Logo', 'saman-seo' ) }
+										style={ {
+											width: `${ Math.max(
+												24,
+												( cardDesign.logo_size || 48 ) /
+													2.5
+											) }px`,
+											height: `${ Math.max(
+												24,
+												( cardDesign.logo_size || 48 ) /
+													2.5
+											) }px`,
+											...( cardDesign.logo_position ===
+												'top-left' && {
+												top: '20px',
+												left: '20px',
+											} ),
+											...( cardDesign.logo_position ===
+												'top-right' && {
+												top: '20px',
+												right: '20px',
+											} ),
+											...( cardDesign.logo_position ===
+												'bottom-left' && {
+												bottom: '20px',
+												left: '20px',
+											} ),
+											...( cardDesign.logo_position ===
+												'bottom-right' && {
+												bottom: '20px',
+												right: '20px',
+											} ),
+											...( cardDesign.logo_position ===
+												'center' && {
+												top: '50%',
+												left: '50%',
+												transform:
+													'translate(-50%, -50%)',
+												opacity: 0.1,
+												width: '40%',
+												height: '40%',
+											} ),
+										} }
+									/>
+								) }
+
+								{ /* Title */ }
+								<h2
+									style={ {
+										color: cardDesign.text_color,
+										fontSize: `${ Math.max(
+											14,
+											cardDesign.title_font_size / 3
+										) }px`,
+										fontWeight:
+											cardDesign.title_weight || 600,
+										margin: 0,
+										marginBottom: '6px',
+										textAlign:
+											cardDesign.layout === 'centered'
+												? 'center'
+												: 'left',
+										zIndex: 1,
+										lineHeight: 1.3,
+										maxWidth:
+											cardDesign.layout === 'centered'
+												? '90%'
+												: '85%',
+									} }
+								>
+									{ cardPreviewTitle }
+								</h2>
+
+								{ /* Site Name */ }
+								<span
+									style={ {
+										color: cardDesign.text_color,
+										fontSize: `${ Math.max(
+											9,
+											cardDesign.site_font_size / 3
+										) }px`,
+										opacity: 0.7,
+										zIndex: 1,
+										fontWeight: 400,
+										letterSpacing:
+											cardDesign.layout === 'magazine'
+												? '0.5px'
+												: '0',
+										textTransform:
+											cardDesign.layout === 'magazine'
+												? 'uppercase'
+												: 'none',
+									} }
+								>
+									{ siteInfo.name ||
+										__( 'Your Site Name', 'saman-seo' ) }
+								</span>
+							</div>
+						</div>
+
+						{ /* Layout Selection */ }
+						<div className="settings-row compact">
+							<div className="settings-label">
+								<label>
+									{ __( 'Layout Style', 'saman-seo' ) }
+								</label>
+								<p className="settings-help">
+									{ __(
+										'Each layout has optimized defaults.',
+										'saman-seo'
+									) }
+								</p>
+							</div>
+							<div className="settings-control">
+								<div className="card-layout-grid">
+									{ cardLayoutOptions.map( ( layout ) => (
+										<label
+											key={ layout.value }
+											className={ `card-layout-option ${
+												cardDesign.layout ===
+												layout.value
+													? 'is-selected'
+													: ''
+											}` }
+										>
+											<input
+												type="radio"
+												name="card-layout"
+												value={ layout.value }
+												checked={
+													cardDesign.layout ===
+													layout.value
+												}
+												onChange={ ( e ) => {
+													const newLayout =
+														e.target.value;
+													const layoutConfig =
+														cardLayoutOptions.find(
+															( l ) =>
+																l.value ===
+																newLayout
+														);
+													setCardDesign( {
+														...cardDesign,
+														layout: newLayout,
+														...( layoutConfig?.defaults ||
+															{} ),
+													} );
+												} }
+											/>
+											<span className="card-layout-option__title">
+												{ layout.label }
+											</span>
+											<span className="card-layout-option__description">
+												{ layout.description }
+											</span>
+										</label>
+									) ) }
+								</div>
+							</div>
+						</div>
+
+						{ /* Color Presets */ }
+						<div className="settings-row compact">
+							<div className="settings-label">
+								<label>
+									{ __( 'Color Presets', 'saman-seo' ) }
+								</label>
+								<p className="settings-help">
+									{ __(
+										'Quick color schemes to get started.',
+										'saman-seo'
+									) }
+								</p>
+							</div>
+							<div className="settings-control">
+								<div className="color-presets">
+									{ colorPresets.map( ( preset ) => (
+										<button
+											key={ preset.name }
+											type="button"
+											className="color-preset"
+											onClick={ () =>
+												setCardDesign( {
+													...cardDesign,
+													background_color: preset.bg,
+													accent_color: preset.accent,
+													text_color: preset.text,
+												} )
+											}
+											title={ preset.name }
+										>
+											<span
+												className="color-preset__swatch"
+												style={ {
+													background: preset.bg,
+												} }
+											/>
+											<span
+												className="color-preset__swatch"
+												style={ {
+													background: preset.accent,
+												} }
+											/>
+											<span>{ preset.name }</span>
+										</button>
+									) ) }
+								</div>
+							</div>
+						</div>
+
+						{ /* Colors Row */ }
+						<div className="settings-row compact">
+							<div className="settings-label">
+								<label>{ __( 'Colors', 'saman-seo' ) }</label>
+							</div>
+							<div className="settings-control">
+								<div className="color-fields">
+									<div className="color-field">
+										<span className="color-field__label">
+											{ __( 'Background', 'saman-seo' ) }
+										</span>
+										<div className="color-field__row">
+											<input
+												type="color"
+												className="color-field__input"
+												value={
+													cardDesign.background_color
+												}
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														background_color:
+															e.target.value,
+													} )
+												}
+											/>
+											<input
+												type="text"
+												className="input color-field__text"
+												value={
+													cardDesign.background_color
+												}
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														background_color:
+															e.target.value,
+													} )
+												}
+											/>
+										</div>
+									</div>
+									<div className="color-field">
+										<span className="color-field__label">
+											{ __( 'Accent', 'saman-seo' ) }
+										</span>
+										<div className="color-field__row">
+											<input
+												type="color"
+												className="color-field__input"
+												value={
+													cardDesign.accent_color
+												}
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														accent_color:
+															e.target.value,
+													} )
+												}
+											/>
+											<input
+												type="text"
+												className="input color-field__text"
+												value={
+													cardDesign.accent_color
+												}
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														accent_color:
+															e.target.value,
+													} )
+												}
+											/>
+										</div>
+									</div>
+									<div className="color-field">
+										<span className="color-field__label">
+											{ __( 'Text', 'saman-seo' ) }
+										</span>
+										<div className="color-field__row">
+											<input
+												type="color"
+												className="color-field__input"
+												value={ cardDesign.text_color }
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														text_color:
+															e.target.value,
+													} )
+												}
+											/>
+											<input
+												type="text"
+												className="input color-field__text"
+												value={ cardDesign.text_color }
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														text_color:
+															e.target.value,
+													} )
+												}
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{ /* Typography */ }
+						<div className="settings-row compact">
+							<div className="settings-label">
+								<label>
+									{ __( 'Typography', 'saman-seo' ) }
+								</label>
+							</div>
+							<div className="settings-control">
+								<div className="inline-fields">
+									<div className="color-field">
+										<span className="color-field__label">
+											{ __( 'Title Size', 'saman-seo' ) }
+										</span>
+										<div className="color-field__row">
+											<input
+												type="range"
+												min={ 24 }
+												max={ 72 }
+												value={
+													cardDesign.title_font_size
+												}
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														title_font_size:
+															parseInt(
+																e.target.value
+															),
+													} )
+												}
+												style={ {
+													width: '100px',
+												} }
+											/>
+											<span className="color-field__label">
+												{ cardDesign.title_font_size }
+												{ __( 'px', 'saman-seo' ) }
+											</span>
+										</div>
+									</div>
+									<div className="color-field">
+										<span className="color-field__label">
+											{ __(
+												'Title Weight',
+												'saman-seo'
+											) }
+										</span>
+										<select
+											className="input color-field__text"
+											value={
+												cardDesign.title_weight || 600
+											}
+											onChange={ ( e ) =>
+												setCardDesign( {
+													...cardDesign,
+													title_weight: parseInt(
+														e.target.value
+													),
+												} )
+											}
+										>
+											<option value={ 400 }>
+												{ __( 'Regular', 'saman-seo' ) }
+											</option>
+											<option value={ 500 }>
+												{ __( 'Medium', 'saman-seo' ) }
+											</option>
+											<option value={ 600 }>
+												{ __(
+													'Semibold',
+													'saman-seo'
+												) }
+											</option>
+											<option value={ 700 }>
+												{ __( 'Bold', 'saman-seo' ) }
+											</option>
+										</select>
+									</div>
+									<div className="color-field">
+										<span className="color-field__label">
+											{ __(
+												'Site Name Size',
+												'saman-seo'
+											) }
+										</span>
+										<div className="color-field__row">
+											<input
+												type="range"
+												min={ 12 }
+												max={ 32 }
+												value={
+													cardDesign.site_font_size
+												}
+												onChange={ ( e ) =>
+													setCardDesign( {
+														...cardDesign,
+														site_font_size:
+															parseInt(
+																e.target.value
+															),
+													} )
+												}
+												style={ {
+													width: '100px',
+												} }
+											/>
+											<span className="color-field__label">
+												{ cardDesign.site_font_size }
+												{ __( 'px', 'saman-seo' ) }
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{ /* Logo Settings */ }
+						<div className="settings-row compact">
+							<div className="settings-label">
+								<label>{ __( 'Logo', 'saman-seo' ) }</label>
+								<p className="settings-help">
+									{ __(
+										'PNG with transparency works best.',
+										'saman-seo'
+									) }
+								</p>
+							</div>
+							<div className="settings-control">
+								<div className="image-uploader">
+									{ cardDesign.logo_url && (
+										<div className="logo-preview">
+											<img
+												src={ cardDesign.logo_url }
+												alt={ __(
+													'Logo preview',
+													'saman-seo'
+												) }
+											/>
+										</div>
+									) }
+									<div className="color-field">
+										<div className="color-field__row">
+											<button
+												type="button"
+												className="button"
+												onClick={ () => {
+													const frame = wp.media( {
+														title: __(
+															'Select Logo',
+															'saman-seo'
+														),
+														button: {
+															text: __(
+																'Use Logo',
+																'saman-seo'
+															),
+														},
+														multiple: false,
+														library: {
+															type: 'image',
+														},
+													} );
+													frame.on( 'select', () => {
+														const attachment = frame
+															.state()
+															.get( 'selection' )
+															.first()
+															.toJSON();
+														setCardDesign( {
+															...cardDesign,
+															logo_url:
+																attachment.url,
+														} );
+													} );
+													frame.open();
+												} }
+											>
+												{ cardDesign.logo_url
+													? __(
+															'Change Logo',
+															'saman-seo'
+													  )
+													: __(
+															'Select Logo',
+															'saman-seo'
+													  ) }
+											</button>
+											{ cardDesign.logo_url && (
+												<button
+													type="button"
+													className="button danger"
+													onClick={ () =>
+														setCardDesign( {
+															...cardDesign,
+															logo_url: '',
+														} )
+													}
+												>
+													{ __(
+														'Remove',
+														'saman-seo'
+													) }
+												</button>
+											) }
+										</div>
+										{ cardDesign.logo_url && (
+											<div className="inline-fields">
+												<div className="color-field">
+													<span className="color-field__label">
+														{ __(
+															'Size',
+															'saman-seo'
+														) }
+													</span>
+													<div className="color-field__row">
+														<input
+															type="range"
+															min={ 24 }
+															max={ 120 }
+															value={
+																cardDesign.logo_size ||
+																48
+															}
+															onChange={ ( e ) =>
+																setCardDesign( {
+																	...cardDesign,
+																	logo_size:
+																		parseInt(
+																			e
+																				.target
+																				.value
+																		),
+																} )
+															}
+															style={ {
+																width: '80px',
+															} }
+														/>
+														<span className="color-field__label">
+															{ cardDesign.logo_size ||
+																48 }
+															{ __(
+																'px',
+																'saman-seo'
+															) }
+														</span>
+													</div>
+												</div>
+												<div className="color-field">
+													<span className="color-field__label">
+														{ __(
+															'Position',
+															'saman-seo'
+														) }
+													</span>
+													<select
+														className="input color-field__text"
+														value={
+															cardDesign.logo_position
+														}
+														onChange={ ( e ) =>
+															setCardDesign( {
+																...cardDesign,
+																logo_position:
+																	e.target
+																		.value,
+															} )
+														}
+													>
+														{ logoPositionOptions.map(
+															( opt ) => (
+																<option
+																	key={
+																		opt.value
+																	}
+																	value={
+																		opt.value
+																	}
+																>
+																	{
+																		opt.label
+																	}
+																</option>
+															)
+														) }
+													</select>
+												</div>
+											</div>
+										) }
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div className="form-actions">
+							<button
+								type="button"
+								className="button primary"
+								onClick={ saveCardDesign }
+								disabled={ saving }
+							>
+								{ saving
+									? __( 'Saving\u2026', 'saman-seo' )
+									: __( 'Save Card Design', 'saman-seo' ) }
+							</button>
+						</div>
+					</div>
+				</section>
+			) }
 		</div>
 	);
 };

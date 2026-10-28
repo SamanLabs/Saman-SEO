@@ -142,10 +142,11 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 									onChange={ ( e ) =>
 										setNewPattern( e.target.value )
 									}
-									placeholder={ __(
-										'/uploads/*',
-										'saman-seo'
-									) }
+									placeholder={
+										isRegex
+											? '^/old-.*\\.html$'
+											: __( '/uploads/*', 'saman-seo' )
+									}
 									disabled={ adding }
 								/>
 							</label>

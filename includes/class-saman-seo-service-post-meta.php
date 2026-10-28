@@ -22,12 +22,27 @@ class Post_Meta {
 	const META_KEY = '_SAMAN_SEO_meta';
 
 	/**
+	 * Post types the meta field has been registered for.
+	 *
+	 * @var array<string,bool>
+	 */
+	private $registered_types = array();
+
+	/**
+	 * Whether the init-time registration has run.
+	 *
+	 * @var bool
+	 */
+	private $initial_registration_done = false;
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
 	 */
 	public function boot() {
-		add_action( 'init', array( $this, 'register_meta' ) );
+		add_action( 'init', array( $this, 'register_meta' ), 99 );
+		add_action( 'registered_post_type', array( $this, 'register_meta_for_late_post_type' ), 10, 1 );
 		add_action( 'save_post', array( $this, 'save_meta' ), 10, 2 );
 	}
 
@@ -37,9 +52,92 @@ class Post_Meta {
 	 * @return void
 	 */
 	public function register_meta() {
-		$schema = array(
-			'type'       => 'object',
-			'properties' => array(
+		// Register for every post type the editor panel appears on, not just
+		// posts and pages, so block-editor saves on custom post types persist.
+		foreach ( self::get_supported_post_types() as $post_type ) {
+			$this->register_meta_for_post_type( $post_type );
+		}
+
+		$this->initial_registration_done = true;
+	}
+
+	/**
+	 * Register the meta field for a post type registered after init:99.
+	 *
+	 * Types registered earlier are covered by register_meta(). Later ones
+	 * (late init callbacks, wp_loaded, ...) go through the same eligibility
+	 * rules and filter via get_supported_post_types().
+	 *
+	 * @param string $post_type Post type name.
+	 * @return void
+	 */
+	public function register_meta_for_late_post_type( $post_type ) {
+		if ( ! $this->initial_registration_done ) {
+			return;
+		}
+
+		$post_type = (string) $post_type;
+
+		if ( isset( $this->registered_types[ $post_type ] ) ) {
+			return;
+		}
+
+		if ( in_array( $post_type, self::get_supported_post_types(), true ) ) {
+			$this->register_meta_for_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Register the SEO meta field for one post type.
+	 *
+	 * The REST API only exposes meta for types supporting custom-fields, so
+	 * support is added when missing.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return void
+	 */
+	public function register_meta_for_post_type( $post_type ) {
+		if ( ! post_type_supports( $post_type, 'custom-fields' ) ) {
+			add_post_type_support( $post_type, 'custom-fields' );
+		}
+
+		register_post_meta(
+			$post_type,
+			self::META_KEY,
+			array(
+				'type'              => 'object',
+				'single'            => true,
+				'show_in_rest'      => array(
+					'schema' => self::get_rest_schema(),
+				),
+				'default'           => array(),
+				'auth_callback'     => static function ( $allowed, $meta_key, $object_id ) {
+					return current_user_can( 'edit_post', $object_id );
+				},
+				'sanitize_callback' => array( $this, 'sanitize' ),
+			)
+		);
+
+		$this->registered_types[ $post_type ] = true;
+	}
+
+	/**
+	 * REST schema for the meta object.
+	 *
+	 * Every object level sets additionalProperties explicitly: core defaults
+	 * it to false for registered meta, and a stored value with a key the
+	 * schema does not list (recipe/event fields, keys written by older
+	 * versions) would then fail validation and the whole field would be
+	 * returned as null. The editor would save that null back over the data.
+	 * sanitize() decides what is persisted, not the REST schema.
+	 *
+	 * @return array
+	 */
+	public static function get_rest_schema() {
+		return array(
+			'type'                 => 'object',
+			'additionalProperties' => true,
+			'properties'           => array(
 				'title'                => array(
 					'type' => 'string',
 				),
@@ -67,6 +165,21 @@ class Post_Meta {
 				'sitemap_exclude'      => array(
 					'type' => 'string',
 				),
+				// Snippet controls. Loose types so a boolean/integer sent
+				// by the editor is normalized by sanitize() instead of
+				// failing REST validation and blocking the post save.
+				'nosnippet'            => array(
+					'type' => array( 'string', 'boolean' ),
+				),
+				'max_snippet'          => array(
+					'type' => array( 'string', 'integer' ),
+				),
+				'max_image_preview'    => array(
+					'type' => 'string',
+				),
+				'noimageindex'         => array(
+					'type' => array( 'string', 'boolean' ),
+				),
 				'og_image'             => array(
 					'type' => 'string',
 				),
@@ -77,47 +190,38 @@ class Post_Meta {
 					'type' => 'string',
 				),
 				'recipe'               => array(
-					'type' => 'object',
+					'type'                 => 'object',
+					'additionalProperties' => true,
 				),
 				'event'                => array(
-					'type' => 'object',
+					'type'                 => 'object',
+					'additionalProperties' => true,
 				),
 			),
 		);
+	}
 
-		register_post_meta(
-			'post',
-			self::META_KEY,
+	/**
+	 * Post types that get the SEO meta field (public, with an admin UI).
+	 *
+	 * Mirrors the editor panel's post types and honours the same filter.
+	 *
+	 * @return string[]
+	 */
+	public static function get_supported_post_types() {
+		$post_types = get_post_types(
 			array(
-				'type'              => 'object',
-				'single'            => true,
-				'show_in_rest'      => array(
-					'schema' => $schema,
-				),
-				'default'           => array(),
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_posts' );
-				},
-				'sanitize_callback' => array( $this, 'sanitize' ),
-			)
+				'public'  => true,
+				'show_ui' => true,
+			),
+			'names'
 		);
 
-		register_post_meta(
-			'page',
-			self::META_KEY,
-			array(
-				'type'              => 'object',
-				'single'            => true,
-				'show_in_rest'      => array(
-					'schema' => $schema,
-				),
-				'default'           => array(),
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_pages' );
-				},
-				'sanitize_callback' => array( $this, 'sanitize' ),
-			)
-		);
+		unset( $post_types['attachment'] );
+
+		$post_types = array_values( array_unique( array_merge( array( 'post', 'page' ), $post_types ) ) );
+
+		return (array) saman_seo_apply_filters( 'saman_seo_editor_post_types', $post_types );
 	}
 
 	/**
@@ -143,7 +247,13 @@ class Post_Meta {
 		$clean['sitemap_exclude'] = ! empty( $value['sitemap_exclude'] ) ? '1' : '';
 		$clean['og_image']        = isset( $value['og_image'] ) ? esc_url_raw( $value['og_image'] ) : '';
 		$clean['schema_type']     = isset( $value['schema_type'] ) ? sanitize_text_field( $value['schema_type'] ) : '';
-		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? wp_kses_post( wp_unslash( $value['custom_schema'] ) ) : '';
+		$clean['custom_schema']   = isset( $value['custom_schema'] ) ? self::sanitize_custom_schema( $value['custom_schema'] ) : '';
+
+		// Snippet controls (also govern Google AI Overviews / AI Mode).
+		$clean['nosnippet']         = self::sanitize_flag( $value['nosnippet'] ?? '' );
+		$clean['max_snippet']       = self::sanitize_max_snippet( $value['max_snippet'] ?? '' );
+		$clean['max_image_preview'] = self::sanitize_max_image_preview( $value['max_image_preview'] ?? '' );
+		$clean['noimageindex']      = self::sanitize_flag( $value['noimageindex'] ?? '' );
 
 		// Handle secondary keyphrases (max 4 additional keywords).
 		$clean['secondary_keyphrases'] = array();
@@ -175,6 +285,96 @@ class Post_Meta {
 		}
 
 		return $clean;
+	}
+
+	/**
+	 * Normalize a boolean-ish flag to the stored '1' / '' format.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_flag( $value ): string {
+		if ( is_string( $value ) ) {
+			$value = strtolower( trim( $value ) );
+
+			return ( '' === $value || '0' === $value || 'false' === $value ) ? '' : '1';
+		}
+
+		return empty( $value ) ? '' : '1';
+	}
+
+	/**
+	 * Normalize the per-post max-snippet value.
+	 *
+	 * Empty means "inherit the global setting"; -1 means no limit; 0 and up
+	 * is a character limit.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_max_snippet( $value ): string {
+		if ( is_bool( $value ) || null === $value || is_array( $value ) || is_object( $value ) ) {
+			return '';
+		}
+
+		$value = trim( (string) $value );
+		if ( '' === $value || ! preg_match( '/^-?\d+$/', $value ) ) {
+			return '';
+		}
+
+		return (string) max( -1, (int) $value );
+	}
+
+	/**
+	 * Normalize the per-post max-image-preview value.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string One of none|standard|large, or '' to inherit.
+	 */
+	public static function sanitize_max_image_preview( $value ): string {
+		$value = is_string( $value ) ? strtolower( trim( $value ) ) : '';
+
+		return in_array( $value, array( 'none', 'standard', 'large' ), true ) ? $value : '';
+	}
+
+	/**
+	 * Validate and canonicalize the custom JSON-LD schema.
+	 *
+	 * The value is JSON, not HTML: running it through an HTML sanitizer
+	 * turns "&" into "&amp;" inside URLs and can corrupt the document.
+	 * Decode it, reject anything that is not a JSON object/array, and store
+	 * the re-encoded canonical JSON. Output escaping (JSON_HEX_TAG etc.)
+	 * happens when the graph is printed.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string Canonical JSON, or '' when the input is not valid JSON.
+	 */
+	public static function sanitize_custom_schema( $value ): string {
+		if ( is_array( $value ) ) {
+			$decoded = $value;
+		} else {
+			if ( ! is_string( $value ) ) {
+				return '';
+			}
+
+			$value = trim( $value );
+			if ( '' === $value ) {
+				return '';
+			}
+
+			$decoded = json_decode( $value, true );
+			if ( JSON_ERROR_NONE !== json_last_error() ) {
+				return '';
+			}
+		}
+
+		if ( ! is_array( $decoded ) || empty( $decoded ) ) {
+			return '';
+		}
+
+		$encoded = wp_json_encode( $decoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+
+		return is_string( $encoded ) ? $encoded : '';
 	}
 
 	/**
@@ -377,9 +577,16 @@ class Post_Meta {
 		// shared sanitizer so every field (focus keyphrase, schema, social,
 		// secondary keyphrases, etc.) persists for any post type.
 		if ( isset( $_POST['SAMAN_SEO_meta_json'] ) ) {
-			$decoded = json_decode( wp_unslash( $_POST['SAMAN_SEO_meta_json'] ), true );
+			$decoded = json_decode( wp_unslash( $_POST['SAMAN_SEO_meta_json'] ), true ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON is decoded here and every field is sanitized by sanitize().
 			if ( is_array( $decoded ) ) {
-				update_post_meta( $post_id, self::META_KEY, $this->sanitize( $decoded ) );
+				// Merge over the stored meta so keys the modal does not
+				// send (recipe/event blocks, ...) survive the save.
+				$existing = get_post_meta( $post_id, self::META_KEY, true );
+				$existing = is_array( $existing ) ? $existing : array();
+
+				// update_post_meta() unslashes its value; slash it so the
+				// backslashes inside JSON strings (custom schema) survive.
+				update_post_meta( $post_id, self::META_KEY, wp_slash( $this->sanitize( array_merge( $existing, $decoded ) ) ) );
 				return;
 			}
 		}
@@ -392,7 +599,7 @@ class Post_Meta {
 			'nofollow'      => ! empty( $_POST['SAMAN_SEO_nofollow'] ) ? '1' : '',
 			'og_image'      => isset( $_POST['SAMAN_SEO_og_image'] ) ? esc_url_raw( wp_unslash( $_POST['SAMAN_SEO_og_image'] ) ) : '',
 			'schema_type'   => isset( $_POST['SAMAN_SEO_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['SAMAN_SEO_schema_type'] ) ) : '',
-			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? wp_kses_post( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '',
+			'custom_schema' => isset( $_POST['SAMAN_SEO_custom_schema'] ) ? self::sanitize_custom_schema( wp_unslash( $_POST['SAMAN_SEO_custom_schema'] ) ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON validated and re-encoded by sanitize_custom_schema().
 		);
 
 		// The classic form only knows a subset of the meta blob. Merge the
@@ -403,6 +610,6 @@ class Post_Meta {
 		$existing = get_post_meta( $post_id, self::META_KEY, true );
 		$existing = is_array( $existing ) ? $existing : array();
 
-		update_post_meta( $post_id, self::META_KEY, $this->sanitize( array_merge( $existing, $data ) ) );
+		update_post_meta( $post_id, self::META_KEY, wp_slash( $this->sanitize( array_merge( $existing, $data ) ) ) );
 	}
 }

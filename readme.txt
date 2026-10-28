@@ -1,8 +1,8 @@
 === Saman SEO ===
 Contributors: juandenis
 Tags: seo, meta tags, sitemap, redirects, schema
-Requires at least: 5.8
-Tested up to: 6.9
+Requires at least: 6.6
+Tested up to: 7.1
 Stable tag: 2.0.33
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -27,7 +27,7 @@ For too long, WordPress SEO has been dominated by proprietary solutions that ope
 
 = Advanced Capabilities =
 
-* **AI-Powered Suggestions**: OpenAI integration for intelligent title and meta description generation
+* **AI-Powered Suggestions**: Title and meta description generation through the separate Saman Labs AI plugin (optional)
 * **Internal Linking Engine**: Automated keyword-to-link conversion with rule-based controls
 * **Advanced Sitemap Manager**: Full XML sitemap control with post type/taxonomy selection, RSS and Google News sitemaps
 * **Audit Dashboard**: Visual severity graphs, issue logging, and automatic fallback generation
@@ -43,9 +43,9 @@ For too long, WordPress SEO has been dominated by proprietary solutions that ope
 
 = Privacy & Security =
 
-* **404 Logging**: Opt-in feature that stores only hashed referrers
-* **No Telemetry**: Zero external tracking or analytics
-* **No External Requests**: All processing happens on your server (except optional AI features)
+* **404 Logging**: On by default; stores the requested URL and the full referrer URL. Referrer logging and the 404 log itself can be turned off in settings
+* **Usage Analytics Are Opt-In**: Anonymous admin usage tracking (Matomo) is off by default and only runs if you enable it in Settings > Modules
+* **External Requests Only for Features You Use**: IndexNow pings, Google Search Console, link health checks and video thumbnail/metadata lookups contact third-party services when those features are used; AI features run through the separate Saman Labs AI plugin
 
 == Installation ==
 
@@ -70,7 +70,7 @@ Yes, Saman SEO includes comprehensive WP-CLI commands for managing redirects, si
 
 = Does the AI feature require an API key? =
 
-Yes, the AI-powered suggestions feature requires an OpenAI API key, which you can configure in the plugin settings. This feature is entirely optional.
+AI suggestions are provided by the separate Saman Labs AI plugin, which handles its own provider and API key settings. This feature is entirely optional.
 
 == Screenshots ==
 

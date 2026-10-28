@@ -6,18 +6,24 @@
  */
 
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { Modal } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { select as dataSelect, useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SEOPanel from './components/SEOPanel';
 import { renderTemplatePreview } from '../utils/template';
 import './editor.css';
 
-// Sidebar name constant
 import { __ } from '@wordpress/i18n';
+
+// Complementary area identifier: `${ plugin name }/${ sidebar name }`.
 const SIDEBAR_NAME = 'saman-seo/seo-sidebar';
+// Complementary area scope shared by the post and site editors (WP 6.6+).
+const SIDEBAR_SCOPE = 'core';
+// Hash and admin bar node that open the modal ("Edit SEO Settings" link).
+const OPEN_MODAL_HASH = '#saman-seo-open-modal';
+const ADMIN_BAR_EDIT_LINK = '#wp-admin-bar-saman-seo-seo-edit a';
 
 // Get localized data
 const editorData = window.SamanSEOEditor || {};
@@ -75,32 +81,66 @@ const SEOModalPlugin = () => {
 		og_image: '',
 		focus_keyphrase: '',
 		schema_type: '',
+		secondary_keyphrases: [],
 	} );
 	const [ seoScore, setSeoScore ] = useState( null );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ hasChanges, setHasChanges ] = useState( false );
 	const [ variableValues, setVariableValues ] = useState( {} );
 	const wasOpenRef = useRef( false );
+	// Post ID whose stored meta has been copied into local state. Until it
+	// matches, edits are ignored so blank fields never overwrite stored meta.
+	const loadedPostIdRef = useRef( null );
 
 	// Check if our sidebar is active
-	const isSidebarActive = useSelect( ( select ) => {
-		const activeGeneralSidebar =
-			select( 'core/edit-post' ).getActiveGeneralSidebarName();
-		return activeGeneralSidebar === SIDEBAR_NAME;
-	}, [] );
+	const isSidebarActive = useSelect(
+		( select ) =>
+			select( 'core/interface' ).getActiveComplementaryArea(
+				SIDEBAR_SCOPE
+			) === SIDEBAR_NAME,
+		[]
+	);
 
 	// Get sidebar controls
-	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const { disableComplementaryArea } = useDispatch( 'core/interface' );
 
 	// When sidebar becomes active, close it and open modal instead
 	useEffect( () => {
 		if ( isSidebarActive && ! wasOpenRef.current ) {
 			// Sidebar was just activated - close it and open modal
-			closeGeneralSidebar();
+			disableComplementaryArea( SIDEBAR_SCOPE );
 			setIsModalOpen( true );
 		}
 		wasOpenRef.current = isSidebarActive;
-	}, [ isSidebarActive, closeGeneralSidebar ] );
+	}, [ isSidebarActive, disableComplementaryArea ] );
+
+	// Open the modal from the admin bar "Edit SEO Settings" link, or when the
+	// editor was reached through that link from another screen.
+	useEffect( () => {
+		const { location, history } = window;
+		if ( location.hash === OPEN_MODAL_HASH ) {
+			setIsModalOpen( true );
+			history.replaceState(
+				history.state,
+				'',
+				location.pathname + location.search
+			);
+		}
+
+		const onClick = ( event ) => {
+			const target = event.target;
+			if ( ! target || ! target.closest ) {
+				return;
+			}
+			if ( target.closest( ADMIN_BAR_EDIT_LINK ) ) {
+				event.preventDefault();
+				setIsModalOpen( true );
+			}
+		};
+
+		document.addEventListener( 'click', onClick );
+		return () => document.removeEventListener( 'click', onClick );
+	}, [] );
 
 	// Get post data from editor
 	const {
@@ -111,9 +151,12 @@ const SEOModalPlugin = () => {
 		postType,
 		postSlug,
 		featuredImage,
+		storedSeoMeta,
+		isMetaReady,
 	} = useSelect( ( select ) => {
 		const editor = select( 'core/editor' );
 		const post = editor.getCurrentPost();
+		const editedMeta = editor.getEditedPostAttribute( 'meta' );
 		const featuredImageId =
 			editor.getEditedPostAttribute( 'featured_media' );
 		let featuredImageUrl = '';
@@ -131,50 +174,42 @@ const SEOModalPlugin = () => {
 			postType: editor.getCurrentPostType(),
 			postSlug: post?.slug || '',
 			featuredImage: featuredImageUrl,
+			// The editor already holds the post's meta (whatever its REST
+			// base), so read it from the store instead of refetching.
+			storedSeoMeta: editedMeta?._SAMAN_SEO_meta,
+			isMetaReady:
+				!! editor.getCurrentPostId() &&
+				( !! editedMeta || !! post?.id ),
 		};
 	}, [] );
 	const { editPost } = useDispatch( 'core/editor' );
 
-	// Get post type REST base
-	const getRestBase = ( type ) => {
-		// Common post type mappings
-		const bases = {
-			post: 'posts',
-			page: 'pages',
-			attachment: 'media',
-		};
-		return bases[ type ] || type;
-	};
-
-	// Load initial meta from post
+	// Load initial meta from the editor store, once per post. Later store
+	// changes come from updateMeta() itself, so local state is not reset.
 	useEffect( () => {
-		if ( ! postId || ! postType ) {
+		if ( ! isMetaReady || loadedPostIdRef.current === postId ) {
 			return;
 		}
-		const restBase = getRestBase( postType );
-		apiFetch( {
-			path: `/wp/v2/${ restBase }/${ postId }`,
-		} )
-			.then( ( post ) => {
-				if ( post.meta && post.meta._SAMAN_SEO_meta ) {
-					const meta = post.meta._SAMAN_SEO_meta;
-					setSeoMeta( {
-						title: meta.title || '',
-						description: meta.description || '',
-						canonical: meta.canonical || '',
-						noindex: meta.noindex === '1',
-						nofollow: meta.nofollow === '1',
-						sitemap_exclude: meta.sitemap_exclude === '1',
-						og_image: meta.og_image || '',
-						focus_keyphrase: meta.focus_keyphrase || '',
-						schema_type: meta.schema_type || '',
-					} );
-				}
-			} )
-			.catch( () => {
-				// Post meta might not exist yet
-			} );
-	}, [ postId, postType ] );
+		const meta =
+			storedSeoMeta && typeof storedSeoMeta === 'object'
+				? storedSeoMeta
+				: {};
+		setSeoMeta( {
+			title: meta.title || '',
+			description: meta.description || '',
+			canonical: meta.canonical || '',
+			noindex: meta.noindex === '1',
+			nofollow: meta.nofollow === '1',
+			sitemap_exclude: meta.sitemap_exclude === '1',
+			og_image: meta.og_image || '',
+			focus_keyphrase: meta.focus_keyphrase || '',
+			schema_type: meta.schema_type || '',
+			secondary_keyphrases: Array.isArray( meta.secondary_keyphrases )
+				? meta.secondary_keyphrases
+				: [],
+		} );
+		loadedPostIdRef.current = postId;
+	}, [ isMetaReady, postId, storedSeoMeta ] );
 
 	// Calculate SEO score
 	useEffect( () => {
@@ -213,37 +248,42 @@ const SEOModalPlugin = () => {
 	// Update meta field
 	const updateMeta = useCallback(
 		( field, value ) => {
+			// Never write before the stored meta is loaded: the local state
+			// is still blank and would overwrite it.
+			if ( ! postId || loadedPostIdRef.current !== postId ) {
+				return;
+			}
+
 			setSeoMeta( ( prev ) => ( {
 				...prev,
 				[ field ]: value,
 			} ) );
 			setHasChanges( true );
 
-			// Also update post meta for saving
-			const newMeta = {
-				...seoMeta,
-				[ field ]: value,
-			};
+			// Change only this field on the meta the editor store holds right now. It keeps
+			// keys this panel doesn't manage (custom schema, snippet controls, recipe/event
+			// data), and two updates in one tick (a template sets title, then description)
+			// no longer write the first one back from a stale seoMeta.
+			const editedMeta =
+				dataSelect( 'core/editor' ).getEditedPostAttribute( 'meta' )
+					?._SAMAN_SEO_meta || {};
+			let stored = value ?? '';
+			if (
+				[ 'noindex', 'nofollow', 'sitemap_exclude' ].includes( field )
+			) {
+				stored = value ? '1' : '';
+			}
 
-			// Convert booleans to strings for storage
-			const metaForSave = {
-				title: newMeta.title,
-				description: newMeta.description,
-				canonical: newMeta.canonical,
-				noindex: newMeta.noindex ? '1' : '',
-				nofollow: newMeta.nofollow ? '1' : '',
-				sitemap_exclude: newMeta.sitemap_exclude ? '1' : '',
-				og_image: newMeta.og_image,
-				focus_keyphrase: newMeta.focus_keyphrase,
-				schema_type: newMeta.schema_type || '',
-			};
 			editPost( {
 				meta: {
-					_SAMAN_SEO_meta: metaForSave,
+					_SAMAN_SEO_meta: {
+						...editedMeta,
+						[ field ]: stored,
+					},
 				},
 			} );
 		},
-		[ seoMeta, editPost ]
+		[ editPost, postId ]
 	);
 
 	// Get effective title and description (with fallbacks).

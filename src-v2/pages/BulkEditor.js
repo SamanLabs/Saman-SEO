@@ -24,7 +24,7 @@ const BulkEditor = ( { onNavigate } ) => {
 			} );
 			if ( response.success ) {
 				setPosts( response.data.posts );
-				setTotalPages( response.data.total_pages );
+				setTotalPages( response.data.pages );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to fetch posts:', error );
@@ -356,7 +356,149 @@ const BulkEditor = ( { onNavigate } ) => {
 							</tr>
 						</thead>
 						<tbody>
-							{ __( 'Generate AI suggestions', 'saman-seo' ) }
+							{ posts.map( ( post ) => {
+								const seoTitle = getFieldValue(
+									post,
+									'seo_title'
+								);
+								const seoDesc = getFieldValue(
+									post,
+									'seo_description'
+								);
+								const isGenerating =
+									generating &&
+									generating.includes( post.id );
+								const hasPostChanges = !! changes[ post.id ];
+								return (
+									<tr
+										key={ post.id }
+										className={
+											hasPostChanges ? 'row-modified' : ''
+										}
+									>
+										<td className="col-checkbox">
+											<input
+												type="checkbox"
+												checked={ selectedPosts.includes(
+													post.id
+												) }
+												onChange={ () =>
+													handleSelectPost( post.id )
+												}
+											/>
+										</td>
+										<td className="col-title">
+											<div className="post-info">
+												<a
+													href={ post.edit_link }
+													target="_blank"
+													rel="noopener noreferrer"
+													className="post-title-link"
+												>
+													{ post.title }
+												</a>
+												<span className="post-type-badge">
+													{ post.post_type }
+												</span>
+											</div>
+										</td>
+										<td className="col-seo-title">
+											<div className="field-wrapper">
+												<input
+													type="text"
+													value={ seoTitle }
+													onChange={ ( e ) =>
+														handleFieldChange(
+															post.id,
+															'seo_title',
+															e.target.value
+														)
+													}
+													placeholder={ post.title }
+													className={
+														isGenerating
+															? 'generating'
+															: ''
+													}
+													disabled={ isGenerating }
+												/>
+												<span
+													className={ `char-count ${ getCharCountClass(
+														seoTitle.length,
+														'title'
+													) }` }
+												>
+													{ seoTitle.length }/60
+												</span>
+											</div>
+										</td>
+										<td className="col-seo-desc">
+											<div className="field-wrapper">
+												<textarea
+													value={ seoDesc }
+													onChange={ ( e ) =>
+														handleFieldChange(
+															post.id,
+															'seo_description',
+															e.target.value
+														)
+													}
+													placeholder={ __(
+														'Enter meta description\u2026',
+														'saman-seo'
+													) }
+													rows={ 2 }
+													className={
+														isGenerating
+															? 'generating'
+															: ''
+													}
+													disabled={ isGenerating }
+												/>
+												<span
+													className={ `char-count ${ getCharCountClass(
+														seoDesc.length,
+														'desc'
+													) }` }
+												>
+													{ seoDesc.length }/160
+												</span>
+											</div>
+										</td>
+										<td className="col-actions">
+											<button
+												type="button"
+												className="action-button"
+												onClick={ () =>
+													handleGenerateSuggestions( [
+														post.id,
+													] )
+												}
+												disabled={ isGenerating }
+												title={ __(
+													'Generate AI suggestions',
+													'saman-seo'
+												) }
+											>
+												{ isGenerating ? (
+													<span className="spinner-small"></span>
+												) : (
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														width="16"
+														height="16"
+													>
+														<path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z" />
+													</svg>
+												) }
+											</button>
+										</td>
+									</tr>
+								);
+							} ) }
 						</tbody>
 					</table>
 				) }

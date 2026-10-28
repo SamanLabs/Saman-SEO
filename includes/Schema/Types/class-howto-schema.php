@@ -24,6 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Parses HowTo block from post content and generates HowTo schema
  * with steps, tools, supplies, and timing. Uses first block only
  * (multiple HowTo schemas on one page is semantically unclear).
+ *
+ * Google retired HowTo rich results in 2023. The markup is still valid
+ * schema.org and is read by other search engines and AI tools.
  */
 class HowTo_Schema extends Abstract_Schema {
 

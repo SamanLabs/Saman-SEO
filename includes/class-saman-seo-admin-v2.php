@@ -274,6 +274,9 @@ class Admin_V2 {
 		$build_dir = SAMAN_SEO_PATH . 'build/v2/';
 		$build_url = SAMAN_SEO_URL . 'build/v2/';
 
+		// Image pickers in the SPA call wp.media(), which isn't a bundle dependency.
+		wp_enqueue_media();
+
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
@@ -290,6 +293,9 @@ class Admin_V2 {
 			$asset['version'],
 			true
 		);
+
+		// Load JS translations for the __() strings bundled in the SPA.
+		wp_set_script_translations( 'saman-seo-admin-v2', 'saman-seo', SAMAN_SEO_PATH . 'languages' );
 
 		// Enqueue React app styles (bundled by webpack)
 		wp_enqueue_style(

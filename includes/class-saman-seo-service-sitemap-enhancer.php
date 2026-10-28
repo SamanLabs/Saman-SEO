@@ -22,6 +22,23 @@ class Sitemap_Enhancer {
 	private const INDEX_CACHE_KEY = 'SAMAN_SEO_sitemap_index_cache';
 
 	/**
+	 * Cron hook that resolves YouTube maxres thumbnails in the background.
+	 *
+	 * @var string
+	 */
+	const THUMBNAIL_CHECK_HOOK = 'saman_seo_check_youtube_thumbnails';
+
+	/**
+	 * YouTube video IDs whose thumbnail choice is not cached yet.
+	 *
+	 * Filled during a sitemap render and handed to a background cron event
+	 * so the render itself never waits on remote HEAD requests.
+	 *
+	 * @var array<string,bool>
+	 */
+	private $pending_thumbnail_checks = array();
+
+	/**
 	 * Internal flag allowing temporary access to WP core sitemaps.
 	 *
 	 * @var bool
@@ -117,6 +134,7 @@ class Sitemap_Enhancer {
 		add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'filter_stylesheet_url' ) );
 		add_action( 'init', array( $this, 'register_custom_sitemap' ) );
 		add_action( 'template_redirect', array( $this, 'render_custom_sitemap' ), 0 );
+		add_action( self::THUMBNAIL_CHECK_HOOK, array( $this, 'check_youtube_thumbnails' ) );
 
 		// Invalidate the cached sitemap index when content changes.
 		add_action( 'save_post', array( $this, 'flush_index_cache' ) );
@@ -139,7 +157,11 @@ class Sitemap_Enhancer {
 	}
 
 	/**
-	 * Append changefreq, priority, and image nodes.
+	 * Append image and video nodes to a post entry.
+	 *
+	 * No fixed priority/changefreq is added: Google ignores both, so
+	 * constant values only add bytes. Sites that want them can still set
+	 * them through the `saman_seo_sitemap_entry` filter.
 	 *
 	 * @param array  $entry Sitemap entry.
 	 * @param int    $post_id Post ID.
@@ -148,29 +170,101 @@ class Sitemap_Enhancer {
 	 * @return array
 	 */
 	public function include_media_fields( $entry, $post_id, $post_type ) {
-		$entry['priority']   = 0.7;
-		$entry['changefreq'] = 'weekly';
-
+		$content        = (string) get_post_field( 'post_content', $post_id );
 		$exclude_images = get_option( 'SAMAN_SEO_sitemap_exclude_images', '0' );
 
 		if ( '1' !== $exclude_images ) {
-			$content = get_post_field( 'post_content', $post_id );
-			$images  = $this->collect_post_images( $post_id, $content );
+			$images = $this->collect_post_images( $post_id, $content );
 
 			if ( ! empty( $images ) ) {
 				$entry['image:image'] = $images;
 			}
 		}
 
-		$first_video = $this->detect_video( get_post_field( 'post_content', $post_id ) );
-		if ( $first_video ) {
-			$entry['video:video'] = array(
-				'video:content_loc' => esc_url_raw( $first_video ),
-				'video:title'       => get_the_title( $post_id ),
-			);
+		$video = $this->build_video_entry( $post_id, $content );
+		if ( ! empty( $video ) ) {
+			$entry['video:video'] = $video;
 		}
 
 		return saman_seo_apply_filters( 'saman_seo_sitemap_entry', $entry, $post_id, $post_type );
+	}
+
+	/**
+	 * Build a Google video sitemap entry for the first video in a post.
+	 *
+	 * Google requires thumbnail_loc, title, description and either
+	 * content_loc (the media file) or player_loc (an embeddable player).
+	 * Returns an empty array when any of those cannot be filled, so no
+	 * invalid video node is emitted.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $content Post content.
+	 * @return array<string,string>
+	 */
+	private function build_video_entry( $post_id, $content ) {
+		$file_url   = $this->detect_video( $content );
+		$youtube_id = '' === $file_url ? $this->detect_youtube_id( $content ) : '';
+
+		if ( '' === $file_url && '' === $youtube_id ) {
+			return array();
+		}
+
+		$thumbnail = '';
+		if ( '' !== $youtube_id ) {
+			$thumbnail = $this->get_youtube_thumbnail_url( $youtube_id );
+		}
+		if ( '' === $thumbnail ) {
+			$thumbnail = (string) get_the_post_thumbnail_url( $post_id, 'full' );
+		}
+
+		$title       = self::plain_text( get_the_title( $post_id ) );
+		$description = $this->get_video_description( $post_id, $title );
+
+		if ( '' === $thumbnail || '' === $title || '' === $description ) {
+			return array();
+		}
+
+		$video = array(
+			'video:thumbnail_loc' => esc_url_raw( $thumbnail ),
+			'video:title'         => $title,
+			'video:description'   => $description,
+		);
+
+		if ( '' !== $file_url ) {
+			$video['video:content_loc'] = esc_url_raw( $file_url );
+		} else {
+			$video['video:player_loc'] = 'https://www.youtube.com/embed/' . $youtube_id;
+		}
+
+		return $video;
+	}
+
+	/**
+	 * Description for a video entry: excerpt, then content snippet, then title.
+	 *
+	 * Google caps video descriptions at 2048 characters.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $title   Fallback title.
+	 * @return string
+	 */
+	private function get_video_description( $post_id, $title ) {
+		$description = '';
+
+		$post = get_post( $post_id );
+		if ( $post instanceof \WP_Post && '' !== trim( (string) $post->post_excerpt ) ) {
+			$description = $post->post_excerpt;
+		} else {
+			$description = \Saman\SEO\Helpers\generate_content_snippet( $post_id, 50 );
+		}
+
+		$description = self::plain_text( $description );
+
+		if ( '' === $description ) {
+			$description = $title;
+		}
+
+		return function_exists( 'mb_substr' ) ? mb_substr( $description, 0, 2048 ) : substr( $description, 0, 2048 );
 	}
 
 	/**
@@ -203,8 +297,9 @@ class Sitemap_Enhancer {
 				'image:loc' => $url,
 			);
 
-			if ( $caption ) {
-				$image_entry['image:caption'] = wp_strip_all_tags( $caption );
+			$caption = self::plain_text( $caption );
+			if ( '' !== $caption ) {
+				$image_entry['image:caption'] = $caption;
 			}
 
 			$images[] = $image_entry;
@@ -305,6 +400,10 @@ class Sitemap_Enhancer {
 	 */
 	public function filter_posts_query_args( $args, $post_type ) {
 		$args = $this->apply_post_exclusions( $args, $post_type );
+
+		// Core turns the meta cache off for sitemap queries, but every entry reads meta
+		// (featured image, video, SEO fields): load it for the whole page in one query.
+		$args['update_post_meta_cache'] = true;
 
 		/**
 		 * Filter the WP_Query args for sitemap generation.
@@ -700,9 +799,176 @@ class Sitemap_Enhancer {
 
 		nocache_headers();
 
-		$renderer->render_sitemap( $url_list );
+		$this->output_urlset( $url_list, $renderer );
 
 		exit;
+	}
+
+	/**
+	 * Send a urlset document.
+	 *
+	 * WP_Sitemaps_Renderer only writes loc/lastmod/changefreq/priority and
+	 * drops (with a _doing_it_wrong notice) the image:image and video:video
+	 * nodes added in include_media_fields(), so urlsets are written here.
+	 *
+	 * @param array                      $url_list URL entries.
+	 * @param \WP_Sitemaps_Renderer|null $renderer Core renderer (stylesheet URL source).
+	 * @return void
+	 */
+	private function output_urlset( array $url_list, $renderer = null ) {
+		$stylesheet = ( $renderer && method_exists( $renderer, 'get_sitemap_stylesheet_url' ) ) ? $renderer->get_sitemap_stylesheet_url() : '';
+
+		$this->schedule_thumbnail_checks();
+
+		header( 'Content-Type: application/xml; charset=UTF-8' );
+
+		echo $this->build_urlset_xml( $url_list, $stylesheet ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every value is XML-escaped in build_urlset_xml().
+	}
+
+	/**
+	 * Build a sitemap urlset XML document.
+	 *
+	 * Supports the core fields (loc, lastmod, changefreq, priority) plus
+	 * Google's image and video sitemap extensions. Image entries emit only
+	 * image:loc (Google deprecated the other image tags in 2022). Video
+	 * entries are emitted only when they carry everything Google requires:
+	 * thumbnail_loc, title, description and content_loc or player_loc.
+	 *
+	 * @param array  $url_list       URL entries.
+	 * @param string $stylesheet_url Optional XSL stylesheet URL.
+	 * @return string
+	 */
+	public function build_urlset_xml( array $url_list, $stylesheet_url = '' ) {
+		$xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+
+		if ( '' !== (string) $stylesheet_url ) {
+			$xml .= '<?xml-stylesheet type="text/xsl" href="' . self::xml_escape( $stylesheet_url ) . '" ?>' . "\n";
+		}
+
+		$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+			. ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'
+			. ' xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">' . "\n";
+
+		foreach ( $url_list as $item ) {
+			if ( ! is_array( $item ) || empty( $item['loc'] ) ) {
+				continue;
+			}
+
+			$xml .= "\t<url>\n";
+			$xml .= "\t\t<loc>" . self::xml_escape( $item['loc'] ) . "</loc>\n";
+
+			foreach ( array( 'lastmod', 'changefreq', 'priority' ) as $field ) {
+				if ( isset( $item[ $field ] ) && '' !== (string) $item[ $field ] ) {
+					$xml .= "\t\t<{$field}>" . self::xml_escape( $item[ $field ] ) . "</{$field}>\n";
+				}
+			}
+
+			if ( ! empty( $item['image:image'] ) && is_array( $item['image:image'] ) ) {
+				foreach ( $item['image:image'] as $image ) {
+					$image_loc = is_array( $image ) ? ( $image['image:loc'] ?? '' ) : $image;
+
+					if ( is_string( $image_loc ) && '' !== $image_loc ) {
+						$xml .= "\t\t<image:image><image:loc>" . self::xml_escape( $image_loc ) . "</image:loc></image:image>\n";
+					}
+				}
+			}
+
+			if ( ! empty( $item['video:video'] ) && is_array( $item['video:video'] ) ) {
+				$videos = isset( $item['video:video']['video:title'] ) ? array( $item['video:video'] ) : $item['video:video'];
+
+				foreach ( $videos as $video ) {
+					$xml .= self::build_video_xml( $video );
+				}
+			}
+
+			$xml .= "\t</url>\n";
+		}
+
+		$xml .= '</urlset>' . "\n";
+
+		return $xml;
+	}
+
+	/**
+	 * Build one video:video node, or nothing when required tags are missing.
+	 *
+	 * @param mixed $video Video entry keyed by "video:*" tag names.
+	 * @return string
+	 */
+	private static function build_video_xml( $video ) {
+		if ( ! is_array( $video ) ) {
+			return '';
+		}
+
+		foreach ( array( 'video:thumbnail_loc', 'video:title', 'video:description' ) as $required ) {
+			if ( empty( $video[ $required ] ) ) {
+				return '';
+			}
+		}
+
+		if ( empty( $video['video:content_loc'] ) && empty( $video['video:player_loc'] ) ) {
+			return '';
+		}
+
+		// Tag order follows Google's video sitemap reference.
+		$order = array(
+			'video:thumbnail_loc',
+			'video:title',
+			'video:description',
+			'video:content_loc',
+			'video:player_loc',
+			'video:duration',
+			'video:expiration_date',
+			'video:publication_date',
+			'video:family_friendly',
+			'video:requires_subscription',
+			'video:live',
+		);
+
+		$xml = "\t\t<video:video>\n";
+		foreach ( $order as $tag ) {
+			if ( isset( $video[ $tag ] ) && '' !== (string) $video[ $tag ] ) {
+				$xml .= "\t\t\t<{$tag}>" . self::xml_escape( $video[ $tag ] ) . "</{$tag}>\n";
+			}
+		}
+		$xml .= "\t\t</video:video>\n";
+
+		return $xml;
+	}
+
+	/**
+	 * Escape a value for XML text or attribute content.
+	 *
+	 * Characters XML 1.0 does not allow (most C0 controls, U+FFFE/U+FFFF)
+	 * are dropped and invalid UTF-8 is substituted, so one bad title cannot
+	 * make the whole sitemap unparseable. Values must be plain text: entities
+	 * are escaped, not interpreted (see plain_text()).
+	 *
+	 * @param mixed $value Value.
+	 * @return string
+	 */
+	private static function xml_escape( $value ) {
+		$value = htmlspecialchars( (string) $value, ENT_QUOTES | ENT_XML1 | ENT_SUBSTITUTE, 'UTF-8' );
+		$clean = preg_replace( '/[^\x{9}\x{A}\x{D}\x{20}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', '', $value );
+
+		return is_string( $clean ) ? $clean : '';
+	}
+
+	/**
+	 * Turn a WordPress display string into plain text for XML output.
+	 *
+	 * Titles and excerpts from WordPress are HTML: texturized and entity-encoded
+	 * ("&#8217;", "&amp;"). Tags are stripped and entities decoded so that
+	 * xml_escape() encodes each character exactly once.
+	 *
+	 * @param mixed $value HTML-ish text.
+	 * @return string
+	 */
+	private static function plain_text( $value ) {
+		$value = wp_strip_all_tags( (string) $value );
+		$value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+		return trim( $value );
 	}
 
 	/**
@@ -1392,13 +1658,13 @@ class Sitemap_Enhancer {
 	}
 
 	/**
-	 * Extract first video URL from content.
+	 * Extract first self-hosted video file URL from content.
 	 *
 	 * @param string $content Post content.
 	 * @return string
 	 */
 	private function detect_video( $content ) {
-		if ( preg_match( '#https?://[^\s"]+\.(mp4|mov|webm)#i', $content, $matches ) ) {
+		if ( preg_match( '#https?://[^\s"\'<>]+\.(mp4|mov|webm)#i', (string) $content, $matches ) ) {
 			return $matches[0];
 		}
 
@@ -1406,43 +1672,121 @@ class Sitemap_Enhancer {
 	}
 
 	/**
-	 * Get the best available YouTube thumbnail URL with a lightweight fallback.
+	 * Extract the first YouTube video ID from content.
 	 *
-	 * Caches the reachable thumbnail choice per video ID to avoid repeated
-	 * remote requests on every sitemap render.
-	 *
-	 * @param string $video_id YouTube video ID.
+	 * @param string $content Post content.
 	 * @return string
 	 */
+	private function detect_youtube_id( $content ) {
+		if ( preg_match( '#(?:youtube(?:-nocookie)?\.com/(?:watch\?(?:[^"\'<>\s]*&(?:amp;)?)?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})#i', (string) $content, $matches ) ) {
+			return $matches[1];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get the best known YouTube thumbnail URL without blocking the render.
+	 *
+	 * The hqdefault.jpg image exists for every YouTube video, so it is returned until
+	 * a background check (see check_youtube_thumbnails()) has confirmed and
+	 * cached that the higher resolution maxresdefault.jpg exists. Sitemap
+	 * renders never wait on a remote request.
+	 *
+	 * @param string $video_id YouTube video ID.
+	 * @return string Empty when the ID is malformed.
+	 */
 	private function get_youtube_thumbnail_url( $video_id ) {
-		$video_id = sanitize_text_field( (string) $video_id );
+		$video_id = (string) $video_id;
+
+		if ( ! preg_match( '/^[A-Za-z0-9_-]{11}$/', $video_id ) ) {
+			return '';
+		}
+
 		$maxres   = 'https://img.youtube.com/vi/' . $video_id . '/maxresdefault.jpg';
 		$fallback = 'https://img.youtube.com/vi/' . $video_id . '/hqdefault.jpg';
-
-		$cache_key = 'saman_seo_yt_thumb_' . md5( $video_id );
-		$cached    = get_transient( $cache_key );
+		$cached   = get_transient( self::youtube_thumbnail_cache_key( $video_id ) );
 
 		if ( 'maxres' === $cached ) {
 			return $maxres;
 		}
-		if ( 'hqdefault' === $cached ) {
-			return $fallback;
+
+		if ( 'hqdefault' !== $cached ) {
+			$this->pending_thumbnail_checks[ $video_id ] = true;
 		}
 
-		$response = wp_remote_head(
-			$maxres,
-			array(
-				'timeout' => 3,
-			)
-		);
-
-		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-			set_transient( $cache_key, 'maxres', DAY_IN_SECONDS );
-			return $maxres;
-		}
-
-		set_transient( $cache_key, 'hqdefault', DAY_IN_SECONDS );
 		return $fallback;
+	}
+
+	/**
+	 * Transient key holding the thumbnail choice for a YouTube video.
+	 *
+	 * @param string $video_id YouTube video ID.
+	 * @return string
+	 */
+	private static function youtube_thumbnail_cache_key( $video_id ) {
+		return 'saman_seo_yt_thumb_' . md5( (string) $video_id );
+	}
+
+	/**
+	 * Queue one background event to check uncached YouTube thumbnails.
+	 *
+	 * @return void
+	 */
+	private function schedule_thumbnail_checks() {
+		if ( empty( $this->pending_thumbnail_checks ) || ! function_exists( 'wp_schedule_single_event' ) ) {
+			return;
+		}
+
+		$ids = array_slice( array_keys( $this->pending_thumbnail_checks ), 0, 50 );
+		sort( $ids );
+
+		$this->pending_thumbnail_checks = array();
+
+		if ( ! wp_next_scheduled( self::THUMBNAIL_CHECK_HOOK, array( $ids ) ) ) {
+			wp_schedule_single_event( time() + MINUTE_IN_SECONDS, self::THUMBNAIL_CHECK_HOOK, array( $ids ) );
+		}
+	}
+
+	/**
+	 * Cron callback: HEAD-check maxresdefault.jpg and cache the result.
+	 *
+	 * Results are cached for 30 days, since a video's thumbnail set rarely
+	 * changes once published.
+	 *
+	 * @param array $video_ids YouTube video IDs.
+	 * @return void
+	 */
+	public function check_youtube_thumbnails( $video_ids ) {
+		foreach ( array_slice( (array) $video_ids, 0, 50 ) as $video_id ) {
+			$video_id = (string) $video_id;
+
+			if ( ! preg_match( '/^[A-Za-z0-9_-]{11}$/', $video_id ) ) {
+				continue;
+			}
+
+			$cache_key = self::youtube_thumbnail_cache_key( $video_id );
+
+			if ( false !== get_transient( $cache_key ) ) {
+				continue;
+			}
+
+			$response = wp_remote_head(
+				'https://img.youtube.com/vi/' . $video_id . '/maxresdefault.jpg',
+				array(
+					'timeout' => 3,
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+				// Transient failure: leave uncached so a later render retries.
+				continue;
+			}
+
+			$choice = 200 === (int) wp_remote_retrieve_response_code( $response ) ? 'maxres' : 'hqdefault';
+
+			set_transient( $cache_key, $choice, 30 * DAY_IN_SECONDS );
+		}
 	}
 
 	/**
@@ -1764,7 +2108,7 @@ class Sitemap_Enhancer {
 				<news:language><?php echo esc_attr( get_locale() ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php echo esc_html( get_post_time( DATE_W3C, true, $post ) ); ?></news:publication_date>
-			<news:title><?php echo esc_html( get_the_title( $post ) ); ?></news:title>
+			<news:title><?php echo self::xml_escape( self::plain_text( get_the_title( $post ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML-escaped. ?></news:title>
 		</news:news>
 	</url>
 	<?php endforeach; ?>
@@ -1808,30 +2152,36 @@ class Sitemap_Enhancer {
 			$post   = $item['post'];
 			$videos = $item['videos'];
 			foreach ( $videos as $video ) :
+				$title       = self::plain_text( get_the_title( $post ) );
+				$description = $this->get_video_description( $post->ID, $title );
 				$thumbnail   = '';
-				$title       = get_the_title( $post );
-				$description = \Saman\SEO\Helpers\generate_content_snippet( $post, 50 );
 
+				// YouTube/Vimeo URLs are HTML players, so only player_loc is
+				// emitted; content_loc is reserved for the media file itself.
 				if ( 'youtube' === $video['platform'] ) {
-					$thumbnail   = $this->get_youtube_thumbnail_url( $video['id'] );
-					$content_loc = 'https://www.youtube.com/watch?v=' . $video['id'];
-					$player_loc  = 'https://www.youtube.com/embed/' . $video['id'];
+					$thumbnail  = $this->get_youtube_thumbnail_url( $video['id'] );
+					$player_loc = 'https://www.youtube.com/embed/' . $video['id'];
 				} elseif ( 'vimeo' === $video['platform'] ) {
-					$content_loc = 'https://vimeo.com/' . $video['id'];
-					$player_loc  = 'https://player.vimeo.com/video/' . $video['id'];
+					$player_loc = 'https://player.vimeo.com/video/' . $video['id'];
 				} else {
+					continue;
+				}
+
+				// thumbnail_loc is required: fall back to the featured image.
+				if ( '' === $thumbnail ) {
+					$thumbnail = (string) get_the_post_thumbnail_url( $post, 'full' );
+				}
+
+				if ( '' === $thumbnail || '' === $title ) {
 					continue;
 				}
 				?>
 	<url>
 		<loc><?php echo esc_url( get_permalink( $post ) ); ?></loc>
 		<video:video>
-			<video:title><?php echo esc_html( $title ); ?></video:title>
-			<video:description><?php echo esc_html( $description ); ?></video:description>
-				<?php if ( $thumbnail ) : ?>
 			<video:thumbnail_loc><?php echo esc_url( $thumbnail ); ?></video:thumbnail_loc>
-			<?php endif; ?>
-			<video:content_loc><?php echo esc_url( $content_loc ); ?></video:content_loc>
+			<video:title><?php echo self::xml_escape( $title ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML-escaped. ?></video:title>
+			<video:description><?php echo self::xml_escape( $description ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML-escaped. ?></video:description>
 			<video:player_loc><?php echo esc_url( $player_loc ); ?></video:player_loc>
 			<video:publication_date><?php echo esc_html( get_post_time( DATE_W3C, true, $post ) ); ?></video:publication_date>
 		</video:video>
@@ -1842,6 +2192,7 @@ endforeach;
 		?>
 </urlset>
 		<?php
+		$this->schedule_thumbnail_checks();
 		exit;
 	}
 
@@ -1885,7 +2236,7 @@ endforeach;
 
 		nocache_headers();
 
-		$renderer->render_sitemap( $url_list );
+		$this->output_urlset( $url_list, $renderer );
 
 		exit;
 	}

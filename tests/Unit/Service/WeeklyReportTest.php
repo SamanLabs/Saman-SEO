@@ -106,6 +106,59 @@ class WeeklyReportTest extends TestCase {
 		$this->assertGreaterThanOrEqual( time(), $ts );
 	}
 
+	/**
+	 * Run maybe_schedule() with an existing event and report what it did to the schedule.
+	 *
+	 * @param int $existing Timestamp of the event already scheduled.
+	 * @return string[] Calls made: 'clear' and/or 'schedule'.
+	 */
+	private function schedule_calls_with_event_at( $existing ) {
+		$calls = array();
+		Functions\when( 'wp_next_scheduled' )->justReturn( $existing );
+		Functions\when( 'wp_date' )->alias(
+			static function ( $format, $timestamp = null ) {
+				return date( $format, null === $timestamp ? time() : $timestamp );
+			}
+		);
+		Functions\when( 'wp_clear_scheduled_hook' )->alias(
+			static function () use ( &$calls ) {
+				$calls[] = 'clear';
+			}
+		);
+		Functions\when( 'wp_schedule_event' )->alias(
+			static function () use ( &$calls ) {
+				$calls[] = 'schedule';
+			}
+		);
+
+		( new Weekly_Report() )->maybe_schedule();
+
+		return $calls;
+	}
+
+	/**
+	 * The event due on the configured day must be left to fire. Compared with the next run
+	 * (a week later once it is past 09:00), it was pushed back a week, every week.
+	 */
+	public function test_event_due_on_the_configured_day_is_left_to_fire() {
+		self::$options[ Weekly_Report::OPTION_ENABLED ] = '1';
+		self::$options[ Weekly_Report::OPTION_DAY ]     = 'wednesday';
+		$due = Weekly_Report::next_run_timestamp( 'wednesday' ) - WEEK_IN_SECONDS;
+
+		$this->assertSame( array(), $this->schedule_calls_with_event_at( $due ) );
+	}
+
+	/**
+	 * Choosing another weekday still moves the event.
+	 */
+	public function test_changing_the_weekday_reschedules() {
+		self::$options[ Weekly_Report::OPTION_ENABLED ] = '1';
+		self::$options[ Weekly_Report::OPTION_DAY ]     = 'friday';
+		$old_day = Weekly_Report::next_run_timestamp( 'monday' );
+
+		$this->assertSame( array( 'clear', 'schedule' ), $this->schedule_calls_with_event_at( $old_day ) );
+	}
+
 	/* ---------------------------------------------------------------------
 	 * Recipient resolution
 	 * ------------------------------------------------------------------- */

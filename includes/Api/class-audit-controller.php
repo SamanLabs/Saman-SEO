@@ -71,7 +71,7 @@ class Audit_Controller extends REST_Controller {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_post_issues' ),
-					'permission_callback' => array( $this, 'permission_check' ),
+					'permission_callback' => array( $this, 'edit_post_permission_check' ),
 					'args'                => array(
 						'id' => array(
 							'type'              => 'integer',
@@ -349,7 +349,8 @@ class Audit_Controller extends REST_Controller {
 		}
 
 		if ( $updated ) {
-			update_post_meta( $post_id, Post_Meta::META_KEY, $meta );
+			// update_post_meta() unslashes; keep backslashes in custom_schema JSON.
+			update_post_meta( $post_id, Post_Meta::META_KEY, wp_slash( $meta ) );
 
 			// Clear audit cache
 			delete_transient( 'SAMAN_SEO_audit_results' );

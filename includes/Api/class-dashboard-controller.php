@@ -356,30 +356,44 @@ class Dashboard_Controller extends REST_Controller {
 		// Count posts with SEO meta vs without
 		$total_posts = wp_count_posts( 'post' )->publish + wp_count_posts( 'page' )->publish;
 
+		// _SAMAN_SEO_meta is a serialized PHP array that always carries both keys, so a blank
+		// field reads s:5:"title";s:0:"";. The old JSON patterns ("title":"") never matched it
+		// and counted every saved post as optimized.
+		$has_title   = '%' . $wpdb->esc_like( 's:5:"title";' ) . '%';
+		$empty_title = '%' . $wpdb->esc_like( 's:5:"title";s:0:"";' ) . '%';
+		$has_desc    = '%' . $wpdb->esc_like( 's:11:"description";' ) . '%';
+		$empty_desc  = '%' . $wpdb->esc_like( 's:11:"description";s:0:"";' ) . '%';
+
 		// Count posts with meta title
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$with_title = $wpdb->get_var(
-			"SELECT COUNT(DISTINCT pm.post_id)
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
              WHERE pm.meta_key = '_SAMAN_SEO_meta'
              AND p.post_status = 'publish'
-             AND pm.meta_value LIKE '%\"title\"%'
-             AND pm.meta_value NOT LIKE '%\"title\":\"\"%'"
+             AND pm.meta_value LIKE %s
+             AND pm.meta_value NOT LIKE %s",
+				$has_title,
+				$empty_title
+			)
 		);
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		// Count posts with meta description
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery -- Literal JSON pattern matching, not user input.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 		$with_desc = $wpdb->get_var(
-			"SELECT COUNT(DISTINCT pm.post_id)
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT pm.post_id)
              FROM {$wpdb->postmeta} pm
              JOIN {$wpdb->posts} p ON pm.post_id = p.ID
              WHERE pm.meta_key = '_SAMAN_SEO_meta'
              AND p.post_status = 'publish'
-             AND pm.meta_value LIKE '%\"description\"%'
-             AND pm.meta_value NOT LIKE '%\"description\":\"\"%'"
+             AND pm.meta_value LIKE %s
+             AND pm.meta_value NOT LIKE %s",
+				$has_desc,
+				$empty_desc
+			)
 		);
 
 		// Get posts by day for the last 7 days
@@ -389,7 +403,7 @@ class Dashboard_Controller extends REST_Controller {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 			$day_label = gmdate( 'D', strtotime( $date ) );
 
-            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery -- Literal JSON pattern matching, not user input.
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct DB access intentional.
 			$optimized = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT COUNT(DISTINCT pm.post_id)
@@ -398,12 +412,14 @@ class Dashboard_Controller extends REST_Controller {
                  WHERE pm.meta_key = '_SAMAN_SEO_meta'
                  AND p.post_status = 'publish'
                  AND DATE(p.post_date) <= %s
-                 AND pm.meta_value LIKE '%\"title\"%'
-                 AND pm.meta_value NOT LIKE '%\"title\":\"\"%'",
-					$date
+                 AND pm.meta_value LIKE %s
+                 AND pm.meta_value NOT LIKE %s",
+					$date,
+					$has_title,
+					$empty_title
 				)
 			);
-            // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery
+            // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$daily_stats[] = array(
 				'date'      => $date,

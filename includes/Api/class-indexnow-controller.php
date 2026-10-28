@@ -170,7 +170,7 @@ class IndexNow_Controller extends REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'submit_post' ),
-					'permission_callback' => array( $this, 'permission_check' ),
+					'permission_callback' => array( $this, 'edit_post_permission_check' ),
 					'args'                => array(
 						'id' => array(
 							'required'          => true,
@@ -190,7 +190,7 @@ class IndexNow_Controller extends REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_post_status' ),
-					'permission_callback' => array( $this, 'permission_check' ),
+					'permission_callback' => array( $this, 'edit_post_permission_check' ),
 					'args'                => array(
 						'id' => array(
 							'required'          => true,

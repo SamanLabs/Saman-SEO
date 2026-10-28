@@ -24,6 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Parses FAQ blocks from post content and generates FAQPage schema
  * with Question/Answer pairs in mainEntity. Respects showSchema
  * attribute on individual blocks.
+ *
+ * Google stopped showing FAQ rich results in May 2026. The markup is still
+ * valid schema.org and is read by other search engines and AI tools.
  */
 class FAQPage_Schema extends Abstract_Schema {
 

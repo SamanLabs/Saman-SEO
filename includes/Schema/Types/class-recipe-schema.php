@@ -255,22 +255,61 @@ class Recipe_Schema extends Abstract_Schema {
 	/**
 	 * Build the aggregateRating block when rating data exists.
 	 *
+	 * These values are typed by hand in the editor, so they are only output
+	 * when they look like a real aggregate: at least one rating, and a value
+	 * inside the rating scale (worstRating..bestRating, default 1-5).
+	 *
+	 * Google's review snippet guidelines (updated July 2026) prohibit fake
+	 * reviews and incentivized reviews that are not disclosed; ratings must
+	 * reflect genuine user feedback. See
+	 * https://developers.google.com/search/docs/appearance/structured-data/review-snippet
+	 * Sites that cannot vouch for these numbers can turn the block off with
+	 * the `saman_seo_recipe_aggregate_rating` filter (return false).
+	 *
 	 * @param array $recipe Raw recipe data.
-	 * @return array Empty when incomplete.
+	 * @return array Empty when incomplete, out of range, or filtered out.
 	 */
 	private function build_rating( array $recipe ): array {
-		$rating_value = isset( $recipe['rating_value'] ) ? (float) $recipe['rating_value'] : 0.0;
+		$rating_value = isset( $recipe['rating_value'] ) && is_numeric( $recipe['rating_value'] ) ? (float) $recipe['rating_value'] : 0.0;
 		$rating_count = isset( $recipe['rating_count'] ) ? absint( $recipe['rating_count'] ) : 0;
+		$best_rating  = isset( $recipe['best_rating'] ) && is_numeric( $recipe['best_rating'] ) && (float) $recipe['best_rating'] > 0 ? (float) $recipe['best_rating'] : 5.0;
+		$worst_rating = isset( $recipe['worst_rating'] ) && is_numeric( $recipe['worst_rating'] ) ? (float) $recipe['worst_rating'] : 1.0;
 
-		if ( $rating_value <= 0 || $rating_count <= 0 ) {
+		if ( $rating_count < 1 || $worst_rating >= $best_rating ) {
 			return array();
 		}
 
-		return array(
+		if ( $rating_value < $worst_rating || $rating_value > $best_rating ) {
+			return array();
+		}
+
+		$rating = array(
 			'@type'       => 'AggregateRating',
 			'ratingValue' => round( $rating_value, 1 ),
 			'ratingCount' => $rating_count,
 		);
+
+		// Only spell out the scale when it differs from the schema.org default.
+		if ( 5.0 !== $best_rating ) {
+			$rating['bestRating'] = $best_rating;
+		}
+		if ( 1.0 !== $worst_rating ) {
+			$rating['worstRating'] = $worst_rating;
+		}
+
+		/**
+		 * Filter the Recipe aggregateRating block.
+		 *
+		 * Return false (or an empty array) to omit aggregateRating, e.g. when
+		 * the numbers are not backed by genuine, disclosed user reviews.
+		 *
+		 * @param array|false $rating  AggregateRating data.
+		 * @param array       $recipe  Raw recipe data.
+		 * @param mixed       $context Schema context.
+		 */
+		$rating = saman_seo_apply_filters( 'saman_seo_recipe_aggregate_rating', $rating, $recipe, $this->context );
+
+		return is_array( $rating ) ? $rating : array();
 	}
 
 	/**

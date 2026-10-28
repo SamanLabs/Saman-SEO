@@ -32,6 +32,24 @@ class Frontend {
 	private $theme_renders_title = false;
 
 	/**
+	 * Attachment the unfiltered social image was resolved from, as
+	 * array( 'url' => string, 'id' => int ).
+	 *
+	 * @var array{url:string,id:int}
+	 */
+	private $social_image_source = array(
+		'url' => '',
+		'id'  => 0,
+	);
+
+	/**
+	 * Per-request cache of image URL => attachment ID (0 = not local).
+	 *
+	 * @var array<string,int>
+	 */
+	private $attachment_id_cache = array();
+
+	/**
 	 * Boot frontend hooks.
 	 *
 	 * @return void
@@ -330,8 +348,7 @@ class Frontend {
 		$description = render_template_safely( $description, $post );
 		$description = saman_seo_apply_filters( 'saman_seo_description', $description, $post );
 
-		$canonical = $this->get_canonical( $post, $meta );
-		$canonical = saman_seo_apply_filters( 'saman_seo_canonical', $canonical, $post );
+		$canonical = $this->resolve_canonical_url( $post, $meta );
 
 		$keywords = $homepage_keywords;
 		if ( empty( $keywords ) && $post instanceof WP_Post && ! empty( $post_type_keywords[ $post->post_type ] ) ) {
@@ -391,8 +408,7 @@ class Frontend {
 
 		$post          = $this->get_context_post();
 		$meta          = $this->get_meta( $post );
-		$canonical_url = $this->get_canonical( $post, $meta );
-		$canonical_url = saman_seo_apply_filters( 'saman_seo_canonical', $canonical_url, $post );
+		$canonical_url = $this->resolve_canonical_url( $post, $meta );
 
 		// OG URL should match canonical URL by default.
 		$url                    = saman_seo_apply_filters( 'saman_seo_og_url', $canonical_url, $post );
@@ -500,6 +516,10 @@ class Frontend {
 		$image         = $this->get_social_image( $post, $meta, $social_defaults );
 		$twitter_image = saman_seo_apply_filters( 'saman_seo_twitter_image', $image, $post );
 
+		// Width/height/type/alt are only known for local attachments.
+		$image_details   = $this->get_social_image_details( self::social_image_url( $image ) );
+		$twitter_details = ( $twitter_image === $image ) ? $image_details : $this->get_social_image_details( self::social_image_url( $twitter_image ) );
+
 		$tags = array(
 			'og:title'            => $title,
 			'og:description'      => $description,
@@ -508,11 +528,17 @@ class Frontend {
 			'og:site_name'        => get_bloginfo( 'name' ),
 			'og:locale'           => get_locale(),
 			'og:image'            => $image,
+			'og:image:width'      => $image_details['width'],
+			'og:image:height'     => $image_details['height'],
+			'og:image:type'       => $image_details['type'],
+			'og:image:alt'        => $image_details['alt'],
 			'twitter:card'        => 'summary_large_image',
 			'twitter:title'       => $twitter_title,
 			'twitter:description' => $twitter_description,
 			'twitter:image'       => $twitter_image,
-			'twitter:image:alt'   => $twitter_title,
+			// The alt text describes the image, not the page: omit it
+			// rather than repeat the title when the image has none.
+			'twitter:image:alt'   => $twitter_details['alt'],
 		);
 
 		$tags = saman_seo_apply_filters( 'saman_seo_social_tags', $tags, $post, $meta, $social_defaults );
@@ -691,9 +717,21 @@ class Frontend {
 			return;
 		}
 
-		$post = get_post();
+		// Only a singular view describes a single post. On archives, the blog
+		// home and search results get_post() is merely the first post of the
+		// loop, so post-specific nodes (Article, FAQ, HowTo, Recipe, Video,
+		// Breadcrumb, ...) must not be built from it.
+		$post      = is_singular() ? $this->get_context_post() : null;
+		$canonical = '';
 
-		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post );
+		if ( is_singular() || is_home() || is_archive() || is_search() || is_404() ) {
+			// Same URL the <link rel="canonical"> tag prints, so WebPage
+			// url/@id follow the per-post canonical override.
+			$canonical_post = $this->get_context_post();
+			$canonical      = $this->resolve_canonical_url( $canonical_post, $this->get_meta( $canonical_post ) );
+		}
+
+		$payload = saman_seo_apply_filters( 'saman_seo_jsonld', array(), $post, (string) $canonical );
 
 		if ( empty( $payload ) ) {
 			return;
@@ -804,6 +842,23 @@ class Frontend {
 		}
 
 		return breadcrumbs( null, false );
+	}
+
+	/**
+	 * Resolve the canonical URL exactly as the head tag prints it.
+	 *
+	 * Shared by the canonical <link>, og:url and the JSON-LD graph so all
+	 * three agree, including the per-post canonical override.
+	 *
+	 * @param WP_Post|null $post Post.
+	 * @param array        $meta Meta.
+	 *
+	 * @return string
+	 */
+	private function resolve_canonical_url( $post, $meta ) {
+		$canonical = $this->get_canonical( $post, $meta );
+
+		return saman_seo_apply_filters( 'saman_seo_canonical', $canonical, $post );
 	}
 
 	/**
@@ -955,6 +1010,12 @@ class Frontend {
 			unset( $robots['follow'] );
 		}
 
+		// nosnippet forbids snippets outright; a max-snippet length beside it
+		// is contradictory.
+		if ( ! empty( $robots['nosnippet'] ) ) {
+			unset( $robots['max-snippet'] );
+		}
+
 		return $robots;
 	}
 
@@ -1000,14 +1061,23 @@ class Frontend {
 			$directives[] = 'nofollow';
 		}
 
+		// Per-post snippet controls. These also govern how the page may be
+		// shown in Google AI Overviews / AI Mode, so they sit at the top
+		// precedence tier and override the global setting.
+		$directives = array_merge( $directives, $this->get_post_snippet_directives( $meta ) );
+
+		$directives = array_values( array_filter( array_unique( array_map( 'trim', $directives ) ) ) );
+
+		// Precedence: per-post / request directives (above) > global setting >
+		// hard-coded defaults. A lower tier never overrides a key an upper tier
+		// already set, so a global "max-snippet:50" survives the default
+		// "max-snippet:-1".
 		$global = get_option( 'SAMAN_SEO_global_robots' );
-		if ( $global ) {
-			$directives = array_merge( $directives, array_map( 'trim', explode( ',', $global ) ) );
+		if ( $global && is_string( $global ) ) {
+			$directives = $this->merge_robots_directives( $directives, explode( ',', $global ) );
 		}
 
-		$directives = array_filter( array_unique( array_map( 'trim', $directives ) ) );
-
-		// Add default advanced directives (can be filtered or disabled via global option).
+		// Default advanced directives (can be filtered or disabled).
 		$advanced = saman_seo_apply_filters(
 			'saman_seo_robots_advanced',
 			array(
@@ -1017,12 +1087,7 @@ class Frontend {
 			)
 		);
 		if ( is_array( $advanced ) ) {
-			foreach ( $advanced as $directive ) {
-				$directive = trim( (string) $directive );
-				if ( '' !== $directive && ! in_array( $directive, $directives, true ) ) {
-					$directives[] = $directive;
-				}
-			}
+			$directives = $this->merge_robots_directives( $directives, $advanced );
 		}
 
 		// Filter the array of directives (e.g. ['noindex', 'nofollow']).
@@ -1055,8 +1120,117 @@ class Frontend {
 		if ( in_array( 'nofollow', $final_directives, true ) ) {
 			$final_directives = array_diff( $final_directives, array( 'follow' ) );
 		}
+		if ( in_array( 'nosnippet', $final_directives, true ) ) {
+			$final_directives = array_filter(
+				$final_directives,
+				static function ( $directive ) {
+					return 'max-snippet' !== self::robots_directive_key( $directive );
+				}
+			);
+		}
 
 		return array_values( $final_directives );
+	}
+
+	/**
+	 * Robots directives from the per-post snippet controls.
+	 *
+	 * Empty values inherit the global setting and add nothing here.
+	 *
+	 * @param array $meta Post SEO meta.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_post_snippet_directives( $meta ) {
+		$directives = array();
+
+		if ( ! empty( $meta['nosnippet'] ) ) {
+			$directives[] = 'nosnippet';
+		} elseif ( isset( $meta['max_snippet'] ) && is_numeric( $meta['max_snippet'] ) && '' !== trim( (string) $meta['max_snippet'] ) ) {
+			$directives[] = 'max-snippet:' . max( -1, (int) $meta['max_snippet'] );
+		}
+
+		$preview = isset( $meta['max_image_preview'] ) ? strtolower( trim( (string) $meta['max_image_preview'] ) ) : '';
+		if ( in_array( $preview, array( 'none', 'standard', 'large' ), true ) ) {
+			$directives[] = 'max-image-preview:' . $preview;
+		}
+
+		if ( ! empty( $meta['noimageindex'] ) ) {
+			$directives[] = 'noimageindex';
+		}
+
+		return $directives;
+	}
+
+	/**
+	 * Append lower-precedence robots directives without overriding keys
+	 * already present.
+	 *
+	 * "max-snippet:50" and "max-snippet:-1" share the key "max-snippet", so
+	 * only the first (higher-precedence) one is kept. Within one tier,
+	 * nosnippet and max-snippet may both appear; the final sanitization lets
+	 * nosnippet win.
+	 *
+	 * @param array<int,string> $directives Higher-precedence directives.
+	 * @param array             $additional Lower-precedence directives.
+	 *
+	 * @return array<int,string>
+	 */
+	private function merge_robots_directives( array $directives, array $additional ) {
+		$upper = array();
+		foreach ( $directives as $directive ) {
+			$upper[ self::robots_precedence_key( $directive ) ] = true;
+		}
+
+		$seen = array();
+		foreach ( $additional as $directive ) {
+			$directive = trim( (string) $directive );
+			if ( '' === $directive ) {
+				continue;
+			}
+
+			$key = self::robots_directive_key( $directive );
+			if ( isset( $upper[ self::robots_precedence_key( $directive ) ] ) || isset( $seen[ $key ] ) ) {
+				continue;
+			}
+
+			$seen[ $key ] = true;
+			$directives[] = $directive;
+		}
+
+		return $directives;
+	}
+
+	/**
+	 * Key of a robots directive: the part before ':' ("max-snippet" for
+	 * "max-snippet:50"), lowercased.
+	 *
+	 * @param string $directive Directive.
+	 *
+	 * @return string
+	 */
+	private static function robots_directive_key( $directive ) {
+		$parts = explode( ':', (string) $directive, 2 );
+
+		return strtolower( trim( $parts[0] ) );
+	}
+
+	/**
+	 * Key used to decide which precedence tier owns a directive.
+	 *
+	 * The nosnippet and max-snippet directives control the same thing
+	 * (snippet length), so they share a key: a per-post "max-snippet:160"
+	 * overrides a global "nosnippet" and a per-post "nosnippet" overrides a
+	 * global "max-snippet:50".
+	 *
+	 * @param string $directive Directive.
+	 *
+	 * @return string
+	 */
+	private static function robots_precedence_key( $directive ) {
+		$key = self::robots_directive_key( $directive );
+
+		return 'nosnippet' === $key ? 'max-snippet' : $key;
 	}
 
 	/**
@@ -1071,6 +1245,11 @@ class Frontend {
 	private function get_social_image( $post, $meta, $social_defaults = array() ) {
 		$image = '';
 
+		$this->social_image_source = array(
+			'url' => '',
+			'id'  => 0,
+		);
+
 		// 1. Check direct post meta override
 		if ( ! empty( $meta['og_image'] ) ) {
 			$image = esc_url_raw( $meta['og_image'] );
@@ -1083,6 +1262,12 @@ class Frontend {
 				$url = wp_get_attachment_image_url( $image_id, 'full' );
 				if ( $url ) {
 					$image = $url;
+
+					// Known attachment: no URL lookup needed later.
+					$this->social_image_source = array(
+						'url' => (string) $url,
+						'id'  => (int) $image_id,
+					);
 				}
 			}
 		}
@@ -1105,13 +1290,7 @@ class Frontend {
 
 		// 5. Dynamic Card Generation (last resort)
 		if ( empty( $image ) && $post instanceof WP_Post ) {
-			$image = add_query_arg(
-				array(
-					'SAMAN_SEO_social_card' => 1,
-					'title'                 => rawurlencode( get_the_title( $post ) ),
-				),
-				home_url( '/' )
-			);
+			$image = Social_Card_Generator::card_url( get_the_title( $post ) );
 		}
 
 		/**
@@ -1123,6 +1302,179 @@ class Frontend {
 		 * @param array   $social_defaults Social default settings.
 		 */
 		return saman_seo_apply_filters( 'saman_seo_og_image', $image, $post, $meta, $social_defaults );
+	}
+
+	/**
+	 * Single image URL from a (possibly filtered) social image value.
+	 *
+	 * The image filters may return something other than a string. An array
+	 * with a 'url' key is accepted; anything else yields '' so no image
+	 * details are looked up.
+	 *
+	 * @param mixed $image Image value.
+	 * @return string
+	 */
+	private static function social_image_url( $image ) {
+		if ( is_string( $image ) ) {
+			return $image;
+		}
+
+		if ( is_array( $image ) && isset( $image['url'] ) && is_string( $image['url'] ) ) {
+			return $image['url'];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Width, height, MIME type and alt text of a social image.
+	 *
+	 * Only local attachments are resolved; for anything else (external
+	 * URLs, the dynamic social card) every value is empty so the tags are
+	 * omitted.
+	 *
+	 * @param string $url Image URL.
+	 *
+	 * @return array{width:string,height:string,type:string,alt:string}
+	 */
+	private function get_social_image_details( $url ) {
+		$details = array(
+			'width'  => '',
+			'height' => '',
+			'type'   => '',
+			'alt'    => '',
+		);
+
+		$attachment_id = $this->get_image_attachment_id( $url );
+		if ( ! $attachment_id || ! function_exists( 'wp_get_attachment_image_src' ) ) {
+			return $details;
+		}
+
+		$width  = 0;
+		$height = 0;
+		$type   = (string) get_post_mime_type( $attachment_id );
+
+		$full = wp_get_attachment_image_src( $attachment_id, 'full' );
+		if ( is_array( $full ) && ! empty( $full[0] ) && $this->same_image_url( (string) $full[0], $url ) ) {
+			$width  = isset( $full[1] ) ? (int) $full[1] : 0;
+			$height = isset( $full[2] ) ? (int) $full[2] : 0;
+		} else {
+			// The URL may point at an intermediate size (image-1024x576.jpg).
+			$metadata = wp_get_attachment_metadata( $attachment_id );
+			$basename = wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+
+			if ( is_array( $metadata ) && ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
+				foreach ( $metadata['sizes'] as $size ) {
+					if ( is_array( $size ) && isset( $size['file'] ) && $basename === $size['file'] ) {
+						$width  = isset( $size['width'] ) ? (int) $size['width'] : 0;
+						$height = isset( $size['height'] ) ? (int) $size['height'] : 0;
+						if ( ! empty( $size['mime-type'] ) ) {
+							$type = (string) $size['mime-type'];
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		if ( $width > 0 && $height > 0 ) {
+			$details['width']  = (string) $width;
+			$details['height'] = (string) $height;
+		}
+
+		if ( 0 === strpos( $type, 'image/' ) ) {
+			$details['type'] = $type;
+		}
+
+		$alt            = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+		$details['alt'] = is_string( $alt ) ? trim( wp_strip_all_tags( $alt ) ) : '';
+
+		return $details;
+	}
+
+	/**
+	 * Resolve the attachment ID behind an image URL.
+	 *
+	 * Reuses the ID the image was resolved from when available, skips URLs
+	 * outside the uploads directory, and caches lookups (per request and in
+	 * the object cache) because attachment_url_to_postid() runs a query.
+	 *
+	 * @param string $url Image URL.
+	 *
+	 * @return int Attachment ID, or 0.
+	 */
+	private function get_image_attachment_id( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return 0;
+		}
+
+		if ( $this->social_image_source['id'] && $url === $this->social_image_source['url'] ) {
+			return (int) $this->social_image_source['id'];
+		}
+
+		if ( isset( $this->attachment_id_cache[ $url ] ) ) {
+			return $this->attachment_id_cache[ $url ];
+		}
+
+		$this->attachment_id_cache[ $url ] = 0;
+
+		if ( ! function_exists( 'attachment_url_to_postid' ) || ! function_exists( 'wp_get_upload_dir' ) ) {
+			return 0;
+		}
+
+		$uploads = wp_get_upload_dir();
+		$baseurl = isset( $uploads['baseurl'] ) ? (string) $uploads['baseurl'] : '';
+		if ( '' === $baseurl || 0 !== strpos( $this->strip_url_scheme( $url ), $this->strip_url_scheme( trailingslashit( $baseurl ) ) ) ) {
+			return 0;
+		}
+
+		$cache_key = 'social_image_id_' . md5( $url );
+		$cached    = wp_cache_get( $cache_key, 'saman_seo' );
+		if ( false !== $cached ) {
+			$this->attachment_id_cache[ $url ] = (int) $cached;
+
+			return (int) $cached;
+		}
+
+		$attachment_id = (int) attachment_url_to_postid( $url );
+
+		// Intermediate sizes (image-1024x576.jpg) are not stored as the
+		// attached file; retry with the original file name.
+		if ( ! $attachment_id ) {
+			$original = preg_replace( '/-\d+x\d+(\.[a-z0-9]+)$/i', '$1', $url );
+			if ( is_string( $original ) && $original !== $url ) {
+				$attachment_id = (int) attachment_url_to_postid( $original );
+			}
+		}
+
+		wp_cache_set( $cache_key, $attachment_id, 'saman_seo', DAY_IN_SECONDS );
+		$this->attachment_id_cache[ $url ] = $attachment_id;
+
+		return $attachment_id;
+	}
+
+	/**
+	 * Compare two image URLs ignoring the scheme.
+	 *
+	 * @param string $a First URL.
+	 * @param string $b Second URL.
+	 *
+	 * @return bool
+	 */
+	private function same_image_url( $a, $b ) {
+		return $this->strip_url_scheme( $a ) === $this->strip_url_scheme( $b );
+	}
+
+	/**
+	 * Remove the scheme from a URL ("https://x" => "//x").
+	 *
+	 * @param string $url URL.
+	 *
+	 * @return string
+	 */
+	private function strip_url_scheme( $url ) {
+		return (string) preg_replace( '#^https?:#i', '', (string) $url );
 	}
 
 	/**
@@ -1435,11 +1787,11 @@ class Frontend {
 				// Merge with defaults, but also replace empty strings with defaults
 				$archive_defaults[ $type ] = wp_parse_args( $archive_defaults[ $type ], $defaults );
 
-				// Replace empty strings OR old values without variables with default values
+				// Fill only empty values: a saved template without {{variables}} ("Page not
+				// found") is a choice, and %legacy% tokens still render.
 				foreach ( $defaults as $key => $default_value ) {
 					$current_value = $archive_defaults[ $type ][ $key ] ?? '';
-					// Replace if empty OR if it's a template field that doesn't have any {{variables}}
-					if ( '' === $current_value || ( in_array( $key, array( 'title_template', 'description_template' ), true ) && strpos( $current_value, '{{' ) === false ) ) {
+					if ( '' === $current_value ) {
 						$archive_defaults[ $type ][ $key ] = $default_value;
 					}
 				}

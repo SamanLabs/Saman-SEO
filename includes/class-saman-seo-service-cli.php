@@ -80,25 +80,32 @@ class CLI {
 						\WP_CLI::error( 'Invalid JSON.' );
 					}
 
-					global $wpdb;
-					$table = $wpdb->prefix . 'SAMAN_SEO_redirects';
+					// Through the manager, like the admin: it normalizes sources, validates regex
+					// rules and skips duplicates, so importing twice no longer doubles every row.
+					$manager  = new Redirect_Manager();
+					$imported = 0;
+					$skipped  = 0;
 
 					foreach ( $data as $row ) {
-						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Importing redirect rows requires direct writes to the custom table.
-						$wpdb->insert(
-							$table,
-							array(
-								'source'      => sanitize_text_field( $row['source'] ?? '' ),
-								'target'      => esc_url_raw( $row['target'] ?? '' ),
-								'status_code' => absint( $row['status_code'] ?? 301 ),
-							),
-							array( '%s', '%s', '%d' )
+						$row    = is_array( $row ) ? $row : array();
+						$result = $manager->create_redirect(
+							sanitize_text_field( $row['source'] ?? '' ),
+							esc_url_raw( $row['target'] ?? '' ),
+							absint( $row['status_code'] ?? 301 ),
+							array_intersect_key( $row, array_flip( array( 'is_regex', 'priority', 'group_name', 'start_date', 'end_date', 'notes' ) ) )
 						);
+
+						if ( is_wp_error( $result ) ) {
+							++$skipped;
+							\WP_CLI::warning( sprintf( '%s: %s', $row['source'] ?? '', $result->get_error_message() ) );
+						} else {
+							++$imported;
+						}
 					}
 
 					Redirect_Manager::flush_cache();
 
-					\WP_CLI::success( sprintf( 'Imported %d redirects.', count( $data ) ) );
+					\WP_CLI::success( sprintf( 'Imported %d redirects, skipped %d.', $imported, $skipped ) );
 				}
 
 				/**
@@ -112,7 +119,7 @@ class CLI {
 					if ( false === $data ) {
 						global $wpdb;
 						$table = esc_sql( $wpdb->prefix . 'SAMAN_SEO_redirects' );
-						$query = "SELECT id, source, target, status_code, hits, last_hit FROM `{$table}`";
+						$query = "SELECT id, source, target, status_code, hits, last_hit, is_regex, priority, group_name, start_date, end_date, notes FROM `{$table}`";
 						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- Table name already sanitized via esc_sql(), and results are cached immediately after.
 						$raw_data = $wpdb->get_results( $query, ARRAY_A );
 
@@ -139,6 +146,12 @@ class CLI {
 						'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
 						'hits'        => isset( $row['hits'] ) ? (int) $row['hits'] : 0,
 						'last_hit'    => isset( $row['last_hit'] ) ? sanitize_text_field( $row['last_hit'] ) : '',
+						'is_regex'    => ! empty( $row['is_regex'] ) ? 1 : 0,
+						'priority'    => isset( $row['priority'] ) ? (int) $row['priority'] : null,
+						'group_name'  => isset( $row['group_name'] ) ? sanitize_text_field( $row['group_name'] ) : '',
+						'start_date'  => isset( $row['start_date'] ) ? sanitize_text_field( $row['start_date'] ) : null,
+						'end_date'    => isset( $row['end_date'] ) ? sanitize_text_field( $row['end_date'] ) : null,
+						'notes'       => isset( $row['notes'] ) ? sanitize_textarea_field( $row['notes'] ) : null,
 					);
 				}
 
@@ -150,10 +163,22 @@ class CLI {
 				 * @return array
 				 */
 				private function sanitize_redirect_row_for_export( array $row ) {
-					return array(
-						'source'      => isset( $row['source'] ) ? sanitize_text_field( $row['source'] ) : '',
-						'target'      => isset( $row['target'] ) ? esc_url_raw( $row['target'] ) : '',
-						'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
+					// Everything import() reads back, so a regex rule stays a regex rule.
+					return array_filter(
+						array(
+							'source'      => isset( $row['source'] ) ? sanitize_text_field( $row['source'] ) : '',
+							'target'      => isset( $row['target'] ) ? esc_url_raw( $row['target'] ) : '',
+							'status_code' => isset( $row['status_code'] ) ? (int) $row['status_code'] : 301,
+							'is_regex'    => ! empty( $row['is_regex'] ) ? 1 : 0,
+							'priority'    => $row['priority'] ?? null,
+							'group_name'  => $row['group_name'] ?? '',
+							'start_date'  => $row['start_date'] ?? null,
+							'end_date'    => $row['end_date'] ?? null,
+							'notes'       => $row['notes'] ?? null,
+						),
+						static function ( $value ) {
+							return null !== $value && '' !== $value;
+						}
 					);
 				}
 			}

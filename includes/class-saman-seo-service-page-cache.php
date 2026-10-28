@@ -74,7 +74,15 @@ class Page_Cache {
 	 *
 	 * @var int
 	 */
-	public const DROPIN_VERSION = 1;
+	public const DROPIN_VERSION = 2;
+
+	/**
+	 * Cookie prefixes that mark a personalised page: logged in, a returning commenter
+	 * (pre-filled comment form) or an unlocked password post. The drop-in skips the same ones.
+	 *
+	 * @var string[]
+	 */
+	public const NO_CACHE_COOKIES = array( 'wordpress_logged_in_', 'comment_author_', 'wp-postpass_' );
 
 	/**
 	 * Whether the current request is being captured.
@@ -116,6 +124,7 @@ class Page_Cache {
 		// Invalidation.
 		if ( '1' === (string) get_option( self::OPTION_PURGE_ON_SAVE, '1' ) ) {
 			add_action( 'save_post', array( $this, 'purge_post_cache' ), 20, 2 );
+			add_action( 'post_updated', array( $this, 'purge_previous_url' ), 20, 3 );
 			add_action( 'delete_post', array( $this, 'purge_post_cache' ), 20, 2 );
 			add_action( 'edited_term', array( $this, 'purge_term_cache' ), 20, 3 );
 			add_action( 'delete_term', array( $this, 'purge_term_cache' ), 20, 3 );
@@ -125,6 +134,40 @@ class Page_Cache {
 
 		// Ride the shared daily janitor for expiry cleanup.
 		add_action( 'saman_seo_daily_maintenance_complete', array( $this, 'gc' ) );
+
+		// Rewrite an outdated drop-in after a plugin update.
+		add_action( 'admin_init', array( $this, 'maybe_refresh_drop_in' ) );
+	}
+
+	/**
+	 * Regenerate our drop-in when it was written by an older plugin version.
+	 *
+	 * Only touches advanced-cache.php when it carries our marker.
+	 *
+	 * @return void
+	 */
+	public function maybe_refresh_drop_in() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$dropin = WP_CONTENT_DIR . '/advanced-cache.php';
+
+		if ( ! is_readable( $dropin ) ) {
+			return;
+		}
+
+		$source = (string) file_get_contents( $dropin ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local drop-in inspection.
+
+		if ( false === strpos( $source, self::DROPIN_MARKER ) ) {
+			return;
+		}
+
+		$installed = preg_match( '/@version\s+(\d+)/', $source, $m ) ? (int) $m[1] : 0;
+
+		if ( $installed < self::DROPIN_VERSION ) {
+			$this->install_drop_in();
+		}
 	}
 
 	/*
@@ -449,7 +492,18 @@ if ( ! is_readable( \$html_file ) ) {
 @header( 'Content-Type: text/html; charset=UTF-8' );
 @header( 'X-Saman-Cache: hit' );
 
-@file_put_contents( '{$dir}/hits.log', gmdate( 'YmdHis' ) . ' ' . number_format( \$ttfb * 1000, 1, '.', '' ) . PHP_EOL, FILE_APPEND | LOCK_EX );
+// Browser prefetches (speculative loading) are served but not counted as hits.
+\$is_prefetch = false;
+foreach ( array( 'HTTP_SEC_PURPOSE', 'HTTP_PURPOSE', 'HTTP_X_PURPOSE', 'HTTP_X_MOZ' ) as \$purpose_header ) {
+	if ( isset( \$_SERVER[ \$purpose_header ] ) && preg_match( '/(?:^|[\s,;])prefetch(?:\$|[\s,;])/i', (string) \$_SERVER[ \$purpose_header ] ) ) {
+		\$is_prefetch = true;
+		break;
+	}
+}
+
+if ( ! \$is_prefetch ) {
+	@file_put_contents( '{$dir}/hits.log', gmdate( 'YmdHis' ) . ' ' . number_format( \$ttfb * 1000, 1, '.', '' ) . PHP_EOL, FILE_APPEND | LOCK_EX );
+}
 
 readfile( \$html_file );
 exit;
@@ -553,7 +607,9 @@ PHP;
 			header( 'X-Saman-Cache: hit-late' );
 		}
 
-		$this->record_hit( microtime( true ) - $this->request_start() );
+		if ( ! Request_Monitor::is_speculative_request() ) {
+			$this->record_hit( microtime( true ) - $this->request_start() );
+		}
 
 		echo $entry['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Cached full HTML snapshot of a previously rendered trusted response.
 
@@ -635,6 +691,15 @@ PHP;
 
 		if ( is_user_logged_in() ) {
 			return false;
+		}
+
+		// A page rendered for one of these visitors carries their data and must never reach the shared cache.
+		foreach ( array_keys( $_COOKIE ) as $cookie_name ) {
+			foreach ( self::NO_CACHE_COOKIES as $prefix ) {
+				if ( 0 === strpos( (string) $cookie_name, $prefix ) ) {
+					return false;
+				}
+			}
 		}
 
 		if ( is_feed() || is_404() || is_search() || is_preview() ) {
@@ -844,6 +909,11 @@ PHP;
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations__file_put_contents -- Writing our own cache artifact.
 		@file_put_contents( $paths['meta'], wp_json_encode( $meta ), LOCK_EX );
 
+		// A prefetch still warms the cache but is not a visitor miss.
+		if ( Request_Monitor::is_speculative_request() ) {
+			return;
+		}
+
 		$this->bump_totals( 'misses' );
 		$this->bump_totals( 'cold_sum', (float) $render_ms );
 		$this->bump_totals( 'cold_count', 1, true );
@@ -991,6 +1061,32 @@ PHP;
 	}
 
 	/**
+	 * Purge the address a published post had before this save.
+	 *
+	 * Unpublishing, trashing or changing the slug moves the permalink, so purge_post_cache()
+	 * no longer reaches the old URL and its snapshot would keep serving until it expires.
+	 *
+	 * @param int      $post_id     Post ID (unused).
+	 * @param \WP_Post $post_after  Post after the update.
+	 * @param \WP_Post $post_before Post before the update.
+	 *
+	 * @return void
+	 */
+	public function purge_previous_url( $post_id, $post_after, $post_before ) {
+		unset( $post_id );
+
+		if ( ! $post_before instanceof \WP_Post || 'publish' !== $post_before->post_status ) {
+			return;
+		}
+
+		$old = get_permalink( $post_before );
+
+		if ( $old && get_permalink( $post_after ) !== $old ) {
+			$this->purge_url( $old );
+		}
+	}
+
+	/**
 	 * Purge term archives on term edits.
 	 *
 	 * @param int    $term_id  Term ID.
@@ -1040,6 +1136,9 @@ PHP;
 		if ( ! $this->is_enabled() ) {
 			return;
 		}
+
+		// The hit log grows with every cached view; fold it in daily, not only when an admin opens the stats.
+		$this->aggregate_hits();
 
 		$root = $this->cache_dir() . '/c';
 
@@ -1234,9 +1333,10 @@ PHP;
 	 * @return void
 	 */
 	private function record_hit( $seconds ) {
-		$this->bump_totals( 'hits', 1, true );
-		$this->bump_totals( 'warm_sum', $seconds * 1000 );
-		$this->bump_totals( 'warm_count', 1, true );
+		// Same append-only log as the drop-in: three option writes per hit made concurrent
+		// visitors queue on one row and lose counts. aggregate_hits() folds it into the totals.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Appending to our own hit log.
+		@file_put_contents( $this->cache_dir() . '/hits.log', gmdate( 'YmdHis' ) . ' ' . number_format( $seconds * 1000, 1, '.', '' ) . PHP_EOL, FILE_APPEND | LOCK_EX );
 	}
 
 	/**

@@ -28,6 +28,15 @@ const mapInitial = ( m = {} ) => ( {
 	canonical: m.canonical || '',
 	noindex: m.noindex === '1',
 	nofollow: m.nofollow === '1',
+	sitemap_exclude: m.sitemap_exclude === '1',
+	// Snippet controls keep their stored string format ('' = inherit).
+	nosnippet: m.nosnippet === '1' ? '1' : '',
+	max_snippet:
+		m.max_snippet === undefined || m.max_snippet === null
+			? ''
+			: String( m.max_snippet ),
+	max_image_preview: m.max_image_preview || '',
+	noimageindex: m.noimageindex === '1' ? '1' : '',
 	og_image: m.og_image || '',
 	focus_keyphrase: m.focus_keyphrase || '',
 	secondary_keyphrases: Array.isArray( m.secondary_keyphrases )
@@ -49,6 +58,11 @@ const toStorage = ( s ) => ( {
 	canonical: s.canonical || '',
 	noindex: s.noindex ? '1' : '',
 	nofollow: s.nofollow ? '1' : '',
+	sitemap_exclude: s.sitemap_exclude ? '1' : '',
+	nosnippet: s.nosnippet === '1' || s.nosnippet === true ? '1' : '',
+	max_snippet: s.max_snippet ? String( s.max_snippet ) : '',
+	max_image_preview: s.max_image_preview || '',
+	noimageindex: s.noimageindex === '1' || s.noimageindex === true ? '1' : '',
 	og_image: s.og_image || '',
 	focus_keyphrase: s.focus_keyphrase || '',
 	secondary_keyphrases: Array.isArray( s.secondary_keyphrases )

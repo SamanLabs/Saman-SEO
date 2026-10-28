@@ -62,6 +62,52 @@ class Schema_Graph_Manager {
 	}
 
 	/**
+	 * Tidy the filtered graph before output.
+	 *
+	 * - Drops empty pieces and re-indexes the list.
+	 * - Removes a nested schema.org @context from pieces added by filters;
+	 *   the root object already declares it.
+	 * - Removes `breadcrumb` references that point at a BreadcrumbList which
+	 *   is not in the graph (breadcrumbs disabled, front page, filtered out),
+	 *   so WebPage never links to a node that does not exist.
+	 *
+	 * @param array $graph Graph pieces.
+	 * @return array
+	 */
+	private function finalize_graph( array $graph ): array {
+		$ids   = array();
+		$clean = array();
+
+		foreach ( $graph as $piece ) {
+			if ( ! is_array( $piece ) || empty( $piece ) ) {
+				continue;
+			}
+
+			if ( isset( $piece['@context'] ) && is_string( $piece['@context'] )
+				&& preg_match( '#^https?://schema\.org/?$#i', $piece['@context'] ) ) {
+				unset( $piece['@context'] );
+			}
+
+			if ( ! empty( $piece['@id'] ) && is_string( $piece['@id'] ) ) {
+				$ids[ $piece['@id'] ] = true;
+			}
+
+			$clean[] = $piece;
+		}
+
+		foreach ( $clean as &$piece ) {
+			if ( isset( $piece['breadcrumb'] ) && is_array( $piece['breadcrumb'] )
+				&& array( '@id' ) === array_keys( $piece['breadcrumb'] )
+				&& ! isset( $ids[ (string) $piece['breadcrumb']['@id'] ] ) ) {
+				unset( $piece['breadcrumb'] );
+			}
+		}
+		unset( $piece );
+
+		return $clean;
+	}
+
+	/**
 	 * Build complete JSON-LD graph for the current context.
 	 *
 	 * Collects all applicable schemas (where is_needed() returns true),
@@ -130,6 +176,8 @@ class Schema_Graph_Manager {
 		 * @param \WP_Post|null $post  The current post or null.
 		 */
 		$graph = saman_seo_apply_filters( 'saman_seo_jsonld_graph', $graph, $context->post );
+
+		$graph = $this->finalize_graph( is_array( $graph ) ? $graph : array() );
 
 		// Return complete JSON-LD structure.
 		// @context is ONLY added here at root level - never in individual pieces.

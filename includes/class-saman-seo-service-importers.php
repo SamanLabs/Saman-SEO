@@ -15,6 +15,22 @@ defined( 'ABSPATH' ) || exit;
 class Importers {
 
 	/**
+	 * Options that must never leave the site in an export file.
+	 *
+	 * API keys, OAuth tokens and client secrets would otherwise end up in a
+	 * JSON file that gets emailed, attached to tickets or committed.
+	 *
+	 * @var string[]
+	 */
+	public const SECRET_OPTIONS = array(
+		'SAMAN_SEO_openai_api_key',
+		'SAMAN_SEO_google_maps_api_key',
+		'SAMAN_SEO_gsc_client_id',
+		'SAMAN_SEO_gsc_client_secret',
+		'SAMAN_SEO_gsc_tokens',
+	);
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
@@ -47,7 +63,6 @@ class Importers {
 			'SAMAN_SEO_ai_prompt_system',
 			'SAMAN_SEO_ai_prompt_title',
 			'SAMAN_SEO_ai_prompt_description',
-			'SAMAN_SEO_openai_api_key',
 			'SAMAN_SEO_homepage_title',
 			'SAMAN_SEO_homepage_description',
 			'SAMAN_SEO_homepage_keywords',
@@ -68,6 +83,8 @@ class Importers {
 			'SAMAN_SEO_robots_txt',
 		);
 
+		$options = self::exportable_options( $options );
+
 		$data = array(
 			'options' => array_map(
 				static function ( $key ) {
@@ -86,6 +103,31 @@ class Importers {
 		header( 'Content-Disposition: attachment; filename="saman-seo-export-' . gmdate( 'Ymd-His' ) . '.json"' );
 		echo wp_json_encode( $data );
 		exit;
+	}
+
+	/**
+	 * Drop secrets from a list of option names.
+	 *
+	 * Matches the explicit denylist plus anything whose name marks it as a
+	 * credential, so a future secret option is not exported by accident.
+	 *
+	 * @param string[] $options Option names.
+	 *
+	 * @return string[]
+	 */
+	public static function exportable_options( array $options ) {
+		return array_values(
+			array_filter(
+				$options,
+				static function ( $key ) {
+					if ( in_array( $key, self::SECRET_OPTIONS, true ) ) {
+						return false;
+					}
+
+					return ! preg_match( '/(api_key|_secret|_token|_tokens|_password)$/i', (string) $key );
+				}
+			)
+		);
 	}
 
 	/**

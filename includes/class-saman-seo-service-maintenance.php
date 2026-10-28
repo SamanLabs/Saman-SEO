@@ -233,7 +233,8 @@ class Maintenance {
 		 */
 		$stale_minutes = (int) saman_seo_apply_filters( 'saman_seo_link_scan_stale_minutes', 60 );
 		if ( $stale_minutes > 0 ) {
-			$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$stale_minutes} minutes" ) );
+			// started_at is written with current_time( 'mysql' ), which is site-local time, so the cutoff is too.
+			$cutoff = wp_date( 'Y-m-d H:i:s', time() - $stale_minutes * MINUTE_IN_SECONDS );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safe.
 			$wpdb->query(
 				$wpdb->prepare(

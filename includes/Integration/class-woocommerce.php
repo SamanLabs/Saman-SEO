@@ -60,6 +60,13 @@ class WooCommerce {
 		if ( ! function_exists( 'WC' ) || null === WC()->structured_data ) {
 			return;
 		}
+
+		// Only replace WooCommerce's schema when ours is printed. With another SEO plugin
+		// active (frontend_head off) or the schema module off, the product had none at all.
+		if ( ! saman_seo_apply_filters( 'saman_seo_feature_toggle', true, 'frontend_head' )
+			|| ! \Saman\SEO\Helpers\module_enabled( 'schema' ) ) {
+			return;
+		}
 		remove_action( 'wp_footer', array( WC()->structured_data, 'output_structured_data' ), 10 );
 		remove_action( 'woocommerce_email_order_details', array( WC()->structured_data, 'output_email_structured_data' ), 30 );
 	}

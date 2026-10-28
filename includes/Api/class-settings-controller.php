@@ -18,6 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Settings_Controller extends REST_Controller {
 
 	/**
+	 * Credentials never sent to the browser: the Google refresh token grants Search Console
+	 * access on its own. The Search Console card uses its own routes and never reads these.
+	 *
+	 * @var string[]
+	 */
+	private const PRIVATE_OPTIONS = array( 'gsc_tokens', 'gsc_client_secret' );
+
+	/**
 	 * Register routes.
 	 */
 	public function register_routes() {
@@ -111,7 +119,10 @@ class Settings_Controller extends REST_Controller {
 
 		$settings = array();
 		foreach ( $options as $opt ) {
-			$key              = str_replace( 'SAMAN_SEO_', '', $opt->option_name );
+			$key = str_replace( 'SAMAN_SEO_', '', $opt->option_name );
+			if ( in_array( $key, self::PRIVATE_OPTIONS, true ) ) {
+				continue;
+			}
 			$settings[ $key ] = maybe_unserialize( $opt->option_value );
 		}
 
@@ -201,7 +212,10 @@ class Settings_Controller extends REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function get_setting( $request ) {
-		$key   = $request->get_param( 'key' );
+		$key = $request->get_param( 'key' );
+		if ( in_array( $key, self::PRIVATE_OPTIONS, true ) ) {
+			return $this->error( __( 'This setting is not available here.', 'saman-seo' ), 'private_setting', 403 );
+		}
 		$value = get_option( 'SAMAN_SEO_' . $key );
 
 		return $this->success(
@@ -236,7 +250,7 @@ class Settings_Controller extends REST_Controller {
 			}
 
 			$sanitized[ $key ] = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
-			update_option( 'SAMAN_SEO_' . $key, $sanitized[ $key ] );
+			update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $sanitized[ $key ], $allowed[ $key ] ) );
 		}
 
 		// Sync breadcrumb settings to consolidated option for the service.
@@ -274,6 +288,33 @@ class Settings_Controller extends REST_Controller {
 			'homepage_social_profiles'         => 'textarea',
 			'local_social_profiles'            => 'textarea',
 
+			// Knowledge Graph: who the site represents in schema.
+			'homepage_knowledge_type'          => 'text',
+			'homepage_organization_name'       => 'text',
+			'homepage_organization_logo'       => 'url',
+			'homepage_person_name'             => 'text',
+			'homepage_person_image'            => 'url',
+			'homepage_person_job_title'        => 'text',
+			'homepage_person_url'              => 'url',
+
+			// Local SEO business details.
+			'local_business_name'              => 'text',
+			'local_business_type'              => 'text',
+			'local_description'                => 'textarea',
+			'local_phone'                      => 'text',
+			'local_email'                      => 'email',
+			'local_street'                     => 'text',
+			'local_city'                       => 'text',
+			'local_state'                      => 'text',
+			'local_zip'                        => 'text',
+			'local_country'                    => 'text',
+			'local_latitude'                   => 'text',
+			'local_longitude'                  => 'text',
+			'local_price_range'                => 'text',
+			'local_logo'                       => 'url',
+			'local_image'                      => 'url',
+			'local_opening_hours'              => 'textarea',
+
 			// Per-post-type options.
 			'post_type_title_templates'        => 'array',
 			'post_type_meta_descriptions'      => 'array',
@@ -300,6 +341,7 @@ class Settings_Controller extends REST_Controller {
 			'module_redirects'                 => 'bool',
 			'module_404_log'                   => 'bool',
 			'module_indexnow'                  => 'bool',
+			'module_search_console'            => 'bool',
 			'module_local_seo'                 => 'bool',
 			'module_social_cards'              => 'bool',
 			'module_analytics'                 => 'bool',
@@ -341,6 +383,13 @@ class Settings_Controller extends REST_Controller {
 			'redirect_monitor_post_types'      => 'array',
 			'redirect_monitor_trash'           => 'bool',
 
+			// 404 log retention and notifications.
+			'enable_404_cleanup'               => 'bool',
+			'cleanup_404_days'                 => 'int',
+			'enable_404_notifications'         => 'bool',
+			'notification_404_threshold'       => 'int',
+			'notification_404_email'           => 'text',
+
 			// 404 log privacy/logging settings.
 			'404_log_ip_level'                 => 'text',
 			'404_log_ip_header'                => 'text',
@@ -376,6 +425,9 @@ class Settings_Controller extends REST_Controller {
 			case 'textarea':
 				return sanitize_textarea_field( $value );
 
+			case 'email':
+				return sanitize_email( $value );
+
 			case 'array':
 				if ( ! is_array( $value ) ) {
 					return array();
@@ -399,6 +451,27 @@ class Settings_Controller extends REST_Controller {
 			default:
 				return sanitize_text_field( $value );
 		}
+	}
+
+	/**
+	 * Convert a sanitized setting to the value written to its option.
+	 *
+	 * Booleans are stored as '1' / '' rather than true / false: update_option()
+	 * treats false as "unchanged" when the option does not exist yet, so
+	 * switching off a setting whose default is on would silently do nothing.
+	 * '' is what WordPress already writes for false, so readers (empty(),
+	 * '1' === checks, and the React UI) see the same values as before.
+	 *
+	 * @param mixed  $value Sanitized value.
+	 * @param string $type  Registered type.
+	 * @return mixed
+	 */
+	private function to_option_value( $value, $type ) {
+		if ( 'bool' === $type ) {
+			return $value ? '1' : '';
+		}
+
+		return $value;
 	}
 
 	/**
@@ -496,7 +569,7 @@ class Settings_Controller extends REST_Controller {
 
 		$value = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
 
-		update_option( 'SAMAN_SEO_' . $key, $value );
+		update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $value, $allowed[ $key ] ) );
 
 		return $this->success(
 			array(

@@ -85,6 +85,27 @@ if ( ! class_exists( 'WP_Term' ) ) {
 	}
 }
 
+if ( ! class_exists( 'WP_Query' ) ) {
+	/**
+	 * Minimal WP_Query stand-in: pages through WP_Query::$fixture_posts.
+	 */
+	class WP_Query {
+		public static $fixture_posts = array();
+		public $posts                = array();
+		public $found_posts          = 0;
+		public $max_num_pages        = 0;
+
+		public function __construct( $args = array() ) {
+			$per_page = (int) ( $args['posts_per_page'] ?? 10 );
+			$paged    = max( 1, (int) ( $args['paged'] ?? 1 ) );
+
+			$this->found_posts   = count( self::$fixture_posts );
+			$this->max_num_pages = $per_page > 0 ? (int) ceil( $this->found_posts / $per_page ) : 1;
+			$this->posts         = $per_page > 0 ? array_slice( self::$fixture_posts, ( $paged - 1 ) * $per_page, $per_page ) : self::$fixture_posts;
+		}
+	}
+}
+
 if ( ! class_exists( 'WP_Error' ) ) {
 	/**
 	 * Lightweight WP_Error replacement for unit tests.

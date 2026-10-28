@@ -1,5 +1,28 @@
 /**
  * Codemod to wrap user-facing strings in src-v2 with @wordpress/i18n.
+ *
+ * ============================================================================
+ * WARNING: REVIEW THE DIFF BEFORE COMMITTING ANYTHING THIS SCRIPT PRODUCES.
+ * ============================================================================
+ *
+ * An earlier version of this script deleted JSX. For string attributes
+ * (placeholder, title, alt, aria-label, label, ...) replaceWithI18n() walked
+ * up to the nearest JSXExpressionContainer and replaced that WHOLE container
+ * with a single __() call. When the attribute sat inside something like
+ * `{ cond && ( <div>...<input placeholder="..." />...</div> ) }`, the entire
+ * conditional block was swapped for `{ __( '...', 'saman-seo' ) }` and the
+ * markup was silently lost (see commit 9c10127, repaired in later commits).
+ *
+ * Fixed here: only the attribute value itself is replaced, and strings used
+ * in ===, !==, == or != comparisons are never wrapped (translating them
+ * breaks the comparison).
+ *
+ * After running it, always check for large deletions before committing:
+ *
+ *     git diff --stat src-v2
+ *
+ * Any file with far more deletions than insertions is a red flag: the
+ * codemod should only ever rewrite strings in place, never remove markup.
  */
 
 const fs = require( 'fs' );
@@ -432,20 +455,25 @@ function addI18nImport( ast, needsSprintf ) {
 	}
 }
 
-function replaceWithI18n( path, call, ctx ) {
-	if ( ctx && ctx.type === 'jsx-attr' ) {
-		let container = path;
-		while ( container && ! container.isJSXExpressionContainer() ) {
-			container = container.parentPath;
-		}
-		if ( container ) {
-			container.replaceWith( t.jsxExpressionContainer( call ) );
-		} else {
-			path.replaceWith( t.jsxExpressionContainer( call ) );
-		}
+function replaceWithI18n( path, call ) {
+	// A bare string attribute value (attr="...") needs the literal itself
+	// swapped for an expression container. Never walk up to an ancestor
+	// JSXExpressionContainer: that can be a far-away `{ cond && ( ... ) }`
+	// block, and replacing it deletes all the JSX inside.
+	if ( path.parentPath && path.parentPath.isJSXAttribute() ) {
+		path.replaceWith( t.jsxExpressionContainer( call ) );
 	} else {
 		path.replaceWith( call );
 	}
+}
+
+const COMPARISON_OPERATORS = new Set( [ '===', '!==', '==', '!=' ] );
+
+function isComparisonOperand( path ) {
+	return (
+		path.parentPath.isBinaryExpression() &&
+		COMPARISON_OPERATORS.has( path.parentPath.node.operator )
+	);
 }
 
 function processFile( filePath ) {
@@ -511,11 +539,13 @@ function processFile( filePath ) {
 		},
 		StringLiteral( path ) {
 			if ( shouldSkipString( path.node.value ) ) return;
+			// Strings compared against values are identifiers, not copy.
+			if ( isComparisonOperand( path ) ) return;
 			const ctx = findTranslatableContext( path );
 			if ( ! ctx ) return;
 			const replacement = makeI18nCall( path.node.value );
 			if ( t.isStringLiteral( replacement ) ) return;
-			replaceWithI18n( path, replacement, ctx );
+			replaceWithI18n( path, replacement );
 			needsI18n = true;
 		},
 		TemplateLiteral( path ) {
@@ -530,7 +560,7 @@ function processFile( filePath ) {
 				needsSprintf = true;
 			}
 			needsI18n = true;
-			replaceWithI18n( path, replacement, ctx );
+			replaceWithI18n( path, replacement );
 		},
 	} );
 

@@ -122,10 +122,11 @@ class Event_Schema extends Abstract_Schema {
 			$schema['image'] = array( $image );
 		}
 
-		// End date (only when it follows the start).
-		$end_date = trim( (string) ( $event['end_date'] ?? '' ) );
-		if ( '' !== $end_date && strtotime( $end_date ) >= strtotime( (string) $event['start_date'] ) ) {
-			$schema['endDate'] = self::sanitize_iso8601( $end_date );
+		// End date (only when it follows the start). Both values are compared
+		// after timezone normalization so offsets are respected.
+		$end_date = self::sanitize_iso8601( (string) ( $event['end_date'] ?? '' ) );
+		if ( '' !== $end_date && '' !== $schema['startDate'] && strtotime( $end_date ) >= strtotime( $schema['startDate'] ) ) {
+			$schema['endDate'] = $end_date;
 		}
 
 		// Status + attendance mode (whitelisted enums with full IRI output).
@@ -134,6 +135,10 @@ class Event_Schema extends Abstract_Schema {
 			$schema['eventStatus'] = 'https://schema.org/' . $status;
 		}
 
+		// OnlineEventAttendanceMode stays valid schema.org markup, but Google
+		// removed online-only events from its event rich result docs in June
+		// 2025, so online-only events should not be expected to show as rich
+		// results. Mixed and offline events with a physical Place still can.
 		$mode = (string) ( $event['attendance_mode'] ?? 'OfflineEventAttendanceMode' );
 		if ( in_array( $mode, self::ATTENDANCE_MODES, true ) ) {
 			$schema['eventAttendanceMode'] = 'https://schema.org/' . $mode;
@@ -323,8 +328,13 @@ class Event_Schema extends Abstract_Schema {
 	/**
 	 * Normalize a date/datetime string into ISO 8601.
 	 *
-	 * Values already in ISO 8601 format pass through unchanged; anything
-	 * else is converted via strtotime() and dropped when unparseable.
+	 * Google asks for event datetimes with a timezone offset. Date-only
+	 * values ("2026-09-15") pass through unchanged. Datetimes that carry
+	 * an offset keep it; datetimes without one (e.g. from a
+	 * datetime-local input) are interpreted in the site timezone
+	 * (wp_timezone()) and output with that offset (DATE_ATOM). A UTC
+	 * offset is written in the compact "Z" form. Unparseable values
+	 * return an empty string.
 	 *
 	 * @param string $value Raw datetime value.
 	 * @return string ISO 8601 string, or empty string when invalid.
@@ -336,12 +346,36 @@ class Event_Schema extends Abstract_Schema {
 			return '';
 		}
 
-		if ( preg_match( '/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:?\d{2})?)?$/', $value ) ) {
-			return str_replace( '+00:00', 'Z', $value );
+		// Date only: valid as-is, no time so no offset needed.
+		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value ) ) {
+			return $value;
 		}
 
-		$timestamp = strtotime( $value );
+		try {
+			// An explicit offset in $value overrides the site timezone.
+			$datetime = new \DateTimeImmutable( $value, self::site_timezone() );
+		} catch ( \Exception $e ) {
+			return '';
+		}
 
-		return false === $timestamp ? '' : gmdate( 'c', $timestamp );
+		$errors = \DateTimeImmutable::getLastErrors();
+		if ( is_array( $errors ) && ( ! empty( $errors['warning_count'] ) || ! empty( $errors['error_count'] ) ) ) {
+			return '';
+		}
+
+		$formatted = $datetime->format( DATE_ATOM );
+
+		return '+00:00' === substr( $formatted, -6 ) ? substr( $formatted, 0, -6 ) . 'Z' : $formatted;
+	}
+
+	/**
+	 * Site timezone, falling back to UTC outside WordPress.
+	 *
+	 * @return \DateTimeZone
+	 */
+	private static function site_timezone(): \DateTimeZone {
+		$timezone = function_exists( 'wp_timezone' ) ? wp_timezone() : null;
+
+		return $timezone instanceof \DateTimeZone ? $timezone : new \DateTimeZone( 'UTC' );
 	}
 }

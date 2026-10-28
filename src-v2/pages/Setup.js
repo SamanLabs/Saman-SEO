@@ -240,7 +240,132 @@ const Setup = ( { onComplete, onSkip } ) => {
 				) }
 
 				{ /* Step 2: Site Info */ }
-				{ __( 'e.g., Technology, Health, Finance\u2026', 'saman-seo' ) }
+				{ step === 2 && (
+					<div className="setup-step">
+						<span className="setup-step__number">
+							{ __( 'Step 1 of 4', 'saman-seo' ) }
+						</span>
+						<h2>
+							{ __( 'Tell us about your site', 'saman-seo' ) }
+						</h2>
+						<p className="setup-step__subtitle">
+							{ __(
+								'This helps us customize SEO recommendations for your needs.',
+								'saman-seo'
+							) }
+						</p>
+
+						<div className="setup-section">
+							<label className="setup-label">
+								{ __(
+									'What type of site is this?',
+									'saman-seo'
+								) }
+							</label>
+							<div className="setup-options setup-options--grid">
+								{ siteTypes.map( ( type ) => (
+									<button
+										key={ type.value }
+										type="button"
+										className={ `setup-option ${
+											data.site_type === type.value
+												? 'active'
+												: ''
+										}` }
+										onClick={ () =>
+											updateData(
+												'site_type',
+												type.value
+											)
+										}
+									>
+										<span className="setup-option__icon">
+											{ type.icon }
+										</span>
+										<span className="setup-option__label">
+											{ type.label }
+										</span>
+									</button>
+								) ) }
+							</div>
+						</div>
+
+						<div className="setup-section">
+							<label className="setup-label">
+								{ __(
+									"What's your primary goal?",
+									'saman-seo'
+								) }
+							</label>
+							<div className="setup-options">
+								{ goals.map( ( goal ) => (
+									<button
+										key={ goal.value }
+										type="button"
+										className={ `setup-option setup-option--horizontal ${
+											data.primary_goal === goal.value
+												? 'active'
+												: ''
+										}` }
+										onClick={ () =>
+											updateData(
+												'primary_goal',
+												goal.value
+											)
+										}
+									>
+										<span className="setup-option__icon">
+											{ goal.icon }
+										</span>
+										<span className="setup-option__label">
+											{ goal.label }
+										</span>
+									</button>
+								) ) }
+							</div>
+						</div>
+
+						<div className="setup-section">
+							<label className="setup-label" htmlFor="industry">
+								{ __(
+									'Industry / Niche (optional)',
+									'saman-seo'
+								) }
+							</label>
+							<input
+								id="industry"
+								type="text"
+								className="setup-input"
+								value={ data.industry }
+								onChange={ ( e ) =>
+									updateData( 'industry', e.target.value )
+								}
+								placeholder={ __(
+									'e.g., Technology, Health, Finance\u2026',
+									'saman-seo'
+								) }
+							/>
+						</div>
+
+						<div className="setup-actions">
+							<button
+								type="button"
+								className="button ghost"
+								onClick={ handleBack }
+							>
+								{ __( 'Back', 'saman-seo' ) }
+							</button>
+							<button
+								type="button"
+								className="button primary"
+								onClick={ handleNext }
+								disabled={ ! data.site_type }
+							>
+								{ __( 'Continue', 'saman-seo' ) }
+							</button>
+						</div>
+					</div>
+				) }
 
 				{ /* Step 3: AI Status */ }
 				{ step === 3 && (

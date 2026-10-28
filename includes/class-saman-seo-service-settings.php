@@ -70,7 +70,7 @@ class Settings {
 		'SAMAN_SEO_enable_og_preview'                => '1',
 		'SAMAN_SEO_enable_llm_txt'                   => '1',
 		'SAMAN_SEO_enable_local_seo'                 => '0',
-		'SAMAN_SEO_enable_analytics'                 => '1',
+		'SAMAN_SEO_enable_analytics'                 => '0',
 
 		// New module toggle options (used by React UI).
 		'SAMAN_SEO_module_sitemap'                   => '1',
@@ -79,7 +79,7 @@ class Settings {
 		'SAMAN_SEO_module_llm_txt'                   => '1',
 		'SAMAN_SEO_module_local_seo'                 => '0',
 		'SAMAN_SEO_module_social_cards'              => '1',
-		'SAMAN_SEO_module_analytics'                 => '1',
+		'SAMAN_SEO_module_analytics'                 => '0',
 		'SAMAN_SEO_module_admin_bar'                 => '1',
 		'SAMAN_SEO_module_internal_links'            => '1',
 		'SAMAN_SEO_module_ai_assistant'              => '1',
@@ -107,6 +107,12 @@ class Settings {
 		'SAMAN_SEO_404_log_ip_header'                => 'REMOTE_ADDR',
 		'SAMAN_SEO_404_log_referer'                  => '1',
 		'SAMAN_SEO_404_log_ignore_bots'              => '0',
+
+		// 404 log retention. Stored up front so switching cleanup off is a
+		// real option change (update_option() ignores false on a missing
+		// option, which made the toggle snap back on).
+		'SAMAN_SEO_enable_404_cleanup'               => '1',
+		'SAMAN_SEO_cleanup_404_days'                 => '30',
 
 		// Data cleanup.
 		'SAMAN_SEO_delete_data_on_uninstall'         => '0',
@@ -200,7 +206,33 @@ class Settings {
 	 * @return void
 	 */
 	public function boot() {
+		self::maybe_migrate_analytics_opt_in();
+
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+	}
+
+	/**
+	 * Option recording that the analytics opt-in migration has run.
+	 */
+	public const ANALYTICS_OPT_IN_MIGRATION = 'SAMAN_SEO_analytics_opt_in_migrated';
+
+	/**
+	 * One-time upgrade: switch usage analytics off on existing installs.
+	 *
+	 * Older versions shipped admin usage tracking enabled by default, so no
+	 * site ever actually opted in. Turn it off once; afterwards the toggle
+	 * in Settings is the only thing that changes it.
+	 *
+	 * @return void
+	 */
+	public static function maybe_migrate_analytics_opt_in() {
+		if ( get_option( self::ANALYTICS_OPT_IN_MIGRATION ) ) {
+			return;
+		}
+
+		update_option( 'SAMAN_SEO_module_analytics', '0' );
+		update_option( 'SAMAN_SEO_enable_analytics', '0' );
+		update_option( self::ANALYTICS_OPT_IN_MIGRATION, '1' );
 	}
 
 	/**
@@ -225,6 +257,21 @@ class Settings {
 	 * @return void
 	 */
 	public function install_default_options() {
+		// 404 retention may only exist in the legacy consolidated array.
+		// Carry it over first so an old "off" is not replaced by the default.
+		$legacy = get_option( 'SAMAN_SEO_settings', array() );
+		if ( is_array( $legacy ) ) {
+			if ( isset( $legacy['enable_404_cleanup'] ) ) {
+				$enabled = $legacy['enable_404_cleanup'];
+				$enabled = is_string( $enabled ) ? filter_var( $enabled, FILTER_VALIDATE_BOOLEAN ) : ! empty( $enabled );
+				add_option( 'SAMAN_SEO_enable_404_cleanup', $enabled ? '1' : '' );
+			}
+
+			if ( isset( $legacy['cleanup_404_days'] ) && absint( $legacy['cleanup_404_days'] ) > 0 ) {
+				add_option( 'SAMAN_SEO_cleanup_404_days', (string) absint( $legacy['cleanup_404_days'] ) );
+			}
+		}
+
 		foreach ( $this->defaults as $key => $default ) {
 			add_option( $key, $default );
 		}

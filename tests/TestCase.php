@@ -283,6 +283,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase {
 		// -----------------------------------------------------------------
 		// URLs & site info.
 		// -----------------------------------------------------------------
+		Functions\when( 'wp_salt' )->justReturn( 'test-salt' );
 		Functions\when( 'home_url' )->alias(
 			static function ( $path = '' ) {
 				$path = (string) $path;
