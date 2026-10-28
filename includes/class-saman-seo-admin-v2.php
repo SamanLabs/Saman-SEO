@@ -274,6 +274,9 @@ class Admin_V2 {
 		$build_dir = SAMAN_SEO_PATH . 'build/v2/';
 		$build_url = SAMAN_SEO_URL . 'build/v2/';
 
+		// Image pickers in the SPA call wp.media(), which isn't a bundle dependency.
+		wp_enqueue_media();
+
 		$asset_file = $build_dir . 'index.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
