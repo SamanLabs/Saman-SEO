@@ -32,6 +32,15 @@ class SitemapExclusionTest extends TestCase {
 	}
 
 	/**
+	 * Core passes update_post_meta_cache => false; each entry's meta read then costs a query.
+	 */
+	public function test_sitemap_query_loads_post_meta_in_one_batch(): void {
+		$args = $this->enhancer->filter_posts_query_args( array( 'update_post_meta_cache' => false ), 'post' );
+
+		$this->assertTrue( $args['update_post_meta_cache'] );
+	}
+
+	/**
 	 * The default query gains an AND-wrapped meta_query excluding the
 	 * per-post toggle, plus noindex when enabled (default).
 	 */

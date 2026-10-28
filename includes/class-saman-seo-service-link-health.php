@@ -448,6 +448,22 @@ class Link_Health {
 			$total_links  = 0;
 			$broken_links = 0;
 			$last_id      = (int) $scan->last_post_id;
+			$scanned      = 0;
+
+			/**
+			 * Filters how long one scan chunk may run, in seconds, before it stops after the
+			 * current post and leaves the rest to the next chunk.
+			 *
+			 * Each link check can wait out its timeout, so a chunk of posts full of links to
+			 * dead hosts used to outlive max_execution_time. That lost its progress, and every
+			 * later scan died at the same posts. 0 disables the limit.
+			 *
+			 * @since 2.0.34
+			 *
+			 * @param float $seconds Time budget per chunk. Default 20.
+			 */
+			$budget  = (float) saman_seo_apply_filters( 'saman_seo_link_scan_chunk_seconds', 20 );
+			$started = microtime( true );
 
 			foreach ( $ids as $post_id ) {
 				$post_id      = (int) $post_id;
@@ -459,13 +475,18 @@ class Link_Health {
 					}
 				}
 				$last_id = $post_id;
+				++$scanned;
+
+				if ( $budget > 0 && microtime( true ) - $started >= $budget ) {
+					break;
+				}
 			}
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->query(
 				$wpdb->prepare(
 					"UPDATE {$this->scans_table} SET scanned_posts = scanned_posts + %d, total_links = total_links + %d, broken_links = broken_links + %d, last_post_id = %d WHERE id = %d",
-					count( $ids ),
+					$scanned,
 					$total_links,
 					$broken_links,
 					$last_id,
@@ -473,8 +494,8 @@ class Link_Health {
 				)
 			);
 
-			if ( count( $ids ) < $chunk_size ) {
-				// Short chunk means we reached the end.
+			if ( count( $ids ) === $scanned && count( $ids ) < $chunk_size ) {
+				// A short chunk scanned to its end means we reached the last post.
 				$this->complete_scan( $scan_id );
 			} else {
 				delete_transient( self::LOCK_TRANSIENT );

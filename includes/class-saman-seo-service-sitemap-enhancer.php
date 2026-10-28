@@ -401,6 +401,10 @@ class Sitemap_Enhancer {
 	public function filter_posts_query_args( $args, $post_type ) {
 		$args = $this->apply_post_exclusions( $args, $post_type );
 
+		// Core turns the meta cache off for sitemap queries, but every entry reads meta
+		// (featured image, video, SEO fields): load it for the whole page in one query.
+		$args['update_post_meta_cache'] = true;
+
 		/**
 		 * Filter the WP_Query args for sitemap generation.
 		 *

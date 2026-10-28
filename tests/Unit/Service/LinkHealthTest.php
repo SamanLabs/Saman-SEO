@@ -67,6 +67,54 @@ class LinkHealthTest extends TestCase {
 			public $queries = array();
 
 			/**
+			 * Posts table name.
+			 *
+			 * @var string
+			 */
+			public $posts = 'wp_posts';
+
+			/**
+			 * Row returned by get_row().
+			 *
+			 * @var object|null
+			 */
+			public $scan = null;
+
+			/**
+			 * IDs returned by get_col().
+			 *
+			 * @var int[]
+			 */
+			public $ids = array();
+
+			/**
+			 * The scan row.
+			 *
+			 * @return object|null
+			 */
+			public function get_row() {
+				return $this->scan;
+			}
+
+			/**
+			 * The chunk's post IDs.
+			 *
+			 * @return int[]
+			 */
+			public function get_col() {
+				return $this->ids;
+			}
+
+			/**
+			 * Accept an update.
+			 *
+			 * @return int
+			 */
+			public function update() {
+				return 1;
+			}
+
+			/**
 			 * Return the query and its args.
 			 *
 			 * @param string $query Query.
@@ -171,6 +219,54 @@ class LinkHealthTest extends TestCase {
 		list( , $external ) = $this->db->inserts[1];
 		$this->assertSame( 'https://elsewhere.test/x', $external['target_url'] );
 		$this->assertSame( 'external', $external['link_type'] );
+	}
+
+	/**
+	 * A chunk that runs out of time stops after the post it is on, records that post as the
+	 * cursor and leaves the rest to the next chunk, instead of being killed with no progress.
+	 */
+	public function test_chunk_over_its_time_budget_saves_progress_and_continues() {
+		$this->db->scan = (object) array(
+			'id'           => 3,
+			'status'       => 'running',
+			'last_post_id' => 0,
+		);
+		$this->db->ids  = array( 10, 11, 12 );
+		$scheduled      = array();
+		Functions\when( 'get_transient' )->justReturn( false );
+		Functions\when( 'set_transient' )->justReturn( true );
+		Functions\when( 'delete_transient' )->justReturn( true );
+		Functions\when( 'wp_next_scheduled' )->justReturn( false );
+		Functions\when( 'wp_schedule_single_event' )->alias(
+			static function ( $time, $hook, $args ) use ( &$scheduled ) {
+				$scheduled[] = $args;
+			}
+		);
+		add_filter(
+			'saman_seo_link_scan_chunk_seconds',
+			static function () {
+				return 0.000001;
+			}
+		);
+
+		$service = new class() extends Link_Health {
+			/**
+			 * No HTTP in tests; a millisecond stands in for a slow link check.
+			 *
+			 * @param int $post_id Post ID.
+			 * @return array
+			 */
+			public function scan_post_links( $post_id ) {
+				usleep( 1000 );
+				return array();
+			}
+		};
+		$service->process_chunk( 3 );
+
+		$progress = end( $this->db->queries );
+		$this->assertStringContainsString( 'last_post_id = %d', $progress['sql'] );
+		$this->assertSame( array( 1, 0, 0, 10, 3 ), $progress['args'], 'one post scanned, cursor on it' );
+		$this->assertSame( array( array( 3 ) ), $scheduled, 'the rest goes to the next chunk' );
 	}
 
 	/**
