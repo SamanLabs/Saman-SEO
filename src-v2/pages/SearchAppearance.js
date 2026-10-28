@@ -555,14 +555,14 @@ const SearchAppearance = () => {
 		}
 	};
 
-	// Save archives
-	const saveArchives = async () => {
+	// Save archives: takes the updated list, since state set just before would still be stale here.
+	const saveArchives = async ( list ) => {
 		setSaving( true );
 		try {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/search-appearance/archives',
 				method: 'POST',
-				data: archives,
+				data: list,
 			} );
 			if ( response.success ) {
 				setArchives( response.data );
@@ -787,6 +787,28 @@ const SearchAppearance = () => {
 									</button>
 								)
 							) }
+							<div className="separator-custom">
+								<input
+									type="text"
+									className="separator-custom__input"
+									value={
+										! Object.keys(
+											separatorOptions
+										).includes( separator )
+											? separator
+											: ''
+									}
+									onChange={ ( e ) =>
+										saveSeparator( e.target.value )
+									}
+									placeholder={ __( 'Custom', 'saman-seo' ) }
+									aria-label={ __(
+										'Custom title separator',
+										'saman-seo'
+									) }
+									maxLength={ 5 }
+								/>
+							</div>
 						</div>
 					</div>
 
@@ -1099,12 +1121,11 @@ const SearchAppearance = () => {
 							variables={ variables }
 							variableValues={ variableValues }
 							onSave={ ( updated ) => {
-								setArchives( ( prev ) =>
-									prev.map( ( a ) =>
-										a.slug === updated.slug ? updated : a
-									)
+								const next = archives.map( ( a ) =>
+									a.slug === updated.slug ? updated : a
 								);
-								setEditingArchive( null );
+								setArchives( next );
+								saveArchives( next );
 							} }
 							onCancel={ () => setEditingArchive( null ) }
 							renderTemplatePreview={ renderTemplatePreview }

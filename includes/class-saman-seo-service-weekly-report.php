@@ -89,8 +89,10 @@ class Weekly_Report {
 			return;
 		}
 
-		// Same target weekday within ±36h? Leave it alone; otherwise reschedule.
-		if ( abs( $next - $desired ) > 36 * HOUR_IN_SECONDS ) {
+		// Reschedule only when the configured weekday changed. Comparing with the next run
+		// pushed the event due today to next week whenever this ran after 09:00 that day,
+		// which includes the wp-cron request about to send it, so the digest never went out.
+		if ( wp_date( 'w', $next ) !== wp_date( 'w', $desired ) ) {
 			self::unschedule();
 			wp_schedule_event( $desired, 'weekly', self::HOOK );
 		}

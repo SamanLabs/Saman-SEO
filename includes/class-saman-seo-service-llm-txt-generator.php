@@ -225,6 +225,7 @@ class LLM_TXT_Generator {
 					'post_type'      => $post_type->name,
 					'posts_per_page' => $posts_per_type,
 					'post_status'    => 'publish',
+					'has_password'   => false,
 					'orderby'        => 'date',
 					'order'          => 'DESC',
 				)
@@ -238,13 +239,24 @@ class LLM_TXT_Generator {
 			$output[] = '';
 
 			foreach ( $posts as $post ) {
+				$meta = get_post_meta( $post->ID, Post_Meta::META_KEY, true );
+				$meta = is_array( $meta ) ? $meta : array();
+
+				// A page kept out of search engines stays out of the list for AI crawlers too.
+				if ( ! empty( $meta['noindex'] ) ) {
+					continue;
+				}
+
 				$title = get_the_title( $post );
 				$url   = get_permalink( $post );
 
 				// Get excerpt or meta description if enabled
 				$description = '';
 				if ( '1' === $include_excerpt ) {
-					$meta_desc = get_post_meta( $post->ID, '_SAMAN_SEO_meta_description', true );
+					$meta_desc = (string) ( $meta['description'] ?? '' );
+					if ( false !== strpos( $meta_desc, '{{' ) ) {
+						$meta_desc = \Saman\SEO\Helpers\strip_unreplaced_variables( \Saman\SEO\Helpers\replace_template_variables( $meta_desc, $post ) );
+					}
 
 					if ( $meta_desc ) {
 						$description = ' - ' . wp_trim_words( $meta_desc, 20, '...' );

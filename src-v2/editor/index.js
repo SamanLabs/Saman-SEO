@@ -260,45 +260,30 @@ const SEOModalPlugin = () => {
 			} ) );
 			setHasChanges( true );
 
-			// Also update post meta for saving
-			const newMeta = {
-				...seoMeta,
-				[ field ]: value,
-			};
-
-			// Start from the meta the editor already holds so keys this
-			// panel doesn't manage (secondary keyphrases, custom schema,
-			// snippet controls, recipe/event data) survive the save.
+			// Change only this field on the meta the editor store holds right now. It keeps
+			// keys this panel doesn't manage (custom schema, snippet controls, recipe/event
+			// data), and two updates in one tick (a template sets title, then description)
+			// no longer write the first one back from a stale seoMeta.
 			const editedMeta =
 				dataSelect( 'core/editor' ).getEditedPostAttribute( 'meta' )
 					?._SAMAN_SEO_meta || {};
+			let stored = value ?? '';
+			if (
+				[ 'noindex', 'nofollow', 'sitemap_exclude' ].includes( field )
+			) {
+				stored = value ? '1' : '';
+			}
 
-			// Convert booleans to strings for storage
-			const metaForSave = {
-				...editedMeta,
-				...( newMeta.secondary_keyphrases !== undefined && {
-					secondary_keyphrases: newMeta.secondary_keyphrases,
-				} ),
-				...( newMeta.custom_schema !== undefined && {
-					custom_schema: newMeta.custom_schema,
-				} ),
-				title: newMeta.title,
-				description: newMeta.description,
-				canonical: newMeta.canonical,
-				noindex: newMeta.noindex ? '1' : '',
-				nofollow: newMeta.nofollow ? '1' : '',
-				sitemap_exclude: newMeta.sitemap_exclude ? '1' : '',
-				og_image: newMeta.og_image,
-				focus_keyphrase: newMeta.focus_keyphrase,
-				schema_type: newMeta.schema_type || '',
-			};
 			editPost( {
 				meta: {
-					_SAMAN_SEO_meta: metaForSave,
+					_SAMAN_SEO_meta: {
+						...editedMeta,
+						[ field ]: stored,
+					},
 				},
 			} );
 		},
-		[ seoMeta, editPost, postId ]
+		[ editPost, postId ]
 	);
 
 	// Get effective title and description (with fallbacks).

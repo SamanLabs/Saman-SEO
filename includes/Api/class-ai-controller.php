@@ -34,7 +34,10 @@ class Ai_Controller extends REST_Controller {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'generate' ),
-					'permission_callback' => array( $this, 'permission_check' ),
+					// The editor sidebar's "Generate with AI" button shows for everyone who writes posts.
+					'permission_callback' => static function () {
+						return current_user_can( 'edit_posts' );
+					},
 				),
 			)
 		);

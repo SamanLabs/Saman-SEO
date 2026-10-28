@@ -46,6 +46,19 @@ abstract class REST_Controller {
 	}
 
 	/**
+	 * For routes the post editor's SEO sidebar calls with a post `id`: anyone who may edit
+	 * that post (the sidebar loads for Authors and Editors too, not only administrators).
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public function edit_post_permission_check( $request ) {
+		$post_id = (int) $request['id'];
+
+		return $post_id > 0 && current_user_can( 'edit_post', $post_id );
+	}
+
+	/**
 	 * Return a success response.
 	 *
 	 * @param mixed  $data    Response data.

@@ -124,4 +124,51 @@ class LlmsTxtGeneratorTest extends TestCase {
 
 		$this->assertSame( '', $output );
 	}
+
+	/**
+	 * Post lines use the Saman meta description and leave out noindexed posts; the query
+	 * asks WordPress to leave out password-protected ones.
+	 */
+	public function test_post_list_uses_saman_descriptions_and_skips_hidden_posts(): void {
+		$query = null;
+		$shown = $this->make_post(
+			array(
+				'ID'         => 11,
+				'post_title' => 'Shown',
+			)
+		);
+		$hidden = $this->make_post(
+			array(
+				'ID'         => 12,
+				'post_title' => 'Hidden',
+			)
+		);
+		self::$post_meta[11]['_SAMAN_SEO_meta'] = array( 'description' => 'From Saman' );
+		self::$post_meta[12]['_SAMAN_SEO_meta'] = array( 'noindex' => '1' );
+
+		Functions\when( 'get_plugin_data' )->justReturn( array( 'Version' => '1.0' ) );
+		Functions\when( 'get_post_types' )->justReturn(
+			array(
+				'post' => (object) array(
+					'name'  => 'post',
+					'label' => 'Posts',
+				),
+			)
+		);
+		Functions\when( 'get_posts' )->alias(
+			static function ( $args ) use ( &$query, $shown, $hidden ) {
+				$query = $args;
+				return array( $shown, $hidden );
+			}
+		);
+		Functions\when( 'has_excerpt' )->justReturn( false );
+
+		$generate = new \ReflectionMethod( LLM_TXT_Generator::class, 'generate_llm_txt_content' );
+		$generate->setAccessible( true );
+		$content = $generate->invoke( new LLM_TXT_Generator() );
+
+		$this->assertFalse( $query['has_password'] );
+		$this->assertStringContainsString( '[Shown](https://example.org/sample-post/) - From Saman', $content );
+		$this->assertStringNotContainsString( 'Hidden', $content );
+	}
 }
