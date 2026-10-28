@@ -169,8 +169,12 @@ namespace Saman\SEO\Helpers {
 			$vars['post_title'] = \wp_strip_all_tags( $context->post_title );
 			// Legacy alias so %title% (the Setup wizard's historical default)
 			// resolves to the post title alongside {{post_title}}.
-			$vars['title']         = $vars['post_title'];
-			$vars['post_excerpt']  = \wp_strip_all_tags( \get_the_excerpt( $context ) );
+			$vars['title'] = $vars['post_title'];
+			// Only when used: without a manual excerpt this runs the whole the_content filter,
+			// once per template on every view (title, description, OG tags).
+			if ( false !== strpos( $template, 'post_excerpt' ) ) {
+				$vars['post_excerpt'] = \wp_strip_all_tags( \get_the_excerpt( $context ) );
+			}
 			$vars['post_date']     = get_the_date( '', $context );
 			$vars['post_author']   = get_the_author_meta( 'display_name', $context->post_author );
 			$vars['modified']      = get_the_modified_date( '', $context );
@@ -181,23 +185,15 @@ namespace Saman\SEO\Helpers {
 			$cats             = get_the_category( $context->ID );
 			$vars['category'] = ( ! empty( $cats ) && ! is_wp_error( $cats ) ) ? $cats[0]->name : '';
 
-			// Custom Fields: {{cf_key_name}}
-			// Prefetch all meta for context or rely on lazy fetching in regex?
-			// Twiglet regex is generic so we need to pass data.
-			// For dynamic custom fields, we might need to pre-populate common ones or just rely on regex match in Twiglet if extended?
-			// Twiglet simple implementation relies on passed $vars.
-			// Let's populate *known* custom fields if possible, or add a catch-all?
-			// Since Twiglet is strict on passed vars, we should fetch what we can.
-			$all_meta = get_post_meta( $context->ID );
-			foreach ( $all_meta as $k => $v ) {
+			// Custom fields: {{cf_key_name}}. Core's get_post_meta(): the unqualified name
+			// resolved to this namespace's helper, which returns SEO meta, so cf_* were empty.
+			$all_meta = false !== strpos( $template, 'cf_' ) ? \get_post_meta( $context->ID ) : array();
+			foreach ( (array) $all_meta as $k => $v ) {
 				if ( ! is_protected_meta( $k, 'post' ) ) {
-					if ( is_array( $v ) ) {
-						$val = isset( $v[0] ) ? $v[0] : '';
-					} else {
-						$val = $v;
-					}
+					$val = is_array( $v ) ? ( $v[0] ?? '' ) : $v;
 					if ( is_serialized( $val ) ) {
-						$val = implode( ', ', maybe_unserialize( $val ) );
+						$val = maybe_unserialize( $val );
+						$val = is_array( $val ) ? implode( ', ', array_filter( $val, 'is_scalar' ) ) : '';
 					}
 					$vars[ 'cf_' . $k ] = $val;
 				}
@@ -213,7 +209,14 @@ namespace Saman\SEO\Helpers {
 		} elseif ( is_post_type_archive() ) {
 			$vars['archive_title'] = post_type_archive_title( '', false );
 		} elseif ( is_date() ) {
-			$vars['archive_date']  = get_the_date();
+			// The archive's period, as core's archive titles show it, not the first post's full date.
+			if ( is_year() ) {
+				$vars['archive_date'] = get_the_date( _x( 'Y', 'yearly archives date format', 'saman-seo' ) );
+			} elseif ( is_month() ) {
+				$vars['archive_date'] = get_the_date( _x( 'F Y', 'monthly archives date format', 'saman-seo' ) );
+			} else {
+				$vars['archive_date'] = get_the_date();
+			}
 			$vars['date']          = $vars['archive_date']; // Alias used in archive defaults.
 			$vars['archive_title'] = get_the_archive_title();
 		} elseif ( is_author() ) {
@@ -328,8 +331,9 @@ namespace Saman\SEO\Helpers {
 		// Remove {{variable}} tokens.
 		$value = preg_replace( '/\{\{[^}]+\}\}/', '', $value );
 
-		// Remove %variable% tokens.
-		$value = preg_replace( '/%[a-zA-Z0-9_\-]+%/', '', $value );
+		// Remove %variable% tokens, shaped as Twiglet reads them (a name starting with a
+		// letter), so text like "10%-20% off" survives.
+		$value = preg_replace( '/%[a-zA-Z_][a-zA-Z0-9_]*%/', '', $value );
 
 		return tidy_rendered_template( $value );
 	}

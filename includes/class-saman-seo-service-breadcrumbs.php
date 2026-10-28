@@ -650,9 +650,11 @@ class Breadcrumbs {
 	 * @return array
 	 */
 	private function truncate_titles( $crumbs, $length ) {
+		// Count characters, not bytes: cutting inside a multibyte character left invalid
+		// UTF-8, which esc_html() turns into an empty crumb.
 		foreach ( $crumbs as &$crumb ) {
-			if ( strlen( $crumb['title'] ) > $length ) {
-				$crumb['title'] = substr( $crumb['title'], 0, $length - 3 ) . '...';
+			if ( mb_strlen( $crumb['title'] ) > $length ) {
+				$crumb['title'] = mb_substr( $crumb['title'], 0, max( 0, $length - 3 ) ) . '...';
 			}
 		}
 

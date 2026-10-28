@@ -1787,11 +1787,11 @@ class Frontend {
 				// Merge with defaults, but also replace empty strings with defaults
 				$archive_defaults[ $type ] = wp_parse_args( $archive_defaults[ $type ], $defaults );
 
-				// Replace empty strings OR old values without variables with default values
+				// Fill only empty values: a saved template without {{variables}} ("Page not
+				// found") is a choice, and %legacy% tokens still render.
 				foreach ( $defaults as $key => $default_value ) {
 					$current_value = $archive_defaults[ $type ][ $key ] ?? '';
-					// Replace if empty OR if it's a template field that doesn't have any {{variables}}
-					if ( '' === $current_value || ( in_array( $key, array( 'title_template', 'description_template' ), true ) && strpos( $current_value, '{{' ) === false ) ) {
+					if ( '' === $current_value ) {
 						$archive_defaults[ $type ][ $key ] = $default_value;
 					}
 				}
