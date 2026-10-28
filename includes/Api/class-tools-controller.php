@@ -1355,8 +1355,9 @@ class Tools_Controller extends REST_Controller {
 
 		$content = isset( $params['content'] ) ? $params['content'] : '';
 
-		// Sanitize - allow only safe characters
-		$content = wp_kses( $content, array() );
+		// robots.txt is plain text: strip markup but keep & and %xx, which rules use
+		// (wp_kses() stored & as &amp;, so crawlers ignored those rules).
+		$content = wp_strip_all_tags( (string) $content );
 
 		update_option( 'SAMAN_SEO_robots_txt', $content );
 

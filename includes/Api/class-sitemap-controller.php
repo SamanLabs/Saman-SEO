@@ -198,7 +198,10 @@ class Sitemap_Controller extends REST_Controller {
 
 			if ( in_array( $option_key, $this->sitemap_settings, true ) ) {
 				// Sanitize based on type
-				if ( is_array( $value ) ) {
+				if ( 'SAMAN_SEO_sitemap_additional_pages' === $option_key ) {
+					// A list of { url, priority } rows: sanitize_text_field() would turn each row into ''.
+					$value = $this->sanitize_additional_pages( $value );
+				} elseif ( is_array( $value ) ) {
 					$value = array_map( 'sanitize_text_field', $value );
 				} elseif ( is_numeric( $value ) ) {
 					$value = absint( $value );
@@ -214,6 +217,33 @@ class Sitemap_Controller extends REST_Controller {
 		delete_transient( 'SAMAN_SEO_sitemap_stats' );
 
 		return $this->success( null, __( 'Settings saved successfully.', 'saman-seo' ) );
+	}
+
+	/**
+	 * Keep the additional sitemap pages that have a URL, with a priority clamped to 0-1.
+	 *
+	 * Same rule as Sitemap_Settings::save_settings() for the classic form.
+	 *
+	 * @param mixed $pages Rows sent by the admin.
+	 * @return array<int,array{url:string,priority:float}>
+	 */
+	private function sanitize_additional_pages( $pages ) {
+		$clean = array();
+
+		foreach ( (array) $pages as $page ) {
+			$url = is_array( $page ) && isset( $page['url'] ) ? esc_url_raw( trim( (string) $page['url'] ) ) : '';
+
+			if ( '' === $url ) {
+				continue;
+			}
+
+			$clean[] = array(
+				'url'      => $url,
+				'priority' => isset( $page['priority'] ) ? min( 1.0, max( 0.0, (float) $page['priority'] ) ) : 0.5,
+			);
+		}
+
+		return $clean;
 	}
 
 	/**

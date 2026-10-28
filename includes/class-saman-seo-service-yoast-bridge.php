@@ -151,11 +151,15 @@ class Yoast_Bridge {
 		$this->resolving = false;
 
 		$merged  = is_array( $stored ) ? $stored : array();
+		$saved   = $merged;
 		$changed = false;
 
+		// A key Saman has saved, even empty, is the editor's choice (an unticked noindex, a
+		// cleared title): only keys Saman never saved fall back to Yoast. The editor reads this
+		// merged meta, so the first Saman save already keeps the Yoast values it showed.
 		foreach ( $this->meta_map as $saman_key => $yoast_key ) {
-			if ( ! empty( $merged[ $saman_key ] ) ) {
-				continue; // A Saman value already exists; it wins.
+			if ( array_key_exists( $saman_key, $saved ) ) {
+				continue;
 			}
 
 			$yoast_value = get_post_meta( $post_id, $yoast_key, true );
@@ -176,11 +180,11 @@ class Yoast_Bridge {
 		}
 
 		// Robots: Yoast stores '1' = noindex / '1' = nofollow (2 = index, 0 = default).
-		if ( empty( $merged['noindex'] ) && '1' === (string) get_post_meta( $post_id, '_yoast_wpseo_meta-robots-noindex', true ) ) {
+		if ( ! array_key_exists( 'noindex', $saved ) && '1' === (string) get_post_meta( $post_id, '_yoast_wpseo_meta-robots-noindex', true ) ) {
 			$merged['noindex'] = '1';
 			$changed           = true;
 		}
-		if ( empty( $merged['nofollow'] ) && '1' === (string) get_post_meta( $post_id, '_yoast_wpseo_meta-robots-nofollow', true ) ) {
+		if ( ! array_key_exists( 'nofollow', $saved ) && '1' === (string) get_post_meta( $post_id, '_yoast_wpseo_meta-robots-nofollow', true ) ) {
 			$merged['nofollow'] = '1';
 			$changed            = true;
 		}
