@@ -196,7 +196,7 @@ class Social_Card_Generator {
 			return null;
 		}
 
-		$signature = md5( wp_json_encode( array( $title, $design, $width, $height ) ) );
+		$signature = md5( wp_json_encode( array( 'v2', $title, $design, $width, $height ) ) );
 		$dir       = trailingslashit( $uploads['basedir'] ) . 'saman-seo-cards';
 		$filename  = 'card-' . $signature . '.png';
 
@@ -300,8 +300,8 @@ class Social_Card_Generator {
 		// Thin accent bar at bottom
 		imagefilledrectangle( $img, 0, $height - 8, $width, $height, $accent );
 		// Title and site name
-		imagestring( $img, 5, 60, $height - 120, $title, $text );
-		imagestring( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
+		$this->draw_text( $img, 5, 60, $height - 120, $title, $text );
+		$this->draw_text( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
 	}
 
 	/**
@@ -318,8 +318,8 @@ class Social_Card_Generator {
 		// Top accent line
 		imagefilledrectangle( $img, 0, 40, $width, 50, $accent );
 		// Centered text (approximate centering)
-		imagestring( $img, 5, 40, ( $height / 2 ) - 20, $title, $text );
-		imagestring( $img, 3, 40, ( $height / 2 ) + 20, get_bloginfo( 'name' ), $text );
+		$this->draw_text( $img, 5, 40, ( $height / 2 ) - 20, $title, $text );
+		$this->draw_text( $img, 3, 40, ( $height / 2 ) + 20, get_bloginfo( 'name' ), $text );
 	}
 
 	/**
@@ -333,8 +333,8 @@ class Social_Card_Generator {
 	 */
 	private function render_minimal_layout( $img, $width, $height, $title, $text ) {
 		// Text only, no accent
-		imagestring( $img, 5, 40, 40, $title, $text );
-		imagestring( $img, 3, 40, $height - 40, get_bloginfo( 'name' ), $text );
+		$this->draw_text( $img, 5, 40, 40, $title, $text );
+		$this->draw_text( $img, 3, 40, $height - 40, get_bloginfo( 'name' ), $text );
 	}
 
 	/**
@@ -351,8 +351,8 @@ class Social_Card_Generator {
 		// Large accent block on left
 		imagefilledrectangle( $img, 0, 0, 200, $height, $accent );
 		// Title and site name offset
-		imagestring( $img, 5, 240, 40, $title, $text );
-		imagestring( $img, 3, 240, $height - 60, get_bloginfo( 'name' ), $text );
+		$this->draw_text( $img, 5, 240, 40, $title, $text );
+		$this->draw_text( $img, 3, 240, $height - 60, get_bloginfo( 'name' ), $text );
 	}
 
 	/**
@@ -369,9 +369,9 @@ class Social_Card_Generator {
 		// Top accent bar
 		imagefilledrectangle( $img, 0, 0, $width, 8, $accent );
 		// Title at bottom
-		imagestring( $img, 5, 60, $height - 120, $title, $text );
+		$this->draw_text( $img, 5, 60, $height - 120, $title, $text );
 		// Site name uppercase style
-		imagestring( $img, 2, 60, $height - 80, strtoupper( get_bloginfo( 'name' ) ), $text );
+		$this->draw_text( $img, 2, 60, $height - 80, strtoupper( get_bloginfo( 'name' ) ), $text );
 	}
 
 	/**
@@ -400,8 +400,8 @@ class Social_Card_Generator {
 		}
 
 		// Title and site name
-		imagestring( $img, 5, 60, $height - 120, $title, $text );
-		imagestring( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
+		$this->draw_text( $img, 5, 60, $height - 120, $title, $text );
+		$this->draw_text( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
 	}
 
 	/**
@@ -424,8 +424,77 @@ class Social_Card_Generator {
 		imagefilledpolygon( $img, $points_br, 3, $accent );
 
 		// Title and site name
-		imagestring( $img, 5, 60, $height - 120, $title, $text );
-		imagestring( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
+		$this->draw_text( $img, 5, 60, $height - 120, $title, $text );
+		$this->draw_text( $img, 3, 60, $height - 80, get_bloginfo( 'name' ), $text );
+	}
+
+	/**
+	 * Draw text with GD's built-in bitmap font, scaled up to the configured size.
+	 *
+	 * The raw bitmap fonts are 9-15px tall, which is unreadable on a
+	 * 1200x630 card. Same call shape as imagestring(): font 5 is the title
+	 * (title_font_size, wrapped to at most 3 lines), any other font is the
+	 * site name (site_font_size). A title block placed in the lower part of
+	 * the card grows upward so it never runs into the line beneath it.
+	 *
+	 * @param resource $img   Image resource.
+	 * @param int      $font  GD font (5 = title).
+	 * @param int      $x     Left position.
+	 * @param int      $y     Top of the unscaled text.
+	 * @param string   $str   Text.
+	 * @param int      $color Allocated text color.
+	 * @return void
+	 */
+	private function draw_text( $img, $font, $x, $y, $str, $color ) {
+		$str = trim( (string) $str );
+		if ( '' === $str ) {
+			return;
+		}
+
+		$is_title = ( 5 === $font );
+		$glyph_w  = imagefontwidth( $font );
+		$glyph_h  = imagefontheight( $font );
+		$size     = $is_title
+			? (int) ( $this->current_design['title_font_size'] ?? 42 )
+			: (int) ( $this->current_design['site_font_size'] ?? 18 );
+		$size     = max( 12, min( 120, $size ) );
+		$scale    = $size / $glyph_h;
+		$img_w    = imagesx( $img );
+		$img_h    = imagesy( $img );
+
+		$max_chars = max( 1, (int) floor( ( $img_w - $x - 60 ) / ( $glyph_w * $scale ) ) );
+		$lines     = $is_title ? explode( "\n", wordwrap( $str, $max_chars, "\n", true ) ) : array( $str );
+		if ( count( $lines ) > 3 ) {
+			$lines    = array_slice( $lines, 0, 3 );
+			$lines[2] = rtrim( substr( $lines[2], 0, max( 1, $max_chars - 3 ) ) ) . '...';
+		}
+
+		$line_h = (int) round( $size * 1.2 );
+		$block  = $line_h * count( $lines );
+		$top    = $y;
+		if ( $is_title && $y > $img_h * 0.3 ) {
+			// Keep the bottom of the block where the one-line bitmap text ended.
+			$top = max( 20, $y + $glyph_h - $block );
+		}
+
+		$rgb = imagecolorsforindex( $img, $color );
+
+		foreach ( $lines as $i => $line ) {
+			$w = $glyph_w * strlen( $line );
+			if ( $w < 1 ) {
+				continue;
+			}
+
+			$small = imagecreatetruecolor( $w, $glyph_h );
+			imagealphablending( $small, false );
+			imagesavealpha( $small, true );
+			imagefilledrectangle( $small, 0, 0, $w, $glyph_h, imagecolorallocatealpha( $small, 0, 0, 0, 127 ) );
+			imagestring( $small, $font, 0, 0, $line, imagecolorallocatealpha( $small, $rgb['red'], $rgb['green'], $rgb['blue'], 0 ) );
+
+			imagealphablending( $img, true );
+			imagecopyresampled( $img, $small, (int) $x, (int) ( $top + $i * $line_h ), 0, 0, (int) round( $w * $scale ), (int) round( $glyph_h * $scale ), $w, $glyph_h );
+			self::free_image( $small );
+		}
 	}
 
 	/**
