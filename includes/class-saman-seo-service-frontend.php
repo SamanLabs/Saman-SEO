@@ -68,6 +68,8 @@ class Frontend {
 			add_action( 'after_setup_theme', array( $this, 'init_title_handling' ), 999 );
 		}
 
+		$this->suppress_conflicting_social_tags();
+
 		add_action( 'wp_head', array( $this, 'render_head_tags' ), 1 );
 		add_action( 'wp_head', array( $this, 'render_social_tags' ), 5 );
 		add_action( 'wp_head', array( $this, 'render_json_ld' ), 20 );
@@ -82,6 +84,93 @@ class Frontend {
 		if ( \Saman\SEO\Helpers\module_enabled( 'breadcrumbs' ) ) {
 			add_shortcode( 'SAMAN_SEO_breadcrumbs', array( $this, 'breadcrumbs_shortcode' ) );
 		}
+	}
+
+	/**
+	 * Stop other plugins from printing a second set of Open Graph / Twitter
+	 * tags next to ours (duplicates make crawlers pick unpredictably).
+	 *
+	 * Only well-known plugins with official switches are touched; theme
+	 * output cannot be removed generically and is left alone.
+	 *
+	 * @return void
+	 */
+	private function suppress_conflicting_social_tags() {
+		if ( ! saman_seo_apply_filters( 'saman_seo_suppress_conflicting_social_tags', true ) ) {
+			return;
+		}
+
+		// Only step in on views where render_social_tags() prints output;
+		// elsewhere (404, feeds, ...) the other plugin stays in charge.
+		$ours = function () {
+			return $this->renders_social_tags();
+		};
+
+		// Jetpack (filters are read at wp_head time, so context is known).
+		add_filter(
+			'jetpack_enable_open_graph',
+			static function ( $enabled ) use ( $ours ) {
+				return $ours() ? false : $enabled;
+			},
+			99
+		);
+		add_filter(
+			'jetpack_disable_twitter_cards',
+			static function ( $disabled ) use ( $ours ) {
+				return $ours() ? true : $disabled;
+			},
+			99
+		);
+
+		// Yoast SEO: drop only its Open Graph / Twitter presenters; titles,
+		// descriptions, canonical, robots and schema presenters are kept.
+		add_filter(
+			'wpseo_frontend_presenters',
+			static function ( $presenters ) use ( $ours ) {
+				if ( ! is_array( $presenters ) || ! $ours() ) {
+					return $presenters;
+				}
+
+				return array_values(
+					array_filter(
+						$presenters,
+						static function ( $presenter ) {
+							if ( ! is_object( $presenter ) ) {
+								return true;
+							}
+							$class = get_class( $presenter );
+							return 0 !== strpos( $class, 'Yoast\\WP\\SEO\\Presenters\\Open_Graph\\' )
+								&& 0 !== strpos( $class, 'Yoast\\WP\\SEO\\Presenters\\Twitter\\' );
+						}
+					)
+				);
+			},
+			99
+		);
+
+		// Rank Math: its OG/Twitter tag callbacks hang off these two actions.
+		// Clearing them at wp_head priority 0 runs after Rank Math has
+		// registered them and before its head output; its title, description,
+		// canonical, robots and schema output use other hooks.
+		add_action(
+			'wp_head',
+			static function () use ( $ours ) {
+				if ( $ours() ) {
+					remove_all_actions( 'rank_math/opengraph/facebook' );
+					remove_all_actions( 'rank_math/opengraph/twitter' );
+				}
+			},
+			0
+		);
+	}
+
+	/**
+	 * Whether render_social_tags() outputs tags for the current request.
+	 *
+	 * @return bool
+	 */
+	private function renders_social_tags() {
+		return is_singular() || is_front_page() || is_home() || is_archive() || is_search();
 	}
 
 	/**
@@ -453,6 +542,10 @@ class Frontend {
 			if ( $is_home_view && empty( $description ) && ! empty( $social_defaults['og_description'] ) ) {
 				$description = $social_defaults['og_description'];
 			}
+			// Same Homepage description setting that feeds <meta name="description">.
+			if ( $is_home_view && empty( $description ) ) {
+				$description = get_option( 'SAMAN_SEO_homepage_description', '' );
+			}
 			if ( empty( $description ) && $post instanceof WP_Post && ! empty( $post_type_descriptions[ $post->post_type ] ) ) {
 				$description = $post_type_descriptions[ $post->post_type ];
 			}
@@ -513,7 +606,7 @@ class Frontend {
 		$twitter_title       = saman_seo_apply_filters( 'saman_seo_twitter_title', $twitter_title, $post );
 		$twitter_description = saman_seo_apply_filters( 'saman_seo_twitter_description', $twitter_description, $post );
 
-		$image         = $this->get_social_image( $post, $meta, $social_defaults );
+		$image         = $this->get_social_image( $post, $meta, $social_defaults, (string) $title );
 		$twitter_image = saman_seo_apply_filters( 'saman_seo_twitter_image', $image, $post );
 
 		// Width/height/type/alt are only known for local attachments.
@@ -1242,7 +1335,7 @@ class Frontend {
 	 *
 	 * @return string
 	 */
-	private function get_social_image( $post, $meta, $social_defaults = array() ) {
+	private function get_social_image( $post, $meta, $social_defaults = array(), $fallback_title = '' ) {
 		$image = '';
 
 		$this->social_image_source = array(
@@ -1259,7 +1352,13 @@ class Frontend {
 		if ( empty( $image ) && $post instanceof WP_Post ) {
 			$image_id = get_post_thumbnail_id( $post );
 			if ( $image_id ) {
-				$url = wp_get_attachment_image_url( $image_id, 'full' );
+				// Smallest registered size that still covers the recommended
+				// 1200x630 card. Multi-megabyte originals are routinely
+				// rejected by WhatsApp/iMessage/Facebook crawlers.
+				$url = $this->get_social_sized_image_url( (int) $image_id );
+				if ( ! $url ) {
+					$url = wp_get_attachment_image_url( $image_id, 'full' );
+				}
 				if ( $url ) {
 					$image = $url;
 
@@ -1288,10 +1387,29 @@ class Frontend {
 			}
 		}
 
-		// 5. Dynamic Card Generation (last resort)
-		if ( empty( $image ) && $post instanceof WP_Post ) {
-			$image = Social_Card_Generator::card_url( get_the_title( $post ) );
+		// 5. Dynamic Card Generation (last resort). Also covers the blog
+		// homepage and archives, which have no post of their own. Skipped
+		// when the card endpoint cannot answer (module off / no GD), so we
+		// never advertise an image URL that returns an error.
+		if ( empty( $image ) && $this->social_card_available() ) {
+			$card_title = $post instanceof WP_Post ? get_the_title( $post ) : $fallback_title;
+			if ( '' === trim( (string) $card_title ) ) {
+				$card_title = get_bloginfo( 'name' );
+			}
+			$image = Social_Card_Generator::card_url( $card_title );
 		}
+
+		// 6. Site icon: better than no preview image at all.
+		if ( empty( $image ) && function_exists( 'get_site_icon_url' ) ) {
+			$icon = get_site_icon_url( 512 );
+			if ( ! empty( $icon ) ) {
+				$image = $icon;
+			}
+		}
+
+		// Social crawlers need absolute URLs; a relative path (e.g. a stored
+		// "/wp-content/uploads/x.jpg" default) is resolved against the site.
+		$image = $this->absolute_image_url( $image );
 
 		/**
 		 * Filter the final Open Graph image URL.
@@ -1302,6 +1420,84 @@ class Frontend {
 		 * @param array   $social_defaults Social default settings.
 		 */
 		return saman_seo_apply_filters( 'saman_seo_og_image', $image, $post, $meta, $social_defaults );
+	}
+
+	/**
+	 * URL of the smallest generated size that is at least 1200px wide.
+	 *
+	 * @param int $image_id Attachment ID.
+	 *
+	 * @return string Empty when no such size exists (caller uses full size).
+	 */
+	private function get_social_sized_image_url( $image_id ) {
+		if ( ! function_exists( 'wp_get_attachment_metadata' ) || ! function_exists( 'wp_get_attachment_image_src' ) ) {
+			return '';
+		}
+
+		$metadata = wp_get_attachment_metadata( $image_id );
+		if ( ! is_array( $metadata ) || empty( $metadata['sizes'] ) || ! is_array( $metadata['sizes'] ) ) {
+			return '';
+		}
+
+		$best_name  = '';
+		$best_width = 0;
+		foreach ( $metadata['sizes'] as $name => $size ) {
+			$width = is_array( $size ) && isset( $size['width'] ) ? (int) $size['width'] : 0;
+			if ( $width >= 1200 && ( 0 === $best_width || $width < $best_width ) ) {
+				$best_name  = (string) $name;
+				$best_width = $width;
+			}
+		}
+
+		if ( '' === $best_name ) {
+			return '';
+		}
+
+		$src = wp_get_attachment_image_src( $image_id, $best_name );
+
+		return ( is_array( $src ) && ! empty( $src[0] ) ) ? (string) $src[0] : '';
+	}
+
+	/**
+	 * Whether the generated social card endpoint can serve images.
+	 *
+	 * @return bool
+	 */
+	private function social_card_available() {
+		if ( ! function_exists( 'imagecreatetruecolor' ) ) {
+			return false;
+		}
+
+		if ( function_exists( 'Saman\SEO\Helpers\module_enabled' ) && ! \Saman\SEO\Helpers\module_enabled( 'social_cards' ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Make an image URL absolute (scheme + host).
+	 *
+	 * @param mixed $image Image URL.
+	 *
+	 * @return mixed Absolute URL; non-strings and empty values pass through.
+	 */
+	private function absolute_image_url( $image ) {
+		if ( ! is_string( $image ) || '' === trim( $image ) ) {
+			return $image;
+		}
+
+		$image = trim( $image );
+
+		if ( 0 === strpos( $image, '//' ) ) {
+			return set_url_scheme( $image );
+		}
+
+		if ( 0 === strpos( $image, '/' ) ) {
+			return home_url( $image );
+		}
+
+		return $image;
 	}
 
 	/**

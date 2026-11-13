@@ -129,6 +129,19 @@ class FrontendSocialTagsTest extends TestCase {
 	}
 
 	/**
+	 * A stored relative default image is output as an absolute URL.
+	 */
+	public function test_relative_default_image_is_made_absolute(): void {
+		$this->make_post();
+		self::$options['SAMAN_SEO_default_og_image'] = '/wp-content/uploads/default.jpg';
+
+		$frontend = new Frontend();
+		$tags     = $this->parse_tags( $this->capture_output( array( $frontend, 'render_social_tags' ) ) );
+
+		$this->assertMatchesRegularExpression( '#^https?://[^/]+/wp-content/uploads/default\.jpg$#', $tags['og:image'] );
+	}
+
+	/**
 	 * Duplicate single-value tags collapse to the last occurrence while
 	 * multi-value tags are preserved.
 	 */
@@ -205,5 +218,76 @@ class FrontendSocialTagsTest extends TestCase {
 
 		$this->assertSame( 'website', $tags['og:type'] );
 		$this->assertSame( 'Coffee | Test Site', $tags['og:title'] );
+	}
+
+	/**
+	 * The Homepage description setting feeds og:description (as it does the meta description).
+	 */
+	public function test_homepage_description_setting_used_for_social_description(): void {
+		$this->set_context( 'singular', false );
+		$this->set_context( 'front_page', true );
+		$this->set_context( 'home', true );
+		self::$options['SAMAN_SEO_homepage_description'] = 'Configured homepage description.';
+
+		$frontend = new Frontend();
+		$tags     = $this->parse_tags( $this->capture_output( array( $frontend, 'render_social_tags' ) ) );
+
+		$this->assertSame( 'Configured homepage description.', $tags['og:description'] );
+		$this->assertSame( 'website', $tags['og:type'] );
+		$this->assertNotSame( '', $tags['og:image'] );
+	}
+
+	/**
+	 * Yoast: only Open Graph / Twitter presenters are removed; others are kept.
+	 */
+	public function test_yoast_social_presenters_removed_but_others_kept(): void {
+		$stubs = array(
+			'Yoast\WP\SEO\Presenters'              => array( 'Title_Presenter', 'Meta_Description_Presenter' ),
+			'Yoast\WP\SEO\Presenters\Open_Graph'   => array( 'Title_Presenter' ),
+			'Yoast\WP\SEO\Presenters\Twitter'      => array( 'Card_Type_Presenter' ),
+		);
+		foreach ( $stubs as $ns => $classes ) {
+			foreach ( $classes as $class ) {
+				if ( ! class_exists( $ns . '\\' . $class ) ) {
+					eval( 'namespace ' . $ns . '; class ' . $class . ' {}' ); // phpcs:ignore Squiz.PHP.Eval.Discouraged -- test stub.
+				}
+			}
+		}
+
+		$frontend = new Frontend();
+		$frontend->boot();
+
+		$presenters = array(
+			new \Yoast\WP\SEO\Presenters\Title_Presenter(),
+			new \Yoast\WP\SEO\Presenters\Meta_Description_Presenter(),
+			new \Yoast\WP\SEO\Presenters\Open_Graph\Title_Presenter(),
+			new \Yoast\WP\SEO\Presenters\Twitter\Card_Type_Presenter(),
+		);
+
+		$this->set_context( 'singular', true );
+		$kept = apply_filters( 'wpseo_frontend_presenters', $presenters );
+		$this->assertCount( 2, $kept );
+		$this->assertInstanceOf( \Yoast\WP\SEO\Presenters\Title_Presenter::class, $kept[0] );
+		$this->assertInstanceOf( \Yoast\WP\SEO\Presenters\Meta_Description_Presenter::class, $kept[1] );
+
+		// Views we do not render social tags for are left untouched.
+		$this->set_context( 'singular', false );
+		$this->assertCount( 4, apply_filters( 'wpseo_frontend_presenters', $presenters ) );
+	}
+
+	/**
+	 * Jetpack Open Graph is switched off only where we render our own tags.
+	 */
+	public function test_jetpack_open_graph_disabled_only_on_rendered_views(): void {
+		$frontend = new Frontend();
+		$frontend->boot();
+
+		$this->set_context( 'singular', true );
+		$this->assertFalse( apply_filters( 'jetpack_enable_open_graph', true ) );
+		$this->assertTrue( apply_filters( 'jetpack_disable_twitter_cards', false ) );
+
+		$this->set_context( 'singular', false );
+		$this->assertTrue( apply_filters( 'jetpack_enable_open_graph', true ) );
+		$this->assertFalse( apply_filters( 'jetpack_disable_twitter_cards', false ) );
 	}
 }
