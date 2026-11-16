@@ -40,6 +40,7 @@ function saman_seo_uninstall_cron_hooks() {
 		'SAMAN_SEO_indexnow_submit',
 		'SAMAN_SEO_sitemap_cron',
 		'saman_seo_check_youtube_thumbnails',
+		'saman_seo_fetch_video_oembed',
 	);
 }
 
