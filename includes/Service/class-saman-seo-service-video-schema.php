@@ -369,18 +369,22 @@ class Video_Schema {
 	/**
 	 * Get all posts with videos for sitemap generation.
 	 *
-	 * @param int $limit Maximum number of posts to return.
+	 * @param int   $limit      Maximum number of posts to return.
+	 * @param array $query_args Extra WP_Query args, e.g. the sitemap's exclusions.
 	 * @return array Array of posts with video data.
 	 */
-	public function get_posts_with_videos( $limit = 1000 ) {
+	public function get_posts_with_videos( $limit = 1000, array $query_args = array() ) {
 		$posts_with_videos = array();
 
-		$args = array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => $limit,
-			'orderby'        => 'modified',
-			'order'          => 'DESC',
+		$args = array_merge(
+			$query_args,
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => $limit,
+				'orderby'        => 'modified',
+				'order'          => 'DESC',
+			)
 		);
 
 		$query = new \WP_Query( $args );

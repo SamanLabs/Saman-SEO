@@ -719,7 +719,7 @@ class Breadcrumbs {
 								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
 							</a>
 						<?php else : ?>
-							<span class="saman-seo-breadcrumbs__current wp-seo-pilot-breadcrumbs__current" itemprop="item">
+							<span class="saman-seo-breadcrumbs__current wp-seo-pilot-breadcrumbs__current">
 								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
 							</span>
 						<?php endif; ?>

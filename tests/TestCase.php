@@ -343,7 +343,13 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase {
 					$url    = (string) $args[2];
 				}
 
-				$query = http_build_query( $params );
+				// WordPress does not encode values here; neither does the stub,
+				// so a caller that forgets to encode fails in tests too.
+				$pairs = array();
+				foreach ( $params as $key => $value ) {
+					$pairs[] = $key . '=' . $value;
+				}
+				$query = implode( '&', $pairs );
 
 				return $url . ( strpos( $url, '?' ) === false ? '?' : '&' ) . $query;
 			}

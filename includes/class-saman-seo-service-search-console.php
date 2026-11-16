@@ -397,13 +397,17 @@ class Search_Console {
 	public function disconnect() {
 		$tokens = $this->get_tokens();
 
-		if ( ! empty( $tokens['access_token'] ) ) {
+		// Revoking the refresh token ends the whole grant; an access token may
+		// already have expired, in which case revoking it does nothing.
+		$token = ! empty( $tokens['refresh_token'] ) ? $tokens['refresh_token'] : ( $tokens['access_token'] ?? '' );
+
+		if ( ! empty( $token ) ) {
 			// Best-effort revocation; ignore failures since we delete locally anyway.
-			wp_remote_get(
-				'https://accounts.google.com/o/oauth2/revoke',
+			wp_remote_post(
+				'https://oauth2.googleapis.com/revoke',
 				array(
 					'timeout' => 10,
-					'body'    => array( 'token' => $tokens['access_token'] ),
+					'body'    => array( 'token' => $token ),
 				)
 			);
 		}

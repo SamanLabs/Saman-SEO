@@ -361,11 +361,49 @@ const GscCard = () => {
 
 			{ connected && (
 				<div className="gsc-connected">
-					{ loadingAnalytics || ! analytics ? (
+					{ loadingAnalytics && (
 						<div className="gsc-loading">
 							{ __( 'Loading search data…', 'saman-seo' ) }
 						</div>
-					) : (
+					) }
+					{ ! loadingAnalytics && ! analytics && (
+						<div className="gsc-connect">
+							<p>
+								{ __(
+									'Search data could not be loaded. Try again, or reconnect your Google account if access was removed.',
+									'saman-seo'
+								) }
+							</p>
+							<button
+								type="button"
+								className="button primary"
+								disabled={ busy }
+								onClick={ fetchAnalytics }
+							>
+								{ __( 'Try again', 'saman-seo' ) }
+							</button>
+							<p className="gsc-fineprint">
+								<button
+									type="button"
+									className="gsc-link-button"
+									disabled={ busy }
+									onClick={ startConnect }
+								>
+									{ __( 'Reconnect', 'saman-seo' ) }
+								</button>{ ' ' }
+								·{ ' ' }
+								<button
+									type="button"
+									className="gsc-link-button"
+									disabled={ busy }
+									onClick={ handleDisconnect }
+								>
+									{ __( 'Disconnect', 'saman-seo' ) }
+								</button>
+							</p>
+						</div>
+					) }
+					{ ! loadingAnalytics && analytics && (
 						<>
 							<div className="gsc-metrics">
 								<div className="gsc-metric">
