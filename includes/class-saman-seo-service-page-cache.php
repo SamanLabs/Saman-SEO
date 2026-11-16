@@ -74,15 +74,24 @@ class Page_Cache {
 	 *
 	 * @var int
 	 */
-	public const DROPIN_VERSION = 2;
+	public const DROPIN_VERSION = 3;
 
 	/**
 	 * Cookie prefixes that mark a personalised page: logged in, a returning commenter
-	 * (pre-filled comment form) or an unlocked password post. The drop-in skips the same ones.
+	 * (pre-filled comment form), an unlocked password post, or a shopper with a
+	 * WooCommerce cart (the header's cart count and contents). The drop-in skips
+	 * the same ones; bump DROPIN_VERSION when this list changes.
 	 *
 	 * @var string[]
 	 */
-	public const NO_CACHE_COOKIES = array( 'wordpress_logged_in_', 'comment_author_', 'wp-postpass_' );
+	public const NO_CACHE_COOKIES = array(
+		'wordpress_logged_in_',
+		'comment_author_',
+		'wp-postpass_',
+		'woocommerce_items_in_cart',
+		'woocommerce_cart_hash',
+		'wp_woocommerce_session_',
+	);
 
 	/**
 	 * Whether the current request is being captured.
@@ -129,6 +138,7 @@ class Page_Cache {
 			add_action( 'edited_term', array( $this, 'purge_term_cache' ), 20, 3 );
 			add_action( 'delete_term', array( $this, 'purge_term_cache' ), 20, 3 );
 			add_action( 'transition_comment_status', array( $this, 'purge_comment_cache' ), 20, 2 );
+			add_action( 'comment_post', array( $this, 'purge_new_comment_cache' ), 20, 2 );
 		}
 		add_action( 'switch_theme', array( $this, 'purge_all' ) );
 
@@ -445,6 +455,9 @@ if ( ! empty( \$_COOKIE ) ) {
 		if ( 0 === strpos( \$cookie_name, 'wordpress_logged_in_' )
 			|| 0 === strpos( \$cookie_name, 'comment_author_' )
 			|| 0 === strpos( \$cookie_name, 'wp-postpass_' )
+			|| 0 === strpos( \$cookie_name, 'woocommerce_items_in_cart' )
+			|| 0 === strpos( \$cookie_name, 'woocommerce_cart_hash' )
+			|| 0 === strpos( \$cookie_name, 'wp_woocommerce_session_' )
 		) {
 			return;
 		}
@@ -1124,6 +1137,22 @@ PHP;
 			if ( $permalink ) {
 				$this->purge_url( $permalink );
 			}
+		}
+	}
+
+	/**
+	 * Purge the post's page when a comment is published straight away.
+	 *
+	 * The transition_comment_status hook only fires on later status changes, so a
+	 * comment that is approved on arrival would stay invisible until expiry.
+	 *
+	 * @param int        $comment_id Comment ID.
+	 * @param int|string $approved   1 when approved, 0 when held, 'spam' when spam.
+	 * @return void
+	 */
+	public function purge_new_comment_cache( $comment_id, $approved ) {
+		if ( 1 === (int) $approved && 'spam' !== $approved ) {
+			$this->purge_comment_cache( 'approved', get_comment( $comment_id ) );
 		}
 	}
 

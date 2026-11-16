@@ -65,7 +65,7 @@ class WebPage_Schema extends Abstract_Schema {
 			'@type'         => $this->get_type(),
 			'@id'           => Schema_IDs::webpage( $this->context->canonical ),
 			'url'           => $this->context->canonical,
-			'name'          => get_the_title( $post ),
+			'name'          => $this->plain_title( $post ),
 			'datePublished' => get_the_date( DATE_W3C, $post ),
 			'dateModified'  => get_the_modified_date( DATE_W3C, $post ),
 			'isPartOf'      => array(

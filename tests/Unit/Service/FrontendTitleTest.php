@@ -47,6 +47,7 @@ class FrontendTitleTest extends TestCase {
 	public function test_homepage_override_on_home_view(): void {
 		$this->set_context( 'singular', false );
 		$this->set_context( 'home', true );
+		$this->set_context( 'front_page', true );
 		self::$options['SAMAN_SEO_homepage_title'] = 'Homepage SEO Title';
 
 		$frontend = new Frontend();
@@ -55,11 +56,26 @@ class FrontendTitleTest extends TestCase {
 	}
 
 	/**
+	 * A separate posts page is not the homepage and must not take its title.
+	 */
+	public function test_posts_page_does_not_inherit_homepage_title(): void {
+		$this->set_context( 'singular', false );
+		$this->set_context( 'home', true );
+		$this->set_context( 'front_page', false );
+		self::$options['SAMAN_SEO_homepage_title'] = 'Homepage SEO Title';
+
+		$frontend = new Frontend();
+
+		$this->assertNotSame( 'Homepage SEO Title', $frontend->filter_document_title( 'Original' ) );
+	}
+
+	/**
 	 * Homepage without an override gets the "Home | Site" default.
 	 */
 	public function test_homepage_default_when_no_override(): void {
 		$this->set_context( 'singular', false );
 		$this->set_context( 'home', true );
+		$this->set_context( 'front_page', true );
 		self::$options['SAMAN_SEO_homepage_title'] = '';
 
 		$frontend = new Frontend();

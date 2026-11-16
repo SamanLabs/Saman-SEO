@@ -121,6 +121,7 @@ class Person_Schema extends Abstract_Schema {
 			}
 		}
 
-		return array_unique( array_filter( $profiles ) );
+		// Re-index: gaps in the keys would serialize as a JSON object.
+		return array_values( array_unique( array_filter( $profiles ) ) );
 	}
 }

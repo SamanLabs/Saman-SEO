@@ -195,7 +195,7 @@ namespace Saman\SEO\Helpers {
 						$val = maybe_unserialize( $val );
 						$val = is_array( $val ) ? implode( ', ', array_filter( $val, 'is_scalar' ) ) : '';
 					}
-					$vars[ 'cf_' . $k ] = $val;
+					$vars[ 'cf_' . $k ] = is_scalar( $val ) ? wp_strip_all_tags( (string) $val ) : '';
 				}
 			}
 		} elseif ( is_category() || is_tag() || is_tax() ) {

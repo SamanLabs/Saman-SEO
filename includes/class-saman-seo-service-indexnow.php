@@ -508,8 +508,8 @@ class IndexNow {
 		// Get items.
 		$orderby  = in_array( $args['orderby'], array( 'submitted_at', 'url', 'status', 'response_code' ), true ) ? $args['orderby'] : 'submitted_at';
 		$order    = 'ASC' === strtoupper( $args['order'] ) ? 'ASC' : 'DESC';
-		$per_page = absint( $args['per_page'] );
-		$offset   = ( absint( $args['page'] ) - 1 ) * $per_page;
+		$per_page = max( 1, absint( $args['per_page'] ) );
+		$offset   = ( max( 1, absint( $args['page'] ) ) - 1 ) * $per_page;
 
 		$query = "SELECT * FROM {$table} {$where_sql} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d";
 

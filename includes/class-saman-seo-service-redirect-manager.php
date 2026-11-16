@@ -156,7 +156,19 @@ class Redirect_Manager {
 		// This handles most standard permalink structures.
 
 		$new_url = get_permalink( $post_id );
-		$old_url = str_replace( $end_slug, $start_slug, $new_url );
+		// Swap the slug only where it ends the path. A plain str_replace() also
+		// rewrote the same text inside parent slugs ("/seo-services/seo/").
+		$old_url = preg_replace(
+			'~/' . preg_quote( $end_slug, '~' ) . '(/?)(\?.*)?$~',
+			'/' . str_replace( array( '\\', '$' ), array( '\\\\', '\\$' ), $start_slug ) . '$1$2',
+			(string) $new_url,
+			1,
+			$swapped
+		);
+
+		if ( ! $swapped || ! is_string( $old_url ) ) {
+			$old_url = str_replace( $end_slug, $start_slug, (string) $new_url );
+		}
 
 		// Normalize to paths.
 		$source = wp_parse_url( $old_url, PHP_URL_PATH );
@@ -880,7 +892,7 @@ class Redirect_Manager {
 
 			// Date-window sanity.
 			if ( ! empty( $rule->end_date ) ) {
-				$end = (int) preg_replace( '/[^0-9]/', '', (string) $rule->end_date );
+				$end = (int) substr( preg_replace( '/[^0-9]/', '', (string) $rule->end_date ), 0, 8 );
 
 				if ( $end && $end < $now_ymd ) {
 					$rule_issues[] = array(
@@ -1458,8 +1470,17 @@ class Redirect_Manager {
 		$settings    = $this->get_redirect_settings();
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
 
-		$request_path  = wp_parse_url( $request_uri, PHP_URL_PATH );
-		$request_path  = $request_path ? sanitize_text_field( $request_path ) : '/';
+		// Decode first: sanitize_text_field() deletes percent-encoded octets, so
+		// "/blog/%D0%BF.../" collapsed to "/blog/" and took that rule's redirect,
+		// while a rule for a non-ASCII path could never match.
+		$request_path = wp_parse_url( $request_uri, PHP_URL_PATH );
+		$request_path = $request_path ? sanitize_text_field( rawurldecode( $request_path ) ) : '/';
+
+		// Nothing usable left (e.g. invalid UTF-8): never fall through to "/".
+		if ( '' === $request_path ) {
+			return;
+		}
+
 		$request_query = wp_parse_url( $request_uri, PHP_URL_QUERY );
 		$request_query = $request_query ? $request_query : '';
 
@@ -1471,7 +1492,13 @@ class Redirect_Manager {
 			$cached = wp_cache_get( $lookup_key, self::CACHE_GROUP );
 			if ( false !== $cached ) {
 				if ( ! empty( $cached['row'] ) ) {
-					$this->execute_redirect( $cached['row'], $cached['target'], $request_query, $settings );
+					$cached_target = (string) $cached['target'];
+
+					if ( 'pass' === $settings['query_matching'] && $request_query ) {
+						$cached_target = $this->append_query_to_target( $cached_target, $request_query );
+					}
+
+					$this->execute_redirect( $cached['row'], $cached_target, $request_query, $settings );
 				}
 				return;
 			}
@@ -1512,7 +1539,9 @@ class Redirect_Manager {
 				$lookup_key,
 				array(
 					'row'    => $cache_row,
-					'target' => $target,
+					// The rule's own target: in "pass" mode the key is the path
+					// alone, so the visitor's query is merged in per request.
+					'target' => (string) $row->target,
 				),
 				self::CACHE_GROUP,
 				self::CACHE_TTL
@@ -2100,9 +2129,13 @@ class Redirect_Manager {
 		}
 
 		$merged = array_merge( $target_params, $request_params );
-		$target = add_query_arg( $merged, $target );
 
-		return $target;
+		// Rebuilt by hand: add_query_arg() does not encode values, so "%26"
+		// and "%23" in a value came back as a literal "&" and "#".
+		$fragment = (string) wp_parse_url( $target, PHP_URL_FRAGMENT );
+		$base     = strtok( (string) strtok( $target, '#' ), '?' );
+
+		return $base . '?' . http_build_query( $merged, '', '&', PHP_QUERY_RFC3986 ) . ( '' !== $fragment ? '#' . $fragment : '' );
 	}
 
 	/**
@@ -2146,10 +2179,19 @@ class Redirect_Manager {
 			return;
 		}
 
-		// Handle target-less statuses.
-		if ( ! $target && in_array( $status_code, $targetless_statuses, true ) ) {
+		// 410 and 451 are answers, not redirects. The editor always saves a
+		// target, and passing a non-3xx status to wp_safe_redirect() dies with
+		// a server error instead.
+		if ( in_array( $status_code, $targetless_statuses, true ) ) {
 			status_header( $status_code );
+			nocache_headers();
 			exit;
+		}
+
+		// A rule that resolves to the URL being requested would loop forever
+		// (e.g. a case-only change on a case-insensitive match).
+		if ( $this->targets_current_request( $target ) ) {
+			return;
 		}
 
 		$configured = isset( $redirect['configured_target'] )
@@ -2194,6 +2236,35 @@ class Redirect_Manager {
 
 		wp_safe_redirect( $target, $status_code );
 		exit;
+	}
+
+	/**
+	 * Whether a redirect target is the very URL being requested.
+	 *
+	 * @param string $target Resolved target (path or absolute URL).
+	 * @return bool
+	 */
+	private function targets_current_request( $target ) {
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared only, never output.
+
+		if ( '' === $request_uri || '' === (string) $target ) {
+			return false;
+		}
+
+		$target_host = wp_parse_url( $target, PHP_URL_HOST );
+
+		if ( $target_host && strtolower( $target_host ) !== strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) ) {
+			return false;
+		}
+
+		$normalize = static function ( $url ) {
+			$path = rawurldecode( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+			$path = '/' . trim( $path, '/' );
+
+			return $path . '?' . (string) wp_parse_url( $url, PHP_URL_QUERY );
+		};
+
+		return $normalize( $target ) === $normalize( $request_uri );
 	}
 
 	/**

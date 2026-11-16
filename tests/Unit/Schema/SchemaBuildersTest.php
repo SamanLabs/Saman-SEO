@@ -146,6 +146,32 @@ class SchemaBuildersTest extends TestCase {
 	}
 
 	/**
+	 * TechArticle and ScholarlyArticle are selectable and share Article's
+	 * builder; they must be emitted under their own @type.
+	 */
+	public function test_article_subtypes_are_emitted(): void {
+		$context              = $this->make_context( $this->make_post() );
+		$context->schema_type = 'TechArticle';
+
+		$schema = new \Saman\SEO\Schema\Types\Article_Schema( $context );
+
+		$this->assertTrue( $schema->is_needed() );
+		$this->assertSame( 'TechArticle', $schema->generate()['@type'] );
+	}
+
+	/**
+	 * Compact and combined durations keep both parts.
+	 */
+	public function test_recipe_duration_parsing(): void {
+		$parse = array( \Saman\SEO\Schema\Types\Recipe_Schema::class, 'parse_duration' );
+
+		$this->assertSame( 'PT1H30M', $parse( '1h30m' ) );
+		$this->assertSame( 'PT1H30M', $parse( '1 hour 30 minutes' ) );
+		$this->assertSame( 'PT45M', $parse( '45 min' ) );
+		$this->assertSame( 'PT2H', $parse( '2 hours' ) );
+	}
+
+	/**
 	 * BlogPosting overrides only the @type; it intentionally keeps the
 	 * inherited #article @id fragment from Article_Schema::generate().
 	 */

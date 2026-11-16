@@ -136,7 +136,7 @@ class Product_Schema extends Abstract_Schema {
 		$schema = array(
 			'@type' => $this->get_type(),
 			'@id'   => $this->get_id(),
-			'name'  => get_the_title( $post ),
+			'name'  => $this->plain_title( $post ),
 			'url'   => $this->context->canonical,
 		);
 

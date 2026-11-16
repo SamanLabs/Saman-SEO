@@ -274,7 +274,7 @@ class Dashboard_Controller extends REST_Controller {
 			'distribution' => $score_dist,
 			'posts_scored' => count( $scores ),
 			'issues'       => $issues,
-			'trend'        => $this->get_score_trend(),
+			'trend'        => $this->get_score_trend( (int) $average ),
 		);
 
 		// Cache for 30 minutes
@@ -286,16 +286,16 @@ class Dashboard_Controller extends REST_Controller {
 	/**
 	 * Get SEO score trend (compare to last week).
 	 *
+	 * @param int $current The score just calculated.
 	 * @return array
 	 */
-	private function get_score_trend() {
+	private function get_score_trend( $current ) {
 		$history = get_option( 'SAMAN_SEO_score_history', array() );
 		if ( ! is_array( $history ) ) {
 			$history = array();
 		}
 
-		// Get current week average
-		$current = $this->get_current_week_score();
+		$current = (int) $current;
 
 		// Store current score
 		$today             = gmdate( 'Y-m-d' );
@@ -327,16 +327,6 @@ class Dashboard_Controller extends REST_Controller {
 			'change'    => round( abs( $change ) ),
 			'history'   => array_slice( $history, -7, 7, true ),
 		);
-	}
-
-	/**
-	 * Get current week's average score.
-	 *
-	 * @return int
-	 */
-	private function get_current_week_score() {
-		$cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
-		return $cached['score'] ?? 0;
 	}
 
 	/**
