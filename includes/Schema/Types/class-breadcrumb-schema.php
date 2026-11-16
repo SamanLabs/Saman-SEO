@@ -104,7 +104,19 @@ class Breadcrumb_Schema extends Abstract_Schema {
 		 * @param Schema_Context $context Current schema context.
 		 */
 		$crumbs = saman_seo_apply_filters( 'saman_seo_breadcrumb_trail', $crumbs, $this->context );
-		$crumbs = is_array( $crumbs ) ? array_values( array_filter( $crumbs, 'is_array' ) ) : array();
+		$crumbs = is_array( $crumbs ) ? array_values( array_filter( $crumbs, array( $this, 'is_usable_crumb' ) ) ) : array();
+
+		// A filter that returns nothing usable must not ship a BreadcrumbList
+		// with an empty itemListElement, which is reported as a critical
+		// error. Rebuild from the post hierarchy; emit no node if that is
+		// empty too (the graph manager drops empty pieces).
+		if ( empty( $crumbs ) ) {
+			$crumbs = array_values( array_filter( $this->fallback_crumbs( $post ), array( $this, 'is_usable_crumb' ) ) );
+		}
+
+		if ( empty( $crumbs ) ) {
+			return array();
+		}
 
 		// Renumber so a filtered trail can never ship a broken position sequence.
 		$rank = 1;
@@ -119,6 +131,19 @@ class Breadcrumb_Schema extends Abstract_Schema {
 			'@id'             => Schema_IDs::breadcrumb( $this->context->canonical ),
 			'itemListElement' => $crumbs,
 		);
+	}
+
+	/**
+	 * Whether a crumb can be written as a ListItem: an array with a name.
+	 *
+	 * @param mixed $crumb Candidate crumb.
+	 * @return bool
+	 */
+	private function is_usable_crumb( $crumb ): bool {
+		return is_array( $crumb )
+			&& isset( $crumb['name'] )
+			&& is_scalar( $crumb['name'] )
+			&& '' !== trim( (string) $crumb['name'] );
 	}
 
 	/**

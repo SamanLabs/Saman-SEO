@@ -76,6 +76,21 @@ class SchemaBuildersTest extends TestCase {
 	}
 
 	/**
+	 * A trail filter that returns nothing usable never ships an empty itemListElement.
+	 */
+	public function test_breadcrumb_survives_empty_filtered_trail(): void {
+		self::$hooks['saman_seo_breadcrumb_trail'][] = static function () {
+			return array( 'Home', array( 'item' => 'https://example.org/' ) );
+		};
+
+		$schema    = new \Saman\SEO\Schema\Types\Breadcrumb_Schema( $this->make_context( $this->make_post() ) );
+		$generated = $schema->generate();
+
+		$this->assertCount( 2, $generated['itemListElement'] );
+		$this->assertSame( 'Sample Post', $generated['itemListElement'][1]['name'] );
+	}
+
+	/**
 	 * Breadcrumb schema is skipped without a post context.
 	 */
 	public function test_breadcrumb_not_needed_without_post(): void {

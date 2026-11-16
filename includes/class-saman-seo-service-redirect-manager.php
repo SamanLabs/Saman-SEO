@@ -935,6 +935,45 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Source paths of every exact (non-regex) redirect that is live right now.
+	 *
+	 * Used by the sitemap to leave out URLs that only answer with a redirect.
+	 * Keys are lowercased when redirects match case-insensitively, so callers
+	 * compare with normalize_sitemap_path().
+	 *
+	 * @return array<string,true> Normalized source path => true.
+	 */
+	public function get_active_source_paths() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe; one read per sitemap page.
+		$rows = $wpdb->get_results( "SELECT source, start_date, end_date FROM {$this->table} WHERE is_regex = 0" );
+
+		$paths = array();
+
+		foreach ( is_array( $rows ) ? $rows : array() as $row ) {
+			if ( $this->is_redirect_active( $row ) ) {
+				$paths[ $this->normalize_sitemap_path( $row->source ) ] = true;
+			}
+		}
+
+		return $paths;
+	}
+
+	/**
+	 * Normalize a path for comparison against get_active_source_paths().
+	 *
+	 * @param string $path URL path.
+	 * @return string
+	 */
+	public function normalize_sitemap_path( $path ) {
+		$path     = $this->normalize_source_path( $path );
+		$settings = $this->get_redirect_settings();
+
+		return ! empty( $settings['case_insensitive'] ) ? strtolower( $path ) : $path;
+	}
+
+	/**
 	 * Normalize a source path the same way create/update does.
 	 *
 	 * @param string $path Raw path.
