@@ -219,7 +219,7 @@ class Link_Health_Controller extends REST_Controller {
 	public function get_broken_links( $request ) {
 		$args = array(
 			'page'     => $request->get_param( 'page' ),
-			'per_page' => $request->get_param( 'per_page' ),
+			'per_page' => max( 1, min( 200, (int) $request->get_param( 'per_page' ) ) ),
 			'type'     => $request->get_param( 'type' ),
 		);
 
@@ -268,7 +268,7 @@ class Link_Health_Controller extends REST_Controller {
 	public function get_orphan_pages( $request ) {
 		$args = array(
 			'page'     => $request->get_param( 'page' ),
-			'per_page' => $request->get_param( 'per_page' ),
+			'per_page' => max( 1, min( 200, (int) $request->get_param( 'per_page' ) ) ),
 		);
 
 		$result = $this->service->get_orphan_pages( $args );

@@ -680,6 +680,25 @@ class Breadcrumbs {
 	}
 
 	/**
+	 * Whether the visible trail should carry BreadcrumbList microdata.
+	 *
+	 * The JSON-LD graph already describes the trail on singular views, so
+	 * marking up the visible list as well gives the page two BreadcrumbLists.
+	 * Microdata is kept wherever the graph has none: archives, search, and
+	 * sites with schema output switched off.
+	 *
+	 * @param array $settings Breadcrumb settings.
+	 * @return bool
+	 */
+	private function uses_microdata( $settings ) {
+		$in_graph = \Saman\SEO\Helpers\module_enabled( 'schema' )
+			&& is_singular()
+			&& ! ( is_front_page() && empty( $settings['show_on_front'] ) );
+
+		return (bool) saman_seo_apply_filters( 'saman_seo_breadcrumb_microdata', ! $in_graph );
+	}
+
+	/**
 	 * Render breadcrumbs HTML.
 	 *
 	 * @param array $args Optional arguments.
@@ -703,27 +722,30 @@ class Breadcrumbs {
 		$separator = $this->get_separator( $args );
 		$preset    = $args['style_preset'] ?? 'default';
 		$total     = count( $crumbs );
+		$microdata = $this->uses_microdata( $settings );
 
 		ob_start();
 		?>
 		<nav class="saman-seo-breadcrumbs wp-seo-pilot-breadcrumbs saman-seo-breadcrumbs--<?php echo esc_attr( $preset ); ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'saman-seo' ); ?>">
-			<ol class="saman-seo-breadcrumbs__list wp-seo-pilot-breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
+			<ol class="saman-seo-breadcrumbs__list wp-seo-pilot-breadcrumbs__list"<?php echo $microdata ? ' itemscope itemtype="https://schema.org/BreadcrumbList"' : ''; ?>>
 				<?php foreach ( $crumbs as $index => $crumb ) : ?>
 					<?php
 					$is_last  = ( $index === $total - 1 );
 					$position = $index + 1;
 					?>
-					<li class="saman-seo-breadcrumbs__item wp-seo-pilot-breadcrumbs__item<?php echo $is_last ? ' saman-seo-breadcrumbs__item--current wp-seo-pilot-breadcrumbs__item--current' : ''; ?>" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+					<li class="saman-seo-breadcrumbs__item wp-seo-pilot-breadcrumbs__item<?php echo $is_last ? ' saman-seo-breadcrumbs__item--current wp-seo-pilot-breadcrumbs__item--current' : ''; ?>"<?php echo $microdata ? ' itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"' : ''; ?>>
 						<?php if ( ! empty( $crumb['url'] ) && ! $is_last ) : ?>
-							<a class="saman-seo-breadcrumbs__link wp-seo-pilot-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>" itemprop="item">
-								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
+							<a class="saman-seo-breadcrumbs__link wp-seo-pilot-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>"<?php echo $microdata ? ' itemprop="item"' : ''; ?>>
+								<span<?php echo $microdata ? ' itemprop="name"' : ''; ?>><?php echo esc_html( $crumb['title'] ); ?></span>
 							</a>
 						<?php else : ?>
-							<span class="saman-seo-breadcrumbs__current wp-seo-pilot-breadcrumbs__current" itemprop="item">
-								<span itemprop="name"><?php echo esc_html( $crumb['title'] ); ?></span>
+							<span class="saman-seo-breadcrumbs__current wp-seo-pilot-breadcrumbs__current">
+								<span<?php echo $microdata ? ' itemprop="name"' : ''; ?>><?php echo esc_html( $crumb['title'] ); ?></span>
 							</span>
 						<?php endif; ?>
-						<meta itemprop="position" content="<?php echo esc_attr( $position ); ?>" />
+						<?php if ( $microdata ) : ?>
+							<meta itemprop="position" content="<?php echo esc_attr( $position ); ?>" />
+						<?php endif; ?>
 						<?php if ( ! $is_last ) : ?>
 							<span class="saman-seo-breadcrumbs__separator wp-seo-pilot-breadcrumbs__separator" aria-hidden="true"><?php echo $separator; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<?php endif; ?>

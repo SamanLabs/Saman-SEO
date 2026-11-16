@@ -438,7 +438,7 @@ class Internal_Linking {
 		}
 
 		$post = $post_id ? get_post( $post_id ) : null;
-		if ( $post_id && ! $post instanceof WP_Post ) {
+		if ( $post_id && ! $post instanceof \WP_Post ) {
 			wp_send_json_error( __( 'Post not found.', 'saman-seo' ), 404 );
 		}
 
@@ -528,11 +528,11 @@ class Internal_Linking {
 	/**
 	 * Prepare rendered post content for preview.
 	 *
-	 * @param WP_Post $post Post object.
+	 * @param \WP_Post $post Post object.
 	 *
 	 * @return string
 	 */
-	private function render_post_content( WP_Post $post ) {
+	private function render_post_content( \WP_Post $post ) {
 		$content = $post->post_content;
 
 		if ( function_exists( 'do_blocks' ) && has_blocks( $post ) ) {

@@ -226,7 +226,21 @@ class Frontend {
 			return $title;
 		}
 
-		return $computed;
+		return $this->escape_title_text( $computed );
+	}
+
+	/**
+	 * Make a computed title safe to print inside <title>.
+	 *
+	 * Core echoes the value of pre_get_document_title and wp_title without
+	 * escaping, and a title template can pull in text from custom fields.
+	 * Existing entities are left alone, so nothing is encoded twice.
+	 *
+	 * @param string $title Computed title.
+	 * @return string
+	 */
+	private function escape_title_text( $title ) {
+		return esc_html( wp_strip_all_tags( (string) $title ) );
 	}
 
 	/**
@@ -259,7 +273,7 @@ class Frontend {
 			return $title;
 		}
 
-		return $computed;
+		return $this->escape_title_text( $computed );
 	}
 
 	/**
@@ -270,7 +284,9 @@ class Frontend {
 	 * @return string
 	 */
 	private function build_document_title( $post, $meta ) {
-		$is_home_view   = is_front_page() || is_home();
+		// is_home() alone is the separate "Posts page" of a static-front-page
+		// site; only the real front page gets the homepage fields.
+		$is_home_view   = is_front_page();
 		$homepage_title = $is_home_view ? get_option( 'SAMAN_SEO_homepage_title', '' ) : '';
 
 		$title = $this->resolve_title( $post, $meta, $is_home_view, $homepage_title, false );
@@ -367,10 +383,14 @@ class Frontend {
 
 		$title = strip_unreplaced_variables( $title );
 
-		// Truncate overly long titles to keep them search-engine friendly.
-		$max_length = absint( saman_seo_apply_filters( 'saman_seo_title_max_length', 60 ) );
+		// Titles are not cut by default. Search engines shorten long titles for
+		// display on their own, and still read the whole tag; cutting it here
+		// threw away the end of the title (usually the site name) and put a
+		// literal "..." in the page. Sites that want a hard limit can return
+		// a length from this filter.
+		$max_length = absint( saman_seo_apply_filters( 'saman_seo_title_max_length', 0 ) );
 		if ( $max_length > 0 && function_exists( 'mb_strlen' ) && mb_strlen( $title ) > $max_length ) {
-			$title = mb_strimwidth( $title, 0, $max_length, '...' );
+			$title = rtrim( mb_substr( $title, 0, max( 1, $max_length - 3 ) ) ) . '...';
 		}
 
 		return saman_seo_apply_filters( 'saman_seo_title', $title, $post );
@@ -391,7 +411,7 @@ class Frontend {
 		$post_type_descriptions = $this->get_post_type_option( 'SAMAN_SEO_post_type_meta_descriptions' );
 		$post_type_keywords     = $this->get_post_type_option( 'SAMAN_SEO_post_type_keywords' );
 		$content_snippet        = ( $post instanceof WP_Post ) ? generate_content_snippet( $post ) : '';
-		$is_home_view           = is_front_page() || is_home();
+		$is_home_view           = is_front_page();
 		$homepage_title         = $is_home_view ? get_option( 'SAMAN_SEO_homepage_title', '' ) : '';
 		$homepage_description   = $is_home_view ? get_option( 'SAMAN_SEO_homepage_description', '' ) : '';
 		$homepage_keywords      = $is_home_view ? trim( (string) get_option( 'SAMAN_SEO_homepage_keywords', '' ) ) : '';
@@ -488,7 +508,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function render_social_tags() {
-		$is_home_view = is_front_page() || is_home();
+		$is_home_view = is_front_page();
 		$is_archive   = is_archive() || is_search();
 
 		if ( ! is_singular() && ! $is_home_view && ! $is_archive ) {
@@ -814,7 +834,14 @@ class Frontend {
 		// home and search results get_post() is merely the first post of the
 		// loop, so post-specific nodes (Article, FAQ, HowTo, Recipe, Video,
 		// Breadcrumb, ...) must not be built from it.
-		$post      = is_singular() ? $this->get_context_post() : null;
+		$post = is_singular() ? $this->get_context_post() : null;
+
+		// A locked post must not describe itself: Article and JobPosting nodes
+		// would print the protected text into the page source.
+		if ( $post && post_password_required( $post ) ) {
+			$post = null;
+		}
+
 		$canonical = '';
 
 		if ( is_singular() || is_home() || is_archive() || is_search() || is_404() ) {
@@ -843,7 +870,21 @@ class Frontend {
 	 */
 	public function render_hreflang() {
 		$map = get_option( 'SAMAN_SEO_hreflang_map' );
-		if ( empty( $map ) ) {
+		if ( empty( $map ) || ! is_string( $map ) ) {
+			return;
+		}
+
+		/**
+		 * Filter whether the site-wide hreflang map is printed on this request.
+		 *
+		 * The map holds one URL per language (each language's home page).
+		 * Printed on every URL it told search engines that each post's
+		 * translations are those home pages, with no return links, which is
+		 * reported as an hreflang error. It is accurate on the front page only.
+		 *
+		 * @param bool $print Whether to print the map. Default: front page only.
+		 */
+		if ( ! saman_seo_apply_filters( 'saman_seo_print_hreflang_map', is_front_page() ) ) {
 			return;
 		}
 
@@ -853,6 +894,10 @@ class Frontend {
 		}
 
 		foreach ( $decoded as $locale => $url ) {
+			if ( ! is_string( $url ) || '' === $url ) {
+				continue;
+			}
+
 			printf(
 				"<link rel=\"alternate\" hreflang=\"%s\" href=\"%s\" />\n",
 				esc_attr( $locale ),
@@ -871,13 +916,17 @@ class Frontend {
 			return;
 		}
 
-		global $post, $page, $numpages;
+		$post = $this->get_context_post();
 
 		if ( ! $post instanceof WP_Post ) {
 			return;
 		}
 
-		// Check if this post has multiple pages (using <!--nextpage-->)
+		// Counted from the content: the $numpages global is only filled in by
+		// setup_postdata() inside the loop, which on classic themes has not
+		// run yet when wp_head fires.
+		$numpages = substr_count( (string) $post->post_content, '<!--nextpage-->' ) + 1;
+
 		if ( $numpages < 2 ) {
 			return;
 		}
@@ -891,7 +940,7 @@ class Frontend {
 		if ( $page > 1 ) {
 			$prev_page = $page - 1;
 			$prev_link = $prev_page > 1
-				? trailingslashit( get_permalink( $post ) ) . user_trailingslashit( $prev_page, 'single_paged' )
+				? $this->paged_post_url( get_permalink( $post ), $prev_page )
 				: get_permalink( $post );
 
 			printf(
@@ -903,7 +952,7 @@ class Frontend {
 		// Output rel="next" for all pages except the last
 		if ( $page < $numpages ) {
 			$next_page = $page + 1;
-			$next_link = trailingslashit( get_permalink( $post ) ) . user_trailingslashit( $next_page, 'single_paged' );
+			$next_link = $this->paged_post_url( get_permalink( $post ), $next_page );
 
 			printf(
 				"<link rel=\"next\" href=\"%s\" />\n",
@@ -982,9 +1031,17 @@ class Frontend {
 				}
 			}
 
+			// The static "Posts page" is an archive that happens to have a post
+			// object: page 2 and up must point at themselves, not at page 1.
+			if ( is_home() && ! is_singular() ) {
+				$paged = (int) get_query_var( 'paged' );
+
+				return $paged > 1 ? $this->clean_archive_url( get_pagenum_link( $paged, false ) ) : esc_url_raw( $url );
+			}
+
 			$page = (int) get_query_var( 'page' );
 			if ( $page > 1 ) {
-				$url = trailingslashit( $url ) . user_trailingslashit( $page, 'single_paged' );
+				$url = $this->paged_post_url( $url, $page );
 			}
 
 			return esc_url_raw( $url );
@@ -999,10 +1056,56 @@ class Frontend {
 			$paged = 1;
 		}
 
-		$url = get_pagenum_link( $paged );
+		// Unescaped: the escaped form carries "&#038;", which esc_url_raw() keeps.
+		$url = get_pagenum_link( $paged, false );
 
 		if ( empty( $url ) ) {
 			$url = home_url( '/' );
+		}
+
+		return $this->clean_archive_url( $url );
+	}
+
+	/**
+	 * URL of page $page of a multi-page post.
+	 *
+	 * Pretty permalinks take the page as a path segment; a query-string
+	 * permalink ("?p=123") takes it as a "page" argument. Appending a path
+	 * segment to the latter produced "?p=123/2/".
+	 *
+	 * @param string $url  Permalink of the post's first page.
+	 * @param int    $page Page number, 2 or higher.
+	 * @return string
+	 */
+	private function paged_post_url( $url, $page ) {
+		$url  = (string) $url;
+		$page = (int) $page;
+
+		if ( '' === (string) get_option( 'permalink_structure' ) || false !== strpos( $url, '?' ) ) {
+			return add_query_arg( 'page', $page, $url );
+		}
+
+		return trailingslashit( $url ) . user_trailingslashit( $page, 'single_paged' );
+	}
+
+	/**
+	 * Canonical form of an archive URL built from the current request.
+	 *
+	 * Core's get_pagenum_link() rebuilds the requested URL, tracking parameters
+	 * included, so every "?utm_source=..." variant would canonicalize to
+	 * itself. With pretty permalinks the query string is never part of an
+	 * archive's address; search results and plain-permalink sites are the
+	 * exceptions, where it is the address.
+	 *
+	 * @param string $url Archive URL.
+	 * @return string
+	 */
+	private function clean_archive_url( $url ) {
+		$url = (string) $url;
+
+		if ( ! is_search() && '' !== (string) get_option( 'permalink_structure' ) ) {
+			$fragment_free = strtok( $url, '#' );
+			$url           = (string) strtok( (string) $fragment_free, '?' );
 		}
 
 		return esc_url_raw( $url );

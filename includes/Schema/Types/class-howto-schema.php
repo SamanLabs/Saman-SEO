@@ -105,7 +105,7 @@ class HowTo_Schema extends Abstract_Schema {
 					'@type' => 'HowToTool',
 					'name'  => $t,
 				),
-				array_filter( $tools )
+				array_values( array_filter( $tools ) )
 			);
 		}
 
@@ -117,7 +117,7 @@ class HowTo_Schema extends Abstract_Schema {
 					'@type' => 'HowToSupply',
 					'name'  => $s,
 				),
-				array_filter( $supplies )
+				array_values( array_filter( $supplies ) )
 			);
 		}
 
@@ -157,8 +157,10 @@ class HowTo_Schema extends Abstract_Schema {
 			if ( 'saman-seo/howto' === $block['blockName'] ) {
 				$attrs = $block['attrs'] ?? array();
 
-				// Respect showSchema toggle.
-				if ( ! empty( $attrs['showSchema'] ) ) {
+				// Respect the showSchema toggle. The editor does not write
+				// default-valued attributes into the block, so a missing key
+				// means the default: on.
+				if ( ! isset( $attrs['showSchema'] ) || $attrs['showSchema'] ) {
 					return $attrs;
 				}
 			}
@@ -227,12 +229,7 @@ class HowTo_Schema extends Abstract_Schema {
 	 * @return string|null ISO 8601 duration (e.g., "PT30M") or null if unparseable.
 	 */
 	private function parse_time_to_iso( string $time_str ): ?string {
-		if ( preg_match( '/(\d+)\s*(min|minute|minutes|m)\b/i', $time_str, $match ) ) {
-			return 'PT' . (int) $match[1] . 'M';
-		}
-		if ( preg_match( '/(\d+)\s*(hour|hours|h)\b/i', $time_str, $match ) ) {
-			return 'PT' . (int) $match[1] . 'H';
-		}
-		return null;
+		// Shared parser: handles combined values such as "1 hour 30 minutes".
+		return Recipe_Schema::parse_duration( $time_str );
 	}
 }

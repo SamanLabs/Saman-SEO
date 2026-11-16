@@ -324,15 +324,15 @@ class Weekly_Report {
 			return null;
 		}
 
-		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		// The rules table only holds lifetime totals; the per-day counters
+		// hold what actually happened this week.
+		$redirects = \Saman\SEO\Plugin::instance()->get( 'redirects' );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Aggregate read from custom table.
-		return (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COALESCE(SUM(hits), 0) FROM {$table} WHERE last_hit IS NOT NULL AND last_hit >= %s",
-				$cutoff
-			)
-		);
+		if ( ! $redirects || ! method_exists( $redirects, 'get_hits_for_days' ) ) {
+			return null;
+		}
+
+		return (int) $redirects->get_hits_for_days( 7 );
 	}
 
 	/**

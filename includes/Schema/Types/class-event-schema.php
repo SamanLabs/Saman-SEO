@@ -100,6 +100,11 @@ class Event_Schema extends Abstract_Schema {
 			return array();
 		}
 
+		// An unparseable date would ship as startDate: "", a critical error.
+		if ( '' === self::sanitize_iso8601( (string) $event['start_date'] ) ) {
+			return array();
+		}
+
 		$schema = array(
 			'@type'            => $this->get_type(),
 			'@id'              => Schema_IDs::event( $this->context->canonical ),
@@ -146,6 +151,13 @@ class Event_Schema extends Abstract_Schema {
 
 		// Location: virtual, physical, or both for mixed mode.
 		$locations = $this->build_locations( $event, $mode );
+
+		// A location is required for the event rich result; without one the
+		// node can only be reported as invalid.
+		if ( empty( $locations['location'] ) ) {
+			return array();
+		}
+
 		foreach ( $locations as $key => $location ) {
 			$schema[ $key ] = $location;
 		}
@@ -222,10 +234,12 @@ class Event_Schema extends Abstract_Schema {
 		$locations = array();
 
 		if ( in_array( $mode, array( 'OnlineEventAttendanceMode', 'MixedEventAttendanceMode' ), true ) && '' !== $virtual_url ) {
-			$locations['location'] = array(
-				'@type' => 'VirtualLocation',
-				'url'   => $virtual_url,
-				'name'  => '' !== $venue_name ? $venue_name : '',
+			$locations['location'] = array_filter(
+				array(
+					'@type' => 'VirtualLocation',
+					'url'   => $virtual_url,
+					'name'  => $venue_name,
+				)
 			);
 		}
 
@@ -240,12 +254,11 @@ class Event_Schema extends Abstract_Schema {
 				)
 			);
 
-			$place = array_merge(
+			$place = array_filter(
 				array(
 					'@type' => 'Place',
 					'name'  => $venue_name,
-				),
-				array()
+				)
 			);
 
 			if ( ! empty( $address ) ) {

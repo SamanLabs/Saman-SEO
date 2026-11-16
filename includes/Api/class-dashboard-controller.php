@@ -274,7 +274,7 @@ class Dashboard_Controller extends REST_Controller {
 			'distribution' => $score_dist,
 			'posts_scored' => count( $scores ),
 			'issues'       => $issues,
-			'trend'        => $this->get_score_trend(),
+			'trend'        => $this->get_score_trend( (int) $average ),
 		);
 
 		// Cache for 30 minutes
@@ -286,16 +286,16 @@ class Dashboard_Controller extends REST_Controller {
 	/**
 	 * Get SEO score trend (compare to last week).
 	 *
+	 * @param int $current The score just calculated.
 	 * @return array
 	 */
-	private function get_score_trend() {
+	private function get_score_trend( $current ) {
 		$history = get_option( 'SAMAN_SEO_score_history', array() );
 		if ( ! is_array( $history ) ) {
 			$history = array();
 		}
 
-		// Get current week average
-		$current = $this->get_current_week_score();
+		$current = (int) $current;
 
 		// Store current score
 		$today             = gmdate( 'Y-m-d' );
@@ -327,16 +327,6 @@ class Dashboard_Controller extends REST_Controller {
 			'change'    => round( abs( $change ) ),
 			'history'   => array_slice( $history, -7, 7, true ),
 		);
-	}
-
-	/**
-	 * Get current week's average score.
-	 *
-	 * @return int
-	 */
-	private function get_current_week_score() {
-		$cached = get_transient( 'SAMAN_SEO_dashboard_seo_score' );
-		return $cached['score'] ?? 0;
 	}
 
 	/**
@@ -542,26 +532,13 @@ class Dashboard_Controller extends REST_Controller {
         // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
 		$active = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->redirects_table} WHERE status_code IN (301, 302, 307)" );
 
-		// Hits today
-		$today = gmdate( 'Y-m-d' );
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-		$hits_today = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT SUM(hits) FROM {$this->redirects_table} WHERE DATE(last_hit) = %s",
-				$today
-			)
-		);
-
-		// Hits this week
-		$week_start = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
-        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-		$hits_week = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT SUM(hits) FROM {$this->redirects_table} WHERE last_hit >= %s",
-            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
-				$week_start
-			)
-		);
+		// Hits today and this week come from the per-day counters: each rule's
+		// own `hits` column is a lifetime total, so summing it over rules that
+		// were touched recently reported all-time numbers.
+		$redirects  = \Saman\SEO\Plugin::instance()->get( 'redirects' );
+		$has_counts = $redirects && method_exists( $redirects, 'get_hits_for_days' );
+		$hits_today = $has_counts ? $redirects->get_hits_for_days( 1 ) : 0;
+		$hits_week  = $has_counts ? $redirects->get_hits_for_days( 7 ) : 0;
 
 		// Get pending suggestions
 		$suggestions       = get_option( 'SAMAN_SEO_monitor_slugs', array() );

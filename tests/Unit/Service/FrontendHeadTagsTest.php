@@ -123,6 +123,11 @@ class FrontendHeadTagsTest extends TestCase {
 			)
 		);
 
+		// The map lists each language's home page, so it is only printed there.
+		$this->set_context( 'front_page', false );
+		$this->assertSame( '', $this->capture_output( array( $frontend, 'render_hreflang' ) ) );
+
+		$this->set_context( 'front_page', true );
 		$html = $this->capture_output( array( $frontend, 'render_hreflang' ) );
 
 		$this->assertSame( 2, substr_count( $html, 'rel="alternate" hreflang=' ) );
@@ -150,9 +155,11 @@ class FrontendHeadTagsTest extends TestCase {
 		// Single page: nothing.
 		$this->assertSame( '', $this->capture_output( array( $frontend, 'render_pagination_links' ) ) );
 
-		// Multi-page post on page 2 of 3: both prev and next.
+		// Multi-page post on page 2 of 3: both prev and next. The page count
+		// comes from the content, not from the loop's $numpages global.
+		$created->post_content               = 'One<!--nextpage-->Two<!--nextpage-->Three';
+		self::$options['permalink_structure'] = '/%postname%/';
 		$GLOBALS['post']           = $created;
-		$GLOBALS['numpages']       = 3;
 		self::$query_vars['page'] = 2;
 
 		$html = $this->capture_output( array( $frontend, 'render_pagination_links' ) );
@@ -160,6 +167,14 @@ class FrontendHeadTagsTest extends TestCase {
 		$this->assertStringContainsString( '<link rel="prev" href="https://example.org/sample-post/"', $html );
 		$this->assertStringContainsString( '<link rel="next" href="https://example.org/sample-post/3"', $html );
 
-		unset( $GLOBALS['post'], $GLOBALS['numpages'] );
+		// Plain permalinks carry the page number as a query argument.
+		self::$options['permalink_structure'] = '';
+
+		$this->assertStringContainsString(
+			'href="https://example.org/sample-post/?page=3"',
+			$this->capture_output( array( $frontend, 'render_pagination_links' ) )
+		);
+
+		unset( $GLOBALS['post'] );
 	}
 }

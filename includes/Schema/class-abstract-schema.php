@@ -99,6 +99,20 @@ abstract class Abstract_Schema {
 	}
 
 	/**
+	 * A post title as plain text.
+	 *
+	 * Titles from get_the_title() are display HTML, texturized and entity-encoded.
+	 * JSON-LD values are plain strings, so those entities would be shown
+	 * literally.
+	 *
+	 * @param \WP_Post|int $post Post object or ID.
+	 * @return string
+	 */
+	protected function plain_title( $post ): string {
+		return trim( html_entity_decode( wp_strip_all_tags( (string) get_the_title( $post ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+	}
+
+	/**
 	 * Apply the fields filter to allow modification of schema data.
 	 *
 	 * Call this method in generate() after building the base schema array

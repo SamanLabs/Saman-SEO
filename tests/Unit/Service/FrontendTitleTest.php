@@ -47,6 +47,7 @@ class FrontendTitleTest extends TestCase {
 	public function test_homepage_override_on_home_view(): void {
 		$this->set_context( 'singular', false );
 		$this->set_context( 'home', true );
+		$this->set_context( 'front_page', true );
 		self::$options['SAMAN_SEO_homepage_title'] = 'Homepage SEO Title';
 
 		$frontend = new Frontend();
@@ -55,11 +56,26 @@ class FrontendTitleTest extends TestCase {
 	}
 
 	/**
+	 * A separate posts page is not the homepage and must not take its title.
+	 */
+	public function test_posts_page_does_not_inherit_homepage_title(): void {
+		$this->set_context( 'singular', false );
+		$this->set_context( 'home', true );
+		$this->set_context( 'front_page', false );
+		self::$options['SAMAN_SEO_homepage_title'] = 'Homepage SEO Title';
+
+		$frontend = new Frontend();
+
+		$this->assertNotSame( 'Homepage SEO Title', $frontend->filter_document_title( 'Original' ) );
+	}
+
+	/**
 	 * Homepage without an override gets the "Home | Site" default.
 	 */
 	public function test_homepage_default_when_no_override(): void {
 		$this->set_context( 'singular', false );
 		$this->set_context( 'home', true );
+		$this->set_context( 'front_page', true );
 		self::$options['SAMAN_SEO_homepage_title'] = '';
 
 		$frontend = new Frontend();
@@ -108,6 +124,22 @@ class FrontendTitleTest extends TestCase {
 	}
 
 	/**
+	 * Long titles are left whole unless a site asks for a limit.
+	 */
+	public function test_long_titles_are_not_cut_by_default(): void {
+		$this->make_post(
+			array( 'post_title' => str_repeat( 'word ', 30 ) )
+		);
+		self::$options['SAMAN_SEO_post_type_title_templates'] = array();
+		unset( self::$options['SAMAN_SEO_default_title_template'] );
+
+		$title = ( new Frontend() )->filter_document_title( '' );
+
+		$this->assertStringEndsWith( 'Test Site', $title );
+		$this->assertStringNotContainsString( '...', $title );
+	}
+
+	/**
 	 * Overly long titles truncate at the filtered max length.
 	 */
 	public function test_long_titles_truncate_at_max_length(): void {
@@ -116,6 +148,9 @@ class FrontendTitleTest extends TestCase {
 		);
 		self::$options['SAMAN_SEO_post_type_title_templates'] = array();
 		unset( self::$options['SAMAN_SEO_default_title_template'] );
+		self::$hooks['saman_seo_title_max_length'][] = static function () {
+			return 60;
+		};
 
 		$frontend = new Frontend();
 		$title    = $frontend->filter_document_title( '' );

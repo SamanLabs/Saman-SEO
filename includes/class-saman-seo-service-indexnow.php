@@ -142,7 +142,8 @@ class IndexNow {
 			flush_rewrite_rules();
 		}
 
-		return $result;
+		// update_option() returns false when nothing changed, which is not a failure.
+		return $result || get_option( 'SAMAN_SEO_indexnow_settings' ) === $sanitized;
 	}
 
 	/**
@@ -419,7 +420,10 @@ class IndexNow {
 
 		// Log each URL.
 		foreach ( $urls as $url ) {
-			$this->log_submission( $url, $post_id, $status, $response_code, $response_message, $search_engine );
+			// $post_id may be one ID for the whole call, or a URL => ID map.
+			$url_post_id = is_array( $post_id ) ? ( $post_id[ $url ] ?? null ) : $post_id;
+
+			$this->log_submission( $url, $url_post_id, $status, $response_code, $response_message, $search_engine );
 		}
 
 		saman_seo_do_action( 'saman_seo_indexnow_submitted', $urls, $success, $response_code );
@@ -508,8 +512,8 @@ class IndexNow {
 		// Get items.
 		$orderby  = in_array( $args['orderby'], array( 'submitted_at', 'url', 'status', 'response_code' ), true ) ? $args['orderby'] : 'submitted_at';
 		$order    = 'ASC' === strtoupper( $args['order'] ) ? 'ASC' : 'DESC';
-		$per_page = absint( $args['per_page'] );
-		$offset   = ( absint( $args['page'] ) - 1 ) * $per_page;
+		$per_page = max( 1, absint( $args['per_page'] ) );
+		$offset   = ( max( 1, absint( $args['page'] ) ) - 1 ) * $per_page;
 
 		$query = "SELECT * FROM {$table} {$where_sql} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d";
 

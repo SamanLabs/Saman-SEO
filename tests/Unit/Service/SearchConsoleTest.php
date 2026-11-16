@@ -185,19 +185,8 @@ class SearchConsoleTest extends TestCase {
 	}
 
 	public function test_get_auth_url_sends_the_whole_redirect_uri() {
-		// Real add_query_arg() does not encode values; the redirect URI holds
-		// an "&" that must not leak out as a separate Google parameter.
-		Functions\when( 'add_query_arg' )->alias(
-			static function ( $params, $url ) {
-				$pairs = array();
-				foreach ( $params as $key => $value ) {
-					$pairs[] = $key . '=' . $value;
-				}
-
-				return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . implode( '&', $pairs );
-			}
-		);
-
+		// add_query_arg() does not encode values; the redirect URI holds an
+		// "&" that must not leak out as a separate Google parameter.
 		$service = new Search_Console();
 		$service->set_credentials( 'client-123.apps.googleusercontent.com', 'shh' );
 
@@ -259,9 +248,18 @@ class SearchConsoleTest extends TestCase {
 		), false );
 		update_option( Search_Console::OPTION_SELECTED_SITE, 'https://example.org/', false );
 
-		Functions\when( 'wp_remote_get' )->justReturn( array() );
+		$revoked = array();
+		Functions\when( 'wp_remote_post' )->alias(
+			static function ( $url, $args ) use ( &$revoked ) {
+				$revoked = array( $url, $args['body']['token'] );
+				return array();
+			}
+		);
 
 		$service->disconnect();
+
+		// The refresh token is revoked, which ends the whole grant.
+		$this->assertSame( array( 'https://oauth2.googleapis.com/revoke', 'r' ), $revoked );
 
 		$this->assertArrayNotHasKey( Search_Console::OPTION_TOKENS, TestCase::$options );
 		$this->assertArrayNotHasKey( Search_Console::OPTION_SELECTED_SITE, TestCase::$options );

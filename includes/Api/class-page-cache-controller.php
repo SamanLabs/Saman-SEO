@@ -218,8 +218,12 @@ class Page_Cache_Controller extends REST_Controller {
 		}
 
 		$excluded_urls = $request->get_param( 'excluded_urls' );
-		if ( null !== $excluded_urls ) {
+		if ( null !== $excluded_urls && (string) $excluded_urls !== (string) get_option( Page_Cache::OPTION_EXCLUSIONS, '' ) ) {
 			update_option( Page_Cache::OPTION_EXCLUSIONS, (string) $excluded_urls, false );
+
+			// The early drop-in serves snapshots without consulting this list,
+			// so a URL excluded after it was cached would keep being served.
+			$this->service->purge_all();
 		}
 
 		return $this->success( $this->get_status_data(), __( 'Cache settings saved.', 'saman-seo' ) );

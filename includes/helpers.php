@@ -195,7 +195,7 @@ namespace Saman\SEO\Helpers {
 						$val = maybe_unserialize( $val );
 						$val = is_array( $val ) ? implode( ', ', array_filter( $val, 'is_scalar' ) ) : '';
 					}
-					$vars[ 'cf_' . $k ] = $val;
+					$vars[ 'cf_' . $k ] = is_scalar( $val ) ? wp_strip_all_tags( (string) $val ) : '';
 				}
 			}
 		} elseif ( is_category() || is_tag() || is_tax() ) {
@@ -226,8 +226,11 @@ namespace Saman\SEO\Helpers {
 		} elseif ( is_404() ) {
 			// 404 page variables
 			$vars['request_url'] = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( home_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) ) : '';
-		} elseif ( is_search() ) {
-			// Search results variables
+		}
+
+		// Not part of the chain above: a search scoped to a post type or a
+		// category is also an archive request, and would never reach it.
+		if ( is_search() ) {
 			$vars['search_term']  = get_search_query();
 			$vars['search_query'] = $vars['search_term']; // Alias for search_query.
 		}

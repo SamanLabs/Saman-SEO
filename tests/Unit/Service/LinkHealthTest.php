@@ -101,9 +101,17 @@ class LinkHealthTest extends TestCase {
 			 *
 			 * @return int[]
 			 */
-			public function get_col() {
+			public function get_col( $query = null ) {
+				$this->selects[] = $query;
 				return $this->ids;
 			}
+
+			/**
+			 * Queries passed to get_col().
+			 *
+			 * @var array
+			 */
+			public $selects = array();
 
 			/**
 			 * Accept an update.
@@ -281,13 +289,33 @@ class LinkHealthTest extends TestCase {
 			}
 		);
 
+		Functions\when( 'get_transient' )->justReturn( false );
+		Functions\when( 'delete_transient' )->justReturn( true );
+		$this->db->ids = array( 7 );
+
 		$reap = new \ReflectionMethod( Link_Health::class, 'reap_stale_scans' );
 		$reap->setAccessible( true );
 		$reap->invoke( new Link_Health() );
 
-		$this->assertCount( 1, $this->db->queries );
-		$cutoff   = end( $this->db->queries[0]['args'] );
+		$this->assertCount( 1, $this->db->queries, 'the stalled scan is failed' );
+		$cutoff   = end( $this->db->selects[0]['args'] );
 		$expected = gmdate( 'Y-m-d H:i:s', time() - 60 * MINUTE_IN_SECONDS + $offset );
 		$this->assertLessThanOrEqual( 2, abs( strtotime( $cutoff ) - strtotime( $expected ) ), $cutoff );
+	}
+
+	/**
+	 * A scan that started long ago but processed a chunk recently is still alive.
+	 */
+	public function test_scan_still_making_progress_is_not_reaped() {
+		Functions\when( 'wp_date' )->alias(
+			static function ( $format, $timestamp = null ) {
+				return gmdate( $format, null === $timestamp ? time() : $timestamp );
+			}
+		);
+		Functions\when( 'get_transient' )->justReturn( time() - 5 * MINUTE_IN_SECONDS );
+		$this->db->ids = array( 7 );
+
+		$this->assertSame( 0, Link_Health::fail_stalled_scans( 'wp_scans', 60, 'stalled' ) );
+		$this->assertCount( 0, $this->db->queries );
 	}
 }

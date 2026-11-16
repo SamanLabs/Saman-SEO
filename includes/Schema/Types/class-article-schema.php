@@ -31,6 +31,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Article_Schema extends Abstract_Schema {
 
 	/**
+	 * Selectable types that share Article's fields and have no class of
+	 * their own. BlogPosting and NewsArticle are separate subclasses.
+	 *
+	 * @var string[]
+	 */
+	const ARTICLE_SUBTYPES = array( 'Article', 'TechArticle', 'ScholarlyArticle' );
+
+	/**
 	 * Get the schema @type value.
 	 *
 	 * @return string The @type value.
@@ -49,7 +57,23 @@ class Article_Schema extends Abstract_Schema {
 	 */
 	public function is_needed(): bool {
 		return $this->context->post instanceof \WP_Post
-			&& 'Article' === $this->context->schema_type;
+			&& in_array( $this->context->schema_type, self::ARTICLE_SUBTYPES, true );
+	}
+
+	/**
+	 * The @type to print: the selected subtype when this class is serving
+	 * one, otherwise whatever the (sub)class declares.
+	 *
+	 * @return string
+	 */
+	protected function get_output_type(): string {
+		$type = (string) $this->get_type();
+
+		if ( 'Article' === $type && in_array( $this->context->schema_type, self::ARTICLE_SUBTYPES, true ) ) {
+			return $this->context->schema_type;
+		}
+
+		return $type;
 	}
 
 	/**
@@ -65,9 +89,9 @@ class Article_Schema extends Abstract_Schema {
 		$post = $this->context->post;
 
 		$schema = array(
-			'@type'            => $this->get_type(),
+			'@type'            => $this->get_output_type(),
 			'@id'              => Schema_IDs::article( $this->context->canonical ),
-			'headline'         => get_the_title( $post ),
+			'headline'         => $this->plain_title( $post ),
 			'datePublished'    => get_the_date( DATE_W3C, $post ),
 			'dateModified'     => get_the_modified_date( DATE_W3C, $post ),
 			'mainEntityOfPage' => array(

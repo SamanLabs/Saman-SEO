@@ -79,6 +79,10 @@ class Recipe_Schema extends Abstract_Schema {
 
 		// Image (single URL or list of URLs).
 		$images = $this->normalize_images( $recipe['images'] ?? ( isset( $recipe['image'] ) ? $recipe['image'] : '' ) );
+		if ( empty( $images ) ) {
+			// image is required for the recipe rich result.
+			$images = $this->normalize_images( (string) get_the_post_thumbnail_url( $post, 'full' ) );
+		}
 		if ( ! empty( $images ) ) {
 			$schema['image'] = $images;
 		}
@@ -341,11 +345,11 @@ class Recipe_Schema extends Abstract_Schema {
 		$hours   = 0.0;
 		$minutes = 0;
 
-		if ( preg_match( '/(\d+(?:[.,]\d+)?)\s*(?:hours?|hrs?|h)\b/', $value, $match ) ) {
+		if ( preg_match( '/(\d+(?:[.,]\d+)?)\s*(?:hours?|hrs?|h)(?![a-z])/', $value, $match ) ) {
 			$hours = (float) str_replace( ',', '.', $match[1] );
 		}
 
-		if ( preg_match( '/(\d+)\s*(?:minutes?|mins?|m)\b/', $value, $match ) ) {
+		if ( preg_match( '/(\d+)\s*(?:minutes?|mins?|m)(?![a-z])/', $value, $match ) ) {
 			$minutes = (int) $match[1];
 		}
 

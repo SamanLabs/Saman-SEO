@@ -691,7 +691,8 @@ class Request_Monitor {
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
 		$request     = wp_parse_url( $request_uri, PHP_URL_PATH );
 		if ( $request ) {
-			$request = sanitize_text_field( $request );
+			// Decode first: sanitize_text_field() deletes %XX octets outright.
+			$request = sanitize_text_field( rawurldecode( $request ) );
 		} else {
 			$request = '/';
 		}

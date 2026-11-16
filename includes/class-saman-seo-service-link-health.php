@@ -247,18 +247,69 @@ class Link_Health {
 			return;
 		}
 
+		self::fail_stalled_scans( $this->scans_table, $minutes, 'Scan timed out and was reaped.' );
+	}
+
+	/**
+	 * Transient key holding the time a scan last processed a chunk.
+	 *
+	 * @param int $scan_id Scan ID.
+	 * @return string
+	 */
+	public static function scan_heartbeat_key( $scan_id ) {
+		return 'saman_seo_link_scan_alive_' . (int) $scan_id;
+	}
+
+	/**
+	 * Mark as failed the running scans that have stopped making progress.
+	 *
+	 * A scan is stalled when it started more than $minutes ago AND has not
+	 * processed a chunk within $minutes. Measuring from the start alone killed
+	 * healthy scans on large sites, where a full pass takes longer than the
+	 * threshold.
+	 *
+	 * @param string $table   Scans table name.
+	 * @param int    $minutes Stale threshold in minutes.
+	 * @param string $message Error message stored on the scan.
+	 * @return int Number of scans failed.
+	 */
+	public static function fail_stalled_scans( $table, $minutes, $message ) {
+		global $wpdb;
+
+		$minutes = (int) $minutes;
+		if ( $minutes < 1 ) {
+			return 0;
+		}
+
 		// started_at is written with current_time( 'mysql' ), which is site-local time, so the cutoff is too.
 		$cutoff = wp_date( 'Y-m-d H:i:s', time() - $minutes * MINUTE_IN_SECONDS );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->query(
-			$wpdb->prepare(
-				"UPDATE {$this->scans_table} SET status = 'failed', completed_at = %s, error_message = %s WHERE status = 'running' AND started_at < %s",
-				current_time( 'mysql' ),
-				'Scan timed out and was reaped.',
-				$cutoff
-			)
-		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safe.
+		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE status = 'running' AND started_at < %s", $cutoff ) );
+
+		$failed = 0;
+
+		foreach ( (array) $ids as $scan_id ) {
+			$last_beat = (int) get_transient( self::scan_heartbeat_key( $scan_id ) );
+
+			if ( $last_beat > time() - $minutes * MINUTE_IN_SECONDS ) {
+				continue;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safe.
+			$failed += (int) $wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$table} SET status = 'failed', completed_at = %s, error_message = %s WHERE id = %d AND status = 'running'",
+					current_time( 'mysql' ),
+					$message,
+					(int) $scan_id
+				)
+			);
+
+			delete_transient( self::scan_heartbeat_key( $scan_id ) );
+		}
+
+		return $failed;
 	}
 
 	/**
@@ -421,6 +472,10 @@ class Link_Health {
 			if ( ! $scan || 'running' !== $scan->status ) {
 				return;
 			}
+
+			// Heartbeat: the reaper spares a scan that is still making progress,
+			// however long ago it started.
+			set_transient( self::scan_heartbeat_key( $scan_id ), time(), DAY_IN_SECONDS );
 
 			$post_types = $this->get_scan_post_types();
 			if ( empty( $post_types ) ) {
@@ -632,7 +687,11 @@ class Link_Health {
 	 */
 	private function check_link( $url ) {
 		$site_url    = home_url();
-		$is_internal = strpos( $url, $site_url ) === 0 || strpos( $url, '/' ) === 0;
+		$is_internal = strpos( $url, $site_url ) === 0 || ( strpos( $url, '/' ) === 0 && strpos( $url, '//' ) !== 0 );
+
+		if ( strpos( $url, '//' ) === 0 ) {
+			$url = ( is_ssl() ? 'https:' : 'http:' ) . $url;
+		}
 
 		$data = array(
 			'target_url'     => $url,

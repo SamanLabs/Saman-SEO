@@ -41,7 +41,7 @@ class Robots_Manager {
 		// Advertise the Saman SEO sitemap index in robots.txt so search engines can
 		// discover it. WordPress core only references its own wp-sitemap.xml, and a
 		// custom robots.txt would otherwise drop the sitemap reference entirely.
-		if ( $is_public ) {
+		if ( $is_public && \Saman\SEO\Helpers\module_enabled( 'sitemap' ) ) {
 			$sitemap_url = home_url( '/sitemap_index.xml' );
 
 			if ( false === stripos( (string) $output, $sitemap_url ) ) {

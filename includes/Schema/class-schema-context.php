@@ -180,7 +180,7 @@ class Schema_Context {
 	 * Priority order:
 	 * 1. Post-specific override from _SAMAN_SEO_meta['schema_type']
 	 * 2. Post type default from SAMAN_SEO_post_type_settings option
-	 * 3. Fallback to 'Article'
+	 * 3. Fallback to 'WebPage' for pages, 'Article' otherwise
 	 *
 	 * @param Schema_Context $context The context to determine type for.
 	 * @return string The schema type.
@@ -207,7 +207,8 @@ class Schema_Context {
 			}
 		}
 
-		// Default to Article.
-		return 'Article';
+		// Pages describe themselves with the WebPage node alone, which is what
+		// the settings screen shows as their default. Everything else is an Article.
+		return 'page' === $context->post_type ? 'WebPage' : 'Article';
 	}
 }

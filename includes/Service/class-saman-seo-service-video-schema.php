@@ -48,6 +48,20 @@ class Video_Schema {
 	);
 
 	/**
+	 * Cron hook that fetches oEmbed metadata in the background.
+	 *
+	 * @var string
+	 */
+	const OEMBED_FETCH_HOOK = 'saman_seo_fetch_video_oembed';
+
+	/**
+	 * Videos seen during this request whose metadata is not cached yet.
+	 *
+	 * @var array<string,array{platform:string,id:string}>
+	 */
+	private $pending_oembed = array();
+
+	/**
 	 * Boot hooks.
 	 *
 	 * @return void
@@ -60,6 +74,7 @@ class Video_Schema {
 		// Match the sibling schema services: canonical hook, priority 20, two
 		// args ($graph, $post).
 		add_filter( 'SAMAN_SEO_jsonld_graph', array( $this, 'add_video_schema_to_graph' ), 20, 2 );
+		add_action( self::OEMBED_FETCH_HOOK, array( $this, 'fetch_pending_oembed' ) );
 	}
 
 	/**
@@ -88,6 +103,8 @@ class Video_Schema {
 				$graph[] = $schema;
 			}
 		}
+
+		$this->schedule_oembed_fetch();
 
 		return $graph;
 	}
@@ -162,7 +179,7 @@ class Video_Schema {
 			$schema['embedUrl'] = 'https://www.youtube.com/embed/' . $video['id'];
 
 			// Try to get additional metadata from oEmbed.
-			$oembed = $this->get_youtube_oembed( $video['id'] );
+			$oembed = $this->get_cached_oembed( 'youtube', $video['id'] );
 
 			$schema['thumbnailUrl'] = $this->get_youtube_thumbnail_url( $video['id'], $oembed );
 
@@ -177,7 +194,7 @@ class Video_Schema {
 			$schema['embedUrl'] = 'https://player.vimeo.com/video/' . $video['id'];
 
 			// Try to get additional metadata from oEmbed.
-			$oembed = $this->get_vimeo_oembed( $video['id'] );
+			$oembed = $this->get_cached_oembed( 'vimeo', $video['id'] );
 			if ( is_array( $oembed ) ) {
 				if ( ! empty( $oembed['title'] ) ) {
 					$schema['name'] = sanitize_text_field( $oembed['title'] );
@@ -295,92 +312,126 @@ class Video_Schema {
 	}
 
 	/**
-	 * Get YouTube video oEmbed data.
+	 * Transient key for a video's oEmbed metadata.
 	 *
-	 * @param string $video_id YouTube video ID.
-	 * @return array|null
+	 * @param string $platform youtube or vimeo.
+	 * @param string $video_id Video ID.
+	 * @return string
 	 */
-	private function get_youtube_oembed( $video_id ) {
-		$cache_key = 'SAMAN_SEO_youtube_oembed_' . $video_id;
-		$cached    = get_transient( $cache_key );
-
-		if ( false !== $cached ) {
-			// 'none' is the sentinel for a previously-failed lookup.
-			return 'none' === $cached ? null : $cached;
-		}
-
-		$url = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json';
-
-		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
-
-		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			// Cache the miss so a dead video is not re-fetched on every view.
-			set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
-			return null;
-		}
-
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( $data ) {
-			set_transient( $cache_key, $data, DAY_IN_SECONDS );
-			return $data;
-		}
-
-		set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
-		return null;
+	private static function oembed_cache_key( $platform, $video_id ) {
+		return 'SAMAN_SEO_' . $platform . '_oembed_' . $video_id;
 	}
 
 	/**
-	 * Get Vimeo video oEmbed data.
+	 * Read a video's oEmbed metadata from cache, never from the network.
 	 *
-	 * @param string $video_id Vimeo video ID.
+	 * This runs while the page renders, so a remote request here would add
+	 * its full latency to the first view of every post with a video. A miss
+	 * is queued for fetch_pending_oembed() and the schema is built from the
+	 * post's own title, date and images until the metadata arrives.
+	 *
+	 * @param string $platform youtube or vimeo.
+	 * @param string $video_id Video ID.
 	 * @return array|null
 	 */
-	private function get_vimeo_oembed( $video_id ) {
-		$cache_key = 'SAMAN_SEO_vimeo_oembed_' . $video_id;
-		$cached    = get_transient( $cache_key );
+	private function get_cached_oembed( $platform, $video_id ) {
+		$cached = get_transient( self::oembed_cache_key( $platform, $video_id ) );
 
-		if ( false !== $cached ) {
-			// 'none' is the sentinel for a previously-failed lookup.
-			return 'none' === $cached ? null : $cached;
-		}
+		if ( false === $cached ) {
+			$this->pending_oembed[ $platform . ':' . $video_id ] = array(
+				'platform' => $platform,
+				'id'       => (string) $video_id,
+			);
 
-		$url = 'https://vimeo.com/api/oembed.json?url=https://vimeo.com/' . $video_id;
-
-		$response = wp_remote_get( $url, array( 'timeout' => 2 ) );
-
-		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			// Cache the miss so a dead video is not re-fetched on every view.
-			set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
 			return null;
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		// 'none' is the sentinel for a previously-failed lookup.
+		return is_array( $cached ) ? $cached : null;
+	}
 
-		if ( $data ) {
-			set_transient( $cache_key, $data, DAY_IN_SECONDS );
-			return $data;
+	/**
+	 * Queue one background event for the metadata this request missed.
+	 *
+	 * @return void
+	 */
+	private function schedule_oembed_fetch() {
+		if ( empty( $this->pending_oembed ) || ! function_exists( 'wp_schedule_single_event' ) ) {
+			return;
 		}
 
-		set_transient( $cache_key, 'none', HOUR_IN_SECONDS );
-		return null;
+		$videos               = array_slice( array_values( $this->pending_oembed ), 0, 20 );
+		$this->pending_oembed = array();
+
+		if ( ! wp_next_scheduled( self::OEMBED_FETCH_HOOK, array( $videos ) ) ) {
+			wp_schedule_single_event( time() + MINUTE_IN_SECONDS, self::OEMBED_FETCH_HOOK, array( $videos ) );
+		}
+	}
+
+	/**
+	 * Cron handler: fetch and cache oEmbed metadata for queued videos.
+	 *
+	 * @param array $videos List of arrays with platform and id.
+	 * @return void
+	 */
+	public function fetch_pending_oembed( $videos ) {
+		foreach ( array_slice( (array) $videos, 0, 20 ) as $video ) {
+			$platform = is_array( $video ) ? (string) ( $video['platform'] ?? '' ) : '';
+			$video_id = is_array( $video ) ? (string) ( $video['id'] ?? '' ) : '';
+
+			if ( 'youtube' === $platform && preg_match( '/^[A-Za-z0-9_-]{11}$/', $video_id ) ) {
+				$url = 'https://www.youtube.com/oembed?format=json&url=' . rawurlencode( 'https://www.youtube.com/watch?v=' . $video_id );
+			} elseif ( 'vimeo' === $platform && preg_match( '/^\d+$/', $video_id ) ) {
+				$url = 'https://vimeo.com/api/oembed.json?url=' . rawurlencode( 'https://vimeo.com/' . $video_id );
+			} else {
+				continue;
+			}
+
+			$cache_key = self::oembed_cache_key( $platform, $video_id );
+
+			if ( false !== get_transient( $cache_key ) ) {
+				continue;
+			}
+
+			$response = wp_remote_get( $url, array( 'timeout' => 5 ) );
+
+			if ( is_wp_error( $response ) ) {
+				// Network failure: leave uncached so a later view queues it again.
+				continue;
+			}
+
+			$data = 200 === (int) wp_remote_retrieve_response_code( $response )
+				? json_decode( wp_remote_retrieve_body( $response ), true )
+				: null;
+
+			if ( is_array( $data ) && ! empty( $data ) ) {
+				set_transient( $cache_key, $data, 7 * DAY_IN_SECONDS );
+			} else {
+				// Private or removed video: do not ask again for a day.
+				set_transient( $cache_key, 'none', DAY_IN_SECONDS );
+			}
+		}
 	}
 
 	/**
 	 * Get all posts with videos for sitemap generation.
 	 *
-	 * @param int $limit Maximum number of posts to return.
+	 * @param int   $limit      Maximum number of posts to return.
+	 * @param array $query_args Extra WP_Query args, e.g. the sitemap's exclusions.
 	 * @return array Array of posts with video data.
 	 */
-	public function get_posts_with_videos( $limit = 1000 ) {
+	public function get_posts_with_videos( $limit = 1000, array $query_args = array() ) {
 		$posts_with_videos = array();
 
-		$args = array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => $limit,
-			'orderby'        => 'modified',
-			'order'          => 'DESC',
+		$args = array_merge(
+			$query_args,
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => $limit,
+				'orderby'        => 'modified',
+				'order'          => 'DESC',
+			)
 		);
 
 		$query = new \WP_Query( $args );

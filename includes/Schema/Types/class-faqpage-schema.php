@@ -98,8 +98,10 @@ class FAQPage_Schema extends Abstract_Schema {
 			if ( 'saman-seo/faq' === $block['blockName'] ) {
 				$attrs = $block['attrs'] ?? array();
 
-				// Respect showSchema toggle - only include if true.
-				if ( empty( $attrs['showSchema'] ) ) {
+				// Respect the showSchema toggle. The editor does not write
+				// default-valued attributes into the block, so a missing key
+				// means the default: on.
+				if ( isset( $attrs['showSchema'] ) && ! $attrs['showSchema'] ) {
 					continue;
 				}
 

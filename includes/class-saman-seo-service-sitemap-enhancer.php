@@ -789,12 +789,11 @@ class Sitemap_Enhancer {
 			return;
 		}
 
+		// The index lists pages from raw post counts, but exclusions (noindex,
+		// per-post toggle, password, redirects) can leave a listed page with
+		// nothing in it. Serve an empty urlset rather than a 404, which
+		// search engines report as an unreachable sitemap.
 		$url_list = $this->fetch_sitemap_urls( $group, $page );
-
-		if ( empty( $url_list ) ) {
-			$this->bail_404();
-			return;
-		}
 
 		$renderer = $this->get_renderer();
 
@@ -2197,7 +2196,7 @@ class Sitemap_Enhancer {
 		}
 
 		// Get posts with videos.
-		$posts_with_videos = $video_service->get_posts_with_videos( 1000 );
+		$posts_with_videos = $video_service->get_posts_with_videos( 1000, $this->apply_post_exclusions( array(), 'post' ) );
 
 		if ( empty( $posts_with_videos ) ) {
 			$this->bail_404();
