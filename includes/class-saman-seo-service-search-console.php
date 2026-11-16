@@ -259,20 +259,24 @@ class Search_Console {
 		$state = wp_generate_password( 24, false );
 		set_transient( self::CACHE_PREFIX . 'oauth_state', $state, 10 * MINUTE_IN_SECONDS );
 
-		return add_query_arg(
-			array_filter(
-				array(
-					'client_id'              => $this->get_client_id(),
-					'redirect_uri'           => $this->get_redirect_uri(),
-					'response_type'          => 'code',
-					'scope'                  => self::SCOPE,
-					'access_type'            => 'offline',
-					'prompt'                 => 'consent',
-					'include_granted_scopes' => 'true',
-					'state'                  => $state,
-				)
+		// Built with http_build_query(), not add_query_arg(): the latter does not
+		// encode values, so the "&saman_gsc_cb=1" inside the redirect URI would
+		// split off into its own parameter and Google would see a redirect URI
+		// that matches nothing registered (redirect_uri_mismatch).
+		return self::AUTH_URL . '?' . http_build_query(
+			array(
+				'client_id'              => $this->get_client_id(),
+				'redirect_uri'           => $this->get_redirect_uri(),
+				'response_type'          => 'code',
+				'scope'                  => self::SCOPE,
+				'access_type'            => 'offline',
+				'prompt'                 => 'consent',
+				'include_granted_scopes' => 'true',
+				'state'                  => $state,
 			),
-			self::AUTH_URL
+			'',
+			'&',
+			PHP_QUERY_RFC3986
 		);
 	}
 

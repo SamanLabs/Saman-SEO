@@ -443,6 +443,12 @@ class Sitemap_Enhancer {
 			);
 		}
 
+		// Password-protected posts are served with noindex, so listing them
+		// reports "Submitted URL marked noindex".
+		if ( $this->should_exclude_noindexed() && ! isset( $args['has_password'] ) ) {
+			$args['has_password'] = false;
+		}
+
 		// Meta-based exclusions: each is an OR-pair so posts without any
 		// plugin meta at all are still matched (a bare NOT LIKE would drop them).
 		$exclusion_pairs = array(
@@ -1229,11 +1235,68 @@ class Sitemap_Enhancer {
 			$list = array();
 		}
 
+		$list = $this->drop_redirected_urls( $list );
+
 		if ( $use_cache ) {
 			$this->sitemap_page_cache[ $cache_key ] = $list;
 		}
 
 		return $list;
+	}
+
+	/**
+	 * Remove entries whose URL is the source of a live redirect rule.
+	 *
+	 * A redirect rule wins over the content at that path, so such a URL can
+	 * only ever answer 3xx; search engines report it as "Page with redirect"
+	 * when it is listed in a sitemap.
+	 *
+	 * @param array<int,array<string,mixed>> $url_list    Sitemap entries.
+	 * @param array<string,true>|null        $sources Normalized source paths; looked up when null.
+	 * @return array<int,array<string,mixed>>
+	 */
+	public function drop_redirected_urls( array $url_list, $sources = null ) {
+		if ( empty( $url_list ) ) {
+			return $url_list;
+		}
+
+		$redirects = null;
+
+		if ( null === $sources ) {
+			if ( ! \Saman\SEO\Helpers\module_enabled( 'redirects' ) ) {
+				return $url_list;
+			}
+
+			$redirects = \Saman\SEO\Plugin::instance()->get( 'redirects' );
+
+			if ( ! $redirects || ! method_exists( $redirects, 'get_active_source_paths' ) ) {
+				return $url_list;
+			}
+
+			$sources = $redirects->get_active_source_paths();
+		}
+
+		if ( empty( $sources ) ) {
+			return $url_list;
+		}
+
+		$kept = array();
+
+		foreach ( $url_list as $entry ) {
+			$path = isset( $entry['loc'] ) ? (string) wp_parse_url( (string) $entry['loc'], PHP_URL_PATH ) : '';
+
+			if ( $redirects ) {
+				$path = $redirects->normalize_sitemap_path( $path );
+			} else {
+				$path = '/' . trim( $path, '/' );
+			}
+
+			if ( ! isset( $sources[ $path ] ) ) {
+				$kept[] = $entry;
+			}
+		}
+
+		return $kept;
 	}
 
 	/**

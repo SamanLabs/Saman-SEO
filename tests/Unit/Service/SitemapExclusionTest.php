@@ -200,4 +200,35 @@ class SitemapExclusionTest extends TestCase {
 
 		$this->assertArrayNotHasKey( 'post__not_in', $args );
 	}
+
+	/**
+	 * Password-protected posts are served noindex, so they stay out of the sitemap.
+	 */
+	public function test_password_protected_posts_excluded(): void {
+		$args = $this->enhancer->apply_post_exclusions( array() );
+
+		$this->assertFalse( $args['has_password'] );
+
+		update_option( 'SAMAN_SEO_sitemap_exclude_noindex', '0' );
+
+		$this->assertArrayNotHasKey( 'has_password', $this->enhancer->apply_post_exclusions( array() ) );
+	}
+
+	/**
+	 * A URL that is the source of a live redirect rule is dropped.
+	 */
+	public function test_redirected_urls_dropped(): void {
+		$list = array(
+			array( 'loc' => 'https://example.org/kept/' ),
+			array( 'loc' => 'https://example.org/moved/' ),
+			array( 'loc' => 'https://example.org/' ),
+		);
+
+		$kept = $this->enhancer->drop_redirected_urls( $list, array( '/moved' => true ) );
+
+		$this->assertSame(
+			array( 'https://example.org/kept/', 'https://example.org/' ),
+			array_column( $kept, 'loc' )
+		);
+	}
 }

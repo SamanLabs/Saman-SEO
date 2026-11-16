@@ -195,7 +195,41 @@ class Video_Schema {
 			}
 		}
 
+		// Google treats name, thumbnailUrl and uploadDate as required and
+		// reports a missing description. Vimeo only supplies a thumbnail via
+		// oEmbed, which fails for private videos and on timeouts.
+		if ( empty( $schema['thumbnailUrl'] ) ) {
+			$schema['thumbnailUrl'] = $this->get_fallback_thumbnail_url( $post );
+		}
+
+		if ( '' === trim( (string) $schema['description'] ) ) {
+			$excerpt               = trim( wp_strip_all_tags( (string) $post->post_excerpt ) );
+			$schema['description'] = '' !== $excerpt ? $excerpt : $schema['name'];
+		}
+
+		// Without a thumbnail the node can only produce a critical error.
+		if ( empty( $schema['thumbnailUrl'] ) || '' === trim( (string) $schema['name'] ) ) {
+			return null;
+		}
+
 		return $schema;
+	}
+
+	/**
+	 * Thumbnail for a video whose platform did not supply one: the post's
+	 * featured image, then the site's default social image.
+	 *
+	 * @param \WP_Post $post The post object.
+	 * @return string URL, or empty string when neither exists.
+	 */
+	private function get_fallback_thumbnail_url( $post ) {
+		$thumbnail = (string) get_the_post_thumbnail_url( $post, 'full' );
+
+		if ( '' === $thumbnail ) {
+			$thumbnail = (string) get_option( 'SAMAN_SEO_default_og_image', '' );
+		}
+
+		return esc_url_raw( $thumbnail );
 	}
 
 	/**

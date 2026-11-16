@@ -184,6 +184,31 @@ class SearchConsoleTest extends TestCase {
 		);
 	}
 
+	public function test_get_auth_url_sends_the_whole_redirect_uri() {
+		// Real add_query_arg() does not encode values; the redirect URI holds
+		// an "&" that must not leak out as a separate Google parameter.
+		Functions\when( 'add_query_arg' )->alias(
+			static function ( $params, $url ) {
+				$pairs = array();
+				foreach ( $params as $key => $value ) {
+					$pairs[] = $key . '=' . $value;
+				}
+
+				return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . implode( '&', $pairs );
+			}
+		);
+
+		$service = new Search_Console();
+		$service->set_credentials( 'client-123.apps.googleusercontent.com', 'shh' );
+
+		parse_str( (string) parse_url( (string) $service->get_auth_url(), PHP_URL_QUERY ), $query );
+
+		$this->assertSame( $service->get_redirect_uri(), $query['redirect_uri'] );
+		$this->assertStringContainsString( 'saman_gsc_cb=1', $query['redirect_uri'] );
+		$this->assertArrayNotHasKey( 'saman_gsc_cb', $query );
+		$this->assertSame( Search_Console::SCOPE, $query['scope'] );
+	}
+
 	public function test_exchange_code_rejects_response_without_tokens() {
 		self::$http_response = array(
 			'body' => json_encode( array( 'error' => 'invalid_grant' ) ),
