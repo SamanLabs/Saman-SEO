@@ -124,6 +124,22 @@ class FrontendTitleTest extends TestCase {
 	}
 
 	/**
+	 * Long titles are left whole unless a site asks for a limit.
+	 */
+	public function test_long_titles_are_not_cut_by_default(): void {
+		$this->make_post(
+			array( 'post_title' => str_repeat( 'word ', 30 ) )
+		);
+		self::$options['SAMAN_SEO_post_type_title_templates'] = array();
+		unset( self::$options['SAMAN_SEO_default_title_template'] );
+
+		$title = ( new Frontend() )->filter_document_title( '' );
+
+		$this->assertStringEndsWith( 'Test Site', $title );
+		$this->assertStringNotContainsString( '...', $title );
+	}
+
+	/**
 	 * Overly long titles truncate at the filtered max length.
 	 */
 	public function test_long_titles_truncate_at_max_length(): void {
@@ -132,6 +148,9 @@ class FrontendTitleTest extends TestCase {
 		);
 		self::$options['SAMAN_SEO_post_type_title_templates'] = array();
 		unset( self::$options['SAMAN_SEO_default_title_template'] );
+		self::$hooks['saman_seo_title_max_length'][] = static function () {
+			return 60;
+		};
 
 		$frontend = new Frontend();
 		$title    = $frontend->filter_document_title( '' );

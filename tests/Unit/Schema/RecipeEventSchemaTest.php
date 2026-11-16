@@ -99,6 +99,7 @@ class RecipeEventSchemaTest extends TestCase {
 			array(
 				'event' => array(
 					'name'       => 'Normalized Event',
+					'venue_name' => 'Town Hall',
 					'start_date' => '2026-09-15T18:00:00+00:00',
 					'end_date'   => '2026-09-15T21:00:00+00:00',
 				),

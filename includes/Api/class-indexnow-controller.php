@@ -719,7 +719,7 @@ class IndexNow_Controller extends REST_Controller {
 		$failed_count  = 0;
 
 		foreach ( array_chunk( $urls, 100 ) as $batch ) {
-			$success = $service->submit_urls( $batch );
+			$success = $service->submit_urls( $batch, $post_id_map );
 			if ( $success ) {
 				$success_count += count( $batch );
 			} else {

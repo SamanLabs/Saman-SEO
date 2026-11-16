@@ -151,6 +151,13 @@ class Event_Schema extends Abstract_Schema {
 
 		// Location: virtual, physical, or both for mixed mode.
 		$locations = $this->build_locations( $event, $mode );
+
+		// A location is required for the event rich result; without one the
+		// node can only be reported as invalid.
+		if ( empty( $locations['location'] ) ) {
+			return array();
+		}
+
 		foreach ( $locations as $key => $location ) {
 			$schema[ $key ] = $location;
 		}

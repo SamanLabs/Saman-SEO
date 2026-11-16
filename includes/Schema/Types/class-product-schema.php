@@ -106,20 +106,90 @@ class Product_Schema extends Abstract_Schema {
 		$this->add_aggregate_rating( $schema, $product );
 		$this->add_reviews( $schema, $product );
 
-		// Offers - handle both simple and variable products.
-		if ( $product->is_type( 'simple' ) ) {
-			$offer = $this->build_offer( $product );
-			if ( ! empty( $offer ) ) {
-				$schema['offers'] = $offer;
+		// Offers. Variable and grouped products describe a price range; every
+		// other type (simple, external, subscription, bundle, ...) has one price.
+		if ( $product->is_type( 'variable' ) ) {
+			$offers = $this->build_aggregate_offer( $product );
+		} elseif ( $product->is_type( 'grouped' ) ) {
+			$offers = $this->build_grouped_offer( $product );
+		} else {
+			$offers = $this->build_offer( $product );
+		}
+
+		if ( ! empty( $offers ) ) {
+			$schema['offers'] = $offers;
+		}
+
+		return $this->apply_fields_filter( $this->require_product_substance( $schema ) );
+	}
+
+	/**
+	 * Drop a Product node that search engines can only report as an error.
+	 *
+	 * A Product needs at least one of offers, review or aggregateRating. A
+	 * node with none of them earns no rich result and is flagged as invalid,
+	 * so the page is better described by its WebPage node alone.
+	 *
+	 * @param array $schema Product schema.
+	 * @return array The schema, or an empty array when it has no substance.
+	 */
+	private function require_product_substance( array $schema ): array {
+		if ( empty( $schema['offers'] ) && empty( $schema['review'] ) && empty( $schema['aggregateRating'] ) ) {
+			return array();
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Whether a price value can be published: numeric and not negative.
+	 * Zero is a valid price (a free product).
+	 *
+	 * @param mixed $price Raw price.
+	 * @return bool
+	 */
+	private function is_publishable_price( $price ): bool {
+		return '' !== (string) $price && is_numeric( $price ) && (float) $price >= 0;
+	}
+
+	/**
+	 * Build AggregateOffer schema for grouped products from their children.
+	 *
+	 * @param \WC_Product $product Grouped product object.
+	 * @return array AggregateOffer schema array, empty when no child has a price.
+	 */
+	protected function build_grouped_offer( \WC_Product $product ): array {
+		$prices   = array();
+		$in_stock = false;
+
+		foreach ( (array) $product->get_children() as $child_id ) {
+			$child = function_exists( 'wc_get_product' ) ? wc_get_product( $child_id ) : null;
+
+			if ( ! $child instanceof \WC_Product ) {
+				continue;
 			}
-		} elseif ( $product->is_type( 'variable' ) ) {
-			$aggregate_offer = $this->build_aggregate_offer( $product );
-			if ( ! empty( $aggregate_offer ) ) {
-				$schema['offers'] = $aggregate_offer;
+
+			$price = $child->get_price();
+
+			if ( $this->is_publishable_price( $price ) ) {
+				$prices[] = (float) $price;
+				$in_stock = $in_stock || $child->is_in_stock();
 			}
 		}
 
-		return $this->apply_fields_filter( $schema );
+		if ( empty( $prices ) ) {
+			return array();
+		}
+
+		return array(
+			'@type'         => 'AggregateOffer',
+			'lowPrice'      => (string) min( $prices ),
+			'highPrice'     => (string) max( $prices ),
+			'priceCurrency' => get_woocommerce_currency(),
+			'url'           => $this->context->canonical,
+			'availability'  => $in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+			'offerCount'    => count( $prices ),
+		);
 	}
 
 	/**
@@ -158,7 +228,7 @@ class Product_Schema extends Abstract_Schema {
 			$currency = 'USD';
 		}
 
-		if ( '' !== $price && is_numeric( $price ) ) {
+		if ( $this->is_publishable_price( $price ) ) {
 			$schema['offers'] = array(
 				'@type'         => 'Offer',
 				'price'         => $price,
@@ -168,7 +238,7 @@ class Product_Schema extends Abstract_Schema {
 			);
 		}
 
-		return $this->apply_fields_filter( $schema );
+		return $this->apply_fields_filter( $this->require_product_substance( $schema ) );
 	}
 
 	/**
@@ -534,8 +604,8 @@ class Product_Schema extends Abstract_Schema {
 	protected function build_offer( \WC_Product $product ): array {
 		$price = $product->get_price();
 
-		// Price is required for merchant listings - skip if zero/empty.
-		if ( empty( $price ) || (float) $price <= 0 ) {
+		// A price is required; zero is a real price (a free product).
+		if ( ! $this->is_publishable_price( $price ) ) {
 			return array();
 		}
 
@@ -585,10 +655,7 @@ class Product_Schema extends Abstract_Schema {
 		$max_price = $product->get_variation_price( 'max' );
 
 		// Both prices required for valid AggregateOffer.
-		if ( empty( $min_price ) || (float) $min_price <= 0 ) {
-			return array();
-		}
-		if ( empty( $max_price ) || (float) $max_price <= 0 ) {
+		if ( ! $this->is_publishable_price( $min_price ) || ! $this->is_publishable_price( $max_price ) ) {
 			return array();
 		}
 

@@ -120,7 +120,7 @@ class Settings_Controller extends REST_Controller {
 		$settings = array();
 		foreach ( $options as $opt ) {
 			$key = str_replace( 'SAMAN_SEO_', '', $opt->option_name );
-			if ( in_array( $key, self::PRIVATE_OPTIONS, true ) ) {
+			if ( in_array( $key, self::PRIVATE_OPTIONS, true ) || 0 === strpos( $key, 'redirect_hits_' ) ) {
 				continue;
 			}
 			$settings[ $key ] = maybe_unserialize( $opt->option_value );
@@ -258,6 +258,15 @@ class Settings_Controller extends REST_Controller {
 
 		// Sync IndexNow settings to consolidated option for the service.
 		$this->sync_indexnow_settings( $sanitized );
+
+		if ( ! empty( $sanitized ) ) {
+			/**
+			 * Fires after plugin settings are saved.
+			 *
+			 * @param string[] $keys Setting keys that were written.
+			 */
+			saman_seo_do_action( 'saman_seo_settings_saved', array_keys( $sanitized ) );
+		}
 
 		$response = array( 'saved' => array_keys( $sanitized ) );
 		if ( ! empty( $rejected ) ) {
@@ -570,6 +579,8 @@ class Settings_Controller extends REST_Controller {
 		$value = $this->sanitize_setting_value( $key, $value, $allowed[ $key ] );
 
 		update_option( 'SAMAN_SEO_' . $key, $this->to_option_value( $value, $allowed[ $key ] ) );
+
+		saman_seo_do_action( 'saman_seo_settings_saved', array( $key ) );
 
 		return $this->success(
 			array(

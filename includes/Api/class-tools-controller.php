@@ -1361,7 +1361,7 @@ class Tools_Controller extends REST_Controller {
 	public function get_robots_txt( $request ) {
 		$content     = get_option( 'SAMAN_SEO_robots_txt', '' );
 		$site_url    = home_url();
-		$sitemap_url = home_url( '/sitemap.xml' );
+		$sitemap_url = home_url( '/sitemap_index.xml' );
 
 		return $this->success(
 			array(
@@ -1410,7 +1410,7 @@ class Tools_Controller extends REST_Controller {
 		delete_option( 'SAMAN_SEO_robots_txt' );
 
 		// Generate default content
-		$default = "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: " . home_url( '/sitemap.xml' );
+		$default = "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: " . home_url( '/sitemap_index.xml' );
 
 		return $this->success(
 			array(

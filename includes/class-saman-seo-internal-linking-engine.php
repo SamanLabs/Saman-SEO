@@ -528,27 +528,165 @@ class Engine {
 			return array( $content );
 		}
 
-		$pieces = preg_split( '/(<\/p>)/i', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
-		if ( empty( $pieces ) ) {
+		return self::split_at_top_level( $content, (int) ( self::CHUNK_THRESHOLD / 2 ) );
+	}
+
+	/**
+	 * Cut HTML into pieces of roughly $limit bytes, only between top-level
+	 * elements.
+	 *
+	 * Each piece is parsed and serialized on its own, and the parser closes
+	 * whatever is still open at the end of a piece. Cutting inside a wrapper
+	 * (a div, table, list or columns block that spans the cut) therefore
+	 * closed it early and dropped its real closing tag, pushing the rest of
+	 * the content out of its container. A cut is only safe where no element
+	 * is open. Content held in one big wrapper simply stays in one piece.
+	 *
+	 * @param string $content HTML.
+	 * @param int    $limit   Target piece size in bytes.
+	 * @return array<int,string>
+	 */
+	public static function split_at_top_level( $content, $limit ) {
+		$content = (string) $content;
+
+		// Raw-text elements and comments are single tokens: a "<" inside a
+		// script or pre is not markup and must not move the depth counter.
+		$tokens = preg_split(
+			'/(<!--.*?-->|<(script|style|pre|textarea)\b[^>]*>.*?<\/\2\s*>|<\/?[a-zA-Z][^>]*>)/is',
+			$content,
+			-1,
+			PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+		);
+
+		if ( ! is_array( $tokens ) || count( $tokens ) < 2 ) {
 			return array( $content );
 		}
 
-		$chunks  = array();
-		$current = '';
+		$void   = array( 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr' );
+		$raw    = array( 'script', 'style', 'pre', 'textarea' );
+		$chunks = array();
+		$piece  = '';
+		$depth  = 0;
+		$count  = count( $tokens );
 
-		foreach ( $pieces as $piece ) {
-			$current .= $piece;
-			if ( mb_strlen( $current, 'UTF-8' ) >= ( self::CHUNK_THRESHOLD / 2 ) ) {
-				$chunks[] = $current;
-				$current  = '';
+		for ( $i = 0; $i < $count; $i++ ) {
+			$token = $tokens[ $i ];
+
+			// The raw-text alternative also captures its tag name as the next
+			// token; that capture is not content.
+			if ( in_array( strtolower( $token ), $raw, true ) && $i > 0 && 0 === stripos( $tokens[ $i - 1 ], '<' . $token ) ) {
+				continue;
+			}
+
+			$piece .= $token;
+
+			if ( '<' !== $token[0] || 0 === strpos( $token, '<!--' ) ) {
+				continue;
+			}
+
+			if ( preg_match( '/^<\/([a-zA-Z][a-zA-Z0-9-]*)/', $token ) ) {
+				$depth = max( 0, $depth - 1 );
+			} elseif ( preg_match( '/^<([a-zA-Z][a-zA-Z0-9-]*)/', $token, $tag ) ) {
+				$name      = strtolower( $tag[1] );
+				$is_closed = in_array( $name, $void, true )
+					|| in_array( $name, $raw, true )
+					|| '/>' === substr( $token, -2 );
+
+				if ( ! $is_closed ) {
+					++$depth;
+					continue;
+				}
+			}
+
+			if ( 0 === $depth && strlen( $piece ) >= $limit ) {
+				$chunks[] = $piece;
+				$piece    = '';
 			}
 		}
 
-		if ( '' !== $current ) {
-			$chunks[] = $current;
+		if ( '' !== $piece ) {
+			$chunks[] = $piece;
 		}
 
-		return $chunks;
+		return empty( $chunks ) ? array( $content ) : $chunks;
+	}
+
+	/**
+	 * Map each character position of an accent-stripped string to the
+	 * position of the character it came from in the original.
+	 *
+	 * Returns null when the two strings line up one to one, which is the case
+	 * unless a character expanded into several.
+	 *
+	 * @param string $text    Original text.
+	 * @param string $subject Text after remove_accents().
+	 * @return array<int,int>|null
+	 */
+	public static function accent_position_map( $text, $subject ) {
+		if ( $text === $subject || mb_strlen( $text, 'UTF-8' ) === mb_strlen( $subject, 'UTF-8' ) ) {
+			return null;
+		}
+
+		$map   = array();
+		$chars = preg_split( '//u', (string) $text, -1, PREG_SPLIT_NO_EMPTY );
+
+		foreach ( is_array( $chars ) ? $chars : array() as $index => $char ) {
+			$width = strlen( $char ) > 1 ? max( 1, mb_strlen( remove_accents( $char ), 'UTF-8' ) ) : 1;
+
+			for ( $i = 0; $i < $width; $i++ ) {
+				$map[] = $index;
+			}
+		}
+
+		// Stripping accents character by character must rebuild $subject
+		// exactly; if it does not, positions cannot be trusted.
+		return count( $map ) === mb_strlen( $subject, 'UTF-8' ) ? $map : array();
+	}
+
+	/**
+	 * Convert an offset in the original text to one in the stripped text.
+	 *
+	 * @param array<int,int> $map    Position map.
+	 * @param int            $offset Offset in the original text.
+	 * @return int
+	 */
+	private static function subject_offset( array $map, $offset ) {
+		foreach ( $map as $subject_index => $text_index ) {
+			if ( $text_index >= $offset ) {
+				return $subject_index;
+			}
+		}
+
+		return count( $map );
+	}
+
+	/**
+	 * Convert a match in the stripped text to start and length in the original.
+	 *
+	 * @param array<int,int> $map         Position map.
+	 * @param int            $pos         Match start in the stripped text.
+	 * @param int            $length      Match length in the stripped text.
+	 * @param int            $text_length Length of the original text.
+	 * @return array{0:int,1:int}|null Null when the match splits a character.
+	 */
+	public static function original_span( array $map, $pos, $length, $text_length ) {
+		$end = $pos + $length;
+
+		if ( ! isset( $map[ $pos ] ) || $length < 1 || $end > count( $map ) ) {
+			return null;
+		}
+
+		if ( $pos > 0 && $map[ $pos - 1 ] === $map[ $pos ] ) {
+			return null;
+		}
+
+		if ( isset( $map[ $end ] ) && $map[ $end ] === $map[ $end - 1 ] ) {
+			return null;
+		}
+
+		$text_end = isset( $map[ $end ] ) ? $map[ $end ] : $text_length;
+
+		return array( $map[ $pos ], $text_end - $map[ $pos ] );
 	}
 
 	/**
@@ -674,7 +812,7 @@ class Engine {
 		$tag = strtolower( $node->nodeName );
 
 		// Skip disallowed containers entirely.
-		if ( in_array( $tag, array( 'a', 'code', 'pre', 'style', 'script' ), true ) ) {
+		if ( in_array( $tag, array( 'a', 'code', 'pre', 'style', 'script', 'textarea', 'button', 'select', 'option', 'svg', 'noscript', 'iframe' ), true ) ) {
 			return;
 		}
 
@@ -810,6 +948,14 @@ class Engine {
 		$subject_lower = mb_strtolower( $subject, $encoding );
 		$best          = null;
 
+		// Removing accents can lengthen the text ("ß" becomes "ss"), so a
+		// position found in $subject is not the same position in $text.
+		$map = self::accent_position_map( $text, $subject );
+
+		if ( null !== $map ) {
+			$start = self::subject_offset( $map, (int) $start );
+		}
+
 		foreach ( $keywords as $keyword ) {
 			$needle       = $settings['normalize_accents'] ? remove_accents( $keyword ) : $keyword;
 			$needle_lower = mb_strtolower( $needle, $encoding );
@@ -840,15 +986,29 @@ class Engine {
 					continue;
 				}
 
-				$length = mb_strlen( $keyword, $encoding );
-				if ( ! $best || $pos < $best['start'] || ( $pos === $best['start'] && $length > $best['length'] ) ) {
+				$length     = mb_strlen( $keyword, $encoding );
+				$text_start = $pos;
+
+				if ( null !== $map ) {
+					$span = self::original_span( $map, $pos, mb_strlen( $needle_lower, $encoding ), mb_strlen( $text, $encoding ) );
+
+					if ( null === $span ) {
+						// Starts or ends inside one expanded character.
+						$offset = $pos + 1;
+						continue;
+					}
+
+					list( $text_start, $length ) = $span;
+				}
+
+				if ( ! $best || $text_start < $best['start'] || ( $text_start === $best['start'] && $length > $best['length'] ) ) {
 					$best = array(
 						'keyword' => $keyword,
-						'start'   => $pos,
+						'start'   => $text_start,
 						'length'  => $length,
 					);
 
-					if ( 0 === $pos ) {
+					if ( 0 === $text_start ) {
 						break 2;
 					}
 				}

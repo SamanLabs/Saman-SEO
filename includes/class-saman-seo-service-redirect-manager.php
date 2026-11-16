@@ -71,6 +71,16 @@ class Redirect_Manager {
 		wp_cache_delete( self::CACHE_KEY_ADMIN, self::CACHE_GROUP );
 		wp_cache_delete( self::CACHE_KEY_CLI, self::CACHE_GROUP );
 		delete_option( self::RULES_CACHE_OPTION );
+
+		/**
+		 * Fires whenever the set of redirect rules changes.
+		 *
+		 * The page cache listens: a snapshot of a URL that now redirects
+		 * would otherwise keep being served ahead of the redirect.
+		 */
+		if ( function_exists( 'saman_seo_do_action' ) ) {
+			saman_seo_do_action( 'saman_seo_redirects_changed' );
+		}
 	}
 
 	/**
@@ -101,6 +111,7 @@ class Redirect_Manager {
 		}
 
 		add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
+		add_action( 'saman_seo_daily_maintenance_complete', array( $this, 'prune_daily_hits' ) );
 		add_action( 'admin_post_SAMAN_SEO_save_redirect', array( $this, 'handle_save' ) );
 		add_action( 'admin_post_SAMAN_SEO_delete_redirect', array( $this, 'handle_delete' ) );
 		add_action( 'admin_post_SAMAN_SEO_dismiss_slug', array( $this, 'handle_dismiss_slug' ) );
@@ -178,6 +189,11 @@ class Redirect_Manager {
 			return;
 		}
 
+		// The content now lives at $target. A rule left over from an earlier
+		// rename that redirects that path away would make the page
+		// unreachable, and accepting the new suggestion would close a loop.
+		$this->release_path( $target );
+
 		// Store in transient for the current user.
 		$user_id = get_current_user_id();
 		set_transient(
@@ -205,6 +221,51 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Remove exact redirect rules and pending suggestions whose source is a
+	 * path that published content has just moved onto.
+	 *
+	 * @param string $path URL path now serving content.
+	 * @return int Number of rules removed.
+	 */
+	public function release_path( $path ) {
+		global $wpdb;
+
+		$source = $this->normalize_source_path( $path );
+
+		if ( '/' === $source ) {
+			return 0;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe.
+		$removed = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$this->table} WHERE source = %s AND is_regex = 0", $source ) );
+
+		if ( $removed > 0 ) {
+			self::flush_cache();
+		}
+
+		$suggestions = get_option( 'SAMAN_SEO_monitor_slugs', array() );
+
+		if ( is_array( $suggestions ) ) {
+			$changed = false;
+
+			foreach ( $suggestions as $key => $suggestion ) {
+				$suggested = isset( $suggestion['source'] ) ? $this->normalize_source_path( $suggestion['source'] ) : '';
+
+				if ( 0 === strcasecmp( $suggested, $source ) ) {
+					unset( $suggestions[ $key ] );
+					$changed = true;
+				}
+			}
+
+			if ( $changed ) {
+				update_option( 'SAMAN_SEO_monitor_slugs', $suggestions );
+			}
+		}
+
+		return $removed;
+	}
+
+	/**
 	 * Detect when a monitored post is trashed and store a suggestion.
 	 *
 	 * @param int $post_id Post ID.
@@ -215,8 +276,11 @@ class Redirect_Manager {
 			return;
 		}
 
+		// This runs on wp_trash_post, which fires before the status changes:
+		// the post is still published and still has its real permalink. Once
+		// trashed, the slug gains a "__trashed" suffix and the old URL is gone.
 		$post = get_post( $post_id );
-		if ( ! $post || 'trash' !== $post->post_status ) {
+		if ( ! $post || 'publish' !== $post->post_status ) {
 			return;
 		}
 
@@ -350,7 +414,17 @@ class Redirect_Manager {
 			return new \WP_Error( 'redirect_exists', __( 'Redirect already exists.', 'saman-seo' ) );
 		}
 
-		$status_code = in_array( $status_code, array( 301, 302, 307, 410 ), true ) ? $status_code : 301;
+		$status_code = in_array( (int) $status_code, array( 301, 302, 307, 308, 410, 451 ), true ) ? (int) $status_code : 301;
+
+		// Matching is case-insensitive on standard database collations, so a
+		// case-only change ("/About" to "/about") redirects to itself forever.
+		if ( ! $is_regex
+			&& ! in_array( $status_code, array( 410, 451 ), true )
+			&& null === wp_parse_url( (string) $target, PHP_URL_QUERY )
+			&& 0 === strcasecmp( $this->target_path( $target ), $normalized )
+		) {
+			return new \WP_Error( 'redirect_loop', __( 'Source and target are the same URL, which would loop forever.', 'saman-seo' ) );
+		}
 
 		$data = array(
 			'source'      => $normalized,
@@ -452,7 +526,7 @@ class Redirect_Manager {
 		// Status code.
 		if ( isset( $data['status_code'] ) ) {
 			$status_code           = absint( $data['status_code'] );
-			$update['status_code'] = in_array( $status_code, array( 301, 302, 307, 410 ), true ) ? $status_code : 301;
+			$update['status_code'] = in_array( (int) $status_code, array( 301, 302, 307, 308, 410, 451 ), true ) ? (int) $status_code : 301;
 			$formats[]             = '%d';
 		}
 
@@ -628,7 +702,7 @@ class Redirect_Manager {
 		$target_path = $this->target_path( $target );
 
 		// Direct loop: source equals target.
-		if ( '' !== $target_path && $target_path === $normalized_source ) {
+		if ( '' !== $target_path && 0 === strcasecmp( $target_path, (string) $normalized_source ) ) {
 			$warnings[] = array(
 				'type'     => 'loop',
 				'severity' => 'high',
@@ -660,10 +734,10 @@ class Redirect_Manager {
 						// translators: 1: number of hops, 2: final destination.
 						__( 'Target is itself redirected (%1$d hop(s)). Redirect directly to the final destination %2$s to avoid a chain.', 'saman-seo' ),
 						$walk['hops'],
-						$walk['final']
+						$this->chain_end_label( $walk )
 					),
 					'hops'     => $walk['hops'],
-					'final'    => $walk['final'],
+					'final'    => $this->chain_end_label( $walk ),
 				);
 			}
 		}
@@ -718,9 +792,10 @@ class Redirect_Manager {
 	 * @return array{hops:int,final:string,loop:string}
 	 */
 	public function walk_chain( $target_path, array $rules_by_source, $exclude_id = 0 ) {
-		$hops    = 0;
-		$visited = array();
-		$loop_at = '';
+		$hops         = 0;
+		$visited      = array();
+		$loop_at      = '';
+		$final_target = '';
 
 		// Normalize both the cursor and the map keys so callers may supply
 		// keys with or without trailing slashes.
@@ -751,9 +826,14 @@ class Redirect_Manager {
 				break;
 			}
 
-			$next = $this->target_path( $rule->target );
+			$next         = $this->target_path( $rule->target );
+			$final_target = (string) $rule->target;
 
 			if ( '' === $next ) {
+				// Leaves the site (or is unparseable): a real hop, and the end.
+				if ( '' !== trim( $final_target ) ) {
+					++$hops;
+				}
 				break;
 			}
 
@@ -762,10 +842,26 @@ class Redirect_Manager {
 		}
 
 		return array(
-			'hops'  => $hops,
-			'final' => $current,
-			'loop'  => $loop_at,
+			'hops'         => $hops,
+			'final'        => $current,
+			'loop'         => $loop_at,
+			// The last rule's target exactly as saved: keeps its host, query
+			// string and fragment, which the normalized path does not.
+			'final_target' => $final_target,
 		);
+	}
+
+	/**
+	 * Where a walked chain ends, for display: the saved target when the chain
+	 * leaves the site, otherwise the final local path.
+	 *
+	 * @param array $walk Result of walk_chain().
+	 * @return string
+	 */
+	private function chain_end_label( array $walk ) {
+		$target = trim( (string) ( $walk['final_target'] ?? '' ) );
+
+		return ( '' !== $target && '' === $this->target_path( $target ) ) ? $target : (string) $walk['final'];
 	}
 
 	/**
@@ -797,8 +893,11 @@ class Redirect_Manager {
 			);
 		}
 
-		// Preserve scheme/host when the original target was absolute-local.
-		$new_target = $this->to_absolute_if_needed( $rule->target, $walk['final'] );
+		// Point straight at the chain's last target, as saved, so an external
+		// destination or a query string survives. Fall back to the path form.
+		$new_target = '' !== trim( (string) ( $walk['final_target'] ?? '' ) )
+			? trim( (string) $walk['final_target'] )
+			: $this->to_absolute_if_needed( $rule->target, $walk['final'] );
 
 		$result = $this->update_redirect( $id, array( 'target' => $new_target ) );
 
@@ -863,9 +962,9 @@ class Redirect_Manager {
 							// translators: %s is the final destination.
 							__( 'Chain of %1$d hop(s); final destination %2$s. Flatten to a single hop.', 'saman-seo' ),
 							$walk['hops'],
-							$walk['final']
+							$this->chain_end_label( $walk )
 						),
-						'final'    => $walk['final'],
+						'final'    => $this->chain_end_label( $walk ),
 					);
 				}
 
@@ -1004,14 +1103,22 @@ class Redirect_Manager {
 	 * @return string Normalized path, or empty string when not local/parseable.
 	 */
 	private function target_path( $target ) {
-		$path = wp_parse_url( trim( (string) $target ), PHP_URL_PATH );
+		$target = trim( (string) $target );
+		$host   = wp_parse_url( $target, PHP_URL_HOST );
+
+		// Another site's "/pricing" is not this site's "/pricing": following
+		// it as a local path reported false loops and let Flatten rewrite a
+		// rule to a local 404.
+		if ( $host && $this->canonical_host( $host ) !== $this->canonical_host( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) ) {
+			return '';
+		}
+
+		$path = wp_parse_url( $target, PHP_URL_PATH );
 
 		// Plain relative paths parse without a host; parse_url returns the
 		// string itself for "path" inputs. Missing path on an absolute URL
 		// means the site root.
 		if ( null === $path ) {
-			$host = wp_parse_url( trim( (string) $target ), PHP_URL_HOST );
-
 			return $host ? '/' : '';
 		}
 
@@ -2172,6 +2279,8 @@ class Redirect_Manager {
 					(int) $redirect['id']
 				)
 			);
+
+			$this->record_daily_hit();
 		}
 
 		// Bail if output has already started.
@@ -2236,6 +2345,81 @@ class Redirect_Manager {
 
 		wp_safe_redirect( $target, $status_code );
 		exit;
+	}
+
+	/**
+	 * Option name prefix for the per-day hit counters (suffix: site-local Ymd).
+	 *
+	 * @var string
+	 */
+	public const DAILY_HITS_PREFIX = 'SAMAN_SEO_redirect_hits_';
+
+	/**
+	 * Count one redirect hit against today.
+	 *
+	 * The rule's own `hits` column is a lifetime total, so "hits this week"
+	 * cannot be derived from it. One row per day is kept instead, bumped with
+	 * a single atomic statement so concurrent hits are never lost and no
+	 * option is read, cached or autoloaded on the front end.
+	 *
+	 * @return void
+	 */
+	private function record_daily_hit() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Atomic counter; the options API would be a read-modify-write.
+		$wpdb->query(
+			$wpdb->prepare(
+				"INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, '1', 'no') ON DUPLICATE KEY UPDATE option_value = option_value + 1",
+				self::DAILY_HITS_PREFIX . current_time( 'Ymd' )
+			)
+		);
+	}
+
+	/**
+	 * Redirect hits over the trailing $days days, today included.
+	 *
+	 * Counting starts when this counter was introduced, so the first week
+	 * after an update reports only the days recorded so far.
+	 *
+	 * @param int $days Number of days, 1 for today only.
+	 * @return int
+	 */
+	public function get_hits_for_days( $days ) {
+		global $wpdb;
+
+		$days  = max( 1, min( 60, (int) $days ) );
+		$names = array();
+		$now   = (int) current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Site-local day boundaries, matching how hits are keyed.
+
+		for ( $i = 0; $i < $days; $i++ ) {
+			$names[] = self::DAILY_HITS_PREFIX . gmdate( 'Ymd', $now - $i * DAY_IN_SECONDS );
+		}
+
+		$placeholders = implode( ', ', array_fill( 0, count( $names ), '%s' ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders generated above; read straight from the table the counter writes to.
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COALESCE(SUM(option_value), 0) FROM {$wpdb->options} WHERE option_name IN ({$placeholders})", $names ) );
+	}
+
+	/**
+	 * Drop per-day hit counters older than 60 days.
+	 *
+	 * @return void
+	 */
+	public function prune_daily_hits() {
+		global $wpdb;
+
+		$oldest = self::DAILY_HITS_PREFIX . gmdate( 'Ymd', (int) current_time( 'timestamp' ) - 60 * DAY_IN_SECONDS ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Site-local day keys.
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk cleanup of the plugin's own counter rows.
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s AND option_name < %s",
+				$wpdb->esc_like( self::DAILY_HITS_PREFIX ) . '%',
+				$oldest
+			)
+		);
 	}
 
 	/**

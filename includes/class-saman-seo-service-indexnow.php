@@ -142,7 +142,8 @@ class IndexNow {
 			flush_rewrite_rules();
 		}
 
-		return $result;
+		// update_option() returns false when nothing changed, which is not a failure.
+		return $result || get_option( 'SAMAN_SEO_indexnow_settings' ) === $sanitized;
 	}
 
 	/**
@@ -419,7 +420,10 @@ class IndexNow {
 
 		// Log each URL.
 		foreach ( $urls as $url ) {
-			$this->log_submission( $url, $post_id, $status, $response_code, $response_message, $search_engine );
+			// $post_id may be one ID for the whole call, or a URL => ID map.
+			$url_post_id = is_array( $post_id ) ? ( $post_id[ $url ] ?? null ) : $post_id;
+
+			$this->log_submission( $url, $url_post_id, $status, $response_code, $response_message, $search_engine );
 		}
 
 		saman_seo_do_action( 'saman_seo_indexnow_submitted', $urls, $success, $response_code );

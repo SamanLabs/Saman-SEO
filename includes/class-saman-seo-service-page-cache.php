@@ -140,7 +140,13 @@ class Page_Cache {
 			add_action( 'transition_comment_status', array( $this, 'purge_comment_cache' ), 20, 2 );
 			add_action( 'comment_post', array( $this, 'purge_new_comment_cache' ), 20, 2 );
 		}
-		add_action( 'switch_theme', array( $this, 'purge_all' ) );
+		// Changes that alter every page: each snapshot carries the old menu,
+		// widgets, theme settings, URL structure or SEO tags until it expires.
+		// A changed redirect rule is in the list because the early drop-in
+		// would answer with the old page before the redirect can run.
+		foreach ( array( 'switch_theme', 'wp_update_nav_menu', 'wp_delete_nav_menu', 'customize_save_after', 'update_option_sidebars_widgets', 'permalink_structure_changed', 'saman_seo_redirects_changed', 'saman_seo_settings_saved' ) as $site_wide_change ) {
+			add_action( $site_wide_change, array( $this, 'purge_all_on_change' ) );
+		}
 
 		// Ride the shared daily janitor for expiry cleanup.
 		add_action( 'saman_seo_daily_maintenance_complete', array( $this, 'gc' ) );
@@ -1138,6 +1144,29 @@ PHP;
 				$this->purge_url( $permalink );
 			}
 		}
+	}
+
+	/**
+	 * Whether a site-wide change already purged the cache in this request.
+	 *
+	 * @var bool
+	 */
+	private $purged_for_change = false;
+
+	/**
+	 * Hook callback for site-wide changes: purge everything, ignoring the
+	 * hook's own arguments.
+	 *
+	 * @return void
+	 */
+	public function purge_all_on_change() {
+		// A bulk import fires the same hook once per row.
+		if ( $this->purged_for_change || ! $this->is_enabled() ) {
+			return;
+		}
+
+		$this->purged_for_change = true;
+		$this->purge_all();
 	}
 
 	/**
