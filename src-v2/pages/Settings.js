@@ -27,8 +27,10 @@ import {
 } from '../components/Icons';
 import { FacebookPreview, TwitterPreview } from '../components/SocialPreview';
 import useUrlTab from '../hooks/useUrlTab';
+import WeeklyDigestCard from '../components/WeeklyDigestCard';
 import { analytics } from '../utils/analytics';
 import { __ } from '@wordpress/i18n';
+import { alertDialog, confirmDialog, toast } from '../components/Dialogs';
 const settingsTabs = [
 	{
 		id: 'general',
@@ -45,6 +47,10 @@ const settingsTabs = [
 	{
 		id: 'social',
 		label: __( 'Social', 'saman-seo' ),
+	},
+	{
+		id: 'reports',
+		label: __( 'Email reports', 'saman-seo' ),
 	},
 	{
 		id: 'advanced',
@@ -254,9 +260,9 @@ const Settings = () => {
 	const openMediaLibrary = ( settingKey ) => {
 		if ( window.wp && window.wp.media ) {
 			const frame = window.wp.media( {
-				title: __( 'Select Image', 'saman-seo' ),
+				title: __( 'Select image', 'saman-seo' ),
 				button: {
-					text: __( 'Use Image', 'saman-seo' ),
+					text: __( 'Use image', 'saman-seo' ),
 				},
 				multiple: false,
 			} );
@@ -302,20 +308,21 @@ const Settings = () => {
 				setSaved( false );
 				setImportFile( null );
 			} catch ( error ) {
-				alert( __( 'Invalid JSON file', 'saman-seo' ) );
+				toast( __( 'Invalid JSON file', 'saman-seo' ), 'error' );
 			}
 		};
 		reader.readAsText( importFile );
 	};
 
 	// Reset to defaults
-	const handleReset = () => {
+	const handleReset = async () => {
 		if (
-			window.confirm(
+			await confirmDialog(
 				__(
 					'Are you sure you want to reset all settings to defaults? This cannot be undone.',
 					'saman-seo'
-				)
+				),
+				{ confirmLabel: __( 'Reset', 'saman-seo' ), danger: true }
 			)
 		) {
 			setSettings( defaultSettings );
@@ -331,7 +338,7 @@ const Settings = () => {
 				path: '/saman-seo/v1/setup/reset',
 				method: 'POST',
 			} );
-			alert(
+			toast(
 				__(
 					'Setup wizard has been reset. It will appear on the next page load.',
 					'saman-seo'
@@ -339,7 +346,7 @@ const Settings = () => {
 			);
 		} catch ( error ) {
 			console.error( 'Failed to reset wizard:', error );
-			alert( __( 'Failed to reset the setup wizard.', 'saman-seo' ) );
+			toast( __( 'Failed to reset the setup wizard.', 'saman-seo' ), 'error' );
 		} finally {
 			setResettingWizard( false );
 		}
@@ -379,13 +386,13 @@ const Settings = () => {
 					>
 						{ saving
 							? __( 'Saving\u2026', 'saman-seo' )
-							: __( 'Save Changes', 'saman-seo' ) }
+							: __( 'Save changes', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 
 			{ pageError && (
-				<div className="notice notice-error" role="alert">
+				<div className="notice-message error" role="alert">
 					<p>{ pageError }</p>
 				</div>
 			) }
@@ -424,6 +431,12 @@ const Settings = () => {
 					settings={ settings }
 					updateSetting={ updateSetting }
 				/>
+			) }
+
+			{ activeTab === 'reports' && (
+				<div className="settings-reports">
+					<WeeklyDigestCard />
+				</div>
 			) }
 
 			{ activeTab === 'advanced' && (
@@ -487,7 +500,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 		<div className="settings-layout">
 			<div className="settings-main">
 				<section className="panel">
-					<h3>{ __( 'Title Separator', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Title separator', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Character used between title parts across your site (e.g., "Page Title | Site Name").',
@@ -533,7 +546,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 
 					<div className="settings-info-box">
 						<strong>
-							{ __( 'Site Name & Tagline', 'saman-seo' ) }
+							{ __( 'Site name & tagline', 'saman-seo' ) }
 						</strong>
 						<p>
 							{ __(
@@ -562,7 +575,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 					<div className="settings-row">
 						<div className="settings-label">
 							<label>
-								{ __( 'Site Represents', 'saman-seo' ) }
+								{ __( 'Site represents', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -619,7 +632,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 								<div className="settings-label">
 									<label htmlFor="org-name">
 										{ __(
-											'Organization Name',
+											'Organization name',
 											'saman-seo'
 										) }
 									</label>
@@ -689,7 +702,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 												}
 											>
 												{ __(
-													'Select Logo',
+													'Select logo',
 													'saman-seo'
 												) }
 											</button>
@@ -729,7 +742,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="person-name">
-										{ __( 'Person Name', 'saman-seo' ) }
+										{ __( 'Person name', 'saman-seo' ) }
 									</label>
 								</div>
 								<div className="settings-control">
@@ -797,7 +810,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 												}
 											>
 												{ __(
-													'Select Photo',
+													'Select photo',
 													'saman-seo'
 												) }
 											</button>
@@ -808,7 +821,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="person-job">
-										{ __( 'Job Title', 'saman-seo' ) }
+										{ __( 'Job title', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -870,7 +883,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="social-profiles">
-										{ __( 'Social Profiles', 'saman-seo' ) }
+										{ __( 'Social profiles', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -905,7 +918,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 
 				<section className="panel">
 					<h3>
-						{ __( 'Webmaster Tools Verification', 'saman-seo' ) }
+						{ __( 'Webmaster Tools verification', 'saman-seo' ) }
 					</h3>
 					<p className="panel-desc">
 						{ __(
@@ -1019,7 +1032,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 				</section>
 
 				<section className="panel">
-					<h3>{ __( 'Editor Sidebar', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Editor sidebar', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Customize how Saman SEO appears in the block editor.',
@@ -1030,7 +1043,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 					<div className="settings-row">
 						<div className="settings-label">
 							<label htmlFor="sidebar-logo">
-								{ __( 'Custom Logo', 'saman-seo' ) }
+								{ __( 'Custom logo', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -1075,7 +1088,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 
 					<div className="settings-info-box">
 						<strong>
-							{ __( 'Default Appearance', 'saman-seo' ) }
+							{ __( 'Default appearance', 'saman-seo' ) }
 						</strong>
 						<p>
 							{ __(
@@ -1089,12 +1102,12 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 
 			<aside className="settings-sidebar">
 				<div className="side-card highlight">
-					<h4>{ __( 'Title Preview', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Title preview', 'saman-seo' ) }</h4>
 					<div className="title-preview">
 						<span className="title-preview__text">
-							{ __( 'Page Title', 'saman-seo' ) }{ ' ' }
+							{ __( 'Page title', 'saman-seo' ) }{ ' ' }
 							{ settings.separator }{ ' ' }
-							{ __( 'Site Name', 'saman-seo' ) }
+							{ __( 'Site name', 'saman-seo' ) }
 						</span>
 					</div>
 					<p className="muted-block">
@@ -1114,7 +1127,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 	const modules = [
 		{
 			key: 'module_sitemap',
-			name: __( 'XML Sitemap', 'saman-seo' ),
+			name: __( 'XML sitemap', 'saman-seo' ),
 			desc: __(
 				'Generate and manage XML sitemaps for search engines.',
 				'saman-seo'
@@ -1132,7 +1145,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_404_log',
-			name: __( '404 Error Log', 'saman-seo' ),
+			name: __( '404 error log', 'saman-seo' ),
 			desc: __(
 				'Track and monitor 404 errors on your site.',
 				'saman-seo'
@@ -1141,7 +1154,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_internal_links',
-			name: __( 'Internal Linking', 'saman-seo' ),
+			name: __( 'Internal linking', 'saman-seo' ),
 			desc: __(
 				'Automatic internal link suggestions and management.',
 				'saman-seo'
@@ -1150,7 +1163,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema',
-			name: __( 'Schema Markup', 'saman-seo' ),
+			name: __( 'Schema markup', 'saman-seo' ),
 			desc: __(
 				'Master switch for all structured data output.',
 				'saman-seo'
@@ -1159,7 +1172,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema_video',
-			name: __( 'Video Schema', 'saman-seo' ),
+			name: __( 'Video schema', 'saman-seo' ),
 			desc: __(
 				'VideoObject schema for embedded YouTube/Vimeo videos.',
 				'saman-seo'
@@ -1168,13 +1181,13 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema_course',
-			name: __( 'Course Schema', 'saman-seo' ),
+			name: __( 'Course schema', 'saman-seo' ),
 			desc: __( 'Course schema for the course post type.', 'saman-seo' ),
 			icon: <IconGraduationCap />,
 		},
 		{
 			key: 'module_schema_software',
-			name: __( 'Software Schema', 'saman-seo' ),
+			name: __( 'Software schema', 'saman-seo' ),
 			desc: __(
 				'SoftwareApplication schema for the software post type.',
 				'saman-seo'
@@ -1183,13 +1196,13 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema_book',
-			name: __( 'Book Schema', 'saman-seo' ),
+			name: __( 'Book schema', 'saman-seo' ),
 			desc: __( 'Book schema for the book post type.', 'saman-seo' ),
 			icon: <IconBookOpen />,
 		},
 		{
 			key: 'module_schema_music',
-			name: __( 'Music Schema', 'saman-seo' ),
+			name: __( 'Music schema', 'saman-seo' ),
 			desc: __(
 				'MusicGroup schema for the music post type.',
 				'saman-seo'
@@ -1198,13 +1211,13 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema_movie',
-			name: __( 'Movie Schema', 'saman-seo' ),
+			name: __( 'Movie schema', 'saman-seo' ),
 			desc: __( 'Movie schema for the movie post type.', 'saman-seo' ),
 			icon: <IconFilm />,
 		},
 		{
 			key: 'module_schema_restaurant',
-			name: __( 'Restaurant Schema', 'saman-seo' ),
+			name: __( 'Restaurant schema', 'saman-seo' ),
 			desc: __(
 				'Restaurant schema for the restaurant post type.',
 				'saman-seo'
@@ -1213,7 +1226,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema_service',
-			name: __( 'Service Schema', 'saman-seo' ),
+			name: __( 'Service schema', 'saman-seo' ),
 			desc: __(
 				'Service schema for the service post type.',
 				'saman-seo'
@@ -1222,7 +1235,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_schema_job_posting',
-			name: __( 'Job Posting Schema', 'saman-seo' ),
+			name: __( 'Job posting schema', 'saman-seo' ),
 			desc: __(
 				'JobPosting schema for the job posting post type.',
 				'saman-seo'
@@ -1231,7 +1244,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_social_cards',
-			name: __( 'Social Cards', 'saman-seo' ),
+			name: __( 'Social cards', 'saman-seo' ),
 			desc: __(
 				'Dynamic Open Graph and Twitter Card generation.',
 				'saman-seo'
@@ -1264,7 +1277,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			key: 'module_ai_assistant',
-			name: __( 'AI Assistant', 'saman-seo' ),
+			name: __( 'AI assistant', 'saman-seo' ),
 			desc: __(
 				'AI-powered content optimization suggestions.',
 				'saman-seo'
@@ -1318,7 +1331,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 				<section className="panel">
 					<div className="panel-header">
 						<div>
-							<h3>{ __( 'Feature Modules', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Feature modules', 'saman-seo' ) }</h3>
 							<p className="panel-desc">
 								{ __(
 									'Enable or disable plugin features. Disabled modules are completely unloaded for performance.',
@@ -1368,7 +1381,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 
 			<aside className="settings-sidebar">
 				<div className="side-card">
-					<h4>{ __( 'Performance Tip', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Performance tip', 'saman-seo' ) }</h4>
 					<p className="muted">
 						{ __(
 							"Disable modules you don't use to reduce database queries and improve page load times.",
@@ -1445,7 +1458,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 		},
 		{
 			value: 'none',
-			label: __( 'No Styling', 'saman-seo' ),
+			label: __( 'No styling', 'saman-seo' ),
 			desc: __( 'Unstyled for custom CSS', 'saman-seo' ),
 		},
 	];
@@ -1458,7 +1471,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 					<div className="panel-header">
 						<div>
 							<h3>
-								{ __( 'Breadcrumbs Navigation', 'saman-seo' ) }
+								{ __( 'Breadcrumbs navigation', 'saman-seo' ) }
 							</h3>
 							<p className="panel-desc">
 								{ __(
@@ -1483,7 +1496,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 					</div>
 
 					{ ! isEnabled && (
-						<div className="notice notice-info">
+						<div className="notice-message info">
 							<p>
 								{ __(
 									'Enable breadcrumbs to configure settings below.',
@@ -1498,7 +1511,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 					<>
 						{ /* Display Settings */ }
 						<section className="panel">
-							<h3>{ __( 'Display Settings', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Display settings', 'saman-seo' ) }</h3>
 							<p className="panel-desc">
 								{ __(
 									'Configure how breadcrumbs appear on your site.',
@@ -1546,7 +1559,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 									<div className="settings-label">
 										<label htmlFor="breadcrumb-separator-custom">
 											{ __(
-												'Custom Separator',
+												'Custom separator',
 												'saman-seo'
 											) }
 										</label>
@@ -1582,7 +1595,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="breadcrumb-style">
-										{ __( 'Style Preset', 'saman-seo' ) }
+										{ __( 'Style preset', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1619,7 +1632,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="breadcrumb-truncate">
-										{ __( 'Truncate Length', 'saman-seo' ) }
+										{ __( 'Truncate length', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1653,7 +1666,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 
 						{ /* Home Link Settings */ }
 						<section className="panel">
-							<h3>{ __( 'Home Link', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Home link', 'saman-seo' ) }</h3>
 							<p className="panel-desc">
 								{ __(
 									'Configure the home link in breadcrumbs.',
@@ -1664,7 +1677,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="breadcrumb-show-home">
-										{ __( 'Show Home Link', 'saman-seo' ) }
+										{ __( 'Show home link', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1697,7 +1710,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 								<div className="settings-row">
 									<div className="settings-label">
 										<label htmlFor="breadcrumb-home-label">
-											{ __( 'Home Label', 'saman-seo' ) }
+											{ __( 'Home label', 'saman-seo' ) }
 										</label>
 										<p className="settings-help">
 											{ __(
@@ -1731,7 +1744,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 
 						{ /* Current Page Settings */ }
 						<section className="panel">
-							<h3>{ __( 'Current Page', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Current page', 'saman-seo' ) }</h3>
 							<p className="panel-desc">
 								{ __(
 									'Configure how the current page appears in breadcrumbs.',
@@ -1743,7 +1756,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 								<div className="settings-label">
 									<label htmlFor="breadcrumb-show-current">
 										{ __(
-											'Show Current Page',
+											'Show current page',
 											'saman-seo'
 										) }
 									</label>
@@ -1778,7 +1791,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 								<div className="settings-label">
 									<label htmlFor="breadcrumb-link-current">
 										{ __(
-											'Link Current Page',
+											'Link current page',
 											'saman-seo'
 										) }
 									</label>
@@ -1813,7 +1826,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 								<div className="settings-label">
 									<label htmlFor="breadcrumb-show-front">
 										{ __(
-											'Show on Front Page',
+											'Show on front page',
 											'saman-seo'
 										) }
 									</label>
@@ -1865,7 +1878,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 				</div>
 
 				<div className="side-card">
-					<h4>{ __( 'Gutenberg Block', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Gutenberg block', 'saman-seo' ) }</h4>
 					<p className="muted">
 						{ __(
 							'Search for "Saman SEO Breadcrumbs" in the block inserter to add breadcrumbs to any page.',
@@ -1875,7 +1888,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 				</div>
 
 				<div className="side-card success">
-					<h4>{ __( 'Schema Markup', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Schema markup', 'saman-seo' ) }</h4>
 					<p className="muted">
 						{ __(
 							'BreadcrumbList JSON-LD schema is automatically added when breadcrumbs are enabled.',
@@ -1891,7 +1904,7 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 // Social Tab
 const SocialTab = ( { settings, updateSetting } ) => {
 	const [ siteInfo, setSiteInfo ] = useState( {
-		name: __( 'Your Site Name', 'saman-seo' ),
+		name: __( 'Your site name', 'saman-seo' ),
 		description: __( 'Your site description', 'saman-seo' ),
 		domain: 'yoursite.com',
 	} );
@@ -1914,7 +1927,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 		<div className="settings-layout">
 			<div className="settings-main">
 				<section className="panel">
-					<h3>{ __( 'Open Graph Defaults', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Open Graph defaults', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Default settings for Facebook and other social platforms.',
@@ -1925,7 +1938,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row">
 						<div className="settings-label">
 							<label>
-								{ __( 'Default Share Image', 'saman-seo' ) }
+								{ __( 'Default share image', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -1973,12 +1986,12 @@ const SocialTab = ( { settings, updateSetting } ) => {
 									onClick={ () => {
 										const frame = wp.media( {
 											title: __(
-												'Select Default Share Image',
+												'Select default share image',
 												'saman-seo'
 											),
 											button: {
 												text: __(
-													'Use Image',
+													'Use image',
 													'saman-seo'
 												),
 											},
@@ -2002,8 +2015,8 @@ const SocialTab = ( { settings, updateSetting } ) => {
 									} }
 								>
 									{ settings.default_og_image
-										? __( 'Change Image', 'saman-seo' )
-										: __( 'Select Image', 'saman-seo' ) }
+										? __( 'Change image', 'saman-seo' )
+										: __( 'Select image', 'saman-seo' ) }
 								</button>
 							</div>
 						</div>
@@ -2012,7 +2025,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row">
 						<div className="settings-label">
 							<label htmlFor="fb-app-id">
-								{ __( 'Facebook App ID', 'saman-seo' ) }
+								{ __( 'Facebook app ID', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __( 'For Facebook Insights.', 'saman-seo' ) }
@@ -2037,7 +2050,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row">
 						<div className="settings-label">
 							<label htmlFor="fb-admin-id">
-								{ __( 'Facebook Admin ID', 'saman-seo' ) }
+								{ __( 'Facebook admin ID', 'saman-seo' ) }
 							</label>
 						</div>
 						<div className="settings-control">
@@ -2058,7 +2071,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 				</section>
 
 				<section className="panel">
-					<h3>{ __( 'Twitter/X Settings', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Twitter/X settings', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Configure Twitter Card appearance.',
@@ -2068,7 +2081,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 
 					<div className="settings-row">
 						<div className="settings-label">
-							<label>{ __( 'Card Type', 'saman-seo' ) }</label>
+							<label>{ __( 'Card type', 'saman-seo' ) }</label>
 							<p className="settings-help">
 								{ __(
 									'How your content appears on Twitter.',
@@ -2113,7 +2126,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 										}
 									/>
 									<span>
-										{ __( 'Large Image', 'saman-seo' ) }
+										{ __( 'Large image', 'saman-seo' ) }
 									</span>
 								</label>
 							</div>
@@ -2123,7 +2136,7 @@ const SocialTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row">
 						<div className="settings-label">
 							<label htmlFor="twitter-username">
-								{ __( 'Twitter Username', 'saman-seo' ) }
+								{ __( 'Twitter username', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2221,7 +2234,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 			<div className="settings-row compact">
 				<div className="settings-label">
 					<label>
-						{ __( 'Case Insensitive Matches', 'saman-seo' ) }
+						{ __( 'Case insensitive matches', 'saman-seo' ) }
 					</label>
 					<p className="settings-help">
 						{ __(
@@ -2250,7 +2263,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 			<div className="settings-row compact">
 				<div className="settings-label">
 					<label>
-						{ __( 'Ignore Trailing Slashes', 'saman-seo' ) }
+						{ __( 'Ignore trailing slashes', 'saman-seo' ) }
 					</label>
 					<p className="settings-help">
 						{ __(
@@ -2281,7 +2294,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 			<div className="settings-row compact">
 				<div className="settings-label">
 					<label>
-						{ __( 'Default Query Matching', 'saman-seo' ) }
+						{ __( 'Default query matching', 'saman-seo' ) }
 					</label>
 					<p className="settings-help">
 						{ __(
@@ -2356,7 +2369,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 			<div className="settings-row compact">
 				<div className="settings-label">
 					<label>
-						{ __( 'Cache Redirects in Object Cache', 'saman-seo' ) }
+						{ __( 'Cache redirects in object cache', 'saman-seo' ) }
 					</label>
 					<p className="settings-help">
 						{ __(
@@ -2418,7 +2431,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 
 			<div className="settings-row compact">
 				<div className="settings-label">
-					<label>{ __( 'Monitor URL Changes', 'saman-seo' ) }</label>
+					<label>{ __( 'Monitor URL changes', 'saman-seo' ) }</label>
 					<p className="settings-help">
 						{ __(
 							'Automatically suggest redirects when URLs change for these content types.',
@@ -2450,7 +2463,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 			<div className="settings-row compact">
 				<div className="settings-label">
 					<label>
-						{ __( 'Monitor Trashed Content', 'saman-seo' ) }
+						{ __( 'Monitor trashed content', 'saman-seo' ) }
 					</label>
 					<p className="settings-help">
 						{ __(
@@ -2490,7 +2503,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 				/>
 
 				<section className="panel">
-					<h3>{ __( 'User Interface', 'saman-seo' ) }</h3>
+					<h3>{ __( 'User interface', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Customize how Saman SEO appears in your WordPress admin.',
@@ -2501,7 +2514,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Admin Bar Menu', 'saman-seo' ) }
+								{ __( 'Admin bar menu', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2529,7 +2542,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 				</section>
 
 				<section className="panel">
-					<h3>{ __( 'WordPress Head Cleanup', 'saman-seo' ) }</h3>
+					<h3>{ __( 'WordPress head cleanup', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							"Remove unnecessary tags from your site's <head> section.",
@@ -2541,7 +2554,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Remove Shortlinks', 'saman-seo' ) }
+									{ __( 'Remove shortlinks', 'saman-seo' ) }
 								</label>
 							</div>
 							<div className="settings-control">
@@ -2564,7 +2577,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Remove RSD Link', 'saman-seo' ) }
+									{ __( 'Remove RSD link', 'saman-seo' ) }
 								</label>
 							</div>
 							<div className="settings-control">
@@ -2587,7 +2600,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Remove WLW Manifest', 'saman-seo' ) }
+									{ __( 'Remove WLW manifest', 'saman-seo' ) }
 								</label>
 							</div>
 							<div className="settings-control">
@@ -2610,7 +2623,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Remove WP Generator', 'saman-seo' ) }
+									{ __( 'Remove WP generator', 'saman-seo' ) }
 								</label>
 							</div>
 							<div className="settings-control">
@@ -2633,7 +2646,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Remove Feed Links', 'saman-seo' ) }
+									{ __( 'Remove feed links', 'saman-seo' ) }
 								</label>
 							</div>
 							<div className="settings-control">
@@ -2657,7 +2670,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 							<div className="settings-label">
 								<label>
 									{ __(
-										'Disable Emoji Scripts',
+										'Disable emoji scripts',
 										'saman-seo'
 									) }
 								</label>
@@ -2682,7 +2695,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 				</section>
 
 				<section className="panel">
-					<h3>{ __( 'Content Analysis', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Content analysis', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Features for content optimization in the editor.',
@@ -2693,7 +2706,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Link Suggestions', 'saman-seo' ) }
+								{ __( 'Link suggestions', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2722,7 +2735,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Internal Link Counter', 'saman-seo' ) }
+								{ __( 'Internal link counter', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2753,7 +2766,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Cornerstone Content', 'saman-seo' ) }
+								{ __( 'Cornerstone content', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2791,7 +2804,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Cache Schema Output', 'saman-seo' ) }
+								{ __( 'Cache schema output', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2820,7 +2833,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Minify Schema', 'saman-seo' ) }
+								{ __( 'Minify schema', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __( 'Minify JSON-LD output.', 'saman-seo' ) }
@@ -2846,7 +2859,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Purge Cache on Save', 'saman-seo' ) }
+								{ __( 'Purge cache on save', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -2875,7 +2888,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 
 				{ settings.module_indexnow && (
 					<section className="panel">
-						<h3>{ __( 'IndexNow Settings', 'saman-seo' ) }</h3>
+						<h3>{ __( 'IndexNow settings', 'saman-seo' ) }</h3>
 						<p className="panel-desc">
 							{ __(
 								'Configure instant URL submission to search engines.',
@@ -2886,7 +2899,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Submit on Publish', 'saman-seo' ) }
+									{ __( 'Submit on publish', 'saman-seo' ) }
 								</label>
 								<p className="settings-help">
 									{ __(
@@ -2917,7 +2930,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Submit on Update', 'saman-seo' ) }
+									{ __( 'Submit on update', 'saman-seo' ) }
 								</label>
 								<p className="settings-help">
 									{ __(
@@ -2956,10 +2969,10 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					</section>
 				) }
 
-				<section className="panel panel--deprecated">
+				<section className="panel">
 					<h3>
-						{ __( 'API Keys', 'saman-seo' ) }{ ' ' }
-						<span className="deprecated-badge">
+						{ __( 'API keys', 'saman-seo' ) }{ ' ' }
+						<span className="pill warning">
 							{ __( 'Deprecated', 'saman-seo' ) }
 						</span>
 					</h3>
@@ -2970,7 +2983,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						) }
 					</p>
 
-					<div className="deprecation-notice deprecation-notice--block">
+					<div className="deprecation-notice">
 						<div className="deprecation-notice__icon">
 							<svg
 								width="24"
@@ -2986,7 +2999,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="deprecation-notice__content">
 							<h4>
 								{ __(
-									'AI Features Now Powered by WP AI Pilot',
+									'AI features now powered by WP AI Pilot',
 									'saman-seo'
 								) }
 							</h4>
@@ -3030,7 +3043,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="openai-key">
-										{ __( 'OpenAI API Key', 'saman-seo' ) }
+										{ __( 'OpenAI API key', 'saman-seo' ) }
 									</label>
 								</div>
 								<div className="settings-control">
@@ -3053,7 +3066,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 							<div className="settings-row">
 								<div className="settings-label">
 									<label htmlFor="google-key">
-										{ __( 'Google API Key', 'saman-seo' ) }
+										{ __( 'Google API key', 'saman-seo' ) }
 									</label>
 								</div>
 								<div className="settings-control">
@@ -3089,7 +3102,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Dashboard Widget', 'saman-seo' ) }
+								{ __( 'Dashboard widget', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -3179,7 +3192,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Email Notifications', 'saman-seo' ) }
+								{ __( 'Email notifications', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -3212,7 +3225,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 							<div className="settings-row compact">
 								<div className="settings-label">
 									<label>
-										{ __( 'Hit Threshold', 'saman-seo' ) }
+										{ __( 'Hit threshold', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -3248,7 +3261,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 								<div className="settings-label">
 									<label>
 										{ __(
-											'Notification Email',
+											'Notification email',
 											'saman-seo'
 										) }
 									</label>
@@ -3286,7 +3299,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Log IP Address', 'saman-seo' ) }
+								{ __( 'Log IP address', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -3325,7 +3338,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label htmlFor="404-ip-header">
-									{ __( 'IP Address Header', 'saman-seo' ) }
+									{ __( 'IP address header', 'saman-seo' ) }
 								</label>
 								<p className="settings-help">
 									{ __(
@@ -3361,7 +3374,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Log HTTP Referer', 'saman-seo' ) }
+								{ __( 'Log HTTP referer', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -3390,7 +3403,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					<div className="settings-row compact">
 						<div className="settings-label">
 							<label>
-								{ __( 'Ignore Bot Requests', 'saman-seo' ) }
+								{ __( 'Ignore bot requests', 'saman-seo' ) }
 							</label>
 							<p className="settings-help">
 								{ __(
@@ -3459,7 +3472,7 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 
 					<div className="settings-row compact">
 						<div className="settings-label">
-							<label>{ __( 'Debug Mode', 'saman-seo' ) }</label>
+							<label>{ __( 'Debug mode', 'saman-seo' ) }</label>
 							<p className="settings-help">
 								{ __(
 									'Enable verbose logging and debug output.',
@@ -3517,11 +3530,12 @@ const ToolsTab = ( {
 	const [ deletingData, setDeletingData ] = useState( false );
 	const handleDeleteAllData = async () => {
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				__(
 					'Are you sure you want to delete all Saman SEO data? This will remove redirects, 404 logs, settings, and post meta. This cannot be undone.',
 					'saman-seo'
-				)
+				),
+				{ confirmLabel: __( 'Delete', 'saman-seo' ), danger: true }
 			)
 		) {
 			return;
@@ -3532,7 +3546,7 @@ const ToolsTab = ( {
 				path: '/saman-seo/v1/tools/delete-all-data',
 				method: 'POST',
 			} );
-			alert(
+			await alertDialog(
 				__(
 					'All plugin data has been deleted. The page will reload.',
 					'saman-seo'
@@ -3541,7 +3555,7 @@ const ToolsTab = ( {
 			window.location.reload();
 		} catch ( error ) {
 			console.error( 'Failed to delete data:', error );
-			alert( __( 'Failed to delete plugin data.', 'saman-seo' ) );
+			toast( __( 'Failed to delete plugin data.', 'saman-seo' ), 'error' );
 		} finally {
 			setDeletingData( false );
 		}
@@ -3550,7 +3564,7 @@ const ToolsTab = ( {
 		<div className="settings-layout">
 			<div className="settings-main">
 				<section className="panel">
-					<h3>{ __( 'Import / Export', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Import / export', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Backup your settings or transfer them to another site.',
@@ -3560,7 +3574,7 @@ const ToolsTab = ( {
 
 					<div className="tools-actions">
 						<div className="tool-action">
-							<h4>{ __( 'Export Settings', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Export settings', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Download all plugin settings as a JSON file.',
@@ -3572,12 +3586,12 @@ const ToolsTab = ( {
 								className="button primary"
 								onClick={ onExport }
 							>
-								{ __( 'Export Settings', 'saman-seo' ) }
+								{ __( 'Export settings', 'saman-seo' ) }
 							</button>
 						</div>
 
 						<div className="tool-action">
-							<h4>{ __( 'Import Settings', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Import settings', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Upload a previously exported JSON file.',
@@ -3599,7 +3613,7 @@ const ToolsTab = ( {
 								>
 									{ importFile
 										? importFile.name
-										: __( 'Choose File', 'saman-seo' ) }
+										: __( 'Choose file', 'saman-seo' ) }
 								</label>
 								<button
 									type="button"
@@ -3615,7 +3629,7 @@ const ToolsTab = ( {
 				</section>
 
 				<section className="panel">
-					<h3>{ __( 'Database Tools', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Database tools', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Manage plugin data stored in your database.',
@@ -3625,7 +3639,7 @@ const ToolsTab = ( {
 
 					<div className="tools-actions">
 						<div className="tool-action">
-							<h4>{ __( 'Clear Cache', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Clear cache', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Clear all cached SEO data (schema, sitemaps, etc).',
@@ -3633,12 +3647,12 @@ const ToolsTab = ( {
 								) }
 							</p>
 							<button type="button" className="button ghost">
-								{ __( 'Clear Cache', 'saman-seo' ) }
+								{ __( 'Clear cache', 'saman-seo' ) }
 							</button>
 						</div>
 
 						<div className="tool-action">
-							<h4>{ __( 'Reindex Content', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Reindex content', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Rebuild internal link index and content analysis.',
@@ -3653,7 +3667,7 @@ const ToolsTab = ( {
 				</section>
 
 				<section className="panel">
-					<h3>{ __( 'Setup Wizard', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Setup wizard', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Run the setup wizard again to reconfigure the plugin.',
@@ -3663,7 +3677,7 @@ const ToolsTab = ( {
 
 					<div className="tools-actions">
 						<div className="tool-action">
-							<h4>{ __( 'Reset Setup Wizard', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Reset setup wizard', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Show the setup wizard on next page load. Existing settings will be preserved.',
@@ -3678,14 +3692,14 @@ const ToolsTab = ( {
 							>
 								{ resettingWizard
 									? __( 'Resetting\u2026', 'saman-seo' )
-									: __( 'Reset Wizard', 'saman-seo' ) }
+									: __( 'Reset wizard', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
 				</section>
 
 				<section className="panel danger-zone">
-					<h3>{ __( 'Danger Zone', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Danger zone', 'saman-seo' ) }</h3>
 					<p className="panel-desc">
 						{ __(
 							'Destructive actions that cannot be undone.',
@@ -3695,7 +3709,7 @@ const ToolsTab = ( {
 
 					<div className="tools-actions">
 						<div className="tool-action">
-							<h4>{ __( 'Reset to Defaults', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Reset to defaults', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Reset all settings to their default values.',
@@ -3707,12 +3721,12 @@ const ToolsTab = ( {
 								className="button danger"
 								onClick={ onReset }
 							>
-								{ __( 'Reset All Settings', 'saman-seo' ) }
+								{ __( 'Reset all settings', 'saman-seo' ) }
 							</button>
 						</div>
 
 						<div className="tool-action">
-							<h4>{ __( 'Delete All Data', 'saman-seo' ) }</h4>
+							<h4>{ __( 'Delete all data', 'saman-seo' ) }</h4>
 							<p className="muted">
 								{ __(
 									'Remove all plugin data including redirects, 404 logs, and meta.',
@@ -3727,14 +3741,14 @@ const ToolsTab = ( {
 							>
 								{ deletingData
 									? __( 'Deleting\u2026', 'saman-seo' )
-									: __( 'Delete All Data', 'saman-seo' ) }
+									: __( 'Delete all data', 'saman-seo' ) }
 							</button>
 						</div>
 
 						<div className="tool-action">
 							<h4>
 								{ __(
-									'Delete Data on Uninstall',
+									'Delete data on uninstall',
 									'saman-seo'
 								) }
 							</h4>
@@ -3766,7 +3780,7 @@ const ToolsTab = ( {
 
 			<aside className="settings-sidebar">
 				<div className="side-card highlight">
-					<h4>{ __( 'Plugin Info', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Plugin info', 'saman-seo' ) }</h4>
 					<div className="info-rows">
 						<div className="info-row">
 							<span>{ __( 'Version', 'saman-seo' ) }</span>
@@ -3803,14 +3817,14 @@ const ToolsTab = ( {
 					<h4>{ __( 'Environment', 'saman-seo' ) }</h4>
 					<div className="info-rows">
 						<div className="info-row">
-							<span>{ __( 'Memory Limit', 'saman-seo' ) }</span>
+							<span>{ __( 'Memory limit', 'saman-seo' ) }</span>
 							<code>
 								{ systemInfo.memory_limit ||
 									__( 'Unknown', 'saman-seo' ) }
 							</code>
 						</div>
 						<div className="info-row">
-							<span>{ __( 'Max Upload', 'saman-seo' ) }</span>
+							<span>{ __( 'Max upload', 'saman-seo' ) }</span>
 							<code>
 								{ systemInfo.max_upload_size ||
 									__( 'Unknown', 'saman-seo' ) }
@@ -3824,7 +3838,7 @@ const ToolsTab = ( {
 							</code>
 						</div>
 						<div className="info-row">
-							<span>{ __( 'Debug Mode', 'saman-seo' ) }</span>
+							<span>{ __( 'Debug mode', 'saman-seo' ) }</span>
 							<code>
 								{ systemInfo.debug_mode
 									? __( 'Enabled', 'saman-seo' )
@@ -3838,14 +3852,14 @@ const ToolsTab = ( {
 					<h4>{ __( 'Theme', 'saman-seo' ) }</h4>
 					<div className="info-rows">
 						<div className="info-row">
-							<span>{ __( 'Active Theme', 'saman-seo' ) }</span>
+							<span>{ __( 'Active theme', 'saman-seo' ) }</span>
 							<code>
 								{ systemInfo.theme ||
 									__( 'Unknown', 'saman-seo' ) }
 							</code>
 						</div>
 						<div className="info-row">
-							<span>{ __( 'Theme Version', 'saman-seo' ) }</span>
+							<span>{ __( 'Theme version', 'saman-seo' ) }</span>
 							<code>
 								{ systemInfo.theme_version ||
 									__( 'Unknown', 'saman-seo' ) }
@@ -3855,7 +3869,7 @@ const ToolsTab = ( {
 				</div>
 
 				<div className="side-card">
-					<h4>{ __( 'Need Help?', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Need help?', 'saman-seo' ) }</h4>
 					<p className="muted">
 						{ __(
 							'Check the documentation or contact support.',
@@ -3866,7 +3880,7 @@ const ToolsTab = ( {
 						href="https://github.com/SamanLabs/Saman-SEO/blob/main/docs/GETTING_STARTED.md"
 						className="button ghost"
 					>
-						{ __( 'View Documentation', 'saman-seo' ) }
+						{ __( 'View documentation', 'saman-seo' ) }
 					</a>
 				</div>
 			</aside>

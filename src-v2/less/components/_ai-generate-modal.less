@@ -307,3 +307,57 @@
         transform: rotate(360deg);
     }
 }
+
+// Setup notice shown instead of the form when the AI plugin is missing or
+// not configured.
+.ai-generate-modal__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-md;
+    padding: @spacing-lg;
+    border-radius: @radius-md;
+    background: @color-primary-lighter;
+    color: @color-text;
+
+    h4 {
+        margin: 0 0 @spacing-xs;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+    }
+
+    p {
+        margin: 0;
+        color: @color-muted;
+    }
+
+    &--warning {
+        background: @color-warning-bg;
+
+        .ai-generate-modal__notice-icon {
+            color: @color-warning-text;
+        }
+    }
+}
+
+.ai-generate-modal__notice-icon {
+    flex-shrink: 0;
+    display: flex;
+    color: @color-primary;
+}
+
+.ai-generate-modal__notice-content {
+    min-width: 0;
+}
+
+.ai-generate-modal__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: @spacing-xs;
+    padding: 2px @spacing-sm;
+    border-radius: @radius-full;
+    background: @color-primary-light;
+    color: @color-primary;
+    font-size: @font-size-xs;
+    font-weight: @font-weight-medium;
+    white-space: nowrap;
+}

@@ -323,7 +323,7 @@ const SEOModalPlugin = () => {
 				target="seo-sidebar"
 				icon={ <PluginIcon /> }
 			>
-				{ __( 'SEO Settings', 'saman-seo' ) }
+				{ __( 'SEO settings', 'saman-seo' ) }
 			</PluginSidebarMoreMenuItem>
 
 			{ /* The actual modal with SEO content */ }

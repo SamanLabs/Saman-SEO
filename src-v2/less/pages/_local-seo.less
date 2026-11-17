@@ -28,42 +28,6 @@
     }
 }
 
-// Tabs
-.tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid @color-border;
-}
-
-.tab {
-    padding: 12px 20px;
-    border: none;
-    background: transparent;
-    font-size: 14px;
-    font-weight: 500;
-    color: @color-text-secondary;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all 0.15s ease;
-
-    &:hover {
-        color: @color-text;
-    }
-
-    &.active {
-        color: @color-primary;
-        border-bottom-color: @color-primary;
-    }
-}
-
-.tab-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
 // Image picker
 .image-picker {
     .image-preview {
@@ -123,12 +87,6 @@
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid @color-border;
-
-    .presets-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: @color-text-secondary;
-    }
 }
 
 // Hours grid
@@ -232,22 +190,6 @@
     font-style: italic;
 }
 
-// Form help text
-.form-help {
-    margin-top: 8px;
-    font-size: 13px;
-    color: @color-text-secondary;
-
-    a {
-        color: @color-primary;
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-}
-
 // ==========================================================================
 // Knowledge Panel Preview
 // ==========================================================================
@@ -258,18 +200,6 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.knowledge-panel__header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: @color-surface-muted;
-    border-bottom: 1px solid @color-border;
-    font-size: 13px;
-    font-weight: 500;
-    color: @color-text-secondary;
 }
 
 .knowledge-panel__cover {
@@ -438,76 +368,46 @@
 }
 
 // Reviews tab
-.reviews-notice {
-    margin: 0 0 @spacing-lg;
-}
-
-.reviews-heading {
-    margin: @spacing-xl 0 @spacing-sm;
-    font-size: @font-size-lg;
-}
-
 .reviews-pages {
-    max-height: 200px;
+    max-height: 220px;
     overflow-y: auto;
-    padding: @spacing-sm;
-    border: 1px solid @color-border;
-    border-radius: 4px;
-
-    label {
-        font-weight: @font-weight-normal;
-        color: @color-text;
-    }
 }
 
-.review-row {
-    margin-bottom: @spacing-lg;
-    padding: @spacing-md;
-    border: 1px solid @color-border;
-    border-radius: 4px;
-    background: @color-surface-muted;
+.input-narrow {
+    max-width: 140px;
+}
+
+// One review: fields sit straight on the panel, separated by a rule.
+.review-item {
     display: flex;
     flex-direction: column;
-    gap: @spacing-sm;
     align-items: flex-start;
+    gap: @spacing-md;
+    padding: @spacing-lg 0;
+    border-top: 1px solid @color-border-light;
 
-    .form-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: @spacing-md;
+    > .form-field {
         width: 100%;
-    }
-
-    .form-field {
-        width: 100%;
-    }
-
-    .form-grid .form-field {
-        width: auto;
     }
 }
 
-.field-hint {
-    margin: @spacing-xs 0 0;
-    font-size: @font-size-sm;
-    color: @color-muted;
+.review-item__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 170px;
+    gap: @spacing-md;
+    width: 100%;
+
+    @media (max-width: 782px) {
+        grid-template-columns: 1fr;
+    }
 }
 
-// Checkboxes inside .form-field would otherwise inherit the full-width text input style.
-.form-field.reviews-check,
-.form-field.reviews-pages {
-    label {
-        display: flex;
-        align-items: center;
-        gap: @spacing-sm;
-        font-weight: @font-weight-normal;
-        color: @color-text;
-        font-size: @font-size-base;
-    }
+.review-item__add {
+    padding-top: @spacing-lg;
+    border-top: 1px solid @color-border-light;
+}
 
-    input[type="checkbox"] {
-        width: auto;
-        flex: 0 0 auto;
-        margin: 0;
-    }
+.review-item__fields input {
+    width: 100%;
+    min-width: 0;
 }

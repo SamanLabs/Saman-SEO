@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
  */
 const SEOReporter = {
 	id: 'seo-reporter',
-	name: __( 'SEO Reporter', 'saman-seo' ),
+	name: __( 'SEO reporter', 'saman-seo' ),
 	description: __(
 		'Your weekly SEO buddy that gives you the rundown on your site.',
 		'saman-seo'

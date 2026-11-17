@@ -16,6 +16,8 @@ const createIcon = ( paths, svgProps ) =>
 				strokeWidth="2"
 				strokeLinecap="round"
 				strokeLinejoin="round"
+				width="1em"
+				height="1em"
 				aria-hidden="true"
 				{ ...svgProps }
 				{ ...props }

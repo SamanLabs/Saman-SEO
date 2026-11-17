@@ -13,99 +13,6 @@
     color: @color-muted;
 }
 
-// Stats Grid
-.audit-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
-
-    @media (max-width: @breakpoint-lg) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: @breakpoint-sm) {
-        grid-template-columns: 1fr;
-    }
-}
-
-// Stat Card
-.audit-stat-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 18px;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    transition: border-color @transition-fast, box-shadow @transition-fast;
-
-    &.has-issues {
-        border-left: 3px solid @color-warning;
-    }
-
-    &.no-issues {
-        .audit-stat-icon.danger,
-        .audit-stat-icon.warning {
-            background: fade(@color-success, 10%);
-            color: @color-success;
-        }
-    }
-
-    &.info {
-        background: @color-surface-muted;
-    }
-}
-
-.audit-stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: @radius-md;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    &.danger {
-        background: fade(@color-danger, 10%);
-        color: @color-danger;
-    }
-
-    &.warning {
-        background: fade(@color-warning, 10%);
-        color: @color-warning;
-    }
-
-    &.muted {
-        background: fade(@color-muted, 10%);
-        color: @color-muted;
-    }
-
-    &.info {
-        background: fade(@color-primary, 10%);
-        color: @color-primary;
-    }
-}
-
-.audit-stat-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.audit-stat-number {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1.1;
-    color: @color-text;
-}
-
-.audit-stat-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: @color-text;
-    margin-top: 2px;
-}
-
 .audit-stat-desc {
     font-size: 12px;
     color: @color-muted;
@@ -116,7 +23,7 @@
 .audit-section {
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
+    border-radius: @radius-xl;
     overflow: hidden;
     margin-bottom: 20px;
 }
@@ -124,7 +31,6 @@
 .audit-section-header {
     padding: 16px 20px;
     border-bottom: 1px solid @color-border-light;
-    background: @color-surface-muted;
 
     h2 {
         margin: 0 0 4px;
@@ -231,72 +137,90 @@
     }
 }
 
-// Recommendations List
-.recommendations-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 16px 20px;
-
-    @media (max-width: @breakpoint-lg) {
-        grid-template-columns: 1fr;
-    }
+// Quick fixes: one list, a row per post. The suggestion is the content, so it
+// is plain text beside a short label rather than a box inside a box.
+.quick-fixes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-.recommendation-card {
-    background: @color-surface-muted;
-    border: 1px solid @color-border-light;
-    border-radius: @radius-md;
-    padding: 16px;
-}
-
-.recommendation-header {
+.quick-fix {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
+    align-items: center;
+    gap: @spacing-md @spacing-2xl;
+    margin: 0;
+    padding: @spacing-lg @spacing-xl;
 
-    h4 {
+    & + & {
+        border-top: 1px solid @color-border-light;
+    }
+
+    &__main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__head {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0 @spacing-md;
+        margin-bottom: @spacing-sm;
+
+        h3 {
+            margin: 0;
+            padding: 0;
+            font-size: @font-size-base;
+            font-weight: @font-weight-semibold;
+            line-height: @line-height-normal;
+        }
+
+        a {
+            font-size: @font-size-sm;
+            color: @color-primary;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    &__fields {
+        display: grid;
+        grid-template-columns: 88px minmax(0, 1fr);
+        gap: @spacing-xs @spacing-md;
         margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1.4;
+
+        dt {
+            font-size: @font-size-sm;
+            font-weight: @font-weight-normal;
+            line-height: 21px;
+            color: @color-muted;
+        }
+
+        dd {
+            max-width: 80ch;
+            margin: 0;
+            font-size: @font-size-base;
+            line-height: 21px;
+            color: @color-text;
+
+            &.is-empty {
+                color: @color-muted;
+            }
+        }
     }
-}
 
-.recommendation-suggestions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.suggestion-item {
-    label {
-        display: block;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: @color-muted;
-        margin-bottom: 4px;
+    .button {
+        flex-shrink: 0;
     }
-}
 
-.suggestion-value {
-    font-size: 13px;
-    color: @color-text;
-    line-height: 1.5;
-    padding: 8px 10px;
-    background: @color-surface;
-    border: 1px solid @color-border-light;
-    border-radius: @radius-sm;
-}
-
-.recommendation-actions {
-    display: flex;
-    justify-content: flex-end;
+    @media (max-width: @breakpoint-md) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 // Empty State in Audit

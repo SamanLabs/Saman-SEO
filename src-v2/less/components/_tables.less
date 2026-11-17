@@ -20,18 +20,22 @@
     td {
         text-align: left;
         padding: @spacing-md @spacing-sm;
-        border-bottom: 1px solid rgba(214, 217, 224, 0.6);
+        border-bottom: 1px solid @color-border-light;
     }
 
     th {
         color: @color-muted;
         font-size: @font-size-sm;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
+        font-weight: @font-weight-medium;
+        border-bottom-color: @color-border;
     }
 
-    tr:hover {
-        background: rgba(34, 113, 177, 0.05);
+    tbody tr:hover {
+        background: @color-surface-muted;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: 0;
     }
 }
 

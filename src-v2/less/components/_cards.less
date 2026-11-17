@@ -9,8 +9,15 @@
     gap: @spacing-lg;
 }
 
-.card {
+// WordPress core also styles `.card` (max-width: 520px, min-width: 255px,
+// margin-top: 20px). Without these resets every card in the app is squeezed
+// to 520px no matter how wide its column is.
+.saman-seo-admin .card {
     .card-base();
+    max-width: none;
+    min-width: 0;
+    margin-top: 0;
+    box-shadow: none;
     padding: @spacing-lg;
     .flex-column();
     gap: @spacing-md;
@@ -33,179 +40,11 @@
     font-size: @font-size-sm;
 }
 
-// Pilot Card (Feature Cards)
-.pilot-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: @spacing-lg;
-    align-items: stretch;
-}
-
-.pilot-card {
-    border: 1px solid @color-border;
-    border-radius: @radius-md;
-    padding: @spacing-lg;
-    min-height: 220px;
-    width: 100%;
-    background: @color-surface;
-    .flex-column();
-    gap: @spacing-md;
-    box-shadow: @shadow-sm;
-    overflow: hidden;
-    transition: border-color @transition-fast, box-shadow @transition-fast;
-
-    &:hover {
-        border-color: @color-primary;
-        box-shadow: @shadow-md;
-    }
-
-    &.active {
-        border-color: @color-primary;
-        box-shadow: 0 0 0 1px @color-primary;
-    }
-
-    &.has-update {
-        border-color: @color-warning;
-        background: @color-warning-bg;
-    }
-}
-
-.pilot-card-head {
-    .flex-between();
-    flex-wrap: wrap;
-    gap: @spacing-md;
-
-    h3 {
-        margin: 0 0 4px;
-        font-size: @font-size-lg;
-        font-weight: @font-weight-semibold;
-    }
-
-    .toggle {
-        flex-shrink: 0;
-    }
-}
-
-.pilot-card-identity {
-    display: flex;
-    align-items: center;
-    gap: @spacing-md;
-    min-width: 0;
-    flex: 1;
-}
-
-.pilot-card-mark {
-    width: 40px;
-    height: 40px;
-    border-radius: @radius-md;
-    .flex-center();
-    color: #fff;
-    flex-shrink: 0;
-
-    &.security {
-        background: @color-success;
-    }
-
-    &.seo {
-        background: @color-primary;
-    }
-
-    &.ai {
-        background: @color-primary;
-    }
-
-    svg {
-        width: 20px;
-        height: 20px;
-        fill: currentColor;
-        display: block;
-    }
-}
-
-.pilot-card-title {
-    display: flex;
-    align-items: center;
-    gap: @spacing-sm;
-    flex-wrap: wrap;
-}
-
-.pilot-card-tagline {
-    margin: 4px 0 0;
-    font-size: @font-size-sm;
-    color: @color-muted;
-}
-
 .pilot-card-desc {
     margin: 0;
     color: @color-muted;
     font-size: @font-size-sm;
     line-height: @line-height-normal;
-}
-
-.pilot-card-meta {
-    display: flex;
-    align-items: center;
-    gap: @spacing-sm;
-    flex-wrap: wrap;
-    margin-top: auto;
-}
-
-.pilot-card-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: @color-primary;
-    text-decoration: none;
-    font-size: @font-size-sm;
-    font-weight: @font-weight-medium;
-    transition: color @transition-fast;
-    margin-left: auto;
-
-    &:hover {
-        color: @color-primary-hover;
-        text-decoration: underline;
-    }
-
-    svg {
-        flex-shrink: 0;
-    }
-}
-
-.pilot-card-version {
-    margin: 0;
-    font-size: @font-size-sm;
-    color: @color-muted;
-    font-weight: @font-weight-medium;
-}
-
-.pilot-card-actions {
-    display: flex;
-    align-items: center;
-    gap: @spacing-sm;
-    flex-wrap: wrap;
-    margin-left: auto;
-
-    .button {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-
-        &.warning {
-            background: @color-warning;
-            color: white;
-            border-color: @color-warning;
-
-            &:hover {
-                background: darken(@color-warning, 8%);
-                border-color: darken(@color-warning, 8%);
-            }
-        }
-
-        .spinner {
-            float: none;
-            margin: 0;
-        }
-    }
 }
 
 // Loading state
@@ -274,17 +113,17 @@
     border-radius: @radius-full;
     font-size: @font-size-xs;
     font-weight: @font-weight-semibold;
-    background: rgba(100, 105, 112, 0.12);
-    color: @color-muted;
+    background: @color-surface-hover;
+    color: @color-text-secondary;
 
     &.success {
         background: @color-success-bg;
-        color: @color-success;
+        color: @color-success-text;
     }
 
     &.warning {
         background: @color-warning-bg;
-        color: darken(@color-warning, 10%);
+        color: @color-warning-text;
     }
 
     &.redirect-exists {
@@ -300,38 +139,41 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 8px;
+    padding: 2px 8px;
     border-radius: @radius-full;
-    font-size: @font-size-xs;
-    font-weight: @font-weight-semibold;
-    background: rgba(100, 105, 112, 0.1);
-    color: @color-muted;
+    font-size: @font-size-sm;
+    line-height: 18px;
+    font-weight: @font-weight-medium;
+    white-space: nowrap;
+    background: @color-surface-hover;
+    color: @color-text-secondary;
 
     &.success {
         background: @color-success-bg;
-        color: @color-success;
+        color: @color-success-text;
     }
 
     &.warning {
         background: @color-warning-bg;
-        color: darken(@color-warning, 10%);
+        color: @color-warning-text;
     }
 
     &.danger {
         background: @color-danger-bg;
-        color: @color-danger;
+        color: @color-danger-text;
     }
 }
 
-// Responsive
-@media (max-width: @breakpoint-xl) {
-    .pilot-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+// Side cards: heading and text share the card's own gap, not browser margins.
+.side-card {
+    h4 {
+        margin: 0;
+        font-size: @font-size-base;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
     }
-}
 
-@media (max-width: 760px) {
-    .pilot-grid {
-        grid-template-columns: 1fr;
+    p {
+        margin: 0;
     }
 }

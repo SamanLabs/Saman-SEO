@@ -27,7 +27,7 @@
 // --------------------------------------------------------------------------
 // 3. Components - Reusable UI Elements
 // --------------------------------------------------------------------------
-@import "components/_header";
+@import "components/_sidebar";
 @import "components/_buttons";
 @import "components/_forms";
 @import "components/_cards";
@@ -35,6 +35,7 @@
 @import "components/_progress";
 @import "components/_status";
 @import "components/_alerts";
+@import "components/_modal";
 @import "components/_pagination";
 @import "components/_search-preview";
 @import "components/_variable-picker";
@@ -43,6 +44,7 @@
 @import "components/_analytics-notice";
 @import "components/_managed-plugins";
 @import "components/_gsc-card";
+@import "components/_kpi";
 
 // --------------------------------------------------------------------------
 // 4. Pages - Page-specific Styles
@@ -65,3 +67,16 @@
 @import "pages/_instant-indexing";
 @import "pages/_improvements";
 @import "pages/_tools-pages";
+
+// Per-group overrides that bring older pages onto the shared page frame.
+@import "pages/_std-content-a";
+@import "pages/_std-content-b";
+@import "pages/_std-technical";
+@import "pages/_std-main";
+
+// --------------------------------------------------------------------------
+// 5. Shared data table and list toolbar
+// --------------------------------------------------------------------------
+// Imported last on purpose: several page files restyle `.data-table` and
+// `.page-toolbar` globally, and this is the one definition that should win.
+@import "components/_data-table";

@@ -47,7 +47,7 @@ export const FacebookPreview = ( { image, title, description, domain } ) => {
 				<div className="social-preview__body">
 					<span className="social-preview__domain">{ domain }</span>
 					<span className="social-preview__title">
-						{ title || __( 'Your Page Title', 'saman-seo' ) }
+						{ title || __( 'Your page title', 'saman-seo' ) }
 					</span>
 					<span className="social-preview__desc">
 						{ description ||
@@ -116,7 +116,7 @@ export const TwitterPreview = ( {
 					</div>
 					<div className="social-preview__body">
 						<span className="social-preview__title">
-							{ title || __( 'Your Page Title', 'saman-seo' ) }
+							{ title || __( 'Your page title', 'saman-seo' ) }
 						</span>
 						<span className="social-preview__desc">
 							{ description ||
@@ -154,7 +154,7 @@ export const TwitterPreview = ( {
 					</div>
 					<div className="social-preview__body">
 						<span className="social-preview__title">
-							{ title || __( 'Your Page Title', 'saman-seo' ) }
+							{ title || __( 'Your page title', 'saman-seo' ) }
 						</span>
 						<span className="social-preview__desc">
 							{ description ||

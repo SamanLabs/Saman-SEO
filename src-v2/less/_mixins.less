@@ -15,12 +15,6 @@
     justify-content: space-between;
 }
 
-.flex-start() {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
 .flex-column() {
     display: flex;
     flex-direction: column;
@@ -35,38 +29,27 @@
     transition: @property @transition-fast;
 }
 
-.transition-slow(@property: all) {
-    transition: @property @transition-slow;
-}
-
 // Shadows
-.shadow-soft() {
-    box-shadow: @shadow-md;
-}
 
 .shadow-card() {
     box-shadow: @shadow-lg;
 }
 
 .shadow-focus() {
-    box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.15);
+    box-shadow: 0 0 0 3px fade(@color-primary, 15%);
 }
 
-// Border Radius
-.rounded-sm() {
-    border-radius: @radius-sm;
-}
-
-.rounded() {
-    border-radius: @radius-md;
-}
-
-.rounded-lg() {
-    border-radius: @radius-lg;
-}
-
-.rounded-full() {
-    border-radius: @radius-full;
+// Hidden visually, still read by assistive technology.
+.visually-hidden() {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
 }
 
 // Text
@@ -76,34 +59,50 @@
     white-space: nowrap;
 }
 
-.text-muted() {
-    color: @color-muted;
-    font-size: @font-size-sm;
-}
-
 // Button Base
 .button-base() {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 16px;
+    gap: 6px;
+    min-height: @button-height;
+    padding: 0 14px;
     border-radius: @radius-md;
-    font-weight: @font-weight-semibold;
-    cursor: pointer;
-    .transition();
     font-family: inherit;
+    font-size: @font-size-base;
+    font-weight: @font-weight-medium;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    text-shadow: none;
+    cursor: pointer;
+    transition: background @transition-fast, border-color @transition-fast, color @transition-fast, box-shadow @transition-fast, transform 0.1s @ease-out;
 }
 
 // Input Base
 .input-base() {
     width: 100%;
-    padding: 10px 12px;
+    padding: 7px 12px;
     border-radius: @radius-md;
     border: 1px solid @color-border;
-    background: @color-surface;
+    // background-color, not the shorthand: core draws the select arrow as a
+    // background image and the shorthand would erase it.
+    background-color: @color-surface;
     font-family: inherit;
     font-size: @font-size-base;
-    .transition(border-color);
+    color: @color-text;
+    line-height: @line-height-normal;
+    min-height: @input-height;
+    box-shadow: none;
+    transition: border-color @transition-fast, box-shadow @transition-fast;
+
+    &::placeholder {
+        color: @color-muted;
+    }
+
+    &:hover {
+        border-color: darken(@color-border, 10%);
+    }
 
     &:focus {
         outline: none;
@@ -116,57 +115,15 @@
 .card-base() {
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    .shadow-card();
+    border-radius: @radius-xl;
 }
 
 // Panel Base
 .panel-base() {
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    padding: @spacing-xl;
-}
-
-// Status Colors
-.status-success() {
-    background: @color-success-bg;
-    color: @color-success;
-}
-
-.status-warning() {
-    background: @color-warning-bg;
-    color: @color-warning;
-}
-
-.status-danger() {
-    background: @color-danger-bg;
-    color: @color-danger;
-}
-
-// Responsive Helpers
-.responsive-stack(@breakpoint: @breakpoint-md) {
-    @media (max-width: @breakpoint) {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
-// Hover States
-.hover-lift() {
-    .transition();
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: @shadow-lg;
-    }
-}
-
-.hover-primary() {
-    .transition();
-    &:hover {
-        color: @color-primary;
-        border-color: rgba(34, 113, 177, 0.4);
-    }
+    border-radius: @radius-xl;
+    padding: @spacing-2xl;
 }
 
 // Code/Mono Text
@@ -176,23 +133,4 @@
     padding: 2px 6px;
     border-radius: @radius-sm;
     font-size: @font-size-sm;
-}
-
-// Overlay for modals/dropdowns
-.overlay-backdrop() {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: @z-modal-backdrop;
-}
-
-// Dropdown Base
-.dropdown-base() {
-    position: absolute;
-    z-index: @z-dropdown;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    box-shadow: @shadow-xl;
-    overflow: hidden;
 }

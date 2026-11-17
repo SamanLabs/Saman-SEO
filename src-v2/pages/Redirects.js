@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { KpiBand, MetricCard, Sparkline } from '../components/Kpi';
 import { __, sprintf } from '@wordpress/i18n';
+import { confirmDialog } from '../components/Dialogs';
 const STATUS_CODES = [
 	{
 		value: 301,
@@ -503,6 +505,7 @@ const Redirects = () => {
 					active_count: response.data.active_count || 0,
 					total_hits: response.data.total_hits || 0,
 					top_redirect: response.data.top_redirect || null,
+					daily_hits: response.data.daily_hits || [],
 				} );
 			}
 		} catch ( error ) {
@@ -710,11 +713,12 @@ const Redirects = () => {
 	// Delete redirect
 	const handleDeleteRedirect = async ( id ) => {
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				__(
 					'Are you sure you want to delete this redirect?',
 					'saman-seo'
-				)
+				),
+				{ confirmLabel: __( 'Delete', 'saman-seo' ), danger: true }
 			)
 		) {
 			return;
@@ -736,14 +740,15 @@ const Redirects = () => {
 	const handleBulkDelete = async () => {
 		if ( selectedIds.length === 0 ) return;
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				sprintf(
 					/* translators: %s: placeholder */ __(
 						'Delete %s selected redirect(s)?',
 						'saman-seo'
 					),
 					selectedIds.length
-				)
+				),
+				{ confirmLabel: __( 'Delete', 'saman-seo' ), danger: true }
 			)
 		)
 			return;
@@ -916,6 +921,52 @@ const Redirects = () => {
 	};
 	return (
 		<div className="page">
+			<KpiBand label={ __( 'Redirect summary', 'saman-seo' ) }>
+				<MetricCard
+					label={ __( 'Total redirects', 'saman-seo' ) }
+					value={
+						summaryLoading
+							? '\u2026'
+							: summary.total.toLocaleString()
+					}
+				/>
+				<MetricCard
+					label={ __( 'Active', 'saman-seo' ) }
+					value={
+						summaryLoading
+							? '\u2026'
+							: summary.active_count.toLocaleString()
+					}
+					tone="success"
+				/>
+				<MetricCard
+					label={ __( 'Total hits', 'saman-seo' ) }
+					sub={ __( 'Hits per day, last 14 days', 'saman-seo' ) }
+					spark={
+						( summary.daily_hits || [] ).some( ( v ) => v > 0 ) && (
+							<Sparkline data={ summary.daily_hits } />
+						)
+					}
+					value={
+						summaryLoading
+							? '\u2026'
+							: summary.total_hits.toLocaleString()
+					}
+				/>
+				<MetricCard
+					label={ __( 'Hits on top redirect', 'saman-seo' ) }
+					value={
+						summaryLoading || ! summary.top_redirect
+							? '0'
+							: summary.top_redirect.hits.toLocaleString()
+					}
+					sub={
+						summary.top_redirect
+							? summary.top_redirect.source
+							: undefined
+					}
+				/>
+			</KpiBand>
 			<div className="page-header">
 				<div>
 					<h1>{ __( 'Redirects', 'saman-seo' ) }</h1>
@@ -960,7 +1011,7 @@ const Redirects = () => {
 						className="button primary"
 						onClick={ openCreateModal }
 					>
-						{ __( 'Add Redirect', 'saman-seo' ) }
+						{ __( 'Add redirect', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -968,59 +1019,6 @@ const Redirects = () => {
 			<section className="page-body">
 				{ /* Summary + Filters */ }
 				<div className="page-toolbar">
-					<div className="page-summary">
-						<div className="stat-list">
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{ summaryLoading
-										? '...'
-										: summary.total.toLocaleString() }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Total redirects', 'saman-seo' ) }
-								</span>
-							</div>
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{ summaryLoading
-										? '...'
-										: summary.active_count.toLocaleString() }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Active', 'saman-seo' ) }
-								</span>
-							</div>
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{ summaryLoading
-										? '...'
-										: summary.total_hits.toLocaleString() }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Total hits', 'saman-seo' ) }
-								</span>
-							</div>
-							<div
-								className="stat-list__item"
-								title={
-									summary.top_redirect
-										? summary.top_redirect.source
-										: ''
-								}
-							>
-								<span className="stat-list__value">
-									{ summaryLoading
-										? '...'
-										: summary.top_redirect
-										? summary.top_redirect.hits.toLocaleString()
-										: '0' }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Top hits', 'saman-seo' ) }
-								</span>
-							</div>
-						</div>
-					</div>
 					<div className="page-toolbar__filters">
 						<input
 							type="search"
@@ -1185,14 +1183,14 @@ const Redirects = () => {
 						>
 							{ bulkLoading
 								? __( 'Deleting\u2026', 'saman-seo' )
-								: __( 'Delete Selected', 'saman-seo' ) }
+								: __( 'Delete selected', 'saman-seo' ) }
 						</button>
 						<button
 							type="button"
 							className="link-button"
 							onClick={ () => setSelectedIds( [] ) }
 						>
-							{ __( 'Clear Selection', 'saman-seo' ) }
+							{ __( 'Clear selection', 'saman-seo' ) }
 						</button>
 					</div>
 				) }
@@ -1235,7 +1233,7 @@ const Redirects = () => {
 								className="button primary"
 								onClick={ openCreateModal }
 							>
-								{ __( 'Add Redirect', 'saman-seo' ) }
+								{ __( 'Add redirect', 'saman-seo' ) }
 							</button>
 						) }
 					</div>
@@ -1493,7 +1491,7 @@ const Redirects = () => {
 					>
 						<div className="modal-header">
 							<h2>
-								{ editingId ? 'Edit Redirect' : 'Add Redirect' }
+								{ editingId ? __( 'Edit redirect', 'saman-seo' ) : __( 'Add redirect', 'saman-seo' ) }
 							</h2>
 							<button
 								type="button"
@@ -1525,7 +1523,7 @@ const Redirects = () => {
 
 								<div className="form-group">
 									<label htmlFor="modal-source">
-										Source Path
+										{ __( 'Source path', 'saman-seo' ) }
 									</label>
 									<input
 										type="text"
@@ -1555,7 +1553,7 @@ const Redirects = () => {
 												)
 											}
 										/>
-										Use regex pattern
+										{ __( 'Use regex pattern', 'saman-seo' ) }
 									</label>
 									{ formData.is_regex && (
 										<p className="field-hint">
@@ -1568,7 +1566,7 @@ const Redirects = () => {
 
 								<div className="form-group">
 									<label htmlFor="modal-target">
-										Target URL
+										{ __( 'Target URL', 'saman-seo' ) }
 									</label>
 									<input
 										type="text"
@@ -1592,7 +1590,7 @@ const Redirects = () => {
 								<div className="form-row">
 									<div className="form-group">
 										<label htmlFor="modal-status">
-											Status Code
+											{ __( 'Status code', 'saman-seo' ) }
 										</label>
 										<select
 											id="modal-status"
@@ -1619,7 +1617,7 @@ const Redirects = () => {
 									</div>
 									<div className="form-group">
 										<label htmlFor="modal-group">
-											Group (optional)
+											{ __( 'Group (optional)', 'saman-seo' ) }
 										</label>
 										<input
 											type="text"
@@ -1653,8 +1651,8 @@ const Redirects = () => {
 									}
 								>
 									{ showAdvanced
-										? 'Hide Advanced Options'
-										: 'Show Advanced Options' }
+										? 'Hide advanced options'
+										: 'Show advanced options' }
 								</button>
 
 								{ showAdvanced && (
@@ -1663,7 +1661,7 @@ const Redirects = () => {
 											<div className="form-group">
 												<label htmlFor="modal-priority">
 													{ __(
-														'Match Priority',
+														'Match priority',
 														'saman-seo'
 													) }
 												</label>
@@ -1783,10 +1781,10 @@ const Redirects = () => {
 									disabled={ formLoading }
 								>
 									{ formLoading
-										? 'Saving...'
+										? __( 'Saving…', 'saman-seo' )
 										: editingId
-										? 'Update Redirect'
-										: 'Add Redirect' }
+										? __( 'Update redirect', 'saman-seo' )
+										: __( 'Add redirect', 'saman-seo' ) }
 								</button>
 							</div>
 						</form>
@@ -1802,7 +1800,7 @@ const Redirects = () => {
 						onClick={ ( e ) => e.stopPropagation() }
 					>
 						<div className="modal-header">
-							<h2>Import Redirects</h2>
+							<h2>{ __( 'Import redirects', 'saman-seo' ) }</h2>
 							<button
 								type="button"
 								className="modal-close"
@@ -1813,7 +1811,7 @@ const Redirects = () => {
 						</div>
 						<div className="modal-body">
 							<div className="form-group">
-								<label>Upload File</label>
+								<label>{ __( 'Upload file', 'saman-seo' ) }</label>
 								<input
 									type="file"
 									ref={ fileInputRef }
@@ -1823,7 +1821,7 @@ const Redirects = () => {
 							</div>
 
 							<div className="form-group">
-								<label>Or paste data directly</label>
+								<label>{ __( 'Or paste data directly', 'saman-seo' ) }</label>
 								<textarea
 									value={ importData }
 									onChange={ ( e ) =>
@@ -1837,7 +1835,7 @@ const Redirects = () => {
 
 							<div className="form-row">
 								<div className="form-group">
-									<label>Format</label>
+									<label>{ __( 'Format', 'saman-seo' ) }</label>
 									<select
 										value={ importFormat }
 										onChange={ ( e ) =>

@@ -194,27 +194,6 @@
     }
 }
 
-// Inline Form
-.inline-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: @spacing-sm;
-    align-items: center;
-
-    input {
-        padding: @spacing-sm @spacing-sm;
-        border-radius: @radius-md;
-        border: 1px solid @color-border;
-        min-width: 180px;
-        font-family: inherit;
-    }
-}
-
-// Filter Form
-.filter-form {
-    margin-bottom: @spacing-lg;
-}
-
 .filter-row {
     display: flex;
     flex-wrap: wrap;
@@ -281,4 +260,69 @@
         flex-direction: column;
         align-items: flex-start;
     }
+}
+
+// Checkboxes and radios keep their own box everywhere. Without this the text
+// input base (`.form-field input`, `.settings-control input`) stretches and
+// rounds them, which is what made them look unstyled inside dialogs.
+.saman-seo-admin {
+    --wp-admin-theme-color: @color-primary;
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        flex-shrink: 0;
+        width: 1rem;
+        min-width: 1rem;
+        height: 1rem;
+        min-height: 0;
+        padding: 0;
+        border: 1px solid darken(@color-border, 28%);
+        box-shadow: none;
+
+        &:checked {
+            border-color: @color-primary;
+        }
+
+        &:focus-visible {
+            outline: 2px solid @color-primary;
+            outline-offset: 2px;
+        }
+    }
+
+    input[type="checkbox"] {
+        border-radius: 3px;
+    }
+
+    input[type="radio"] {
+        border-radius: 50%;
+    }
+
+    // The switch track is a span; it needs a box of its own even when the
+    // label around it is not a flex container.
+    .toggle-track {
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .form-field > label.toggle {
+        display: inline-flex;
+        align-self: flex-start;
+    }
+}
+
+.settings-control > .checkbox-grid {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: @spacing-sm;
+}
+
+// A checkbox or radio with its label, wherever it sits (dialogs restyle
+// plain labels as block field captions).
+.saman-seo-admin .checkbox-item,
+.saman-seo-admin .radio-item {
+    display: inline-flex;
+    align-items: center;
+    gap: @spacing-sm;
+    margin-bottom: 0;
+    cursor: pointer;
 }

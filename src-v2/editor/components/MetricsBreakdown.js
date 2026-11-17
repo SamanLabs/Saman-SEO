@@ -129,11 +129,11 @@ const MetricsBreakdown = ( { metrics, metricsByCategory, hasKeyphrase } ) => {
 		},
 		{
 			key: 'structure',
-			label: __( 'Content Structure', 'saman-seo' ),
+			label: __( 'Content structure', 'saman-seo' ),
 		},
 		{
 			key: 'links',
-			label: __( 'Links & Media', 'saman-seo' ),
+			label: __( 'Links & media', 'saman-seo' ),
 		},
 	];
 

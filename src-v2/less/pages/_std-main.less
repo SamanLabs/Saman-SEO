@@ -1,0 +1,260 @@
+// Page standard overrides: main group. See the page frame in pages/_layout.less.
+//
+// Covers Sitemap, AI Assistant, Assistants, the Tools hub and More. Everything
+// here flattens page-specific boxes onto the single surface level of the
+// shared frame; the older rules these replace are left in their own files.
+
+// --------------------------------------------------------------------------
+// Shared by the pages in this group
+// --------------------------------------------------------------------------
+
+// A page-level message already gets its spacing from the page's flex gap.
+.page > .notice-message {
+    margin-bottom: 0;
+}
+
+// Leading icon of a list row: one neutral glyph, no tile behind it.
+.assistant-row__icon,
+.plugin-row__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    color: @color-muted;
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+// Below this width a row wraps and its text takes the full line, which would
+// leave the icon stranded on a line of its own.
+@media (max-width: @breakpoint-lg) {
+    .assistant-row__icon,
+    .plugin-row__icon {
+        display: none;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Tools hub
+// --------------------------------------------------------------------------
+
+.tools-section {
+    margin-bottom: 0;
+}
+
+.tools-section__header {
+    margin-bottom: @spacing-md;
+}
+
+.tools-section__title {
+    padding: 0;
+    margin: 0 0 2px;
+}
+
+// Every group uses the same tile width, so the four groups line up.
+.tools-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: @spacing-md;
+}
+
+.tool-card {
+    gap: @spacing-md;
+    width: 100%;
+    padding: @spacing-lg;
+    border-radius: @radius-xl;
+    box-shadow: none;
+    color: @color-text;
+    transition: border-color @transition-fast, background @transition-fast;
+
+    // `tool-card--hover` mirrors the pointer state the component tracks.
+    &:hover:not(.tool-card--disabled),
+    &.tool-card--hover:not(.tool-card--disabled) {
+        border-color: @color-primary;
+        box-shadow: none;
+        transform: none;
+    }
+
+    &:focus {
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        border-color: @color-primary;
+        .shadow-focus();
+    }
+}
+
+// Switched-off and coming-soon tools stay fully legible: the tile recedes
+// into the page background instead of fading its text.
+.tool-card--disabled {
+    background: @color-surface-muted;
+
+    .tool-card__icon {
+        filter: none;
+        opacity: 1;
+    }
+
+    .tool-card__content {
+        opacity: 1;
+    }
+
+    .tool-card__name {
+        color: @color-text-secondary;
+    }
+}
+
+.tool-card__icon {
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    border-radius: 0;
+    background: none;
+    color: @color-muted;
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.tool-card__header {
+    flex-wrap: wrap;
+    // Room for the module switch in the tile's top right corner.
+    padding-right: 44px;
+}
+
+.tool-card__name {
+    padding: 0;
+    font-size: @font-size-base;
+    line-height: @line-height-normal;
+}
+
+.tool-card__desc {
+    color: @color-text-secondary;
+    line-height: @line-height-normal;
+}
+
+.tool-card__stats {
+    display: block;
+    min-width: 0;
+    margin: @spacing-sm 0 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+// --------------------------------------------------------------------------
+// Assistants
+// --------------------------------------------------------------------------
+
+.assistant-row__actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: @spacing-md;
+}
+
+.assistants-form {
+    .flex-column();
+    gap: @spacing-lg;
+    max-width: 860px;
+
+    .form-actions {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+    }
+}
+
+// --------------------------------------------------------------------------
+// AI Assistant
+// --------------------------------------------------------------------------
+
+// Generated results read as plain rows of the panel, not boxes inside it.
+.ai-results {
+    gap: @spacing-lg;
+    margin-top: 0;
+    padding-top: @spacing-lg;
+}
+
+.ai-result-item {
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+}
+
+.ai-result-label {
+    font-size: @font-size-sm;
+    text-transform: none;
+    letter-spacing: 0;
+    color: @color-text;
+}
+
+.ai-result-count {
+    font-size: @font-size-sm;
+}
+
+// --------------------------------------------------------------------------
+// Sitemap
+// --------------------------------------------------------------------------
+
+// Fields revealed under a checkbox (Google News publication name and types).
+.sitemap-subfields {
+    .flex-column();
+    gap: @spacing-sm;
+    margin-top: @spacing-md;
+}
+
+.additional-page-row {
+    padding: 0;
+    background: none;
+    border-radius: 0;
+}
+
+.sitemap-link-item {
+    padding: 0;
+    background: none;
+    border-radius: 0;
+
+    strong {
+        font-size: @font-size-sm;
+        font-weight: @font-weight-medium;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+}
+
+// --------------------------------------------------------------------------
+// More (sibling plugins)
+// --------------------------------------------------------------------------
+
+.plugin-row__icon {
+    overflow: hidden;
+    border-radius: @radius-md;
+
+    img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.plugin-row__icon-fallback {
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+
+    svg {
+        fill: currentColor;
+    }
+}

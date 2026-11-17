@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
+import { KpiBand, MetricCard } from '../components/Kpi';
 import useUrlTab from '../hooks/useUrlTab';
 import { __ } from '@wordpress/i18n';
+import { confirmDialog } from '../components/Dialogs';
 const linkingTabs = [
 	{
 		id: 'rules',
@@ -14,7 +16,7 @@ const linkingTabs = [
 	},
 	{
 		id: 'utm-templates',
-		label: __( 'UTM Templates', 'saman-seo' ),
+		label: __( 'UTM templates', 'saman-seo' ),
 	},
 	{
 		id: 'settings',
@@ -34,7 +36,7 @@ const InternalLinking = () => {
 	const [ categories, setCategories ] = useState( [] );
 	const [ templates, setTemplates ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
-	const [ stats, setStats ] = useState( {
+	const [ , setStats ] = useState( {
 		total_rules: 0,
 		active_rules: 0,
 		categories: 0,
@@ -120,13 +122,13 @@ const InternalLinking = () => {
 
 	// Get category by ID
 	const getCategoryById = ( id ) => categories.find( ( c ) => c.id === id );
-	const getTemplateById = ( id ) => templates.find( ( t ) => t.id === id );
 
 	// Rule actions
 	const handleDeleteRule = async ( id ) => {
 		if (
-			! window.confirm(
-				__( 'Are you sure you want to delete this rule?', 'saman-seo' )
+			! await confirmDialog(
+				__( 'Are you sure you want to delete this rule?', 'saman-seo' ),
+				{ confirmLabel: __( 'Delete', 'saman-seo' ), danger: true }
 			)
 		)
 			return;
@@ -217,15 +219,16 @@ const InternalLinking = () => {
 		let reassign = null;
 		if ( rulesInCategory > 0 ) {
 			const message = `This category has ${ rulesInCategory } rule(s). Delete anyway and remove category from rules?`;
-			if ( ! window.confirm( message ) ) return;
+			if ( ! await confirmDialog( message, { confirmLabel: __( 'Delete', 'saman-seo' ), danger: true } ) ) return;
 			reassign = '__none__';
 		} else {
 			if (
-				! window.confirm(
+				! await confirmDialog(
 					__(
 						'Are you sure you want to delete this category?',
 						'saman-seo'
-					)
+					),
+					{ confirmLabel: __( 'Delete', 'saman-seo' ), danger: true }
 				)
 			)
 				return;
@@ -261,11 +264,12 @@ const InternalLinking = () => {
 	// Template actions
 	const handleDeleteTemplate = async ( id ) => {
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				__(
 					'Are you sure you want to delete this UTM template?',
 					'saman-seo'
-				)
+				),
+				{ confirmLabel: __( 'Delete', 'saman-seo' ), danger: true }
 			)
 		)
 			return;
@@ -295,11 +299,54 @@ const InternalLinking = () => {
 			console.error( 'Failed to save settings:', error );
 		}
 	};
+	const openAddRule = () => {
+		setEditingRule( null );
+		setRuleModalOpen( true );
+	};
+	const openAddCategory = () => {
+		setEditingCategory( null );
+		setCategoryModalOpen( true );
+	};
+	const openAddTemplate = () => {
+		setEditingTemplate( null );
+		setTemplateModalOpen( true );
+	};
+
+	// The band counts the lists the tabs show, so it follows every add,
+	// toggle and delete without another request.
+	const activeRuleCount = rules.filter(
+		( rule ) => rule.status === 'active'
+	).length;
 	return (
 		<div className="page">
+			{ rulesLoading ? (
+				<KpiBand loading count={ 4 } />
+			) : (
+				<KpiBand
+					label={ __( 'Internal linking summary', 'saman-seo' ) }
+				>
+					<MetricCard
+						label={ __( 'Total rules', 'saman-seo' ) }
+						value={ rules.length.toLocaleString() }
+					/>
+					<MetricCard
+						label={ __( 'Active rules', 'saman-seo' ) }
+						value={ activeRuleCount.toLocaleString() }
+						tone="success"
+					/>
+					<MetricCard
+						label={ __( 'Categories', 'saman-seo' ) }
+						value={ categories.length.toLocaleString() }
+					/>
+					<MetricCard
+						label={ __( 'UTM templates', 'saman-seo' ) }
+						value={ templates.length.toLocaleString() }
+					/>
+				</KpiBand>
+			) }
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'Internal Linking', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Internal linking', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Automatically add internal links to your content based on keywords.',
@@ -307,23 +354,43 @@ const InternalLinking = () => {
 						) }
 					</p>
 				</div>
-				<div className="page-header__stats">
-					<div className="stat-chip">
-						<span className="stat-chip__value">
-							{ stats.active_rules }
-						</span>
-						<span className="stat-chip__label">
-							{ __( 'Active Rules', 'saman-seo' ) }
-						</span>
-					</div>
-					<div className="stat-chip">
-						<span className="stat-chip__value">
-							{ stats.categories }
-						</span>
-						<span className="stat-chip__label">
-							{ __( 'Categories', 'saman-seo' ) }
-						</span>
-					</div>
+				<div className="header-actions">
+					{ activeTab === 'rules' && (
+						<button
+							type="button"
+							className="button primary"
+							onClick={ openAddRule }
+						>
+							{ __( 'Add rule', 'saman-seo' ) }
+						</button>
+					) }
+					{ activeTab === 'categories' && (
+						<button
+							type="button"
+							className="button primary"
+							onClick={ openAddCategory }
+						>
+							{ __( 'Add category', 'saman-seo' ) }
+						</button>
+					) }
+					{ activeTab === 'utm-templates' && (
+						<button
+							type="button"
+							className="button primary"
+							onClick={ openAddTemplate }
+						>
+							{ __( 'Add template', 'saman-seo' ) }
+						</button>
+					) }
+					{ activeTab === 'settings' && (
+						<button
+							type="button"
+							className="button primary"
+							onClick={ handleSaveSettings }
+						>
+							{ __( 'Save settings', 'saman-seo' ) }
+						</button>
+					) }
 				</div>
 			</div>
 
@@ -339,7 +406,6 @@ const InternalLinking = () => {
 					rules={ filteredRules }
 					rulesLoading={ rulesLoading }
 					categories={ categories }
-					templates={ templates }
 					selectedRules={ selectedRules }
 					filterStatus={ filterStatus }
 					filterCategory={ filterCategory }
@@ -361,12 +427,8 @@ const InternalLinking = () => {
 					onBulkAction={ setBulkAction }
 					onBulkCategory={ setBulkCategory }
 					onApplyBulk={ handleBulkAction }
-					onAddRule={ () => {
-						setEditingRule( null );
-						setRuleModalOpen( true );
-					} }
+					onAddRule={ openAddRule }
 					getCategoryById={ getCategoryById }
-					getTemplateById={ getTemplateById }
 				/>
 			) }
 
@@ -374,39 +436,31 @@ const InternalLinking = () => {
 				<CategoriesTab
 					categories={ categories }
 					templates={ templates }
+					loading={ rulesLoading }
 					onEdit={ ( cat ) => {
 						setEditingCategory( cat );
 						setCategoryModalOpen( true );
 					} }
 					onDelete={ handleDeleteCategory }
-					onAdd={ () => {
-						setEditingCategory( null );
-						setCategoryModalOpen( true );
-					} }
+					onAdd={ openAddCategory }
 				/>
 			) }
 
 			{ activeTab === 'utm-templates' && (
 				<TemplatesTab
 					templates={ templates }
+					loading={ rulesLoading }
 					onEdit={ ( tpl ) => {
 						setEditingTemplate( tpl );
 						setTemplateModalOpen( true );
 					} }
 					onDelete={ handleDeleteTemplate }
-					onAdd={ () => {
-						setEditingTemplate( null );
-						setTemplateModalOpen( true );
-					} }
+					onAdd={ openAddTemplate }
 				/>
 			) }
 
 			{ activeTab === 'settings' && (
-				<SettingsTab
-					settings={ settings }
-					onChange={ setSettings }
-					onSave={ handleSaveSettings }
-				/>
+				<SettingsTab settings={ settings } onChange={ setSettings } />
 			) }
 
 			{ ruleModalOpen && (
@@ -489,7 +543,6 @@ const RulesTab = ( {
 	rules,
 	rulesLoading,
 	categories,
-	templates,
 	selectedRules,
 	filterStatus,
 	filterCategory,
@@ -510,7 +563,6 @@ const RulesTab = ( {
 	onApplyBulk,
 	onAddRule,
 	getCategoryById,
-	getTemplateById,
 } ) => {
 	const clearFilters = () => {
 		onFilterStatus( '' );
@@ -518,172 +570,113 @@ const RulesTab = ( {
 		onFilterSearch( '' );
 	};
 	const hasFilters = filterStatus || filterCategory || filterSearch;
-	return (
-		<section className="panel">
-			<div className="table-toolbar">
-				<div>
-					<h3>{ __( 'Linking Rules', 'saman-seo' ) }</h3>
-					<p className="muted">
-						{ __(
-							'Define keywords and their target URLs for automatic linking.',
-							'saman-seo'
-						) }
-					</p>
-				</div>
-				<button
-					type="button"
-					className="button primary"
-					onClick={ onAddRule }
-				>
-					{ __( 'Add Rule', 'saman-seo' ) }
-				</button>
+	let content;
+	if ( rulesLoading ) {
+		content = (
+			<div className="loading-state">
+				{ __( 'Loading rules…', 'saman-seo' ) }
 			</div>
-
-			<div className="filters-bar">
-				<div className="filters-bar__filters">
-					<select
-						value={ filterStatus }
-						onChange={ ( e ) => onFilterStatus( e.target.value ) }
+		);
+	} else if ( rules.length === 0 ) {
+		content = (
+			<div className="empty-state">
+				<div className="empty-state__icon">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="1.5"
+						width="48"
+						height="48"
+						aria-hidden="true"
 					>
-						<option value="">
-							{ __( 'All statuses', 'saman-seo' ) }
-						</option>
-						<option value="active">
-							{ __( 'Active', 'saman-seo' ) }
-						</option>
-						<option value="inactive">
-							{ __( 'Inactive', 'saman-seo' ) }
-						</option>
-					</select>
-					<select
-						value={ filterCategory }
-						onChange={ ( e ) => onFilterCategory( e.target.value ) }
-					>
-						<option value="">
-							{ __( 'All categories', 'saman-seo' ) }
-						</option>
-						{ categories.map( ( cat ) => (
-							<option key={ cat.id } value={ cat.id }>
-								{ cat.name }
-							</option>
-						) ) }
-					</select>
-					<input
-						type="search"
-						placeholder={ __( 'Search rules\u2026', 'saman-seo' ) }
-						value={ filterSearch }
-						onChange={ ( e ) => onFilterSearch( e.target.value ) }
-					/>
-					{ hasFilters && (
-						<button
-							type="button"
-							className="link-button"
-							onClick={ clearFilters }
-						>
-							{ __( 'Clear', 'saman-seo' ) }
-						</button>
-					) }
+						<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+						<path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+					</svg>
 				</div>
+				<h3>
+					{ hasFilters
+						? __( 'No rules match your filters', 'saman-seo' )
+						: __( 'No linking rules yet', 'saman-seo' ) }
+				</h3>
+				<p>
+					{ hasFilters
+						? __( 'Try adjusting your filters.', 'saman-seo' )
+						: __(
+								'Create your first internal link rule to get started.',
+								'saman-seo'
+						  ) }
+				</p>
+				{ ! hasFilters && (
+					<button
+						type="button"
+						className="button primary"
+						onClick={ onAddRule }
+					>
+						{ __( 'Add rule', 'saman-seo' ) }
+					</button>
+				) }
 			</div>
-
-			{ rulesLoading ? (
-				<div className="loading-state">
-					{ __( 'Loading rules\u2026', 'saman-seo' ) }
-				</div>
-			) : rules.length === 0 ? (
-				<div className="empty-state">
-					<div className="empty-state__icon">
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							width="48"
-							height="48"
-						>
-							<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-							<path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-						</svg>
-					</div>
-					<h3>
-						{ hasFilters
-							? __( 'No rules match your filters', 'saman-seo' )
-							: __( 'No linking rules yet', 'saman-seo' ) }
-					</h3>
-					<p>
-						{ hasFilters
-							? __( 'Try adjusting your filters.', 'saman-seo' )
-							: __(
-									'Create your first internal link rule to get started.',
-									'saman-seo'
-							  ) }
-					</p>
-					{ ! hasFilters && (
-						<button
-							type="button"
-							className="button primary"
-							onClick={ onAddRule }
-						>
-							{ __( 'Create Rule', 'saman-seo' ) }
-						</button>
-					) }
-				</div>
-			) : (
-				<>
-					<table className="data-table">
-						<thead>
-							<tr>
-								<th className="check-column">
-									<input
-										type="checkbox"
-										checked={
-											selectedRules.length ===
-												rules.length && rules.length > 0
-										}
-										onChange={ onSelectAll }
-									/>
-								</th>
-								<th>{ __( 'Title', 'saman-seo' ) }</th>
-								<th>{ __( 'Category', 'saman-seo' ) }</th>
-								<th>{ __( 'Keywords', 'saman-seo' ) }</th>
-								<th>{ __( 'Destination', 'saman-seo' ) }</th>
-								<th>{ __( 'Status', 'saman-seo' ) }</th>
-								<th>{ __( 'Actions', 'saman-seo' ) }</th>
-							</tr>
-						</thead>
-						<tbody>
-							{ rules.map( ( rule ) => {
-								const category = getCategoryById(
-									rule.category
-								);
-								return (
-									<tr key={ rule.id }>
-										<td className="check-column">
-											<input
-												type="checkbox"
-												checked={ selectedRules.includes(
-													rule.id
-												) }
-												onChange={ () =>
-													onSelectRule( rule.id )
-												}
-											/>
-										</td>
-										<td>
-											<strong>
-												<button
-													type="button"
-													className="link-button"
-													onClick={ () =>
-														onEditRule( rule )
-													}
-												>
-													{ rule.title }
-												</button>
-											</strong>
-										</td>
-										<td>
-											{ category ? (
+		);
+	} else {
+		content = (
+			<div className="table-wrap">
+				<table className="data-table">
+					<thead>
+						<tr>
+							<th className="checkbox-col">
+								<input
+									type="checkbox"
+									aria-label={ __(
+										'Select all rules',
+										'saman-seo'
+									) }
+									checked={
+										selectedRules.length === rules.length &&
+										rules.length > 0
+									}
+									onChange={ onSelectAll }
+								/>
+							</th>
+							<th className="col-title">
+								{ __( 'Rule', 'saman-seo' ) }
+							</th>
+							<th>{ __( 'Destination', 'saman-seo' ) }</th>
+							<th className="col-status">
+								{ __( 'Status', 'saman-seo' ) }
+							</th>
+							<th className="col-actions">
+								{ __( 'Actions', 'saman-seo' ) }
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{ rules.map( ( rule ) => {
+							const category = getCategoryById( rule.category );
+							return (
+								<tr key={ rule.id }>
+									<td className="checkbox-col">
+										<input
+											type="checkbox"
+											aria-label={ rule.title }
+											checked={ selectedRules.includes(
+												rule.id
+											) }
+											onChange={ () =>
+												onSelectRule( rule.id )
+											}
+										/>
+									</td>
+									<td className="rule-cell">
+										<button
+											type="button"
+											className="link-button"
+											onClick={ () => onEditRule( rule ) }
+										>
+											{ rule.title }
+										</button>
+										<div className="rule-cell__meta">
+											{ category && (
 												<span
 													className="category-pill"
 													style={ {
@@ -693,11 +686,7 @@ const RulesTab = ( {
 												>
 													{ category.name }
 												</span>
-											) : (
-												<span className="muted">—</span>
 											) }
-										</td>
-										<td>
 											<span className="keywords-preview">
 												{ ( rule.keywords || [] )
 													.slice( 0, 3 )
@@ -712,165 +701,216 @@ const RulesTab = ( {
 													</span>
 												) }
 											</span>
-										</td>
-										<td>
-											{ rule.destination_url ? (
-												<a
-													href={
-														rule.destination_url
-													}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="destination-link"
-												>
-													{ rule.destination_label }
-												</a>
-											) : (
-												<span className="muted">—</span>
-											) }
-										</td>
-										<td>
-											<span
-												className={ `pill ${
-													rule.status === 'active'
-														? 'success'
-														: 'muted'
-												}` }
+										</div>
+									</td>
+									<td className="url-cell">
+										{ rule.destination_url ? (
+											<a
+												href={ rule.destination_url }
+												target="_blank"
+												rel="noopener noreferrer"
+												className="destination-link"
+											>
+												{ rule.destination_label }
+											</a>
+										) : (
+											<span className="muted">—</span>
+										) }
+									</td>
+									<td className="status-cell">
+										<span
+											className={ `pill${
+												rule.status === 'active'
+													? ' success'
+													: ''
+											}` }
+										>
+											{ rule.status === 'active'
+												? __( 'Active', 'saman-seo' )
+												: __(
+														'Inactive',
+														'saman-seo'
+												  ) }
+										</span>
+									</td>
+									<td className="action-cell">
+										<div className="table-actions">
+											<button
+												type="button"
+												className="table-actions__secondary"
+												onClick={ () =>
+													onEditRule( rule )
+												}
+											>
+												{ __( 'Edit', 'saman-seo' ) }
+											</button>
+											<button
+												type="button"
+												className="table-actions__secondary"
+												onClick={ () =>
+													onDuplicateRule( rule.id )
+												}
+											>
+												{ __(
+													'Duplicate',
+													'saman-seo'
+												) }
+											</button>
+											<button
+												type="button"
+												className="table-actions__secondary"
+												onClick={ () =>
+													onToggleRule( rule.id )
+												}
 											>
 												{ rule.status === 'active'
 													? __(
-															'Active',
+															'Deactivate',
 															'saman-seo'
 													  )
 													: __(
-															'Inactive',
+															'Activate',
 															'saman-seo'
 													  ) }
-											</span>
-										</td>
-										<td>
-											<div className="action-buttons">
-												<button
-													type="button"
-													className="link-button"
-													onClick={ () =>
-														onEditRule( rule )
-													}
-												>
-													{ __(
-														'Edit',
-														'saman-seo'
-													) }
-												</button>
-												<button
-													type="button"
-													className="link-button"
-													onClick={ () =>
-														onDuplicateRule(
-															rule.id
-														)
-													}
-												>
-													{ __(
-														'Duplicate',
-														'saman-seo'
-													) }
-												</button>
-												<button
-													type="button"
-													className="link-button"
-													onClick={ () =>
-														onToggleRule( rule.id )
-													}
-												>
-													{ rule.status === 'active'
-														? __(
-																'Deactivate',
-																'saman-seo'
-														  )
-														: __(
-																'Activate',
-																'saman-seo'
-														  ) }
-												</button>
-												<button
-													type="button"
-													className="link-button danger"
-													onClick={ () =>
-														onDeleteRule( rule.id )
-													}
-												>
-													{ __(
-														'Delete',
-														'saman-seo'
-													) }
-												</button>
-											</div>
-										</td>
-									</tr>
-								);
-							} ) }
-						</tbody>
-					</table>
-
-					{ selectedRules.length > 0 && (
-						<div className="bulk-actions">
-							<span className="bulk-actions__count">
-								{ selectedRules.length }{ ' ' }
-								{ __( 'selected', 'saman-seo' ) }
-							</span>
-							<select
-								value={ bulkAction }
-								onChange={ ( e ) =>
-									onBulkAction( e.target.value )
-								}
-							>
-								<option value="">
-									{ __( 'Bulk actions', 'saman-seo' ) }
+											</button>
+											<button
+												type="button"
+												className="table-actions__danger"
+												onClick={ () =>
+													onDeleteRule( rule.id )
+												}
+											>
+												{ __( 'Delete', 'saman-seo' ) }
+											</button>
+										</div>
+									</td>
+								</tr>
+							);
+						} ) }
+					</tbody>
+				</table>
+			</div>
+		);
+	}
+	return (
+		<div className="page-body">
+			<div className="page-toolbar">
+				<div className="page-toolbar__filters">
+					<input
+						type="search"
+						className="search-input"
+						aria-label={ __( 'Search rules', 'saman-seo' ) }
+						placeholder={ __( 'Search rules…', 'saman-seo' ) }
+						value={ filterSearch }
+						onChange={ ( e ) => onFilterSearch( e.target.value ) }
+					/>
+					<label className="filter-field">
+						<span>{ __( 'Status', 'saman-seo' ) }</span>
+						<select
+							value={ filterStatus }
+							onChange={ ( e ) =>
+								onFilterStatus( e.target.value )
+							}
+						>
+							<option value="">
+								{ __( 'All statuses', 'saman-seo' ) }
+							</option>
+							<option value="active">
+								{ __( 'Active', 'saman-seo' ) }
+							</option>
+							<option value="inactive">
+								{ __( 'Inactive', 'saman-seo' ) }
+							</option>
+						</select>
+					</label>
+					<label className="filter-field">
+						<span>{ __( 'Category', 'saman-seo' ) }</span>
+						<select
+							value={ filterCategory }
+							onChange={ ( e ) =>
+								onFilterCategory( e.target.value )
+							}
+						>
+							<option value="">
+								{ __( 'All categories', 'saman-seo' ) }
+							</option>
+							{ categories.map( ( cat ) => (
+								<option key={ cat.id } value={ cat.id }>
+									{ cat.name }
 								</option>
-								<option value="activate">
-									{ __( 'Activate', 'saman-seo' ) }
-								</option>
-								<option value="deactivate">
-									{ __( 'Deactivate', 'saman-seo' ) }
-								</option>
-								<option value="change_category">
-									{ __( 'Change category', 'saman-seo' ) }
-								</option>
-								<option value="delete">
-									{ __( 'Delete', 'saman-seo' ) }
-								</option>
-							</select>
-							{ bulkAction === 'change_category' && (
-								<select
-									value={ bulkCategory }
-									onChange={ ( e ) =>
-										onBulkCategory( e.target.value )
-									}
-								>
-									<option value="__none__">
-										{ __( 'Remove category', 'saman-seo' ) }
-									</option>
-									{ categories.map( ( cat ) => (
-										<option key={ cat.id } value={ cat.id }>
-											{ cat.name }
-										</option>
-									) ) }
-								</select>
-							) }
-							<button
-								type="button"
-								className="button"
-								onClick={ onApplyBulk }
-								disabled={ ! bulkAction }
-							>
-								{ __( 'Apply', 'saman-seo' ) }
-							</button>
-						</div>
+							) ) }
+						</select>
+					</label>
+					{ hasFilters && (
+						<button
+							type="button"
+							className="link-button"
+							onClick={ clearFilters }
+						>
+							{ __( 'Clear', 'saman-seo' ) }
+						</button>
 					) }
-				</>
+				</div>
+			</div>
+
+			{ ! rulesLoading && selectedRules.length > 0 && (
+				<div className="bulk-actions">
+					<span className="bulk-actions__count">
+						{ selectedRules.length }{ ' ' }
+						{ __( 'selected', 'saman-seo' ) }
+					</span>
+					<select
+						aria-label={ __( 'Bulk actions', 'saman-seo' ) }
+						value={ bulkAction }
+						onChange={ ( e ) => onBulkAction( e.target.value ) }
+					>
+						<option value="">
+							{ __( 'Bulk actions', 'saman-seo' ) }
+						</option>
+						<option value="activate">
+							{ __( 'Activate', 'saman-seo' ) }
+						</option>
+						<option value="deactivate">
+							{ __( 'Deactivate', 'saman-seo' ) }
+						</option>
+						<option value="change_category">
+							{ __( 'Change category', 'saman-seo' ) }
+						</option>
+						<option value="delete">
+							{ __( 'Delete', 'saman-seo' ) }
+						</option>
+					</select>
+					{ bulkAction === 'change_category' && (
+						<select
+							aria-label={ __( 'Category', 'saman-seo' ) }
+							value={ bulkCategory }
+							onChange={ ( e ) =>
+								onBulkCategory( e.target.value )
+							}
+						>
+							<option value="__none__">
+								{ __( 'Remove category', 'saman-seo' ) }
+							</option>
+							{ categories.map( ( cat ) => (
+								<option key={ cat.id } value={ cat.id }>
+									{ cat.name }
+								</option>
+							) ) }
+						</select>
+					) }
+					<button
+						type="button"
+						className="button small"
+						onClick={ onApplyBulk }
+						disabled={ ! bulkAction }
+					>
+						{ __( 'Apply', 'saman-seo' ) }
+					</button>
+				</div>
 			) }
-		</section>
+
+			{ content }
+		</div>
 	);
 };
 
@@ -878,32 +918,23 @@ const RulesTab = ( {
 const CategoriesTab = ( {
 	categories,
 	templates,
+	loading,
 	onEdit,
 	onDelete,
 	onAdd,
 } ) => {
 	const getTemplateById = ( id ) => templates.find( ( t ) => t.id === id );
-	return (
-		<section className="panel">
-			<div className="table-toolbar">
-				<div>
-					<h3>{ __( 'Rule Categories', 'saman-seo' ) }</h3>
-					<p className="muted">
-						{ __(
-							'Group rules, pick a color, and set per-category limits.',
-							'saman-seo'
-						) }
-					</p>
+	if ( loading ) {
+		return (
+			<div className="page-body">
+				<div className="loading-state">
+					{ __( 'Loading categories…', 'saman-seo' ) }
 				</div>
-				<button
-					type="button"
-					className="button primary"
-					onClick={ onAdd }
-				>
-					{ __( 'Add Category', 'saman-seo' ) }
-				</button>
 			</div>
-
+		);
+	}
+	return (
+		<div className="page-body">
 			{ categories.length === 0 ? (
 				<div className="empty-state">
 					<h3>{ __( 'No categories yet', 'saman-seo' ) }</h3>
@@ -918,128 +949,138 @@ const CategoriesTab = ( {
 						className="button primary"
 						onClick={ onAdd }
 					>
-						{ __( 'Create Category', 'saman-seo' ) }
+						{ __( 'Add category', 'saman-seo' ) }
 					</button>
 				</div>
 			) : (
-				<table className="data-table">
-					<thead>
-						<tr>
-							<th>{ __( 'Name', 'saman-seo' ) }</th>
-							<th>{ __( 'Color', 'saman-seo' ) }</th>
-							<th>{ __( 'Default UTM', 'saman-seo' ) }</th>
-							<th>{ __( 'Cap', 'saman-seo' ) }</th>
-							<th>{ __( 'Rules', 'saman-seo' ) }</th>
-							<th>{ __( 'Actions', 'saman-seo' ) }</th>
-						</tr>
-					</thead>
-					<tbody>
-						{ categories.map( ( cat ) => {
-							const template = getTemplateById( cat.default_utm );
-							return (
-								<tr key={ cat.id }>
-									<td>
-										<strong>{ cat.name }</strong>
-										{ cat.description && (
-											<div className="muted small">
-												{ cat.description }
+				<div className="table-wrap">
+					<table className="data-table">
+						<thead>
+							<tr>
+								<th>{ __( 'Name', 'saman-seo' ) }</th>
+								<th>{ __( 'Default UTM', 'saman-seo' ) }</th>
+								<th className="col-numeric">
+									{ __( 'Cap', 'saman-seo' ) }
+								</th>
+								<th className="col-numeric">
+									{ __( 'Rules', 'saman-seo' ) }
+								</th>
+								<th className="col-actions">
+									{ __( 'Actions', 'saman-seo' ) }
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ categories.map( ( cat ) => {
+								const template = getTemplateById(
+									cat.default_utm
+								);
+								return (
+									<tr key={ cat.id }>
+										<td>
+											<div className="category-name">
+												<span
+													className="color-chip"
+													style={ {
+														backgroundColor:
+															cat.color,
+													} }
+												/>
+												<strong>{ cat.name }</strong>
 											</div>
-										) }
-									</td>
-									<td>
-										<span
-											className="color-chip"
-											style={ {
-												backgroundColor: cat.color,
-											} }
-										/>
-									</td>
-									<td>
-										{ template ? (
-											template.name
-										) : (
-											<span className="muted">—</span>
-										) }
-									</td>
-									<td>
-										{ cat.category_cap || (
-											<span className="muted">—</span>
-										) }
-									</td>
-									<td>{ cat.rule_count || 0 }</td>
-									<td>
-										<div className="action-buttons">
-											<button
-												type="button"
-												className="link-button"
-												onClick={ () => onEdit( cat ) }
-											>
-												{ __( 'Edit', 'saman-seo' ) }
-											</button>
-											<button
-												type="button"
-												className="link-button danger"
-												onClick={ () =>
-													onDelete( cat.id )
-												}
-											>
-												{ __( 'Delete', 'saman-seo' ) }
-											</button>
-										</div>
-									</td>
-								</tr>
-							);
-						} ) }
-					</tbody>
-				</table>
+											{ cat.description && (
+												<div className="muted">
+													{ cat.description }
+												</div>
+											) }
+										</td>
+										<td>
+											{ template ? (
+												template.name
+											) : (
+												<span className="muted">—</span>
+											) }
+										</td>
+										<td className="numeric-cell">
+											{ cat.category_cap || (
+												<span className="muted">—</span>
+											) }
+										</td>
+										<td className="numeric-cell">
+											{ cat.rule_count || 0 }
+										</td>
+										<td className="action-cell">
+											<div className="table-actions">
+												<button
+													type="button"
+													className="table-actions__secondary"
+													onClick={ () =>
+														onEdit( cat )
+													}
+												>
+													{ __(
+														'Edit',
+														'saman-seo'
+													) }
+												</button>
+												<button
+													type="button"
+													className="table-actions__danger"
+													onClick={ () =>
+														onDelete( cat.id )
+													}
+												>
+													{ __(
+														'Delete',
+														'saman-seo'
+													) }
+												</button>
+											</div>
+										</td>
+									</tr>
+								);
+							} ) }
+						</tbody>
+					</table>
+				</div>
 			) }
-		</section>
+		</div>
 	);
 };
 
 // Templates Tab Component
-const TemplatesTab = ( { templates, onEdit, onDelete, onAdd } ) => {
+const TemplatesTab = ( { templates, loading, onEdit, onDelete, onAdd } ) => {
 	const applyToLabel = ( value ) => {
 		switch ( value ) {
 			case 'internal':
-				return 'Internal only';
+				return __( 'Internal only', 'saman-seo' );
 			case 'external':
-				return 'External only';
+				return __( 'External only', 'saman-seo' );
 			default:
-				return 'Both';
+				return __( 'Both', 'saman-seo' );
 		}
 	};
 	const appendModeLabel = ( value ) => {
 		switch ( value ) {
 			case 'always_overwrite':
-				return 'Always overwrite';
+				return __( 'Always overwrite', 'saman-seo' );
 			case 'never':
-				return 'Never overwrite';
+				return __( 'Never overwrite', 'saman-seo' );
 			default:
-				return 'Append if missing';
+				return __( 'Append if missing', 'saman-seo' );
 		}
 	};
-	return (
-		<section className="panel">
-			<div className="table-toolbar">
-				<div>
-					<h3>{ __( 'UTM Templates', 'saman-seo' ) }</h3>
-					<p className="muted">
-						{ __(
-							'Define reusable parameter sets for consistent tracking.',
-							'saman-seo'
-						) }
-					</p>
+	if ( loading ) {
+		return (
+			<div className="page-body">
+				<div className="loading-state">
+					{ __( 'Loading templates…', 'saman-seo' ) }
 				</div>
-				<button
-					type="button"
-					className="button primary"
-					onClick={ onAdd }
-				>
-					{ __( 'Add Template', 'saman-seo' ) }
-				</button>
 			</div>
-
+		);
+	}
+	return (
+		<div className="page-body">
 			{ templates.length === 0 ? (
 				<div className="empty-state">
 					<h3>{ __( 'No UTM templates yet', 'saman-seo' ) }</h3>
@@ -1054,74 +1095,103 @@ const TemplatesTab = ( { templates, onEdit, onDelete, onAdd } ) => {
 						className="button primary"
 						onClick={ onAdd }
 					>
-						{ __( 'Create Template', 'saman-seo' ) }
+						{ __( 'Add template', 'saman-seo' ) }
 					</button>
 				</div>
 			) : (
-				<table className="data-table">
-					<thead>
-						<tr>
-							<th>{ __( 'Name', 'saman-seo' ) }</th>
-							<th>{ __( 'utm_source', 'saman-seo' ) }</th>
-							<th>{ __( 'utm_medium', 'saman-seo' ) }</th>
-							<th>{ __( 'utm_campaign', 'saman-seo' ) }</th>
-							<th>{ __( 'Apply to', 'saman-seo' ) }</th>
-							<th>{ __( 'Mode', 'saman-seo' ) }</th>
-							<th>{ __( 'Actions', 'saman-seo' ) }</th>
-						</tr>
-					</thead>
-					<tbody>
-						{ templates.map( ( tpl ) => (
-							<tr key={ tpl.id }>
-								<td>
-									<strong>{ tpl.name }</strong>
-								</td>
-								<td>
-									{ tpl.utm_source || (
-										<span className="muted">—</span>
-									) }
-								</td>
-								<td>
-									{ tpl.utm_medium || (
-										<span className="muted">—</span>
-									) }
-								</td>
-								<td>
-									{ tpl.utm_campaign || (
-										<span className="muted">—</span>
-									) }
-								</td>
-								<td>{ applyToLabel( tpl.apply_to ) }</td>
-								<td>{ appendModeLabel( tpl.append_mode ) }</td>
-								<td>
-									<div className="action-buttons">
-										<button
-											type="button"
-											className="link-button"
-											onClick={ () => onEdit( tpl ) }
-										>
-											{ __( 'Edit', 'saman-seo' ) }
-										</button>
-										<button
-											type="button"
-											className="link-button danger"
-											onClick={ () => onDelete( tpl.id ) }
-										>
-											{ __( 'Delete', 'saman-seo' ) }
-										</button>
-									</div>
-								</td>
+				<div className="table-wrap">
+					<table className="data-table">
+						<thead>
+							<tr>
+								<th>{ __( 'Name', 'saman-seo' ) }</th>
+								<th>{ __( 'utm_source', 'saman-seo' ) }</th>
+								<th>{ __( 'utm_medium', 'saman-seo' ) }</th>
+								<th>{ __( 'utm_campaign', 'saman-seo' ) }</th>
+								<th>{ __( 'Apply to', 'saman-seo' ) }</th>
+								<th>{ __( 'Mode', 'saman-seo' ) }</th>
+								<th className="col-actions">
+									{ __( 'Actions', 'saman-seo' ) }
+								</th>
 							</tr>
-						) ) }
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{ templates.map( ( tpl ) => (
+								<tr key={ tpl.id }>
+									<td>
+										<strong>{ tpl.name }</strong>
+									</td>
+									<td>
+										{ tpl.utm_source || (
+											<span className="muted">—</span>
+										) }
+									</td>
+									<td>
+										{ tpl.utm_medium || (
+											<span className="muted">—</span>
+										) }
+									</td>
+									<td>
+										{ tpl.utm_campaign || (
+											<span className="muted">—</span>
+										) }
+									</td>
+									<td>{ applyToLabel( tpl.apply_to ) }</td>
+									<td>
+										{ appendModeLabel( tpl.append_mode ) }
+									</td>
+									<td className="action-cell">
+										<div className="table-actions">
+											<button
+												type="button"
+												className="table-actions__secondary"
+												onClick={ () => onEdit( tpl ) }
+											>
+												{ __( 'Edit', 'saman-seo' ) }
+											</button>
+											<button
+												type="button"
+												className="table-actions__danger"
+												onClick={ () =>
+													onDelete( tpl.id )
+												}
+											>
+												{ __( 'Delete', 'saman-seo' ) }
+											</button>
+										</div>
+									</td>
+								</tr>
+							) ) }
+						</tbody>
+					</table>
+				</div>
 			) }
-		</section>
+		</div>
 	);
 };
 
+// One label + toggle row in the settings tab.
+const ToggleRow = ( { id, label, help, checked, onChange } ) => (
+	<div className="settings-row">
+		<div className="settings-label">
+			<label htmlFor={ id }>{ label }</label>
+			{ help && <p className="settings-help">{ help }</p> }
+		</div>
+		<div className="settings-control">
+			<label className="toggle">
+				<input
+					id={ id }
+					type="checkbox"
+					checked={ !! checked }
+					onChange={ ( e ) => onChange( e.target.checked ) }
+				/>
+				<span className="toggle-track" />
+			</label>
+		</div>
+	</div>
+);
+
 // Settings Tab Component
-const SettingsTab = ( { settings, onChange, onSave } ) => {
+const SettingsTab = ( { settings, onChange } ) => {
 	const updateSetting = ( key, value ) => {
 		onChange( {
 			...settings,
@@ -1140,25 +1210,11 @@ const SettingsTab = ( { settings, onChange, onSave } ) => {
 		}
 	};
 	return (
-		<section className="panel">
-			<div className="table-toolbar">
-				<div>
-					<h3>{ __( 'Module Settings', 'saman-seo' ) }</h3>
-					<p className="muted">
-						{ __(
-							'Configure how internal links are applied to your content.',
-							'saman-seo'
-						) }
-					</p>
-				</div>
-			</div>
+		<div className="page-body">
+			<section className="panel">
+				<h3>{ __( 'Global defaults', 'saman-seo' ) }</h3>
 
-			<div className="settings-section">
-				<h4 className="settings-section__title">
-					{ __( 'Global Defaults', 'saman-seo' ) }
-				</h4>
-
-				<div className="settings-row compact">
+				<div className="settings-row">
 					<div className="settings-label">
 						<label htmlFor="default-max-links">
 							{ __( 'Default max links per page', 'saman-seo' ) }
@@ -1170,6 +1226,7 @@ const SettingsTab = ( { settings, onChange, onSave } ) => {
 					<div className="settings-control">
 						<input
 							id="default-max-links"
+							className="input--narrow"
 							type="number"
 							min="0"
 							max="50"
@@ -1180,18 +1237,15 @@ const SettingsTab = ( { settings, onChange, onSave } ) => {
 									parseInt( e.target.value, 10 ) || 0
 								)
 							}
-							style={ {
-								width: '80px',
-							} }
 						/>
 					</div>
 				</div>
 
-				<div className="settings-row compact">
+				<div className="settings-row">
 					<div className="settings-label">
-						<label>
+						<span className="settings-label__text">
 							{ __( 'Default heading behavior', 'saman-seo' ) }
-						</label>
+						</span>
 						<p className="settings-help">
 							{ __(
 								'Control whether links can appear in headings.',
@@ -1226,12 +1280,7 @@ const SettingsTab = ( { settings, onChange, onSave } ) => {
 							) ) }
 						</div>
 						{ settings.default_heading_behavior === 'selected' && (
-							<div
-								className="checkbox-group"
-								style={ {
-									marginTop: '8px',
-								} }
-							>
+							<div className="checkbox-group">
 								{ HEADING_LEVELS.map( ( level ) => (
 									<label
 										key={ level }
@@ -1254,162 +1303,63 @@ const SettingsTab = ( { settings, onChange, onSave } ) => {
 						) }
 					</div>
 				</div>
-			</div>
+			</section>
 
-			<div className="settings-section">
-				<h4 className="settings-section__title">
-					{ __( 'Safeties', 'saman-seo' ) }
-				</h4>
+			<section className="panel">
+				<h3>{ __( 'Safeties', 'saman-seo' ) }</h3>
+				<ToggleRow
+					id="avoid-existing"
+					label={ __(
+						'Avoid replacing inside existing links',
+						'saman-seo'
+					) }
+					checked={ settings.avoid_existing_links }
+					onChange={ ( value ) =>
+						updateSetting( 'avoid_existing_links', value )
+					}
+				/>
+				<ToggleRow
+					id="word-boundaries"
+					label={ __( 'Prefer word boundaries', 'saman-seo' ) }
+					checked={ settings.prefer_word_boundaries }
+					onChange={ ( value ) =>
+						updateSetting( 'prefer_word_boundaries', value )
+					}
+				/>
+				<ToggleRow
+					id="normalize-accents"
+					label={ __( 'Normalize accents/diacritics', 'saman-seo' ) }
+					checked={ settings.normalize_accents }
+					onChange={ ( value ) =>
+						updateSetting( 'normalize_accents', value )
+					}
+				/>
+			</section>
 
-				<div className="settings-row compact">
-					<div className="settings-label">
-						<label htmlFor="avoid-existing">
-							{ __(
-								'Avoid replacing inside existing links',
-								'saman-seo'
-							) }
-						</label>
-					</div>
-					<div className="settings-control">
-						<label className="toggle">
-							<input
-								id="avoid-existing"
-								type="checkbox"
-								checked={ settings.avoid_existing_links }
-								onChange={ ( e ) =>
-									updateSetting(
-										'avoid_existing_links',
-										e.target.checked
-									)
-								}
-							/>
-							<span className="toggle-track" />
-						</label>
-					</div>
-				</div>
-
-				<div className="settings-row compact">
-					<div className="settings-label">
-						<label htmlFor="word-boundaries">
-							{ __( 'Prefer word boundaries', 'saman-seo' ) }
-						</label>
-					</div>
-					<div className="settings-control">
-						<label className="toggle">
-							<input
-								id="word-boundaries"
-								type="checkbox"
-								checked={ settings.prefer_word_boundaries }
-								onChange={ ( e ) =>
-									updateSetting(
-										'prefer_word_boundaries',
-										e.target.checked
-									)
-								}
-							/>
-							<span className="toggle-track" />
-						</label>
-					</div>
-				</div>
-
-				<div className="settings-row compact">
-					<div className="settings-label">
-						<label htmlFor="normalize-accents">
-							{ __(
-								'Normalize accents/diacritics',
-								'saman-seo'
-							) }
-						</label>
-					</div>
-					<div className="settings-control">
-						<label className="toggle">
-							<input
-								id="normalize-accents"
-								type="checkbox"
-								checked={ settings.normalize_accents }
-								onChange={ ( e ) =>
-									updateSetting(
-										'normalize_accents',
-										e.target.checked
-									)
-								}
-							/>
-							<span className="toggle-track" />
-						</label>
-					</div>
-				</div>
-			</div>
-
-			<div className="settings-section">
-				<h4 className="settings-section__title">
-					{ __( 'Performance', 'saman-seo' ) }
-				</h4>
-
-				<div className="settings-row compact">
-					<div className="settings-label">
-						<label htmlFor="cache-content">
-							{ __( 'Cache rendered content', 'saman-seo' ) }
-						</label>
-					</div>
-					<div className="settings-control">
-						<label className="toggle">
-							<input
-								id="cache-content"
-								type="checkbox"
-								checked={ settings.cache_rendered_content }
-								onChange={ ( e ) =>
-									updateSetting(
-										'cache_rendered_content',
-										e.target.checked
-									)
-								}
-							/>
-							<span className="toggle-track" />
-						</label>
-					</div>
-				</div>
-
-				<div className="settings-row compact">
-					<div className="settings-label">
-						<label htmlFor="chunk-docs">
-							{ __( 'Chunk long documents', 'saman-seo' ) }
-						</label>
-						<p className="settings-help">
-							{ __(
-								'Prevents timeouts on large content.',
-								'saman-seo'
-							) }
-						</p>
-					</div>
-					<div className="settings-control">
-						<label className="toggle">
-							<input
-								id="chunk-docs"
-								type="checkbox"
-								checked={ settings.chunk_long_documents }
-								onChange={ ( e ) =>
-									updateSetting(
-										'chunk_long_documents',
-										e.target.checked
-									)
-								}
-							/>
-							<span className="toggle-track" />
-						</label>
-					</div>
-				</div>
-			</div>
-
-			<div className="panel-footer">
-				<button
-					type="button"
-					className="button primary"
-					onClick={ onSave }
-				>
-					{ __( 'Save Settings', 'saman-seo' ) }
-				</button>
-			</div>
-		</section>
+			<section className="panel">
+				<h3>{ __( 'Performance', 'saman-seo' ) }</h3>
+				<ToggleRow
+					id="cache-content"
+					label={ __( 'Cache rendered content', 'saman-seo' ) }
+					checked={ settings.cache_rendered_content }
+					onChange={ ( value ) =>
+						updateSetting( 'cache_rendered_content', value )
+					}
+				/>
+				<ToggleRow
+					id="chunk-docs"
+					label={ __( 'Chunk long documents', 'saman-seo' ) }
+					help={ __(
+						'Prevents timeouts on large content.',
+						'saman-seo'
+					) }
+					checked={ settings.chunk_long_documents }
+					onChange={ ( value ) =>
+						updateSetting( 'chunk_long_documents', value )
+					}
+				/>
+			</section>
+		</div>
 	);
 };
 
@@ -1548,18 +1498,19 @@ const RuleModal = ( { rule, categories, templates, onClose, onSave } ) => {
 	return (
 		<div className="modal-overlay" onClick={ onClose }>
 			<div
-				className="modal modal--large"
+				className="modal modal--large internal-link-modal"
 				onClick={ ( e ) => e.stopPropagation() }
 			>
 				<div className="modal__header">
 					<h2>
 						{ isEdit
-							? __( 'Edit Rule', 'saman-seo' )
-							: __( 'Add Rule', 'saman-seo' ) }
+							? __( 'Edit rule', 'saman-seo' )
+							: __( 'Add rule', 'saman-seo' ) }
 					</h2>
 					<button
 						type="button"
 						className="modal__close"
+						aria-label={ __( 'Close', 'saman-seo' ) }
 						onClick={ onClose }
 					>
 						&times;
@@ -1937,16 +1888,20 @@ const CategoryModal = ( { category, templates, onClose, onSave } ) => {
 	};
 	return (
 		<div className="modal-overlay" onClick={ onClose }>
-			<div className="modal" onClick={ ( e ) => e.stopPropagation() }>
+			<div
+				className="modal internal-link-modal"
+				onClick={ ( e ) => e.stopPropagation() }
+			>
 				<div className="modal__header">
 					<h2>
 						{ isEdit
-							? __( 'Edit Category', 'saman-seo' )
-							: __( 'Add Category', 'saman-seo' ) }
+							? __( 'Edit category', 'saman-seo' )
+							: __( 'Add category', 'saman-seo' ) }
 					</h2>
 					<button
 						type="button"
 						className="modal__close"
+						aria-label={ __( 'Close', 'saman-seo' ) }
 						onClick={ onClose }
 					>
 						&times;
@@ -2011,7 +1966,7 @@ const CategoryModal = ( { category, templates, onClose, onSave } ) => {
 
 						<div className="form-field">
 							<label htmlFor="cat-utm">
-								{ __( 'Default UTM Template', 'saman-seo' ) }
+								{ __( 'Default UTM template', 'saman-seo' ) }
 							</label>
 							<select
 								id="cat-utm"
@@ -2078,8 +2033,8 @@ const CategoryModal = ( { category, templates, onClose, onSave } ) => {
 							{ saving
 								? __( 'Saving\u2026', 'saman-seo' )
 								: isEdit
-								? __( 'Update Category', 'saman-seo' )
-								: __( 'Create Category', 'saman-seo' ) }
+								? __( 'Update category', 'saman-seo' )
+								: __( 'Create category', 'saman-seo' ) }
 						</button>
 					</div>
 				</form>
@@ -2136,16 +2091,20 @@ const TemplateModal = ( { template, onClose, onSave } ) => {
 	};
 	return (
 		<div className="modal-overlay" onClick={ onClose }>
-			<div className="modal" onClick={ ( e ) => e.stopPropagation() }>
+			<div
+				className="modal internal-link-modal"
+				onClick={ ( e ) => e.stopPropagation() }
+			>
 				<div className="modal__header">
 					<h2>
 						{ isEdit
-							? __( 'Edit Template', 'saman-seo' )
-							: __( 'Add Template', 'saman-seo' ) }
+							? __( 'Edit template', 'saman-seo' )
+							: __( 'Add template', 'saman-seo' ) }
 					</h2>
 					<button
 						type="button"
 						className="modal__close"
+						aria-label={ __( 'Close', 'saman-seo' ) }
 						onClick={ onClose }
 					>
 						&times;

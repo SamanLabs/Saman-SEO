@@ -137,6 +137,8 @@ class Audit_Controller extends REST_Controller {
 
 		if ( $cached ) {
 			$cached['from_cache'] = true;
+			$cached['score_history'] = $this->get_score_history();
+
 			return $this->success( $cached );
 		}
 
@@ -147,7 +149,29 @@ class Audit_Controller extends REST_Controller {
 		// Cache for 1 hour
 		set_transient( 'SAMAN_SEO_audit_results', $results, HOUR_IN_SECONDS );
 
+		$results['score_history'] = $this->get_score_history();
+
 		return $this->success( $results );
+	}
+
+	/**
+	 * Site SEO score per recorded day, oldest first, for the last 14 entries.
+	 *
+	 * Reads the history the dashboard records each time it calculates the
+	 * overall score.
+	 *
+	 * @return int[]
+	 */
+	private function get_score_history() {
+		$history = get_option( 'SAMAN_SEO_score_history', array() );
+
+		if ( ! is_array( $history ) || empty( $history ) ) {
+			return array();
+		}
+
+		ksort( $history );
+
+		return array_map( 'intval', array_values( array_slice( $history, -14, 14, true ) ) );
 	}
 
 	/**

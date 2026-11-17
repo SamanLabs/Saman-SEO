@@ -185,7 +185,7 @@
     padding: @spacing-md;
     background: @color-primary-light;
     border-radius: @radius-sm;
-    border-left: 3px solid @color-primary;
+    border: 1px solid fade(@color-primary, 30%);
 
     strong {
         display: block;
@@ -216,7 +216,7 @@
         gap: @spacing-sm;
         background: linear-gradient(135deg, fade(@color-primary, 8%) 0%, fade(@color-primary, 4%) 100%);
         border: 1px solid fade(@color-primary, 15%);
-        border-left: 3px solid @color-primary;
+        border: 1px solid fade(@color-primary, 30%);
         border-radius: @radius-md;
         padding: @spacing-lg;
 
@@ -321,17 +321,6 @@
     &__placeholder {
         text-align: center;
         color: #999;
-    }
-
-    &__domain-overlay {
-        position: absolute;
-        bottom: @spacing-sm;
-        left: @spacing-sm;
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        font-size: 11px;
-        padding: 2px @spacing-sm;
-        border-radius: 3px;
     }
 
     &__body {
@@ -543,7 +532,7 @@
 // Side card variants
 .side-card {
     &.warning {
-        border-left: 3px solid @color-warning;
+        border: 1px solid fade(@color-warning, 30%);
     }
 }
 
@@ -619,4 +608,318 @@
     border: 1px solid @color-border;
     border-radius: @radius-sm;
     padding: 2px;
+}
+
+// Email reports tab: a single self-saving card, kept to a readable width.
+.settings-reports {
+    max-width: 560px;
+}
+
+// ==========================================================================
+// Settings redesign
+// ==========================================================================
+// Later rules win, so this block restyles the page without touching the
+// markup: one surface per section, rows instead of boxes inside boxes.
+
+.settings-layout {
+    gap: @spacing-xl;
+}
+
+.settings-main {
+    gap: @spacing-xl;
+}
+
+.settings-sidebar {
+    top: 32px + @spacing-2xl;
+}
+
+// Label on the left, control in a fixed column on the right, so every control
+// on the page lines up.
+.settings-row {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
+    align-items: center;
+    gap: @spacing-2xl;
+    padding: @spacing-lg 0;
+    border-bottom: 1px solid @color-border-light;
+
+    &.compact {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
+    }
+
+    &:first-of-type {
+        padding-top: 0;
+    }
+
+    &:last-child {
+        padding-bottom: 0;
+    }
+}
+
+.settings-label label {
+    font-weight: @font-weight-medium;
+}
+
+.settings-help {
+    margin-top: 2px;
+}
+
+.settings-control {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: @spacing-sm;
+    min-width: 0;
+
+    // Compact controls sit at the right edge; inputs fill the column.
+    > .radio-group,
+    > .toggle,
+    > .separator-picker,
+    > .button,
+    > .link-button {
+        align-self: flex-end;
+    }
+
+    // Two or three exclusive choices read best as one segmented control.
+    .radio-group {
+        flex-direction: row;
+        gap: 2px;
+        padding: 3px;
+        border: 1px solid @color-border;
+        border-radius: @radius-lg;
+        background: @color-surface;
+    }
+}
+
+.panel-desc {
+    margin: -@spacing-md 0 @spacing-sm;
+    font-size: @font-size-base;
+}
+
+.panel-header {
+    align-items: center;
+    margin-bottom: @spacing-sm;
+}
+
+.module-count {
+    padding: 2px @spacing-sm;
+    background: @color-surface-hover;
+    color: @color-text-secondary;
+}
+
+// Modules: a two-column list with hairlines, not a grid of bordered cards.
+.modules-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0 @spacing-3xl;
+}
+
+.module-card,
+.module-card.active {
+    align-items: center;
+    padding: @spacing-md 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid @color-border-light;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.module-card {
+    &__icon {
+        .flex-center();
+        width: 36px;
+        height: 36px;
+        border-radius: @radius-md;
+        background: @color-surface-muted;
+        color: @color-muted;
+        font-size: 18px;
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    &.active &__icon {
+        background: @color-primary-light;
+        color: @color-primary;
+    }
+
+    &__content h4 {
+        margin-bottom: 0;
+        font-weight: @font-weight-medium;
+    }
+
+    &:not(.active) &__content h4 {
+        color: @color-text-secondary;
+    }
+}
+
+.separator-option {
+    width: 36px;
+    height: 36px;
+    font-size: @font-size-base;
+    font-weight: @font-weight-medium;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+
+    &.active {
+        background: @color-primary-light;
+        border-color: @color-primary;
+    }
+}
+
+// Notes inside a section: plain muted blocks, no tinted borders or gradients.
+.settings-info-box,
+.settings-info-box--cta {
+    margin-top: @spacing-lg;
+    padding: @spacing-md @spacing-lg;
+    background: @color-surface-muted;
+    border: 0;
+    border-radius: @radius-md;
+
+    strong {
+        font-size: @font-size-base;
+        font-weight: @font-weight-medium;
+        color: @color-text;
+    }
+
+    p {
+        font-size: @font-size-base;
+        color: @color-text-secondary;
+    }
+}
+
+.side-card,
+.side-card.highlight,
+.side-card.warning,
+.side-card.success {
+    padding: @spacing-xl;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-xl;
+
+    h3 {
+        font-size: @font-size-base;
+    }
+}
+
+.settings-grid .settings-row {
+    padding: @spacing-md @spacing-lg;
+    border: 0;
+    border-radius: @radius-md;
+}
+
+.tool-action {
+    border-radius: @radius-lg;
+}
+
+.danger-zone {
+    border-color: fade(@color-danger, 35%);
+
+    h3 {
+        color: @color-danger-text;
+    }
+}
+
+.panel-header .panel-desc {
+    margin: 2px 0 0;
+}
+
+// Moved-elsewhere notice (API keys now live in the AI plugin). Sits directly
+// in its panel: icon, text, actions, no box of its own.
+.deprecation-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-lg;
+    padding-top: @spacing-sm;
+
+    h4 {
+        margin: 0 0 @spacing-xs;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+
+    p {
+        margin: 0;
+        max-width: 68ch;
+        color: @color-muted;
+    }
+}
+
+.deprecation-notice__icon {
+    flex-shrink: 0;
+    display: flex;
+    color: @color-primary;
+}
+
+.deprecation-notice__content {
+    min-width: 0;
+}
+
+.deprecation-notice__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-sm;
+    margin-top: @spacing-lg;
+}
+
+.legacy-settings-toggle {
+    margin-top: @spacing-xl;
+    padding-top: @spacing-lg;
+    border-top: 1px solid @color-border;
+
+    > summary {
+        cursor: pointer;
+        color: @color-muted;
+        font-size: @font-size-sm;
+
+        &:hover {
+            color: @color-text;
+        }
+    }
+}
+
+.legacy-settings-content {
+    margin-top: @spacing-lg;
+}
+
+.settings-info {
+    margin-top: @spacing-lg;
+
+    p {
+        margin: 0;
+        max-width: 72ch;
+    }
+}
+
+// One surface level: notes, tool blocks and module icons sit directly on
+// their panel instead of in a tinted box of their own.
+.settings-info-box,
+.settings-info-box--cta {
+    margin-top: @spacing-lg;
+    padding: @spacing-lg 0 0;
+    background: none;
+    border: 0;
+    border-top: 1px solid @color-border-light;
+    border-radius: 0;
+}
+
+.tool-action {
+    padding: 0;
+    background: none;
+    border-radius: 0;
+}
+
+.tools-actions {
+    gap: @spacing-xl @spacing-3xl;
+}
+
+.module-card__icon,
+.module-card.active .module-card__icon {
+    width: 20px;
+    height: 20px;
+    background: none;
+    border-radius: 0;
 }

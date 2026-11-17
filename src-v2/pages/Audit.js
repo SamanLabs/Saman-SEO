@@ -2,15 +2,17 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 // Issue type labels
+import { KpiBand, MetricCard, Sparkline } from '../components/Kpi';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 const ISSUE_TYPE_LABELS = {
-	title_missing: __( 'Missing Meta Title', 'saman-seo' ),
-	title_length: __( 'Title Too Long', 'saman-seo' ),
-	description_missing: __( 'Missing Meta Description', 'saman-seo' ),
-	description_length: __( 'Description Too Long', 'saman-seo' ),
-	missing_alt: __( 'Missing Alt Text', 'saman-seo' ),
-	low_word_count: __( 'Low Word Count', 'saman-seo' ),
-	missing_h1: __( 'Missing H1 Heading', 'saman-seo' ),
+	title_missing: __( 'Missing meta title', 'saman-seo' ),
+	title_length: __( 'Title too long', 'saman-seo' ),
+	description_missing: __( 'Missing meta description', 'saman-seo' ),
+	description_length: __( 'Description too long', 'saman-seo' ),
+	missing_alt: __( 'Missing alt text', 'saman-seo' ),
+	low_word_count: __( 'Low word count', 'saman-seo' ),
+	missing_h1: __( 'Missing H1 heading', 'saman-seo' ),
 };
 
 // Severity colors and labels
@@ -171,9 +173,10 @@ const Audit = () => {
 	if ( loading ) {
 		return (
 			<div className="page">
+				<KpiBand loading count={ 4 } />
 				<div className="page-header">
 					<div>
-						<h1>{ __( 'SEO Audit', 'saman-seo' ) }</h1>
+						<h1>{ __( 'SEO audit', 'saman-seo' ) }</h1>
 						<p>
 							{ __(
 								'Scan your site for SEO issues and get actionable recommendations.',
@@ -197,11 +200,76 @@ const Audit = () => {
 		total: 0,
 	};
 	const issuesByType = getIssuesByType();
+	const scoreHistory = auditData?.score_history || [];
 	return (
 		<div className="page">
+			<KpiBand label={ __( 'Audit summary', 'saman-seo' ) }>
+				<MetricCard
+					label={ __( 'Critical issues', 'saman-seo' ) }
+					value={ stats.severity.high }
+					tone={ stats.severity.high > 0 ? 'danger' : 'success' }
+					sub={
+						stats.severity.high === 0
+							? __( 'All critical checks passed', 'saman-seo' )
+							: __( 'Issues severely impacting SEO', 'saman-seo' )
+					}
+				/>
+				<MetricCard
+					label={ __( 'Warnings', 'saman-seo' ) }
+					value={ stats.severity.medium }
+					tone={ stats.severity.medium > 0 ? 'warning' : 'success' }
+					sub={
+						stats.severity.medium === 0
+							? __( 'No warnings found', 'saman-seo' )
+							: __(
+									'Issues that may affect rankings',
+									'saman-seo'
+							  )
+					}
+				/>
+				<MetricCard
+					label={ __( 'Suggestions', 'saman-seo' ) }
+					value={ stats.severity.low }
+					sub={
+						stats.severity.low === 0
+							? __( 'No suggestions', 'saman-seo' )
+							: __(
+									'Optional improvements available',
+									'saman-seo'
+							  )
+					}
+				/>
+				{ scoreHistory.length > 1 ? (
+					<MetricCard
+						label={ __( 'Site SEO score', 'saman-seo' ) }
+						value={ scoreHistory[ scoreHistory.length - 1 ] }
+						unit={ __( 'of 100', 'saman-seo' ) }
+						sub={ sprintf(
+							/* translators: 1: posts scanned, 2: posts with issues */
+							__(
+								'%1$s posts scanned, %2$s with issues',
+								'saman-seo'
+							),
+							auditData?.scanned || 0,
+							stats.posts_with_issues || 0
+						) }
+						spark={ <Sparkline data={ scoreHistory } /> }
+					/>
+				) : (
+					<MetricCard
+						label={ __( 'Posts scanned', 'saman-seo' ) }
+						value={ auditData?.scanned || 0 }
+						sub={ sprintf(
+							/* translators: %s: number of posts */
+							__( '%s with issues', 'saman-seo' ),
+							stats.posts_with_issues || 0
+						) }
+					/>
+				) }
+			</KpiBand>
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'SEO Audit', 'saman-seo' ) }</h1>
+					<h1>{ __( 'SEO audit', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Scan your site for SEO issues and get actionable recommendations.',
@@ -227,7 +295,7 @@ const Audit = () => {
 								{ __( 'Running Audit\u2026', 'saman-seo' ) }
 							</>
 						) : (
-							__( 'Run Full Audit', 'saman-seo' )
+							__( 'Run full audit', 'saman-seo' )
 						) }
 					</button>
 				</div>
@@ -240,158 +308,11 @@ const Audit = () => {
 			) }
 
 			{ /* Stats Cards */ }
-			<div className="audit-stats-grid">
-				<div
-					className={ `audit-stat-card ${
-						stats.severity.high > 0 ? 'has-issues' : 'no-issues'
-					}` }
-				>
-					<div className="audit-stat-icon danger">
-						<svg
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
-							<path
-								d="M12 9v4M12 17h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-							/>
-						</svg>
-					</div>
-					<div className="audit-stat-content">
-						<div className="audit-stat-number">
-							{ stats.severity.high }
-						</div>
-						<div className="audit-stat-label">
-							{ __( 'Critical Issues', 'saman-seo' ) }
-						</div>
-						<div className="audit-stat-desc">
-							{ stats.severity.high === 0
-								? __(
-										'All critical checks passed',
-										'saman-seo'
-								  )
-								: __(
-										'Issues severely impacting SEO',
-										'saman-seo'
-								  ) }
-						</div>
-					</div>
-				</div>
-
-				<div
-					className={ `audit-stat-card ${
-						stats.severity.medium > 0 ? 'has-issues' : 'no-issues'
-					}` }
-				>
-					<div className="audit-stat-icon warning">
-						<svg
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
-							<path
-								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</div>
-					<div className="audit-stat-content">
-						<div className="audit-stat-number">
-							{ stats.severity.medium }
-						</div>
-						<div className="audit-stat-label">
-							{ __( 'Warnings', 'saman-seo' ) }
-						</div>
-						<div className="audit-stat-desc">
-							{ stats.severity.medium === 0
-								? __( 'No warnings found', 'saman-seo' )
-								: __(
-										'Issues that may affect rankings',
-										'saman-seo'
-								  ) }
-						</div>
-					</div>
-				</div>
-
-				<div className="audit-stat-card">
-					<div className="audit-stat-icon muted">
-						<svg
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
-							<path
-								d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</div>
-					<div className="audit-stat-content">
-						<div className="audit-stat-number">
-							{ stats.severity.low }
-						</div>
-						<div className="audit-stat-label">
-							{ __( 'Suggestions', 'saman-seo' ) }
-						</div>
-						<div className="audit-stat-desc">
-							{ stats.severity.low === 0
-								? __( 'No suggestions', 'saman-seo' )
-								: __(
-										'Optional improvements available',
-										'saman-seo'
-								  ) }
-						</div>
-					</div>
-				</div>
-
-				<div className="audit-stat-card info">
-					<div className="audit-stat-icon info">
-						<svg
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
-							<path
-								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</div>
-					<div className="audit-stat-content">
-						<div className="audit-stat-number">
-							{ auditData?.scanned || 0 }
-						</div>
-						<div className="audit-stat-label">
-							{ __( 'Posts Scanned', 'saman-seo' ) }
-						</div>
-						<div className="audit-stat-desc">
-							{ stats.posts_with_issues || 0 }{ ' ' }
-							{ __( 'with issues', 'saman-seo' ) }
-						</div>
-					</div>
-				</div>
-			</div>
 
 			{ /* Issues by Type */ }
 			<section className="audit-section">
 				<div className="audit-section-header">
-					<h2>{ __( 'Issues by Type', 'saman-seo' ) }</h2>
+					<h2>{ __( 'Issues by type', 'saman-seo' ) }</h2>
 					<p className="muted">
 						{ __(
 							'Click on an issue type to see affected posts.',
@@ -541,7 +462,7 @@ const Audit = () => {
 																			className="link-button"
 																		>
 																			{ __(
-																				'Edit Post',
+																				'Edit post',
 																				'saman-seo'
 																			) }
 																		</a>
@@ -566,7 +487,7 @@ const Audit = () => {
 				auditData.recommendations.length > 0 && (
 					<section className="audit-section">
 						<div className="audit-section-header">
-							<h2>{ __( 'Quick Fixes', 'saman-seo' ) }</h2>
+							<h2>{ __( 'Quick fixes', 'saman-seo' ) }</h2>
 							<p className="muted">
 								{ __(
 									'Apply suggested meta titles and descriptions with one click.',
@@ -575,78 +496,79 @@ const Audit = () => {
 							</p>
 						</div>
 
-						<div className="recommendations-list">
+						<ul className="quick-fixes">
 							{ auditData.recommendations.map( ( rec ) => (
-								<div
-									key={ rec.post_id }
-									className="recommendation-card"
-								>
-									<div className="recommendation-header">
-										<h4>{ rec.title }</h4>
-										<a
-											href={ rec.edit_url }
-											target="_blank"
-											rel="noopener noreferrer"
-											className="link-button small"
-										>
-											{ __( 'Edit Post', 'saman-seo' ) }
-										</a>
-									</div>
-									<div className="recommendation-suggestions">
-										<div className="suggestion-item">
-											<label>
+								<li key={ rec.post_id } className="quick-fix">
+									<div className="quick-fix__main">
+										<div className="quick-fix__head">
+											<h3>
+												{ decodeEntities( rec.title ) }
+											</h3>
+											<a
+												href={ rec.edit_url }
+												target="_blank"
+												rel="noopener noreferrer"
+											>
 												{ __(
-													'Suggested Title',
+													'Edit post',
 													'saman-seo'
 												) }
-											</label>
-											<div className="suggestion-value">
-												{ rec.suggested_title }
-											</div>
+											</a>
 										</div>
-										<div className="suggestion-item">
-											<label>
+										<dl className="quick-fix__fields">
+											<dt>
+												{ __( 'Title', 'saman-seo' ) }
+											</dt>
+											<dd>
+												{ decodeEntities(
+													rec.suggested_title || ''
+												) }
+											</dd>
+											<dt>
 												{ __(
-													'Suggested Description',
+													'Description',
 													'saman-seo'
 												) }
-											</label>
-											<div className="suggestion-value">
-												{ rec.suggested_description ||
-													__(
-														'(No suggestion available)',
-														'saman-seo'
-													) }
-											</div>
-										</div>
+											</dt>
+											<dd
+												className={
+													rec.suggested_description
+														? ''
+														: 'is-empty'
+												}
+											>
+												{ rec.suggested_description
+													? decodeEntities(
+															rec.suggested_description
+													  )
+													: __(
+															'No suggestion available',
+															'saman-seo'
+													  ) }
+											</dd>
+										</dl>
 									</div>
-									<div className="recommendation-actions">
-										<button
-											type="button"
-											className="button primary small"
-											onClick={ () =>
-												handleApplyRecommendation( rec )
-											}
-											disabled={
-												applyingRecommendation ===
-												rec.post_id
-											}
-										>
-											{ applyingRecommendation ===
+									<button
+										type="button"
+										className="button small"
+										onClick={ () =>
+											handleApplyRecommendation( rec )
+										}
+										disabled={
+											applyingRecommendation ===
 											rec.post_id
-												? __(
-														'Applying\u2026',
-														'saman-seo'
-												  )
-												: __(
-														'Apply Suggestions',
-														'saman-seo'
-												  ) }
-										</button>
-									</div>
-								</div>
+										}
+									>
+										{ applyingRecommendation === rec.post_id
+											? __(
+													'Applying\u2026',
+													'saman-seo'
+											  )
+											: __( 'Apply', 'saman-seo' ) }
+									</button>
+								</li>
 							) ) }
-						</div>
+						</ul>
 					</section>
 				) }
 		</div>

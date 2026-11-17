@@ -8,6 +8,7 @@ import { useState, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import { icons as sharedIcons } from '../components/Icons';
+import { KpiBand, MetricCard } from '../components/Kpi';
 
 // Map schema types to shared icon components.
 const schemaIconMap = {
@@ -20,13 +21,6 @@ const schemaIconMap = {
 	FAQPage: 'helpCircle',
 	HowTo: 'checklist',
 	VideoObject: 'video',
-};
-
-// Info notices (e.g. types Google no longer shows as rich results) use the
-// schema-issues layout with a neutral blue palette.
-const infoIssueStyle = {
-	background: '#f0f6fc',
-	color: '#135e96',
 };
 
 const SchemaValidator = ( { onNavigate } ) => {
@@ -122,11 +116,53 @@ const SchemaValidator = ( { onNavigate } ) => {
 		const c = config[ status ] || config.valid;
 		return <span className={ `pill ${ c.className }` }>{ c.label }</span>;
 	};
+
+	// The band is always on the page so the frame does not jump when a
+	// result arrives; before the first run its tiles show a dash.
+	const schemaCount = results?.schemas?.length || 0;
+	const dash = '\u2013';
 	return (
-		<div className="page">
+		<div className="page schema-validator-page">
+			{ ( loading || results ) &&
+				( loading ? (
+					<KpiBand loading count={ 4 } />
+				) : (
+					<KpiBand label={ __( 'Validation summary', 'saman-seo' ) }>
+						<MetricCard
+							label={ __( 'Schemas found', 'saman-seo' ) }
+							value={ results ? schemaCount : dash }
+						/>
+						<MetricCard
+							label={ __( 'Valid', 'saman-seo' ) }
+							value={ results ? results.valid_count || 0 : dash }
+							tone={
+								results?.valid_count > 0 ? 'success' : undefined
+							}
+						/>
+						<MetricCard
+							label={ __( 'Warnings', 'saman-seo' ) }
+							value={
+								results ? results.warning_count || 0 : dash
+							}
+							tone={
+								results?.warning_count > 0
+									? 'warning'
+									: undefined
+							}
+						/>
+						<MetricCard
+							label={ __( 'Errors', 'saman-seo' ) }
+							value={ results ? results.error_count || 0 : dash }
+							tone={
+								results?.error_count > 0 ? 'danger' : undefined
+							}
+						/>
+					</KpiBand>
+				) ) }
+
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'Schema Validator', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Schema validator', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Test and validate structured data (JSON-LD) on any URL.',
@@ -137,69 +173,67 @@ const SchemaValidator = ( { onNavigate } ) => {
 			</div>
 
 			{ /* URL Input */ }
-			<div className="card">
-				<div className="schema-validator-input">
-					<div className="input-group">
-						<input
-							type="url"
-							className="tool-input"
-							placeholder={ __(
-								'Enter URL to validate (e.g., https://example.com/page)',
-								'saman-seo'
-							) }
-							value={ url }
-							onChange={ ( e ) => setUrl( e.target.value ) }
-							onKeyDown={ ( e ) =>
-								e.key === 'Enter' && handleValidate()
-							}
-						/>
-						<button
-							id="validate-btn"
-							type="button"
-							className="button primary large"
-							onClick={ handleValidate }
-							disabled={ loading }
-						>
-							{ loading ? (
-								<>
-									<span className="spinner" />
-									{ __( 'Validating\u2026', 'saman-seo' ) }
-								</>
-							) : (
-								<>
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										width="18"
-										height="18"
-									>
-										<circle cx="11" cy="11" r="8" />
-										<path d="M21 21l-4.35-4.35" />
-									</svg>
-									{ __( 'Validate', 'saman-seo' ) }
-								</>
-							) }
-						</button>
-					</div>
-					<div className="quick-actions">
-						<button
-							type="button"
-							className="button ghost small"
-							onClick={ handleValidateSite }
-						>
-							{ __( 'Test Homepage', 'saman-seo' ) }
-						</button>
-						<span className="quick-actions__hint">
-							{ __(
-								'Enter any URL to check its structured data markup',
-								'saman-seo'
-							) }
-						</span>
-					</div>
+			<section className="panel">
+				<h3>{ __( 'URL to validate', 'saman-seo' ) }</h3>
+				<p className="panel-desc">
+					{ __(
+						'Enter any URL to check its structured data markup',
+						'saman-seo'
+					) }
+				</p>
+				<div className="input-group">
+					<input
+						type="url"
+						className="tool-input"
+						aria-label={ __( 'URL to validate', 'saman-seo' ) }
+						placeholder={ __(
+							'Enter URL to validate (e.g., https://example.com/page)',
+							'saman-seo'
+						) }
+						value={ url }
+						onChange={ ( e ) => setUrl( e.target.value ) }
+						onKeyDown={ ( e ) =>
+							e.key === 'Enter' && handleValidate()
+						}
+					/>
+					<button
+						type="button"
+						className="button"
+						onClick={ handleValidateSite }
+					>
+						{ __( 'Test homepage', 'saman-seo' ) }
+					</button>
+					<button
+						id="validate-btn"
+						type="button"
+						className="button primary"
+						onClick={ handleValidate }
+						disabled={ loading }
+					>
+						{ loading ? (
+							<>
+								<span className="spinner-small" />
+								{ __( 'Validating\u2026', 'saman-seo' ) }
+							</>
+						) : (
+							<>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									width="16"
+									height="16"
+								>
+									<circle cx="11" cy="11" r="8" />
+									<path d="M21 21l-4.35-4.35" />
+								</svg>
+								{ __( 'Validate', 'saman-seo' ) }
+							</>
+						) }
+					</button>
 				</div>
-			</div>
+			</section>
 
 			{ /* Error */ }
 			{ error && (
@@ -219,181 +253,134 @@ const SchemaValidator = ( { onNavigate } ) => {
 				</div>
 			) }
 
-			{ /* Results */ }
-			{ results && (
-				<div className="schema-validator-results">
-					{ /* Summary */ }
-					<div className="card">
-						<div className="schema-summary">
-							<div className="schema-summary__header">
-								<h3>
-									{ __( 'Validation Results', 'saman-seo' ) }
-								</h3>
-								<a
-									href={ results.url }
-									target="_blank"
-									rel="noopener noreferrer"
-									className="schema-summary__url"
-								>
-									{ results.url }
-								</a>
-							</div>
-							<div className="schema-summary__stats">
-								<div className="schema-stat">
-									<div className="schema-stat__value">
-										{ results.schemas?.length || 0 }
-									</div>
-									<div className="schema-stat__label">
-										{ __( 'Schema', 'saman-seo' ) }
-										{ results.schemas?.length !== 1
-											? 's'
-											: '' }{ ' ' }
-										{ __( 'Found', 'saman-seo' ) }
-									</div>
-								</div>
-								<div className="schema-stat schema-stat--success">
-									<div className="schema-stat__value">
-										{ results.valid_count || 0 }
-									</div>
-									<div className="schema-stat__label">
-										{ __( 'Valid', 'saman-seo' ) }
-									</div>
-								</div>
-								<div className="schema-stat schema-stat--warning">
-									<div className="schema-stat__value">
-										{ results.warning_count || 0 }
-									</div>
-									<div className="schema-stat__label">
-										{ __( 'Warnings', 'saman-seo' ) }
-									</div>
-								</div>
-								<div className="schema-stat schema-stat--error">
-									<div className="schema-stat__value">
-										{ results.error_count || 0 }
-									</div>
-									<div className="schema-stat__label">
-										{ __( 'Errors', 'saman-seo' ) }
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+			{ /* No Schemas */ }
+			{ results && schemaCount === 0 && (
+				<div className="empty-state">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+					>
+						<path d="M16 18l2-2-2-2M8 18l-2-2 2-2M14 4l-4 16" />
+					</svg>
+					<h3>{ __( 'No structured data found', 'saman-seo' ) }</h3>
+					<p>
+						{ __(
+							"This page doesn't contain any JSON-LD structured data markup.",
+							'saman-seo'
+						) }
+					</p>
+				</div>
+			) }
 
-					{ /* No Schemas */ }
-					{ ( ! results.schemas || results.schemas.length === 0 ) && (
-						<div className="card">
-							<div className="empty-state">
-								<div className="empty-state__icon">
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-									>
-										<path d="M16 18l2-2-2-2M8 18l-2-2 2-2M14 4l-4 16" />
-									</svg>
-								</div>
-								<h3>
-									{ __(
-										'No Structured Data Found',
-										'saman-seo'
-									) }
-								</h3>
-								<p>
-									{ __(
-										"This page doesn't contain any JSON-LD structured data markup.",
-										'saman-seo'
-									) }
-								</p>
-							</div>
-						</div>
-					) }
-
-					{ /* Schema List */ }
-					{ results.schemas && results.schemas.length > 0 && (
-						<div className="schema-list">
-							{ results.schemas.map( ( schema, index ) => (
-								<div key={ index } className="card schema-card">
-									<div
-										className="schema-card__header"
+			{ /* Schema List */ }
+			{ results && schemaCount > 0 && (
+				<section className="improvements-group">
+					<h2 className="improvements-group__title">
+						{ __( 'Validation results', 'saman-seo' ) }
+					</h2>
+					<p className="group-note">
+						<a
+							href={ results.url }
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{ results.url }
+						</a>
+					</p>
+					<ul className="improvements-list">
+						{ results.schemas.map( ( schema, index ) => {
+							const isOpen = expandedSchema === index;
+							const errorCount = schema.errors?.length || 0;
+							const warningCount = schema.warnings?.length || 0;
+							return (
+								<li key={ index } className="schema-result">
+									<button
+										type="button"
+										className="improvement-row schema-result__head"
+										aria-expanded={ isOpen }
 										onClick={ () =>
 											setExpandedSchema(
-												expandedSchema === index
-													? null
-													: index
+												isOpen ? null : index
 											)
 										}
 									>
-										<div className="schema-card__type">
-											<div className="schema-card__icon">
-												{ getSchemaIcon(
-													schema.types?.[ 0 ] ||
-														schema.type
+										<span
+											className="schema-result__icon"
+											aria-hidden="true"
+										>
+											{ getSchemaIcon(
+												schema.types?.[ 0 ] ||
+													schema.type
+											) }
+										</span>
+										<span className="schema-result__main">
+											<span className="schema-result__title">
+												<span className="schema-result__type">
+													{ schema.type }
+												</span>
+												{ errorCount > 0 && (
+													<StatusBadge
+														status="errors"
+														count={ errorCount }
+													/>
 												) }
-											</div>
-											<div className="schema-card__info">
-												<h4>{ schema.type }</h4>
-												{ schema.name && (
-													<span className="schema-card__name">
-														{ schema.name }
+												{ errorCount === 0 &&
+													warningCount > 0 && (
+														<StatusBadge
+															status="warnings"
+															count={
+																warningCount
+															}
+														/>
+													) }
+												{ errorCount === 0 &&
+													warningCount === 0 && (
+														<StatusBadge status="valid" />
+													) }
+												{ schema.notices?.length >
+													0 && (
+													<span className="pill">
+														{ __(
+															'No Google rich result',
+															'saman-seo'
+														) }
 													</span>
 												) }
-											</div>
-										</div>
-										<div className="schema-card__status">
-											{ schema.errors?.length > 0 ? (
-												<StatusBadge
-													status="errors"
-													count={
-														schema.errors.length
-													}
-												/>
-											) : schema.warnings?.length > 0 ? (
-												<StatusBadge
-													status="warnings"
-													count={
-														schema.warnings.length
-													}
-												/>
-											) : (
-												<StatusBadge status="valid" />
-											) }
-											{ schema.notices?.length > 0 && (
-												<span className="pill info">
-													{ __(
-														'No Google rich result',
-														'saman-seo'
-													) }
+											</span>
+											{ schema.name && (
+												<span className="schema-result__name">
+													{ schema.name }
 												</span>
 											) }
-											<svg
-												className={ `schema-card__toggle ${
-													expandedSchema === index
-														? 'schema-card__toggle--open'
-														: ''
-												}` }
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<path d="M6 9l6 6 6-6" />
-											</svg>
-										</div>
-									</div>
+										</span>
+										<svg
+											className={ `schema-result__toggle${
+												isOpen ? ' is-open' : ''
+											}` }
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											aria-hidden="true"
+										>
+											<path d="M6 9l6 6 6-6" />
+										</svg>
+									</button>
 
-									{ expandedSchema === index && (
-										<div className="schema-card__body">
+									{ isOpen && (
+										<div className="schema-result__body">
 											{ /* Errors */ }
-											{ schema.errors?.length > 0 && (
-												<div className="schema-issues schema-issues--error">
-													<h5>
+											{ errorCount > 0 && (
+												<div>
+													<h4>
 														{ __(
 															'Errors',
 															'saman-seo'
 														) }
-													</h5>
-													<ul>
+													</h4>
+													<ul className="note-list is-danger">
 														{ schema.errors.map(
 															( err, i ) => (
 																<li key={ i }>
@@ -406,15 +393,15 @@ const SchemaValidator = ( { onNavigate } ) => {
 											) }
 
 											{ /* Warnings */ }
-											{ schema.warnings?.length > 0 && (
-												<div className="schema-issues schema-issues--warning">
-													<h5>
+											{ warningCount > 0 && (
+												<div>
+													<h4>
 														{ __(
 															'Warnings',
 															'saman-seo'
 														) }
-													</h5>
-													<ul>
+													</h4>
+													<ul className="note-list is-warning">
 														{ schema.warnings.map(
 															( warn, i ) => (
 																<li key={ i }>
@@ -428,17 +415,14 @@ const SchemaValidator = ( { onNavigate } ) => {
 
 											{ /* Info notices */ }
 											{ schema.notices?.length > 0 && (
-												<div
-													className="schema-issues schema-issues--info"
-													style={ infoIssueStyle }
-												>
-													<h5>
+												<div>
+													<h4>
 														{ __(
 															'Info',
 															'saman-seo'
 														) }
-													</h5>
-													<ul>
+													</h4>
+													<ul className="note-list">
 														{ schema.notices.map(
 															( notice, i ) => (
 																<li key={ i }>
@@ -451,26 +435,26 @@ const SchemaValidator = ( { onNavigate } ) => {
 											) }
 
 											{ /* Properties */ }
-											<div className="schema-properties">
-												<h5>
+											<div>
+												<h4>
 													{ __(
 														'Properties',
 														'saman-seo'
 													) }
-												</h5>
-												<div className="schema-properties__list">
+												</h4>
+												<div className="schema-props">
 													{ Object.entries(
 														schema.properties || {}
 													).map(
 														( [ key, value ] ) => (
 															<div
 																key={ key }
-																className="schema-property"
+																className="schema-props__row"
 															>
-																<span className="schema-property__key">
+																<span className="schema-props__key">
 																	{ key }
 																</span>
-																<span className="schema-property__value">
+																<span className="schema-props__value">
 																	{ typeof value ===
 																	'object'
 																		? JSON.stringify(
@@ -492,14 +476,14 @@ const SchemaValidator = ( { onNavigate } ) => {
 											</div>
 
 											{ /* Raw JSON */ }
-											<details className="schema-raw">
+											<details>
 												<summary>
 													{ __(
-														'View Raw JSON-LD',
+														'View raw JSON-LD',
 														'saman-seo'
 													) }
 												</summary>
-												<pre>
+												<pre className="code-block">
 													{ JSON.stringify(
 														schema.raw,
 														null,
@@ -509,61 +493,60 @@ const SchemaValidator = ( { onNavigate } ) => {
 											</details>
 										</div>
 									) }
-								</div>
-							) ) }
-						</div>
-					) }
+								</li>
+							);
+						} ) }
+					</ul>
+				</section>
+			) }
 
-					{ /* Tips */ }
-					<div className="card schema-tips">
-						<h4>{ __( 'Testing Tips', 'saman-seo' ) }</h4>
-						<ul>
-							<li>
-								{ __( 'Use', 'saman-seo' ) }{ ' ' }
-								<a
-									href="https://search.google.com/test/rich-results"
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ __(
-										'Google Rich Results Test',
-										'saman-seo'
-									) }
-								</a>{ ' ' }
-								{ __( 'for official validation', 'saman-seo' ) }
-							</li>
-							<li>
-								{ __( 'Use', 'saman-seo' ) }{ ' ' }
-								<a
-									href="https://validator.schema.org/"
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ __(
-										'Schema.org Validator',
-										'saman-seo'
-									) }
-								</a>{ ' ' }
+			{ /* Tips */ }
+			{ results && (
+				<section className="panel">
+					<h3>{ __( 'Testing tips', 'saman-seo' ) }</h3>
+					<ul className="note-list">
+						<li>
+							{ __( 'Use', 'saman-seo' ) }{ ' ' }
+							<a
+								href="https://search.google.com/test/rich-results"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								{ __(
-									'for detailed schema checking',
+									'Google Rich Results Test',
 									'saman-seo'
 								) }
-							</li>
-							<li>
-								{ __(
-									'Common issues: missing required properties, incorrect data types, invalid URLs',
-									'saman-seo'
-								) }
-							</li>
-							<li>
-								{ __(
-									'Info notices mark markup that is valid schema.org but no longer produces a Google rich result (for example FAQ and HowTo). It is safe to keep.',
-									'saman-seo'
-								) }
-							</li>
-						</ul>
-					</div>
-				</div>
+							</a>{ ' ' }
+							{ __( 'for official validation', 'saman-seo' ) }
+						</li>
+						<li>
+							{ __( 'Use', 'saman-seo' ) }{ ' ' }
+							<a
+								href="https://validator.schema.org/"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{ __( 'Schema.org validator', 'saman-seo' ) }
+							</a>{ ' ' }
+							{ __(
+								'for detailed schema checking',
+								'saman-seo'
+							) }
+						</li>
+						<li>
+							{ __(
+								'Common issues: missing required properties, incorrect data types, invalid URLs',
+								'saman-seo'
+							) }
+						</li>
+						<li>
+							{ __(
+								'Info notices mark markup that is valid schema.org but no longer produces a Google rich result (for example FAQ and HowTo). It is safe to keep.',
+								'saman-seo'
+							) }
+						</li>
+					</ul>
+				</section>
 			) }
 		</div>
 	);

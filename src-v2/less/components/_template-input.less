@@ -5,10 +5,6 @@
 // Variable colors by type (consistent WordPress palette)
 @var-global: @color-primary;   // Blue - site/global vars
 @var-separator: @color-muted;  // Gray - separator
-@var-post: @color-primary;     // Blue - post vars
-@var-taxonomy: @color-success; // Green - taxonomy vars
-@var-author: @color-warning;   // Yellow - author vars
-@var-archive: @color-primary;  // Blue - archive vars
 
 .template-input-v2 {
     .flex-column();
@@ -16,7 +12,7 @@
 
     &.is-focused .template-input-v2__container {
         border-color: @color-primary;
-        box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.12);
+        box-shadow: 0 0 0 3px fade(@color-primary, 12%);
     }
 
     &.is-disabled {
@@ -78,7 +74,7 @@
 
     &--global {
         background: #e7f3ff;
-        color: #2271b1;
+        color: @color-primary;
         border-color: #b8d6fb;
     }
 
@@ -267,7 +263,6 @@
         font-weight: @font-weight-semibold;
     }
 }
-
 
 // Override WordPress/settings-control input styles
 // Only target the main field, NOT the variable picker search input

@@ -559,6 +559,7 @@ class Dashboard_Controller extends REST_Controller {
 			'active'        => (int) $active,
 			'hits_today'    => (int) $hits_today,
 			'hits_week'     => (int) $hits_week,
+			'daily_hits'    => $redirects && method_exists( $redirects, 'get_daily_hits_series' ) ? $redirects->get_daily_hits_series( 14 ) : array(),
 			'broken'        => 0, // Placeholder for broken redirect detection
 			'suggestions'   => $suggestions_count,
 			'status'        => $active > 0 ? 'active' : 'inactive',
@@ -633,11 +634,29 @@ class Dashboard_Controller extends REST_Controller {
 			ARRAY_A
 		);
 
+		// Entries last seen on each of the past 14 days, oldest first.
+		$fourteen_days_ago = gmdate( 'Y-m-d 00:00:00', strtotime( '-13 days' ) );
+        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is safe, built from $wpdb->prefix.
+		$daily_rows = $wpdb->get_results(
+			$wpdb->prepare(
+            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe, built from $wpdb->prefix.
+				"SELECT DATE(last_seen) AS day, COUNT(*) AS entries FROM {$this->log_table} WHERE last_seen >= %s GROUP BY DATE(last_seen)",
+				$fourteen_days_ago
+			),
+			OBJECT_K
+		);
+		$daily      = array();
+		for ( $i = 13; $i >= 0; $i-- ) {
+			$day     = gmdate( 'Y-m-d', strtotime( "-{$i} days" ) );
+			$daily[] = isset( $daily_rows[ $day ] ) ? (int) $daily_rows[ $day ]->entries : 0;
+		}
+
 		return array(
 			'enabled'      => $logging_enabled,
 			'total'        => (int) $total,
 			'last_30_days' => (int) $last_30,
 			'last_7_days'  => (int) $last_7,
+			'daily'        => $daily,
 			'status'       => $total > 0 ? 'warning' : 'good',
 			'top_errors'   => $top_errors ?: array(),
 		);

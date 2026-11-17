@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 const STATUS_META = {
 	on: {
@@ -12,12 +12,12 @@ const STATUS_META = {
 		pill: 'warning',
 	},
 	attention: {
-		label: __( 'Needs Attention', 'saman-seo' ),
+		label: __( 'Needs attention', 'saman-seo' ),
 		pill: 'danger',
 	},
 	off: {
-		label: __( 'Not Enabled', 'saman-seo' ),
-		pill: 'muted',
+		label: __( 'Not enabled', 'saman-seo' ),
+		pill: '',
 	},
 };
 
@@ -80,14 +80,6 @@ const Improvements = ( { onNavigate } ) => {
 	}
 
 	const groups = data?.groups || [];
-	const counts = data?.counts || {
-		on: 0,
-		partial: 0,
-		attention: 0,
-		off: 0,
-	};
-	const total = counts.on + counts.partial + counts.attention + counts.off;
-	const pct = total > 0 ? Math.round( ( counts.on / total ) * 100 ) : 0;
 
 	return (
 		<div className="page">
@@ -103,126 +95,74 @@ const Improvements = ( { onNavigate } ) => {
 				</div>
 			</div>
 
-			<div className="improvements-summary">
-				<div className="improvements-summary__bar">
-					<div
-						className="improvements-summary__fill"
-						role="progressbar"
-						aria-valuenow={ pct }
-						aria-valuemin={ 0 }
-						aria-valuemax={ 100 }
-						aria-label={ __(
-							'Optimizations fully active',
-							'saman-seo'
-						) }
-						style={ { width: `${ pct }%` } }
-					/>
-				</div>
-				<div className="improvements-summary__legend">
-					<span>
-						{ sprintf(
-							/* translators: 1: active count, 2: total count, 3: percent */
-							__(
-								'%1$d of %2$d optimizations fully active (%3$d%%)',
-								'saman-seo'
-							),
-							counts.on,
-							total,
-							pct
-						) }
-					</span>
-					{ counts.attention > 0 && (
-						<span className="imp-legend imp-legend--danger">
-							{ sprintf(
-								/* translators: %d: count */
-								__( '%d need attention', 'saman-seo' ),
-								counts.attention
-							) }
-						</span>
-					) }
-					{ counts.off > 0 && (
-						<span className="imp-legend imp-legend--muted">
-							{ sprintf(
-								/* translators: %d: count */
-								__( '%d not enabled', 'saman-seo' ),
-								counts.off
-							) }
-						</span>
-					) }
-				</div>
-			</div>
-
 			{ groups.map( ( group ) => (
 				<section key={ group.id } className="improvements-group">
 					<h2 className="improvements-group__title">
 						{ group.label }
 					</h2>
-					<div className="improvements-grid">
+					<ul className="improvements-list">
 						{ group.items.map( ( item ) => {
 							const meta =
 								STATUS_META[ item.status ] || STATUS_META.off;
 
 							return (
-								<div
-									key={ item.id }
-									className={ `dashboard-card improvement-card status-${ item.status }` }
-								>
-									<div className="card-header">
-										<h3>{ item.title }</h3>
-										<span
-											className={ `pill ${ meta.pill }` }
-										>
-											{ meta.label }
-										</span>
-									</div>
-
-									<p className="improvement-card__desc">
-										{ item.description }
-									</p>
-
-									{ item.metrics.length > 0 && (
-										<div className="improvement-card__metrics">
-											{ item.metrics.map( ( metric ) => (
-												<div
-													key={ metric.label }
-													className="imp-metric"
-												>
-													<span className="imp-metric__value">
-														{ metric.value }
-													</span>
-													<span className="imp-metric__label">
-														{ metric.label }
-													</span>
-												</div>
-											) ) }
+								<li key={ item.id } className="improvement-row">
+									<div className="improvement-row__main">
+										<div className="improvement-row__title">
+											<h3>{ item.title }</h3>
+											<span
+												className={ `pill ${ meta.pill }` }
+											>
+												{ meta.label }
+											</span>
 										</div>
-									) }
-
-									<div className="improvement-card__footer">
-										<span
-											className={ `imp-impact imp-impact--${ item.impact }` }
-										>
-											{ IMPACT_LABEL[ item.impact ] ||
-												item.impact }
-										</span>
-										<button
-											type="button"
-											className="button"
-											onClick={ () =>
-												item.view &&
-												onNavigate &&
-												onNavigate( item.view )
-											}
-										>
-											{ item.status === 'on'
-												? __( 'Open', 'saman-seo' )
-												: __( 'Set up', 'saman-seo' ) }
-										</button>
+										<p className="improvement-row__desc">
+											{ item.description }
+										</p>
+										{ item.metrics.length > 0 && (
+											<dl className="improvement-row__metrics">
+												{ item.metrics.map(
+													( metric ) => (
+														<div
+															key={ metric.label }
+														>
+															<dd>
+																{ metric.value }
+															</dd>
+															<dt>
+																{ metric.label }
+															</dt>
+														</div>
+													)
+												) }
+											</dl>
+										) }
 									</div>
-								</div>
+									<span className="improvement-row__impact">
+										{ IMPACT_LABEL[ item.impact ] ||
+											item.impact }
+									</span>
+									<button
+										type="button"
+										className={ `button small${
+											item.status === 'on'
+												? ''
+												: ' primary'
+										}` }
+										onClick={ () =>
+											item.view &&
+											onNavigate &&
+											onNavigate( item.view )
+										}
+									>
+										{ item.status === 'on'
+											? __( 'Open', 'saman-seo' )
+											: __( 'Set up', 'saman-seo' ) }
+									</button>
+								</li>
 							);
 						} ) }
-					</div>
+					</ul>
 				</section>
 			) ) }
 		</div>

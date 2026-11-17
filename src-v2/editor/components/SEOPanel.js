@@ -37,7 +37,7 @@ const quickTemplates = [
 	},
 	{
 		id: 'keyword',
-		name: __( 'Keyword Focus', 'saman-seo' ),
+		name: __( 'Keyword focus', 'saman-seo' ),
 		title: __( '{{post_title}} - Guide', 'saman-seo' ),
 		description: __(
 			'Learn about {{post_title}}. {{post_excerpt}}',
@@ -55,7 +55,7 @@ const quickTemplates = [
 	},
 	{
 		id: 'list',
-		name: __( 'List Post', 'saman-seo' ),
+		name: __( 'List post', 'saman-seo' ),
 		title: __( 'Best {{post_title}}', 'saman-seo' ),
 		description: __(
 			'Discover the best {{post_title}}. {{post_excerpt}}',
@@ -216,7 +216,7 @@ const SEOPanel = ( {
 				/>
 				<div className="saman-seo-score-info">
 					<div className="saman-seo-score-label">
-						{ __( 'SEO Score', 'saman-seo' ) }
+						{ __( 'SEO score', 'saman-seo' ) }
 					</div>
 					<div className="saman-seo-score-status">
 						{ seoScore?.issues?.length > 0
@@ -308,7 +308,7 @@ const SEOPanel = ( {
 					{ /* Search Preview */ }
 					<div className="saman-seo-preview-section">
 						<label className="saman-seo-section-label">
-							{ __( 'Search Preview', 'saman-seo' ) }
+							{ __( 'Search preview', 'saman-seo' ) }
 						</label>
 						<SearchPreview
 							title={ effectiveTitle }
@@ -321,7 +321,7 @@ const SEOPanel = ( {
 					<div className="saman-seo-field saman-seo-field--keyphrases">
 						<div className="saman-seo-field-header">
 							<label>
-								{ __( 'Focus Keyphrases', 'saman-seo' ) }
+								{ __( 'Focus keyphrases', 'saman-seo' ) }
 							</label>
 							<span className="saman-seo-field-count">
 								{ 1 +
@@ -435,7 +435,7 @@ const SEOPanel = ( {
 									<line x1="12" y1="5" x2="12" y2="19"></line>
 									<line x1="5" y1="12" x2="19" y2="12"></line>
 								</svg>
-								{ __( 'Add Secondary Keyphrase', 'saman-seo' ) }
+								{ __( 'Add secondary keyphrase', 'saman-seo' ) }
 							</button>
 						) }
 
@@ -476,7 +476,7 @@ const SEOPanel = ( {
 									/>
 									<path d="M7 7h10M7 12h10M7 17h6" />
 								</svg>
-								{ __( 'Quick Templates', 'saman-seo' ) }
+								{ __( 'Quick templates', 'saman-seo' ) }
 								<svg
 									width="12"
 									height="12"
@@ -520,7 +520,7 @@ const SEOPanel = ( {
 
 					{ /* SEO Title with AI and Variables */ }
 					<TemplateInput
-						label={ __( 'SEO Title', 'saman-seo' ) }
+						label={ __( 'SEO title', 'saman-seo' ) }
 						id="saman-seo-seo-title"
 						value={ seoMeta.title || '' }
 						onChange={ ( value ) => updateMeta( 'title', value ) }
@@ -542,7 +542,7 @@ const SEOPanel = ( {
 
 					{ /* Meta Description with AI and Variables */ }
 					<TemplateInput
-						label={ __( 'Meta Description', 'saman-seo' ) }
+						label={ __( 'Meta description', 'saman-seo' ) }
 						id="saman-seo-meta-desc"
 						value={ seoMeta.description || '' }
 						onChange={ ( value ) =>
@@ -655,7 +655,7 @@ const SEOPanel = ( {
 					{ /* Robots Settings */ }
 					<div className="saman-seo-robots-section">
 						<label className="saman-seo-section-label">
-							{ __( 'Search Engine Visibility', 'saman-seo' ) }
+							{ __( 'Search engine visibility', 'saman-seo' ) }
 						</label>
 
 						<label className="saman-seo-toggle">
@@ -735,7 +735,7 @@ const SEOPanel = ( {
 					{ /* Robots Preview */ }
 					<div className="saman-seo-robots-preview">
 						<label className="saman-seo-section-label">
-							{ __( 'Robots Meta', 'saman-seo' ) }
+							{ __( 'Robots meta', 'saman-seo' ) }
 						</label>
 						<code className="saman-seo-robots-code">
 							{ seoMeta.noindex ||
@@ -755,7 +755,7 @@ const SEOPanel = ( {
 					{ /* Instant Indexing Section */ }
 					<div className="saman-seo-indexing-section">
 						<label className="saman-seo-section-label">
-							{ __( 'Instant Indexing', 'saman-seo' ) }
+							{ __( 'Instant indexing', 'saman-seo' ) }
 						</label>
 
 						{ indexingStatus &&
@@ -916,7 +916,7 @@ const SEOPanel = ( {
 												<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
 											</svg>
 											{ __(
-												'Request Indexing',
+												'Request indexing',
 												'saman-seo'
 											) }
 										</>
@@ -959,7 +959,7 @@ const SEOPanel = ( {
 						<div className="saman-seo-social-col">
 							<div className="saman-seo-social-preview">
 								<label className="saman-seo-section-label">
-									{ __( 'Social Preview', 'saman-seo' ) }
+									{ __( 'Social preview', 'saman-seo' ) }
 								</label>
 								<div className="saman-seo-social-card">
 									<div className="saman-seo-social-image">
@@ -1035,7 +1035,7 @@ const SEOPanel = ( {
 							<div className="saman-seo-field">
 								<div className="saman-seo-field-header">
 									<label>
-										{ __( 'Social Image', 'saman-seo' ) }
+										{ __( 'Social image', 'saman-seo' ) }
 									</label>
 								</div>
 								<div className="saman-seo-image-picker">
@@ -1103,12 +1103,12 @@ const SEOPanel = ( {
 									onClick={ () => {
 										const frame = wp.media( {
 											title: __(
-												'Select Social Image',
+												'Select social image',
 												'saman-seo'
 											),
 											button: {
 												text: __(
-													'Use Image',
+													'Use image',
 													'saman-seo'
 												),
 											},
@@ -1162,8 +1162,8 @@ const SEOPanel = ( {
 										/>
 									</svg>
 									{ seoMeta.og_image
-										? __( 'Change Image', 'saman-seo' )
-										: __( 'Select Image', 'saman-seo' ) }
+										? __( 'Change image', 'saman-seo' )
+										: __( 'Select image', 'saman-seo' ) }
 								</Button>
 								<p className="saman-seo-field-help">
 									{ __(
