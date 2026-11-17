@@ -354,6 +354,22 @@ add_filter( 'saman_seo_schema_article', function( $data ) {
 });
 ```
 
+### `saman_seo_reviews_item_reviewed_id`
+
+Change which node the site-level review schema (Local SEO > Reviews) points at.
+By default it uses the single-location LocalBusiness, then Organization, then
+Person, whichever is in the graph on that page. Return `''` to output no review
+markup. The `@id` must belong to a node present in the same `@graph`.
+
+**Parameters:** `string $id`, `Schema_Context $context`
+
+**Example:**
+```php
+add_filter( 'saman_seo_reviews_item_reviewed_id', function( $id ) {
+    return home_url( '/' ) . '#organization';
+});
+```
+
 ---
 
 ## Breadcrumbs

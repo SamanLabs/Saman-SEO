@@ -324,6 +324,14 @@ class Settings_Controller extends REST_Controller {
 			'local_image'                      => 'url',
 			'local_opening_hours'              => 'textarea',
 
+			// Site-level reviews schema (Local SEO > Reviews). Off by default.
+			'reviews_enabled'                  => 'bool',
+			'reviews_scope'                    => 'text',
+			'reviews_page_ids'                 => 'array',
+			'reviews_rating_value'             => 'text',
+			'reviews_count'                    => 'int',
+			'reviews_items'                    => 'array',
+
 			// Per-post-type options.
 			'post_type_title_templates'        => 'array',
 			'post_type_meta_descriptions'      => 'array',
@@ -421,6 +429,19 @@ class Settings_Controller extends REST_Controller {
 	 * @return mixed
 	 */
 	private function sanitize_setting_value( $key, $value, $type ) {
+		// Reviews settings have value rules beyond their base type.
+		if ( 'reviews_rating_value' === $key ) {
+			return \Saman\SEO\Schema\Types\Reviews_Schema::sanitize_rating_value( $value );
+		}
+
+		if ( 'reviews_scope' === $key ) {
+			return 'pages' === $value ? 'pages' : 'front_page';
+		}
+
+		if ( 'reviews_count' === $key ) {
+			return max( 0, (int) $value );
+		}
+
 		switch ( $type ) {
 			case 'bool':
 				return rest_sanitize_boolean( $value );
@@ -440,6 +461,14 @@ class Settings_Controller extends REST_Controller {
 			case 'array':
 				if ( ! is_array( $value ) ) {
 					return array();
+				}
+
+				if ( 'reviews_items' === $key ) {
+					return \Saman\SEO\Schema\Types\Reviews_Schema::sanitize_items( $value );
+				}
+
+				if ( 'reviews_page_ids' === $key ) {
+					return \Saman\SEO\Schema\Types\Reviews_Schema::sanitize_page_ids( $value );
 				}
 
 				if ( 'redirect_monitor_post_types' === $key ) {
