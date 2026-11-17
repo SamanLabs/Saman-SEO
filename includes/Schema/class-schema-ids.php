@@ -120,6 +120,25 @@ class Schema_IDs {
 	}
 
 	/**
+	 * Get the site-level AggregateRating schema @id.
+	 *
+	 * @return string URL#aggregaterating identifier.
+	 */
+	public static function aggregate_rating(): string {
+		return home_url( '/' ) . '#aggregaterating';
+	}
+
+	/**
+	 * Get a site-level Review schema @id.
+	 *
+	 * @param int $position 1-based position of the review in the configured list.
+	 * @return string URL#review-N identifier.
+	 */
+	public static function review( int $position ): string {
+		return home_url( '/' ) . '#review-' . $position;
+	}
+
+	/**
 	 * Get the Product schema @id for a specific URL.
 	 *
 	 * @param string $url The canonical URL of the product.

@@ -21,6 +21,7 @@ use Saman\SEO\Schema\Types\FAQPage_Schema;
 use Saman\SEO\Schema\Types\HowTo_Schema;
 use Saman\SEO\Schema\Types\LocalBusiness_Schema;
 use Saman\SEO\Schema\Types\Recipe_Schema;
+use Saman\SEO\Schema\Types\Reviews_Schema;
 use Saman\SEO\Schema\Types\Event_Schema;
 
 defined( 'ABSPATH' ) || exit;
@@ -80,6 +81,17 @@ class Plugin {
 			array(
 				'label'    => 'Local Business',
 				'priority' => 5,
+			)
+		);
+
+		// Site-level reviews / aggregate rating (priority 6 - after LocalBusiness 5).
+		// Off until configured under Local SEO > Reviews.
+		$registry->register(
+			'reviews',
+			Reviews_Schema::class,
+			array(
+				'label'    => 'Reviews',
+				'priority' => 6,
 			)
 		);
 

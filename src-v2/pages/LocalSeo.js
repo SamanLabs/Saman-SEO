@@ -573,6 +573,17 @@ const LocalSeo = () => {
 		'',
 		'',
 	] );
+
+	// Reviews schema state (off until the owner turns it on)
+	const [ reviews, setReviews ] = useState( {
+		enabled: false,
+		scope: 'front_page',
+		pageIds: [],
+		ratingValue: '',
+		count: '',
+		items: [],
+	} );
+	const [ pages, setPages ] = useState( [] );
 	const loadSettings = useCallback( async () => {
 		try {
 			setLoading( true );
@@ -603,6 +614,25 @@ const LocalSeo = () => {
 						data.homepage_organization_logo ||
 						'',
 					image: data.local_image || '',
+				} );
+
+				// Load reviews
+				setReviews( {
+					enabled: '1' === String( data.reviews_enabled || '' ),
+					scope: 'pages' === data.reviews_scope ? 'pages' : 'front_page',
+					pageIds: Array.isArray( data.reviews_page_ids )
+						? data.reviews_page_ids.map( Number )
+						: [],
+					ratingValue: data.reviews_rating_value || '',
+					count: data.reviews_count ? String( data.reviews_count ) : '',
+					items: Array.isArray( data.reviews_items )
+						? data.reviews_items.map( ( item ) => ( {
+								author: item.author || '',
+								text: item.text || '',
+								rating: item.rating ? String( item.rating ) : '',
+								date: item.date || '',
+						  } ) )
+						: [],
 				} );
 
 				// Load hours
@@ -654,6 +684,30 @@ const LocalSeo = () => {
 	useEffect( () => {
 		loadSettings();
 	}, [ loadSettings ] );
+
+	// Pages the owner can limit the reviews markup to.
+	useEffect( () => {
+		apiFetch( {
+			path: '/wp/v2/pages?per_page=100&status=publish&_fields=id,title',
+		} )
+			.then( ( list ) =>
+				setPages(
+					Array.isArray( list )
+						? list.map( ( page ) => ( {
+								id: page.id,
+								// Titles arrive HTML-escaped; read them back as plain text.
+								title:
+									new DOMParser().parseFromString(
+										page.title?.rendered || '',
+										'text/html'
+									).documentElement.textContent ||
+									`#${ page.id }`,
+						  } ) )
+						: []
+				)
+			)
+			.catch( () => setPages( [] ) );
+	}, [] );
 	useEffect( () => {
 		if ( notice ) {
 			const timer = setTimeout( () => setNotice( null ), 5000 );
@@ -689,6 +743,13 @@ const LocalSeo = () => {
 					// Sync with Knowledge Graph
 					homepage_organization_name: business.name,
 					homepage_organization_logo: business.logo,
+					// Reviews schema
+					reviews_enabled: reviews.enabled,
+					reviews_scope: reviews.scope,
+					reviews_page_ids: reviews.pageIds,
+					reviews_rating_value: reviews.ratingValue,
+					reviews_count: reviews.count === '' ? 0 : Number( reviews.count ),
+					reviews_items: reviews.items,
 				},
 			} );
 			setNotice( {
@@ -748,6 +809,40 @@ const LocalSeo = () => {
 			return updated;
 		} );
 		setActivePreset( 'custom' );
+	};
+	const handleReviewsChange = ( field, value ) => {
+		setReviews( ( prev ) => ( { ...prev, [ field ]: value } ) );
+	};
+	const handleReviewItemChange = ( index, field, value ) => {
+		setReviews( ( prev ) => ( {
+			...prev,
+			items: prev.items.map( ( item, i ) =>
+				i === index ? { ...item, [ field ]: value } : item
+			),
+		} ) );
+	};
+	const addReviewItem = () => {
+		setReviews( ( prev ) => ( {
+			...prev,
+			items: [
+				...prev.items,
+				{ author: '', text: '', rating: '', date: '' },
+			],
+		} ) );
+	};
+	const removeReviewItem = ( index ) => {
+		setReviews( ( prev ) => ( {
+			...prev,
+			items: prev.items.filter( ( item, i ) => i !== index ),
+		} ) );
+	};
+	const togglePage = ( id ) => {
+		setReviews( ( prev ) => ( {
+			...prev,
+			pageIds: prev.pageIds.includes( id )
+				? prev.pageIds.filter( ( pageId ) => pageId !== id )
+				: [ ...prev.pageIds, id ],
+		} ) );
 	};
 	const handleSocialChange = ( index, value ) => {
 		setSocialProfiles( ( prev ) => {
@@ -854,6 +949,14 @@ const LocalSeo = () => {
 							onClick={ () => setActiveTab( 'hours' ) }
 						>
 							{ __( 'Opening Hours', 'saman-seo' ) }
+						</button>
+						<button
+							className={ `tab ${
+								activeTab === 'reviews' ? 'active' : ''
+							}` }
+							onClick={ () => setActiveTab( 'reviews' ) }
+						>
+							{ __( 'Reviews', 'saman-seo' ) }
 						</button>
 					</div>
 
@@ -1531,6 +1634,200 @@ const LocalSeo = () => {
 											</div>
 										) ) }
 									</div>
+								</div>
+							</div>
+						</div>
+					) }
+					{ /* Reviews Tab */ }
+					{ activeTab === 'reviews' && (
+						<div className="tab-content">
+							<div className="card">
+								<div className="card-header">
+									<h2>{ __( 'Review Schema', 'saman-seo' ) }</h2>
+									<p>
+										{ __(
+											'Adds AggregateRating and Review structured data about your business, using the values you enter here. Nothing is fetched from Google or any review service.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+								<div className="card-body">
+									<div className="notice notice-warning reviews-notice">
+										<p>
+											<strong>
+												{ __( 'This markup does not earn Google review stars.', 'saman-seo' ) }
+											</strong>{ ' ' }
+											{ __(
+												'Google does not show star ratings for LocalBusiness or Organization pages when the business controls the reviews about itself. This is valid schema.org data that other consumers may read, but do not expect rich results in Google Search.',
+												'saman-seo'
+											) }
+										</p>
+										<p>
+											{ __(
+												'Only enter reviews that are real, from genuine customers, and shown to visitors on the pages you pick below. Markup for content people cannot see breaks Google’s structured data guidelines.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+
+									<div className="form-field reviews-check">
+										<label>
+											<input
+												type="checkbox"
+												checked={ reviews.enabled }
+												onChange={ ( e ) =>
+													handleReviewsChange( 'enabled', e.target.checked )
+												}
+											/>{ ' ' }
+											{ __( 'Output review schema', 'saman-seo' ) }
+										</label>
+									</div>
+
+									<div className="form-field">
+										<label>{ __( 'Output on', 'saman-seo' ) }</label>
+										<select
+											value={ reviews.scope }
+											onChange={ ( e ) =>
+												handleReviewsChange( 'scope', e.target.value )
+											}
+										>
+											<option value="front_page">
+												{ __( 'Front page only', 'saman-seo' ) }
+											</option>
+											<option value="pages">
+												{ __( 'Selected pages only', 'saman-seo' ) }
+											</option>
+										</select>
+									</div>
+
+									{ reviews.scope === 'pages' && (
+										<div className="form-field reviews-pages">
+											{ pages.length === 0 && (
+												<span className="field-hint">
+													{ __( 'No published pages found.', 'saman-seo' ) }
+												</span>
+											) }
+											{ pages.map( ( page ) => (
+												<label key={ page.id }>
+													<input
+														type="checkbox"
+														checked={ reviews.pageIds.includes( page.id ) }
+														onChange={ () => togglePage( page.id ) }
+													/>{ ' ' }
+													<span>{ page.title }</span>
+												</label>
+											) ) }
+										</div>
+									) }
+
+									<h3 className="reviews-heading">
+										{ __( 'Overall rating', 'saman-seo' ) }
+									</h3>
+									<div className="form-grid">
+										<div className="form-field">
+											<label>{ __( 'Rating value (1–5)', 'saman-seo' ) }</label>
+											<input
+												type="number"
+												min="1"
+												max="5"
+												step="0.1"
+												value={ reviews.ratingValue }
+												onChange={ ( e ) =>
+													handleReviewsChange( 'ratingValue', e.target.value )
+												}
+											/>
+										</div>
+										<div className="form-field">
+											<label>{ __( 'Total number of reviews', 'saman-seo' ) }</label>
+											<input
+												type="number"
+												min="0"
+												step="1"
+												value={ reviews.count }
+												onChange={ ( e ) =>
+													handleReviewsChange( 'count', e.target.value )
+												}
+											/>
+										</div>
+									</div>
+									<p className="field-hint">
+										{ __(
+											'Leave both blank to calculate them from the complete reviews below. A review count lower than the reviews listed is raised to match.',
+											'saman-seo'
+										) }
+									</p>
+
+									<h3 className="reviews-heading">{ __( 'Reviews', 'saman-seo' ) }</h3>
+									{ reviews.items.map( ( item, index ) => (
+										<div className="review-row" key={ index }>
+											<div className="form-grid">
+												<div className="form-field">
+													<label>{ __( 'Reviewer name', 'saman-seo' ) }</label>
+													<input
+														type="text"
+														maxLength={ 99 }
+														value={ item.author }
+														onChange={ ( e ) =>
+															handleReviewItemChange( index, 'author', e.target.value )
+														}
+													/>
+												</div>
+												<div className="form-field narrow">
+													<label>{ __( 'Rating (1–5)', 'saman-seo' ) }</label>
+													<input
+														type="number"
+														min="1"
+														max="5"
+														step="0.5"
+														value={ item.rating }
+														onChange={ ( e ) =>
+															handleReviewItemChange( index, 'rating', e.target.value )
+														}
+													/>
+												</div>
+												<div className="form-field narrow">
+													<label>{ __( 'Date (optional)', 'saman-seo' ) }</label>
+													<input
+														type="date"
+														value={ item.date }
+														onChange={ ( e ) =>
+															handleReviewItemChange( index, 'date', e.target.value )
+														}
+													/>
+												</div>
+											</div>
+											<div className="form-field">
+												<label>{ __( 'Review text', 'saman-seo' ) }</label>
+												<textarea
+													rows="3"
+													value={ item.text }
+													onChange={ ( e ) =>
+														handleReviewItemChange( index, 'text', e.target.value )
+													}
+												/>
+											</div>
+											<button
+												type="button"
+												className="button ghost small"
+												onClick={ () => removeReviewItem( index ) }
+											>
+												{ __( 'Remove review', 'saman-seo' ) }
+											</button>
+										</div>
+									) ) }
+									<button
+										type="button"
+										className="button ghost"
+										onClick={ addReviewItem }
+									>
+										{ __( 'Add review', 'saman-seo' ) }
+									</button>
+									<p className="field-hint">
+										{ __(
+											'A review is only output when it has a name, text and a rating. Incomplete rows are saved but skipped.',
+											'saman-seo'
+										) }
+									</p>
 								</div>
 							</div>
 						</div>
