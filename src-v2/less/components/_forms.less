@@ -8,15 +8,22 @@
     gap: @spacing-lg;
 }
 
+// Label on the left, control in a fixed column on the right, so every control
+// on a page lines up.
 .settings-row {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: @spacing-lg;
-    padding-bottom: @spacing-lg;
-    border-bottom: 1px solid @color-border;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
+    align-items: center;
+    gap: @spacing-2xl;
+    padding: @spacing-lg 0;
+    border-bottom: 1px solid @color-border-light;
 
     &.compact {
         grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
+    }
+
+    &:first-of-type {
+        padding-top: 0;
     }
 
     &:last-child {
@@ -27,12 +34,12 @@
 
 .settings-label {
     label {
-        font-weight: @font-weight-semibold;
+        font-weight: @font-weight-medium;
     }
 }
 
 .settings-help {
-    margin: 6px 0 0;
+    margin: 2px 0 0;
     color: @color-muted;
     font-size: @font-size-sm;
 
@@ -46,12 +53,37 @@
 }
 
 .settings-control {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: @spacing-sm;
+    min-width: 0;
+
     input[type="text"],
     input[type="number"],
     input[type="password"],
     select,
     textarea {
         .input-base();
+    }
+
+    // Compact controls sit at the right edge; inputs fill the column.
+    > .radio-group,
+    > .toggle,
+    > .separator-picker,
+    > .button,
+    > .link-button {
+        align-self: flex-end;
+    }
+
+    // Two or three exclusive choices read best as one segmented control.
+    .radio-group {
+        flex-direction: row;
+        gap: 2px;
+        padding: 3px;
+        border: 1px solid @color-border;
+        border-radius: @radius-lg;
+        background: @color-surface;
     }
 }
 
@@ -244,6 +276,18 @@
     .settings-row,
     .settings-row.compact {
         grid-template-columns: 1fr;
+        gap: @spacing-sm;
+    }
+
+    // Stacked under its label, a control starts at the left edge.
+    .settings-control {
+        > .radio-group,
+        > .toggle,
+        > .separator-picker,
+        > .button,
+        > .link-button {
+            align-self: flex-start;
+        }
     }
 
     .form-row {

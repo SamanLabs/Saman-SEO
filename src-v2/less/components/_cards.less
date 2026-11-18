@@ -86,22 +86,30 @@
     gap: @spacing-lg;
 }
 
+// Side cards: heading and text share the card's own gap, not browser margins.
 .side-card {
     background: @color-surface;
     border: 1px solid @color-border;
-    border-radius: @radius-md;
-    padding: @spacing-lg;
+    border-radius: @radius-xl;
+    padding: @spacing-xl;
     .flex-column();
     gap: @spacing-md;
 
     h3 {
         margin: 0;
-        font-size: @font-size-lg;
+        font-size: @font-size-base;
         font-weight: @font-weight-semibold;
     }
 
-    &.highlight {
-        background: @color-primary-lighter;
+    h4 {
+        margin: 0;
+        font-size: @font-size-base;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+
+    p {
+        margin: 0;
     }
 }
 
@@ -161,19 +169,5 @@
     &.danger {
         background: @color-danger-bg;
         color: @color-danger-text;
-    }
-}
-
-// Side cards: heading and text share the card's own gap, not browser margins.
-.side-card {
-    h4 {
-        margin: 0;
-        font-size: @font-size-base;
-        font-weight: @font-weight-semibold;
-        color: @color-text;
-    }
-
-    p {
-        margin: 0;
     }
 }

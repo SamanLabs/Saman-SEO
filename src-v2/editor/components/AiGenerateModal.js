@@ -13,7 +13,6 @@ const AiGenerateModal = ( {
 	onGenerate,
 	fieldType = 'title',
 	// 'title' or 'description'
-	currentValue = '',
 	variableValues = {},
 	context = {},
 	postTitle = '',
@@ -45,7 +44,7 @@ const AiGenerateModal = ( {
 
 		// Add variable values
 		const relevantVars = Object.entries( variableValues )
-			.filter( ( [ key, value ] ) => value && typeof value === 'string' )
+			.filter( ( [ , value ] ) => value && typeof value === 'string' )
 			.map(
 				( [ key, value ] ) =>
 					`${ key.replace( /_/g, ' ' ) }: ${ value }`

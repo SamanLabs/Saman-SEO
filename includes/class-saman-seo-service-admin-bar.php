@@ -113,7 +113,7 @@ class Admin_Bar {
 				'meta'  => array(
 					'class' => 'saman-seo-admin-bar-item saman-seo-admin-bar-item--has-score',
 					// translators: Placeholder values
-					'title' => sprintf( __( 'SEO Score: %d/100', 'saman-seo' ), $score ),
+					'title' => sprintf( __( 'SEO score: %d/100', 'saman-seo' ), $score ),
 				),
 			)
 		);
@@ -223,7 +223,7 @@ class Admin_Bar {
 					'parent' => 'saman-seo-seo',
 					'title'  => sprintf(
 						'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> %s',
-						__( 'Edit SEO Settings', 'saman-seo' )
+						__( 'Edit SEO settings', 'saman-seo' )
 					),
 					'href'   => $edit_link . '#saman-seo-open-modal',
 					'meta'   => array( 'class' => 'saman-seo-ab-action-link' ),
@@ -239,7 +239,7 @@ class Admin_Bar {
 					'parent' => 'saman-seo-seo',
 					'title'  => sprintf(
 						'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> %s',
-						__( 'Full Analysis', 'saman-seo' )
+						__( 'Full analysis', 'saman-seo' )
 					),
 					'href'   => admin_url( 'admin.php?page=saman-seo-audit&post_id=' . $post->ID ),
 					'meta'   => array( 'class' => 'saman-seo-ab-action-link' ),
@@ -335,11 +335,11 @@ class Admin_Bar {
 				'url'   => admin_url( 'admin.php?page=saman-seo-redirects' ),
 			),
 			'404'       => array(
-				'label' => __( '404 Monitor', 'saman-seo' ),
+				'label' => __( '404 monitor', 'saman-seo' ),
 				'url'   => admin_url( 'admin.php?page=saman-seo-404-log' ),
 			),
 			'audit'     => array(
-				'label' => __( 'Site Audit', 'saman-seo' ),
+				'label' => __( 'SEO audit', 'saman-seo' ),
 				'url'   => admin_url( 'admin.php?page=saman-seo-audit' ),
 			),
 			'sitemap'   => array(
@@ -434,7 +434,7 @@ class Admin_Bar {
 	private function get_status_text( $level ) {
 		$texts = array(
 			'good' => __( 'Good', 'saman-seo' ),
-			'fair' => __( 'Needs Work', 'saman-seo' ),
+			'fair' => __( 'Needs work', 'saman-seo' ),
 			'poor' => __( 'Poor', 'saman-seo' ),
 			'low'  => __( 'Needs attention', 'saman-seo' ),
 		);

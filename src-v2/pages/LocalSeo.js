@@ -672,7 +672,7 @@ const LocalSeo = () => {
 							...defaultHours,
 							...parsedHours,
 						} );
-					} catch ( e ) {
+					} catch {
 						setHours( defaultHours );
 					}
 				}
@@ -692,7 +692,7 @@ const LocalSeo = () => {
 								  )
 								: [ '', '', '', '', '' ]
 						);
-					} catch ( e ) {
+					} catch {
 						setSocialProfiles( [ '', '', '', '', '' ] );
 					}
 				}
@@ -723,7 +723,7 @@ const LocalSeo = () => {
 								id: page.id,
 								// Titles arrive HTML-escaped; read them back as plain text.
 								title:
-									new DOMParser().parseFromString(
+									new window.DOMParser().parseFromString(
 										page.title?.rendered || '',
 										'text/html'
 									).documentElement.textContent ||

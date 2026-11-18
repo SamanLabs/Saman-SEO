@@ -23,7 +23,7 @@ const schemaIconMap = {
 	VideoObject: 'video',
 };
 
-const SchemaValidator = ( { onNavigate } ) => {
+const SchemaValidator = () => {
 	const [ url, setUrl ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
 	const [ results, setResults ] = useState( null );

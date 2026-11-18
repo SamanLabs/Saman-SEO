@@ -16,7 +16,7 @@ const SORT_OPTIONS = [
 	},
 ];
 const PER_PAGE_OPTIONS = [ 25, 50, 100, 200 ];
-const Log404 = ( { onNavigate } ) => {
+const Log404 = () => {
 	// 404 Log state
 	const [ logEntries, setLogEntries ] = useState( [] );
 	const [ logLoading, setLogLoading ] = useState( true );
@@ -386,7 +386,7 @@ const Log404 = ( { onNavigate } ) => {
 
 			<section className="page-body">
 				{ /* Summary + Filters */ }
-				<div className="page-toolbar">
+				<div className="page-toolbar page-toolbar--long">
 					<div className="page-toolbar__filters">
 						<label className="filter-field">
 							<span>{ __( 'Sort by', 'saman-seo' ) }</span>

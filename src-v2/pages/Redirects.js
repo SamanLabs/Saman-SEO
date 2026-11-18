@@ -850,7 +850,7 @@ const Redirects = () => {
 	const handleFileUpload = ( e ) => {
 		const file = e.target.files?.[ 0 ];
 		if ( ! file ) return;
-		const reader = new FileReader();
+		const reader = new window.FileReader();
 		reader.onload = ( event ) => {
 			setImportData( event.target.result );
 			setImportFormat( file.name.endsWith( '.csv' ) ? 'csv' : 'json' );

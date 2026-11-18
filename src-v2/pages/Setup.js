@@ -60,7 +60,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 				method: 'POST',
 			} );
 			setAiStatus( response.data || response );
-		} catch ( err ) {
+		} catch {
 			setAiStatus( {
 				status: 'error',
 				message: __( 'Could not check AI status.', 'saman-seo' ),
@@ -94,7 +94,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 				path: '/saman-seo/v1/setup/skip',
 				method: 'POST',
 			} );
-		} catch ( err ) {
+		} catch {
 			// Ignore errors, just navigate away
 		}
 		if ( onSkip ) onSkip();

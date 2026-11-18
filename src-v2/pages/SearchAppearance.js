@@ -3119,7 +3119,6 @@ const SearchAppearance = () => {
 const PostTypeEditor = ( {
 	postType,
 	schemaOptions,
-	separator,
 	siteInfo,
 	variables,
 	variableValues,
@@ -3455,7 +3454,6 @@ const PostTypeEditor = ( {
  */
 const TaxonomyEditor = ( {
 	taxonomy,
-	separator,
 	siteInfo,
 	variables,
 	variableValues,
@@ -3696,7 +3694,6 @@ const TaxonomyEditor = ( {
  */
 const ArchiveEditor = ( {
 	archive,
-	separator,
 	siteInfo,
 	variables,
 	variableValues,

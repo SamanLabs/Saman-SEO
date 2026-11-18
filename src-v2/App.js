@@ -121,7 +121,7 @@ const App = ( { initialView = 'dashboard' } ) => {
 				if ( response.success && response.data.show_wizard ) {
 					setShowSetup( true );
 				}
-			} catch ( err ) {
+			} catch {
 				// Ignore errors, just show the app
 			}
 			setSetupChecked( true );
@@ -198,7 +198,7 @@ const App = ( { initialView = 'dashboard' } ) => {
 		if ( importer && typeof importer === 'function' ) {
 			try {
 				importer();
-			} catch ( err ) {
+			} catch {
 				// Prefetch is best-effort; ignore failures.
 			}
 		}

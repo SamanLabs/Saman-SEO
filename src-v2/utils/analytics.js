@@ -41,7 +41,7 @@ export const trackEvent = ( category, action, name = null, value = null ) => {
 				value,
 			} );
 		}
-	} catch ( e ) {
+	} catch {
 		// Silently fail - analytics should never break functionality
 	}
 };
@@ -61,7 +61,7 @@ export const trackPageView = ( pageName, pageUrl = null ) => {
 		}
 		window._paq.push( [ 'setDocumentTitle', `Saman SEO - ${ pageName }` ] );
 		window._paq.push( [ 'trackPageView' ] );
-	} catch ( e ) {
+	} catch {
 		// Silently fail
 	}
 };

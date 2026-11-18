@@ -164,13 +164,26 @@
             margin-top: -(38px + @spacing-xl);
         }
 
-        + .page-body > .page-toolbar:first-child {
-            min-height: 38px;
-            margin-top: -(38px + @spacing-xl);
-            // Room for the actions on the right.
-            padding-right: 400px;
+        + .page-body > .page-toolbar:first-child:not(.page-toolbar--long) {
+            .toolbar-shares-header-row();
         }
     }
+}
+
+// A filter row too long to sit beside the actions at @breakpoint-xl stays on
+// its own row until the window is wide enough for both.
+@media (min-width: 1560px) {
+    .page > .page-header:has(button, a, input, select)
+        + .page-body > .page-toolbar--long:first-child {
+        .toolbar-shares-header-row();
+    }
+}
+
+.toolbar-shares-header-row() {
+    min-height: 38px;
+    margin-top: -(38px + @spacing-xl);
+    // Room for the actions on the right.
+    padding-right: 400px;
 }
 
 // Header Actions

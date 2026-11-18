@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import { confirmDialog } from '../components/Dialogs';
-const HtaccessEditor = ( { onNavigate } ) => {
+const HtaccessEditor = () => {
 	const [ content, setContent ] = useState( '' );
 	const [ originalContent, setOriginalContent ] = useState( '' );
 	const [ backups, setBackups ] = useState( [] );

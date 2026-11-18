@@ -297,7 +297,7 @@ const Settings = () => {
 	// Import settings
 	const handleImport = () => {
 		if ( ! importFile ) return;
-		const reader = new FileReader();
+		const reader = new window.FileReader();
 		reader.onload = ( e ) => {
 			try {
 				const imported = JSON.parse( e.target.result );
@@ -307,7 +307,7 @@ const Settings = () => {
 				} ) );
 				setSaved( false );
 				setImportFile( null );
-			} catch ( error ) {
+			} catch {
 				toast( __( 'Invalid JSON file', 'saman-seo' ), 'error' );
 			}
 		};
@@ -1101,7 +1101,7 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 			</div>
 
 			<aside className="settings-sidebar">
-				<div className="side-card highlight">
+				<div className="side-card">
 					<h4>{ __( 'Title preview', 'saman-seo' ) }</h4>
 					<div className="title-preview">
 						<span className="title-preview__text">
@@ -1320,7 +1320,7 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 		}
 	};
 	return (
-		<div className="settings-layout">
+		<div className="settings-layout settings-layout--single">
 			<div className="settings-main">
 				{ /* Analytics Notice - Always at top */ }
 				<AnalyticsNotice
@@ -1378,27 +1378,6 @@ const ModulesTab = ( { settings, updateSetting } ) => {
 					</div>
 				</section>
 			</div>
-
-			<aside className="settings-sidebar">
-				<div className="side-card">
-					<h4>{ __( 'Performance tip', 'saman-seo' ) }</h4>
-					<p className="muted">
-						{ __(
-							"Disable modules you don't use to reduce database queries and improve page load times.",
-							'saman-seo'
-						) }
-					</p>
-				</div>
-				<div className="side-card warning">
-					<h4>{ __( 'Dependencies', 'saman-seo' ) }</h4>
-					<p className="muted">
-						{ __(
-							'Some modules require others. For example, "404 Error Log" works best with "Redirects" enabled.',
-							'saman-seo'
-						) }
-					</p>
-				</div>
-			</aside>
 		</div>
 	);
 };
@@ -1875,20 +1854,12 @@ const BreadcrumbsTab = ( { settings, updateSetting } ) => {
 						{ __( 'Or in PHP:', 'saman-seo' ) }
 					</p>
 					<code className="code-block">Saman_seo_breadcrumbs();</code>
-				</div>
-
-				<div className="side-card">
-					<h4>{ __( 'Gutenberg block', 'saman-seo' ) }</h4>
 					<p className="muted">
 						{ __(
 							'Search for "Saman SEO Breadcrumbs" in the block inserter to add breadcrumbs to any page.',
 							'saman-seo'
 						) }
 					</p>
-				</div>
-
-				<div className="side-card success">
-					<h4>{ __( 'Schema markup', 'saman-seo' ) }</h4>
 					<p className="muted">
 						{ __(
 							'BreadcrumbList JSON-LD schema is automatically added when breadcrumbs are enabled.',
@@ -2495,7 +2466,7 @@ const RedirectsPanel = ( { settings, updateSetting } ) => {
 // Advanced Tab
 const AdvancedTab = ( { settings, updateSetting } ) => {
 	return (
-		<div className="settings-layout">
+		<div className="settings-layout settings-layout--single">
 			<div className="settings-main">
 				<RedirectsPanel
 					settings={ settings }
@@ -3498,18 +3469,6 @@ const AdvancedTab = ( { settings, updateSetting } ) => {
 					</div>
 				</section>
 			</div>
-
-			<aside className="settings-sidebar">
-				<div className="side-card warning">
-					<h4>{ __( 'Caution', 'saman-seo' ) }</h4>
-					<p className="muted">
-						{ __(
-							'Changes to advanced settings may affect site functionality. Make sure you understand what each option does.',
-							'saman-seo'
-						) }
-					</p>
-				</div>
-			</aside>
 		</div>
 	);
 };
@@ -3779,8 +3738,8 @@ const ToolsTab = ( {
 			</div>
 
 			<aside className="settings-sidebar">
-				<div className="side-card highlight">
-					<h4>{ __( 'Plugin info', 'saman-seo' ) }</h4>
+				<div className="side-card">
+					<h4>{ __( 'System info', 'saman-seo' ) }</h4>
 					<div className="info-rows">
 						<div className="info-row">
 							<span>{ __( 'Version', 'saman-seo' ) }</span>
@@ -3810,12 +3769,6 @@ const ToolsTab = ( {
 									__( 'Unknown', 'saman-seo' ) }
 							</code>
 						</div>
-					</div>
-				</div>
-
-				<div className="side-card">
-					<h4>{ __( 'Environment', 'saman-seo' ) }</h4>
-					<div className="info-rows">
 						<div className="info-row">
 							<span>{ __( 'Memory limit', 'saman-seo' ) }</span>
 							<code>
@@ -3845,12 +3798,6 @@ const ToolsTab = ( {
 									: __( 'Disabled', 'saman-seo' ) }
 							</code>
 						</div>
-					</div>
-				</div>
-
-				<div className="side-card">
-					<h4>{ __( 'Theme', 'saman-seo' ) }</h4>
-					<div className="info-rows">
 						<div className="info-row">
 							<span>{ __( 'Active theme', 'saman-seo' ) }</span>
 							<code>
@@ -3866,16 +3813,6 @@ const ToolsTab = ( {
 							</code>
 						</div>
 					</div>
-				</div>
-
-				<div className="side-card">
-					<h4>{ __( 'Need help?', 'saman-seo' ) }</h4>
-					<p className="muted">
-						{ __(
-							'Check the documentation or contact support.',
-							'saman-seo'
-						) }
-					</p>
 					<a
 						href="https://github.com/SamanLabs/Saman-SEO/blob/main/docs/GETTING_STARTED.md"
 						className="button ghost"

@@ -75,7 +75,6 @@ const SEOPanel = ( {
 	postTitle,
 	postContent,
 	featuredImage,
-	hasChanges,
 	variables,
 	variableValues,
 	aiEnabled,
@@ -167,20 +166,6 @@ const SEOPanel = ( {
 	// Character limits
 	const TITLE_MAX = 60;
 	const DESC_MAX = 160;
-	const titleLength = ( seoMeta.title || '' ).length;
-	const descLength = ( seoMeta.description || '' ).length;
-	const getTitleStatus = () => {
-		if ( titleLength === 0 ) return 'empty';
-		if ( titleLength < 30 ) return 'short';
-		if ( titleLength > TITLE_MAX ) return 'long';
-		return 'good';
-	};
-	const getDescStatus = () => {
-		if ( descLength === 0 ) return 'empty';
-		if ( descLength < 70 ) return 'short';
-		if ( descLength > DESC_MAX ) return 'long';
-		return 'good';
-	};
 
 	// AI Modal handlers
 	const openAiModal = useCallback( ( fieldType, onApply ) => {

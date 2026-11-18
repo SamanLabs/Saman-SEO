@@ -6,8 +6,13 @@
 .settings-layout {
     display: grid;
     grid-template-columns: 1fr 300px;
-    gap: @spacing-2xl;
+    gap: @spacing-xl;
     align-items: start;
+
+    // Tabs with nothing to show beside the form.
+    &--single {
+        grid-template-columns: 1fr;
+    }
 
     @media (max-width: @breakpoint-lg) {
         grid-template-columns: 1fr;
@@ -17,7 +22,7 @@
 .settings-main {
     display: flex;
     flex-direction: column;
-    gap: @spacing-2xl;
+    gap: @spacing-xl;
     min-width: 0;
 }
 
@@ -26,7 +31,7 @@
     flex-direction: column;
     gap: @spacing-lg;
     position: sticky;
-    top: @spacing-2xl;
+    top: 32px + @spacing-2xl;
 }
 
 // Page header actions
@@ -52,63 +57,66 @@
 // Panel description
 .panel-desc {
     color: @color-muted;
-    font-size: @font-size-sm;
-    margin: -@spacing-sm 0 @spacing-xl 0;
+    font-size: @font-size-base;
+    margin: -@spacing-md 0 @spacing-sm;
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: @spacing-xl;
+    align-items: center;
+    margin-bottom: @spacing-sm;
 
     h3 {
         margin-bottom: @spacing-xs;
+    }
+
+    .panel-desc {
+        margin: 2px 0 0;
     }
 }
 
 // Module count badge
 .module-count {
-    background: @color-primary-light;
-    color: @color-primary;
-    padding: @spacing-xs @spacing-md;
+    background: @color-surface-hover;
+    color: @color-text-secondary;
+    padding: 2px @spacing-sm;
     border-radius: @radius-full;
     font-size: @font-size-sm;
     font-weight: @font-weight-medium;
     white-space: nowrap;
 }
 
-// Modules grid
+// Modules: a two-column list with hairlines, not a grid of bordered cards.
 .modules-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: @spacing-lg;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0 @spacing-3xl;
 }
 
 .module-card {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: @spacing-md;
-    padding: @spacing-lg;
-    background: @color-surface-muted;
-    border-radius: @radius-md;
-    border: 1px solid transparent;
-    transition: all @transition-fast;
-
-    &.active {
-        background: @color-surface;
-        border-color: @color-primary;
-        box-shadow: @shadow-sm;
-    }
+    padding: @spacing-md 0;
+    border-bottom: 1px solid @color-border-light;
 
     &__icon {
-        font-size: 24px;
+        .flex-center();
         flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        color: @color-muted;
+        font-size: 18px;
 
         svg {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
         }
+    }
+
+    &.active &__icon {
+        color: @color-primary;
     }
 
     &__content {
@@ -117,8 +125,8 @@
 
         h4 {
             font-size: @font-size-base;
-            font-weight: @font-weight-semibold;
-            margin: 0 0 @spacing-xs 0;
+            font-weight: @font-weight-medium;
+            margin: 0;
         }
 
         p {
@@ -127,6 +135,10 @@
             margin: 0;
             line-height: @line-height-normal;
         }
+    }
+
+    &:not(.active) &__content h4 {
+        color: @color-text-secondary;
     }
 
     .toggle {
@@ -141,16 +153,16 @@
 }
 
 .separator-option {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: @font-size-lg;
-    font-weight: @font-weight-bold;
-    background: @color-surface-muted;
-    border: 2px solid transparent;
-    border-radius: @radius-sm;
+    font-size: @font-size-base;
+    font-weight: @font-weight-medium;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
     cursor: pointer;
     transition: all @transition-fast;
 
@@ -159,7 +171,7 @@
     }
 
     &.active {
-        background: @color-surface;
+        background: @color-primary-light;
         border-color: @color-primary;
         color: @color-primary;
     }
@@ -179,24 +191,24 @@
     }
 }
 
-// Info box
+// Note inside a section: sits straight on its panel under a rule, no box.
 .settings-info-box {
     margin-top: @spacing-lg;
-    padding: @spacing-md;
-    background: @color-primary-light;
-    border-radius: @radius-sm;
-    border: 1px solid fade(@color-primary, 30%);
+    padding: @spacing-lg 0 0;
+    border-top: 1px solid @color-border-light;
 
     strong {
         display: block;
         margin-bottom: @spacing-xs;
-        font-size: @font-size-sm;
+        font-size: @font-size-base;
+        font-weight: @font-weight-medium;
+        color: @color-text;
     }
 
     p {
         margin: 0;
-        font-size: @font-size-sm;
-        color: @color-muted;
+        font-size: @font-size-base;
+        color: @color-text-secondary;
     }
 
     a {
@@ -209,21 +221,11 @@
         }
     }
 
-    // CTA variant with button
+    // With a button under the text.
     &--cta {
         display: flex;
         flex-direction: column;
         gap: @spacing-sm;
-        background: linear-gradient(135deg, fade(@color-primary, 8%) 0%, fade(@color-primary, 4%) 100%);
-        border: 1px solid fade(@color-primary, 15%);
-        border: 1px solid fade(@color-primary, 30%);
-        border-radius: @radius-md;
-        padding: @spacing-lg;
-
-        strong {
-            font-size: @font-size-base;
-            color: @color-text;
-        }
 
         p {
             margin-bottom: @spacing-xs;
@@ -445,18 +447,19 @@
     }
 
     .settings-row {
-        padding: @spacing-md;
-        background: @color-surface-muted;
-        border-radius: @radius-sm;
         margin: 0;
+        padding: @spacing-md @spacing-lg;
+        background: @color-surface-muted;
+        border: 0;
+        border-radius: @radius-md;
     }
 }
 
-// Tools actions
+// Tools actions: blocks sit straight on their panel.
 .tools-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: @spacing-lg;
+    gap: @spacing-xl @spacing-3xl;
 
     @media (max-width: @breakpoint-md) {
         grid-template-columns: 1fr;
@@ -464,10 +467,6 @@
 }
 
 .tool-action {
-    padding: @spacing-lg;
-    background: @color-surface-muted;
-    border-radius: @radius-md;
-
     h4 {
         font-size: @font-size-base;
         font-weight: @font-weight-semibold;
@@ -492,14 +491,10 @@
 
 // Danger zone panel
 .danger-zone {
-    border: 1px solid @color-danger;
+    border: 1px solid fade(@color-danger, 35%);
 
     h3 {
-        color: @color-danger;
-    }
-
-    .tool-action {
-        background: @color-danger-bg;
+        color: @color-danger-text;
     }
 }
 
@@ -508,7 +503,6 @@
     display: flex;
     flex-direction: column;
     gap: @spacing-sm;
-    margin-top: @spacing-md;
 }
 
 .info-row {
@@ -526,26 +520,6 @@
         padding: 2px @spacing-xs;
         border-radius: 3px;
         font-size: @font-size-xs;
-    }
-}
-
-// Side card variants
-.side-card {
-    &.warning {
-        border: 1px solid fade(@color-warning, 30%);
-    }
-}
-
-// Danger button
-.button.danger {
-    background: @color-danger;
-    color: white;
-    border-color: @color-danger;
-
-    &:hover {
-        background: darken(@color-danger, 10%);
-        border-color: darken(@color-danger, 10%);
-        color: white;
     }
 }
 
@@ -615,217 +589,6 @@
     max-width: 560px;
 }
 
-// ==========================================================================
-// Settings redesign
-// ==========================================================================
-// Later rules win, so this block restyles the page without touching the
-// markup: one surface per section, rows instead of boxes inside boxes.
-
-.settings-layout {
-    gap: @spacing-xl;
-}
-
-.settings-main {
-    gap: @spacing-xl;
-}
-
-.settings-sidebar {
-    top: 32px + @spacing-2xl;
-}
-
-// Label on the left, control in a fixed column on the right, so every control
-// on the page lines up.
-.settings-row {
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
-    align-items: center;
-    gap: @spacing-2xl;
-    padding: @spacing-lg 0;
-    border-bottom: 1px solid @color-border-light;
-
-    &.compact {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
-    }
-
-    &:first-of-type {
-        padding-top: 0;
-    }
-
-    &:last-child {
-        padding-bottom: 0;
-    }
-}
-
-.settings-label label {
-    font-weight: @font-weight-medium;
-}
-
-.settings-help {
-    margin-top: 2px;
-}
-
-.settings-control {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: @spacing-sm;
-    min-width: 0;
-
-    // Compact controls sit at the right edge; inputs fill the column.
-    > .radio-group,
-    > .toggle,
-    > .separator-picker,
-    > .button,
-    > .link-button {
-        align-self: flex-end;
-    }
-
-    // Two or three exclusive choices read best as one segmented control.
-    .radio-group {
-        flex-direction: row;
-        gap: 2px;
-        padding: 3px;
-        border: 1px solid @color-border;
-        border-radius: @radius-lg;
-        background: @color-surface;
-    }
-}
-
-.panel-desc {
-    margin: -@spacing-md 0 @spacing-sm;
-    font-size: @font-size-base;
-}
-
-.panel-header {
-    align-items: center;
-    margin-bottom: @spacing-sm;
-}
-
-.module-count {
-    padding: 2px @spacing-sm;
-    background: @color-surface-hover;
-    color: @color-text-secondary;
-}
-
-// Modules: a two-column list with hairlines, not a grid of bordered cards.
-.modules-grid {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 0 @spacing-3xl;
-}
-
-.module-card,
-.module-card.active {
-    align-items: center;
-    padding: @spacing-md 0;
-    background: transparent;
-    border: 0;
-    border-bottom: 1px solid @color-border-light;
-    border-radius: 0;
-    box-shadow: none;
-}
-
-.module-card {
-    &__icon {
-        .flex-center();
-        width: 36px;
-        height: 36px;
-        border-radius: @radius-md;
-        background: @color-surface-muted;
-        color: @color-muted;
-        font-size: 18px;
-
-        svg {
-            width: 18px;
-            height: 18px;
-        }
-    }
-
-    &.active &__icon {
-        background: @color-primary-light;
-        color: @color-primary;
-    }
-
-    &__content h4 {
-        margin-bottom: 0;
-        font-weight: @font-weight-medium;
-    }
-
-    &:not(.active) &__content h4 {
-        color: @color-text-secondary;
-    }
-}
-
-.separator-option {
-    width: 36px;
-    height: 36px;
-    font-size: @font-size-base;
-    font-weight: @font-weight-medium;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-md;
-
-    &.active {
-        background: @color-primary-light;
-        border-color: @color-primary;
-    }
-}
-
-// Notes inside a section: plain muted blocks, no tinted borders or gradients.
-.settings-info-box,
-.settings-info-box--cta {
-    margin-top: @spacing-lg;
-    padding: @spacing-md @spacing-lg;
-    background: @color-surface-muted;
-    border: 0;
-    border-radius: @radius-md;
-
-    strong {
-        font-size: @font-size-base;
-        font-weight: @font-weight-medium;
-        color: @color-text;
-    }
-
-    p {
-        font-size: @font-size-base;
-        color: @color-text-secondary;
-    }
-}
-
-.side-card,
-.side-card.highlight,
-.side-card.warning,
-.side-card.success {
-    padding: @spacing-xl;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-xl;
-
-    h3 {
-        font-size: @font-size-base;
-    }
-}
-
-.settings-grid .settings-row {
-    padding: @spacing-md @spacing-lg;
-    border: 0;
-    border-radius: @radius-md;
-}
-
-.tool-action {
-    border-radius: @radius-lg;
-}
-
-.danger-zone {
-    border-color: fade(@color-danger, 35%);
-
-    h3 {
-        color: @color-danger-text;
-    }
-}
-
-.panel-header .panel-desc {
-    margin: 2px 0 0;
-}
-
 // Moved-elsewhere notice (API keys now live in the AI plugin). Sits directly
 // in its panel: icon, text, actions, no box of its own.
 .deprecation-notice {
@@ -892,34 +655,4 @@
         margin: 0;
         max-width: 72ch;
     }
-}
-
-// One surface level: notes, tool blocks and module icons sit directly on
-// their panel instead of in a tinted box of their own.
-.settings-info-box,
-.settings-info-box--cta {
-    margin-top: @spacing-lg;
-    padding: @spacing-lg 0 0;
-    background: none;
-    border: 0;
-    border-top: 1px solid @color-border-light;
-    border-radius: 0;
-}
-
-.tool-action {
-    padding: 0;
-    background: none;
-    border-radius: 0;
-}
-
-.tools-actions {
-    gap: @spacing-xl @spacing-3xl;
-}
-
-.module-card__icon,
-.module-card.active .module-card__icon {
-    width: 20px;
-    height: 20px;
-    background: none;
-    border-radius: 0;
 }

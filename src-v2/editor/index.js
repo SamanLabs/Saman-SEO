@@ -84,7 +84,6 @@ const SEOModalPlugin = () => {
 		secondary_keyphrases: [],
 	} );
 	const [ seoScore, setSeoScore ] = useState( null );
-	const [ isSaving, setIsSaving ] = useState( false );
 	const [ hasChanges, setHasChanges ] = useState( false );
 	const [ variableValues, setVariableValues ] = useState( {} );
 	const wasOpenRef = useRef( false );

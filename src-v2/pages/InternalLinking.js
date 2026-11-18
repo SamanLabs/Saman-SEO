@@ -1364,7 +1364,7 @@ const SettingsTab = ( { settings, onChange } ) => {
 };
 
 // Rule Modal Component - Simplified
-const RuleModal = ( { rule, categories, templates, onClose, onSave } ) => {
+const RuleModal = ( { rule, categories, onClose, onSave } ) => {
 	const isEdit = !! rule;
 	const [ formData, setFormData ] = useState( () => {
 		if ( rule ) {

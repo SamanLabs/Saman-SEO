@@ -117,7 +117,7 @@ const StatusIcons = {
 		</svg>
 	),
 };
-const MetricsBreakdown = ( { metrics, metricsByCategory, hasKeyphrase } ) => {
+const MetricsBreakdown = ( { metricsByCategory, hasKeyphrase } ) => {
 	const categories = [
 		{
 			key: 'basic',

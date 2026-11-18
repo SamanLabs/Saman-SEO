@@ -16,7 +16,7 @@ const schemaTypeOptions = [
 	{ value: 'NewsArticle', label: __( 'News article', 'saman-seo' ) },
 ];
 
-const SchemaTypeSelector = ( { value, onChange, postType } ) => {
+const SchemaTypeSelector = ( { value, onChange } ) => {
 	return (
 		<div className="saman-seo-field">
 			<SelectControl

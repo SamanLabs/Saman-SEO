@@ -20,8 +20,6 @@ const AiGenerateModal = ( {
 	onGenerate,
 	fieldType = 'title',
 	// 'title' or 'description'
-	currentValue = '',
-	placeholder = '',
 	variableValues = {},
 	context = {}, // Additional context like post type, taxonomy name, etc.
 } ) => {
@@ -46,7 +44,7 @@ const AiGenerateModal = ( {
 
 		// Add variable values
 		const relevantVars = Object.entries( variableValues )
-			.filter( ( [ key, value ] ) => value && typeof value === 'string' )
+			.filter( ( [ , value ] ) => value && typeof value === 'string' )
 			.map(
 				( [ key, value ] ) =>
 					`${ key.replace( /_/g, ' ' ) }: ${ value }`
@@ -357,7 +355,7 @@ const AiGenerateModal = ( {
 								<div className="ai-generate-modal__context-box">
 									{ Object.entries( variableValues )
 										.filter(
-											( [ key, value ] ) =>
+											( [ , value ] ) =>
 												value &&
 												typeof value === 'string'
 										)

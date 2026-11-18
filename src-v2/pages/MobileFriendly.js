@@ -21,7 +21,7 @@ const severityPills = {
 	info: { tone: '', label: __( 'Info', 'saman-seo' ) },
 };
 
-const MobileFriendly = ( { onNavigate } ) => {
+const MobileFriendly = () => {
 	const [ url, setUrl ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
 	const [ results, setResults ] = useState( null );
@@ -38,7 +38,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 				if ( response.success ) {
 					setRecentTests( response.data || [] );
 				}
-			} catch ( err ) {
+			} catch {
 				// Ignore errors for recent tests
 			}
 		};
