@@ -13,7 +13,6 @@ const AiGenerateModal = ( {
 	onGenerate,
 	fieldType = 'title',
 	// 'title' or 'description'
-	currentValue = '',
 	variableValues = {},
 	context = {},
 	postTitle = '',
@@ -45,7 +44,7 @@ const AiGenerateModal = ( {
 
 		// Add variable values
 		const relevantVars = Object.entries( variableValues )
-			.filter( ( [ key, value ] ) => value && typeof value === 'string' )
+			.filter( ( [ , value ] ) => value && typeof value === 'string' )
 			.map(
 				( [ key, value ] ) =>
 					`${ key.replace( /_/g, ' ' ) }: ${ value }`
@@ -152,7 +151,7 @@ const AiGenerateModal = ( {
 								<circle cx="12" cy="12" r="10" />
 								<path d="M12 8v4m0 4h.01" />
 							</svg>
-							{ __( 'AI Not Configured', 'saman-seo' ) }
+							{ __( 'AI not configured', 'saman-seo' ) }
 						</h3>
 						<button
 							type="button"
@@ -191,7 +190,7 @@ const AiGenerateModal = ( {
 								<div className="saman-seo-ai-notice__content">
 									<h4>
 										{ __(
-											'WP AI Pilot Needs Configuration',
+											'WP AI Pilot needs configuration',
 											'saman-seo'
 										) }
 									</h4>

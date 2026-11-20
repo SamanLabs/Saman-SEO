@@ -1,48 +1,91 @@
 // ==========================================================================
 // Buttons - All Button Styles
 // ==========================================================================
+//
+// Every rule is scoped under .saman-seo-admin on purpose. WordPress core ships
+// `.wp-core-ui .button` (two classes), which outranks a bare `.button` and used
+// to repaint our buttons with the core blue outline, 30px height and 13px text.
 
-.button {
+// `.btn` and the BEM modifiers below are older spellings still used by a few
+// pages. They share these rules so every button in the app looks the same.
+.saman-seo-admin .button,
+.saman-seo-admin .btn {
     .button-base();
+    height: auto;
+    margin: 0;
     border: 1px solid @color-border;
     background: @color-surface;
     color: @color-text;
     box-shadow: @shadow-sm;
     position: relative;
 
+    svg {
+        flex-shrink: 0;
+    }
+
     &:hover {
-        border-color: @color-muted;
-        background: @color-surface-hover;
+        border-color: darken(@color-border, 8%);
+        background: @color-surface-muted;
+        color: @color-text;
     }
 
     &:active {
         background: @color-surface-hover;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        box-shadow: none;
+        transform: translateY(1px);
     }
 
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 1.5px @color-primary;
+        border-color: @color-border;
+        color: @color-text;
+        box-shadow: @shadow-sm;
     }
 
-    &.primary {
+    &:focus-visible {
+        outline: 2px solid @color-primary;
+        outline-offset: 2px;
+    }
+
+    &:disabled,
+    &[disabled],
+    &.is-disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        // Core forces its own disabled colors with !important.
+        color: @color-text !important;
+        background: @color-surface !important;
+        border-color: @color-border !important;
+    }
+
+    &.primary,
+    &.button--primary,
+    &.button-primary {
         background: @color-primary;
         border-color: @color-primary;
         color: #fff;
-        box-shadow: none;
 
         &:hover {
             background: @color-primary-hover;
             border-color: @color-primary-hover;
+            color: #fff;
         }
 
         &:active {
             background: darken(@color-primary-hover, 5%);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
         &:focus {
-            box-shadow: 0 0 0 1.5px @color-primary;
+            border-color: @color-primary;
+            color: #fff;
+        }
+
+        &:disabled,
+        &[disabled] {
+            color: #fff !important;
+            background: @color-primary !important;
+            border-color: @color-primary !important;
         }
     }
 
@@ -50,11 +93,11 @@
         background: @color-danger;
         border-color: @color-danger;
         color: #fff;
-        box-shadow: none;
 
         &:hover {
             background: darken(@color-danger, 8%);
             border-color: darken(@color-danger, 8%);
+            color: #fff;
         }
 
         &:active {
@@ -62,40 +105,63 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 1.5px @color-danger;
+            border-color: @color-danger;
+            color: #fff;
+        }
+
+        &:focus-visible {
+            outline-color: @color-danger;
+        }
+
+        &:disabled,
+        &[disabled] {
+            color: #fff !important;
+            background: @color-danger !important;
+            border-color: @color-danger !important;
         }
     }
 
     &.ghost {
         background: transparent;
         color: @color-primary;
-        border-color: rgba(34, 113, 177, 0.25);
+        border-color: transparent;
         box-shadow: none;
 
         &:hover {
             background: @color-primary-lighter;
-            border-color: rgba(34, 113, 177, 0.4);
-            color: @color-primary;
+            border-color: transparent;
+            color: @color-primary-hover;
         }
 
         &:active {
             background: @color-primary-light;
-            box-shadow: none;
         }
 
         &:focus {
-            box-shadow: 0 0 0 1.5px @color-primary;
+            border-color: transparent;
+            color: @color-primary;
+            box-shadow: none;
+        }
+
+        &:disabled,
+        &[disabled] {
+            color: @color-primary !important;
+            background: transparent !important;
+            border-color: transparent !important;
         }
     }
 
-    &.small {
-        padding: 4px 10px;
+    &.small,
+    &.button--small {
+        min-height: 28px;
+        padding: 0 10px;
         font-size: @font-size-sm;
-        border-radius: @radius-sm;
+        border-radius: @radius-md;
     }
 
     &.large {
-        padding: 10px 18px;
+        min-height: 40px;
+        padding: 0 18px;
         font-size: @font-size-base;
         border-radius: @radius-md;
     }
@@ -104,12 +170,18 @@
 .link-button {
     border: none;
     background: transparent;
+    padding: 0;
     color: @color-primary;
     cursor: pointer;
-    font-weight: @font-weight-semibold;
+    font-weight: @font-weight-medium;
+
+    &:hover {
+        color: @color-primary-hover;
+        text-decoration: underline;
+    }
 
     &.danger {
-        color: @color-danger;
+        color: @color-danger-text;
 
         &:hover {
             text-decoration: underline;
@@ -130,11 +202,4 @@
     align-items: center;
     gap: @spacing-md;
     padding-top: @spacing-sm;
-}
-
-// Form Footer
-.form-footer {
-    display: flex;
-    align-items: center;
-    gap: @spacing-md;
 }

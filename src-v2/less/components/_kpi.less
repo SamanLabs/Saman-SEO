@@ -1,0 +1,197 @@
+// ==========================================================================
+// KPI band and tiles (components/Kpi.js)
+// ==========================================================================
+// One grid for every row of KPI tiles, and one tile. Pages compose
+// <KpiBand><MetricCard/>…</KpiBand> and never write their own stat grid.
+
+.kpi-band {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: @spacing-md;
+}
+
+.kpi {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    min-width: 0;
+    // Tall enough for value + label + one detail line, so tiles are the same
+    // height on every page whether or not they carry a detail line.
+    min-height: 92px;
+    padding: @spacing-md @spacing-lg;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-lg;
+    overflow: hidden;
+    font-family: inherit;
+    text-align: left;
+    color: @color-text;
+    transition: border-color @transition-fast, background @transition-fast;
+
+    &--clickable {
+        cursor: pointer;
+
+        &:hover {
+            border-color: darken(@color-border, 12%);
+        }
+    }
+
+    // Icon beside the value, trend pinned top right.
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: @spacing-md;
+        min-width: 0;
+    }
+
+    &__icon {
+        .flex-center();
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: @radius-md;
+        background: @color-surface-muted;
+        color: @color-muted;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__value {
+        max-width: 100%;
+        font-size: 22px;
+        font-weight: @font-weight-semibold;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        .text-truncate();
+
+        small {
+            font-size: @font-size-sm;
+            font-weight: @font-weight-medium;
+            letter-spacing: 0;
+            color: @color-muted;
+        }
+    }
+
+    &__label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 100%;
+        font-size: @font-size-sm;
+        color: @color-text-secondary;
+        white-space: nowrap;
+    }
+
+    &__dot {
+        flex-shrink: 0;
+        width: 7px;
+        height: 7px;
+        border-radius: @radius-full;
+        background: darken(@color-border, 12%);
+
+        &--success {
+            background: @color-success;
+        }
+
+        &--warning {
+            background: @color-warning;
+        }
+
+        &--danger {
+            background: @color-danger;
+        }
+    }
+
+    &__trend {
+        align-self: flex-start;
+        flex-shrink: 0;
+        font-size: @font-size-sm;
+        font-weight: @font-weight-medium;
+        color: @color-muted;
+        white-space: nowrap;
+
+        &--up {
+            color: @color-success-text;
+        }
+
+        &--down {
+            color: @color-danger-text;
+        }
+    }
+
+    &__sub {
+        max-width: 100%;
+        margin-top: 2px;
+        font-size: @font-size-sm;
+        color: @color-muted;
+        .text-truncate();
+    }
+
+    // The chart bleeds to the tile's left, right and bottom edges.
+    &__spark {
+        display: block;
+        margin: @spacing-sm -(@spacing-lg) -(@spacing-md);
+        line-height: 0;
+    }
+
+    // Tiles in a row keep the same height whether or not they have a chart.
+    &--spark &__spark {
+        margin-top: auto;
+        padding-top: @spacing-sm;
+    }
+}
+
+.kpi-spark {
+    display: block;
+    width: 100%;
+
+    &__area {
+        fill: currentColor;
+        opacity: 0.1;
+    }
+
+    &__line {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        vector-effect: non-scaling-stroke;
+    }
+}
+
+// Placeholders keep the band's shape while a page loads or has nothing to
+// count, so every page opens with the same frame.
+.kpi--placeholder {
+    .kpi__value {
+        color: darken(@color-border, 12%);
+    }
+
+    &.is-loading {
+        background: linear-gradient(
+            90deg,
+            @color-surface 25%,
+            @color-surface-muted 37%,
+            @color-surface 63%
+        );
+        background-size: 400% 100%;
+        animation: dash-skeleton-shimmer 1.4s ease infinite;
+
+        .kpi__value {
+            color: transparent;
+        }
+    }
+}

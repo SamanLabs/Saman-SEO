@@ -84,7 +84,6 @@ const SEOModalPlugin = () => {
 		secondary_keyphrases: [],
 	} );
 	const [ seoScore, setSeoScore ] = useState( null );
-	const [ isSaving, setIsSaving ] = useState( false );
 	const [ hasChanges, setHasChanges ] = useState( false );
 	const [ variableValues, setVariableValues ] = useState( {} );
 	const wasOpenRef = useRef( false );
@@ -323,7 +322,7 @@ const SEOModalPlugin = () => {
 				target="seo-sidebar"
 				icon={ <PluginIcon /> }
 			>
-				{ __( 'SEO Settings', 'saman-seo' ) }
+				{ __( 'SEO settings', 'saman-seo' ) }
 			</PluginSidebarMoreMenuItem>
 
 			{ /* The actual modal with SEO content */ }

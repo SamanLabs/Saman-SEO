@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
  */
 const GeneralSEO = {
 	id: 'general-seo',
-	name: __( 'SEO Assistant', 'saman-seo' ),
+	name: __( 'SEO assistant', 'saman-seo' ),
 	description: __(
 		'Your helpful SEO buddy for all things search optimization.',
 		'saman-seo'

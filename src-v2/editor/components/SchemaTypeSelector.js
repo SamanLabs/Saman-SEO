@@ -12,15 +12,15 @@ import { __ } from '@wordpress/i18n';
 const schemaTypeOptions = [
 	{ value: '', label: __( 'Use default', 'saman-seo' ) },
 	{ value: 'Article', label: __( 'Article', 'saman-seo' ) },
-	{ value: 'BlogPosting', label: __( 'Blog Posting', 'saman-seo' ) },
-	{ value: 'NewsArticle', label: __( 'News Article', 'saman-seo' ) },
+	{ value: 'BlogPosting', label: __( 'Blog posting', 'saman-seo' ) },
+	{ value: 'NewsArticle', label: __( 'News article', 'saman-seo' ) },
 ];
 
-const SchemaTypeSelector = ( { value, onChange, postType } ) => {
+const SchemaTypeSelector = ( { value, onChange } ) => {
 	return (
 		<div className="saman-seo-field">
 			<SelectControl
-				label={ __( 'Schema Type', 'saman-seo' ) }
+				label={ __( 'Schema type', 'saman-seo' ) }
 				value={ value || '' }
 				options={ schemaTypeOptions }
 				onChange={ onChange }

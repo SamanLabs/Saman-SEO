@@ -54,7 +54,7 @@ const SchemaPreview = ( { jsonLd, loading, error } ) => {
 		<div className="saman-seo-schema-preview">
 			<div className="saman-seo-schema-preview-header">
 				<span className="saman-seo-section-label">
-					{ __( 'JSON-LD Preview', 'saman-seo' ) }
+					{ __( 'JSON-LD preview', 'saman-seo' ) }
 				</span>
 				<Button
 					variant="tertiary"

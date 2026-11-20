@@ -6,8 +6,13 @@
 .settings-layout {
     display: grid;
     grid-template-columns: 1fr 300px;
-    gap: @spacing-2xl;
+    gap: @spacing-xl;
     align-items: start;
+
+    // Tabs with nothing to show beside the form.
+    &--single {
+        grid-template-columns: 1fr;
+    }
 
     @media (max-width: @breakpoint-lg) {
         grid-template-columns: 1fr;
@@ -17,7 +22,7 @@
 .settings-main {
     display: flex;
     flex-direction: column;
-    gap: @spacing-2xl;
+    gap: @spacing-xl;
     min-width: 0;
 }
 
@@ -26,7 +31,7 @@
     flex-direction: column;
     gap: @spacing-lg;
     position: sticky;
-    top: @spacing-2xl;
+    top: 32px + @spacing-2xl;
 }
 
 // Page header actions
@@ -52,63 +57,66 @@
 // Panel description
 .panel-desc {
     color: @color-muted;
-    font-size: @font-size-sm;
-    margin: -@spacing-sm 0 @spacing-xl 0;
+    font-size: @font-size-base;
+    margin: -@spacing-md 0 @spacing-sm;
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: @spacing-xl;
+    align-items: center;
+    margin-bottom: @spacing-sm;
 
     h3 {
         margin-bottom: @spacing-xs;
+    }
+
+    .panel-desc {
+        margin: 2px 0 0;
     }
 }
 
 // Module count badge
 .module-count {
-    background: @color-primary-light;
-    color: @color-primary;
-    padding: @spacing-xs @spacing-md;
+    background: @color-surface-hover;
+    color: @color-text-secondary;
+    padding: 2px @spacing-sm;
     border-radius: @radius-full;
     font-size: @font-size-sm;
     font-weight: @font-weight-medium;
     white-space: nowrap;
 }
 
-// Modules grid
+// Modules: a two-column list with hairlines, not a grid of bordered cards.
 .modules-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: @spacing-lg;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0 @spacing-3xl;
 }
 
 .module-card {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: @spacing-md;
-    padding: @spacing-lg;
-    background: @color-surface-muted;
-    border-radius: @radius-md;
-    border: 1px solid transparent;
-    transition: all @transition-fast;
-
-    &.active {
-        background: @color-surface;
-        border-color: @color-primary;
-        box-shadow: @shadow-sm;
-    }
+    padding: @spacing-md 0;
+    border-bottom: 1px solid @color-border-light;
 
     &__icon {
-        font-size: 24px;
+        .flex-center();
         flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        color: @color-muted;
+        font-size: 18px;
 
         svg {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
         }
+    }
+
+    &.active &__icon {
+        color: @color-primary;
     }
 
     &__content {
@@ -117,8 +125,8 @@
 
         h4 {
             font-size: @font-size-base;
-            font-weight: @font-weight-semibold;
-            margin: 0 0 @spacing-xs 0;
+            font-weight: @font-weight-medium;
+            margin: 0;
         }
 
         p {
@@ -127,6 +135,10 @@
             margin: 0;
             line-height: @line-height-normal;
         }
+    }
+
+    &:not(.active) &__content h4 {
+        color: @color-text-secondary;
     }
 
     .toggle {
@@ -141,16 +153,16 @@
 }
 
 .separator-option {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: @font-size-lg;
-    font-weight: @font-weight-bold;
-    background: @color-surface-muted;
-    border: 2px solid transparent;
-    border-radius: @radius-sm;
+    font-size: @font-size-base;
+    font-weight: @font-weight-medium;
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
     cursor: pointer;
     transition: all @transition-fast;
 
@@ -159,7 +171,7 @@
     }
 
     &.active {
-        background: @color-surface;
+        background: @color-primary-light;
         border-color: @color-primary;
         color: @color-primary;
     }
@@ -179,24 +191,24 @@
     }
 }
 
-// Info box
+// Note inside a section: sits straight on its panel under a rule, no box.
 .settings-info-box {
     margin-top: @spacing-lg;
-    padding: @spacing-md;
-    background: @color-primary-light;
-    border-radius: @radius-sm;
-    border-left: 3px solid @color-primary;
+    padding: @spacing-lg 0 0;
+    border-top: 1px solid @color-border-light;
 
     strong {
         display: block;
         margin-bottom: @spacing-xs;
-        font-size: @font-size-sm;
+        font-size: @font-size-base;
+        font-weight: @font-weight-medium;
+        color: @color-text;
     }
 
     p {
         margin: 0;
-        font-size: @font-size-sm;
-        color: @color-muted;
+        font-size: @font-size-base;
+        color: @color-text-secondary;
     }
 
     a {
@@ -209,21 +221,11 @@
         }
     }
 
-    // CTA variant with button
+    // With a button under the text.
     &--cta {
         display: flex;
         flex-direction: column;
         gap: @spacing-sm;
-        background: linear-gradient(135deg, fade(@color-primary, 8%) 0%, fade(@color-primary, 4%) 100%);
-        border: 1px solid fade(@color-primary, 15%);
-        border-left: 3px solid @color-primary;
-        border-radius: @radius-md;
-        padding: @spacing-lg;
-
-        strong {
-            font-size: @font-size-base;
-            color: @color-text;
-        }
 
         p {
             margin-bottom: @spacing-xs;
@@ -321,17 +323,6 @@
     &__placeholder {
         text-align: center;
         color: #999;
-    }
-
-    &__domain-overlay {
-        position: absolute;
-        bottom: @spacing-sm;
-        left: @spacing-sm;
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        font-size: 11px;
-        padding: 2px @spacing-sm;
-        border-radius: 3px;
     }
 
     &__body {
@@ -456,18 +447,19 @@
     }
 
     .settings-row {
-        padding: @spacing-md;
-        background: @color-surface-muted;
-        border-radius: @radius-sm;
         margin: 0;
+        padding: @spacing-md @spacing-lg;
+        background: @color-surface-muted;
+        border: 0;
+        border-radius: @radius-md;
     }
 }
 
-// Tools actions
+// Tools actions: blocks sit straight on their panel.
 .tools-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: @spacing-lg;
+    gap: @spacing-xl @spacing-3xl;
 
     @media (max-width: @breakpoint-md) {
         grid-template-columns: 1fr;
@@ -475,10 +467,6 @@
 }
 
 .tool-action {
-    padding: @spacing-lg;
-    background: @color-surface-muted;
-    border-radius: @radius-md;
-
     h4 {
         font-size: @font-size-base;
         font-weight: @font-weight-semibold;
@@ -503,14 +491,10 @@
 
 // Danger zone panel
 .danger-zone {
-    border: 1px solid @color-danger;
+    border: 1px solid fade(@color-danger, 35%);
 
     h3 {
-        color: @color-danger;
-    }
-
-    .tool-action {
-        background: @color-danger-bg;
+        color: @color-danger-text;
     }
 }
 
@@ -519,7 +503,6 @@
     display: flex;
     flex-direction: column;
     gap: @spacing-sm;
-    margin-top: @spacing-md;
 }
 
 .info-row {
@@ -537,26 +520,6 @@
         padding: 2px @spacing-xs;
         border-radius: 3px;
         font-size: @font-size-xs;
-    }
-}
-
-// Side card variants
-.side-card {
-    &.warning {
-        border-left: 3px solid @color-warning;
-    }
-}
-
-// Danger button
-.button.danger {
-    background: @color-danger;
-    color: white;
-    border-color: @color-danger;
-
-    &:hover {
-        background: darken(@color-danger, 10%);
-        border-color: darken(@color-danger, 10%);
-        color: white;
     }
 }
 
@@ -619,4 +582,77 @@
     border: 1px solid @color-border;
     border-radius: @radius-sm;
     padding: 2px;
+}
+
+// Email reports tab: a single self-saving card, kept to a readable width.
+.settings-reports {
+    max-width: 560px;
+}
+
+// Moved-elsewhere notice (API keys now live in the AI plugin). Sits directly
+// in its panel: icon, text, actions, no box of its own.
+.deprecation-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-lg;
+    padding-top: @spacing-sm;
+
+    h4 {
+        margin: 0 0 @spacing-xs;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+
+    p {
+        margin: 0;
+        max-width: 68ch;
+        color: @color-muted;
+    }
+}
+
+.deprecation-notice__icon {
+    flex-shrink: 0;
+    display: flex;
+    color: @color-primary;
+}
+
+.deprecation-notice__content {
+    min-width: 0;
+}
+
+.deprecation-notice__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-sm;
+    margin-top: @spacing-lg;
+}
+
+.legacy-settings-toggle {
+    margin-top: @spacing-xl;
+    padding-top: @spacing-lg;
+    border-top: 1px solid @color-border;
+
+    > summary {
+        cursor: pointer;
+        color: @color-muted;
+        font-size: @font-size-sm;
+
+        &:hover {
+            color: @color-text;
+        }
+    }
+}
+
+.legacy-settings-content {
+    margin-top: @spacing-lg;
+}
+
+.settings-info {
+    margin-top: @spacing-lg;
+
+    p {
+        margin: 0;
+        max-width: 72ch;
+    }
 }

@@ -191,7 +191,7 @@ class Admin_V2 {
 		// Visible submenu items - matching Header.js navItems
 		$visible_subpages = array(
 			'dashboard'         => __( 'Dashboard', 'saman-seo' ),
-			'search-appearance' => __( 'Search Appearance', 'saman-seo' ),
+			'search-appearance' => __( 'Search appearance', 'saman-seo' ),
 			'tools'             => __( 'Tools', 'saman-seo' ),
 			'settings'          => __( 'Settings', 'saman-seo' ),
 			'more'              => __( 'More', 'saman-seo' ),
@@ -217,23 +217,23 @@ class Admin_V2 {
 		// All pages registered unconditionally so direct URL access (refresh) always works.
 		// The React app handles module-disabled states in the UI.
 		$hidden_subpages = array(
-			'audit'            => __( 'Site Audit', 'saman-seo' ),
-			'bulk-editor'      => __( 'Bulk Editor', 'saman-seo' ),
-			'content-gaps'     => __( 'Content Gaps', 'saman-seo' ),
-			'schema-builder'   => __( 'Schema Builder', 'saman-seo' ),
-			'link-health'      => __( 'Link Health', 'saman-seo' ),
-			'robots-txt'       => __( 'robots.txt Editor', 'saman-seo' ),
+			'audit'            => __( 'SEO audit', 'saman-seo' ),
+			'bulk-editor'      => __( 'Bulk editor', 'saman-seo' ),
+			'content-gaps'     => __( 'Content gaps', 'saman-seo' ),
+			'schema-builder'   => __( 'Schema builder', 'saman-seo' ),
+			'link-health'      => __( 'Link health', 'saman-seo' ),
+			'robots-txt'       => __( 'robots.txt', 'saman-seo' ),
 			'image-seo'        => __( 'Image SEO', 'saman-seo' ),
-			'instant-indexing' => __( 'Instant Indexing', 'saman-seo' ),
-			'schema-validator' => __( 'Schema Validator', 'saman-seo' ),
-			'htaccess-editor'  => __( '.htaccess Editor', 'saman-seo' ),
-			'mobile-friendly'  => __( 'Mobile Friendly Test', 'saman-seo' ),
+			'instant-indexing' => __( 'Instant indexing', 'saman-seo' ),
+			'schema-validator' => __( 'Schema validator', 'saman-seo' ),
+			'htaccess-editor'  => __( '.htaccess', 'saman-seo' ),
+			'mobile-friendly'  => __( 'Mobile friendly', 'saman-seo' ),
 			'redirects'        => __( 'Redirects', 'saman-seo' ),
-			'404-log'          => __( '404 Log', 'saman-seo' ),
-			'internal-linking' => __( 'Internal Linking', 'saman-seo' ),
+			'404-log'          => __( '404 monitor', 'saman-seo' ),
+			'internal-linking' => __( 'Internal linking', 'saman-seo' ),
 			'local-seo'        => __( 'Local SEO', 'saman-seo' ),
-			'ai-assistant'     => __( 'AI Assistant', 'saman-seo' ),
-			'assistants'       => __( 'AI Assistants', 'saman-seo' ),
+			'ai-assistant'     => __( 'AI assistant', 'saman-seo' ),
+			'assistants'       => __( 'Assistants', 'saman-seo' ),
 			'improvements'     => __( 'Improvements', 'saman-seo' ),
 		);
 

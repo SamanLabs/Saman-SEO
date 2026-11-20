@@ -1,0 +1,643 @@
+// Page standard overrides: technical group. See the page frame in pages/_layout.less.
+//
+// Schema builder, schema validator, robots.txt editor, .htaccess editor and the
+// mobile friendly test. Everything here follows one rule: a white panel, side
+// card or list sits on the gray page and nothing inside it draws a second box.
+
+// --------------------------------------------------------------------------
+// Shared: section rhythm
+// --------------------------------------------------------------------------
+// Group titles above a list are spaced by the page or column gap, not by the
+// group's own bottom margin.
+.schema-builder-page,
+.schema-validator-page,
+.robots-page,
+.mobile-friendly-page {
+    .improvements-group {
+        margin-bottom: 0;
+    }
+}
+
+// One muted line under a group title (the URL a result belongs to).
+.group-note {
+    margin: -@spacing-sm 0 @spacing-md;
+    font-size: @font-size-sm;
+    color: @color-muted;
+    overflow-wrap: anywhere;
+
+    a {
+        color: inherit;
+    }
+}
+
+// Controls that sit side by side: an input with its button, a row of buttons.
+.inline-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-sm;
+
+    input[type="text"],
+    input[type="url"] {
+        .input-base();
+        flex: 1 1 160px;
+        width: auto;
+        min-width: 0;
+    }
+
+    .button {
+        flex-shrink: 0;
+    }
+}
+
+// The URL field of the two tester pages is a normal input, not an oversized one.
+.input-group .tool-input {
+    padding: 7px 12px;
+    font-size: @font-size-base;
+}
+
+// --------------------------------------------------------------------------
+// Shared: plain rows inside a panel or side card
+// --------------------------------------------------------------------------
+.plain-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    > li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: @spacing-md;
+        margin: 0;
+        padding: @spacing-sm 0;
+        border-top: 1px solid @color-border-light;
+
+        &:first-child {
+            padding-top: 0;
+            border-top: 0;
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    &__main {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    &__title {
+        font-size: @font-size-base;
+        font-weight: @font-weight-medium;
+        color: @color-text;
+    }
+
+    &__meta {
+        font-size: @font-size-sm;
+        color: @color-muted;
+    }
+
+    // A row that is itself the control.
+    &__button {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover .plain-list__title,
+        &:focus-visible .plain-list__title {
+            color: @color-primary;
+        }
+
+        &:focus-visible {
+            outline: 2px solid @color-primary;
+            outline-offset: 2px;
+            border-radius: @radius-sm;
+        }
+    }
+
+    // Rows that start with a status pill and wrap a long message.
+    &--notes > li {
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: @spacing-sm;
+        font-size: @font-size-sm;
+        color: @color-text-secondary;
+    }
+}
+
+// Short notes under a heading: validation errors, warnings, notices.
+.note-list {
+    margin: 0;
+    padding-left: @spacing-lg;
+    list-style: disc;
+    font-size: @font-size-sm;
+    line-height: @line-height-normal;
+    color: @color-text-secondary;
+
+    li {
+        margin: 0 0 @spacing-xs;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &.is-danger {
+        color: @color-danger-text;
+    }
+
+    &.is-warning {
+        color: @color-warning-text;
+    }
+}
+
+.side-card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-sm;
+}
+
+.side-card > .panel-desc {
+    margin: -@spacing-sm 0 0;
+    font-size: @font-size-sm;
+}
+
+// --------------------------------------------------------------------------
+// Shared: code
+// --------------------------------------------------------------------------
+// The editor is the panel: the textarea runs edge to edge between a head and
+// an optional foot, so there is no bordered box inside the bordered panel.
+.saman-seo-admin .panel.code-panel {
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.code-panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-sm;
+    min-height: 44px;
+    padding: @spacing-sm @spacing-xl;
+    border-bottom: 1px solid @color-border-light;
+}
+
+.code-panel__path {
+    font-family: @font-family-mono;
+}
+
+.code-panel__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-sm;
+    padding: @spacing-md @spacing-xl;
+    border-top: 1px solid @color-border-light;
+}
+
+.code-panel__label {
+    font-size: @font-size-sm;
+    color: @color-muted;
+}
+
+.saman-seo-admin .code-editor {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-height: 460px;
+    margin: 0;
+    padding: @spacing-lg @spacing-xl;
+    border: 0;
+    border-radius: 0;
+    background: @color-surface;
+    box-shadow: none;
+    color: @color-text;
+    font-family: @font-family-mono;
+    font-size: @font-size-sm;
+    line-height: 1.6;
+    tab-size: 4;
+    resize: vertical;
+
+    &::placeholder {
+        color: @color-muted;
+    }
+
+    &:focus {
+        outline: none;
+        border: 0;
+        box-shadow: inset 0 0 0 2px fade(@color-primary, 35%);
+    }
+}
+
+// Read-only code: flat text on the surface it sits in.
+.code-block {
+    margin: 0;
+    padding: 0;
+    max-height: 420px;
+    overflow: auto;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: @color-text;
+    font-family: @font-family-mono;
+    font-size: @font-size-sm;
+    line-height: 1.6;
+    white-space: pre;
+
+    code {
+        padding: 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+    }
+}
+
+// ==========================================================================
+// Schema builder
+// ==========================================================================
+
+// Until a schema type is picked the header holds no actions. Its breadcrumb is
+// already hidden, so the whole row goes with it.
+.page.schema-builder-page > .page-header:not(:has(.header-actions)) {
+    .visually-hidden();
+    min-height: 0;
+}
+
+.schema-builder-page {
+    // The JSON preview needs more room than a settings sidebar.
+    .page-body.two-column {
+        grid-template-columns: minmax(0, 1fr) 400px;
+
+        @media (max-width: @breakpoint-xl) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (min-width: (@breakpoint-xl + 1px)) {
+        .side-panel {
+            position: sticky;
+            top: 32px + @spacing-xl;
+        }
+    }
+
+    .settings-row {
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 440px);
+    }
+
+    // Repeating fields need the full width, with the label above them.
+    .settings-row--stacked {
+        grid-template-columns: minmax(0, 1fr);
+        gap: @spacing-sm;
+    }
+
+    // A repeating field has no single control to label, so its name is text.
+    .settings-label__text {
+        font-weight: @font-weight-medium;
+    }
+
+    .settings-label .required {
+        margin-left: 2px;
+        color: @color-danger-text;
+    }
+
+    .settings-control {
+        input:not([type="checkbox"]):not([type="radio"]),
+        select,
+        textarea {
+            .input-base();
+        }
+
+        textarea {
+            min-height: 72px;
+            resize: vertical;
+        }
+    }
+
+    .schema-fields h3 {
+        display: flex;
+        align-items: center;
+        gap: @spacing-sm;
+
+        svg {
+            width: 18px;
+            height: 18px;
+            color: @color-muted;
+        }
+    }
+}
+
+// Repeating field (FAQ, steps, list items, breadcrumbs): rows split by a
+// hairline, never a tinted box per item.
+.repeat-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: @spacing-md;
+
+    > .button {
+        align-self: flex-start;
+    }
+}
+
+.repeat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-sm;
+    width: 100%;
+    padding-bottom: @spacing-md;
+    border-bottom: 1px solid @color-border-light;
+
+    &__index {
+        flex-shrink: 0;
+        min-width: 20px;
+        font-size: @font-size-sm;
+        font-weight: @font-weight-medium;
+        font-variant-numeric: tabular-nums;
+        line-height: @input-height;
+        color: @color-muted;
+    }
+
+    &__fields {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: @spacing-sm;
+        min-width: 0;
+    }
+
+    > input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    > .button {
+        flex-shrink: 0;
+        padding: 0 @spacing-sm;
+    }
+}
+
+.schema-preview {
+    min-width: 0;
+
+    .code-block {
+        padding-top: @spacing-md;
+        border-top: 1px solid @color-border-light;
+    }
+}
+
+// ==========================================================================
+// Schema validator
+// ==========================================================================
+
+// One row per schema found; the row opens to show its details.
+.schema-result {
+    margin: 0;
+
+    & + & {
+        border-top: 1px solid @color-border-light;
+    }
+
+    &__head {
+        width: 100%;
+        border: 0;
+        background: none;
+        font-family: inherit;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:focus-visible {
+            outline: 2px solid @color-primary;
+            outline-offset: -2px;
+        }
+    }
+
+    &__icon {
+        display: flex;
+        flex-shrink: 0;
+        color: @color-muted;
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    &__main {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    &__title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: @spacing-xs @spacing-sm;
+    }
+
+    &__type {
+        font-size: @font-size-base;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+
+    &__name {
+        font-size: @font-size-base;
+        color: @color-text-secondary;
+    }
+
+    &__toggle {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        color: @color-muted;
+        transition: transform @transition-fast;
+
+        &.is-open {
+            transform: rotate(180deg);
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-lg;
+        padding: @spacing-lg @spacing-xl @spacing-xl;
+        border-top: 1px solid @color-border-light;
+
+        h4 {
+            margin: 0 0 @spacing-sm;
+            font-size: @font-size-base;
+            font-weight: @font-weight-semibold;
+            color: @color-text;
+        }
+
+        summary {
+            font-size: @font-size-base;
+            font-weight: @font-weight-medium;
+            color: @color-primary;
+            cursor: pointer;
+        }
+
+        .code-block {
+            margin-top: @spacing-sm;
+        }
+    }
+}
+
+.schema-props {
+    display: flex;
+    flex-direction: column;
+
+    &__row {
+        display: flex;
+        gap: @spacing-md;
+        padding: 6px 0;
+        border-top: 1px solid @color-border-light;
+        font-size: @font-size-sm;
+
+        &:first-child {
+            border-top: 0;
+        }
+    }
+
+    &__key {
+        flex-shrink: 0;
+        width: 160px;
+        font-family: @font-family-mono;
+        color: @color-text-secondary;
+    }
+
+    &__value {
+        min-width: 0;
+        color: @color-text;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+    }
+}
+
+.schema-validator-page .panel .note-list a {
+    color: @color-primary;
+}
+
+// ==========================================================================
+// robots.txt editor
+// ==========================================================================
+
+.ai-notes {
+    margin: 0;
+    padding-left: @spacing-lg;
+    list-style: disc;
+    font-size: @font-size-sm;
+    line-height: @line-height-normal;
+    color: @color-text-secondary;
+
+    li {
+        margin: 0 0 @spacing-xs;
+    }
+}
+
+.ai-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: @spacing-lg @spacing-2xl;
+}
+
+.ai-bot {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-sm;
+
+    input[type="checkbox"] {
+        flex-shrink: 0;
+        margin: 3px 0 0;
+        accent-color: @color-primary;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-xs;
+        min-width: 0;
+    }
+
+    &__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+
+        label {
+            font-family: @font-family-mono;
+            font-size: @font-size-sm;
+            font-weight: @font-weight-semibold;
+            color: @color-text;
+            cursor: pointer;
+        }
+    }
+
+    &__desc {
+        font-size: @font-size-sm;
+        line-height: @line-height-normal;
+        color: @color-muted;
+    }
+
+    &.is-present label {
+        color: @color-text-secondary;
+        cursor: default;
+    }
+}
+
+.test-result {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-sm;
+
+    &__rule {
+        font-family: @font-family-mono;
+        font-size: @font-size-sm;
+        color: @color-muted;
+        overflow-wrap: anywhere;
+    }
+}
+
+.reference-list {
+    margin: 0;
+    font-size: @font-size-sm;
+
+    dt {
+        margin-top: @spacing-sm;
+        font-family: @font-family-mono;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    dd {
+        margin: 2px 0 0;
+        color: @color-muted;
+    }
+}

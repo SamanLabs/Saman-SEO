@@ -22,7 +22,9 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 				path: '/saman-seo/v1/404-ignore-patterns',
 			} );
 			if ( response.success ) {
-				setPatterns( response.data );
+				setPatterns(
+					Array.isArray( response.data ) ? response.data : []
+				);
 			}
 		} catch ( err ) {
 			console.error( 'Failed to fetch patterns:', err );
@@ -92,7 +94,7 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 				onClick={ ( e ) => e.stopPropagation() }
 			>
 				<div className="modal-header">
-					<h2>{ __( 'Manage Ignore Patterns', 'saman-seo' ) }</h2>
+					<h2>{ __( 'Manage ignore patterns', 'saman-seo' ) }</h2>
 					<button
 						type="button"
 						className="modal-close"
@@ -178,7 +180,7 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 									}
 									disabled={ adding }
 								/>
-								<span>{ __( 'Use Regex', 'saman-seo' ) }</span>
+								<span>{ __( 'Use regex', 'saman-seo' ) }</span>
 							</label>
 						</div>
 						{ error && <p className="form-error">{ error }</p> }
@@ -190,14 +192,14 @@ const IgnorePatternManager = ( { onClose, onPatternChange } ) => {
 							>
 								{ adding
 									? __( 'Adding\u2026', 'saman-seo' )
-									: __( 'Add Pattern', 'saman-seo' ) }
+									: __( 'Add pattern', 'saman-seo' ) }
 							</button>
 						</div>
 					</form>
 
 					{ /* Patterns List */ }
 					<div className="patterns-list">
-						<h3>{ __( 'Current Patterns', 'saman-seo' ) }</h3>
+						<h3>{ __( 'Current patterns', 'saman-seo' ) }</h3>
 						{ loading ? (
 							<div className="loading-state">
 								{ __( 'Loading patterns\u2026', 'saman-seo' ) }

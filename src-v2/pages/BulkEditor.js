@@ -136,6 +136,19 @@ const BulkEditor = ( { onNavigate } ) => {
 			return 'good';
 		}
 	};
+	const aiIcon = (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			width="16"
+			height="16"
+			aria-hidden="true"
+		>
+			<path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z" />
+		</svg>
+	);
 	return (
 		<div className="page bulk-editor-page">
 			<div className="page-header">
@@ -149,9 +162,9 @@ const BulkEditor = ( { onNavigate } ) => {
 							{ __( 'Tools', 'saman-seo' ) }
 						</button>
 						<span className="breadcrumb-separator">/</span>
-						<span>{ __( 'Bulk Editor', 'saman-seo' ) }</span>
+						<span>{ __( 'Bulk editor', 'saman-seo' ) }</span>
 					</div>
-					<h1>{ __( 'Smart Bulk Editor', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Smart bulk editor', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Edit SEO titles and descriptions in bulk with AI-powered suggestions.',
@@ -159,11 +172,11 @@ const BulkEditor = ( { onNavigate } ) => {
 						) }
 					</p>
 				</div>
-				<div className="page-header__actions">
+				<div className="header-actions">
 					{ selectedPosts.length > 0 && (
 						<button
 							type="button"
-							className="button button--secondary"
+							className="button"
 							onClick={ () => handleGenerateSuggestions() }
 							disabled={ generating }
 						>
@@ -174,16 +187,7 @@ const BulkEditor = ( { onNavigate } ) => {
 								</>
 							) : (
 								<>
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										width="16"
-										height="16"
-									>
-										<path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z" />
-									</svg>
+									{ aiIcon }
 									{ __( 'Generate AI (', 'saman-seo' ) }
 									{ selectedPosts.length })
 								</>
@@ -192,7 +196,7 @@ const BulkEditor = ( { onNavigate } ) => {
 					) }
 					<button
 						type="button"
-						className="button button--primary"
+						className="button primary"
 						onClick={ handleSaveAll }
 						disabled={ ! hasChanges || saving }
 					>
@@ -203,19 +207,7 @@ const BulkEditor = ( { onNavigate } ) => {
 							</>
 						) : (
 							<>
-								<svg
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									width="16"
-									height="16"
-								>
-									<path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-									<polyline points="17 21 17 13 7 13 7 21" />
-									<polyline points="7 3 7 8 15 8" />
-								</svg>
-								{ __( 'Save Changes', 'saman-seo' ) }{ ' ' }
+								{ __( 'Save changes', 'saman-seo' ) }{ ' ' }
 								{ hasChanges &&
 									`(${ Object.keys( changes ).length })` }
 							</>
@@ -224,102 +216,104 @@ const BulkEditor = ( { onNavigate } ) => {
 				</div>
 			</div>
 
-			<div className="bulk-editor-controls">
-				<div className="bulk-editor-filters">
-					<select
-						value={ postType }
-						onChange={ ( e ) => {
-							setPostType( e.target.value );
-							setPage( 1 );
-						} }
-						className="bulk-editor-select"
-					>
-						<option value="post">
-							{ __( 'Posts', 'saman-seo' ) }
-						</option>
-						<option value="page">
-							{ __( 'Pages', 'saman-seo' ) }
-						</option>
-					</select>
-
-					<select
-						value={ filter }
-						onChange={ ( e ) => {
-							setFilter( e.target.value );
-							setPage( 1 );
-						} }
-						className="bulk-editor-select"
-					>
-						<option value="all">
-							{ __( 'All', 'saman-seo' ) }
-						</option>
-						<option value="missing_title">
-							{ __( 'Missing SEO Title', 'saman-seo' ) }
-						</option>
-						<option value="missing_description">
-							{ __( 'Missing Description', 'saman-seo' ) }
-						</option>
-						<option value="missing_both">
-							{ __( 'Missing Both', 'saman-seo' ) }
-						</option>
-					</select>
-
-					<div className="bulk-editor-search">
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="16"
-							height="16"
+			<section className="page-body">
+				<div className="page-toolbar">
+					<div className="page-toolbar__filters">
+						<label
+							className="filter-field"
+							htmlFor="bulk-editor-post-type"
 						>
-							<circle cx="11" cy="11" r="8" />
-							<path d="M21 21l-4.35-4.35" />
-						</svg>
+							<span>{ __( 'Post type', 'saman-seo' ) }</span>
+							<select
+								id="bulk-editor-post-type"
+								value={ postType }
+								onChange={ ( e ) => {
+									setPostType( e.target.value );
+									setPage( 1 );
+								} }
+							>
+								<option value="post">
+									{ __( 'Posts', 'saman-seo' ) }
+								</option>
+								<option value="page">
+									{ __( 'Pages', 'saman-seo' ) }
+								</option>
+							</select>
+						</label>
+
+						<label
+							className="filter-field"
+							htmlFor="bulk-editor-filter"
+						>
+							<span>{ __( 'Show', 'saman-seo' ) }</span>
+							<select
+								id="bulk-editor-filter"
+								value={ filter }
+								onChange={ ( e ) => {
+									setFilter( e.target.value );
+									setPage( 1 );
+								} }
+							>
+								<option value="all">
+									{ __( 'All', 'saman-seo' ) }
+								</option>
+								<option value="missing_title">
+									{ __( 'Missing SEO title', 'saman-seo' ) }
+								</option>
+								<option value="missing_description">
+									{ __( 'Missing description', 'saman-seo' ) }
+								</option>
+								<option value="missing_both">
+									{ __( 'Missing both', 'saman-seo' ) }
+								</option>
+							</select>
+						</label>
+
 						<input
-							type="text"
+							type="search"
+							className="search-input"
 							placeholder={ __(
 								'Search posts\u2026',
 								'saman-seo'
 							) }
+							aria-label={ __( 'Search posts', 'saman-seo' ) }
 							value={ searchQuery }
 							onChange={ ( e ) => {
 								setSearchQuery( e.target.value );
 								setPage( 1 );
 							} }
 						/>
+
+						{ selectedPosts.length > 0 && (
+							<span className="selected-count">
+								{ selectedPosts.length }{ ' ' }
+								{ __( 'selected', 'saman-seo' ) }
+							</span>
+						) }
 					</div>
 				</div>
 
-				<div className="bulk-editor-stats">
-					{ selectedPosts.length > 0 && (
-						<span className="selected-count">
-							{ selectedPosts.length }{ ' ' }
-							{ __( 'selected', 'saman-seo' ) }
-						</span>
-					) }
-				</div>
-			</div>
-
-			<div className="bulk-editor-table-wrapper">
-				{ loading ? (
-					<div className="bulk-editor-loading">
-						<span className="spinner"></span>
+				{ loading && (
+					<div className="loading-state">
 						{ __( 'Loading posts\u2026', 'saman-seo' ) }
 					</div>
-				) : posts.length === 0 ? (
-					<div className="bulk-editor-empty">
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="48"
-							height="48"
-						>
-							<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-							<polyline points="14 2 14 8 20 8" />
-						</svg>
+				) }
+
+				{ ! loading && posts.length === 0 && (
+					<div className="empty-state">
+						<div className="empty-state__icon">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								width="48"
+								height="48"
+							>
+								<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+								<polyline points="14 2 14 8 20 8" />
+							</svg>
+						</div>
 						<p>
 							{ __(
 								'No posts found matching your criteria.',
@@ -327,231 +321,250 @@ const BulkEditor = ( { onNavigate } ) => {
 							) }
 						</p>
 					</div>
-				) : (
-					<table className="bulk-editor-table">
-						<thead>
-							<tr>
-								<th className="col-checkbox">
-									<input
-										type="checkbox"
-										checked={
-											selectedPosts.length ===
-											posts.length
-										}
-										onChange={ handleSelectAll }
-									/>
-								</th>
-								<th className="col-title">
-									{ __( 'Post Title', 'saman-seo' ) }
-								</th>
-								<th className="col-seo-title">
-									{ __( 'SEO Title', 'saman-seo' ) }
-								</th>
-								<th className="col-seo-desc">
-									{ __( 'Meta Description', 'saman-seo' ) }
-								</th>
-								<th className="col-actions">
-									{ __( 'Actions', 'saman-seo' ) }
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{ posts.map( ( post ) => {
-								const seoTitle = getFieldValue(
-									post,
-									'seo_title'
-								);
-								const seoDesc = getFieldValue(
-									post,
-									'seo_description'
-								);
-								const isGenerating =
-									generating &&
-									generating.includes( post.id );
-								const hasPostChanges = !! changes[ post.id ];
-								return (
-									<tr
-										key={ post.id }
-										className={
-											hasPostChanges ? 'row-modified' : ''
-										}
-									>
-										<td className="col-checkbox">
-											<input
-												type="checkbox"
-												checked={ selectedPosts.includes(
-													post.id
-												) }
-												onChange={ () =>
-													handleSelectPost( post.id )
-												}
-											/>
-										</td>
-										<td className="col-title">
-											<div className="post-info">
-												<a
-													href={ post.edit_link }
-													target="_blank"
-													rel="noopener noreferrer"
-													className="post-title-link"
-												>
-													{ post.title }
-												</a>
-												<span className="post-type-badge">
-													{ post.post_type }
-												</span>
-											</div>
-										</td>
-										<td className="col-seo-title">
-											<div className="field-wrapper">
-												<input
-													type="text"
-													value={ seoTitle }
-													onChange={ ( e ) =>
-														handleFieldChange(
-															post.id,
-															'seo_title',
-															e.target.value
-														)
-													}
-													placeholder={ post.title }
-													className={
-														isGenerating
-															? 'generating'
-															: ''
-													}
-													disabled={ isGenerating }
-												/>
-												<span
-													className={ `char-count ${ getCharCountClass(
-														seoTitle.length,
-														'title'
-													) }` }
-												>
-													{ seoTitle.length }/60
-												</span>
-											</div>
-										</td>
-										<td className="col-seo-desc">
-											<div className="field-wrapper">
-												<textarea
-													value={ seoDesc }
-													onChange={ ( e ) =>
-														handleFieldChange(
-															post.id,
-															'seo_description',
-															e.target.value
-														)
-													}
-													placeholder={ __(
-														'Enter meta description\u2026',
-														'saman-seo'
-													) }
-													rows={ 2 }
-													className={
-														isGenerating
-															? 'generating'
-															: ''
-													}
-													disabled={ isGenerating }
-												/>
-												<span
-													className={ `char-count ${ getCharCountClass(
-														seoDesc.length,
-														'desc'
-													) }` }
-												>
-													{ seoDesc.length }/160
-												</span>
-											</div>
-										</td>
-										<td className="col-actions">
-											<button
-												type="button"
-												className="action-button"
-												onClick={ () =>
-													handleGenerateSuggestions( [
-														post.id,
-													] )
-												}
-												disabled={ isGenerating }
-												title={ __(
-													'Generate AI suggestions',
-													'saman-seo'
-												) }
-											>
-												{ isGenerating ? (
-													<span className="spinner-small"></span>
-												) : (
-													<svg
-														viewBox="0 0 24 24"
-														fill="none"
-														stroke="currentColor"
-														strokeWidth="2"
-														width="16"
-														height="16"
-													>
-														<path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z" />
-													</svg>
-												) }
-											</button>
-										</td>
-									</tr>
-								);
-							} ) }
-						</tbody>
-					</table>
 				) }
-			</div>
 
-			{ totalPages > 1 && (
-				<div className="bulk-editor-pagination">
-					<button
-						type="button"
-						className="pagination-button"
-						onClick={ () =>
-							setPage( ( p ) => Math.max( 1, p - 1 ) )
-						}
-						disabled={ page === 1 }
-					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="16"
-							height="16"
-						>
-							<path d="M15 18l-6-6 6-6" />
-						</svg>
-						{ __( 'Previous', 'saman-seo' ) }
-					</button>
-					<span className="pagination-info">
-						{ __( 'Page', 'saman-seo' ) } { page }{ ' ' }
-						{ __( 'of', 'saman-seo' ) } { totalPages }
-					</span>
-					<button
-						type="button"
-						className="pagination-button"
-						onClick={ () =>
-							setPage( ( p ) => Math.min( totalPages, p + 1 ) )
-						}
-						disabled={ page === totalPages }
-					>
-						{ __( 'Next', 'saman-seo' ) }
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="16"
-							height="16"
-						>
-							<path d="M9 18l6-6-6-6" />
-						</svg>
-					</button>
-				</div>
-			) }
+				{ ! loading && posts.length > 0 && (
+					<div className="table-wrap">
+						<table className="data-table">
+							<thead>
+								<tr>
+									<th className="checkbox-col">
+										<input
+											type="checkbox"
+											aria-label={ __(
+												'Select all posts',
+												'saman-seo'
+											) }
+											checked={
+												selectedPosts.length ===
+												posts.length
+											}
+											onChange={ handleSelectAll }
+										/>
+									</th>
+									<th className="col-title">
+										{ __( 'Post title', 'saman-seo' ) }
+									</th>
+									<th className="col-seo-title">
+										{ __( 'SEO title', 'saman-seo' ) }
+									</th>
+									<th className="col-seo-desc">
+										{ __(
+											'Meta description',
+											'saman-seo'
+										) }
+									</th>
+									<th className="col-actions">
+										{ __( 'Actions', 'saman-seo' ) }
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{ posts.map( ( post ) => {
+									const seoTitle = getFieldValue(
+										post,
+										'seo_title'
+									);
+									const seoDesc = getFieldValue(
+										post,
+										'seo_description'
+									);
+									const isGenerating =
+										generating &&
+										generating.includes( post.id );
+									const hasPostChanges =
+										!! changes[ post.id ];
+									return (
+										<tr
+											key={ post.id }
+											className={
+												hasPostChanges
+													? 'row-modified'
+													: ''
+											}
+										>
+											<td className="checkbox-col">
+												<input
+													type="checkbox"
+													aria-label={ post.title }
+													checked={ selectedPosts.includes(
+														post.id
+													) }
+													onChange={ () =>
+														handleSelectPost(
+															post.id
+														)
+													}
+												/>
+											</td>
+											<td className="col-title">
+												<div className="post-info">
+													<a
+														href={
+															post.edit_url ||
+															post.edit_link
+														}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="post-title-link"
+													>
+														{ post.title }
+													</a>
+													{ post.post_type && (
+														<span className="post-type-badge">
+															{ post.post_type }
+														</span>
+													) }
+												</div>
+											</td>
+											<td className="col-seo-title">
+												<div className="field-wrapper">
+													<input
+														type="text"
+														aria-label={ __(
+															'SEO title',
+															'saman-seo'
+														) }
+														value={ seoTitle }
+														onChange={ ( e ) =>
+															handleFieldChange(
+																post.id,
+																'seo_title',
+																e.target.value
+															)
+														}
+														placeholder={
+															post.title
+														}
+														className={
+															isGenerating
+																? 'generating'
+																: ''
+														}
+														disabled={
+															isGenerating
+														}
+													/>
+													<span
+														className={ `char-count ${ getCharCountClass(
+															seoTitle.length,
+															'title'
+														) }` }
+													>
+														{ seoTitle.length }/60
+													</span>
+												</div>
+											</td>
+											<td className="col-seo-desc">
+												<div className="field-wrapper">
+													<textarea
+														aria-label={ __(
+															'Meta description',
+															'saman-seo'
+														) }
+														value={ seoDesc }
+														onChange={ ( e ) =>
+															handleFieldChange(
+																post.id,
+																'seo_description',
+																e.target.value
+															)
+														}
+														placeholder={ __(
+															'Enter meta description\u2026',
+															'saman-seo'
+														) }
+														rows={ 2 }
+														className={
+															isGenerating
+																? 'generating'
+																: ''
+														}
+														disabled={
+															isGenerating
+														}
+													/>
+													<span
+														className={ `char-count ${ getCharCountClass(
+															seoDesc.length,
+															'desc'
+														) }` }
+													>
+														{ seoDesc.length }/160
+													</span>
+												</div>
+											</td>
+											<td className="action-cell">
+												<div className="table-actions">
+													<button
+														type="button"
+														className="button ghost small"
+														onClick={ () =>
+															handleGenerateSuggestions(
+																[ post.id ]
+															)
+														}
+														disabled={
+															isGenerating
+														}
+														title={ __(
+															'Generate AI suggestions',
+															'saman-seo'
+														) }
+														aria-label={ __(
+															'Generate AI suggestions',
+															'saman-seo'
+														) }
+													>
+														{ isGenerating ? (
+															<span className="spinner-small"></span>
+														) : (
+															aiIcon
+														) }
+													</button>
+												</div>
+											</td>
+										</tr>
+									);
+								} ) }
+							</tbody>
+						</table>
+					</div>
+				) }
+
+				{ totalPages > 1 && (
+					<div className="pagination">
+						<span className="pagination-info">
+							{ __( 'Page', 'saman-seo' ) } { page }{ ' ' }
+							{ __( 'of', 'saman-seo' ) } { totalPages }
+						</span>
+						<div className="pagination-links">
+							<button
+								type="button"
+								className="pagination-btn"
+								onClick={ () =>
+									setPage( ( p ) => Math.max( 1, p - 1 ) )
+								}
+								disabled={ page === 1 }
+							>
+								{ __( 'Previous', 'saman-seo' ) }
+							</button>
+							<button
+								type="button"
+								className="pagination-btn"
+								onClick={ () =>
+									setPage( ( p ) =>
+										Math.min( totalPages, p + 1 )
+									)
+								}
+								disabled={ page === totalPages }
+							>
+								{ __( 'Next', 'saman-seo' ) }
+							</button>
+						</div>
+					</div>
+				) }
+			</section>
 		</div>
 	);
 };

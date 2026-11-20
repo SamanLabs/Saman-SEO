@@ -1,0 +1,385 @@
+// Page standard overrides: content-a group. See the page frame in pages/_layout.less.
+//
+// Bulk editor, Content gaps and Image SEO. Everything is scoped to the page
+// class and prefixed with .saman-seo-admin so it outranks both WordPress core
+// and the shared data table, which is imported last.
+
+// --------------------------------------------------------------------------
+// Shared by the three pages
+// --------------------------------------------------------------------------
+
+.saman-seo-admin .bulk-editor-page,
+.saman-seo-admin .content-gaps-page,
+.saman-seo-admin .image-seo-page {
+    // WordPress core ships its own `.spinner` (hidden, floated, a GIF
+    // background). Inside a button it is our ring, inline with the label.
+    .button .spinner,
+    .button .spinner-small {
+        display: inline-block;
+        float: none;
+        flex-shrink: 0;
+        width: 14px;
+        height: 14px;
+        margin: 0;
+        background: none;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        opacity: 1;
+        visibility: visible;
+        animation: spin 0.75s linear infinite;
+    }
+
+    .page-toolbar .button {
+        min-height: 32px;
+    }
+
+    // The pagination row sits on the page under the table card.
+    .page-body > .pagination {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .empty-state {
+        h3 {
+            color: @color-text;
+        }
+
+        p {
+            max-width: 60ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Bulk editor
+// --------------------------------------------------------------------------
+
+.saman-seo-admin .bulk-editor-page {
+    .selected-count {
+        font-size: @font-size-sm;
+        font-weight: @font-weight-medium;
+        color: @color-text-secondary;
+    }
+
+    .data-table {
+        td {
+            vertical-align: top;
+        }
+
+        .checkbox-col {
+            padding-right: 0;
+
+            input[type="checkbox"] {
+                margin: 0;
+                accent-color: @color-primary;
+                cursor: pointer;
+            }
+        }
+
+        td.checkbox-col,
+        td.col-title {
+            padding-top: 18px;
+        }
+
+        .col-title {
+            width: 22%;
+            min-width: 160px;
+        }
+
+        .col-seo-title {
+            width: 30%;
+            min-width: 220px;
+        }
+
+        .col-seo-desc {
+            min-width: 280px;
+        }
+
+        tr.row-modified,
+        tr.row-modified:hover {
+            background: @color-primary-lighter;
+        }
+    }
+
+    .post-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .post-title-link {
+            color: @color-text;
+            font-weight: @font-weight-medium;
+            text-decoration: none;
+            overflow-wrap: anywhere;
+
+            &:hover {
+                color: @color-primary;
+            }
+        }
+
+        .post-type-badge {
+            font-size: @font-size-sm;
+            color: @color-muted;
+            text-transform: capitalize;
+        }
+    }
+
+    .field-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-xs;
+
+        input[type="text"],
+        textarea {
+            .input-base();
+            margin: 0;
+
+            &.generating {
+                background-color: @color-surface-muted;
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+        }
+
+        textarea {
+            min-height: 58px;
+            resize: vertical;
+        }
+
+        .char-count {
+            font-size: @font-size-xs;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+            color: @color-muted;
+
+            &.good {
+                color: @color-success-text;
+            }
+
+            &.short,
+            &.empty {
+                color: @color-warning-text;
+            }
+
+            &.long {
+                color: @color-danger-text;
+            }
+        }
+    }
+
+    // Icon-only row action.
+    .table-actions .button {
+        width: 28px;
+        padding: 0;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Content gaps
+// --------------------------------------------------------------------------
+
+.saman-seo-admin .content-gaps-page {
+    .filter-field input[type="text"] {
+        width: 260px;
+        max-width: 100%;
+        padding-right: 10px;
+    }
+
+    .loading-state p {
+        margin: 0;
+        font-weight: @font-weight-medium;
+        color: @color-text;
+    }
+
+    .section-head {
+        margin-bottom: @spacing-md;
+
+        .improvements-group__title {
+            margin: 0;
+        }
+
+        .section-desc {
+            margin: 2px 0 0;
+            font-size: @font-size-base;
+            color: @color-muted;
+        }
+    }
+
+    .gap-priority {
+        text-transform: capitalize;
+    }
+
+    .cluster-missing {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px @spacing-sm;
+        margin-top: @spacing-sm;
+
+        .missing-label {
+            font-size: @font-size-sm;
+            color: @color-muted;
+        }
+    }
+
+    // Outline dialog: the shared .modal, with stacked sections in its body.
+    .modal-header h2 {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .modal-close {
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    .outline-body {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-2xl;
+    }
+
+    .outline-section {
+        h4 {
+            margin: 0 0 @spacing-sm;
+            font-size: @font-size-sm;
+            font-weight: @font-weight-medium;
+            color: @color-muted;
+        }
+
+        p {
+            margin: 0;
+            line-height: @line-height-normal;
+            color: @color-text;
+        }
+
+        .suggested-title {
+            font-size: @font-size-xl;
+            font-weight: @font-weight-semibold;
+        }
+    }
+
+    .outline-list {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-md;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .outline-item {
+        margin: 0;
+
+        &--h3 {
+            margin-left: @spacing-xl;
+        }
+    }
+
+    .outline-heading {
+        display: block;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+
+    .outline-points {
+        margin: @spacing-xs 0 0;
+        padding-left: @spacing-xl;
+        list-style: disc;
+
+        li {
+            margin: 0 0 2px;
+            font-size: @font-size-base;
+            color: @color-text-secondary;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// Image SEO
+// --------------------------------------------------------------------------
+
+.saman-seo-admin .image-seo-page {
+    .page-toolbar .search-input {
+        width: 260px;
+        max-width: 100%;
+    }
+
+    .data-table {
+        .col-thumb {
+            width: 1%;
+            white-space: nowrap;
+        }
+
+        .col-filename {
+            width: 30%;
+        }
+    }
+
+    .image-preview {
+        width: 44px;
+        height: 44px;
+        border: 0;
+        border-radius: @radius-md;
+        background: @color-surface-muted;
+        overflow: hidden;
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .image-filename {
+        .filename {
+            font-weight: @font-weight-medium;
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+
+        .dimensions {
+            font-size: @font-size-sm;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .inline-edit {
+        flex-direction: row;
+        align-items: center;
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 160px;
+            min-height: 32px;
+            margin: 0;
+            padding: 4px 10px;
+        }
+    }
+
+    .inline-edit-actions {
+        flex-shrink: 0;
+    }
+
+    .tips-list li {
+        max-width: 75ch;
+        color: @color-text-secondary;
+
+        &::before {
+            background: @color-muted;
+        }
+    }
+}

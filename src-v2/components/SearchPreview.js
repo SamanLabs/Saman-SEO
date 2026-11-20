@@ -34,7 +34,7 @@ const SearchPreview = ( {
 		<div className="search-preview">
 			<div className="search-preview__header">
 				<span className="search-preview__label">
-					{ __( 'Search Result Preview', 'saman-seo' ) }
+					{ __( 'Search result preview', 'saman-seo' ) }
 				</span>
 			</div>
 			<div className="search-preview__body">
@@ -53,7 +53,7 @@ const SearchPreview = ( {
 					</span>
 				</div>
 				<div className="search-preview__title">
-					{ displayTitle || __( 'Page Title', 'saman-seo' ) }
+					{ displayTitle || __( 'Page title', 'saman-seo' ) }
 				</div>
 				<div className="search-preview__description">
 					{ displayDescription ||

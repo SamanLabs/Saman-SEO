@@ -1,114 +1,144 @@
 // ==========================================================================
-// Google Search Console card (Dashboard)
+// Dashboard service cards: Search Console, site speed, weekly digest
 // ==========================================================================
 
 .gsc-card {
-	display: flex;
-	flex-direction: column;
-
-	.card-header {
-		.pill {
-			font-size: @font-size-xs;
-			text-transform: uppercase;
-			letter-spacing: 0.04em;
-			color: @color-text-secondary;
-			background: @color-surface-muted;
-
-			&.success {
-				color: @color-success;
-				background: @color-success-bg;
-			}
-		}
+	// Body copy inside these cards.
+	p {
+		margin: 0;
+		font-size: @font-size-base;
+		line-height: @line-height-normal;
 	}
 }
 
 .gsc-loading {
-	padding: @spacing-xl 0;
-	color: @color-text-secondary;
+	padding: @spacing-lg 0;
+	color: @color-muted;
 	font-size: @font-size-base;
 }
 
 .gsc-alert {
-	position: relative;
-	margin-bottom: @spacing-md;
-	padding: @spacing-sm @spacing-lg;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: @spacing-md;
+	margin-bottom: @spacing-lg;
+	padding: 10px @spacing-md;
+	border: 1px solid transparent;
 	border-radius: @radius-md;
 	font-size: @font-size-sm;
 	line-height: @line-height-normal;
 
 	&--error {
 		background: @color-danger-bg;
-		border-left: 3px solid @color-danger;
-		color: #8a1f21;
+		border-color: fade(@color-danger, 18%);
+		color: @color-danger-text;
 	}
 
 	&--info {
 		background: @color-primary-lighter;
-		border-left: 3px solid @color-primary;
+		border-color: fade(@color-primary, 14%);
 		color: @color-text;
 	}
 
 	&__close {
-		position: absolute;
-		top: 2px;
-		right: 4px;
+		.flex-center();
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+		margin: -1px -4px 0 0;
+		padding: 0;
+		border: 0;
+		border-radius: @radius-sm;
 		background: none;
-		border: none;
-		cursor: pointer;
 		color: inherit;
-		font-size: @font-size-lg;
+		font-size: 16px;
 		line-height: 1;
-		padding: 2px 6px;
+		cursor: pointer;
+
+		&:hover {
+			background: fade(@color-danger, 12%);
+		}
 	}
 }
 
-// --- Connect / setup ------------------------------------------------------
-
-.gsc-digest-toggle {
-	display: flex;
-	align-items: center;
-	gap: @spacing-sm;
-	margin-bottom: @spacing-md;
-
-	input[type='checkbox'] {
-		margin: 0;
-	}
-}
+// --- Intro / connect / setup -------------------------------------------------
 
 .gsc-connect,
 .gsc-setup {
-	p:first-child {
-		margin-top: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: @spacing-lg;
+
+	> p:first-child {
+		max-width: 62ch;
 		color: @color-text-secondary;
 	}
 }
 
+.gsc-setup {
+	align-items: stretch;
+}
+
 .gsc-howto {
-	margin: 0 0 @spacing-md;
 	font-size: @font-size-sm;
 	color: @color-text-secondary;
 
 	summary {
+		display: inline-block;
 		cursor: pointer;
 		color: @color-primary;
+		font-weight: @font-weight-medium;
+		list-style: none;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+
+		&::before {
+			content: "";
+			display: inline-block;
+			width: 5px;
+			height: 5px;
+			margin: 0 8px 2px 2px;
+			border-right: 1.5px solid currentColor;
+			border-bottom: 1.5px solid currentColor;
+			transform: rotate(-45deg);
+			transition: transform @transition-fast;
+		}
+
+		&:hover {
+			color: @color-primary-hover;
+		}
+	}
+
+	&[open] summary::before {
+		transform: rotate(45deg);
 	}
 
 	ol {
-		margin: @spacing-sm 0 0 @spacing-lg;
-		padding-left: @spacing-md;
+		margin: @spacing-md 0 0;
+		padding: @spacing-md @spacing-lg @spacing-md @spacing-3xl;
+		border-radius: @radius-md;
+		background: @color-surface-muted;
 
 		li {
-			margin-bottom: @spacing-xs;
+			margin: 0 0 6px;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
 		}
 	}
 }
 
 .gsc-redirect-uri {
 	display: block;
-	margin-top: @spacing-xs;
-	padding: @spacing-xs @spacing-sm;
-	background: @color-surface-muted;
-	border: 1px solid @color-border-light;
+	margin-top: 6px;
+	padding: 6px @spacing-sm;
+	background: @color-surface;
+	border: 1px solid @color-border;
 	border-radius: @radius-sm;
 	font-family: @font-family-mono;
 	font-size: @font-size-xs;
@@ -116,50 +146,136 @@
 	user-select: all;
 }
 
-.gsc-field {
+// Label + control. WordPress core styles bare inputs, so these are scoped to
+// outrank `.wp-core-ui select` and `input[type=...]`.
+.saman-seo-admin .gsc-field {
 	display: block;
-	margin-bottom: @spacing-md;
+	min-width: 0;
 
-	span {
+	> span {
 		display: block;
-		margin-bottom: @spacing-xs;
-		font-weight: @font-weight-medium;
+		margin-bottom: 6px;
 		font-size: @font-size-sm;
+		font-weight: @font-weight-medium;
+		color: @color-text;
 	}
 
-	input {
-		width: 100%;
+	input,
+	select,
+	textarea {
+		.input-base();
+		max-width: none;
+		margin: 0;
+	}
+
+	select {
+		padding-right: 28px;
+	}
+
+	textarea {
+		font-family: @font-family-mono;
+		font-size: @font-size-sm;
+		resize: vertical;
+	}
+}
+
+.gsc-field-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 140px;
+	gap: @spacing-md;
+
+	@media (max-width: @breakpoint-sm) {
+		grid-template-columns: minmax(0, 1fr);
 	}
 }
 
 .gsc-setup-actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: @spacing-sm;
 }
 
 .gsc-fineprint {
-	margin: @spacing-md 0 0;
-	font-size: @font-size-xs;
+	font-size: @font-size-sm !important;
 	color: @color-muted;
 }
 
 .gsc-speed-win {
-	margin: 0 0 @spacing-md;
-	padding: @spacing-sm @spacing-md;
+	margin: 0 0 @spacing-lg !important;
+	padding: 10px @spacing-md;
+	border-radius: @radius-md;
 	background: @color-success-bg;
-	border-left: 3px solid @color-success;
-	color: #1e4620;
-	font-size: @font-size-sm;
+	color: @color-success-text;
+	font-size: @font-size-sm !important;
 	font-weight: @font-weight-medium;
 }
 
 .gsc-cache-settings {
-	margin-top: @spacing-md;
-	padding-top: @spacing-md;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: @spacing-lg;
+	margin-top: @spacing-lg;
+	padding-top: @spacing-lg;
 	border-top: 1px solid @color-border-light;
 
-	textarea {
+	.gsc-field {
 		width: 100%;
+	}
+}
+
+// --- Weekly digest ----------------------------------------------------------
+
+.gsc-digest {
+	display: flex;
+	flex-direction: column;
+	gap: @spacing-lg;
+
+	> p:first-child {
+		color: @color-text-secondary;
+	}
+}
+
+// Switch row: the label is the click target, the switch sits on the right.
+.gsc-digest-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: @spacing-md;
+	padding: 10px @spacing-md;
+	border: 1px solid @color-border;
+	border-radius: @radius-md;
+	font-size: @font-size-base;
+	font-weight: @font-weight-medium;
+	cursor: pointer;
+	transition: border-color @transition-fast, background @transition-fast;
+
+	&:hover {
+		background: @color-surface-muted;
+	}
+
+	input[type='checkbox'] {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.toggle-track {
+		flex-shrink: 0;
+		order: 2;
+	}
+
+	input:focus-visible + .toggle-track {
+		outline: 2px solid @color-primary;
+		outline-offset: 2px;
+	}
+
+	input:checked + .toggle-track {
+		background: @color-primary;
+
+		&::after {
+			transform: translateX(20px);
+		}
 	}
 }
 
@@ -167,86 +283,100 @@
 
 .gsc-metrics {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: @spacing-sm;
-	margin-bottom: @spacing-md;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: @spacing-lg;
+	margin-bottom: @spacing-xl;
 
 	@media (max-width: @breakpoint-sm) {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 .gsc-metric {
 	display: flex;
-	flex-direction: column;
+	flex-direction: column-reverse;
 	gap: 2px;
-	padding: @spacing-sm @spacing-md;
-	background: @color-surface-muted;
-	border-radius: @radius-lg;
+	min-width: 0;
+
+	& + & {
+		padding-left: @spacing-lg;
+		border-left: 1px solid @color-border-light;
+	}
 
 	&__value {
-		font-size: @font-size-2xl;
-		font-weight: @font-weight-bold;
+		font-size: 24px;
+		font-weight: @font-weight-semibold;
 		line-height: @line-height-tight;
+		letter-spacing: -0.02em;
 		font-variant-numeric: tabular-nums;
+		color: @color-text;
 	}
 
 	&__label {
-		font-size: @font-size-xs;
-		color: @color-text-secondary;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
+		font-size: @font-size-sm;
+		color: @color-muted;
+		.text-truncate();
+	}
+
+	@media (max-width: @breakpoint-sm) {
+		&:nth-child(odd) {
+			padding-left: 0;
+			border-left: 0;
+		}
 	}
 }
 
 .gsc-sparkline {
 	display: flex;
 	align-items: flex-end;
-	gap: 2px;
-	height: 48px;
-	margin-bottom: @spacing-md;
+	gap: 3px;
+	height: 64px;
+	margin-bottom: @spacing-xl;
+	padding-bottom: 1px;
+	border-bottom: 1px solid @color-border;
 }
 
 .gsc-bar {
 	flex: 1;
-	min-height: 4px;
-	background: var(--color-accent, #5a84ff);
-	opacity: 0.75;
-	border-radius: 1px 1px 0 0;
-	transition: opacity @transition-fast;
+	min-height: 2px;
+	background: fade(@color-primary, 55%);
+	border-radius: 2px 2px 0 0;
+	transition: background @transition-fast;
 
 	&:hover {
-		opacity: 1;
+		background: @color-primary;
 	}
 }
 
 .gsc-queries {
 	width: 100%;
-	font-size: @font-size-sm;
+	border-collapse: collapse;
+	font-size: @font-size-base;
 
 	th,
 	td {
-		padding: @spacing-xs 0;
+		padding: 7px 0;
 		border-bottom: 1px solid @color-border-light;
 		text-align: left;
 	}
 
 	th.num,
 	td.num {
+		padding-left: @spacing-xl;
 		text-align: right;
+		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
 	}
 
 	th {
-		font-size: @font-size-xs;
+		font-size: @font-size-sm;
 		font-weight: @font-weight-medium;
-		color: @color-text-secondary;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
+		color: @color-muted;
 	}
 
 	.gsc-query-text {
-		max-width: 200px;
+		max-width: 0;
+		width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -261,13 +391,25 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: wrap;
 	gap: @spacing-sm;
-	margin-top: @spacing-md;
+	margin-top: @spacing-lg;
+
+	> div {
+		display: flex;
+		gap: @spacing-sm;
+	}
+
+	& + .gsc-fineprint {
+		margin-top: @spacing-md;
+	}
 }
 
-.gsc-site-select {
+.saman-seo-admin .gsc-site-select {
+	.input-base();
+	width: auto;
 	max-width: 65%;
-	height: @button-height;
+	padding-right: 28px;
 }
 
 .gsc-link-button {
@@ -275,11 +417,22 @@
 	border: none;
 	padding: 0;
 	cursor: pointer;
-	color: @color-danger;
+	font-family: inherit;
 	font-size: @font-size-sm;
+	font-weight: @font-weight-medium;
+	color: @color-primary;
 	text-decoration: none;
 
 	&:hover {
+		color: @color-primary-hover;
 		text-decoration: underline;
+	}
+
+	&--danger {
+		color: @color-danger-text;
+
+		&:hover {
+			color: @color-danger-text;
+		}
 	}
 }

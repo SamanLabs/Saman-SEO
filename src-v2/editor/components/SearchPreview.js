@@ -86,7 +86,7 @@ const SearchPreview = ( { title, description, url } ) => {
 
 			{ /* Title */ }
 			<h3 className="saman-seo-search-preview__title">
-				{ displayTitle || __( 'Page Title', 'saman-seo' ) }
+				{ displayTitle || __( 'Page title', 'saman-seo' ) }
 			</h3>
 
 			{ /* Description */ }

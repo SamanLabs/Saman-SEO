@@ -7,7 +7,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-const MobileFriendly = ( { onNavigate } ) => {
+import { KpiBand, MetricCard } from '../components/Kpi';
+
+// Pill tone and label for a check result or an issue severity.
+const checkPills = {
+	pass: { tone: 'success', label: __( 'Pass', 'saman-seo' ) },
+	warning: { tone: 'warning', label: __( 'Warning', 'saman-seo' ) },
+	fail: { tone: 'danger', label: __( 'Fail', 'saman-seo' ) },
+};
+const severityPills = {
+	critical: { tone: 'danger', label: __( 'Critical', 'saman-seo' ) },
+	warning: { tone: 'warning', label: __( 'Warning', 'saman-seo' ) },
+	info: { tone: '', label: __( 'Info', 'saman-seo' ) },
+};
+
+const MobileFriendly = () => {
 	const [ url, setUrl ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
 	const [ results, setResults ] = useState( null );
@@ -24,7 +38,7 @@ const MobileFriendly = ( { onNavigate } ) => {
 				if ( response.success ) {
 					setRecentTests( response.data || [] );
 				}
-			} catch ( err ) {
+			} catch {
 				// Ignore errors for recent tests
 			}
 		};
@@ -88,64 +102,76 @@ const MobileFriendly = ( { onNavigate } ) => {
 		}
 	}, [] );
 
-	// Get score color
-	const getScoreColor = ( score ) => {
-		if ( score >= 90 ) return '#00a32a';
-		if ( score >= 70 ) return '#f0b849';
-		return '#d63638';
+	// Status tone for a 0-100 score.
+	const getScoreTone = ( score ) => {
+		if ( score >= 90 ) {
+			return 'success';
+		}
+		if ( score >= 70 ) {
+			return 'warning';
+		}
+		return 'danger';
 	};
 
-	// Issue severity icon
-	const SeverityIcon = ( { severity } ) => {
-		if ( severity === 'critical' ) {
-			return (
-				<svg
-					className="issue-icon issue-icon--critical"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-				>
-					<circle cx="12" cy="12" r="10" />
-					<line x1="15" y1="9" x2="9" y2="15" />
-					<line x1="9" y1="9" x2="15" y2="15" />
-				</svg>
-			);
+	const getStatusLabel = ( status ) => {
+		if ( status === 'pass' ) {
+			return __( 'Mobile friendly', 'saman-seo' );
 		}
-		if ( severity === 'warning' ) {
-			return (
-				<svg
-					className="issue-icon issue-icon--warning"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-				>
-					<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-					<line x1="12" y1="9" x2="12" y2="13" />
-					<line x1="12" y1="17" x2="12.01" y2="17" />
-				</svg>
-			);
+		if ( status === 'warning' ) {
+			return __( 'Needs improvement', 'saman-seo' );
 		}
-		return (
-			<svg
-				className="issue-icon issue-icon--info"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-			>
-				<circle cx="12" cy="12" r="10" />
-				<line x1="12" y1="16" x2="12" y2="12" />
-				<line x1="12" y1="8" x2="12.01" y2="8" />
-			</svg>
-		);
+		return __( 'Not mobile friendly', 'saman-seo' );
 	};
+
+	// The band is always on the page so the frame does not jump when a
+	// result arrives; before the first run its tiles show a dash.
+	const dash = '\u2013';
+	const checks = results?.checks || [];
+	const issues = results?.issues || [];
+	const passedCount = checks.filter( ( c ) => c.status === 'pass' ).length;
+	const reviewCount = checks.length - passedCount;
 	return (
-		<div className="page">
+		<div className="page mobile-friendly-page">
+			{ ( loading || results ) &&
+				( loading ? (
+					<KpiBand loading count={ 4 } />
+				) : (
+					<KpiBand label={ __( 'Mobile test summary', 'saman-seo' ) }>
+						<MetricCard
+							label={ __( 'Mobile score', 'saman-seo' ) }
+							value={ results ? results.score : dash }
+							unit={ results ? '/ 100' : undefined }
+							tone={
+								results
+									? getScoreTone( results.score )
+									: undefined
+							}
+							sub={
+								results
+									? getStatusLabel( results.status )
+									: undefined
+							}
+						/>
+						<MetricCard
+							label={ __( 'Checks passed', 'saman-seo' ) }
+							value={ results ? passedCount : dash }
+						/>
+						<MetricCard
+							label={ __( 'Checks to review', 'saman-seo' ) }
+							value={ results ? reviewCount : dash }
+							tone={ reviewCount > 0 ? 'warning' : undefined }
+						/>
+						<MetricCard
+							label={ __( 'Issues found', 'saman-seo' ) }
+							value={ results ? issues.length : dash }
+							tone={ issues.length > 0 ? 'danger' : undefined }
+						/>
+					</KpiBand>
+				) ) }
+
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'Mobile Friendly Test', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Mobile friendly test', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Check if your pages are optimized for mobile devices.',
@@ -153,78 +179,98 @@ const MobileFriendly = ( { onNavigate } ) => {
 						) }
 					</p>
 				</div>
+				{ results && (
+					<div className="header-actions">
+						<a
+							href={ `https://search.google.com/test/mobile-friendly?url=${ encodeURIComponent(
+								results.url
+							) }` }
+							target="_blank"
+							rel="noopener noreferrer"
+							className="button"
+						>
+							{ __( 'Google mobile test', 'saman-seo' ) }
+						</a>
+						<a
+							href={ `https://pagespeed.web.dev/report?url=${ encodeURIComponent(
+								results.url
+							) }` }
+							target="_blank"
+							rel="noopener noreferrer"
+							className="button"
+						>
+							{ __( 'PageSpeed Insights', 'saman-seo' ) }
+						</a>
+					</div>
+				) }
 			</div>
 
 			{ /* URL Input */ }
-			<div className="card">
-				<div className="mobile-test-input">
-					<div className="input-group">
-						<input
-							type="url"
-							className="tool-input"
-							placeholder={ __(
-								'Enter URL to test (e.g., https://example.com)',
-								'saman-seo'
-							) }
-							value={ url }
-							onChange={ ( e ) => setUrl( e.target.value ) }
-							onKeyDown={ ( e ) =>
-								e.key === 'Enter' && handleTest()
-							}
-						/>
-						<button
-							id="test-btn"
-							type="button"
-							className="button primary large"
-							onClick={ handleTest }
-							disabled={ loading }
-						>
-							{ loading ? (
-								<>
-									<span className="spinner" />
-									{ __( 'Testing\u2026', 'saman-seo' ) }
-								</>
-							) : (
-								<>
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										width="18"
-										height="18"
-									>
-										<rect
-											x="5"
-											y="2"
-											width="14"
-											height="20"
-											rx="2"
-										/>
-										<path d="M12 18h.01" />
-									</svg>
-									{ __( 'Test Page', 'saman-seo' ) }
-								</>
-							) }
-						</button>
-					</div>
-					<div className="quick-actions">
-						<button
-							type="button"
-							className="button ghost small"
-							onClick={ handleTestHomepage }
-						>
-							{ __( 'Test Homepage', 'saman-seo' ) }
-						</button>
-						<span className="quick-actions__hint">
-							{ __(
-								'Analyzes viewport, touch targets, font sizes, and more',
-								'saman-seo'
-							) }
-						</span>
-					</div>
+			<section className="panel">
+				<h3>{ __( 'URL to test', 'saman-seo' ) }</h3>
+				<p className="panel-desc">
+					{ __(
+						'Analyzes viewport, touch targets, font sizes, and more',
+						'saman-seo'
+					) }
+				</p>
+				<div className="input-group">
+					<input
+						type="url"
+						className="tool-input"
+						aria-label={ __( 'URL to test', 'saman-seo' ) }
+						placeholder={ __(
+							'Enter URL to test (e.g., https://example.com)',
+							'saman-seo'
+						) }
+						value={ url }
+						onChange={ ( e ) => setUrl( e.target.value ) }
+						onKeyDown={ ( e ) => e.key === 'Enter' && handleTest() }
+					/>
+					<button
+						type="button"
+						className="button"
+						onClick={ handleTestHomepage }
+					>
+						{ __( 'Test homepage', 'saman-seo' ) }
+					</button>
+					<button
+						id="test-btn"
+						type="button"
+						className="button primary"
+						onClick={ handleTest }
+						disabled={ loading }
+					>
+						{ loading ? (
+							<>
+								<span className="spinner-small" />
+								{ __( 'Testing\u2026', 'saman-seo' ) }
+							</>
+						) : (
+							<>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									width="16"
+									height="16"
+								>
+									<rect
+										x="5"
+										y="2"
+										width="14"
+										height="20"
+										rx="2"
+									/>
+									<path d="M12 18h.01" />
+								</svg>
+								{ __( 'Test page', 'saman-seo' ) }
+							</>
+						) }
+					</button>
 				</div>
-			</div>
+			</section>
 
 			{ /* Error */ }
 			{ error && (
@@ -244,257 +290,120 @@ const MobileFriendly = ( { onNavigate } ) => {
 				</div>
 			) }
 
-			{ /* Results */ }
-			{ results && (
-				<div className="mobile-test-results">
-					{ /* Score Card */ }
-					<div className="card mobile-score-card">
-						<div className="mobile-score">
-							<div
-								className="mobile-score__circle"
-								style={ {
-									'--score-color': getScoreColor(
-										results.score
-									),
-								} }
-							>
-								<svg
-									viewBox="0 0 36 36"
-									className="mobile-score__ring"
-								>
-									<path
-										className="mobile-score__bg"
-										d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-									/>
-									<path
-										className="mobile-score__fg"
-										strokeDasharray={ `${ results.score }, 100` }
-										d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-									/>
-								</svg>
-								<span className="mobile-score__value">
-									{ results.score }
-								</span>
-							</div>
-							<div className="mobile-score__info">
-								<h3
-									className={ `mobile-score__status mobile-score__status--${ results.status }` }
-								>
-									{ results.status === 'pass'
-										? __( 'Mobile Friendly', 'saman-seo' )
-										: results.status === 'warning'
-										? __( 'Needs Improvement', 'saman-seo' )
-										: __(
-												'Not Mobile Friendly',
-												'saman-seo'
-										  ) }
-								</h3>
-								<p className="mobile-score__url">
-									{ results.url }
-								</p>
-							</div>
-						</div>
-					</div>
+			{ /* Checks */ }
+			{ results && checks.length > 0 && (
+				<section className="improvements-group">
+					<h2 className="improvements-group__title">
+						{ __( 'Checks performed', 'saman-seo' ) }
+					</h2>
+					<p className="group-note">{ results.url }</p>
+					<ul className="improvements-list">
+						{ checks.map( ( check, index ) => {
+							const pill =
+								checkPills[ check.status ] ||
+								checkPills.warning;
+							return (
+								<li key={ index } className="improvement-row">
+									<div className="improvement-row__main">
+										<div className="improvement-row__title">
+											<h3>{ check.name }</h3>
+										</div>
+										<p className="improvement-row__desc">
+											{ check.detail }
+										</p>
+									</div>
+									<span className={ `pill ${ pill.tone }` }>
+										{ pill.label }
+									</span>
+								</li>
+							);
+						} ) }
+					</ul>
+				</section>
+			) }
 
-					{ /* Checks Grid */ }
-					<div className="mobile-checks">
-						<h3>{ __( 'Checks Performed', 'saman-seo' ) }</h3>
-						<div className="mobile-checks__grid">
-							{ results.checks?.map( ( check, index ) => (
-								<div
-									key={ index }
-									className={ `mobile-check mobile-check--${ check.status }` }
-								>
-									<div className="mobile-check__icon">
-										{ check.status === 'pass' ? (
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
+			{ /* Issues */ }
+			{ results && issues.length > 0 && (
+				<section className="improvements-group">
+					<h2 className="improvements-group__title">
+						{ __( 'Issues found (', 'saman-seo' ) }
+						{ issues.length })
+					</h2>
+					<ul className="improvements-list">
+						{ issues.map( ( issue, index ) => {
+							const pill =
+								severityPills[ issue.severity ] ||
+								severityPills.info;
+							return (
+								<li key={ index } className="improvement-row">
+									<div className="improvement-row__main">
+										<div className="improvement-row__title">
+											<h3>{ issue.title }</h3>
+											<span
+												className={ `pill ${ pill.tone }`.trim() }
 											>
-												<path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-												<path d="M22 4L12 14.01l-3-3" />
-											</svg>
-										) : check.status === 'fail' ? (
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<circle
-													cx="12"
-													cy="12"
-													r="10"
-												/>
-												<line
-													x1="15"
-													y1="9"
-													x2="9"
-													y2="15"
-												/>
-												<line
-													x1="9"
-													y1="9"
-													x2="15"
-													y2="15"
-												/>
-											</svg>
-										) : (
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-												<line
-													x1="12"
-													y1="9"
-													x2="12"
-													y2="13"
-												/>
-												<line
-													x1="12"
-													y1="17"
-													x2="12.01"
-													y2="17"
-												/>
-											</svg>
+												{ pill.label }
+											</span>
+										</div>
+										<p className="improvement-row__desc">
+											{ issue.description }
+										</p>
+										{ issue.fix && (
+											<p className="improvement-row__desc">
+												<strong>
+													{ __(
+														'Fix:',
+														'saman-seo'
+													) }
+												</strong>{ ' ' }
+												{ issue.fix }
+											</p>
 										) }
 									</div>
-									<div className="mobile-check__content">
-										<span className="mobile-check__name">
-											{ check.name }
-										</span>
-										<span className="mobile-check__detail">
-											{ check.detail }
-										</span>
-									</div>
-								</div>
-							) ) }
-						</div>
-					</div>
-
-					{ /* Issues */ }
-					{ results.issues && results.issues.length > 0 && (
-						<div className="card mobile-issues">
-							<h3>
-								{ __( 'Issues Found (', 'saman-seo' ) }
-								{ results.issues.length })
-							</h3>
-							<ul className="mobile-issues__list">
-								{ results.issues.map( ( issue, index ) => (
-									<li
-										key={ index }
-										className={ `mobile-issue mobile-issue--${ issue.severity }` }
-									>
-										<SeverityIcon
-											severity={ issue.severity }
-										/>
-										<div className="mobile-issue__content">
-											<strong>{ issue.title }</strong>
-											<p>{ issue.description }</p>
-											{ issue.fix && (
-												<span className="mobile-issue__fix">
-													<strong>
-														{ __(
-															'Fix:',
-															'saman-seo'
-														) }
-													</strong>{ ' ' }
-													{ issue.fix }
-												</span>
-											) }
-										</div>
-									</li>
-								) ) }
-							</ul>
-						</div>
-					) }
-
-					{ /* External Tools */ }
-					<div className="card mobile-external">
-						<h4>
-							{ __( 'Test with Official Tools', 'saman-seo' ) }
-						</h4>
-						<div className="mobile-external__links">
-							<a
-								href={ `https://search.google.com/test/mobile-friendly?url=${ encodeURIComponent(
-									results.url
-								) }` }
-								target="_blank"
-								rel="noopener noreferrer"
-								className="button ghost"
-							>
-								<svg
-									viewBox="0 0 24 24"
-									width="16"
-									height="16"
-									fill="currentColor"
-								>
-									<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-									<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-									<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-									<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-								</svg>
-								{ __( 'Google Mobile Test', 'saman-seo' ) }
-							</a>
-							<a
-								href={ `https://pagespeed.web.dev/report?url=${ encodeURIComponent(
-									results.url
-								) }` }
-								target="_blank"
-								rel="noopener noreferrer"
-								className="button ghost"
-							>
-								<svg
-									viewBox="0 0 24 24"
-									width="16"
-									height="16"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<circle cx="12" cy="12" r="10" />
-									<path d="M12 6v6l4 2" />
-								</svg>
-								{ __( 'PageSpeed Insights', 'saman-seo' ) }
-							</a>
-						</div>
-					</div>
-				</div>
+								</li>
+							);
+						} ) }
+					</ul>
+				</section>
 			) }
 
 			{ /* Recent Tests */ }
 			{ ! results && recentTests.length > 0 && (
-				<div className="card">
-					<h3>{ __( 'Recent Tests', 'saman-seo' ) }</h3>
-					<ul className="recent-tests">
+				<section className="improvements-group">
+					<h2 className="improvements-group__title">
+						{ __( 'Recent tests', 'saman-seo' ) }
+					</h2>
+					<ul className="improvements-list">
 						{ recentTests.map( ( test, index ) => (
-							<li key={ index } className="recent-test">
+							<li key={ index } className="improvement-row">
+								<div className="improvement-row__main">
+									<div className="improvement-row__title">
+										<h3>{ test.url }</h3>
+										<span
+											className={ `pill ${ getScoreTone(
+												test.score
+											) }` }
+										>
+											{ test.score }/100
+										</span>
+									</div>
+									{ test.date && (
+										<p className="improvement-row__desc">
+											{ test.date }
+										</p>
+									) }
+								</div>
 								<button
 									type="button"
-									className="recent-test__btn"
+									className="button small"
 									onClick={ () => setUrl( test.url ) }
 								>
-									<span className="recent-test__url">
-										{ test.url }
-									</span>
-									<span
-										className="recent-test__score"
-										style={ {
-											color: getScoreColor( test.score ),
-										} }
-									>
-										{ test.score }/100
-									</span>
+									{ __( 'Use URL', 'saman-seo' ) }
 								</button>
 							</li>
 						) ) }
 					</ul>
-				</div>
+				</section>
 			) }
 		</div>
 	);

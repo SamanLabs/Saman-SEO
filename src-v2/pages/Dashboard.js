@@ -1,33 +1,54 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import GscCard from '../components/GscCard';
+import PageCacheCard from '../components/PageCacheCard';
+import { KpiBand, MetricCard, Sparkline } from '../components/Kpi';
+import { ICONS } from '../components/Sidebar';
 
 // Score level configuration
-import { __, sprintf } from '@wordpress/i18n';
-import GscCard from '../components/GscCard';
-import WeeklyDigestCard from '../components/WeeklyDigestCard';
-import PageCacheCard from '../components/PageCacheCard';
 const SCORE_LEVELS = {
 	excellent: {
 		label: __( 'Excellent', 'saman-seo' ),
-		color: 'var(--color-success)',
 		class: 'success',
 	},
 	good: {
 		label: __( 'Good', 'saman-seo' ),
-		color: 'var(--color-success)',
 		class: 'success',
 	},
 	fair: {
 		label: __( 'Fair', 'saman-seo' ),
-		color: 'var(--color-warning)',
 		class: 'warning',
 	},
 	poor: {
-		label: __( 'Needs Work', 'saman-seo' ),
-		color: 'var(--color-danger)',
+		label: __( 'Needs work', 'saman-seo' ),
 		class: 'danger',
 	},
 };
+
+// Buckets of the per-post score distribution, best first.
+const SCORE_BUCKETS = [
+	{
+		key: 'excellent',
+		label: __( 'Excellent', 'saman-seo' ),
+		range: '80+',
+	},
+	{
+		key: 'good',
+		label: __( 'Good', 'saman-seo' ),
+		range: '60–79',
+	},
+	{
+		key: 'fair',
+		label: __( 'Fair', 'saman-seo' ),
+		range: '40–59',
+	},
+	{
+		key: 'poor',
+		label: __( 'Poor', 'saman-seo' ),
+		range: '<40',
+	},
+];
 
 // Priority order for notification types
 const PRIORITY_ORDER = {
@@ -45,25 +66,528 @@ const ACTION_VIEW_MAP = {
 	content: 'audit',
 	seo: 'audit',
 };
-const COVERAGE_VIEWS = {
-	breakdown: 'breakdown',
-	timeline: 'timeline',
-	checklist: 'checklist',
+
+const MAX_VISIBLE_NOTIFICATIONS = 3;
+
+const formatNumber = ( value ) =>
+	new Intl.NumberFormat().format( Math.round( Number( value ) || 0 ) );
+
+const Icon = ( { children, size = 16, strokeWidth = 2 } ) => (
+	<svg
+		width={ size }
+		height={ size }
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth={ strokeWidth }
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+		focusable="false"
+	>
+		{ children }
+	</svg>
+);
+
+const ArrowIcon = () => (
+	<Icon size={ 14 }>
+		<path d="M5 12h14M13 6l6 6-6 6" />
+	</Icon>
+);
+
+const NOTIFICATION_ICONS = {
+	error: (
+		<Icon>
+			<circle cx="12" cy="12" r="9" />
+			<path d="M12 8v4.5M12 16h.01" />
+		</Icon>
+	),
+	warning: (
+		<Icon>
+			<path d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z" />
+		</Icon>
+	),
+	info: (
+		<Icon>
+			<circle cx="12" cy="12" r="9" />
+			<path d="M12 16v-4.5M12 8h.01" />
+		</Icon>
+	),
 };
+
+/**
+ * Placeholder layout shown while the dashboard request is in flight.
+ *
+ * @return {*} Skeleton blocks matching the loaded layout.
+ */
+const DashboardSkeleton = () => (
+	<div
+		className="dash-skeleton"
+		role="status"
+		aria-label={ __( 'Loading dashboard data…', 'saman-seo' ) }
+	>
+		<div className="dash-row dash-row--hero">
+			<div className="dash-skeleton__block dash-skeleton__block--lg" />
+			<div className="dash-skeleton__block dash-skeleton__block--lg" />
+		</div>
+		<div className="dash-skeleton__block dash-skeleton__block--sm" />
+		<div className="dash-row dash-row--main">
+			<div className="dash-skeleton__block dash-skeleton__block--md" />
+			<div className="dash-skeleton__block dash-skeleton__block--md" />
+		</div>
+	</div>
+);
+
+/**
+ * Issues the site owner should act on, most severe first.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.notifications Sorted notifications.
+ * @param {?string}  props.dismissing    ID currently being dismissed.
+ * @param {Function} props.onDismiss     Dismiss handler.
+ * @param {Function} props.onNavigate    View navigation handler.
+ * @return {*} Attention list or null when there is nothing to show.
+ */
+const AttentionList = ( {
+	notifications,
+	dismissing,
+	onDismiss,
+	onNavigate,
+} ) => {
+	const [ expanded, setExpanded ] = useState( false );
+	if ( ! notifications.length ) {
+		return null;
+	}
+	const visible = expanded
+		? notifications
+		: notifications.slice( 0, MAX_VISIBLE_NOTIFICATIONS );
+	const hiddenCount = notifications.length - MAX_VISIBLE_NOTIFICATIONS;
+
+	return (
+		<section
+			className="dashboard-card attention"
+			aria-labelledby="saman-attention-title"
+		>
+			<div className="attention__head">
+				<h2 id="saman-attention-title">
+					{ __( 'Needs attention', 'saman-seo' ) }
+				</h2>
+				<span className="attention__count">
+					{ notifications.length }
+				</span>
+			</div>
+			<ul className="attention__list">
+				{ visible.map( ( notif ) => (
+					<li
+						key={ notif.id }
+						className={ `attention__item attention__item--${ notif.type }` }
+					>
+						<span className="attention__icon">
+							{ NOTIFICATION_ICONS[ notif.type ] ||
+								NOTIFICATION_ICONS.info }
+						</span>
+						<div className="attention__body">
+							<strong>{ notif.title }</strong>
+							<span>{ notif.message }</span>
+						</div>
+						{ notif.action && (
+							<button
+								type="button"
+								className="button small"
+								onClick={ () =>
+									onNavigate(
+										ACTION_VIEW_MAP[ notif.category ] ||
+											'tools'
+									)
+								}
+							>
+								{ notif.action.label }
+							</button>
+						) }
+						<button
+							type="button"
+							className="attention__dismiss"
+							onClick={ () => onDismiss( notif.id ) }
+							disabled={ dismissing === notif.id }
+							aria-label={ sprintf(
+								/* translators: %s: notification title */
+								__( 'Dismiss: %s', 'saman-seo' ),
+								notif.title
+							) }
+							title={ __( 'Dismiss', 'saman-seo' ) }
+						>
+							<Icon size={ 14 }>
+								<path d="M18 6L6 18M6 6l12 12" />
+							</Icon>
+						</button>
+					</li>
+				) ) }
+			</ul>
+			{ hiddenCount > 0 && (
+				<button
+					type="button"
+					className="attention__toggle"
+					aria-expanded={ expanded }
+					onClick={ () => setExpanded( ! expanded ) }
+				>
+					{ expanded
+						? __( 'Show fewer', 'saman-seo' )
+						: sprintf(
+								/* translators: %s: number of hidden notifications */
+								_n(
+									'Show %s more',
+									'Show %s more',
+									hiddenCount,
+									'saman-seo'
+								),
+								hiddenCount
+						  ) }
+				</button>
+			) }
+		</section>
+	);
+};
+
+/**
+ * Site-wide SEO score with the per-post distribution behind it.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.seoScore   Score payload from the dashboard endpoint.
+ * @param {Function} props.onNavigate View navigation handler.
+ * @return {*} Score card.
+ */
+const ScoreCard = ( { seoScore, onNavigate } ) => {
+	const level = SCORE_LEVELS[ seoScore.level ] || SCORE_LEVELS.poor;
+	const score = Math.max( 0, Math.min( 100, Number( seoScore.score ) || 0 ) );
+	const distribution = seoScore.distribution || {};
+	const scored = SCORE_BUCKETS.reduce(
+		( sum, bucket ) => sum + ( Number( distribution[ bucket.key ] ) || 0 ),
+		0
+	);
+	const trend = seoScore.trend;
+	const hasTrend = trend && trend.direction !== 'stable' && trend.change > 0;
+
+	return (
+		<section className="dashboard-card score-card">
+			<div className="card-header">
+				<h3>{ __( 'SEO score', 'saman-seo' ) }</h3>
+				<span className={ `pill ${ level.class }` }>
+					{ level.label }
+				</span>
+			</div>
+			<div className="score-card__body">
+				<div
+					className={ `score-gauge score-gauge--${ level.class }` }
+					role="img"
+					aria-label={ sprintf(
+						/* translators: %s: score from 0 to 100 */
+						__( 'SEO score: %s out of 100', 'saman-seo' ),
+						score
+					) }
+				>
+					<svg viewBox="0 0 120 120" aria-hidden="true">
+						<circle
+							className="score-gauge__track"
+							cx="60"
+							cy="60"
+							r="52"
+							pathLength="100"
+						/>
+						{ score > 0 && (
+							<circle
+								className="score-gauge__fill"
+								cx="60"
+								cy="60"
+								r="52"
+								pathLength="100"
+								strokeDasharray={ `${ score } 100` }
+							/>
+						) }
+					</svg>
+					<div className="score-gauge__center">
+						<span className="score-gauge__value">{ score }</span>
+						<span className="score-gauge__label">
+							{ __( 'out of 100', 'saman-seo' ) }
+						</span>
+					</div>
+				</div>
+				<div className="score-card__detail">
+					<p className="score-card__summary">
+						{ sprintf(
+							/* translators: %s: number of posts */
+							_n(
+								'Average across your %s most recent post.',
+								'Average across your %s most recent posts.',
+								seoScore.posts_scored || 0,
+								'saman-seo'
+							),
+							formatNumber( seoScore.posts_scored )
+						) }
+						{ hasTrend && (
+							<span
+								className={ `score-trend score-trend--${ trend.direction }` }
+							>
+								<Icon size={ 12 } strokeWidth={ 2.5 }>
+									{ trend.direction === 'up' ? (
+										<path d="M12 19V5M6 11l6-6 6 6" />
+									) : (
+										<path d="M12 5v14M6 13l6 6 6-6" />
+									) }
+								</Icon>
+								{ sprintf(
+									/* translators: %s: number of points */
+									_n(
+										'%s pt vs last week',
+										'%s pts vs last week',
+										trend.change,
+										'saman-seo'
+									),
+									trend.change
+								) }
+							</span>
+						) }
+					</p>
+					{ scored > 0 && (
+						<div className="score-dist" aria-hidden="true">
+							{ SCORE_BUCKETS.map( ( bucket ) => {
+								const count =
+									Number( distribution[ bucket.key ] ) || 0;
+								if ( ! count ) {
+									return null;
+								}
+								return (
+									<span
+										key={ bucket.key }
+										className={ `score-dist__seg score-dist__seg--${ bucket.key }` }
+										style={ { flexGrow: count } }
+									/>
+								);
+							} ) }
+						</div>
+					) }
+					<ul className="score-legend">
+						{ SCORE_BUCKETS.map( ( bucket ) => (
+							<li key={ bucket.key }>
+								<span
+									className={ `score-legend__dot score-dist__seg--${ bucket.key }` }
+									aria-hidden="true"
+								/>
+								<span className="score-legend__label">
+									{ bucket.label }
+								</span>
+								<span className="score-legend__range">
+									{ bucket.range }
+								</span>
+								<span className="score-legend__value">
+									{ formatNumber(
+										distribution[ bucket.key ]
+									) }
+								</span>
+							</li>
+						) ) }
+					</ul>
+				</div>
+			</div>
+			{ seoScore.issues > 0 && (
+				<div className="card-foot">
+					<span>
+						{ sprintf(
+							/* translators: %s: number of posts */
+							_n(
+								'%s post scores below 80.',
+								'%s posts score below 80.',
+								seoScore.issues,
+								'saman-seo'
+							),
+							formatNumber( seoScore.issues )
+						) }
+					</span>
+					<button
+						type="button"
+						className="card-link"
+						onClick={ () => onNavigate( 'audit' ) }
+					>
+						{ __( 'Review in audit', 'saman-seo' ) }
+						<ArrowIcon />
+					</button>
+				</div>
+			) }
+		</section>
+	);
+};
+
+/**
+ * How much of the site has hand-written titles and descriptions.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.coverage   Coverage payload from the dashboard endpoint.
+ * @param {Function} props.onNavigate View navigation handler.
+ * @return {*} Coverage card.
+ */
+const CoverageCard = ( { coverage, onNavigate } ) => {
+	const total = Number( coverage.total ) || 0;
+	const pct = Number( coverage.coverage_pct ) || 0;
+	const rows = [
+		{
+			key: 'title',
+			label: __( 'SEO titles', 'saman-seo' ),
+			value: Number( coverage.with_title ) || 0,
+		},
+		{
+			key: 'description',
+			label: __( 'Meta descriptions', 'saman-seo' ),
+			value: Number( coverage.with_description ) || 0,
+		},
+		{
+			key: 'optimized',
+			label: __( 'Both set', 'saman-seo' ),
+			value: Number( coverage.optimized ) || 0,
+		},
+	];
+	const daily = coverage.daily_stats || [];
+	const dailyMax = Math.max( ...daily.map( ( d ) => d.optimized || 0 ), 0 );
+	let pillClass = 'danger';
+	if ( pct >= 80 ) {
+		pillClass = 'success';
+	} else if ( pct >= 50 ) {
+		pillClass = 'warning';
+	}
+
+	return (
+		<section className="dashboard-card coverage-card">
+			<div className="card-header">
+				<h3>{ __( 'Content coverage', 'saman-seo' ) }</h3>
+				<span className={ `pill ${ pillClass }` }>
+					{ sprintf(
+						/* translators: %s: percentage */
+						__( '%s%% optimized', 'saman-seo' ),
+						pct
+					) }
+				</span>
+			</div>
+			<p className="coverage-card__headline">
+				<strong>{ formatNumber( coverage.optimized ) }</strong>
+				<span>
+					{ sprintf(
+						/* translators: %s: total number of pages */
+						_n(
+							'of %s page has a custom title and description',
+							'of %s pages have a custom title and description',
+							total,
+							'saman-seo'
+						),
+						formatNumber( total )
+					) }
+				</span>
+			</p>
+			<ul className="coverage-bars">
+				{ rows.map( ( row ) => {
+					const rowPct =
+						total > 0
+							? Math.min( 100, ( row.value / total ) * 100 )
+							: 0;
+					return (
+						<li key={ row.key }>
+							<div className="coverage-bars__meta">
+								<span>{ row.label }</span>
+								<span className="coverage-bars__value">
+									{ formatNumber( row.value ) }
+									<em> / { formatNumber( total ) }</em>
+								</span>
+							</div>
+							<div
+								className="coverage-bars__track"
+								role="img"
+								aria-label={ sprintf(
+									/* translators: 1: metric label, 2: percentage */
+									__( '%1$s: %2$s%%', 'saman-seo' ),
+									row.label,
+									Math.round( rowPct )
+								) }
+							>
+								{ rowPct > 0 && (
+									<span
+										style={ {
+											width: `${ Math.max(
+												rowPct,
+												1.5
+											) }%`,
+										} }
+									/>
+								) }
+							</div>
+						</li>
+					);
+				} ) }
+			</ul>
+			{ dailyMax > 0 && (
+				<div className="coverage-daily">
+					<span className="coverage-daily__title">
+						{ __( 'Optimized per day', 'saman-seo' ) }
+					</span>
+					<div className="coverage-daily__bars">
+						{ daily.map( ( day, idx ) => (
+							<div
+								key={ day.date || idx }
+								className="coverage-daily__col"
+								title={ sprintf(
+									/* translators: 1: day label, 2: count */
+									__( '%1$s: %2$s optimized', 'saman-seo' ),
+									day.label,
+									day.optimized || 0
+								) }
+							>
+								<span
+									className="coverage-daily__bar"
+									style={ {
+										height: `${ Math.max(
+											( ( day.optimized || 0 ) /
+												dailyMax ) *
+												100,
+											4
+										) }%`,
+									} }
+								/>
+								<span className="coverage-daily__label">
+									{ day.label }
+								</span>
+							</div>
+						) ) }
+					</div>
+				</div>
+			) }
+			{ coverage.pending > 0 && (
+				<div className="card-foot">
+					<span>
+						{ sprintf(
+							/* translators: %s: number of pages */
+							_n(
+								'%s page still uses defaults.',
+								'%s pages still use defaults.',
+								coverage.pending,
+								'saman-seo'
+							),
+							formatNumber( coverage.pending )
+						) }
+					</span>
+					<button
+						type="button"
+						className="card-link"
+						onClick={ () => onNavigate( 'bulk-editor' ) }
+					>
+						{ __( 'Open bulk editor', 'saman-seo' ) }
+						<ArrowIcon />
+					</button>
+				</div>
+			) }
+		</section>
+	);
+};
+
 const Dashboard = ( { onNavigate } ) => {
 	const [ loading, setLoading ] = useState( true );
 	const [ data, setData ] = useState( null );
 	const [ dismissing, setDismissing ] = useState( null );
-	const [ showAllNotifications, setShowAllNotifications ] = useState( false );
-	const [ coverageView, setCoverageView ] = useState( () => {
-		if ( typeof window === 'undefined' ) {
-			return COVERAGE_VIEWS.breakdown;
-		}
-		const saved = window.localStorage.getItem( 'saman_seo_coverage_view' );
-		return Object.values( COVERAGE_VIEWS ).includes( saved )
-			? saved
-			: COVERAGE_VIEWS.breakdown;
-	} );
 
 	// Fetch dashboard data
 	const fetchDashboard = useCallback( async () => {
@@ -113,38 +637,45 @@ const Dashboard = ( { onNavigate } ) => {
 		}
 	};
 
-	// Switch coverage card visualization and persist preference.
-	const handleCoverageViewChange = ( view ) => {
-		setCoverageView( view );
-		if ( typeof window !== 'undefined' ) {
-			window.localStorage.setItem( 'saman_seo_coverage_view', view );
-		}
-	};
+	const header = (
+		<div className="page-header">
+			<div>
+				<h1>{ __( 'Dashboard', 'saman-seo' ) }</h1>
+				<p>
+					{ __(
+						'SEO health, content coverage, and search traffic for this site.',
+						'saman-seo'
+					) }
+				</p>
+			</div>
+			<div className="header-actions">
+				<button
+					type="button"
+					className="button"
+					onClick={ () => handleNavigation( 'improvements' ) }
+				>
+					{ __( 'Improvements', 'saman-seo' ) }
+				</button>
+				<button
+					type="button"
+					className="button primary"
+					onClick={ () => handleNavigation( 'audit' ) }
+				>
+					{ __( 'Run SEO audit', 'saman-seo' ) }
+				</button>
+			</div>
+		</div>
+	);
 
-	// Navigate to audit
-	const handleRunAudit = () => {
-		handleNavigation( 'audit' );
-	};
 	if ( loading ) {
 		return (
-			<div className="page">
-				<div className="page-header">
-					<div>
-						<h1>{ __( 'Dashboard', 'saman-seo' ) }</h1>
-						<p>
-							{ __(
-								'SEO health, content insights, and optimization status at a glance.',
-								'saman-seo'
-							) }
-						</p>
-					</div>
-				</div>
-				<div className="loading-state">
-					{ __( 'Loading dashboard data\u2026', 'saman-seo' ) }
-				</div>
+			<div className="page dashboard">
+				{ header }
+				<DashboardSkeleton />
 			</div>
 		);
 	}
+
 	const seoScore = data?.seo_score || {
 		score: 0,
 		level: 'poor',
@@ -169,1037 +700,159 @@ const Dashboard = ( { onNavigate } ) => {
 	const errors404 = data?.errors_404 || {
 		total: 0,
 		last_30_days: 0,
+		last_7_days: 0,
 	};
 	const schema = data?.schema || {
 		status: 'partial',
 		types: [],
 	};
-	const allNotifications = data?.notifications || [];
 
 	// Sort notifications by priority
-	const sortedNotifications = [ ...allNotifications ].sort( ( a, b ) => {
-		const priorityA = PRIORITY_ORDER[ a.type ] || 99;
-		const priorityB = PRIORITY_ORDER[ b.type ] || 99;
-		return priorityA - priorityB;
-	} );
+	const notifications = [ ...( data?.notifications || [] ) ].sort(
+		( a, b ) =>
+			( PRIORITY_ORDER[ a.type ] || 99 ) -
+			( PRIORITY_ORDER[ b.type ] || 99 )
+	);
 
-	// Show max 3 notifications on dashboard, or all if expanded
-	const visibleNotifications = showAllNotifications
-		? sortedNotifications
-		: sortedNotifications.slice( 0, 3 );
-	const hasMoreNotifications = sortedNotifications.length > 3;
-	const scoreConfig = SCORE_LEVELS[ seoScore.level ] || SCORE_LEVELS.poor;
+	const schemaTypes = schema.types || [];
+	let sitemapState = 'off';
+	if ( sitemap.enabled ) {
+		sitemapState = sitemap.errors > 0 ? 'warning' : 'success';
+	}
+	const tiles = [
+		{
+			view: 'sitemap',
+			label: __( 'Sitemap', 'saman-seo' ),
+			state: sitemapState,
+			value: sitemap.enabled
+				? formatNumber( sitemap.total_urls )
+				: __( 'Off', 'saman-seo' ),
+			sub: sitemap.enabled
+				? sprintf(
+						/* translators: %s: relative time, e.g. "3 hours ago" */
+						__( 'URLs · updated %s', 'saman-seo' ),
+						sitemap.last_generated
+				  )
+				: __( 'Turn it on to help crawlers', 'saman-seo' ),
+		},
+		{
+			view: 'redirects',
+			series: redirects.daily_hits,
+			label: __( 'Redirects', 'saman-seo' ),
+			state: redirects.suggestions > 0 ? 'warning' : 'success',
+			value: formatNumber( redirects.active ),
+			sub:
+				redirects.suggestions > 0
+					? sprintf(
+							/* translators: %s: number of suggestions */
+							_n(
+								'active · %s suggestion waiting',
+								'active · %s suggestions waiting',
+								redirects.suggestions,
+								'saman-seo'
+							),
+							formatNumber( redirects.suggestions )
+					  )
+					: sprintf(
+							/* translators: %s: number of hits */
+							_n(
+								'active · %s hit today',
+								'active · %s hits today',
+								redirects.hits_today || 0,
+								'saman-seo'
+							),
+							formatNumber( redirects.hits_today )
+					  ),
+		},
+		{
+			view: '404-log',
+			series: errors404.daily,
+			label: __( '404 errors', 'saman-seo' ),
+			state: errors404.last_7_days > 0 ? 'warning' : 'success',
+			value: formatNumber( errors404.last_7_days ),
+			sub: sprintf(
+				/* translators: %s: number of errors */
+				__( 'this week · %s in 30 days', 'saman-seo' ),
+				formatNumber( errors404.last_30_days )
+			),
+		},
+		{
+			view: 'search-appearance',
+			icon: 'schema-builder',
+			label: __( 'Schema markup', 'saman-seo' ),
+			state: schema.status === 'valid' ? 'success' : 'off',
+			value: formatNumber( schemaTypes.length ),
+			sub:
+				schemaTypes.length > 0
+					? [
+							schemaTypes.slice( 0, 3 ).join( ', ' ),
+							schemaTypes.length > 3
+								? sprintf(
+										/* translators: %s: number of additional schema types */
+										__( '+%s more', 'saman-seo' ),
+										schemaTypes.length - 3
+								  )
+								: '',
+					  ]
+							.filter( Boolean )
+							.join( ' ' )
+					: __( 'Basic markup only', 'saman-seo' ),
+		},
+	];
+
 	return (
-		<div className="page">
-			<div className="page-header">
-				<div>
-					<h1>{ __( 'Dashboard', 'saman-seo' ) }</h1>
-					<p>
-						{ __(
-							'SEO health, content insights, and optimization status at a glance.',
-							'saman-seo'
-						) }
-					</p>
-				</div>
-				<button
-					type="button"
-					className="button"
-					onClick={ () => handleNavigation( 'improvements' ) }
-				>
-					{ __( 'Improvements', 'saman-seo' ) }
-				</button>
-				<button
-					type="button"
-					className="button primary"
-					onClick={ handleRunAudit }
-				>
-					{ __( 'Run SEO Audit', 'saman-seo' ) }
-				</button>
+		<div className="page dashboard">
+			{ header }
+
+			<AttentionList
+				notifications={ notifications }
+				dismissing={ dismissing }
+				onDismiss={ handleDismissNotification }
+				onNavigate={ handleNavigation }
+			/>
+
+			<div className="dash-row dash-row--hero">
+				<ScoreCard
+					seoScore={ seoScore }
+					onNavigate={ handleNavigation }
+				/>
+				<CoverageCard
+					coverage={ coverage }
+					onNavigate={ handleNavigation }
+				/>
 			</div>
 
-			{ /* Notifications */ }
-			{ visibleNotifications.length > 0 && (
-				<div className="dashboard-notifications">
-					{ visibleNotifications.map( ( notif ) => (
-						<div
-							key={ notif.id }
-							className={ `notification-banner notification-banner--${ notif.type }` }
-						>
-							<div className="notification-icon">
-								{ notif.type === 'error' && (
-									<svg
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-									>
-										<circle
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											strokeWidth="2"
-										/>
-										<path
-											d="M12 8v4M12 16h.01"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-										/>
-									</svg>
-								) }
-								{ notif.type === 'warning' && (
-									<svg
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-									>
-										<path
-											d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-								) }
-								{ notif.type === 'info' && (
-									<svg
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-									>
-										<circle
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											strokeWidth="2"
-										/>
-										<path
-											d="M12 16v-4m0-4h.01"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-										/>
-									</svg>
-								) }
-							</div>
-							<div className="notification-content">
-								<strong>{ notif.title }</strong>
-								<span>{ notif.message }</span>
-							</div>
-							<div className="notification-actions">
-								{ notif.action && (
-									<button
-										type="button"
-										className="button ghost small notification-action"
-										onClick={ () =>
-											handleNavigation(
-												ACTION_VIEW_MAP[
-													notif.category
-												] || 'tools'
-											)
-										}
-									>
-										{ notif.action.label }
-									</button>
-								) }
-								<button
-									type="button"
-									className="button ghost small notification-action notification-action--dismiss"
-									onClick={ () =>
-										handleDismissNotification( notif.id )
+			<KpiBand label={ __( 'Module status', 'saman-seo' ) }>
+				{ tiles.map( ( tile ) => (
+					<MetricCard
+						key={ tile.view }
+						icon={ ICONS[ tile.icon || tile.view ] }
+						label={ tile.label }
+						value={ tile.value }
+						sub={ tile.sub }
+						tone={ tile.state }
+						spark={
+							( tile.series || [] ).some( ( v ) => v > 0 ) && (
+								<Sparkline
+									data={ tile.series }
+									tone={
+										tile.state === 'warning'
+											? 'warning'
+											: undefined
 									}
-									disabled={ dismissing === notif.id }
-									aria-label={ __(
-										'Dismiss notification',
-										'saman-seo'
-									) }
-									title={ __( 'Dismiss', 'saman-seo' ) }
-								>
-									{ dismissing === notif.id ? (
-										<span className="loading-dots">
-											...
-										</span>
-									) : (
-										<svg
-											width="16"
-											height="16"
-											viewBox="0 0 24 24"
-											fill="none"
-										>
-											<path
-												d="M18 6L6 18M6 6l12 12"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-											/>
-										</svg>
-									) }
-								</button>
-							</div>
-						</div>
-					) ) }
-					{ hasMoreNotifications && (
-						<button
-							type="button"
-							className="notifications-toggle"
-							onClick={ () =>
-								setShowAllNotifications(
-									! showAllNotifications
-								)
-							}
-						>
-							{ showAllNotifications
-								? __( 'Show less', 'saman-seo' )
-								: sprintf(
-										/* translators: %s: placeholder */ __(
-											'View all %s notifications',
-											'saman-seo'
-										),
-										sortedNotifications.length
-								  ) }
-						</button>
-					) }
-				</div>
-			) }
-
-			{ /* Main Stats Grid */ }
-			<div className="dashboard-grid">
-				{ /* SEO Score Card - Large */ }
-				<div className="dashboard-card seo-score-card">
-					<div className="card-header">
-						<h3>{ __( 'SEO Score', 'saman-seo' ) }</h3>
-						<span className={ `pill ${ scoreConfig.class }` }>
-							{ scoreConfig.label }
-						</span>
-					</div>
-					<div className="seo-score-content">
-						<div className="score-gauge">
-							<svg viewBox="0 0 120 120" className="gauge-svg">
-								<circle
-									className="gauge-bg"
-									cx="60"
-									cy="60"
-									r="50"
-									fill="none"
-									strokeWidth="10"
 								/>
-								<circle
-									className="gauge-fill"
-									cx="60"
-									cy="60"
-									r="50"
-									fill="none"
-									strokeWidth="10"
-									strokeDasharray={ `${
-										( seoScore.score / 100 ) * 314
-									} 314` }
-									strokeLinecap="round"
-									style={ {
-										stroke: scoreConfig.color,
-									} }
-								/>
-							</svg>
-							<div className="gauge-center">
-								<div className="gauge-value">
-									{ seoScore.score }%
-								</div>
-								<div className="gauge-label">
-									{ seoScore.posts_scored || 0 }{ ' ' }
-									{ __( 'posts', 'saman-seo' ) }
-								</div>
-							</div>
-						</div>
-						<div className="score-breakdown">
-							<div className="breakdown-item">
-								<span className="breakdown-dot excellent"></span>
-								<span className="breakdown-label">
-									{ __( 'Excellent (80+)', 'saman-seo' ) }
-								</span>
-								<span className="breakdown-value">
-									{ seoScore.distribution?.excellent || 0 }
-								</span>
-							</div>
-							<div className="breakdown-item">
-								<span className="breakdown-dot good"></span>
-								<span className="breakdown-label">
-									{ __( 'Good (60–79)', 'saman-seo' ) }
-								</span>
-								<span className="breakdown-value">
-									{ seoScore.distribution?.good || 0 }
-								</span>
-							</div>
-							<div className="breakdown-item">
-								<span className="breakdown-dot fair"></span>
-								<span className="breakdown-label">
-									{ __( 'Fair (40–59)', 'saman-seo' ) }
-								</span>
-								<span className="breakdown-value">
-									{ seoScore.distribution?.fair || 0 }
-								</span>
-							</div>
-							<div className="breakdown-item">
-								<span className="breakdown-dot poor"></span>
-								<span className="breakdown-label">
-									{ __( 'Poor (<40)', 'saman-seo' ) }
-								</span>
-								<span className="breakdown-value">
-									{ seoScore.distribution?.poor || 0 }
-								</span>
-							</div>
-						</div>
-					</div>
-					{ seoScore.issues > 0 && (
-						<p className="card-note">
-							{ seoScore.issues } { __( 'post', 'saman-seo' ) }
-							{ seoScore.issues !== 1 ? 's' : '' }{ ' ' }
-							{ __( 'could use optimization.', 'saman-seo' ) }
-						</p>
-					) }
-				</div>
+							)
+						}
+						onClick={ () => handleNavigation( tile.view ) }
+					/>
+				) ) }
+			</KpiBand>
 
+			<div className="dash-row dash-row--main">
 				{ /* Google Search Console - real search traffic */ }
 				<GscCard />
-
-				{ /* Scheduled weekly email digest */ }
-				<WeeklyDigestCard />
-
 				{ /* Static page cache with before/after TTFB */ }
 				<PageCacheCard />
-
-				{ /* Content Coverage Card - Large */ }
-				<div className="dashboard-card content-coverage-card">
-					<div className="card-header">
-						<h3>{ __( 'Content Coverage', 'saman-seo' ) }</h3>
-						<div className="coverage-view-toggle">
-							<button
-								type="button"
-								className={ `coverage-view-btn ${
-									coverageView === COVERAGE_VIEWS.breakdown
-										? 'is-active'
-										: ''
-								}` }
-								onClick={ () =>
-									handleCoverageViewChange(
-										COVERAGE_VIEWS.breakdown
-									)
-								}
-								aria-label={ __(
-									'Breakdown view',
-									'saman-seo'
-								) }
-								title={ __( 'Breakdown', 'saman-seo' ) }
-							>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<circle cx="12" cy="12" r="10" />
-									<path d="M12 2a10 10 0 0 1 10 10H12V2z" />
-								</svg>
-							</button>
-							<button
-								type="button"
-								className={ `coverage-view-btn ${
-									coverageView === COVERAGE_VIEWS.timeline
-										? 'is-active'
-										: ''
-								}` }
-								onClick={ () =>
-									handleCoverageViewChange(
-										COVERAGE_VIEWS.timeline
-									)
-								}
-								aria-label={ __(
-									'Timeline view',
-									'saman-seo'
-								) }
-								title={ __( 'Timeline', 'saman-seo' ) }
-							>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<line x1="18" y1="20" x2="18" y2="10" />
-									<line x1="12" y1="20" x2="12" y2="4" />
-									<line x1="6" y1="20" x2="6" y2="14" />
-								</svg>
-							</button>
-							<button
-								type="button"
-								className={ `coverage-view-btn ${
-									coverageView === COVERAGE_VIEWS.checklist
-										? 'is-active'
-										: ''
-								}` }
-								onClick={ () =>
-									handleCoverageViewChange(
-										COVERAGE_VIEWS.checklist
-									)
-								}
-								aria-label={ __(
-									'Checklist view',
-									'saman-seo'
-								) }
-								title={ __( 'Checklist', 'saman-seo' ) }
-							>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M9 11l3 3L22 4" />
-									<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-								</svg>
-							</button>
-							<span className="pill">
-								{ coverage.coverage_pct || 0 }
-								{ __( '% Optimized', 'saman-seo' ) }
-							</span>
-						</div>
-					</div>
-					<div className="coverage-content">
-						{ coverageView === COVERAGE_VIEWS.timeline && (
-							<div className="coverage-chart">
-								<div className="spark-bars" aria-hidden="true">
-									{ ( coverage.daily_stats || [] ).map(
-										( day, idx ) => {
-											const maxOptimized = Math.max(
-												...coverage.daily_stats.map(
-													( d ) => d.optimized || 0
-												),
-												1
-											);
-											const height = Math.max(
-												15,
-												( ( day.optimized || 0 ) /
-													maxOptimized ) *
-													100
-											);
-											return (
-												<div
-													key={ idx }
-													className="spark-bar-wrapper"
-													title={ sprintf(
-														/* translators: %1$s: placeholder, %2$s: placeholder */ __(
-															'%1$s: %2$s optimized',
-															'saman-seo'
-														),
-														day.label,
-														day.optimized
-													) }
-												>
-													<span
-														style={ {
-															height: `${ height }%`,
-														} }
-													/>
-													<span className="spark-label">
-														{ day.label }
-													</span>
-												</div>
-											);
-										}
-									) }
-								</div>
-							</div>
-						) }
-						{ coverageView === COVERAGE_VIEWS.breakdown && (
-							<div className="coverage-chart coverage-chart--breakdown">
-								<div
-									className="coverage-donut"
-									aria-hidden="true"
-								>
-									<svg
-										viewBox="0 0 120 120"
-										className="coverage-donut__svg"
-									>
-										<circle
-											className="coverage-donut__bg"
-											cx="60"
-											cy="60"
-											r="50"
-										/>
-										<circle
-											className="coverage-donut__fill"
-											cx="60"
-											cy="60"
-											r="50"
-											strokeDasharray={ `${
-												( coverage.coverage_pct /
-													100 ) *
-												314
-											} 314` }
-											style={ {
-												stroke:
-													coverage.coverage_pct >= 80
-														? 'var(--color-success)'
-														: coverage.coverage_pct >=
-														  50
-														? 'var(--color-warning)'
-														: 'var(--color-danger)',
-											} }
-										/>
-									</svg>
-									<div className="coverage-donut__center">
-										<span className="coverage-donut__value">
-											{ coverage.coverage_pct || 0 }%
-										</span>
-										<span className="coverage-donut__label">
-											{ __( 'Optimized', 'saman-seo' ) }
-										</span>
-									</div>
-								</div>
-								<div className="coverage-legend">
-									<div className="coverage-legend__item">
-										<span className="coverage-legend__dot coverage-legend__dot--optimized" />
-										<span className="coverage-legend__label">
-											{ __( 'Optimized', 'saman-seo' ) }
-										</span>
-										<span className="coverage-legend__value">
-											{ coverage.optimized || 0 }
-										</span>
-									</div>
-									<div className="coverage-legend__item">
-										<span className="coverage-legend__dot coverage-legend__dot--pending" />
-										<span className="coverage-legend__label">
-											{ __( 'Pending', 'saman-seo' ) }
-										</span>
-										<span className="coverage-legend__value">
-											{ coverage.pending || 0 }
-										</span>
-									</div>
-								</div>
-							</div>
-						) }
-						{ coverageView === COVERAGE_VIEWS.checklist && (
-							<div className="coverage-chart coverage-chart--checklist">
-								<div className="coverage-checklist">
-									<div
-										className={ `coverage-checklist__item ${
-											coverage.with_title >=
-												coverage.total &&
-											coverage.total > 0
-												? 'is-done'
-												: ''
-										}` }
-									>
-										<span className="coverage-checklist__icon">
-											<svg
-												width="16"
-												height="16"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="3"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											>
-												<path d="M20 6L9 17l-5-5" />
-											</svg>
-										</span>
-										<span className="coverage-checklist__text">
-											{ coverage.with_title || 0 }{ ' ' }
-											{ __( 'of', 'saman-seo' ) }{ ' ' }
-											{ coverage.total || 0 }{ ' ' }
-											{ __(
-												'pages have SEO titles',
-												'saman-seo'
-											) }
-										</span>
-									</div>
-									<div
-										className={ `coverage-checklist__item ${
-											coverage.with_description >=
-												coverage.total &&
-											coverage.total > 0
-												? 'is-done'
-												: ''
-										}` }
-									>
-										<span className="coverage-checklist__icon">
-											<svg
-												width="16"
-												height="16"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="3"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											>
-												<path d="M20 6L9 17l-5-5" />
-											</svg>
-										</span>
-										<span className="coverage-checklist__text">
-											{ coverage.with_description || 0 }{ ' ' }
-											{ __( 'of', 'saman-seo' ) }{ ' ' }
-											{ coverage.total || 0 }{ ' ' }
-											{ __(
-												'pages have meta descriptions',
-												'saman-seo'
-											) }
-										</span>
-									</div>
-									<div
-										className={ `coverage-checklist__item ${
-											coverage.optimized >=
-												coverage.total &&
-											coverage.total > 0
-												? 'is-done'
-												: ''
-										}` }
-									>
-										<span className="coverage-checklist__icon">
-											<svg
-												width="16"
-												height="16"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="3"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											>
-												<path d="M20 6L9 17l-5-5" />
-											</svg>
-										</span>
-										<span className="coverage-checklist__text">
-											{ coverage.optimized || 0 }{ ' ' }
-											{ __( 'of', 'saman-seo' ) }{ ' ' }
-											{ coverage.total || 0 }{ ' ' }
-											{ __(
-												'pages are fully optimized',
-												'saman-seo'
-											) }
-										</span>
-									</div>
-								</div>
-							</div>
-						) }
-						<div className="coverage-stats">
-							<div className="coverage-stat">
-								<div className="coverage-stat-value">
-									{ coverage.optimized || 0 }
-								</div>
-								<div className="coverage-stat-label">
-									{ __( 'Optimized', 'saman-seo' ) }
-								</div>
-							</div>
-							<div className="coverage-stat pending">
-								<div className="coverage-stat-value">
-									{ coverage.pending || 0 }
-								</div>
-								<div className="coverage-stat-label">
-									{ __( 'Pending', 'saman-seo' ) }
-								</div>
-							</div>
-						</div>
-					</div>
-					<p className="card-note">
-						{ coverage.total || 0 }{ ' ' }
-						{ __( 'total pages \xB7', 'saman-seo' ) }{ ' ' }
-						{ coverage.with_title || 0 }{ ' ' }
-						{ __( 'with titles \xB7', 'saman-seo' ) }{ ' ' }
-						{ coverage.with_description || 0 }{ ' ' }
-						{ __( 'with descriptions', 'saman-seo' ) }
-					</p>
-				</div>
-			</div>
-
-			{ /* Secondary Stats Grid */ }
-			<div
-				className="card-grid"
-				style={ {
-					marginTop: 'var(--space-lg)',
-				} }
-			>
-				{ /* Sitemap Status */ }
-				<div className="card">
-					<div className="card-header">
-						<h3>{ __( 'Sitemap Status', 'saman-seo' ) }</h3>
-						<span
-							className={ `pill ${
-								sitemap.enabled ? 'success' : 'warning'
-							}` }
-						>
-							{ sitemap.status_label ||
-								( sitemap.enabled
-									? __( 'Active', 'saman-seo' )
-									: __( 'Disabled', 'saman-seo' ) ) }
-						</span>
-					</div>
-					<div className="status-row">
-						<span
-							className={ `status-dot ${
-								sitemap.enabled ? 'success' : 'warning'
-							}` }
-							aria-hidden="true"
-						/>
-						<div>
-							<div className="status-title">
-								{ sitemap.enabled
-									? sprintf(
-											/* translators: %s: placeholder */ __(
-												'%s URLs indexed',
-												'saman-seo'
-											),
-											sitemap.total_urls
-									  )
-									: __( 'Sitemap disabled', 'saman-seo' ) }
-							</div>
-							<div className="status-subtitle">
-								{ sitemap.enabled
-									? sprintf(
-											/* translators: %s: placeholder */ __(
-												'Last generated: %s',
-												'saman-seo'
-											),
-											sitemap.last_generated
-									  )
-									: __(
-											'Enable to help search engines',
-											'saman-seo'
-									  ) }
-							</div>
-						</div>
-					</div>
-					<button
-						type="button"
-						className="button ghost small"
-						onClick={ () => handleNavigation( 'sitemap' ) }
-					>
-						{ sitemap.enabled
-							? __( 'View Sitemap', 'saman-seo' )
-							: __( 'Enable Sitemap', 'saman-seo' ) }
-					</button>
-				</div>
-
-				{ /* Redirects */ }
-				<div className="card">
-					<div className="card-header">
-						<h3>{ __( 'Redirects', 'saman-seo' ) }</h3>
-						<span
-							className={ `pill ${
-								redirects.active > 0 ? 'success' : ''
-							}` }
-						>
-							{ redirects.active } { __( 'Active', 'saman-seo' ) }
-						</span>
-					</div>
-					<div className="status-row">
-						<span
-							className={ `status-dot ${
-								redirects.suggestions > 0
-									? 'warning'
-									: 'success'
-							}` }
-							aria-hidden="true"
-						/>
-						<div>
-							<div className="status-title">
-								{ redirects.suggestions > 0
-									? sprintf(
-											/* translators: %1$s: placeholder, %2$s: placeholder */ __(
-												'%1$s pending suggestion%2$s',
-												'saman-seo'
-											),
-											redirects.suggestions,
-											redirects.suggestions !== 1
-												? 's'
-												: ''
-									  )
-									: __(
-											'All redirects working',
-											'saman-seo'
-									  ) }
-							</div>
-							<div className="status-subtitle">
-								{ redirects.hits_today || 0 }{ ' ' }
-								{ __( 'hits today', 'saman-seo' ) }
-							</div>
-						</div>
-					</div>
-					<button
-						type="button"
-						className="button ghost small"
-						onClick={ () => handleNavigation( 'redirects' ) }
-					>
-						{ __( 'Manage Redirects', 'saman-seo' ) }
-					</button>
-				</div>
-
-				{ /* 404 Errors */ }
-				<div className="card">
-					<div className="card-header">
-						<h3>{ __( '404 Errors', 'saman-seo' ) }</h3>
-						<span
-							className={ `pill ${
-								errors404.last_30_days > 0
-									? 'warning'
-									: 'success'
-							}` }
-						>
-							{ errors404.last_30_days > 0
-								? sprintf(
-										/* translators: %s: placeholder */ __(
-											'%s Found',
-											'saman-seo'
-										),
-										errors404.last_30_days
-								  )
-								: __( 'None', 'saman-seo' ) }
-						</span>
-					</div>
-					<div className="status-row">
-						<span
-							className={ `status-dot ${
-								errors404.last_30_days > 0
-									? 'warning'
-									: 'success'
-							}` }
-							aria-hidden="true"
-						/>
-						<div>
-							<div className="status-title">
-								{ errors404.last_7_days > 0
-									? sprintf(
-											/* translators: %s: placeholder */ __(
-												'%s errors this week',
-												'saman-seo'
-											),
-											errors404.last_7_days
-									  )
-									: __( 'No recent errors', 'saman-seo' ) }
-							</div>
-							<div className="status-subtitle">
-								{ __( 'Last 30 days', 'saman-seo' ) }
-							</div>
-						</div>
-					</div>
-					<button
-						type="button"
-						className="button ghost small"
-						onClick={ () => handleNavigation( '404-log' ) }
-					>
-						{ __( 'View 404 Log', 'saman-seo' ) }
-					</button>
-				</div>
-
-				{ /* Schema Status */ }
-				<div className="card">
-					<div className="card-header">
-						<h3>{ __( 'Schema Markup', 'saman-seo' ) }</h3>
-						<span
-							className={ `pill ${
-								schema.status === 'valid' ? 'success' : ''
-							}` }
-						>
-							{ schema.status_label || schema.status }
-						</span>
-					</div>
-					<div className="status-row">
-						<span
-							className={ `status-dot ${
-								schema.status === 'valid' ? 'success' : ''
-							}` }
-							aria-hidden="true"
-						/>
-						<div>
-							<div className="status-title">
-								{ schema.types?.length > 0
-									? schema.types.slice( 0, 3 ).join( ', ' )
-									: __( 'Basic markup', 'saman-seo' ) }
-							</div>
-							<div className="status-subtitle">
-								{ schema.types?.length > 3
-									? sprintf(
-											/* translators: %s: placeholder */ __(
-												'+%s more types',
-												'saman-seo'
-											),
-											schema.types.length - 3
-									  )
-									: __( 'Schema types active', 'saman-seo' ) }
-							</div>
-						</div>
-					</div>
-					<button
-						type="button"
-						className="button ghost small"
-						onClick={ () =>
-							handleNavigation( 'search-appearance' )
-						}
-					>
-						{ __( 'Configure Schema', 'saman-seo' ) }
-					</button>
-				</div>
-			</div>
-
-			{ /* Quick Actions */ }
-			<div className="dashboard-actions">
-				<h3>{ __( 'Quick Actions', 'saman-seo' ) }</h3>
-				<div className="actions-grid">
-					<button
-						type="button"
-						className="action-card"
-						onClick={ () => handleNavigation( 'audit' ) }
-					>
-						<div className="action-icon">
-							<svg
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-							>
-								<path
-									d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</div>
-						<div className="action-content">
-							<strong>
-								{ __( 'Run SEO Audit', 'saman-seo' ) }
-							</strong>
-							<span>
-								{ __( 'Scan for issues', 'saman-seo' ) }
-							</span>
-						</div>
-					</button>
-					<button
-						type="button"
-						className="action-card"
-						onClick={ () => handleNavigation( 'redirects' ) }
-					>
-						<div className="action-icon">
-							<svg
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-							>
-								<path
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</div>
-						<div className="action-content">
-							<strong>
-								{ __( 'Manage Redirects', 'saman-seo' ) }
-							</strong>
-							<span>
-								{ redirects.suggestions > 0
-									? sprintf(
-											/* translators: %s: placeholder */ __(
-												'%s suggestions',
-												'saman-seo'
-											),
-											redirects.suggestions
-									  )
-									: __( 'All good', 'saman-seo' ) }
-							</span>
-						</div>
-					</button>
-					<button
-						type="button"
-						className="action-card"
-						onClick={ () => handleNavigation( 'sitemap' ) }
-					>
-						<div className="action-icon">
-							<svg
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-							>
-								<path
-									d="M4 6h16M4 12h16M4 18h10"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-								/>
-							</svg>
-						</div>
-						<div className="action-content">
-							<strong>
-								{ __( 'View Sitemap', 'saman-seo' ) }
-							</strong>
-							<span>
-								{ sitemap.total_urls }{ ' ' }
-								{ __( 'URLs', 'saman-seo' ) }
-							</span>
-						</div>
-					</button>
-					<button
-						type="button"
-						className="action-card"
-						onClick={ () => handleNavigation( 'ai-assistant' ) }
-					>
-						<div className="action-icon">
-							<svg
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-							>
-								<path
-									d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z"
-									stroke="currentColor"
-									strokeWidth="2"
-								/>
-								<circle
-									cx="9"
-									cy="13"
-									r="1"
-									fill="currentColor"
-								/>
-								<circle
-									cx="15"
-									cy="13"
-									r="1"
-									fill="currentColor"
-								/>
-							</svg>
-						</div>
-						<div className="action-content">
-							<strong>
-								{ __( 'AI Assistant', 'saman-seo' ) }
-							</strong>
-							<span>
-								{ __( 'Generate content', 'saman-seo' ) }
-							</span>
-						</div>
-					</button>
-				</div>
 			</div>
 		</div>
 	);

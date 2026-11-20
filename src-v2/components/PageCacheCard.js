@@ -129,7 +129,7 @@ const PageCacheCard = () => {
 		return (
 			<div className="dashboard-card gsc-card">
 				<div className="card-header">
-					<h3>{ __( 'Site Speed', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Site speed', 'saman-seo' ) }</h3>
 				</div>
 				<div className="gsc-loading">
 					{ __( 'Checking page cache…', 'saman-seo' ) }
@@ -147,7 +147,7 @@ const PageCacheCard = () => {
 	return (
 		<div className="dashboard-card gsc-card">
 			<div className="card-header">
-				<h3>{ __( 'Site Speed', 'saman-seo' ) }</h3>
+				<h3>{ __( 'Site speed', 'saman-seo' ) }</h3>
 				{ enabled ? (
 					<span className="pill success">
 						{ status.tier === 'dropin'
@@ -172,7 +172,7 @@ const PageCacheCard = () => {
 				<div className="gsc-connect">
 					<p>
 						{ __(
-							'Snapshot your public pages as static HTML and serve them instantly. WordPress rebuilds each snapshot automatically when you edit content.',
+							'Serve public pages as static HTML snapshots. Each snapshot rebuilds automatically when you edit its content.',
 							'saman-seo'
 						) }
 					</p>
@@ -196,7 +196,7 @@ const PageCacheCard = () => {
 						>
 							{ busy
 								? __( 'Working…', 'saman-seo' )
-								: __( 'Enable Page Cache', 'saman-seo' ) }
+								: __( 'Enable page cache', 'saman-seo' ) }
 						</button>
 					) }
 				</div>
@@ -282,7 +282,7 @@ const PageCacheCard = () => {
 								disabled={ busy }
 								onClick={ handlePurge }
 							>
-								{ __( 'Clear Cache', 'saman-seo' ) }
+								{ __( 'Clear cache', 'saman-seo' ) }
 							</button>{ ' ' }
 							<button
 								type="button"
@@ -296,7 +296,7 @@ const PageCacheCard = () => {
 						</div>
 						<button
 							type="button"
-							className="gsc-link-button"
+							className="gsc-link-button gsc-link-button--danger"
 							disabled={ busy }
 							onClick={ () => handleToggle( false ) }
 						>
@@ -371,7 +371,7 @@ const PageCacheCard = () => {
 								disabled={ busy }
 								onClick={ handleSaveSettings }
 							>
-								{ __( 'Save Settings', 'saman-seo' ) }
+								{ __( 'Save cache settings', 'saman-seo' ) }
 							</button>
 						</div>
 					) }

@@ -32,7 +32,7 @@
         border-color: @color-primary;
         background: @color-primary-light;
         color: @color-primary;
-        box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.2);
+        box-shadow: 0 0 0 2px fade(@color-primary, 20%);
     }
 }
 
@@ -64,7 +64,7 @@
     &:focus {
         outline: none;
         border-color: @color-primary;
-        box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.15);
+        box-shadow: 0 0 0 2px fade(@color-primary, 15%);
     }
 
     &:not(:placeholder-shown) {
@@ -89,65 +89,6 @@
         margin: 0;
         font-size: @font-size-xl;
     }
-}
-
-// Archives Grid
-.archives-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: @spacing-lg;
-    margin-bottom: @spacing-xl;
-}
-
-.archive-card {
-    background: @color-surface-muted;
-    border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    padding: @spacing-lg;
-    .flex-column();
-    gap: @spacing-md;
-}
-
-.archive-card__header {
-    .flex-between();
-    gap: @spacing-md;
-
-    h4 {
-        margin: 0;
-        font-size: 15px;
-    }
-}
-
-.archive-card__template {
-    .flex-column();
-    gap: 4px;
-    font-size: @font-size-sm;
-
-    .label {
-        color: @color-muted;
-        font-weight: @font-weight-semibold;
-    }
-
-    code {
-        font-size: @font-size-xs;
-        word-break: break-all;
-    }
-}
-
-.archive-card__preview {
-    padding: @spacing-sm @spacing-md;
-    background: @color-surface;
-    border-radius: @radius-sm;
-    border: 1px solid @color-border;
-}
-
-// Template Preview Text
-.template-preview-text {
-    font-size: @font-size-sm;
-    color: @color-text;
-    max-width: 300px;
-    display: block;
-    .text-truncate();
 }
 
 // Title Preview Cell (in tables)
@@ -478,11 +419,114 @@
 
 // Responsive
 @media (max-width: @breakpoint-lg) {
-    .archives-grid {
-        grid-template-columns: 1fr;
-    }
-
     .separator-selector {
         justify-content: flex-start;
     }
+}
+
+// Homepage tab: the form on the left, a live Google preview that stays in
+// view on the right.
+.sa-home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+    gap: @spacing-xl;
+    align-items: start;
+
+    @media (max-width: @breakpoint-xl) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__form {
+        gap: @spacing-xl;
+
+        .panel-actions {
+            margin: 0;
+            padding-top: @spacing-xl;
+            border-top: 1px solid @color-border-light;
+        }
+    }
+
+    &__preview {
+        position: sticky;
+        top: 32px + @spacing-2xl;
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-md;
+
+        h3 {
+            margin: 0;
+            padding: 0;
+            font-size: @font-size-base;
+            font-weight: @font-weight-semibold;
+        }
+
+        .search-preview {
+            margin: 0;
+        }
+
+        .muted {
+            margin: 0;
+        }
+
+        @media (max-width: @breakpoint-xl) {
+            position: static;
+            order: -1;
+        }
+    }
+}
+
+// Inside a panel the toolbar is a plain row; the boxed look belongs to pages
+// where it sits on the page background.
+.panel > .table-toolbar {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+
+    // The active tab already names the section.
+    h3,
+    h3 + .muted {
+        .visually-hidden();
+    }
+
+    &:not(:has(button, input, select, a)) {
+        .visually-hidden();
+    }
+}
+
+.page {
+    .panel > .data-table,
+    .panel > .table-wrap {
+        margin-top: -@spacing-sm;
+    }
+}
+
+// Social preview sits directly in the panel instead of in a second gray box.
+.preview-panel {
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+}
+
+.form-section__title {
+    font-size: @font-size-lg;
+}
+
+// Stacked field inside a control column: label, help, then the input.
+.settings-control__label {
+    display: block;
+    font-weight: @font-weight-semibold;
+    color: @color-text;
+}
+
+.settings-control__help {
+    margin: @spacing-xs 0 @spacing-sm;
+    color: @color-muted;
+    font-size: @font-size-sm;
+}
+
+.settings-control__input {
+    width: 100%;
 }

@@ -1,0 +1,289 @@
+// Page standard overrides: content-b group. See the page frame in pages/_layout.less.
+//
+// Internal linking and Local SEO. Both pages sit on the shared frame (KPI
+// band, header actions, sub tabs, toolbar, table card, panels); the rules here
+// only cover what the shared classes do not.
+
+// --------------------------------------------------------------------------
+// Shared by both pages
+// --------------------------------------------------------------------------
+
+// A row label that names a group of controls rather than a single input.
+.saman-seo-admin .settings-label__text {
+    font-weight: @font-weight-medium;
+    color: @color-text;
+}
+
+// Field types the shared settings control does not cover yet.
+.saman-seo-admin .settings-control {
+    input[type="tel"],
+    input[type="email"],
+    input[type="url"] {
+        .input-base();
+    }
+
+    // Compact controls line up on the right edge with the toggles.
+    > .input--narrow,
+    > .image-picker,
+    > .checkbox-group {
+        align-self: flex-end;
+    }
+
+    > .checkbox-group {
+        justify-content: flex-end;
+        gap: @spacing-sm @spacing-lg;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Internal linking
+// --------------------------------------------------------------------------
+
+// The category colour was used for both the fill and the text, which made the
+// name unreadable. The colour now lives in the dot only.
+.saman-seo-admin .category-pill {
+    padding: 2px @spacing-sm;
+    background: @color-surface-hover;
+    color: @color-text-secondary;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+.saman-seo-admin .category-name {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+
+    .color-chip {
+        flex-shrink: 0;
+        width: 12px;
+        height: 12px;
+        border: 0;
+        border-radius: @radius-full;
+    }
+}
+
+.saman-seo-admin .data-table .destination-link {
+    max-width: 280px;
+}
+
+.saman-seo-admin .data-table .keywords-preview {
+    font-size: @font-size-base;
+}
+
+// Bulk bar: one quiet row above the table, sized like the filter row.
+.saman-seo-admin .page-body > .bulk-actions {
+    flex-wrap: wrap;
+    gap: @spacing-sm @spacing-md;
+    padding: @spacing-sm @spacing-lg;
+    border-radius: @radius-lg;
+
+    select {
+        .input-base();
+        width: auto;
+        min-width: 140px;
+        min-height: 32px;
+        padding: 4px 28px 4px 10px;
+        font-size: @font-size-sm;
+    }
+}
+
+// Rule, category and template dialogs. The fields had no vertical rhythm and
+// the shared `.form-field input` rule stretched checkboxes to full width.
+.saman-seo-admin .internal-link-modal {
+    .modal__body {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-lg;
+
+        > * {
+            flex: 0 0 auto;
+            margin: 0;
+        }
+    }
+
+    .form-row {
+        align-items: flex-start;
+        gap: @spacing-lg;
+    }
+
+    .form-field {
+        min-width: 0;
+
+        > label:first-child {
+            color: @color-text-secondary;
+        }
+
+        textarea {
+            .input-base();
+            resize: vertical;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: auto;
+            min-height: 0;
+            padding: 0;
+        }
+
+        input[type="color"] {
+            width: 64px;
+            padding: 2px;
+            cursor: pointer;
+        }
+    }
+
+    .radio-group {
+        align-self: flex-start;
+        flex-direction: row;
+    }
+
+    .radio-item,
+    .checkbox-item {
+        font-size: @font-size-base;
+        font-weight: @font-weight-normal;
+        color: @color-text;
+    }
+
+    .checkbox-group {
+        min-height: @input-height;
+        align-items: center;
+    }
+
+    .toggle {
+        align-self: flex-start;
+        min-height: @input-height;
+    }
+
+    .tag-input input {
+        width: auto;
+        min-height: 0;
+        box-shadow: none;
+    }
+
+    .selected-post {
+        min-height: @input-height;
+        border: 1px solid @color-border;
+        border-radius: @radius-md;
+        background: none;
+    }
+
+    .form-error {
+        padding: @spacing-sm @spacing-md;
+        border-radius: @radius-md;
+        background: @color-danger-bg;
+        color: @color-danger-text;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Local SEO
+// --------------------------------------------------------------------------
+
+// Save notice: message on the left, dismiss on the right, spaced by the page.
+.saman-seo-admin .page > .notice-message:has(> .link-button) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-lg;
+    margin: 0;
+}
+
+// Opening hours: day on the left, its switch and times in one row beside it.
+.saman-seo-admin .settings-row.hours-day-row {
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: @spacing-lg;
+}
+
+.saman-seo-admin .hours-control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-sm @spacing-md;
+    min-height: @input-height;
+
+    .hours-time {
+        .input-base();
+        width: 124px;
+    }
+
+    .hours-closed {
+        font-style: normal;
+        color: @color-muted;
+    }
+}
+
+// Knowledge panel preview: the side card is the only surface, so the old
+// inner frame, tinted header and tinted footer are flattened into it.
+.saman-seo-admin .local-seo-preview {
+    position: sticky;
+    top: 32px + @spacing-2xl;
+}
+
+.saman-seo-admin .side-card.knowledge-panel {
+    overflow: visible;
+    box-shadow: none;
+
+    .knowledge-panel__title {
+        display: flex;
+        align-items: center;
+        gap: @spacing-sm;
+
+        svg {
+            flex-shrink: 0;
+        }
+    }
+
+    .knowledge-panel__cover {
+        border-radius: @radius-md;
+    }
+
+    .knowledge-panel__body {
+        padding: 0;
+    }
+
+    .knowledge-panel__actions {
+        justify-content: flex-start;
+        padding: 0;
+        border: 0;
+        background: none;
+    }
+}
+
+@media (max-width: @breakpoint-lg) {
+    .saman-seo-admin .local-seo-preview {
+        position: static;
+    }
+
+    .saman-seo-admin .settings-row.hours-day-row {
+        grid-template-columns: 1fr;
+        gap: @spacing-sm;
+    }
+}
+
+// The rule title is the main column: keep it readable instead of letting the
+// content-sized columns squeeze it to one word per line.
+.saman-seo-admin .data-table th.col-title {
+    min-width: 130px;
+}
+
+// Rules table: the category and keywords sit under the rule title so the
+// row fits without sideways scrolling.
+.saman-seo-admin .data-table .rule-cell {
+    min-width: 240px;
+
+    .link-button {
+        font-weight: @font-weight-medium;
+        text-align: left;
+    }
+}
+
+.saman-seo-admin .data-table .rule-cell__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-xs @spacing-sm;
+    margin-top: @spacing-xs;
+    color: @color-muted;
+    font-size: @font-size-sm;
+}

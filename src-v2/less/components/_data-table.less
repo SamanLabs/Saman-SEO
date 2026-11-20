@@ -1,0 +1,296 @@
+// ==========================================================================
+// Data table and list toolbar
+// ==========================================================================
+// Spacing follows the ServerKit design system's data table: a short header
+// row whose labels never wrap, comfortable cells, wider gutters at the two
+// edges, and columns that size to their content so only the main column
+// flexes.
+
+.saman-seo-admin .table-wrap {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius-xl;
+    overflow-x: auto;
+}
+
+.saman-seo-admin .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: @font-size-base;
+
+    th,
+    td {
+        padding: 10px @spacing-md;
+        border-bottom: 1px solid @color-border-light;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    th {
+        height: 38px;
+        padding-top: 0;
+        padding-bottom: 0;
+        background: transparent;
+        border-bottom-color: @color-border;
+        color: @color-muted;
+        font-size: @font-size-sm;
+        font-weight: @font-weight-medium;
+        text-transform: none;
+        letter-spacing: 0;
+        white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+        padding-left: @spacing-xl;
+    }
+
+    th:last-child,
+    td:last-child {
+        padding-right: @spacing-xl;
+    }
+
+    tbody tr {
+        transition: background @transition-fast;
+    }
+
+    tbody tr:hover {
+        background: @color-surface-muted;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    // Content-sized columns: never wrap, never take spare width.
+    .col-numeric,
+    .numeric-cell,
+    .col-date,
+    .date-cell,
+    .col-device,
+    .device-cell,
+    .col-actions,
+    .action-cell {
+        width: 1%;
+        white-space: nowrap;
+    }
+
+    .col-numeric,
+    .numeric-cell {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .date-cell,
+    .device-cell {
+        color: @color-text-secondary;
+    }
+
+    // The main column takes what is left and may break long URLs.
+    .url-cell {
+        overflow-wrap: anywhere;
+    }
+
+    .table-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: @spacing-md;
+    }
+}
+
+// List toolbar: one quiet row of filters above a table.
+.saman-seo-admin .page-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-sm @spacing-xl;
+    margin: 0 0 @spacing-md;
+    padding: 0;
+    border: 0;
+
+    &__filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: @spacing-sm @spacing-lg;
+    }
+}
+
+.saman-seo-admin .filter-field {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+
+    span {
+        font-size: @font-size-sm;
+        color: @color-muted;
+    }
+
+    select,
+    input[type="text"],
+    input[type="search"] {
+        .input-base();
+        width: auto;
+        min-height: 32px;
+        padding: 4px 28px 4px 10px;
+        font-size: @font-size-sm;
+    }
+}
+
+.saman-seo-admin .filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: @color-primary;
+        cursor: pointer;
+    }
+
+    span {
+        font-size: @font-size-sm;
+        color: @color-text-secondary;
+    }
+}
+
+// The older boxed toolbar becomes the same quiet filter row everywhere.
+.saman-seo-admin .table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-sm @spacing-lg;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+}
+
+.saman-seo-admin .table-toolbar-filters,
+.saman-seo-admin .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-sm;
+
+    select,
+    input[type="text"],
+    input[type="search"] {
+        .input-base();
+        width: auto;
+        min-width: 0;
+        min-height: 32px;
+        padding: 4px 10px;
+        font-size: @font-size-sm;
+    }
+
+    select {
+        padding-right: 28px;
+    }
+}
+
+.saman-seo-admin .page-toolbar__filters input[type="search"],
+.saman-seo-admin .page-toolbar__filters input[type="text"],
+.saman-seo-admin .page-toolbar__filters select,
+.saman-seo-admin .search-input {
+    .input-base();
+    width: auto;
+    min-height: 32px;
+    padding: 4px 10px;
+    font-size: @font-size-sm;
+}
+
+.saman-seo-admin .page-toolbar__filters select {
+    padding-right: 28px;
+}
+
+// A panel whose content is a table is the table card: the header keeps its
+// padding and the table runs edge to edge.
+.saman-seo-admin .panel:has(> .data-table) {
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+
+    > .panel-header {
+        margin: 0;
+        padding: @spacing-md @spacing-xl;
+        border-bottom: 1px solid @color-border-light;
+    }
+
+    > .panel-desc {
+        margin: 0;
+        padding: @spacing-md @spacing-xl;
+    }
+
+    > .pagination {
+        margin: 0;
+        padding: @spacing-md @spacing-xl;
+        border-top: 1px solid @color-border-light;
+    }
+
+    > .loading-state,
+    > .empty-state {
+        margin: @spacing-xl;
+    }
+}
+
+.saman-seo-admin .data-table .checkbox-col {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.saman-seo-admin .data-table .loading-cell,
+.saman-seo-admin .data-table .empty-cell {
+    padding: @spacing-3xl @spacing-xl;
+    text-align: center;
+    color: @color-muted;
+}
+
+// Page rhythm: the band, the filter row and the table card are spaced by the
+// container, never by their own margins, so every tool page lines up.
+.saman-seo-admin .page-body:not(.two-column) {
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-lg;
+
+    > * {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+.saman-seo-admin .page > .tabs,
+.saman-seo-admin .page > .sub-tabs {
+    margin-bottom: 0;
+}
+
+// Core paints the select arrow as a background image that other rules reset,
+// so toolbar selects carry their own.
+.saman-seo-admin .page-toolbar select,
+.saman-seo-admin .table-toolbar select,
+.saman-seo-admin .filter-row select,
+.saman-seo-admin .filter-field select {
+    appearance: none;
+    padding-right: 28px;
+    background-color: @color-surface;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23646c7d' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    background-size: 12px;
+}
+
+// An empty state that is a panel's only content uses the panel as its
+// surface instead of drawing a second dashed box inside it.
+.saman-seo-admin .panel > .empty-state:only-child,
+.saman-seo-admin .audit-section .empty-state {
+    margin: 0;
+    background: none;
+    border: 0;
+}

@@ -2,36 +2,39 @@
 // Variables - Design Tokens for Saman SEO V2
 // ==========================================================================
 
-// Colors - Primary (WordPress admin blue)
-@color-primary: #2271b1;
-@color-primary-hover: #135e96;
-@color-primary-light: rgba(34, 113, 177, 0.08);
-@color-primary-lighter: rgba(34, 113, 177, 0.06);
+// Colors - Primary (cobalt; brighter and cooler than the WordPress admin blue)
+@color-primary: #2f5fe3;
+@color-primary-hover: #244cc0;
+@color-primary-light: fade(@color-primary, 10%);
+@color-primary-lighter: fade(@color-primary, 6%);
 
-// Colors - Semantic (WordPress admin defaults)
-@color-success: #00a32a;
-@color-success-bg: #edfaef;
-@color-warning: #dba617;
-@color-warning-bg: #fcf9e8;
-@color-danger: #d63638;
-@color-danger-bg: #fcf0f1;
+// Colors - Semantic. The *-text shades pass 4.5:1 on their *-bg tint.
+@color-success: #17a34a;
+@color-success-bg: #e8f6ed;
+@color-success-text: #0f6b31;
+@color-warning: #e0a01a;
+@color-warning-bg: #fcf3dc;
+@color-warning-text: #85580a;
+@color-danger: #d92d3a;
+@color-danger-bg: #fcebec;
+@color-danger-text: #a3202b;
 
-// Colors - Neutrals (consistent WordPress gray family)
-@color-text: #1e1e1e;
-@color-text-secondary: #757575;
-@color-muted: #646970;
-@color-border: #dcdcde;
-@color-border-light: #f0f0f1;
+// Colors - Neutrals (cool gray, tinted slightly toward the primary hue)
+@color-text: #141824;
+@color-text-secondary: #4b5263;
+@color-muted: #646c7d;
+@color-border: #e0e3ea;
+@color-border-light: #eceef3;
 
 // Colors - Surfaces
 @color-surface: #ffffff;
-@color-surface-muted: #f6f7f7;
-@color-surface-hover: #f0f0f0;
-@color-background: #f0f0f1;
+@color-surface-muted: #f6f7fa;
+@color-surface-hover: #eff1f6;
+@color-background: #f2f3f7;
 
 // Typography (WordPress/system stack for native admin feel)
 @font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-@font-family-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+@font-family-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Consolas', monospace;
 
 @font-size-xs: 11px;
 @font-size-sm: 12px;
@@ -60,23 +63,24 @@
 @spacing-3xl: 32px;
 @spacing-4xl: 40px;
 
-// Border Radius (restrained, WordPress-native)
-@radius-sm: 2px;
-@radius-md: 4px;
-@radius-lg: 6px;
-@radius-xl: 8px;
+// Border Radius
+@radius-sm: 4px;
+@radius-md: 6px;
+@radius-lg: 10px;
+@radius-xl: 12px;
 @radius-full: 9999px;
 
 // Shadows (subtle, never colored)
-@shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.04);
-@shadow-md: 0 1px 2px rgba(0, 0, 0, 0.06);
-@shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.08);
-@shadow-xl: 0 4px 8px rgba(0, 0, 0, 0.1);
+@shadow-sm: 0 1px 2px rgba(20, 24, 36, 0.05);
+@shadow-md: 0 1px 3px rgba(20, 24, 36, 0.08);
+@shadow-lg: 0 2px 6px rgba(20, 24, 36, 0.06);
+@shadow-xl: 0 8px 24px rgba(20, 24, 36, 0.12);
 
 // Transitions
-@transition-fast: 0.15s ease;
-@transition-normal: 0.2s ease;
-@transition-slow: 0.3s ease;
+@ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+@transition-fast: 0.15s @ease-out;
+@transition-normal: 0.2s @ease-out;
+@transition-slow: 0.45s @ease-out;
 
 // Z-Index Scale
 @z-dropdown: 1000;
@@ -94,7 +98,7 @@
 @breakpoint-xl: 1200px;
 
 // Component-specific
-@header-height: 64px;
-@sidebar-width: 200px;
-@input-height: 40px;
+@header-height: 56px;
+@sidebar-width: 224px;
+@input-height: 36px;
 @button-height: 36px;

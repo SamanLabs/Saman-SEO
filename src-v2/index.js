@@ -1,4 +1,4 @@
-/* global __webpack_public_path__ */
+/* global __webpack_public_path__ */ // eslint-disable-line no-unused-vars
 
 // Set webpack public path so lazy-loaded chunks always resolve from the plugin
 // build folder, regardless of the current WordPress admin page URL.

@@ -4,19 +4,19 @@ import { __ } from '@wordpress/i18n';
 const STATUS_CODES = [
 	{
 		value: 301,
-		label: __( '301 - Permanent Redirect', 'saman-seo' ),
+		label: __( '301 - Permanent redirect', 'saman-seo' ),
 	},
 	{
 		value: 302,
-		label: __( '302 - Temporary Redirect', 'saman-seo' ),
+		label: __( '302 - Temporary redirect', 'saman-seo' ),
 	},
 	{
 		value: 307,
-		label: __( '307 - Temporary (Preserve Method)', 'saman-seo' ),
+		label: __( '307 - Temporary (preserve method)', 'saman-seo' ),
 	},
 	{
 		value: 410,
-		label: __( '410 - Gone (Deleted)', 'saman-seo' ),
+		label: __( '410 - Gone (deleted)', 'saman-seo' ),
 	},
 ];
 const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
@@ -95,7 +95,7 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 		>
 			<div className="modal redirect-modal">
 				<div className="modal__header">
-					<h2>{ __( 'Create Redirect', 'saman-seo' ) }</h2>
+					<h2>{ __( 'Create redirect', 'saman-seo' ) }</h2>
 					<button
 						type="button"
 						className="modal__close"
@@ -228,7 +228,7 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 					{ /* Status Code */ }
 					<div className="form-group">
 						<label htmlFor="status-code">
-							{ __( 'Status Code', 'saman-seo' ) }
+							{ __( 'Status code', 'saman-seo' ) }
 						</label>
 						<select
 							id="status-code"
@@ -290,7 +290,7 @@ const CreateRedirectModal = ( { entry, onClose, onSuccess } ) => {
 					>
 						{ creating
 							? __( 'Creating\u2026', 'saman-seo' )
-							: __( 'Create Redirect', 'saman-seo' ) }
+							: __( 'Create redirect', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>

@@ -60,7 +60,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 				method: 'POST',
 			} );
 			setAiStatus( response.data || response );
-		} catch ( err ) {
+		} catch {
 			setAiStatus( {
 				status: 'error',
 				message: __( 'Could not check AI status.', 'saman-seo' ),
@@ -94,7 +94,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 				path: '/saman-seo/v1/setup/skip',
 				method: 'POST',
 			} );
-		} catch ( err ) {
+		} catch {
 			// Ignore errors, just navigate away
 		}
 		if ( onSkip ) onSkip();
@@ -102,32 +102,32 @@ const Setup = ( { onComplete, onSkip } ) => {
 	const siteTypes = [
 		{
 			value: 'blog',
-			label: __( 'Blog / News', 'saman-seo' ),
+			label: __( 'Blog / news', 'saman-seo' ),
 			icon: <IconFileText />,
 		},
 		{
 			value: 'business',
-			label: __( 'Business / Company', 'saman-seo' ),
+			label: __( 'Business / company', 'saman-seo' ),
 			icon: <IconBuilding />,
 		},
 		{
 			value: 'ecommerce',
-			label: __( 'E-commerce / Store', 'saman-seo' ),
+			label: __( 'E-commerce / store', 'saman-seo' ),
 			icon: <IconShoppingCart />,
 		},
 		{
 			value: 'portfolio',
-			label: __( 'Portfolio / Personal', 'saman-seo' ),
+			label: __( 'Portfolio / personal', 'saman-seo' ),
 			icon: <IconPalette />,
 		},
 		{
 			value: 'agency',
-			label: __( 'Agency / Services', 'saman-seo' ),
+			label: __( 'Agency / services', 'saman-seo' ),
 			icon: <IconBriefcase />,
 		},
 		{
 			value: 'nonprofit',
-			label: __( 'Non-profit / Charity', 'saman-seo' ),
+			label: __( 'Non-profit / charity', 'saman-seo' ),
 			icon: <IconHeart />,
 		},
 	];
@@ -373,7 +373,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 						<span className="setup-step__number">
 							{ __( 'Step 2 of 4', 'saman-seo' ) }
 						</span>
-						<h2>{ __( 'AI Features', 'saman-seo' ) }</h2>
+						<h2>{ __( 'AI features', 'saman-seo' ) }</h2>
 						<p className="setup-step__subtitle">
 							{ __(
 								'AI-powered features are provided by the Saman Labs AI plugin.',
@@ -405,7 +405,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							<div className="setup-info-box">
 								<h4>
 									{ __(
-										'Saman Labs AI Not Installed',
+										'Saman Labs AI not installed',
 										'saman-seo'
 									) }
 								</h4>
@@ -421,7 +421,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{ __( 'Install Plugin', 'saman-seo' ) }
+									{ __( 'Install plugin', 'saman-seo' ) }
 								</a>
 							</div>
 						) }
@@ -430,7 +430,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							<div className="setup-info-box">
 								<h4>
 									{ __(
-										'Saman Labs AI Not Active',
+										'Saman Labs AI not active',
 										'saman-seo'
 									) }
 								</h4>
@@ -446,7 +446,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{ __( 'Activate Plugin', 'saman-seo' ) }
+									{ __( 'Activate plugin', 'saman-seo' ) }
 								</a>
 							</div>
 						) }
@@ -455,7 +455,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							<div className="setup-info-box">
 								<h4>
 									{ __(
-										'Saman Labs AI Not Configured',
+										'Saman Labs AI not configured',
 										'saman-seo'
 									) }
 								</h4>
@@ -510,7 +510,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 						<span className="setup-step__number">
 							{ __( 'Step 3 of 4', 'saman-seo' ) }
 						</span>
-						<h2>{ __( 'Quick Wins', 'saman-seo' ) }</h2>
+						<h2>{ __( 'Quick wins', 'saman-seo' ) }</h2>
 						<p className="setup-step__subtitle">
 							{ __(
 								'Enable these essential features to get started quickly.',
@@ -522,7 +522,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							<label className="setup-toggle">
 								<div className="setup-toggle__content">
 									<strong>
-										{ __( 'XML Sitemap', 'saman-seo' ) }
+										{ __( 'XML sitemap', 'saman-seo' ) }
 									</strong>
 									<span>
 										{ __(
@@ -548,7 +548,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 								<div className="setup-toggle__content">
 									<strong>
 										{ __(
-											'404 Error Logging',
+											'404 error logging',
 											'saman-seo'
 										) }
 									</strong>
@@ -576,7 +576,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 								<div className="setup-toggle__content">
 									<strong>
 										{ __(
-											'Redirects Manager',
+											'Redirects manager',
 											'saman-seo'
 										) }
 									</strong>
@@ -603,7 +603,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 
 						<div className="setup-section">
 							<label className="setup-label">
-								{ __( 'Title Template', 'saman-seo' ) }
+								{ __( 'Title template', 'saman-seo' ) }
 							</label>
 							<select
 								className="setup-select"
@@ -617,24 +617,24 @@ const Setup = ( { onComplete, onSkip } ) => {
 							>
 								<option value="{{post_title}} - {{site_title}}">
 									{ __(
-										'Page Title - Site Name',
+										'Page title - Site name',
 										'saman-seo'
 									) }
 								</option>
 								<option value="{{post_title}} | {{site_title}}">
 									{ __(
-										'Page Title | Site Name',
+										'Page title | Site name',
 										'saman-seo'
 									) }
 								</option>
 								<option value="{{site_title}} - {{post_title}}">
 									{ __(
-										'Site Name - Page Title',
+										'Site name - Page title',
 										'saman-seo'
 									) }
 								</option>
 								<option value="{{post_title}}">
-									{ __( 'Page Title Only', 'saman-seo' ) }
+									{ __( 'Page title only', 'saman-seo' ) }
 								</option>
 							</select>
 							<p className="setup-help">
@@ -688,7 +688,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 						<div className="setup-summary">
 							<div className="setup-summary__item">
 								<span className="setup-summary__label">
-									{ __( 'Site Type', 'saman-seo' ) }
+									{ __( 'Site type', 'saman-seo' ) }
 								</span>
 								<span className="setup-summary__value">
 									{ siteTypes.find(
@@ -698,7 +698,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							</div>
 							<div className="setup-summary__item">
 								<span className="setup-summary__label">
-									{ __( 'AI Features', 'saman-seo' ) }
+									{ __( 'AI features', 'saman-seo' ) }
 								</span>
 								<span className="setup-summary__value">
 									{ aiStatus?.status === 'ready'
@@ -708,7 +708,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							</div>
 							<div className="setup-summary__item">
 								<span className="setup-summary__label">
-									{ __( 'Features Enabled', 'saman-seo' ) }
+									{ __( 'Features enabled', 'saman-seo' ) }
 								</span>
 								<span className="setup-summary__value">
 									{ [
@@ -732,7 +732,7 @@ const Setup = ( { onComplete, onSkip } ) => {
 							>
 								{ loading
 									? __( 'Saving\u2026', 'saman-seo' )
-									: __( 'Go to Dashboard', 'saman-seo' ) }
+									: __( 'Go to dashboard', 'saman-seo' ) }
 							</button>
 						</div>
 

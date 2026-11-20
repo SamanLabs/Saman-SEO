@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -9,10 +9,36 @@ import {
 	IconYoutube,
 	IconLink,
 } from '../components/Icons';
+import SubTabs from '../components/SubTabs';
+const localSeoTabs = [
+	{
+		id: 'business',
+		label: __( 'Business information', 'saman-seo' ),
+	},
+	{
+		id: 'hours',
+		label: __( 'Opening hours', 'saman-seo' ),
+	},
+	{
+		id: 'reviews',
+		label: __( 'Reviews', 'saman-seo' ),
+	},
+];
+const WEEKDAYS = [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday' ];
+
+// One label + control row inside a panel.
+const Field = ( { id, label, children } ) => (
+	<div className="settings-row">
+		<div className="settings-label">
+			<label htmlFor={ id }>{ label }</label>
+		</div>
+		<div className="settings-control">{ children }</div>
+	</div>
+);
 const businessTypes = [
 	{
 		value: 'LocalBusiness',
-		label: __( 'Local Business (Generic)', 'saman-seo' ),
+		label: __( 'Local business (generic)', 'saman-seo' ),
 	},
 	{
 		value: 'Restaurant',
@@ -28,7 +54,7 @@ const businessTypes = [
 	},
 	{
 		value: 'MedicalClinic',
-		label: __( 'Medical Clinic', 'saman-seo' ),
+		label: __( 'Medical clinic', 'saman-seo' ),
 	},
 	{
 		value: 'Attorney',
@@ -36,7 +62,7 @@ const businessTypes = [
 	},
 	{
 		value: 'RealEstateAgent',
-		label: __( 'Real Estate Agent', 'saman-seo' ),
+		label: __( 'Real estate agent', 'saman-seo' ),
 	},
 	{
 		value: 'Store',
@@ -44,15 +70,15 @@ const businessTypes = [
 	},
 	{
 		value: 'AutoDealer',
-		label: __( 'Auto Dealer', 'saman-seo' ),
+		label: __( 'Auto dealer', 'saman-seo' ),
 	},
 	{
 		value: 'HairSalon',
-		label: __( 'Hair Salon', 'saman-seo' ),
+		label: __( 'Hair salon', 'saman-seo' ),
 	},
 	{
 		value: 'BeautySalon',
-		label: __( 'Beauty Salon', 'saman-seo' ),
+		label: __( 'Beauty salon', 'saman-seo' ),
 	},
 	{
 		value: 'Plumber',
@@ -64,15 +90,15 @@ const businessTypes = [
 	},
 	{
 		value: 'AccountingService',
-		label: __( 'Accounting Service', 'saman-seo' ),
+		label: __( 'Accounting service', 'saman-seo' ),
 	},
 	{
 		value: 'FinancialService',
-		label: __( 'Financial Service', 'saman-seo' ),
+		label: __( 'Financial service', 'saman-seo' ),
 	},
 	{
 		value: 'InsuranceAgency',
-		label: __( 'Insurance Agency', 'saman-seo' ),
+		label: __( 'Insurance agency', 'saman-seo' ),
 	},
 	{
 		value: 'Hotel',
@@ -84,11 +110,11 @@ const businessTypes = [
 	},
 	{
 		value: 'BarOrPub',
-		label: __( 'Bar or Pub', 'saman-seo' ),
+		label: __( 'Bar or pub', 'saman-seo' ),
 	},
 	{
 		value: 'CafeOrCoffeeShop',
-		label: __( 'Cafe / Coffee Shop', 'saman-seo' ),
+		label: __( 'Cafe / coffee shop', 'saman-seo' ),
 	},
 	{
 		value: 'Pharmacy',
@@ -96,11 +122,11 @@ const businessTypes = [
 	},
 	{
 		value: 'SportsClub',
-		label: __( 'Sports Club', 'saman-seo' ),
+		label: __( 'Sports club', 'saman-seo' ),
 	},
 	{
 		value: 'HealthClub',
-		label: __( 'Health Club / Gym', 'saman-seo' ),
+		label: __( 'Health club / gym', 'saman-seo' ),
 	},
 ];
 const days = [
@@ -311,8 +337,8 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 			icon: getSocialIcon( url ),
 		} ) );
 	return (
-		<div className="knowledge-panel">
-			<div className="knowledge-panel__header">
+		<div className="side-card knowledge-panel">
+			<h3 className="knowledge-panel__title">
 				<svg
 					viewBox="0 0 24 24"
 					width="16"
@@ -336,8 +362,8 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 						fill="#EA4335"
 					/>
 				</svg>
-				<span>{ __( 'Knowledge Panel Preview', 'saman-seo' ) }</span>
-			</div>
+				<span>{ __( 'Knowledge panel preview', 'saman-seo' ) }</span>
+			</h3>
 
 			{ business.image ? (
 				<div
@@ -400,7 +426,7 @@ const KnowledgePanelPreview = ( { business, hours, socialProfiles } ) => {
 							}` }
 						>
 							{ business.name ||
-								__( 'Business Name', 'saman-seo' ) }
+								__( 'Business name', 'saman-seo' ) }
 						</h3>
 						<p className="knowledge-panel__type">
 							{ businessTypeLabel }
@@ -646,7 +672,7 @@ const LocalSeo = () => {
 							...defaultHours,
 							...parsedHours,
 						} );
-					} catch ( e ) {
+					} catch {
 						setHours( defaultHours );
 					}
 				}
@@ -666,7 +692,7 @@ const LocalSeo = () => {
 								  )
 								: [ '', '', '', '', '' ]
 						);
-					} catch ( e ) {
+					} catch {
 						setSocialProfiles( [ '', '', '', '', '' ] );
 					}
 				}
@@ -697,7 +723,7 @@ const LocalSeo = () => {
 								id: page.id,
 								// Titles arrive HTML-escaped; read them back as plain text.
 								title:
-									new DOMParser().parseFromString(
+									new window.DOMParser().parseFromString(
 										page.title?.rendered || '',
 										'text/html'
 									).documentElement.textContent ||
@@ -858,10 +884,10 @@ const LocalSeo = () => {
 			const frame = window.wp.media( {
 				title:
 					field === 'logo'
-						? __( 'Select Logo', 'saman-seo' )
-						: __( 'Select Cover Image', 'saman-seo' ),
+						? __( 'Select logo', 'saman-seo' )
+						: __( 'Select cover image', 'saman-seo' ),
 				button: {
-					text: __( 'Use Image', 'saman-seo' ),
+					text: __( 'Use image', 'saman-seo' ),
 				},
 				multiple: false,
 			} );
@@ -881,16 +907,52 @@ const LocalSeo = () => {
 			<div className="page">
 				<div className="loading-state">
 					<span className="spinner is-active"></span>
-					<p>
-						{ __(
-							'Loading Local SEO settings\u2026',
-							'saman-seo'
-						) }
-					</p>
+					<p>{ __( 'Loading Local SEO settings…', 'saman-seo' ) }</p>
 				</div>
 			</div>
 		);
 	}
+	const renderInput = ( field, label, inputProps = {} ) => (
+		<Field id={ `local-${ field }` } label={ label }>
+			<input
+				id={ `local-${ field }` }
+				type="text"
+				value={ business[ field ] }
+				onChange={ ( e ) =>
+					handleBusinessChange( field, e.target.value )
+				}
+				{ ...inputProps }
+			/>
+		</Field>
+	);
+	const renderImagePicker = ( field, label, buttonLabel, alt ) => (
+		<Field id={ `local-${ field }` } label={ label }>
+			<div className="image-picker">
+				{ business[ field ] ? (
+					<div className="image-preview">
+						<img src={ business[ field ] } alt={ alt } />
+						<button
+							type="button"
+							className="image-remove"
+							aria-label={ __( 'Remove image', 'saman-seo' ) }
+							onClick={ () => handleBusinessChange( field, '' ) }
+						>
+							×
+						</button>
+					</div>
+				) : (
+					<button
+						type="button"
+						id={ `local-${ field }` }
+						className="button ghost"
+						onClick={ () => openMediaLibrary( field ) }
+					>
+						{ buttonLabel }
+					</button>
+				) }
+			</div>
+		</Field>
+	);
 	return (
 		<div className="page">
 			<div className="page-header">
@@ -903,615 +965,343 @@ const LocalSeo = () => {
 						) }
 					</p>
 				</div>
-				<button
-					className="button primary"
-					onClick={ saveSettings }
-					disabled={ saving }
-				>
-					{ saving
-						? __( 'Saving\u2026', 'saman-seo' )
-						: __( 'Save Changes', 'saman-seo' ) }
-				</button>
-			</div>
-
-			{ notice && (
-				<div className={ `notice notice-${ notice.type }` }>
-					<p>{ notice.message }</p>
+				<div className="header-actions">
 					<button
 						type="button"
-						className="notice-dismiss"
+						className="button primary"
+						onClick={ saveSettings }
+						disabled={ saving }
+					>
+						{ saving
+							? __( 'Saving…', 'saman-seo' )
+							: __( 'Save changes', 'saman-seo' ) }
+					</button>
+				</div>
+			</div>
+
+			<SubTabs
+				tabs={ localSeoTabs }
+				activeTab={ activeTab }
+				onChange={ setActiveTab }
+				ariaLabel={ __( 'Local SEO sections', 'saman-seo' ) }
+			/>
+
+			{ notice && (
+				<div
+					className={ `notice-message ${ notice.type }` }
+					role="status"
+				>
+					<span>{ notice.message }</span>
+					<button
+						type="button"
+						className="link-button"
 						onClick={ () => setNotice( null ) }
 					>
-						<span className="screen-reader-text">
-							{ __( 'Dismiss', 'saman-seo' ) }
-						</span>
+						{ __( 'Dismiss', 'saman-seo' ) }
 					</button>
 				</div>
 			) }
 
-			<div className="local-seo-layout">
-				{ /* Main Content */ }
-				<div className="local-seo-main">
-					{ /* Tabs */ }
-					<div className="tabs">
-						<button
-							className={ `tab ${
-								activeTab === 'business' ? 'active' : ''
-							}` }
-							onClick={ () => setActiveTab( 'business' ) }
-						>
-							{ __( 'Business Information', 'saman-seo' ) }
-						</button>
-						<button
-							className={ `tab ${
-								activeTab === 'hours' ? 'active' : ''
-							}` }
-							onClick={ () => setActiveTab( 'hours' ) }
-						>
-							{ __( 'Opening Hours', 'saman-seo' ) }
-						</button>
-						<button
-							className={ `tab ${
-								activeTab === 'reviews' ? 'active' : ''
-							}` }
-							onClick={ () => setActiveTab( 'reviews' ) }
-						>
-							{ __( 'Reviews', 'saman-seo' ) }
-						</button>
-					</div>
-
-					{ /* Business Information Tab */ }
+			<div className="page-body two-column">
+				<div className="main-column">
 					{ activeTab === 'business' && (
-						<div className="tab-content">
-							{ /* Business Identity */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>
-										{ __(
-											'Business Identity',
+						<>
+							<section className="panel">
+								<h3>
+									{ __( 'Business identity', 'saman-seo' ) }
+								</h3>
+								{ renderInput(
+									'name',
+									__( 'Business name', 'saman-seo' ),
+									{
+										placeholder: __(
+											'Your business name',
 											'saman-seo'
-										) }
-									</h2>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field">
-											<label>
-												{ __(
-													'Business Name',
-													'saman-seo'
-												) }
-											</label>
-											<input
-												type="text"
-												value={ business.name }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'name',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'Your Business Name',
-													'saman-seo'
-												) }
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __(
-													'Business Type',
-													'saman-seo'
-												) }
-											</label>
-											<select
-												value={ business.type }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'type',
-														e.target.value
-													)
-												}
+										),
+									}
+								) }
+								<Field
+									id="local-type"
+									label={ __( 'Business type', 'saman-seo' ) }
+								>
+									<select
+										id="local-type"
+										value={ business.type }
+										onChange={ ( e ) =>
+											handleBusinessChange(
+												'type',
+												e.target.value
+											)
+										}
+									>
+										{ businessTypes.map( ( type ) => (
+											<option
+												key={ type.value }
+												value={ type.value }
 											>
-												{ businessTypes.map(
-													( type ) => (
-														<option
-															key={ type.value }
-															value={ type.value }
-														>
-															{ type.label }
-														</option>
-													)
-												) }
-											</select>
-										</div>
-										<div className="form-field full-width">
-											<label>
-												{ __(
-													'Description',
-													'saman-seo'
-												) }
-											</label>
-											<textarea
-												value={ business.description }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'description',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'Brief description of your business',
-													'saman-seo'
-												) }
-												rows={ 3 }
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __( 'Logo', 'saman-seo' ) }
-											</label>
-											<div className="image-picker">
-												{ business.logo ? (
-													<div className="image-preview">
-														<img
-															src={
-																business.logo
-															}
-															alt={ __(
-																'Logo',
-																'saman-seo'
-															) }
-														/>
-														<button
-															className="image-remove"
-															onClick={ () =>
-																handleBusinessChange(
-																	'logo',
-																	''
-																)
-															}
-														>
-															×
-														</button>
-													</div>
-												) : (
-													<button
-														className="button ghost"
-														onClick={ () =>
-															openMediaLibrary(
-																'logo'
-															)
-														}
-													>
-														{ __(
-															'Select Logo',
-															'saman-seo'
-														) }
-													</button>
-												) }
-											</div>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __(
-													'Cover Image',
-													'saman-seo'
-												) }
-											</label>
-											<div className="image-picker">
-												{ business.image ? (
-													<div className="image-preview">
-														<img
-															src={
-																business.image
-															}
-															alt={ __(
-																'Cover',
-																'saman-seo'
-															) }
-														/>
-														<button
-															className="image-remove"
-															onClick={ () =>
-																handleBusinessChange(
-																	'image',
-																	''
-																)
-															}
-														>
-															×
-														</button>
-													</div>
-												) : (
-													<button
-														className="button ghost"
-														onClick={ () =>
-															openMediaLibrary(
-																'image'
-															)
-														}
-													>
-														{ __(
-															'Select Image',
-															'saman-seo'
-														) }
-													</button>
-												) }
-											</div>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __(
-													'Price Range',
-													'saman-seo'
-												) }
-											</label>
-											<select
-												value={ business.priceRange }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'priceRange',
-														e.target.value
-													)
-												}
-											>
-												<option value="">
-													{ __(
-														'Select\u2026',
-														'saman-seo'
-													) }
-												</option>
-												<option value="$">
-													{ __(
-														'$ (Budget)',
-														'saman-seo'
-													) }
-												</option>
-												<option value="$$">
-													{ __(
-														'$$ (Moderate)',
-														'saman-seo'
-													) }
-												</option>
-												<option value="$$$">
-													{ __(
-														'$$$ (Expensive)',
-														'saman-seo'
-													) }
-												</option>
-												<option value="$$$$">
-													{ __(
-														'$$$$ (Luxury)',
-														'saman-seo'
-													) }
-												</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{ /* Contact Information */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>
-										{ __(
-											'Contact Information',
+												{ type.label }
+											</option>
+										) ) }
+									</select>
+								</Field>
+								<Field
+									id="local-description"
+									label={ __( 'Description', 'saman-seo' ) }
+								>
+									<textarea
+										id="local-description"
+										value={ business.description }
+										onChange={ ( e ) =>
+											handleBusinessChange(
+												'description',
+												e.target.value
+											)
+										}
+										placeholder={ __(
+											'Brief description of your business',
 											'saman-seo'
 										) }
-									</h2>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field">
-											<label>
-												{ __( 'Phone', 'saman-seo' ) }
-											</label>
-											<input
-												type="tel"
-												value={ business.phone }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'phone',
-														e.target.value
-													)
-												}
-												placeholder="+1 (555) 123-4567"
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __( 'Email', 'saman-seo' ) }
-											</label>
-											<input
-												type="email"
-												value={ business.email }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'email',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'contact@yourbusiness.com',
-													'saman-seo'
-												) }
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{ /* Address */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>{ __( 'Address', 'saman-seo' ) }</h2>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field full-width">
-											<label>
-												{ __(
-													'Street Address',
-													'saman-seo'
-												) }
-											</label>
-											<input
-												type="text"
-												value={ business.street }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'street',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'123 Main Street',
-													'saman-seo'
-												) }
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __( 'City', 'saman-seo' ) }
-											</label>
-											<input
-												type="text"
-												value={ business.city }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'city',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'New York',
-													'saman-seo'
-												) }
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __(
-													'State/Province',
-													'saman-seo'
-												) }
-											</label>
-											<input
-												type="text"
-												value={ business.state }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'state',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'NY',
-													'saman-seo'
-												) }
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __(
-													'ZIP/Postal Code',
-													'saman-seo'
-												) }
-											</label>
-											<input
-												type="text"
-												value={ business.zip }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'zip',
-														e.target.value
-													)
-												}
-												placeholder="10001"
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __( 'Country', 'saman-seo' ) }
-											</label>
-											<input
-												type="text"
-												value={ business.country }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'country',
-														e.target.value
-													)
-												}
-												placeholder={ __(
-													'US',
-													'saman-seo'
-												) }
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{ /* Geo Coordinates */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>
-										{ __( 'Geo Coordinates', 'saman-seo' ) }
-									</h2>
-									<p>
-										{ __(
-											'Optional but recommended for precise location in search results.',
-											'saman-seo'
-										) }
-									</p>
-								</div>
-								<div className="card-body">
-									<div className="form-grid">
-										<div className="form-field">
-											<label>
-												{ __(
-													'Latitude',
-													'saman-seo'
-												) }
-											</label>
-											<input
-												type="text"
-												value={ business.latitude }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'latitude',
-														e.target.value
-													)
-												}
-												placeholder="40.7128"
-											/>
-										</div>
-										<div className="form-field">
-											<label>
-												{ __(
-													'Longitude',
-													'saman-seo'
-												) }
-											</label>
-											<input
-												type="text"
-												value={ business.longitude }
-												onChange={ ( e ) =>
-													handleBusinessChange(
-														'longitude',
-														e.target.value
-													)
-												}
-												placeholder="-74.0060"
-											/>
-										</div>
-									</div>
-									<p className="form-help">
-										<a
-											href={ `https://www.google.com/maps/search/${ encodeURIComponent(
-												[
-													business.street,
-													business.city,
-													business.state,
-													business.zip,
-												]
-													.filter( Boolean )
-													.join( ', ' )
-											) }` }
-											target="_blank"
-											rel="noopener noreferrer"
-										>
+										rows={ 3 }
+									/>
+								</Field>
+								{ renderImagePicker(
+									'logo',
+									__( 'Logo', 'saman-seo' ),
+									__( 'Select logo', 'saman-seo' ),
+									__( 'Logo', 'saman-seo' )
+								) }
+								{ renderImagePicker(
+									'image',
+									__( 'Cover image', 'saman-seo' ),
+									__( 'Select image', 'saman-seo' ),
+									__( 'Cover', 'saman-seo' )
+								) }
+								<Field
+									id="local-price-range"
+									label={ __( 'Price range', 'saman-seo' ) }
+								>
+									<select
+										id="local-price-range"
+										value={ business.priceRange }
+										onChange={ ( e ) =>
+											handleBusinessChange(
+												'priceRange',
+												e.target.value
+											)
+										}
+									>
+										<option value="">
+											{ __( 'Select…', 'saman-seo' ) }
+										</option>
+										<option value="$">
+											{ __( '$ (Budget)', 'saman-seo' ) }
+										</option>
+										<option value="$$">
 											{ __(
-												'Find coordinates on Google Maps \u2192',
+												'$$ (Moderate)',
 												'saman-seo'
 											) }
-										</a>
-									</p>
-								</div>
-							</div>
+										</option>
+										<option value="$$$">
+											{ __(
+												'$$$ (Expensive)',
+												'saman-seo'
+											) }
+										</option>
+										<option value="$$$$">
+											{ __(
+												'$$$$ (Luxury)',
+												'saman-seo'
+											) }
+										</option>
+									</select>
+								</Field>
+							</section>
 
-							{ /* Social Profiles */ }
-							<div className="card">
-								<div className="card-header">
-									<h2>
-										{ __( 'Social Profiles', 'saman-seo' ) }
-									</h2>
-									<p>
+							<section className="panel">
+								<h3>
+									{ __( 'Contact information', 'saman-seo' ) }
+								</h3>
+								{ renderInput(
+									'phone',
+									__( 'Phone', 'saman-seo' ),
+									{
+										type: 'tel',
+										placeholder: '+1 (555) 123-4567',
+									}
+								) }
+								{ renderInput(
+									'email',
+									__( 'Email', 'saman-seo' ),
+									{
+										type: 'email',
+										placeholder: __(
+											'contact@yourbusiness.com',
+											'saman-seo'
+										),
+									}
+								) }
+							</section>
+
+							<section className="panel">
+								<h3>{ __( 'Address', 'saman-seo' ) }</h3>
+								{ renderInput(
+									'street',
+									__( 'Street address', 'saman-seo' ),
+									{
+										placeholder: __(
+											'123 Main Street',
+											'saman-seo'
+										),
+									}
+								) }
+								{ renderInput(
+									'city',
+									__( 'City', 'saman-seo' ),
+									{
+										placeholder: __(
+											'New York',
+											'saman-seo'
+										),
+									}
+								) }
+								{ renderInput(
+									'state',
+									__( 'State/Province', 'saman-seo' ),
+									{
+										placeholder: __( 'NY', 'saman-seo' ),
+									}
+								) }
+								{ renderInput(
+									'zip',
+									__( 'ZIP/Postal code', 'saman-seo' ),
+									{
+										placeholder: '10001',
+									}
+								) }
+								{ renderInput(
+									'country',
+									__( 'Country', 'saman-seo' ),
+									{
+										placeholder: __( 'US', 'saman-seo' ),
+									}
+								) }
+							</section>
+
+							<section className="panel">
+								<h3>
+									{ __( 'Geo coordinates', 'saman-seo' ) }
+								</h3>
+								<p className="panel-desc">
+									{ __(
+										'Optional but recommended for precise location in search results.',
+										'saman-seo'
+									) }{ ' ' }
+									<a
+										href={ `https://www.google.com/maps/search/${ encodeURIComponent(
+											[
+												business.street,
+												business.city,
+												business.state,
+												business.zip,
+											]
+												.filter( Boolean )
+												.join( ', ' )
+										) }` }
+										target="_blank"
+										rel="noopener noreferrer"
+									>
 										{ __(
-											'Add your social media profile URLs for rich search results.',
+											'Find coordinates on Google Maps →',
 											'saman-seo'
 										) }
-									</p>
-								</div>
-								<div className="card-body">
-									<div className="social-profiles">
-										{ socialProfiles.map(
-											( url, index ) => (
-												<div
-													key={ index }
-													className="form-field"
-												>
-													<input
-														type="url"
-														value={ url }
-														onChange={ ( e ) =>
-															handleSocialChange(
-																index,
-																e.target.value
-															)
-														}
-														placeholder={ sprintf(
-															/* translators: %s: placeholder */ __(
-																'Social profile URL %s',
-																'saman-seo'
-															),
-															index + 1
-														) }
-													/>
-												</div>
-											)
+									</a>
+								</p>
+								{ renderInput(
+									'latitude',
+									__( 'Latitude', 'saman-seo' ),
+									{
+										placeholder: '40.7128',
+									}
+								) }
+								{ renderInput(
+									'longitude',
+									__( 'Longitude', 'saman-seo' ),
+									{
+										placeholder: '-74.0060',
+									}
+								) }
+							</section>
+
+							<section className="panel">
+								<h3>
+									{ __( 'Social profiles', 'saman-seo' ) }
+								</h3>
+								<p className="panel-desc">
+									{ __(
+										'Add your social media profile URLs for rich search results.',
+										'saman-seo'
+									) }
+								</p>
+								{ socialProfiles.map( ( url, index ) => (
+									<Field
+										key={ index }
+										id={ `local-social-${ index }` }
+										label={ sprintf(
+											/* translators: %s: placeholder */ __(
+												'Social profile URL %s',
+												'saman-seo'
+											),
+											index + 1
 										) }
-									</div>
-								</div>
-							</div>
-						</div>
+									>
+										<input
+											id={ `local-social-${ index }` }
+											type="url"
+											value={ url }
+											onChange={ ( e ) =>
+												handleSocialChange(
+													index,
+													e.target.value
+												)
+											}
+											placeholder="https://"
+										/>
+									</Field>
+								) ) }
+							</section>
+						</>
 					) }
 
-					{ /* Opening Hours Tab */ }
 					{ activeTab === 'hours' && (
-						<div className="tab-content">
-							<div className="card">
-								<div className="card-header">
-									<h2>
-										{ __( 'Opening Hours', 'saman-seo' ) }
-									</h2>
-									<p>
-										{ __(
-											'Set your business hours. These appear in search results and Google Knowledge Panel.',
-											'saman-seo'
-										) }
-									</p>
+						<section className="panel">
+							<h3>{ __( 'Opening hours', 'saman-seo' ) }</h3>
+							<p className="panel-desc">
+								{ __(
+									'Set your business hours. These appear in search results and Google Knowledge Panel.',
+									'saman-seo'
+								) }
+							</p>
+							<div className="settings-row hours-day-row">
+								<div className="settings-label">
+									<span className="settings-label__text">
+										{ __( 'Quick presets', 'saman-seo' ) }
+									</span>
 								</div>
-								<div className="card-body">
-									{ /* Presets */ }
-									<div className="hours-presets">
-										<span className="presets-label">
-											{ __(
-												'Quick presets:',
-												'saman-seo'
-											) }
-										</span>
+								<div className="settings-control">
+									<div className="hours-control">
 										{ hourPresets.map( ( preset ) => (
 											<button
 												key={ preset.id }
+												type="button"
 												className={ `button ${
 													activePreset === preset.id
 														? 'primary'
 														: 'ghost'
 												} small` }
+												aria-pressed={
+													activePreset === preset.id
+												}
 												onClick={ () =>
 													applyPreset( preset )
 												}
@@ -1520,301 +1310,431 @@ const LocalSeo = () => {
 											</button>
 										) ) }
 									</div>
-
-									{ /* Hours Grid */ }
-									<div className="hours-grid">
-										{ days.map( ( day ) => (
-											<div
-												key={ day.key }
-												className={ `hours-row ${
-													hours[ day.key ]?.enabled
-														? 'is-open'
-														: 'is-closed'
-												}` }
-											>
-												<label className="hours-toggle">
+								</div>
+							</div>
+							{ days.map( ( day ) => (
+								<div
+									key={ day.key }
+									className="settings-row hours-day-row"
+								>
+									<div className="settings-label">
+										<label htmlFor={ `hours-${ day.key }` }>
+											{ day.label }
+										</label>
+									</div>
+									<div className="settings-control">
+										<div className="hours-control">
+											<label className="toggle">
+												<input
+													id={ `hours-${ day.key }` }
+													type="checkbox"
+													checked={
+														hours[ day.key ]
+															?.enabled || false
+													}
+													onChange={ ( e ) =>
+														handleHoursChange(
+															day.key,
+															'enabled',
+															e.target.checked
+														)
+													}
+												/>
+												<span className="toggle-track"></span>
+											</label>
+											{ hours[ day.key ]?.enabled ? (
+												<>
 													<input
-														type="checkbox"
-														checked={
+														type="time"
+														aria-label={ sprintf(
+															/* translators: %s: day of the week */ __(
+																'%s opening time',
+																'saman-seo'
+															),
+															day.label
+														) }
+														value={
 															hours[ day.key ]
-																?.enabled ||
-															false
+																?.open ||
+															'09:00'
 														}
 														onChange={ ( e ) =>
 															handleHoursChange(
 																day.key,
-																'enabled',
-																e.target.checked
+																'open',
+																e.target.value
 															)
 														}
+														className="hours-time"
 													/>
-													<span className="toggle-track"></span>
-												</label>
-												<span className="hours-day">
-													{ day.label }
-												</span>
-												{ hours[ day.key ]?.enabled ? (
-													<>
-														<input
-															type="time"
-															value={
-																hours[ day.key ]
-																	?.open ||
-																'09:00'
-															}
-															onChange={ ( e ) =>
-																handleHoursChange(
-																	day.key,
-																	'open',
-																	e.target
-																		.value
-																)
-															}
-															className="hours-time"
-														/>
-														<span className="hours-separator">
-															{ __(
-																'to',
-																'saman-seo'
-															) }
-														</span>
-														<input
-															type="time"
-															value={
-																hours[ day.key ]
-																	?.close ||
-																'17:00'
-															}
-															onChange={ ( e ) =>
-																handleHoursChange(
-																	day.key,
-																	'close',
-																	e.target
-																		.value
-																)
-															}
-															className="hours-time"
-														/>
-														{ [
-															'monday',
-															'tuesday',
-															'wednesday',
-															'thursday',
-															'friday',
-														].includes(
-															day.key
-														) && (
-															<button
-																className="button ghost small"
-																onClick={ () =>
-																	copyToWeekdays(
-																		day.key
-																	)
-																}
-																title={ __(
-																	'Copy to all weekdays',
-																	'saman-seo'
-																) }
-															>
-																{ __(
-																	'Copy to weekdays',
-																	'saman-seo'
-																) }
-															</button>
-														) }
-													</>
-												) : (
-													<span className="hours-closed">
+													<span className="hours-separator">
 														{ __(
-															'Closed',
+															'to',
 															'saman-seo'
 														) }
 													</span>
-												) }
-											</div>
-										) ) }
-									</div>
-								</div>
-							</div>
-						</div>
-					) }
-					{ /* Reviews Tab */ }
-					{ activeTab === 'reviews' && (
-						<div className="tab-content">
-							<div className="card">
-								<div className="card-header">
-									<h2>{ __( 'Review Schema', 'saman-seo' ) }</h2>
-									<p>
-										{ __(
-											'Adds AggregateRating and Review structured data about your business, using the values you enter here. Nothing is fetched from Google or any review service.',
-											'saman-seo'
-										) }
-									</p>
-								</div>
-								<div className="card-body">
-									<div className="notice notice-warning reviews-notice">
-										<p>
-											<strong>
-												{ __( 'This markup does not earn Google review stars.', 'saman-seo' ) }
-											</strong>{ ' ' }
-											{ __(
-												'Google does not show star ratings for LocalBusiness or Organization pages when the business controls the reviews about itself. This is valid schema.org data that other consumers may read, but do not expect rich results in Google Search.',
-												'saman-seo'
-											) }
-										</p>
-										<p>
-											{ __(
-												'Only enter reviews that are real, from genuine customers, and shown to visitors on the pages you pick below. Markup for content people cannot see breaks Google’s structured data guidelines.',
-												'saman-seo'
-											) }
-										</p>
-									</div>
-
-									<div className="form-field reviews-check">
-										<label>
-											<input
-												type="checkbox"
-												checked={ reviews.enabled }
-												onChange={ ( e ) =>
-													handleReviewsChange( 'enabled', e.target.checked )
-												}
-											/>{ ' ' }
-											{ __( 'Output review schema', 'saman-seo' ) }
-										</label>
-									</div>
-
-									<div className="form-field">
-										<label>{ __( 'Output on', 'saman-seo' ) }</label>
-										<select
-											value={ reviews.scope }
-											onChange={ ( e ) =>
-												handleReviewsChange( 'scope', e.target.value )
-											}
-										>
-											<option value="front_page">
-												{ __( 'Front page only', 'saman-seo' ) }
-											</option>
-											<option value="pages">
-												{ __( 'Selected pages only', 'saman-seo' ) }
-											</option>
-										</select>
-									</div>
-
-									{ reviews.scope === 'pages' && (
-										<div className="form-field reviews-pages">
-											{ pages.length === 0 && (
-												<span className="field-hint">
-													{ __( 'No published pages found.', 'saman-seo' ) }
+													<input
+														type="time"
+														aria-label={ sprintf(
+															/* translators: %s: day of the week */ __(
+																'%s closing time',
+																'saman-seo'
+															),
+															day.label
+														) }
+														value={
+															hours[ day.key ]
+																?.close ||
+															'17:00'
+														}
+														onChange={ ( e ) =>
+															handleHoursChange(
+																day.key,
+																'close',
+																e.target.value
+															)
+														}
+														className="hours-time"
+													/>
+													{ WEEKDAYS.includes(
+														day.key
+													) && (
+														<button
+															type="button"
+															className="link-button"
+															onClick={ () =>
+																copyToWeekdays(
+																	day.key
+																)
+															}
+															title={ __(
+																'Copy to all weekdays',
+																'saman-seo'
+															) }
+														>
+															{ __(
+																'Copy to weekdays',
+																'saman-seo'
+															) }
+														</button>
+													) }
+												</>
+											) : (
+												<span className="hours-closed">
+													{ __(
+														'Closed',
+														'saman-seo'
+													) }
 												</span>
 											) }
-											{ pages.map( ( page ) => (
-												<label key={ page.id }>
-													<input
-														type="checkbox"
-														checked={ reviews.pageIds.includes( page.id ) }
-														onChange={ () => togglePage( page.id ) }
-													/>{ ' ' }
-													<span>{ page.title }</span>
-												</label>
-											) ) }
-										</div>
-									) }
-
-									<h3 className="reviews-heading">
-										{ __( 'Overall rating', 'saman-seo' ) }
-									</h3>
-									<div className="form-grid">
-										<div className="form-field">
-											<label>{ __( 'Rating value (1–5)', 'saman-seo' ) }</label>
-											<input
-												type="number"
-												min="1"
-												max="5"
-												step="0.1"
-												value={ reviews.ratingValue }
-												onChange={ ( e ) =>
-													handleReviewsChange( 'ratingValue', e.target.value )
-												}
-											/>
-										</div>
-										<div className="form-field">
-											<label>{ __( 'Total number of reviews', 'saman-seo' ) }</label>
-											<input
-												type="number"
-												min="0"
-												step="1"
-												value={ reviews.count }
-												onChange={ ( e ) =>
-													handleReviewsChange( 'count', e.target.value )
-												}
-											/>
 										</div>
 									</div>
-									<p className="field-hint">
+								</div>
+							) ) }
+						</section>
+					) }
+					{ activeTab === 'reviews' && (
+						<>
+							<div className="alert-banner alert-banner--warning">
+								<div>
+									<p>
+										<strong>
+											{ __(
+												'This markup does not earn Google review stars.',
+												'saman-seo'
+											) }
+										</strong>{ ' ' }
 										{ __(
-											'Leave both blank to calculate them from the complete reviews below. A review count lower than the reviews listed is raised to match.',
+											'Google does not show star ratings for LocalBusiness or Organization pages when the business controls the reviews about itself. This is valid schema.org data that other consumers may read, but do not expect rich results in Google Search.',
 											'saman-seo'
 										) }
 									</p>
+									<p>
+										{ __(
+											'Only enter reviews that are real, from genuine customers, and shown to visitors on the pages you pick below. Markup for content people cannot see breaks Google’s structured data guidelines.',
+											'saman-seo'
+										) }
+									</p>
+								</div>
+							</div>
 
-									<h3 className="reviews-heading">{ __( 'Reviews', 'saman-seo' ) }</h3>
-									{ reviews.items.map( ( item, index ) => (
-										<div className="review-row" key={ index }>
-											<div className="form-grid">
-												<div className="form-field">
-													<label>{ __( 'Reviewer name', 'saman-seo' ) }</label>
-													<input
-														type="text"
-														maxLength={ 99 }
-														value={ item.author }
-														onChange={ ( e ) =>
-															handleReviewItemChange( index, 'author', e.target.value )
-														}
-													/>
+							<section className="panel">
+								<h3>{ __( 'Review schema', 'saman-seo' ) }</h3>
+								<p className="panel-desc">
+									{ __(
+										'Adds AggregateRating and Review structured data about your business, using the values you enter here. Nothing is fetched from Google or any review service.',
+										'saman-seo'
+									) }
+								</p>
+								<Field
+									id="reviews-enabled"
+									label={ __(
+										'Output review schema',
+										'saman-seo'
+									) }
+								>
+									<label className="toggle">
+										<input
+											id="reviews-enabled"
+											type="checkbox"
+											checked={ reviews.enabled }
+											onChange={ ( e ) =>
+												handleReviewsChange(
+													'enabled',
+													e.target.checked
+												)
+											}
+										/>
+										<span className="toggle-track"></span>
+									</label>
+								</Field>
+								<Field
+									id="reviews-scope"
+									label={ __( 'Output on', 'saman-seo' ) }
+								>
+									<select
+										id="reviews-scope"
+										value={ reviews.scope }
+										onChange={ ( e ) =>
+											handleReviewsChange(
+												'scope',
+												e.target.value
+											)
+										}
+									>
+										<option value="front_page">
+											{ __(
+												'Front page only',
+												'saman-seo'
+											) }
+										</option>
+										<option value="pages">
+											{ __(
+												'Selected pages only',
+												'saman-seo'
+											) }
+										</option>
+									</select>
+								</Field>
+								{ reviews.scope === 'pages' && (
+									<div className="settings-row">
+										<div className="settings-label">
+											<span className="settings-label__text">
+												{ __( 'Pages', 'saman-seo' ) }
+											</span>
+										</div>
+										<div className="settings-control">
+											{ pages.length === 0 ? (
+												<p className="settings-help">
+													{ __(
+														'No published pages found.',
+														'saman-seo'
+													) }
+												</p>
+											) : (
+												<div className="checkbox-grid reviews-pages">
+													{ pages.map( ( page ) => (
+														<label
+															key={ page.id }
+															className="checkbox-item"
+														>
+															<input
+																type="checkbox"
+																checked={ reviews.pageIds.includes(
+																	page.id
+																) }
+																onChange={ () =>
+																	togglePage(
+																		page.id
+																	)
+																}
+															/>
+															<span>
+																{ page.title }
+															</span>
+														</label>
+													) ) }
 												</div>
-												<div className="form-field narrow">
-													<label>{ __( 'Rating (1–5)', 'saman-seo' ) }</label>
-													<input
-														type="number"
-														min="1"
-														max="5"
-														step="0.5"
-														value={ item.rating }
-														onChange={ ( e ) =>
-															handleReviewItemChange( index, 'rating', e.target.value )
-														}
-													/>
-												</div>
-												<div className="form-field narrow">
-													<label>{ __( 'Date (optional)', 'saman-seo' ) }</label>
-													<input
-														type="date"
-														value={ item.date }
-														onChange={ ( e ) =>
-															handleReviewItemChange( index, 'date', e.target.value )
-														}
-													/>
-												</div>
-											</div>
+											) }
+										</div>
+									</div>
+								) }
+							</section>
+
+							<section className="panel">
+								<h3>{ __( 'Overall rating', 'saman-seo' ) }</h3>
+								<p className="panel-desc">
+									{ __(
+										'Leave both blank to calculate them from the complete reviews below. A review count lower than the reviews listed is raised to match.',
+										'saman-seo'
+									) }
+								</p>
+								<Field
+									id="reviews-rating"
+									label={ __(
+										'Rating value (1–5)',
+										'saman-seo'
+									) }
+								>
+									<input
+										id="reviews-rating"
+										className="input-narrow"
+										type="number"
+										min="1"
+										max="5"
+										step="0.1"
+										value={ reviews.ratingValue }
+										onChange={ ( e ) =>
+											handleReviewsChange(
+												'ratingValue',
+												e.target.value
+											)
+										}
+									/>
+								</Field>
+								<Field
+									id="reviews-count"
+									label={ __(
+										'Total number of reviews',
+										'saman-seo'
+									) }
+								>
+									<input
+										id="reviews-count"
+										className="input-narrow"
+										type="number"
+										min="0"
+										step="1"
+										value={ reviews.count }
+										onChange={ ( e ) =>
+											handleReviewsChange(
+												'count',
+												e.target.value
+											)
+										}
+									/>
+								</Field>
+							</section>
+
+							<section className="panel">
+								<h3>{ __( 'Reviews', 'saman-seo' ) }</h3>
+								<p className="panel-desc">
+									{ __(
+										'A review is only output when it has a name, text and a rating. Incomplete rows are saved but skipped.',
+										'saman-seo'
+									) }
+								</p>
+								{ reviews.items.map( ( item, index ) => (
+									<div className="review-item" key={ index }>
+										<div className="review-item__fields">
 											<div className="form-field">
-												<label>{ __( 'Review text', 'saman-seo' ) }</label>
-												<textarea
-													rows="3"
-													value={ item.text }
+												<label
+													htmlFor={ `review-author-${ index }` }
+												>
+													{ __(
+														'Reviewer name',
+														'saman-seo'
+													) }
+												</label>
+												<input
+													id={ `review-author-${ index }` }
+													type="text"
+													maxLength={ 99 }
+													value={ item.author }
 													onChange={ ( e ) =>
-														handleReviewItemChange( index, 'text', e.target.value )
+														handleReviewItemChange(
+															index,
+															'author',
+															e.target.value
+														)
 													}
 												/>
 											</div>
-											<button
-												type="button"
-												className="button ghost small"
-												onClick={ () => removeReviewItem( index ) }
-											>
-												{ __( 'Remove review', 'saman-seo' ) }
-											</button>
+											<div className="form-field">
+												<label
+													htmlFor={ `review-rating-${ index }` }
+												>
+													{ __(
+														'Rating (1–5)',
+														'saman-seo'
+													) }
+												</label>
+												<input
+													id={ `review-rating-${ index }` }
+													type="number"
+													min="1"
+													max="5"
+													step="0.5"
+													value={ item.rating }
+													onChange={ ( e ) =>
+														handleReviewItemChange(
+															index,
+															'rating',
+															e.target.value
+														)
+													}
+												/>
+											</div>
+											<div className="form-field">
+												<label
+													htmlFor={ `review-date-${ index }` }
+												>
+													{ __(
+														'Date (optional)',
+														'saman-seo'
+													) }
+												</label>
+												<input
+													id={ `review-date-${ index }` }
+													type="date"
+													value={ item.date }
+													onChange={ ( e ) =>
+														handleReviewItemChange(
+															index,
+															'date',
+															e.target.value
+														)
+													}
+												/>
+											</div>
 										</div>
-									) ) }
+										<div className="form-field">
+											<label
+												htmlFor={ `review-text-${ index }` }
+											>
+												{ __(
+													'Review text',
+													'saman-seo'
+												) }
+											</label>
+											<textarea
+												id={ `review-text-${ index }` }
+												rows="3"
+												value={ item.text }
+												onChange={ ( e ) =>
+													handleReviewItemChange(
+														index,
+														'text',
+														e.target.value
+													)
+												}
+											/>
+										</div>
+										<button
+											type="button"
+											className="link-button danger"
+											onClick={ () =>
+												removeReviewItem( index )
+											}
+										>
+											{ __(
+												'Remove review',
+												'saman-seo'
+											) }
+										</button>
+									</div>
+								) ) }
+								<div className="review-item__add">
 									<button
 										type="button"
 										className="button ghost"
@@ -1822,26 +1742,19 @@ const LocalSeo = () => {
 									>
 										{ __( 'Add review', 'saman-seo' ) }
 									</button>
-									<p className="field-hint">
-										{ __(
-											'A review is only output when it has a name, text and a rating. Incomplete rows are saved but skipped.',
-											'saman-seo'
-										) }
-									</p>
 								</div>
-							</div>
-						</div>
+							</section>
+						</>
 					) }
 				</div>
 
-				{ /* Sidebar */ }
-				<div className="local-seo-sidebar">
+				<aside className="side-panel local-seo-preview">
 					<KnowledgePanelPreview
 						business={ business }
 						hours={ hours }
 						socialProfiles={ socialProfiles }
 					/>
-				</div>
+				</aside>
 			</div>
 		</div>
 	);

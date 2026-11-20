@@ -1,0 +1,317 @@
+// ==========================================================================
+// Sidebar - App Shell and Primary Navigation
+// ==========================================================================
+//
+// The plugin has its own sidebar, flush against the WordPress admin menu, that
+// lists every page. Three shapes:
+//   - full (default)
+//   - icon rail: user-collapsed, or automatic below @breakpoint-xl
+//   - horizontal strip: below @breakpoint-md, where WordPress hides its menu
+
+@sidebar-rail-width: 56px;
+@adminbar-height: 32px;
+
+.saman-seo-shell {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    min-height: inherit;
+}
+
+.saman-seo-main {
+    min-width: 0;
+    padding: @spacing-2xl @spacing-3xl @spacing-4xl;
+
+    > .content-area {
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+}
+
+// Brand mark (also used by the setup wizard).
+.brand-icon {
+    .flex-center();
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: @color-primary;
+
+    svg {
+        width: 18px;
+        height: 18px;
+        fill: #fff;
+        display: block;
+    }
+}
+
+.side-nav {
+    position: sticky;
+    top: @adminbar-height;
+    display: flex;
+    flex-direction: column;
+    width: @sidebar-width;
+    height: calc(100vh - @adminbar-height);
+    background: @color-surface;
+    border-right: 1px solid @color-border;
+    transition: width @transition-normal;
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    li {
+        margin: 0;
+    }
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        height: 60px;
+        padding: 0 @spacing-lg;
+    }
+
+    &__brand-name {
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+        letter-spacing: -0.01em;
+        color: @color-text;
+        white-space: nowrap;
+    }
+
+    &__scroll {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: @spacing-xs @spacing-sm @spacing-2xl;
+        // Fade the last rows out so a cut-off item reads as "scroll for more".
+        -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+        mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+        scrollbar-width: thin;
+        scrollbar-color: @color-border transparent;
+    }
+
+    &__group + &__group {
+        margin-top: @spacing-lg;
+    }
+
+    &__heading {
+        margin: 0 0 @spacing-xs;
+        padding: 0 @spacing-sm;
+        font-size: @font-size-sm;
+        font-weight: @font-weight-medium;
+        line-height: 20px;
+        letter-spacing: 0;
+        color: @color-muted;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__item,
+    &__collapse {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: 32px;
+        padding: 0 @spacing-sm;
+        border: 0;
+        border-radius: @radius-md;
+        background: transparent;
+        font-family: inherit;
+        font-size: @font-size-base;
+        font-weight: @font-weight-normal;
+        color: @color-text-secondary;
+        text-align: left;
+        cursor: pointer;
+        transition: background @transition-fast, color @transition-fast;
+
+        &:hover {
+            background: @color-surface-hover;
+            color: @color-text;
+        }
+
+        &:focus-visible {
+            outline-offset: -2px;
+        }
+    }
+
+    &__item.is-active {
+        background: @color-primary-light;
+        color: @color-primary;
+        font-weight: @font-weight-medium;
+    }
+
+    &__icon {
+        .flex-center();
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+    }
+
+    &__label {
+        min-width: 0;
+        .text-truncate();
+    }
+
+    &__footer {
+        flex-shrink: 0;
+        padding: @spacing-sm;
+        border-top: 1px solid @color-border-light;
+    }
+
+    &__collapse {
+        margin-top: @spacing-xs;
+        color: @color-muted;
+
+        svg {
+            transition: transform @transition-normal;
+        }
+    }
+}
+
+// Icon rail ------------------------------------------------------------------
+
+.side-nav-rail() {
+    width: @sidebar-rail-width;
+
+    .side-nav__brand {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .side-nav__brand-name,
+    .side-nav__label,
+    .side-nav__heading {
+        display: none;
+    }
+
+    .side-nav__group + .side-nav__group {
+        margin-top: @spacing-sm;
+        padding-top: @spacing-sm;
+        border-top: 1px solid @color-border-light;
+    }
+
+    .side-nav__item,
+    .side-nav__collapse {
+        justify-content: center;
+        padding: 0;
+    }
+}
+
+.side-nav.is-collapsed {
+    .side-nav-rail();
+
+    .side-nav__collapse svg {
+        transform: scaleX(-1);
+    }
+}
+
+@media (max-width: @breakpoint-xl) {
+    .side-nav {
+        .side-nav-rail();
+    }
+
+    // The rail is automatic at this width, so the toggle would do nothing.
+    .side-nav__collapse {
+        display: none;
+    }
+
+    .saman-seo-main {
+        padding: @spacing-xl @spacing-xl @spacing-4xl;
+    }
+}
+
+// Horizontal strip (WordPress mobile layout) ---------------------------------
+
+@media (max-width: @breakpoint-md) {
+    .saman-seo-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    // Selectors are doubled up to outrank the icon-rail rules above, which
+    // also apply at this width.
+    .side-nav {
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        gap: @spacing-xs;
+        width: auto;
+        height: 52px;
+        padding: 0 @spacing-md;
+        border-right: 0;
+        border-bottom: 1px solid @color-border;
+        overflow-x: auto;
+        scrollbar-width: none;
+
+        .side-nav__brand {
+            height: auto;
+            padding: 0 @spacing-xs 0 0;
+        }
+
+        .side-nav__scroll {
+            display: flex;
+            flex: none;
+            gap: @spacing-xs;
+            overflow: visible;
+            padding: 0;
+        }
+
+        .side-nav__group,
+        .side-nav__group ul,
+        .side-nav__footer ul {
+            display: flex;
+            flex: none;
+            gap: @spacing-xs;
+        }
+
+        .side-nav__group + .side-nav__group {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        .side-nav__footer {
+            flex: none;
+            padding: 0;
+            border: 0;
+        }
+
+        .side-nav__item {
+            width: auto;
+            padding: 0 10px;
+            white-space: nowrap;
+        }
+
+        .side-nav__label {
+            display: block;
+            overflow: visible;
+        }
+
+        .side-nav__icon {
+            display: none;
+        }
+    }
+
+    .saman-seo-main {
+        padding: @spacing-lg @spacing-md @spacing-3xl;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    .side-nav {
+        top: 46px;
+    }
+}
+
+// Header Actions
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: @spacing-sm;
+}

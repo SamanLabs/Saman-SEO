@@ -23,7 +23,7 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#2271b1',
-		stats: __( 'Import/Export, Regex, Groups', 'saman-seo' ),
+		stats: __( 'Import/export, regex, groups', 'saman-seo' ),
 		moduleKey: 'module_redirects',
 	},
 	{
@@ -45,12 +45,12 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#d63638',
-		stats: __( 'Real-time, Smart Suggestions', 'saman-seo' ),
+		stats: __( 'Real-time, smart suggestions', 'saman-seo' ),
 		moduleKey: 'module_404_log',
 	},
 	{
 		id: 'instant-indexing',
-		name: __( 'Instant Indexing', 'saman-seo' ),
+		name: __( 'Instant indexing', 'saman-seo' ),
 		description: __(
 			'Submit URLs to search engines via IndexNow. Bulk submit posts for faster discovery by Bing, Yandex, and more.',
 			'saman-seo'
@@ -66,12 +66,12 @@ export const popularTools = [
 			</svg>
 		),
 		color: '#0891b2',
-		stats: __( 'IndexNow, Bulk Submit', 'saman-seo' ),
+		stats: __( 'IndexNow, bulk submit', 'saman-seo' ),
 		moduleKey: 'module_indexnow',
 	},
 	{
 		id: 'audit',
-		name: __( 'SEO Audit', 'saman-seo' ),
+		name: __( 'SEO audit', 'saman-seo' ),
 		description: __(
 			'Comprehensive 14-factor SEO analysis. Get actionable recommendations to improve rankings and fix issues.',
 			'saman-seo'
@@ -97,7 +97,7 @@ export const popularTools = [
 const aiTools = [
 	{
 		id: 'bulk-editor',
-		name: __( 'Smart Bulk Editor', 'saman-seo' ),
+		name: __( 'Smart bulk editor', 'saman-seo' ),
 		description: __(
 			'Edit SEO titles and descriptions in bulk. Spreadsheet view for efficient editing across all your content.',
 			'saman-seo'
@@ -117,7 +117,7 @@ const aiTools = [
 	},
 	{
 		id: 'content-gaps',
-		name: __( 'Content Gaps', 'saman-seo' ),
+		name: __( 'Content gaps', 'saman-seo' ),
 		description: __(
 			"Discover missing topics and content opportunities. Find what your competitors cover that you don't.",
 			'saman-seo'
@@ -138,7 +138,7 @@ const aiTools = [
 	},
 	{
 		id: 'schema-builder',
-		name: __( 'Schema Builder', 'saman-seo' ),
+		name: __( 'Schema builder', 'saman-seo' ),
 		description: __(
 			'Visual schema creation for rich search results. Generate JSON-LD structured data with ease.',
 			'saman-seo'
@@ -158,7 +158,7 @@ const aiTools = [
 	},
 	{
 		id: 'ai-assistant',
-		name: __( 'AI Assistant', 'saman-seo' ),
+		name: __( 'AI assistant', 'saman-seo' ),
 		description: __(
 			'Chat with AI about SEO. Get suggestions for titles, descriptions, and content optimization.',
 			'saman-seo'
@@ -185,7 +185,7 @@ const aiTools = [
 const moreTools = [
 	{
 		id: 'internal-linking',
-		name: __( 'Internal Linking', 'saman-seo' ),
+		name: __( 'Internal linking', 'saman-seo' ),
 		description: __(
 			'Discover and manage internal link opportunities. Build a stronger site structure.',
 			'saman-seo'
@@ -206,7 +206,7 @@ const moreTools = [
 	},
 	{
 		id: 'link-health',
-		name: __( 'Link Health', 'saman-seo' ),
+		name: __( 'Link health', 'saman-seo' ),
 		description: __(
 			'Scan for broken links and orphan pages. Find and fix link issues.',
 			'saman-seo'
@@ -248,7 +248,7 @@ const moreTools = [
 	},
 	{
 		id: 'robots-txt',
-		name: __( 'robots.txt Editor', 'saman-seo' ),
+		name: __( 'robots.txt editor', 'saman-seo' ),
 		description: __(
 			'Edit your robots.txt with validation and presets. Test if URLs are blocked.',
 			'saman-seo'
@@ -289,7 +289,7 @@ const moreTools = [
 	},
 	{
 		id: 'sitemap',
-		name: __( 'Sitemap Settings', 'saman-seo' ),
+		name: __( 'Sitemap settings', 'saman-seo' ),
 		description: __(
 			'Configure XML sitemaps including news and video sitemaps.',
 			'saman-seo'
@@ -311,7 +311,7 @@ const moreTools = [
 	},
 	{
 		id: 'schema-validator',
-		name: __( 'Schema Validator', 'saman-seo' ),
+		name: __( 'Schema validator', 'saman-seo' ),
 		description: __(
 			'Test structured data on any page. Validate JSON-LD markup.',
 			'saman-seo'
@@ -332,7 +332,7 @@ const moreTools = [
 	},
 	{
 		id: 'htaccess-editor',
-		name: __( '.htaccess Editor', 'saman-seo' ),
+		name: __( '.htaccess editor', 'saman-seo' ),
 		description: __(
 			'Safely edit your .htaccess file with backups and presets.',
 			'saman-seo'
@@ -351,7 +351,7 @@ const moreTools = [
 	},
 	{
 		id: 'mobile-friendly',
-		name: __( 'Mobile Friendly', 'saman-seo' ),
+		name: __( 'Mobile friendly', 'saman-seo' ),
 		description: __(
 			'Check if pages are mobile-friendly. Identify viewport and touch issues.',
 			'saman-seo'
@@ -396,7 +396,7 @@ const comingSoonTools = [
 	},
 	{
 		id: 'import-export',
-		name: __( 'Import / Export', 'saman-seo' ),
+		name: __( 'Import / export', 'saman-seo' ),
 		description: __(
 			'Migrate from Yoast, Rank Math, or AIOSEO. Export all settings.',
 			'saman-seo'
@@ -417,7 +417,7 @@ const comingSoonTools = [
 	},
 	{
 		id: 'keyword-tracker',
-		name: __( 'Keyword Tracker', 'saman-seo' ),
+		name: __( 'Keyword tracker', 'saman-seo' ),
 		description: __(
 			'Monitor keyword rankings over time. Track your positions in search results.',
 			'saman-seo'
@@ -437,7 +437,7 @@ const comingSoonTools = [
 	},
 	{
 		id: 'page-speed',
-		name: __( 'Page Speed', 'saman-seo' ),
+		name: __( 'Page speed', 'saman-seo' ),
 		description: __(
 			'Test page load performance. Get Core Web Vitals scores and tips.',
 			'saman-seo'
@@ -457,7 +457,7 @@ const comingSoonTools = [
 	},
 	{
 		id: 'heading-analyzer',
-		name: __( 'Heading Analyzer', 'saman-seo' ),
+		name: __( 'Heading analyzer', 'saman-seo' ),
 		description: __(
 			'Analyze heading structure. Check H1-H6 hierarchy and find issues.',
 			'saman-seo'
@@ -478,7 +478,6 @@ const comingSoonTools = [
 const Tools = ( { onNavigate } ) => {
 	const [ hoveredTool, setHoveredTool ] = useState( null );
 	const [ settings, setSettings ] = useState( {} );
-	const [ loadingSettings, setLoadingSettings ] = useState( true );
 
 	// Fetch settings on mount
 	const fetchSettings = useCallback( async () => {
@@ -492,8 +491,6 @@ const Tools = ( { onNavigate } ) => {
 			}
 		} catch ( error ) {
 			console.error( 'Failed to fetch settings:', error );
-		} finally {
-			setLoadingSettings( false );
 		}
 	}, [] );
 	useEffect( () => {
@@ -542,7 +539,7 @@ const Tools = ( { onNavigate } ) => {
 		if ( tool.moduleKey && ! settings[ tool.moduleKey ] ) return true;
 		return false;
 	};
-	const ToolCard = ( { tool, size = 'large', showBadge = null } ) => {
+	const ToolCard = ( { tool, showBadge = null } ) => {
 		const disabled = isToolDisabled( tool );
 		const hasModuleToggle = tool.moduleKey && ! tool.comingSoon;
 		const moduleEnabled = tool.moduleKey
@@ -552,10 +549,8 @@ const Tools = ( { onNavigate } ) => {
 			<button
 				type="button"
 				className={ `tool-card ${
-					size === 'compact' ? 'tool-card--compact' : ''
-				} ${ disabled ? 'tool-card--disabled' : '' } ${
-					hoveredTool === tool.id ? 'tool-card--hover' : ''
-				}` }
+					disabled ? 'tool-card--disabled' : ''
+				} ${ hoveredTool === tool.id ? 'tool-card--hover' : '' }` }
 				onClick={ () => handleToolClick( tool ) }
 				onMouseEnter={ () => setHoveredTool( tool.id ) }
 				onMouseLeave={ () => setHoveredTool( null ) }
@@ -583,73 +578,39 @@ const Tools = ( { onNavigate } ) => {
 						</label>
 					</div>
 				) }
-				<div
-					className={ `tool-card__icon ${
-						size === 'compact' ? 'tool-card__icon--small' : ''
-					}` }
-					style={ {
-						backgroundColor: `${ tool.color }15`,
-						color: tool.color,
-					} }
-				>
+				<div className="tool-card__icon" aria-hidden="true">
 					{ tool.icon }
 				</div>
 				<div className="tool-card__content">
 					<div className="tool-card__header">
 						<h3 className="tool-card__name">{ tool.name }</h3>
 						{ showBadge && (
-							<span
-								className={ `tool-card__badge ${
-									showBadge === 'AI'
-										? 'tool-card__badge--ai'
-										: ''
-								}` }
-							>
-								{ showBadge }
-							</span>
+							<span className="pill">{ showBadge }</span>
 						) }
 						{ tool.comingSoon && (
-							<span className="tool-card__badge">
+							<span className="pill">
 								{ __( 'Soon', 'saman-seo' ) }
 							</span>
 						) }
 						{ hasModuleToggle && ! moduleEnabled && (
-							<span className="tool-card__badge tool-card__badge--disabled">
+							<span className="pill">
 								{ __( 'Disabled', 'saman-seo' ) }
 							</span>
 						) }
 					</div>
 					<p className="tool-card__desc">{ tool.description }</p>
-					{ tool.stats && size !== 'compact' && (
-						<div className="tool-card__stats">{ tool.stats }</div>
+					{ tool.stats && (
+						<p className="tool-card__stats">{ tool.stats }</p>
 					) }
 				</div>
-				{ size !== 'compact' && ! disabled && (
-					<div
-						className="tool-card__arrow"
-						style={ {
-							color: tool.color,
-						} }
-					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-						>
-							<path d="M9 18l6-6-6-6" />
-						</svg>
-					</div>
-				) }
 			</button>
 		);
 	};
 	return (
 		<div className="page">
-			{ /* Hero Header */ }
-			<div className="page-header page-header--hero">
-				<div className="page-header__content">
-					<h1>{ __( 'SEO Tools Hub', 'saman-seo' ) }</h1>
+			<div className="page-header">
+				<div>
+					<h1>{ __( 'SEO tools hub', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'All your SEO tools in one place. From redirects and 404 monitoring to AI-powered content optimization.',
@@ -663,7 +624,7 @@ const Tools = ( { onNavigate } ) => {
 			<section className="tools-section">
 				<div className="tools-section__header">
 					<h2 className="tools-section__title">
-						{ __( 'Most Popular', 'saman-seo' ) }
+						{ __( 'Most popular', 'saman-seo' ) }
 					</h2>
 					<p className="tools-section__subtitle">
 						{ __(
@@ -672,9 +633,9 @@ const Tools = ( { onNavigate } ) => {
 						) }
 					</p>
 				</div>
-				<div className="tools-grid tools-grid--large">
+				<div className="tools-grid">
 					{ popularTools.map( ( tool ) => (
-						<ToolCard key={ tool.id } tool={ tool } size="large" />
+						<ToolCard key={ tool.id } tool={ tool } />
 					) ) }
 				</div>
 			</section>
@@ -692,12 +653,11 @@ const Tools = ( { onNavigate } ) => {
 						) }
 					</p>
 				</div>
-				<div className="tools-grid tools-grid--large">
+				<div className="tools-grid">
 					{ aiTools.map( ( tool ) => (
 						<ToolCard
 							key={ tool.id }
 							tool={ tool }
-							size="large"
 							showBadge="AI"
 						/>
 					) ) }
@@ -708,7 +668,7 @@ const Tools = ( { onNavigate } ) => {
 			<section className="tools-section">
 				<div className="tools-section__header">
 					<h2 className="tools-section__title">
-						{ __( 'More Tools', 'saman-seo' ) }
+						{ __( 'More tools', 'saman-seo' ) }
 					</h2>
 					<p className="tools-section__subtitle">
 						{ __(
@@ -717,24 +677,24 @@ const Tools = ( { onNavigate } ) => {
 						) }
 					</p>
 				</div>
-				<div className="tools-grid tools-grid--medium">
+				<div className="tools-grid">
 					{ moreTools.map( ( tool ) => (
-						<ToolCard key={ tool.id } tool={ tool } size="medium" />
+						<ToolCard key={ tool.id } tool={ tool } />
 					) ) }
 				</div>
 			</section>
 
 			{ /* Coming Soon */ }
-			<section className="tools-section tools-section--muted">
+			<section className="tools-section">
 				<div className="tools-section__header">
 					<h2 className="tools-section__title">
-						{ __( 'Coming Soon', 'saman-seo' ) }
+						{ __( 'Coming soon', 'saman-seo' ) }
 					</h2>
 					<p className="tools-section__subtitle">
 						{ __( 'New tools in development', 'saman-seo' ) }
 					</p>
 				</div>
-				<div className="tools-grid tools-grid--small">
+				<div className="tools-grid">
 					{ comingSoonTools.map( ( tool ) => (
 						<ToolCard
 							key={ tool.id }
@@ -742,7 +702,6 @@ const Tools = ( { onNavigate } ) => {
 								...tool,
 								comingSoon: true,
 							} }
-							size="compact"
 						/>
 					) ) }
 				</div>

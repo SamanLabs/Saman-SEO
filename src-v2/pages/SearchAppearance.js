@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import SubTabs from '../components/SubTabs';
 import SearchPreview from '../components/SearchPreview';
@@ -12,8 +12,6 @@ import useUrlTab from '../hooks/useUrlTab';
 import { __ } from '@wordpress/i18n';
 const globalSettings = window.samanSeoV2Settings || {};
 const aiEnabled = globalSettings.aiEnabled || false;
-const aiProvider = globalSettings.aiProvider || 'none';
-const aiPilot = globalSettings.aiPilot || null;
 const searchAppearanceTabs = [
 	{
 		id: 'homepage',
@@ -21,7 +19,7 @@ const searchAppearanceTabs = [
 	},
 	{
 		id: 'content-types',
-		label: __( 'Content Types', 'saman-seo' ),
+		label: __( 'Content types', 'saman-seo' ),
 	},
 	{
 		id: 'taxonomies',
@@ -33,11 +31,11 @@ const searchAppearanceTabs = [
 	},
 	{
 		id: 'social-settings',
-		label: __( 'Social Settings', 'saman-seo' ),
+		label: __( 'Social settings', 'saman-seo' ),
 	},
 	{
 		id: 'social-cards',
-		label: __( 'Social Cards', 'saman-seo' ),
+		label: __( 'Social cards', 'saman-seo' ),
 	},
 ];
 
@@ -168,7 +166,7 @@ const cardLayoutOptions = [
 // Color presets for quick styling
 const colorPresets = [
 	{
-		name: __( 'Dark Blue', 'saman-seo' ),
+		name: __( 'Dark blue', 'saman-seo' ),
 		bg: '#1a1a36',
 		accent: '#5a84ff',
 		text: __( '#ffffff', 'saman-seo' ),
@@ -221,19 +219,19 @@ const colorPresets = [
 const logoPositionOptions = [
 	{
 		value: 'top-left',
-		label: __( 'Top Left', 'saman-seo' ),
+		label: __( 'Top left', 'saman-seo' ),
 	},
 	{
 		value: 'top-right',
-		label: __( 'Top Right', 'saman-seo' ),
+		label: __( 'Top right', 'saman-seo' ),
 	},
 	{
 		value: 'bottom-left',
-		label: __( 'Bottom Left', 'saman-seo' ),
+		label: __( 'Bottom left', 'saman-seo' ),
 	},
 	{
 		value: 'bottom-right',
-		label: __( 'Bottom Right', 'saman-seo' ),
+		label: __( 'Bottom right', 'saman-seo' ),
 	},
 	{
 		value: 'center',
@@ -657,7 +655,7 @@ const SearchAppearance = () => {
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'Search Appearance', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Search appearance', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Control how your content appears in search results.',
@@ -679,183 +677,196 @@ const SearchAppearance = () => {
 
 			{ /* Homepage Tab */ }
 			{ activeTab === 'homepage' && (
-				<section className="panel">
-					<div className="panel-section">
-						<h3>{ __( 'Homepage SEO', 'saman-seo' ) }</h3>
-						<p className="muted">
-							{ __(
-								'Configure default title and meta description for your homepage.',
+				<div className="sa-home">
+					<section className="panel sa-home__form">
+						<h3>{ __( 'Homepage', 'saman-seo' ) }</h3>
+						<TemplateInput
+							label={ __( 'Homepage title', 'saman-seo' ) }
+							helpText={ __(
+								'The title tag for your homepage.',
 								'saman-seo'
 							) }
-						</p>
-					</div>
-
-					<SearchPreview
-						title={ renderTemplatePreview(
-							homepage.meta_title ||
-								`${
-									siteInfo.name || '{{site_title}}'
-								} ${ separator } ${
-									siteInfo.description || '{{tagline}}'
-								}`
-						) }
-						description={ renderTemplatePreview(
-							homepage.meta_description
-						) }
-						url={ siteInfo.url || '' }
-						domain={ siteInfo.domain || '' }
-						favicon={ siteInfo.favicon || '' }
-					/>
-
-					<TemplateInput
-						label={ __( 'Homepage Title', 'saman-seo' ) }
-						helpText={ __(
-							'The title tag for your homepage.',
-							'saman-seo'
-						) }
-						value={ homepage.meta_title || '' }
-						onChange={ ( value ) =>
-							setHomepage( { ...homepage, meta_title: value } )
-						}
-						variables={ variables }
-						variableValues={ variableValues }
-						context="global"
-						maxLength={ 60 }
-						onAiClick={ () =>
-							openAiModal( 'title', ( result ) =>
+							value={ homepage.meta_title || '' }
+							onChange={ ( value ) =>
 								setHomepage( {
 									...homepage,
-									meta_title: result,
-								} )
-							)
-						}
-						aiEnabled={ aiEnabled }
-					/>
-
-					<TemplateInput
-						label={ __( 'Meta Description', 'saman-seo' ) }
-						helpText={ __(
-							'A brief description of your website (150–160 chars recommended).',
-							'saman-seo'
-						) }
-						value={ homepage.meta_description || '' }
-						onChange={ ( value ) =>
-							setHomepage( {
-								...homepage,
-								meta_description: value,
-							} )
-						}
-						variables={ variables }
-						variableValues={ variableValues }
-						context="global"
-						multiline
-						maxLength={ 160 }
-						onAiClick={ () =>
-							openAiModal( 'description', ( result ) =>
-								setHomepage( {
-									...homepage,
-									meta_description: result,
-								} )
-							)
-						}
-						aiEnabled={ aiEnabled }
-					/>
-
-					<div className="settings-control">
-						<label className="settings-control__label">
-							{ __( 'Title Separator', 'saman-seo' ) }
-						</label>
-						<p className="settings-control__help">
-							{ __(
-								'Character used between title parts across your site.',
-								'saman-seo'
-							) }
-						</p>
-						<div className="separator-selector">
-							{ Object.entries( separatorOptions ).map(
-								( [ value, label ] ) => (
-									<button
-										key={ value }
-										type="button"
-										className={ `separator-option ${
-											separator === value ? 'active' : ''
-										}` }
-										onClick={ () => saveSeparator( value ) }
-										title={ label }
-									>
-										{ value }
-									</button>
-								)
-							) }
-							<div className="separator-custom">
-								<input
-									type="text"
-									className="separator-custom__input"
-									value={
-										! Object.keys(
-											separatorOptions
-										).includes( separator )
-											? separator
-											: ''
-									}
-									onChange={ ( e ) =>
-										saveSeparator( e.target.value )
-									}
-									placeholder={ __( 'Custom', 'saman-seo' ) }
-									aria-label={ __(
-										'Custom title separator',
-										'saman-seo'
-									) }
-									maxLength={ 5 }
-								/>
-							</div>
-						</div>
-					</div>
-
-					<div className="settings-control">
-						<label
-							className="settings-control__label"
-							htmlFor="homepage-keywords"
-						>
-							{ __( 'Meta Keywords', 'saman-seo' ) }
-						</label>
-						<p className="settings-control__help">
-							{ __(
-								'Comma separated keywords (optional, less relevant for modern SEO).',
-								'saman-seo'
-							) }
-						</p>
-						<input
-							id="homepage-keywords"
-							type="text"
-							className="settings-control__input"
-							value={ homepage.meta_keywords || '' }
-							onChange={ ( e ) =>
-								setHomepage( {
-									...homepage,
-									meta_keywords: e.target.value,
+									meta_title: value,
 								} )
 							}
-							placeholder={ __(
-								'keyword1, keyword2, keyword3',
+							variables={ variables }
+							variableValues={ variableValues }
+							context="global"
+							maxLength={ 60 }
+							onAiClick={ () =>
+								openAiModal( 'title', ( result ) =>
+									setHomepage( {
+										...homepage,
+										meta_title: result,
+									} )
+								)
+							}
+							aiEnabled={ aiEnabled }
+						/>
+
+						<TemplateInput
+							label={ __( 'Meta description', 'saman-seo' ) }
+							helpText={ __(
+								'A brief description of your website (150–160 chars recommended).',
 								'saman-seo'
 							) }
+							value={ homepage.meta_description || '' }
+							onChange={ ( value ) =>
+								setHomepage( {
+									...homepage,
+									meta_description: value,
+								} )
+							}
+							variables={ variables }
+							variableValues={ variableValues }
+							context="global"
+							multiline
+							maxLength={ 160 }
+							onAiClick={ () =>
+								openAiModal( 'description', ( result ) =>
+									setHomepage( {
+										...homepage,
+										meta_description: result,
+									} )
+								)
+							}
+							aiEnabled={ aiEnabled }
 						/>
-					</div>
 
-					<div className="panel-actions">
-						<button
-							type="button"
-							className="button button-primary"
-							onClick={ saveHomepage }
-							disabled={ saving }
-						>
-							{ saving
-								? __( 'Saving…', 'saman-seo' )
-								: __( 'Save Homepage Settings', 'saman-seo' ) }
-						</button>
-					</div>
-				</section>
+						<div className="settings-control">
+							<label className="settings-control__label">
+								{ __( 'Title separator', 'saman-seo' ) }
+							</label>
+							<p className="settings-control__help">
+								{ __(
+									'Character used between title parts across your site.',
+									'saman-seo'
+								) }
+							</p>
+							<div className="separator-selector">
+								{ Object.entries( separatorOptions ).map(
+									( [ value, label ] ) => (
+										<button
+											key={ value }
+											type="button"
+											className={ `separator-option ${
+												separator === value
+													? 'active'
+													: ''
+											}` }
+											onClick={ () =>
+												saveSeparator( value )
+											}
+											title={ label }
+										>
+											{ value }
+										</button>
+									)
+								) }
+								<div className="separator-custom">
+									<input
+										type="text"
+										className="separator-custom__input"
+										value={
+											! Object.keys(
+												separatorOptions
+											).includes( separator )
+												? separator
+												: ''
+										}
+										onChange={ ( e ) =>
+											saveSeparator( e.target.value )
+										}
+										placeholder={ __(
+											'Custom',
+											'saman-seo'
+										) }
+										aria-label={ __(
+											'Custom title separator',
+											'saman-seo'
+										) }
+										maxLength={ 5 }
+									/>
+								</div>
+							</div>
+						</div>
+
+						<div className="settings-control">
+							<label
+								className="settings-control__label"
+								htmlFor="homepage-keywords"
+							>
+								{ __( 'Meta keywords', 'saman-seo' ) }
+							</label>
+							<p className="settings-control__help">
+								{ __(
+									'Comma separated keywords (optional, less relevant for modern SEO).',
+									'saman-seo'
+								) }
+							</p>
+							<input
+								id="homepage-keywords"
+								type="text"
+								className="settings-control__input"
+								value={ homepage.meta_keywords || '' }
+								onChange={ ( e ) =>
+									setHomepage( {
+										...homepage,
+										meta_keywords: e.target.value,
+									} )
+								}
+								placeholder={ __(
+									'keyword1, keyword2, keyword3',
+									'saman-seo'
+								) }
+							/>
+						</div>
+
+						<div className="panel-actions">
+							<button
+								type="button"
+								className="button primary"
+								onClick={ saveHomepage }
+								disabled={ saving }
+							>
+								{ saving
+									? __( 'Saving…', 'saman-seo' )
+									: __(
+											'Save homepage settings',
+											'saman-seo'
+									  ) }
+							</button>
+						</div>
+					</section>
+					<aside className="sa-home__preview">
+						<SearchPreview
+							title={ renderTemplatePreview(
+								homepage.meta_title ||
+									`${
+										siteInfo.name || '{{site_title}}'
+									} ${ separator } ${
+										siteInfo.description || '{{tagline}}'
+									}`
+							) }
+							description={ renderTemplatePreview(
+								homepage.meta_description
+							) }
+							url={ siteInfo.url || '' }
+							domain={ siteInfo.domain || '' }
+							favicon={ siteInfo.favicon || '' }
+						/>
+						<p className="muted">
+							{ __(
+								'Updates as you type. Google may rewrite titles and descriptions it finds unhelpful.',
+								'saman-seo'
+							) }
+						</p>
+					</aside>
+				</div>
 			) }
 
 			{ /* Content Types Tab */ }
@@ -863,7 +874,7 @@ const SearchAppearance = () => {
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>{ __( 'Content Types', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Content types', 'saman-seo' ) }</h3>
 							<p className="muted">
 								{ __(
 									'Configure SEO defaults for each post type.',
@@ -891,12 +902,12 @@ const SearchAppearance = () => {
 						<table className="data-table">
 							<thead>
 								<tr>
-									<th>{ __( 'Post Type', 'saman-seo' ) }</th>
+									<th>{ __( 'Post type', 'saman-seo' ) }</th>
 									<th>
-										{ __( 'Title Preview', 'saman-seo' ) }
+										{ __( 'Title preview', 'saman-seo' ) }
 									</th>
 									<th>
-										{ __( 'Show in Search', 'saman-seo' ) }
+										{ __( 'Show in search', 'saman-seo' ) }
 									</th>
 									<th>{ __( 'Posts', 'saman-seo' ) }</th>
 									<th>{ __( 'Action', 'saman-seo' ) }</th>
@@ -1012,10 +1023,10 @@ const SearchAppearance = () => {
 								<tr>
 									<th>{ __( 'Taxonomy', 'saman-seo' ) }</th>
 									<th>
-										{ __( 'Title Preview', 'saman-seo' ) }
+										{ __( 'Title preview', 'saman-seo' ) }
 									</th>
 									<th>
-										{ __( 'Show in Search', 'saman-seo' ) }
+										{ __( 'Show in search', 'saman-seo' ) }
 									</th>
 									<th>{ __( 'Terms', 'saman-seo' ) }</th>
 									<th>{ __( 'Action', 'saman-seo' ) }</th>
@@ -1136,13 +1147,13 @@ const SearchAppearance = () => {
 							<thead>
 								<tr>
 									<th>
-										{ __( 'Archive Type', 'saman-seo' ) }
+										{ __( 'Archive type', 'saman-seo' ) }
 									</th>
 									<th>
-										{ __( 'Title Preview', 'saman-seo' ) }
+										{ __( 'Title preview', 'saman-seo' ) }
 									</th>
 									<th>
-										{ __( 'Show in Search', 'saman-seo' ) }
+										{ __( 'Show in search', 'saman-seo' ) }
 									</th>
 									<th>{ __( 'Action', 'saman-seo' ) }</th>
 								</tr>
@@ -1227,7 +1238,7 @@ const SearchAppearance = () => {
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>{ __( 'Social Settings', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Social settings', 'saman-seo' ) }</h3>
 							<p className="muted">
 								{ __(
 									'Configure default Open Graph, Twitter, and schema values for social sharing.',
@@ -1243,7 +1254,7 @@ const SearchAppearance = () => {
 								<h4>
 									{ __( 'Edit', 'saman-seo' ) }{ ' ' }
 									{ editingPostTypeSocial.name }{ ' ' }
-									{ __( 'Social Settings', 'saman-seo' ) }
+									{ __( 'Social settings', 'saman-seo' ) }
 								</h4>
 								<button
 									type="button"
@@ -1259,7 +1270,7 @@ const SearchAppearance = () => {
 							<div className="settings-row compact">
 								<div className="settings-label">
 									<label>
-										{ __( 'OG Title', 'saman-seo' ) }
+										{ __( 'OG title', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1298,7 +1309,7 @@ const SearchAppearance = () => {
 												{
 													type: editingPostTypeSocial.name,
 													name: __(
-														'OG Title',
+														'OG title',
 														'saman-seo'
 													),
 												}
@@ -1311,7 +1322,7 @@ const SearchAppearance = () => {
 							<div className="settings-row compact">
 								<div className="settings-label">
 									<label>
-										{ __( 'OG Description', 'saman-seo' ) }
+										{ __( 'OG description', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1352,7 +1363,7 @@ const SearchAppearance = () => {
 												{
 													type: editingPostTypeSocial.name,
 													name: __(
-														'OG Description',
+														'OG description',
 														'saman-seo'
 													),
 												}
@@ -1365,7 +1376,7 @@ const SearchAppearance = () => {
 							<div className="settings-row compact">
 								<div className="settings-label">
 									<label>
-										{ __( 'Twitter Title', 'saman-seo' ) }
+										{ __( 'Twitter title', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1405,7 +1416,7 @@ const SearchAppearance = () => {
 												{
 													type: editingPostTypeSocial.name,
 													name: __(
-														'Twitter Title',
+														'Twitter title',
 														'saman-seo'
 													),
 												}
@@ -1419,7 +1430,7 @@ const SearchAppearance = () => {
 								<div className="settings-label">
 									<label>
 										{ __(
-											'Twitter Description',
+											'Twitter description',
 											'saman-seo'
 										) }
 									</label>
@@ -1463,7 +1474,7 @@ const SearchAppearance = () => {
 												{
 													type: editingPostTypeSocial.name,
 													name: __(
-														'Twitter Description',
+														'Twitter description',
 														'saman-seo'
 													),
 												}
@@ -1476,7 +1487,7 @@ const SearchAppearance = () => {
 							<div className="settings-row compact">
 								<div className="settings-label">
 									<label>
-										{ __( 'Fallback Image', 'saman-seo' ) }
+										{ __( 'Fallback image', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1532,12 +1543,12 @@ const SearchAppearance = () => {
 											onClick={ () => {
 												const frame = wp.media( {
 													title: __(
-														'Select Fallback Image',
+														'Select fallback image',
 														'saman-seo'
 													),
 													button: {
 														text: __(
-															'Use Image',
+															'Use image',
 															'saman-seo'
 														),
 													},
@@ -1563,11 +1574,11 @@ const SearchAppearance = () => {
 										>
 											{ editingPostTypeSocial.image_source
 												? __(
-														'Change Image',
+														'Change image',
 														'saman-seo'
 												  )
 												: __(
-														'Select Image',
+														'Select image',
 														'saman-seo'
 												  ) }
 										</button>
@@ -1578,7 +1589,7 @@ const SearchAppearance = () => {
 							<div className="settings-row compact">
 								<div className="settings-label">
 									<label>
-										{ __( 'Schema Type', 'saman-seo' ) }
+										{ __( 'Schema type', 'saman-seo' ) }
 									</label>
 									<p className="settings-help">
 										{ __(
@@ -1627,7 +1638,7 @@ const SearchAppearance = () => {
 								>
 									{ saving
 										? __( 'Saving\u2026', 'saman-seo' )
-										: __( 'Save Settings', 'saman-seo' ) }
+										: __( 'Save settings', 'saman-seo' ) }
 								</button>
 								<button
 									type="button"
@@ -1645,7 +1656,7 @@ const SearchAppearance = () => {
 							{ /* Social Preview Cards */ }
 							<div className="preview-panel">
 								<h4 className="form-section__title">
-									{ __( 'Social Preview', 'saman-seo' ) }
+									{ __( 'Social preview', 'saman-seo' ) }
 								</h4>
 								<p className="preview-panel__description">
 									{ __(
@@ -1692,7 +1703,7 @@ const SearchAppearance = () => {
 							<div className="settings-form form-section">
 								<h4 className="form-section__title">
 									{ __(
-										'Global Social Defaults',
+										'Global social defaults',
 										'saman-seo'
 									) }
 								</h4>
@@ -1706,7 +1717,7 @@ const SearchAppearance = () => {
 								<div className="settings-row compact">
 									<div className="settings-label">
 										<label>
-											{ __( 'OG Title', 'saman-seo' ) }
+											{ __( 'OG title', 'saman-seo' ) }
 										</label>
 										<p className="settings-help">
 											{ __(
@@ -1745,7 +1756,7 @@ const SearchAppearance = () => {
 													{
 														type: 'Social',
 														name: __(
-															'Open Graph Title',
+															'Open Graph title',
 															'saman-seo'
 														),
 													}
@@ -1759,7 +1770,7 @@ const SearchAppearance = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'OG Description',
+												'OG description',
 												'saman-seo'
 											) }
 										</label>
@@ -1802,7 +1813,7 @@ const SearchAppearance = () => {
 													{
 														type: 'Social',
 														name: __(
-															'Open Graph Description',
+															'Open Graph description',
 															'saman-seo'
 														),
 													}
@@ -1816,7 +1827,7 @@ const SearchAppearance = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Twitter Title',
+												'Twitter title',
 												'saman-seo'
 											) }
 										</label>
@@ -1858,7 +1869,7 @@ const SearchAppearance = () => {
 													{
 														type: 'Social',
 														name: __(
-															'Twitter Card Title',
+															'Twitter Card title',
 															'saman-seo'
 														),
 													}
@@ -1872,7 +1883,7 @@ const SearchAppearance = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Twitter Description',
+												'Twitter description',
 												'saman-seo'
 											) }
 										</label>
@@ -1916,7 +1927,7 @@ const SearchAppearance = () => {
 													{
 														type: 'Social',
 														name: __(
-															'Twitter Card Description',
+															'Twitter Card description',
 															'saman-seo'
 														),
 													}
@@ -1930,7 +1941,7 @@ const SearchAppearance = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Fallback Image',
+												'Fallback image',
 												'saman-seo'
 											) }
 										</label>
@@ -1986,12 +1997,12 @@ const SearchAppearance = () => {
 												onClick={ () => {
 													const frame = wp.media( {
 														title: __(
-															'Select Fallback Image',
+															'Select fallback image',
 															'saman-seo'
 														),
 														button: {
 															text: __(
-																'Use Image',
+																'Use image',
 																'saman-seo'
 															),
 														},
@@ -2017,11 +2028,11 @@ const SearchAppearance = () => {
 											>
 												{ socialDefaults.image_source
 													? __(
-															'Change Image',
+															'Change image',
 															'saman-seo'
 													  )
 													: __(
-															'Select Image',
+															'Select image',
 															'saman-seo'
 													  ) }
 											</button>
@@ -2033,7 +2044,7 @@ const SearchAppearance = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Default Schema Type',
+												'Default schema type',
 												'saman-seo'
 											) }
 										</label>
@@ -2083,7 +2094,7 @@ const SearchAppearance = () => {
 										{ saving
 											? __( 'Saving\u2026', 'saman-seo' )
 											: __(
-													'Save Global Defaults',
+													'Save global defaults',
 													'saman-seo'
 											  ) }
 									</button>
@@ -2094,7 +2105,7 @@ const SearchAppearance = () => {
 							<div className="form-section">
 								<h4 className="form-section__title">
 									{ __(
-										'Post Type Specific Settings',
+										'Post type specific settings',
 										'saman-seo'
 									) }
 								</h4>
@@ -2110,19 +2121,19 @@ const SearchAppearance = () => {
 										<tr>
 											<th>
 												{ __(
-													'Post Type',
+													'Post type',
 													'saman-seo'
 												) }
 											</th>
 											<th>
 												{ __(
-													'OG Title',
+													'OG title',
 													'saman-seo'
 												) }
 											</th>
 											<th>
 												{ __(
-													'Schema Type',
+													'Schema type',
 													'saman-seo'
 												) }
 											</th>
@@ -2211,7 +2222,7 @@ const SearchAppearance = () => {
 				<section className="panel">
 					<div className="table-toolbar">
 						<div>
-							<h3>{ __( 'Social Cards', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Social cards', 'saman-seo' ) }</h3>
 							<p className="muted">
 								{ __(
 									'Customize the appearance of dynamically generated social card images.',
@@ -2236,14 +2247,14 @@ const SearchAppearance = () => {
 						{ /* Live Preview */ }
 						<div className="preview-panel">
 							<div className="preview-panel__header">
-								<h4>{ __( 'Live Preview', 'saman-seo' ) }</h4>
+								<h4>{ __( 'Live preview', 'saman-seo' ) }</h4>
 							</div>
 
 							{ /* Preview Title Input */ }
 							<div className="inline-fields">
 								<div className="field-group grow">
 									<label className="field-group__label">
-										{ __( 'Preview Title', 'saman-seo' ) }
+										{ __( 'Preview title', 'saman-seo' ) }
 									</label>
 									<input
 										type="text"
@@ -2549,7 +2560,7 @@ const SearchAppearance = () => {
 									} }
 								>
 									{ siteInfo.name ||
-										__( 'Your Site Name', 'saman-seo' ) }
+										__( 'Your site name', 'saman-seo' ) }
 								</span>
 							</div>
 						</div>
@@ -2558,7 +2569,7 @@ const SearchAppearance = () => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Layout Style', 'saman-seo' ) }
+									{ __( 'Layout style', 'saman-seo' ) }
 								</label>
 								<p className="settings-help">
 									{ __(
@@ -2620,7 +2631,7 @@ const SearchAppearance = () => {
 						<div className="settings-row compact">
 							<div className="settings-label">
 								<label>
-									{ __( 'Color Presets', 'saman-seo' ) }
+									{ __( 'Color presets', 'saman-seo' ) }
 								</label>
 								<p className="settings-help">
 									{ __(
@@ -2788,7 +2799,7 @@ const SearchAppearance = () => {
 								<div className="inline-fields">
 									<div className="color-field">
 										<span className="color-field__label">
-											{ __( 'Title Size', 'saman-seo' ) }
+											{ __( 'Title size', 'saman-seo' ) }
 										</span>
 										<div className="color-field__row">
 											<input
@@ -2820,7 +2831,7 @@ const SearchAppearance = () => {
 									<div className="color-field">
 										<span className="color-field__label">
 											{ __(
-												'Title Weight',
+												'Title weight',
 												'saman-seo'
 											) }
 										</span>
@@ -2858,7 +2869,7 @@ const SearchAppearance = () => {
 									<div className="color-field">
 										<span className="color-field__label">
 											{ __(
-												'Site Name Size',
+												'Site name size',
 												'saman-seo'
 											) }
 										</span>
@@ -2925,12 +2936,12 @@ const SearchAppearance = () => {
 												onClick={ () => {
 													const frame = wp.media( {
 														title: __(
-															'Select Logo',
+															'Select logo',
 															'saman-seo'
 														),
 														button: {
 															text: __(
-																'Use Logo',
+																'Use logo',
 																'saman-seo'
 															),
 														},
@@ -2956,11 +2967,11 @@ const SearchAppearance = () => {
 											>
 												{ cardDesign.logo_url
 													? __(
-															'Change Logo',
+															'Change logo',
 															'saman-seo'
 													  )
 													: __(
-															'Select Logo',
+															'Select logo',
 															'saman-seo'
 													  ) }
 											</button>
@@ -3080,7 +3091,7 @@ const SearchAppearance = () => {
 							>
 								{ saving
 									? __( 'Saving\u2026', 'saman-seo' )
-									: __( 'Save Card Design', 'saman-seo' ) }
+									: __( 'Save card design', 'saman-seo' ) }
 							</button>
 						</div>
 					</div>
@@ -3108,7 +3119,6 @@ const SearchAppearance = () => {
 const PostTypeEditor = ( {
 	postType,
 	schemaOptions,
-	separator,
 	siteInfo,
 	variables,
 	variableValues,
@@ -3151,7 +3161,7 @@ const PostTypeEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Show in Search Results', 'saman-seo' ) }
+							{ __( 'Show in search results', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3184,7 +3194,7 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>{ __( 'Title Template', 'saman-seo' ) }</label>
+						<label>{ __( 'Title template', 'saman-seo' ) }</label>
 						<p className="settings-help">
 							{ __(
 								'Click "Variables" to insert dynamic content.',
@@ -3230,7 +3240,7 @@ const PostTypeEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Description Template', 'saman-seo' ) }
+							{ __( 'Description template', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3278,7 +3288,7 @@ const PostTypeEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Default Schema Type', 'saman-seo' ) }
+							{ __( 'Default schema type', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3308,7 +3318,7 @@ const PostTypeEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>{ __( 'Schema Page Type', 'saman-seo' ) }</label>
+						<label>{ __( 'Schema page type', 'saman-seo' ) }</label>
 						<p className="settings-help">
 							{ __(
 								'Default structured data page type.',
@@ -3340,7 +3350,7 @@ const PostTypeEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Schema Article Type', 'saman-seo' ) }
+							{ __( 'Schema article type', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3373,7 +3383,7 @@ const PostTypeEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Show SEO Controls', 'saman-seo' ) }
+							{ __( 'Show SEO controls', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3413,7 +3423,7 @@ const PostTypeEditor = ( {
 					>
 						{ saving
 							? __( 'Saving\u2026', 'saman-seo' )
-							: __( 'Save Changes', 'saman-seo' ) }
+							: __( 'Save changes', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
@@ -3444,7 +3454,6 @@ const PostTypeEditor = ( {
  */
 const TaxonomyEditor = ( {
 	taxonomy,
-	separator,
 	siteInfo,
 	variables,
 	variableValues,
@@ -3488,7 +3497,7 @@ const TaxonomyEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Show in Search Results', 'saman-seo' ) }
+							{ __( 'Show in search results', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3521,7 +3530,7 @@ const TaxonomyEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>{ __( 'Title Template', 'saman-seo' ) }</label>
+						<label>{ __( 'Title template', 'saman-seo' ) }</label>
 						<p className="settings-help">
 							{ __(
 								'Click "Variables" to insert dynamic content.',
@@ -3567,7 +3576,7 @@ const TaxonomyEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Description Template', 'saman-seo' ) }
+							{ __( 'Description template', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3615,7 +3624,7 @@ const TaxonomyEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Show SEO Controls', 'saman-seo' ) }
+							{ __( 'Show SEO controls', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3655,7 +3664,7 @@ const TaxonomyEditor = ( {
 					>
 						{ saving
 							? __( 'Saving\u2026', 'saman-seo' )
-							: __( 'Save Changes', 'saman-seo' ) }
+							: __( 'Save changes', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
@@ -3685,7 +3694,6 @@ const TaxonomyEditor = ( {
  */
 const ArchiveEditor = ( {
 	archive,
-	separator,
 	siteInfo,
 	variables,
 	variableValues,
@@ -3741,7 +3749,7 @@ const ArchiveEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Show in Search Results', 'saman-seo' ) }
+							{ __( 'Show in search results', 'saman-seo' ) }
 						</label>
 						<p className="settings-help">
 							{ __(
@@ -3774,7 +3782,7 @@ const ArchiveEditor = ( {
 
 				<div className="settings-row compact">
 					<div className="settings-label">
-						<label>{ __( 'Title Template', 'saman-seo' ) }</label>
+						<label>{ __( 'Title template', 'saman-seo' ) }</label>
 						<p className="settings-help">
 							{ __(
 								'Click "Variables" to insert dynamic content.',
@@ -3816,7 +3824,7 @@ const ArchiveEditor = ( {
 				<div className="settings-row compact">
 					<div className="settings-label">
 						<label>
-							{ __( 'Description Template', 'saman-seo' ) }
+							{ __( 'Description template', 'saman-seo' ) }
 						</label>
 					</div>
 					<div className="settings-control">
@@ -3857,7 +3865,7 @@ const ArchiveEditor = ( {
 						className="button primary"
 						onClick={ () => onSave( data ) }
 					>
-						{ __( 'Save Changes', 'saman-seo' ) }
+						{ __( 'Save changes', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"

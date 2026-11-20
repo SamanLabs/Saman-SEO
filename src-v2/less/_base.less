@@ -22,6 +22,17 @@ body[class*="saman-seo"] #wpbody-content {
     padding-bottom: 0;
 }
 
+// The app fills the screen below the admin bar. The WordPress footer and
+// notices from other plugins are positioned for classic admin pages and land
+// on top of the sidebar, so they are hidden on Saman SEO screens only.
+body[class*="saman-seo"] #wpfooter,
+body[class*="saman-seo"] #wpbody-content > .notice,
+body[class*="saman-seo"] #wpbody-content > .update-nag,
+body[class*="saman-seo"] #wpbody-content > .updated,
+body[class*="saman-seo"] #wpbody-content > .error {
+    display: none;
+}
+
 // Main admin container
 .saman-seo-admin {
     // CSS Custom Properties (for runtime theming if needed)
@@ -35,12 +46,17 @@ body[class*="saman-seo"] #wpbody-content {
     --color-success: @color-success;
     --color-warning: @color-warning;
     --color-danger: @color-danger;
+    --color-accent: @color-primary;
+    --color-success-text: @color-success-text;
+    --color-warning-text: @color-warning-text;
+    --color-danger-text: @color-danger-text;
     --shadow-soft: @shadow-md;
 
     color: @color-text;
     font-family: @font-family;
-    padding: @spacing-lg;
-    padding-bottom: @spacing-4xl;
+    font-size: @font-size-base;
+    line-height: @line-height-normal;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     box-sizing: border-box;
     background: @color-background;
@@ -56,10 +72,9 @@ body.admin-bar .saman-seo-admin {
     }
 }
 
-// Shell container
-.saman-seo-shell {
-    max-width: 1400px;
-    margin: 0 auto @spacing-2xl;
+// Screens without the sidebar (setup wizard, first load).
+.saman-seo-admin--plain {
+    padding: @spacing-xl;
 }
 
 // Box sizing reset
@@ -69,14 +84,31 @@ body.admin-bar .saman-seo-admin {
     box-sizing: border-box;
 }
 
+// Headings: WordPress admin sets its own colors and margins on h1-h4.
+.saman-seo-admin h1,
+.saman-seo-admin h2,
+.saman-seo-admin h3,
+.saman-seo-admin h4 {
+    color: @color-text;
+    letter-spacing: -0.01em;
+}
+
+// One visible keyboard focus ring for every control in the app.
+.saman-seo-admin :focus-visible {
+    outline: 2px solid @color-primary;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .saman-seo-admin *,
+    .saman-seo-admin *::before,
+    .saman-seo-admin *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
 // Code styling
 code {
     .code-text();
-}
-
-// Inline icon helper
-.icon-inline {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: @spacing-xs;
 }

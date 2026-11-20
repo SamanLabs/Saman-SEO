@@ -984,11 +984,16 @@ class Redirects_Controller extends REST_Controller {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safe, summary requires direct query.
         $top_redirect = $wpdb->get_row( "SELECT * FROM {$this->redirects_table} ORDER BY hits DESC, id DESC LIMIT 1" );
 
+        // Hits per day for the last 14 days, oldest first.
+        $service    = \Saman\SEO\Plugin::instance()->get( 'redirects' );
+        $daily_hits = $service && method_exists( $service, 'get_daily_hits_series' ) ? $service->get_daily_hits_series( 14 ) : [];
+
         return $this->success( [
             'total'        => $total,
             'active_count' => $active_count,
             'total_hits'   => $total_hits,
             'top_redirect' => $top_redirect ? $this->format_redirect( $top_redirect ) : null,
+            'daily_hits'   => $daily_hits,
         ] );
     }
 
@@ -1471,7 +1476,18 @@ class Redirects_Controller extends REST_Controller {
 
         $total_pages = max( 1, (int) ceil( $total_count / $per_page ) );
 
+        // Entries last seen on each of the past 14 days, oldest first.
+        $since = gmdate( 'Y-m-d 00:00:00', strtotime( '-13 days' ) );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe, built from $wpdb->prefix.
+        $daily_rows = $wpdb->get_results( $wpdb->prepare( "SELECT DATE(last_seen) AS day, COUNT(*) AS entries FROM {$this->log_table} WHERE last_seen >= %s GROUP BY DATE(last_seen)", $since ), OBJECT_K );
+        $daily      = [];
+        for ( $i = 13; $i >= 0; $i-- ) {
+            $day     = gmdate( 'Y-m-d', strtotime( "-{$i} days" ) );
+            $daily[] = isset( $daily_rows[ $day ] ) ? (int) $daily_rows[ $day ]->entries : 0;
+        }
+
         return $this->success( [
+            'daily'         => $daily,
             'items'         => $data,
             'total'         => $total_count,
             'page'          => $page,

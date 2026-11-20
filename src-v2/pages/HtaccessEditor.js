@@ -7,7 +7,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
-const HtaccessEditor = ( { onNavigate } ) => {
+import { confirmDialog } from '../components/Dialogs';
+const HtaccessEditor = () => {
 	const [ content, setContent ] = useState( '' );
 	const [ originalContent, setOriginalContent ] = useState( '' );
 	const [ backups, setBackups ] = useState( [] );
@@ -21,7 +22,7 @@ const HtaccessEditor = ( { onNavigate } ) => {
 	// Presets
 	const presets = [
 		{
-			name: __( 'Disable Directory Browsing', 'saman-seo' ),
+			name: __( 'Disable directory browsing', 'saman-seo' ),
 			code: 'Options -Indexes',
 			description: __(
 				'Prevent users from seeing directory contents',
@@ -53,14 +54,14 @@ RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]`,
 			description: __( 'Redirect non-www to www version', 'saman-seo' ),
 		},
 		{
-			name: __( 'Block Bad Bots', 'saman-seo' ),
+			name: __( 'Block bad bots', 'saman-seo' ),
 			code: `RewriteEngine On
 RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|MJ12bot|SemrushBot|DotBot) [NC]
 RewriteRule .* - [F,L]`,
 			description: __( 'Block common SEO crawlers/bots', 'saman-seo' ),
 		},
 		{
-			name: __( 'Enable GZIP Compression', 'saman-seo' ),
+			name: __( 'Enable GZIP compression', 'saman-seo' ),
 			code: `<IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
   AddOutputFilterByType DEFLATE application/javascript application/x-javascript
@@ -72,7 +73,7 @@ RewriteRule .* - [F,L]`,
 			),
 		},
 		{
-			name: __( 'Browser Caching', 'saman-seo' ),
+			name: __( 'Browser caching', 'saman-seo' ),
 			code: `<IfModule mod_expires.c>
   ExpiresActive On
   ExpiresByType image/jpg "access plus 1 year"
@@ -89,7 +90,7 @@ RewriteRule .* - [F,L]`,
 			),
 		},
 		{
-			name: __( 'Security Headers', 'saman-seo' ),
+			name: __( 'Security headers', 'saman-seo' ),
 			code: `<IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
@@ -163,14 +164,15 @@ RewriteRule .* - [F,L]`,
 	// Restore backup
 	const handleRestore = useCallback( async ( backup ) => {
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				sprintf(
 					/* translators: %s: placeholder */ __(
 						'Restore backup from %s? This will overwrite the current .htaccess file.',
 						'saman-seo'
 					),
 					backup.date
-				)
+				),
+				{ confirmLabel: __( 'Restore', 'saman-seo' ) }
 			)
 		) {
 			return;
@@ -217,8 +219,8 @@ RewriteRule .* - [F,L]`,
 	);
 
 	// Reset to original
-	const handleReset = useCallback( () => {
-		if ( window.confirm( __( 'Discard all changes?', 'saman-seo' ) ) ) {
+	const handleReset = useCallback( async () => {
+		if ( await confirmDialog( __( 'Discard all changes?', 'saman-seo' ), { confirmLabel: __( 'Discard', 'saman-seo' ), danger: true } ) ) {
 			setContent( originalContent );
 		}
 	}, [ originalContent ] );
@@ -226,12 +228,12 @@ RewriteRule .* - [F,L]`,
 		return (
 			<div className="page">
 				<div className="page-header">
-					<h1>{ __( '.htaccess Editor', 'saman-seo' ) }</h1>
-				</div>
-				<div className="card">
-					<div className="loading-state">
-						{ __( 'Loading\u2026', 'saman-seo' ) }
+					<div>
+						<h1>{ __( '.htaccess editor', 'saman-seo' ) }</h1>
 					</div>
+				</div>
+				<div className="loading-state">
+					{ __( 'Loading\u2026', 'saman-seo' ) }
 				</div>
 			</div>
 		);
@@ -240,7 +242,7 @@ RewriteRule .* - [F,L]`,
 		<div className="page">
 			<div className="page-header">
 				<div>
-					<h1>{ __( '.htaccess Editor', 'saman-seo' ) }</h1>
+					<h1>{ __( '.htaccess editor', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Edit your server configuration file. Changes take effect immediately.',
@@ -248,10 +250,11 @@ RewriteRule .* - [F,L]`,
 						) }
 					</p>
 				</div>
-				<div className="page-header-actions">
+				<div className="header-actions">
 					<button
 						type="button"
-						className="button ghost"
+						className="button"
+						aria-expanded={ showBackups }
 						onClick={ () => setShowBackups( ! showBackups ) }
 					>
 						<svg
@@ -274,7 +277,7 @@ RewriteRule .* - [F,L]`,
 							className="button ghost"
 							onClick={ handleReset }
 						>
-							{ __( 'Discard Changes', 'saman-seo' ) }
+							{ __( 'Discard changes', 'saman-seo' ) }
 						</button>
 					) }
 					<button
@@ -285,7 +288,7 @@ RewriteRule .* - [F,L]`,
 					>
 						{ saving
 							? __( 'Saving\u2026', 'saman-seo' )
-							: __( 'Save Changes', 'saman-seo' ) }
+							: __( 'Save changes', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -347,59 +350,59 @@ RewriteRule .* - [F,L]`,
 				</div>
 			) }
 
-			<div className="htaccess-layout">
+			<div className="page-body two-column">
 				{ /* Editor */ }
-				<div className="card htaccess-editor-card">
-					<div className="htaccess-editor-header">
-						<span className="htaccess-editor-path">
-							{ __( '/.htaccess', 'saman-seo' ) }
-						</span>
-						{ hasChanges && (
-							<span className="htaccess-editor-modified">
-								{ __( 'Modified', 'saman-seo' ) }
-							</span>
-						) }
-					</div>
-					<textarea
-						className="htaccess-textarea"
-						value={ content }
-						onChange={ ( e ) => setContent( e.target.value ) }
-						spellCheck="false"
-						placeholder={ __(
-							'# Your .htaccess rules here\u2026',
-							'saman-seo'
-						) }
-					/>
+				<div className="main-column">
+					<section className="panel code-panel">
+						<div className="code-panel__head">
+							<h3 className="code-panel__path">
+								{ __( '/.htaccess', 'saman-seo' ) }
+							</h3>
+							{ hasChanges && (
+								<span className="pill warning">
+									{ __( 'Modified', 'saman-seo' ) }
+								</span>
+							) }
+						</div>
+						<textarea
+							className="code-editor"
+							aria-label={ __( '.htaccess editor', 'saman-seo' ) }
+							value={ content }
+							onChange={ ( e ) => setContent( e.target.value ) }
+							spellCheck="false"
+							placeholder={ __(
+								'# Your .htaccess rules here\u2026',
+								'saman-seo'
+							) }
+						/>
+					</section>
 				</div>
 
 				{ /* Sidebar */ }
-				<div className="htaccess-sidebar">
+				<aside className="side-panel">
 					{ /* Backups Panel */ }
 					{ showBackups && (
-						<div className="card htaccess-backups">
+						<div className="side-card">
 							<h3>{ __( 'Backups', 'saman-seo' ) }</h3>
 							{ backups.length === 0 ? (
-								<p className="htaccess-backups__empty">
+								<p className="panel-desc">
 									{ __( 'No backups yet', 'saman-seo' ) }
 								</p>
 							) : (
-								<ul className="htaccess-backups__list">
+								<ul className="plain-list">
 									{ backups.map( ( backup ) => (
-										<li
-											key={ backup.file }
-											className="htaccess-backup"
-										>
-											<div className="htaccess-backup__info">
-												<span className="htaccess-backup__date">
+										<li key={ backup.file }>
+											<div className="plain-list__main">
+												<span className="plain-list__title">
 													{ backup.date }
 												</span>
-												<span className="htaccess-backup__size">
+												<span className="plain-list__meta">
 													{ backup.size }
 												</span>
 											</div>
 											<button
 												type="button"
-												className="button ghost small"
+												className="button small"
 												onClick={ () =>
 													handleRestore( backup )
 												}
@@ -414,24 +417,24 @@ RewriteRule .* - [F,L]`,
 					) }
 
 					{ /* Presets */ }
-					<div className="card htaccess-presets">
-						<h3>{ __( 'Quick Insert', 'saman-seo' ) }</h3>
-						<p className="htaccess-presets__desc">
+					<div className="side-card">
+						<h3>{ __( 'Quick insert', 'saman-seo' ) }</h3>
+						<p className="panel-desc">
 							{ __( 'Click to add common rules', 'saman-seo' ) }
 						</p>
-						<ul className="htaccess-presets__list">
+						<ul className="plain-list">
 							{ presets.map( ( preset ) => (
 								<li key={ preset.name }>
 									<button
 										type="button"
-										className="htaccess-preset"
+										className="plain-list__button"
 										onClick={ () => insertPreset( preset ) }
 										title={ preset.description }
 									>
-										<span className="htaccess-preset__name">
+										<span className="plain-list__title">
 											{ preset.name }
 										</span>
-										<span className="htaccess-preset__desc">
+										<span className="plain-list__meta">
 											{ preset.description }
 										</span>
 									</button>
@@ -439,7 +442,7 @@ RewriteRule .* - [F,L]`,
 							) ) }
 						</ul>
 					</div>
-				</div>
+				</aside>
 			</div>
 		</div>
 	);
