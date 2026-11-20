@@ -1,0 +1,230 @@
+// ==========================================================================
+// Modal
+// ==========================================================================
+// One dialog for the whole app. Parts exist under two spellings
+// (`.modal-header` and `.modal__header`); both resolve to the rules below.
+
+@keyframes modal-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes modal-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: @z-modal-backdrop;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: @spacing-2xl;
+    overflow: hidden;
+    background: rgba(15, 18, 28, 0.45);
+    animation: modal-fade-in 0.15s ease-out;
+}
+
+.modal {
+    z-index: @z-modal;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+    border-radius: @radius-lg;
+    background: @color-surface;
+    box-shadow: @shadow-xl;
+    animation: modal-slide-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &.modal-wide,
+    &.modal--large {
+        max-width: 640px;
+    }
+
+    &.modal--dialog {
+        max-width: 440px;
+    }
+}
+
+.modal-header,
+.modal__header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-md;
+    padding: @spacing-lg @spacing-xl;
+    border-bottom: 1px solid @color-border-light;
+
+    h2 {
+        margin: 0;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-semibold;
+        color: @color-text;
+    }
+}
+
+.modal-close,
+.modal__close {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: @radius-sm;
+    background: none;
+    color: @color-muted;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background @transition-fast, color @transition-fast;
+
+    &:hover {
+        background: @color-surface-muted;
+        color: @color-text;
+    }
+}
+
+.modal-body,
+.modal__body {
+    flex: 1;
+    min-height: 0;
+    padding: @spacing-xl;
+    overflow-y: auto;
+}
+
+.modal-footer,
+.modal__footer {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    gap: @spacing-md;
+    padding: @spacing-lg @spacing-xl;
+    border-top: 1px solid @color-border-light;
+}
+
+.modal-body .form-row {
+    align-items: flex-start;
+
+    .form-group {
+        margin-bottom: 0;
+    }
+}
+
+// Confirm / prompt dialog: a message and two buttons, no header rule.
+.modal--dialog {
+    .modal__body {
+        padding-bottom: @spacing-md;
+        color: @color-text;
+        font-size: @font-size-base;
+        line-height: @line-height-normal;
+
+        p {
+            margin: 0;
+        }
+
+        input {
+            width: 100%;
+            margin-top: @spacing-md;
+        }
+    }
+
+    .modal__footer {
+        border-top: 0;
+        padding-top: @spacing-md;
+    }
+}
+
+// Toasts: short confirmations and errors, bottom right, above dialogs.
+.toast-stack {
+    position: fixed;
+    right: @spacing-xl;
+    bottom: @spacing-xl;
+    z-index: @z-tooltip;
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-sm;
+    max-width: min(380px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-md;
+    padding: @spacing-md @spacing-lg;
+    border-radius: @radius-md;
+    background: #1c2130;
+    color: #fff;
+    font-size: @font-size-base;
+    line-height: @line-height-normal;
+    box-shadow: @shadow-xl;
+    pointer-events: auto;
+    animation: modal-slide-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &--error {
+        background: @color-danger-text;
+    }
+
+    > span {
+        flex: 1;
+        min-width: 0;
+    }
+
+    > button {
+        flex-shrink: 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font-size: 18px;
+        line-height: 1;
+        opacity: 0.75;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
+
+@media (max-width: @breakpoint-md) {
+    .modal-overlay {
+        padding: @spacing-md;
+    }
+
+    .modal {
+        max-height: calc(100vh - 24px);
+    }
+
+    .modal-header,
+    .modal__header,
+    .modal-body,
+    .modal__body,
+    .modal-footer,
+    .modal__footer {
+        padding-left: @spacing-lg;
+        padding-right: @spacing-lg;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal-overlay,
+    .modal,
+    .toast {
+        animation: none;
+    }
+}

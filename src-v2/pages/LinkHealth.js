@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { __ } from '@wordpress/i18n';
+import { KpiBand, MetricCard } from '../components/Kpi';
+import { __, sprintf } from '@wordpress/i18n';
+import { confirmDialog } from '../components/Dialogs';
 const TAB_OPTIONS = [
 	{
 		value: 'overview',
@@ -8,11 +10,11 @@ const TAB_OPTIONS = [
 	},
 	{
 		value: 'broken',
-		label: __( 'Broken Links', 'saman-seo' ),
+		label: __( 'Broken links', 'saman-seo' ),
 	},
 	{
 		value: 'orphans',
-		label: __( 'Orphan Pages', 'saman-seo' ),
+		label: __( 'Orphan pages', 'saman-seo' ),
 	},
 ];
 const LinkHealth = () => {
@@ -184,11 +186,12 @@ const LinkHealth = () => {
 	// Delete a link entry
 	const handleDeleteLink = async ( linkId ) => {
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				__(
 					'Remove this link from the report? This will not remove the actual link from your content.',
 					'saman-seo'
-				)
+				),
+				{ confirmLabel: __( 'Remove', 'saman-seo' ), danger: true }
 			)
 		) {
 			return;
@@ -227,9 +230,50 @@ const LinkHealth = () => {
 	};
 	return (
 		<div className="page">
+			{ summary ? (
+				<KpiBand label={ __( 'Link summary', 'saman-seo' ) }>
+					<MetricCard
+						label={ __( 'Link health score', 'saman-seo' ) }
+						value={ `${ summary.health_score }%` }
+						tone={ getHealthColor( summary.health_score ) }
+						sub={ sprintf(
+							/* translators: %s: number of links */
+							__( '%s links checked', 'saman-seo' ),
+							summary.total_links.toLocaleString()
+						) }
+					/>
+					<MetricCard
+						label={ __( 'Broken links', 'saman-seo' ) }
+						value={ summary.broken_links.toLocaleString() }
+						tone={ summary.broken_links > 0 ? 'danger' : 'success' }
+						onClick={ () => setActiveTab( 'broken' ) }
+					/>
+					<MetricCard
+						label={ __( 'Orphan pages', 'saman-seo' ) }
+						value={ summary.orphan_pages.toLocaleString() }
+						tone={
+							summary.orphan_pages > 0 ? 'warning' : 'success'
+						}
+						onClick={ () => setActiveTab( 'orphans' ) }
+					/>
+					<MetricCard
+						label={ __( 'Redirected links', 'saman-seo' ) }
+						value={ summary.redirects.toLocaleString() }
+						tone={ summary.redirects > 0 ? 'warning' : 'off' }
+						sub={ sprintf(
+							/* translators: 1: internal link count, 2: external link count */
+							__( '%1$s internal, %2$s external', 'saman-seo' ),
+							summary.internal.toLocaleString(),
+							summary.external.toLocaleString()
+						) }
+					/>
+				</KpiBand>
+			) : (
+				<KpiBand loading count={ 4 } />
+			) }
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'Link Health', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Link health', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Monitor and fix broken links across your site.',
@@ -246,7 +290,7 @@ const LinkHealth = () => {
 					>
 						{ scanning
 							? __( 'Scanning\u2026', 'saman-seo' )
-							: __( 'Run Full Scan', 'saman-seo' ) }
+							: __( 'Run full scan', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
@@ -306,107 +350,25 @@ const LinkHealth = () => {
 
 			{ /* Overview Tab */ }
 			{ activeTab === 'overview' && (
-				<section className="panel">
+				<section className="panel link-health-overview">
 					{ ! summary ? (
 						<div className="loading-state">
 							{ __( 'Loading summary\u2026', 'saman-seo' ) }
 						</div>
 					) : (
 						<>
-							{ /* Health Score */ }
-							<div className="health-score-card">
-								<div
-									className={ `health-score ${ getHealthColor(
-										summary.health_score
-									) }` }
-								>
-									<span className="health-score__value">
-										{ summary.health_score }%
-									</span>
-									<span className="health-score__label">
-										{ __(
-											'Link Health Score',
+							<p className="link-health-status">
+								{ summary.last_scan
+									? sprintf(
+											/* translators: %s: date and time of the last scan */
+											__( 'Last scan: %s', 'saman-seo' ),
+											formatDate( summary.last_scan )
+									  )
+									: __(
+											'No scan has run yet.',
 											'saman-seo'
-										) }
-									</span>
-								</div>
-								<div className="health-score__info">
-									<p>
-										{ summary.health_score >= 90
-											? __(
-													'Excellent! Your links are in great shape.',
-													'saman-seo'
-											  )
-											: summary.health_score >= 70
-											? __(
-													'Good, but there are some issues to address.',
-													'saman-seo'
-											  )
-											: __(
-													'Needs attention. Multiple broken links detected.',
-													'saman-seo'
-											  ) }
-									</p>
-									{ summary.last_scan && (
-										<span className="muted">
-											{ __( 'Last scan:', 'saman-seo' ) }{ ' ' }
-											{ formatDate( summary.last_scan ) }
-										</span>
-									) }
-								</div>
-							</div>
-
-							{ /* Stats Grid */ }
-							<div className="stats-grid">
-								<div className="stat-card">
-									<span className="stat-card__value">
-										{ summary.total_links.toLocaleString() }
-									</span>
-									<span className="stat-card__label">
-										{ __( 'Total Links', 'saman-seo' ) }
-									</span>
-								</div>
-								<div className="stat-card danger">
-									<span className="stat-card__value">
-										{ summary.broken_links.toLocaleString() }
-									</span>
-									<span className="stat-card__label">
-										{ __( 'Broken Links', 'saman-seo' ) }
-									</span>
-								</div>
-								<div className="stat-card warning">
-									<span className="stat-card__value">
-										{ summary.redirects.toLocaleString() }
-									</span>
-									<span className="stat-card__label">
-										{ __( 'Redirects', 'saman-seo' ) }
-									</span>
-								</div>
-								<div className="stat-card">
-									<span className="stat-card__value">
-										{ summary.internal.toLocaleString() }
-									</span>
-									<span className="stat-card__label">
-										{ __( 'Internal Links', 'saman-seo' ) }
-									</span>
-								</div>
-								<div className="stat-card">
-									<span className="stat-card__value">
-										{ summary.external.toLocaleString() }
-									</span>
-									<span className="stat-card__label">
-										{ __( 'External Links', 'saman-seo' ) }
-									</span>
-								</div>
-								<div className="stat-card warning">
-									<span className="stat-card__value">
-										{ summary.orphan_pages.toLocaleString() }
-									</span>
-									<span className="stat-card__label">
-										{ __( 'Orphan Pages', 'saman-seo' ) }
-									</span>
-								</div>
-							</div>
+									  ) }
+							</p>
 
 							{ /* Quick Actions */ }
 							{ ( summary.broken_links > 0 ||
@@ -414,7 +376,7 @@ const LinkHealth = () => {
 								<div className="quick-actions">
 									<h3>
 										{ __(
-											'Recommended Actions',
+											'Recommended actions',
 											'saman-seo'
 										) }
 									</h3>
@@ -496,7 +458,7 @@ const LinkHealth = () => {
 			{ activeTab === 'broken' && (
 				<section className="panel">
 					<div className="panel-header">
-						<h3>{ __( 'Broken Links', 'saman-seo' ) }</h3>
+						<h3>{ __( 'Broken links', 'saman-seo' ) }</h3>
 						<div className="filter-row">
 							<label className="filter-field">
 								<span>{ __( 'Type', 'saman-seo' ) }</span>
@@ -507,13 +469,13 @@ const LinkHealth = () => {
 									}
 								>
 									<option value="">
-										{ __( 'All Links', 'saman-seo' ) }
+										{ __( 'All links', 'saman-seo' ) }
 									</option>
 									<option value="internal">
-										{ __( 'Internal Only', 'saman-seo' ) }
+										{ __( 'Internal only', 'saman-seo' ) }
 									</option>
 									<option value="external">
-										{ __( 'External Only', 'saman-seo' ) }
+										{ __( 'External only', 'saman-seo' ) }
 									</option>
 								</select>
 							</label>
@@ -555,13 +517,13 @@ const LinkHealth = () => {
 								<thead>
 									<tr>
 										<th>
-											{ __( 'Source Page', 'saman-seo' ) }
+											{ __( 'Source page', 'saman-seo' ) }
 										</th>
 										<th>
 											{ __( 'Broken URL', 'saman-seo' ) }
 										</th>
 										<th>
-											{ __( 'Link Text', 'saman-seo' ) }
+											{ __( 'Link text', 'saman-seo' ) }
 										</th>
 										<th>{ __( 'Status', 'saman-seo' ) }</th>
 										<th>
@@ -733,7 +695,7 @@ const LinkHealth = () => {
 			{ activeTab === 'orphans' && (
 				<section className="panel">
 					<div className="panel-header">
-						<h3>{ __( 'Orphan Pages', 'saman-seo' ) }</h3>
+						<h3>{ __( 'Orphan pages', 'saman-seo' ) }</h3>
 						<p className="panel-desc">
 							{ __(
 								'Pages with no internal links pointing to them. Consider adding links from other content.',
@@ -777,7 +739,7 @@ const LinkHealth = () => {
 								<thead>
 									<tr>
 										<th>
-											{ __( 'Page Title', 'saman-seo' ) }
+											{ __( 'Page title', 'saman-seo' ) }
 										</th>
 										<th>{ __( 'Type', 'saman-seo' ) }</th>
 										<th>

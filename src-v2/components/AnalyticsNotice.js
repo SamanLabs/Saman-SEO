@@ -26,7 +26,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 					</svg>
 				</div>
 				<div className="analytics-notice__content">
-					<h4>{ __( 'Help Improve Saman SEO', 'saman-seo' ) }</h4>
+					<h4>{ __( 'Help improve Saman SEO', 'saman-seo' ) }</h4>
 					<p>
 						{ __(
 							'Share anonymous usage data to help us understand which features are most valuable and improve the plugin for everyone.',
@@ -70,7 +70,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 			{ expanded && (
 				<div className="analytics-notice__details">
 					<div className="analytics-privacy-info">
-						<h5>{ __( 'What We Collect', 'saman-seo' ) }</h5>
+						<h5>{ __( 'What we collect', 'saman-seo' ) }</h5>
 						<ul>
 							<li>
 								<svg
@@ -146,7 +146,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 							</li>
 						</ul>
 
-						<h5>{ __( 'What We Never Collect', 'saman-seo' ) }</h5>
+						<h5>{ __( 'What we never collect', 'saman-seo' ) }</h5>
 						<ul className="analytics-privacy-info__never">
 							<li>
 								<svg
@@ -226,7 +226,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 							</li>
 						</ul>
 
-						<h5>{ __( 'Privacy Measures', 'saman-seo' ) }</h5>
+						<h5>{ __( 'Privacy measures', 'saman-seo' ) }</h5>
 						<div className="analytics-privacy-info__measures">
 							<div className="privacy-measure">
 								<span className="privacy-measure__icon">
@@ -251,7 +251,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 								</span>
 								<div>
 									<strong>
-										{ __( 'No Cookies', 'saman-seo' ) }
+										{ __( 'No cookies', 'saman-seo' ) }
 									</strong>
 									<span>
 										{ __(
@@ -276,7 +276,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 								</span>
 								<div>
 									<strong>
-										{ __( 'Admin Only', 'saman-seo' ) }
+										{ __( 'Admin only', 'saman-seo' ) }
 									</strong>
 									<span>
 										{ __(
@@ -307,7 +307,7 @@ const AnalyticsNotice = ( { isEnabled, onToggle } ) => {
 								</span>
 								<div>
 									<strong>
-										{ __( 'Opt-out Anytime', 'saman-seo' ) }
+										{ __( 'Opt-out anytime', 'saman-seo' ) }
 									</strong>
 									<span>
 										{ __(

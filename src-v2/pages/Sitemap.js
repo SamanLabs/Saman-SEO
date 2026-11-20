@@ -6,7 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
 const sitemapTabs = [
 	{
 		id: 'xml-sitemap',
-		label: __( 'XML Sitemap', 'saman-seo' ),
+		label: __( 'XML sitemap', 'saman-seo' ),
 	},
 	{
 		id: 'llm-txt',
@@ -24,7 +24,7 @@ const SCHEDULE_OPTIONS = [
 	},
 	{
 		value: 'twicedaily',
-		label: __( 'Twice Daily', 'saman-seo' ),
+		label: __( 'Twice daily', 'saman-seo' ),
 	},
 	{
 		value: 'daily',
@@ -343,7 +343,7 @@ const Sitemap = () => {
 						rel="noopener noreferrer"
 						className="button ghost"
 					>
-						{ __( 'View Sitemap', 'saman-seo' ) }
+						{ __( 'View sitemap', 'saman-seo' ) }
 					</a>
 					{ llmSettings.enable_llm_txt === '1' && (
 						<a
@@ -354,6 +354,41 @@ const Sitemap = () => {
 						>
 							{ __( 'Open llms.txt', 'saman-seo' ) }
 						</a>
+					) }
+					{ activeTab === 'xml-sitemap' ? (
+						<>
+							<button
+								type="button"
+								className="button"
+								onClick={ handleRegenerate }
+								disabled={ regenerating }
+							>
+								{ regenerating
+									? __( 'Regenerating\u2026', 'saman-seo' )
+									: __( 'Regenerate now', 'saman-seo' ) }
+							</button>
+							<button
+								type="button"
+								className="button primary"
+								onClick={ handleSaveSettings }
+								disabled={ saving }
+							>
+								{ saving
+									? __( 'Saving\u2026', 'saman-seo' )
+									: __( 'Save changes', 'saman-seo' ) }
+							</button>
+						</>
+					) : (
+						<button
+							type="button"
+							className="button primary"
+							onClick={ handleSaveLlmSettings }
+							disabled={ saving }
+						>
+							{ saving
+								? __( 'Saving\u2026', 'saman-seo' )
+								: __( 'Save changes', 'saman-seo' ) }
+						</button>
 					) }
 				</div>
 			</div>
@@ -371,7 +406,7 @@ const Sitemap = () => {
 						{ /* XML Sitemap Configuration - Single Panel */ }
 						<section className="panel">
 							<h3>
-								{ __( 'XML Sitemap Settings', 'saman-seo' ) }
+								{ __( 'XML sitemap settings', 'saman-seo' ) }
 							</h3>
 							<p className="muted">
 								{ __(
@@ -386,7 +421,7 @@ const Sitemap = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Automatic Updates',
+												'Automatic updates',
 												'saman-seo'
 											) }
 										</label>
@@ -424,7 +459,7 @@ const Sitemap = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Max URLs Per Page',
+												'Max URLs per page',
 												'saman-seo'
 											) }
 										</label>
@@ -451,9 +486,7 @@ const Sitemap = () => {
 											}
 											min="1"
 											max="50000"
-											style={ {
-												width: '120px',
-											} }
+											className="input--medium"
 										/>
 									</div>
 								</div>
@@ -462,7 +495,7 @@ const Sitemap = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Generation Options',
+												'Generation options',
 												'saman-seo'
 											) }
 										</label>
@@ -547,7 +580,7 @@ const Sitemap = () => {
 								<div className="settings-row compact">
 									<div className="settings-label">
 										<label>
-											{ __( 'Post Types', 'saman-seo' ) }
+											{ __( 'Post types', 'saman-seo' ) }
 										</label>
 										<p className="settings-help">
 											{ __(
@@ -630,7 +663,7 @@ const Sitemap = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Archive Pages',
+												'Archive pages',
 												'saman-seo'
 											) }
 										</label>
@@ -691,7 +724,7 @@ const Sitemap = () => {
 								<div className="settings-row compact">
 									<div className="settings-label">
 										<label>
-											{ __( 'RSS Sitemap', 'saman-seo' ) }
+											{ __( 'RSS sitemap', 'saman-seo' ) }
 										</label>
 									</div>
 									<div className="settings-control">
@@ -755,11 +788,7 @@ const Sitemap = () => {
 
 										{ settings.enable_google_news ===
 											'1' && (
-											<div
-												style={ {
-													marginTop: '12px',
-												} }
-											>
+											<div className="sitemap-subfields">
 												<input
 													type="text"
 													value={
@@ -776,13 +805,9 @@ const Sitemap = () => {
 														)
 													}
 													placeholder={ __(
-														'Publication Name',
+														'Publication name',
 														'saman-seo'
 													) }
-													style={ {
-														width: '100%',
-														marginBottom: '8px',
-													} }
 												/>
 												<div className="checkbox-grid">
 													{ postTypes.map( ( pt ) => (
@@ -820,7 +845,7 @@ const Sitemap = () => {
 									<div className="settings-label">
 										<label>
 											{ __(
-												'Custom Pages',
+												'Custom pages',
 												'saman-seo'
 											) }
 										</label>
@@ -891,56 +916,22 @@ const Sitemap = () => {
 											className="button ghost small"
 											onClick={ addAdditionalPage }
 										>
-											{ __( '+ Add Page', 'saman-seo' ) }
+											{ __( '+ Add page', 'saman-seo' ) }
 										</button>
 									</div>
 								</div>
-							</div>
-
-							{ /* Save Button inside panel */ }
-							<div
-								className="form-actions"
-								style={ {
-									marginTop: '24px',
-									paddingTop: '24px',
-									borderTop: '1px solid #e5e7eb',
-								} }
-							>
-								<button
-									type="button"
-									className="button primary"
-									onClick={ handleSaveSettings }
-									disabled={ saving }
-								>
-									{ saving
-										? __( 'Saving\u2026', 'saman-seo' )
-										: __( 'Save Changes', 'saman-seo' ) }
-								</button>
-								<button
-									type="button"
-									className="button ghost"
-									onClick={ handleRegenerate }
-									disabled={ regenerating }
-								>
-									{ regenerating
-										? __(
-												'Regenerating\u2026',
-												'saman-seo'
-										  )
-										: __( 'Regenerate Now', 'saman-seo' ) }
-								</button>
 							</div>
 						</section>
 					</div>
 
 					{ /* Sidebar */ }
 					<aside className="side-panel">
-						<div className="side-card highlight">
-							<h3>{ __( 'Your Sitemaps', 'saman-seo' ) }</h3>
+						<div className="side-card">
+							<h3>{ __( 'Your sitemaps', 'saman-seo' ) }</h3>
 							<div className="sitemap-links">
 								<div className="sitemap-link-item">
 									<strong>
-										{ __( 'Main Index', 'saman-seo' ) }
+										{ __( 'Main index', 'saman-seo' ) }
 									</strong>
 									<a
 										href={ settings.sitemap_url }
@@ -953,7 +944,7 @@ const Sitemap = () => {
 								{ settings.enable_rss === '1' && (
 									<div className="sitemap-link-item">
 										<strong>
-											{ __( 'RSS Feed', 'saman-seo' ) }
+											{ __( 'RSS feed', 'saman-seo' ) }
 										</strong>
 										<a
 											href={ settings.rss_sitemap_url }
@@ -994,7 +985,7 @@ const Sitemap = () => {
 								</div>
 								<div className="stat-item">
 									<span className="muted">
-										{ __( 'Last Updated', 'saman-seo' ) }
+										{ __( 'Last updated', 'saman-seo' ) }
 									</span>
 									<span className="stat-value">
 										{ formatDate( stats.last_regenerated ) }
@@ -1004,7 +995,7 @@ const Sitemap = () => {
 						</div>
 
 						<div className="side-card">
-							<h3>{ __( 'Pro Tip', 'saman-seo' ) }</h3>
+							<h3>{ __( 'Pro tip', 'saman-seo' ) }</h3>
 							<p className="muted">
 								{ __(
 									'Submit your sitemap to Google Search Console and Bing Webmaster Tools for faster indexing.',
@@ -1020,7 +1011,7 @@ const Sitemap = () => {
 						{ /* llms.txt - Single Panel */ }
 						<section className="panel">
 							<h3>
-								{ __( 'llms.txt Configuration', 'saman-seo' ) }
+								{ __( 'llms.txt configuration', 'saman-seo' ) }
 							</h3>
 							<p className="muted">
 								{ __(
@@ -1173,7 +1164,7 @@ const Sitemap = () => {
 											<div className="settings-label">
 												<label>
 													{ __(
-														'Max Posts Per Type',
+														'Max posts per type',
 														'saman-seo'
 													) }
 												</label>
@@ -1205,9 +1196,7 @@ const Sitemap = () => {
 													}
 													min="1"
 													max="500"
-													style={ {
-														width: '120px',
-													} }
+													className="input--medium"
 												/>
 											</div>
 										</div>
@@ -1257,7 +1246,7 @@ const Sitemap = () => {
 											<div className="settings-label">
 												<label>
 													{ __(
-														'Content Included',
+														'Content included',
 														'saman-seo'
 													) }
 												</label>
@@ -1269,7 +1258,7 @@ const Sitemap = () => {
 												</p>
 											</div>
 											<div className="settings-control">
-												<div className="post-types-preview">
+												<div className="stats-list">
 													{ postTypes.map( ( pt ) => {
 														const willInclude =
 															Math.min(
@@ -1279,31 +1268,25 @@ const Sitemap = () => {
 														return (
 															<div
 																key={ pt.name }
-																className="post-type-preview-item"
+																className="stat-item"
 															>
-																<div className="post-type-info">
-																	<strong>
-																		{
-																			pt.label
-																		}
-																	</strong>
-																	<span className="muted">
-																		{
-																			willInclude
-																		}{ ' ' }
-																		{ __(
-																			'of',
-																			'saman-seo'
-																		) }{ ' ' }
-																		{
-																			pt.count
-																		}{ ' ' }
-																		{ __(
-																			'posts',
-																			'saman-seo'
-																		) }
-																	</span>
-																</div>
+																<span>
+																	{ pt.label }
+																</span>
+																<span className="muted">
+																	{
+																		willInclude
+																	}{ ' ' }
+																	{ __(
+																		'of',
+																		'saman-seo'
+																	) }{ ' ' }
+																	{ pt.count }{ ' ' }
+																	{ __(
+																		'posts',
+																		'saman-seo'
+																	) }
+																</span>
 															</div>
 														);
 													} ) }
@@ -1313,46 +1296,12 @@ const Sitemap = () => {
 									</>
 								) }
 							</div>
-
-							{ /* Save Button inside panel */ }
-							{ llmSettings.enable_llm_txt === '1' && (
-								<div
-									className="form-actions"
-									style={ {
-										marginTop: '24px',
-										paddingTop: '24px',
-										borderTop: '1px solid #e5e7eb',
-									} }
-								>
-									<button
-										type="button"
-										className="button primary"
-										onClick={ handleSaveLlmSettings }
-										disabled={ saving }
-									>
-										{ saving
-											? __( 'Saving\u2026', 'saman-seo' )
-											: __(
-													'Save Changes',
-													'saman-seo'
-											  ) }
-									</button>
-									<a
-										href={ llmsTxtUrl }
-										target="_blank"
-										rel="noopener noreferrer"
-										className="button ghost"
-									>
-										{ __( 'View llms.txt', 'saman-seo' ) }
-									</a>
-								</div>
-							) }
 						</section>
 
 						{ /* AGENTS.md - Single Panel */ }
 						<section className="panel">
 							<h3>
-								{ __( 'AGENTS.md Configuration', 'saman-seo' ) }
+								{ __( 'AGENTS.md configuration', 'saman-seo' ) }
 							</h3>
 							<p className="muted">
 								{ __(
@@ -1458,59 +1407,27 @@ const Sitemap = () => {
 									</div>
 								) }
 							</div>
-
-							{ /* Save Button inside panel */ }
-							{ llmSettings.enable_agents_md === '1' && (
-								<div
-									className="form-actions"
-									style={ {
-										marginTop: '24px',
-										paddingTop: '24px',
-										borderTop: '1px solid #e5e7eb',
-									} }
-								>
-									<button
-										type="button"
-										className="button primary"
-										onClick={ handleSaveLlmSettings }
-										disabled={ saving }
-									>
-										{ saving
-											? __( 'Saving\u2026', 'saman-seo' )
-											: __(
-													'Save Changes',
-													'saman-seo'
-											  ) }
-									</button>
-									<a
-										href={ llmSettings.agents_md_url }
-										target="_blank"
-										rel="noopener noreferrer"
-										className="button ghost"
-									>
-										{ __( 'View AGENTS.md', 'saman-seo' ) }
-									</a>
-								</div>
-							) }
 						</section>
 					</div>
 
 					{ /* Sidebar */ }
 					<aside className="side-panel">
-						<div className="side-card highlight">
+						<div className="side-card">
 							<h3>{ __( 'Your llms.txt', 'saman-seo' ) }</h3>
 							{ llmSettings.enable_llm_txt === '1' ? (
 								<>
-									<code className="url-display">
-										{ llmsTxtUrl }
-									</code>
-									<p
-										className="muted"
-										style={ {
-											marginTop: '12px',
-											fontSize: '13px',
-										} }
-									>
+									<div className="sitemap-links">
+										<div className="sitemap-link-item">
+											<a
+												href={ llmsTxtUrl }
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{ llmsTxtUrl }
+											</a>
+										</div>
+									</div>
+									<p className="muted">
 										{ __(
 											'If not accessible, go to Settings > Permalinks and save to flush rewrite rules.',
 											'saman-seo'
@@ -1527,20 +1444,24 @@ const Sitemap = () => {
 							) }
 						</div>
 
-						<div className="side-card highlight">
+						<div className="side-card">
 							<h3>{ __( 'Your AGENTS.md', 'saman-seo' ) }</h3>
 							{ llmSettings.enable_agents_md === '1' ? (
 								<>
-									<code className="url-display">
-										{ llmSettings.agents_md_url }
-									</code>
-									<p
-										className="muted"
-										style={ {
-											marginTop: '12px',
-											fontSize: '13px',
-										} }
-									>
+									<div className="sitemap-links">
+										<div className="sitemap-link-item">
+											<a
+												href={
+													llmSettings.agents_md_url
+												}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{ llmSettings.agents_md_url }
+											</a>
+										</div>
+									</div>
+									<p className="muted">
 										{ __(
 											'If not accessible, go to Settings > Permalinks and save to flush rewrite rules.',
 											'saman-seo'
@@ -1565,28 +1486,12 @@ const Sitemap = () => {
 									'saman-seo'
 								) }
 							</p>
-							<p
-								className="muted"
-								style={ {
-									marginTop: '8px',
-								} }
-							>
+							<p className="muted">
 								{ __(
 									'Google Search does not use llms.txt. Keep it only if other services you care about read it. The old /llm.txt address redirects here.',
 									'saman-seo'
 								) }
 							</p>
-							<a
-								href="https://llmstxt.org/"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="button ghost small"
-								style={ {
-									marginTop: '12px',
-								} }
-							>
-								{ __( 'Learn More', 'saman-seo' ) }
-							</a>
 						</div>
 					</aside>
 				</div>

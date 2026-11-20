@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import CreateRedirectModal from '../components/CreateRedirectModal';
 import IgnorePatternManager from '../components/IgnorePatternManager';
+import { KpiBand, MetricCard, Sparkline } from '../components/Kpi';
 import { __ } from '@wordpress/i18n';
+import { confirmDialog } from '../components/Dialogs';
 const SORT_OPTIONS = [
 	{
 		value: 'recent',
@@ -14,12 +16,13 @@ const SORT_OPTIONS = [
 	},
 ];
 const PER_PAGE_OPTIONS = [ 25, 50, 100, 200 ];
-const Log404 = ( { onNavigate } ) => {
+const Log404 = () => {
 	// 404 Log state
 	const [ logEntries, setLogEntries ] = useState( [] );
 	const [ logLoading, setLogLoading ] = useState( true );
 	const [ logTotal, setLogTotal ] = useState( 0 );
 	const [ botCount, setBotCount ] = useState( 0 );
+	const [ dailySeries, setDailySeries ] = useState( [] );
 	const [ logPage, setLogPage ] = useState( 1 );
 	const [ logPerPage, setLogPerPage ] = useState( 50 );
 	const [ logTotalPages, setLogTotalPages ] = useState( 1 );
@@ -59,6 +62,7 @@ const Log404 = ( { onNavigate } ) => {
 				setLogTotal( response.data.total );
 				setLogTotalPages( response.data.total_pages );
 				setBotCount( response.data.bot_count || 0 );
+				setDailySeries( response.data.daily || [] );
 				setIgnoredCount( response.data.ignored_count || 0 );
 			}
 		} catch ( error ) {
@@ -115,11 +119,12 @@ const Log404 = ( { onNavigate } ) => {
 	// Clear 404 log
 	const handleClearLog = async () => {
 		if (
-			! window.confirm(
+			! await confirmDialog(
 				__(
 					'Are you sure you want to clear the entire 404 log? This cannot be undone.',
 					'saman-seo'
-				)
+				),
+				{ confirmLabel: __( 'Clear log', 'saman-seo' ), danger: true }
 			)
 		) {
 			return;
@@ -268,6 +273,37 @@ const Log404 = ( { onNavigate } ) => {
 	};
 	return (
 		<div className="page">
+			<KpiBand label={ __( '404 summary', 'saman-seo' ) }>
+				<MetricCard
+					label={ __( 'Total entries', 'saman-seo' ) }
+					value={ logTotal.toLocaleString() }
+					sub={ __( 'Seen per day, last 14 days', 'saman-seo' ) }
+					spark={
+						dailySeries.some( ( v ) => v > 0 ) && (
+							<Sparkline data={ dailySeries } />
+						)
+					}
+				/>
+				<MetricCard
+					label={ __( 'Need redirect', 'saman-seo' ) }
+					value={ logEntries
+						.filter( ( e ) => ! e.redirect_exists )
+						.length.toLocaleString() }
+					tone={
+						logEntries.some( ( e ) => ! e.redirect_exists )
+							? 'warning'
+							: 'success'
+					}
+				/>
+				<MetricCard
+					label={ __( 'Bot hits', 'saman-seo' ) }
+					value={ botCount.toLocaleString() }
+				/>
+				<MetricCard
+					label={ __( 'Ignored', 'saman-seo' ) }
+					value={ ignoredCount.toLocaleString() }
+				/>
+			</KpiBand>
 			<div className="page-header">
 				<div>
 					<h1>{ __( '404 Log', 'saman-seo' ) }</h1>
@@ -284,7 +320,7 @@ const Log404 = ( { onNavigate } ) => {
 						className="button"
 						onClick={ () => setShowIgnoreManager( true ) }
 					>
-						{ __( 'Manage Ignore Patterns', 'saman-seo' ) }
+						{ __( 'Manage ignore patterns', 'saman-seo' ) }
 					</button>
 					<div
 						className={ `dropdown log-export-dropdown ${
@@ -343,54 +379,14 @@ const Log404 = ( { onNavigate } ) => {
 					>
 						{ clearingLog
 							? __( 'Clearing\u2026', 'saman-seo' )
-							: __( 'Clear Log', 'saman-seo' ) }
+							: __( 'Clear log', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 
 			<section className="page-body">
 				{ /* Summary + Filters */ }
-				<div className="page-toolbar">
-					<div className="page-summary">
-						<div className="stat-list">
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{ logTotal.toLocaleString() }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Total entries', 'saman-seo' ) }
-								</span>
-							</div>
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{
-										logEntries.filter(
-											( e ) => ! e.redirect_exists
-										).length
-									}
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Need redirect', 'saman-seo' ) }
-								</span>
-							</div>
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{ botCount.toLocaleString() }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Bot hits', 'saman-seo' ) }
-								</span>
-							</div>
-							<div className="stat-list__item">
-								<span className="stat-list__value">
-									{ ignoredCount.toLocaleString() }
-								</span>
-								<span className="stat-list__label">
-									{ __( 'Ignored', 'saman-seo' ) }
-								</span>
-							</div>
-						</div>
-					</div>
+				<div className="page-toolbar page-toolbar--long">
 					<div className="page-toolbar__filters">
 						<label className="filter-field">
 							<span>{ __( 'Sort by', 'saman-seo' ) }</span>

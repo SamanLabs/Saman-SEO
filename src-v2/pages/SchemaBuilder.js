@@ -23,6 +23,7 @@ import {
 	IconWrench,
 	IconBriefcase,
 } from '../components/Icons';
+import { promptDialog, toast } from '../components/Dialogs';
 const schemaTypes = [
 	{
 		id: 'Article',
@@ -38,19 +39,19 @@ const schemaTypes = [
 	},
 	{
 		id: 'LocalBusiness',
-		name: __( 'Local Business', 'saman-seo' ),
+		name: __( 'Local business', 'saman-seo' ),
 		icon: <IconMapPin />,
 		description: __( 'Physical business location', 'saman-seo' ),
 	},
 	{
 		id: 'FAQPage',
-		name: __( 'FAQ Page', 'saman-seo' ),
+		name: __( 'FAQ page', 'saman-seo' ),
 		icon: <IconHelpCircle />,
 		description: __( 'Frequently asked questions', 'saman-seo' ),
 	},
 	{
 		id: 'HowTo',
-		name: __( 'How To', 'saman-seo' ),
+		name: __( 'How-to', 'saman-seo' ),
 		icon: <IconChecklist />,
 		description: __( 'Step-by-step instructions', 'saman-seo' ),
 	},
@@ -140,7 +141,7 @@ const schemaTypes = [
 	},
 	{
 		id: 'JobPosting',
-		name: __( 'Job Posting', 'saman-seo' ),
+		name: __( 'Job posting', 'saman-seo' ),
 		icon: <IconBriefcase />,
 		description: __( 'Job opportunities', 'saman-seo' ),
 	},
@@ -160,17 +161,17 @@ const schemaFields = {
 		},
 		{
 			key: 'author',
-			label: __( 'Author Name', 'saman-seo' ),
+			label: __( 'Author name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'datePublished',
-			label: __( 'Date Published', 'saman-seo' ),
+			label: __( 'Date published', 'saman-seo' ),
 			type: 'date',
 		},
 		{
 			key: 'dateModified',
-			label: __( 'Date Modified', 'saman-seo' ),
+			label: __( 'Date modified', 'saman-seo' ),
 			type: 'date',
 		},
 		{
@@ -182,7 +183,7 @@ const schemaFields = {
 	Product: [
 		{
 			key: 'name',
-			label: __( 'Product Name', 'saman-seo' ),
+			label: __( 'Product name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -231,7 +232,7 @@ const schemaFields = {
 	LocalBusiness: [
 		{
 			key: 'name',
-			label: __( 'Business Name', 'saman-seo' ),
+			label: __( 'Business name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -252,7 +253,7 @@ const schemaFields = {
 		},
 		{
 			key: 'streetAddress',
-			label: __( 'Street Address', 'saman-seo' ),
+			label: __( 'Street address', 'saman-seo' ),
 			type: 'text',
 		},
 		{
@@ -267,7 +268,7 @@ const schemaFields = {
 		},
 		{
 			key: 'postalCode',
-			label: __( 'Postal Code', 'saman-seo' ),
+			label: __( 'Postal code', 'saman-seo' ),
 			type: 'text',
 		},
 		{
@@ -279,7 +280,7 @@ const schemaFields = {
 	FAQPage: [
 		{
 			key: 'faqs',
-			label: __( 'FAQ Items', 'saman-seo' ),
+			label: __( 'FAQ items', 'saman-seo' ),
 			type: 'faq-list',
 		},
 	],
@@ -297,7 +298,7 @@ const schemaFields = {
 		},
 		{
 			key: 'totalTime',
-			label: __( 'Total Time', 'saman-seo' ),
+			label: __( 'Total time', 'saman-seo' ),
 			type: 'text',
 			placeholder: __( 'PT30M (30 minutes)', 'saman-seo' ),
 		},
@@ -310,7 +311,7 @@ const schemaFields = {
 	Recipe: [
 		{
 			key: 'name',
-			label: __( 'Recipe Name', 'saman-seo' ),
+			label: __( 'Recipe name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -326,13 +327,13 @@ const schemaFields = {
 		},
 		{
 			key: 'prepTime',
-			label: __( 'Prep Time', 'saman-seo' ),
+			label: __( 'Prep time', 'saman-seo' ),
 			type: 'text',
 			placeholder: __( 'PT15M', 'saman-seo' ),
 		},
 		{
 			key: 'cookTime',
-			label: __( 'Cook Time', 'saman-seo' ),
+			label: __( 'Cook time', 'saman-seo' ),
 			type: 'text',
 			placeholder: __( 'PT30M', 'saman-seo' ),
 		},
@@ -355,7 +356,7 @@ const schemaFields = {
 	Event: [
 		{
 			key: 'name',
-			label: __( 'Event Name', 'saman-seo' ),
+			label: __( 'Event name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -366,17 +367,17 @@ const schemaFields = {
 		},
 		{
 			key: 'startDate',
-			label: __( 'Start Date', 'saman-seo' ),
+			label: __( 'Start date', 'saman-seo' ),
 			type: 'datetime-local',
 		},
 		{
 			key: 'endDate',
-			label: __( 'End Date', 'saman-seo' ),
+			label: __( 'End date', 'saman-seo' ),
 			type: 'datetime-local',
 		},
 		{
 			key: 'location',
-			label: __( 'Location Name', 'saman-seo' ),
+			label: __( 'Location name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
@@ -399,7 +400,7 @@ const schemaFields = {
 		},
 		{
 			key: 'jobTitle',
-			label: __( 'Job Title', 'saman-seo' ),
+			label: __( 'Job title', 'saman-seo' ),
 			type: 'text',
 		},
 		{
@@ -426,7 +427,7 @@ const schemaFields = {
 	Organization: [
 		{
 			key: 'name',
-			label: __( 'Organization Name', 'saman-seo' ),
+			label: __( 'Organization name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -459,7 +460,7 @@ const schemaFields = {
 	WebSite: [
 		{
 			key: 'name',
-			label: __( 'Site Name', 'saman-seo' ),
+			label: __( 'Site name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -476,21 +477,21 @@ const schemaFields = {
 		},
 		{
 			key: 'potentialAction',
-			label: __( 'Enable Site Search', 'saman-seo' ),
+			label: __( 'Enable site search', 'saman-seo' ),
 			type: 'checkbox',
 		},
 	],
 	BreadcrumbList: [
 		{
 			key: 'items',
-			label: __( 'Breadcrumb Items', 'saman-seo' ),
+			label: __( 'Breadcrumb items', 'saman-seo' ),
 			type: 'breadcrumb-list',
 		},
 	],
 	VideoObject: [
 		{
 			key: 'name',
-			label: __( 'Video Title', 'saman-seo' ),
+			label: __( 'Video title', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -506,7 +507,7 @@ const schemaFields = {
 		},
 		{
 			key: 'uploadDate',
-			label: __( 'Upload Date', 'saman-seo' ),
+			label: __( 'Upload date', 'saman-seo' ),
 			type: 'date',
 		},
 		{
@@ -529,7 +530,7 @@ const schemaFields = {
 	Course: [
 		{
 			key: 'name',
-			label: __( 'Course Name', 'saman-seo' ),
+			label: __( 'Course name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -540,43 +541,43 @@ const schemaFields = {
 		},
 		{
 			key: 'provider',
-			label: __( 'Provider Name', 'saman-seo' ),
+			label: __( 'Provider name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'courseCode',
-			label: __( 'Course Code', 'saman-seo' ),
+			label: __( 'Course code', 'saman-seo' ),
 			type: 'text',
 		},
 	],
 	SoftwareApplication: [
 		{
 			key: 'name',
-			label: __( 'Software Name', 'saman-seo' ),
+			label: __( 'Software name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
 		{
 			key: 'operatingSystem',
-			label: __( 'Operating System', 'saman-seo' ),
+			label: __( 'Operating system', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'applicationCategory',
-			label: __( 'Application Category', 'saman-seo' ),
+			label: __( 'Application category', 'saman-seo' ),
 			type: 'text',
 		},
 	],
 	Book: [
 		{
 			key: 'name',
-			label: __( 'Book Title', 'saman-seo' ),
+			label: __( 'Book title', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
 		{
 			key: 'author',
-			label: __( 'Author Name', 'saman-seo' ),
+			label: __( 'Author name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
@@ -586,91 +587,91 @@ const schemaFields = {
 		},
 		{
 			key: 'bookEdition',
-			label: __( 'Book Edition', 'saman-seo' ),
+			label: __( 'Book edition', 'saman-seo' ),
 			type: 'text',
 		},
 	],
 	MusicAlbum: [
 		{
 			key: 'name',
-			label: __( 'Album Name', 'saman-seo' ),
+			label: __( 'Album name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
 		{
 			key: 'byArtist',
-			label: __( 'Artist Name', 'saman-seo' ),
+			label: __( 'Artist name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'numTracks',
-			label: __( 'Number of Tracks', 'saman-seo' ),
+			label: __( 'Number of tracks', 'saman-seo' ),
 			type: 'number',
 		},
 	],
 	Movie: [
 		{
 			key: 'name',
-			label: __( 'Movie Title', 'saman-seo' ),
+			label: __( 'Movie title', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
 		{
 			key: 'director',
-			label: __( 'Director Name', 'saman-seo' ),
+			label: __( 'Director name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'dateCreated',
-			label: __( 'Date Created', 'saman-seo' ),
+			label: __( 'Date created', 'saman-seo' ),
 			type: 'date',
 		},
 	],
 	Restaurant: [
 		{
 			key: 'name',
-			label: __( 'Restaurant Name', 'saman-seo' ),
+			label: __( 'Restaurant name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
 		{
 			key: 'servesCuisine',
-			label: __( 'Serves Cuisine', 'saman-seo' ),
+			label: __( 'Serves cuisine', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'priceRange',
-			label: __( 'Price Range', 'saman-seo' ),
+			label: __( 'Price range', 'saman-seo' ),
 			type: 'text',
 		},
 	],
 	Service: [
 		{
 			key: 'name',
-			label: __( 'Service Name', 'saman-seo' ),
+			label: __( 'Service name', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
 		{
 			key: 'serviceType',
-			label: __( 'Service Type', 'saman-seo' ),
+			label: __( 'Service type', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'provider',
-			label: __( 'Provider Name', 'saman-seo' ),
+			label: __( 'Provider name', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'areaServed',
-			label: __( 'Area Served', 'saman-seo' ),
+			label: __( 'Area served', 'saman-seo' ),
 			type: 'text',
 		},
 	],
 	JobPosting: [
 		{
 			key: 'title',
-			label: __( 'Job Title', 'saman-seo' ),
+			label: __( 'Job title', 'saman-seo' ),
 			type: 'text',
 			required: true,
 		},
@@ -681,27 +682,27 @@ const schemaFields = {
 		},
 		{
 			key: 'hiringOrganization',
-			label: __( 'Hiring Organization', 'saman-seo' ),
+			label: __( 'Hiring organization', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'employmentType',
-			label: __( 'Employment Type', 'saman-seo' ),
+			label: __( 'Employment type', 'saman-seo' ),
 			type: 'text',
 		},
 		{
 			key: 'datePosted',
-			label: __( 'Date Posted', 'saman-seo' ),
+			label: __( 'Date posted', 'saman-seo' ),
 			type: 'date',
 		},
 		{
 			key: 'validThrough',
-			label: __( 'Valid Through', 'saman-seo' ),
+			label: __( 'Valid through', 'saman-seo' ),
 			type: 'date',
 		},
 		{
 			key: 'jobLocation',
-			label: __( 'Job Location', 'saman-seo' ),
+			label: __( 'Job location', 'saman-seo' ),
 			type: 'text',
 		},
 	],
@@ -726,7 +727,10 @@ const SchemaBuilder = ( { onNavigate } ) => {
 		apiFetch( {
 			path: '/saman-seo/v1/tools/schema/templates',
 		} )
-			.then( setTemplates )
+			.then( ( response ) => {
+				const list = response?.data ?? response;
+				setTemplates( Array.isArray( list ) ? list : [] );
+			} )
 			.catch( ( err ) =>
 				console.error( 'Failed to fetch templates:', err )
 			);
@@ -791,10 +795,10 @@ const SchemaBuilder = ( { onNavigate } ) => {
 			}
 		} catch ( error ) {
 			console.error( 'Failed to generate:', error );
-			// eslint-disable-next-line no-alert
-			window.alert(
+			toast(
 				error?.message ||
-					__( 'Failed to generate schema.', 'saman-seo' )
+					__( 'Failed to generate schema.', 'saman-seo' ),
+					'error'
 			);
 		} finally {
 			setGenerating( false );
@@ -830,8 +834,8 @@ const SchemaBuilder = ( { onNavigate } ) => {
 		setCopied( true );
 		setTimeout( () => setCopied( false ), 2000 );
 	};
-	const handleSaveTemplate = () => {
-		const templateName = prompt(
+	const handleSaveTemplate = async () => {
+		const templateName = await promptDialog(
 			__( 'Enter a name for this template:', 'saman-seo' )
 		);
 		if ( templateName ) {
@@ -847,7 +851,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 			} )
 				.then( () => {
 					setTemplates( [ ...templates, newTemplate ] );
-					alert( __( 'Template saved!', 'saman-seo' ) );
+					toast( __( 'Template saved!', 'saman-seo' ) );
 				} )
 				.catch( ( err ) =>
 					console.error( 'Failed to save template:', err )
@@ -872,15 +876,16 @@ const SchemaBuilder = ( { onNavigate } ) => {
 			if ( response.success ) {
 				setSelectedType( response.data.type );
 				setFormData( response.data.data );
-				alert( __( 'Schema imported successfully!', 'saman-seo' ) );
+				toast( __( 'Schema imported successfully!', 'saman-seo' ) );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to import schema:', error );
-			alert(
+			toast(
 				__(
 					'Failed to import schema. Check the URL and try again.',
 					'saman-seo'
-				)
+				),
+				'error'
 			);
 		} finally {
 			setImporting( false );
@@ -902,24 +907,25 @@ const SchemaBuilder = ( { onNavigate } ) => {
 				},
 			} );
 			if ( response.success ) {
-				alert( __( 'Schema saved successfully!', 'saman-seo' ) );
+				toast( __( 'Schema saved successfully!', 'saman-seo' ) );
 			}
 		} catch ( error ) {
 			console.error( 'Failed to save schema:', error );
-			// eslint-disable-next-line no-alert
-			window.alert(
-				error?.message || __( 'Failed to save schema.', 'saman-seo' )
+			toast(
+				error?.message || __( 'Failed to save schema.', 'saman-seo' ),
+				'error'
 			);
 		} finally {
 			setSaving( false );
 		}
 	};
-	const renderField = ( field ) => {
+	const renderField = ( field, id ) => {
 		const value = formData[ field.key ] || '';
 		switch ( field.type ) {
 			case 'textarea':
 				return (
 					<textarea
+						id={ id }
 						value={ value }
 						onChange={ ( e ) =>
 							handleFieldChange( field.key, e.target.value )
@@ -931,6 +937,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 			case 'select':
 				return (
 					<select
+						id={ id }
 						value={ value }
 						onChange={ ( e ) =>
 							handleFieldChange( field.key, e.target.value )
@@ -950,6 +957,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 				return (
 					<label className="checkbox-label">
 						<input
+							id={ id }
 							type="checkbox"
 							checked={ !! value }
 							onChange={ ( e ) =>
@@ -990,6 +998,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 			default:
 				return (
 					<input
+						id={ id }
 						type={ field.type }
 						value={ value }
 						onChange={ ( e ) =>
@@ -1000,6 +1009,7 @@ const SchemaBuilder = ( { onNavigate } ) => {
 				);
 		}
 	};
+	const activeType = schemaTypes.find( ( t ) => t.id === selectedType );
 	return (
 		<div className="page schema-builder-page">
 			<div className="page-header">
@@ -1013,9 +1023,9 @@ const SchemaBuilder = ( { onNavigate } ) => {
 							{ __( 'Tools', 'saman-seo' ) }
 						</button>
 						<span className="breadcrumb-separator">/</span>
-						<span>{ __( 'Schema Builder', 'saman-seo' ) }</span>
+						<span>{ __( 'Schema builder', 'saman-seo' ) }</span>
 					</div>
-					<h1>{ __( 'Visual Schema Builder', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Visual schema builder', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Create structured data markup for rich search results.',
@@ -1023,105 +1033,211 @@ const SchemaBuilder = ( { onNavigate } ) => {
 						) }
 					</p>
 				</div>
+				{ selectedType && (
+					<div className="header-actions">
+						<button
+							type="button"
+							className="button ghost"
+							onClick={ () => {
+								setSelectedType( null );
+								setFormData( {} );
+								setGeneratedSchema( null );
+							} }
+						>
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								width="16"
+								height="16"
+							>
+								<path d="M19 12H5M12 19l-7-7 7-7" />
+							</svg>
+							{ __( 'Back', 'saman-seo' ) }
+						</button>
+						{ generatedSchema && (
+							<button
+								type="button"
+								className="button"
+								onClick={ handleSaveTemplate }
+							>
+								{ __( 'Save as template', 'saman-seo' ) }
+							</button>
+						) }
+						<button
+							type="button"
+							className={
+								generatedSchema ? 'button' : 'button primary'
+							}
+							onClick={ handleGenerateSchema }
+							disabled={ generating }
+						>
+							{ generating ? (
+								<>
+									<span className="spinner-small"></span>
+									{ __( 'Generating\u2026', 'saman-seo' ) }
+								</>
+							) : (
+								__( 'Generate schema', 'saman-seo' )
+							) }
+						</button>
+						{ generatedSchema && (
+							<button
+								type="button"
+								className="button primary"
+								onClick={ handleSaveSchema }
+								disabled={ saving }
+							>
+								{ saving
+									? __( 'Saving\u2026', 'saman-seo' )
+									: __( 'Save schema', 'saman-seo' ) }
+							</button>
+						) }
+					</div>
+				) }
 			</div>
 
-			<div className="schema-builder-layout">
-				<div className="schema-builder-main">
+			<div
+				className={ `page-body${
+					generatedSchema ? ' two-column' : ''
+				}` }
+			>
+				<div className="main-column">
 					{ ! selectedType ? (
 						<>
-							<div className="schema-detect">
+							<section className="panel">
 								<h3>
+									{ __( 'Start from a URL', 'saman-seo' ) }
+								</h3>
+								<div className="settings-row">
+									<div className="settings-label">
+										<label htmlFor="saman-seo-schema-detect-url">
+											{ __(
+												'Auto-detect from URL',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Suggests a schema type for the page and fills in what it can.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<div className="inline-row">
+											<input
+												id="saman-seo-schema-detect-url"
+												type="url"
+												value={ postUrl }
+												onChange={ ( e ) =>
+													setPostUrl( e.target.value )
+												}
+												placeholder={ __(
+													'Enter a page URL to auto-detect schema type\u2026',
+													'saman-seo'
+												) }
+											/>
+											<button
+												type="button"
+												className="button"
+												onClick={ handleDetectSchema }
+												disabled={
+													detecting || ! postUrl
+												}
+											>
+												{ detecting ? (
+													<span className="spinner-small"></span>
+												) : (
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														width="16"
+														height="16"
+													>
+														<circle
+															cx="11"
+															cy="11"
+															r="8"
+														/>
+														<path d="M21 21l-4.35-4.35" />
+													</svg>
+												) }
+												{ __( 'Detect', 'saman-seo' ) }
+											</button>
+										</div>
+									</div>
+								</div>
+								<div className="settings-row">
+									<div className="settings-label">
+										<label htmlFor="saman-seo-schema-import-url">
+											{ __(
+												'Import from URL',
+												'saman-seo'
+											) }
+										</label>
+										<p className="settings-help">
+											{ __(
+												'Copies the structured data an existing page already has.',
+												'saman-seo'
+											) }
+										</p>
+									</div>
+									<div className="settings-control">
+										<div className="inline-row">
+											<input
+												id="saman-seo-schema-import-url"
+												type="url"
+												value={ importUrl }
+												onChange={ ( e ) =>
+													setImportUrl(
+														e.target.value
+													)
+												}
+												placeholder={ __(
+													'Enter a URL to import schema from\u2026',
+													'saman-seo'
+												) }
+											/>
+											<button
+												type="button"
+												className="button"
+												onClick={ handleImportSchema }
+												disabled={
+													importing || ! importUrl
+												}
+											>
+												{ importing ? (
+													<span className="spinner-small"></span>
+												) : (
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														width="16"
+														height="16"
+													>
+														<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+													</svg>
+												) }
+												{ __( 'Import', 'saman-seo' ) }
+											</button>
+										</div>
+									</div>
+								</div>
+							</section>
+
+							<section className="improvements-group schema-types">
+								<h2 className="improvements-group__title">
 									{ __(
-										'Auto-Detect from URL',
+										'Or choose schema type',
 										'saman-seo'
 									) }
-								</h3>
-								<div className="detect-input">
-									<input
-										type="url"
-										value={ postUrl }
-										onChange={ ( e ) =>
-											setPostUrl( e.target.value )
-										}
-										placeholder={ __(
-											'Enter a page URL to auto-detect schema type\u2026',
-											'saman-seo'
-										) }
-									/>
-									<button
-										type="button"
-										className="button button--secondary"
-										onClick={ handleDetectSchema }
-										disabled={ detecting || ! postUrl }
-									>
-										{ detecting ? (
-											<span className="spinner-small"></span>
-										) : (
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-												width="16"
-												height="16"
-											>
-												<circle cx="11" cy="11" r="8" />
-												<path d="M21 21l-4.35-4.35" />
-											</svg>
-										) }
-										{ __( 'Detect', 'saman-seo' ) }
-									</button>
-								</div>
-							</div>
-
-							<div className="schema-import">
-								<h3>
-									{ __( 'Import from URL', 'saman-seo' ) }
-								</h3>
-								<div className="import-input">
-									<input
-										type="url"
-										value={ importUrl }
-										onChange={ ( e ) =>
-											setImportUrl( e.target.value )
-										}
-										placeholder={ __(
-											'Enter a URL to import schema from\u2026',
-											'saman-seo'
-										) }
-									/>
-									<button
-										type="button"
-										className="button button--secondary"
-										onClick={ handleImportSchema }
-										disabled={ importing || ! importUrl }
-									>
-										{ importing ? (
-											<span className="spinner-small"></span>
-										) : (
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-												width="16"
-												height="16"
-											>
-												<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-											</svg>
-										) }
-										{ __( 'Import', 'saman-seo' ) }
-									</button>
-								</div>
-							</div>
-
-							<div className="schema-types">
-								<h3>
-									{ __(
-										'Or Choose Schema Type',
-										'saman-seo'
-									) }
-								</h3>
+								</h2>
 								<div className="schema-types-grid">
 									{ schemaTypes.map( ( type ) => (
 										<button
@@ -1144,134 +1260,149 @@ const SchemaBuilder = ( { onNavigate } ) => {
 										</button>
 									) ) }
 								</div>
-							</div>
+							</section>
 						</>
 					) : (
-						<>
-							<div className="schema-form-header">
-								<button
-									type="button"
-									className="back-button"
-									onClick={ () => {
-										setSelectedType( null );
-										setFormData( {} );
-										setGeneratedSchema( null );
-									} }
-								>
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										width="16"
-										height="16"
+						<section className="panel schema-fields">
+							<h3>
+								{ activeType?.icon } { activeType?.name }{ ' ' }
+								{ __( 'Schema', 'saman-seo' ) }
+							</h3>
+							{ schemaFields[ selectedType ]?.map( ( field ) => {
+								const fieldId = `saman-seo-schema-field-${ field.key }`;
+								const isList = field.type.endsWith( 'list' );
+								return (
+									<div
+										key={ field.key }
+										className={ `settings-row${
+											isList
+												? ' settings-row--stacked'
+												: ''
+										}` }
 									>
-										<path d="M19 12H5M12 19l-7-7 7-7" />
-									</svg>
-									{ __( 'Back', 'saman-seo' ) }
-								</button>
-								<h3>
-									{
-										schemaTypes.find(
-											( t ) => t.id === selectedType
-										)?.icon
-									}{ ' ' }
-									{
-										schemaTypes.find(
-											( t ) => t.id === selectedType
-										)?.name
-									}{ ' ' }
-									{ __( 'Schema', 'saman-seo' ) }
-								</h3>
-							</div>
-
-							<div className="schema-form">
-								{ schemaFields[ selectedType ]?.map(
-									( field ) => (
-										<div
-											key={ field.key }
-											className="form-field"
-										>
-											<label>
-												{ field.label }
-												{ field.required && (
-													<span className="required">
-														*
-													</span>
-												) }
-											</label>
-											{ renderField( field ) }
+										<div className="settings-label">
+											{ isList ? (
+												<span className="settings-label__text">
+													{ field.label }
+												</span>
+											) : (
+												<label htmlFor={ fieldId }>
+													{ field.label }
+													{ field.required && (
+														<span className="required">
+															*
+														</span>
+													) }
+												</label>
+											) }
 										</div>
-									)
-								) }
+										<div className="settings-control">
+											{ renderField( field, fieldId ) }
+										</div>
+									</div>
+								);
+							} ) }
+						</section>
+					) }
 
-								<div className="form-actions">
-									<button
-										type="button"
-										className="button button--primary"
-										onClick={ handleGenerateSchema }
-										disabled={ generating }
-									>
-										{ generating ? (
-											<>
-												<span className="spinner"></span>
-												{ __(
-													'Generating\u2026',
-													'saman-seo'
-												) }
-											</>
-										) : (
-											<>
-												<svg
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-													width="16"
-													height="16"
-												>
-													<path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
-													<rect
-														x="8"
-														y="2"
-														width="8"
-														height="4"
-														rx="1"
-													/>
-												</svg>
-												{ __(
-													'Generate Schema',
-													'saman-seo'
-												) }
-											</>
-										) }
-									</button>
-									{ generatedSchema && (
+					{ templates.length > 0 && (
+						<section className="improvements-group">
+							<h2 className="improvements-group__title">
+								{ __( 'Saved templates', 'saman-seo' ) }
+							</h2>
+							<ul className="improvements-list">
+								{ templates.map( ( template, idx ) => (
+									<li key={ idx } className="improvement-row">
+										<div className="improvement-row__main">
+											<div className="improvement-row__title">
+												<h3>{ template.name }</h3>
+												<span className="pill">
+													{ template.type }
+												</span>
+											</div>
+										</div>
 										<button
 											type="button"
-											className="button"
-											onClick={ handleSaveTemplate }
+											className="button small"
+											onClick={ () =>
+												handleApplyTemplate( template )
+											}
 										>
 											{ __(
-												'Save as Template',
+												'Use template',
 												'saman-seo'
 											) }
 										</button>
-									) }
-								</div>
-							</div>
-						</>
+									</li>
+								) ) }
+							</ul>
+						</section>
 					) }
 				</div>
 
 				{ generatedSchema && (
-					<div className="schema-builder-preview">
-						<div className="preview-header">
-							<h3>{ __( 'Generated Schema', 'saman-seo' ) }</h3>
-							<div className="preview-actions">
+					<aside className="side-panel">
+						<div className="side-card schema-preview">
+							<div className="side-card__head">
+								<h3>
+									{ __( 'Generated schema', 'saman-seo' ) }
+								</h3>
+								{ validation && validation.valid && (
+									<span className="pill success">
+										{ __(
+											'Valid schema markup',
+											'saman-seo'
+										) }
+									</span>
+								) }
+								{ validation && ! validation.valid && (
+									<span className="pill danger">
+										{ validation.errors?.length || 0 }{ ' ' }
+										{ __( 'issues found', 'saman-seo' ) }
+									</span>
+								) }
+							</div>
+
+							{ validation?.errors?.length > 0 && (
+								<ul className="note-list is-danger">
+									{ validation.errors.map( ( err, idx ) => (
+										<li key={ idx }>{ err }</li>
+									) ) }
+								</ul>
+							) }
+
+							{ validation?.warnings?.length > 0 && (
+								<ul className="note-list is-warning">
+									{ validation.warnings.map(
+										( warn, idx ) => (
+											<li key={ idx }>{ warn }</li>
+										)
+									) }
+								</ul>
+							) }
+
+							{ generateNotices.length > 0 && (
+								<ul className="note-list">
+									{ generateNotices.map( ( notice, idx ) => (
+										<li key={ idx }>{ notice }</li>
+									) ) }
+								</ul>
+							) }
+
+							<pre className="code-block">
+								<code>
+									{ JSON.stringify(
+										generatedSchema,
+										null,
+										2
+									) }
+								</code>
+							</pre>
+
+							<div className="inline-row">
 								<button
 									type="button"
-									className="button button--small"
+									className="button small"
 									onClick={ handleValidate }
 									disabled={ validating }
 								>
@@ -1281,167 +1412,39 @@ const SchemaBuilder = ( { onNavigate } ) => {
 								</button>
 								<button
 									type="button"
-									className="button button--small button--primary"
+									className="button small"
 									onClick={ handleCopySchema }
 								>
 									{ copied
 										? __( 'Copied!', 'saman-seo' )
 										: __( 'Copy', 'saman-seo' ) }
 								</button>
+								<a
+									href={ `https://search.google.com/test/rich-results?url=${ encodeURIComponent(
+										'data:application/ld+json,' +
+											JSON.stringify( generatedSchema )
+									) }` }
+									target="_blank"
+									rel="noopener noreferrer"
+									className="button small"
+								>
+									{ __( 'Test in Google', 'saman-seo' ) }
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										width="14"
+										height="14"
+									>
+										<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+										<polyline points="15 3 21 3 21 9" />
+										<line x1="10" y1="14" x2="21" y2="3" />
+									</svg>
+								</a>
 							</div>
 						</div>
-
-						{ validation && (
-							<div
-								className={ `validation-result ${
-									validation.valid ? 'valid' : 'invalid'
-								}` }
-							>
-								{ validation.valid ? (
-									<>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2"
-											width="16"
-											height="16"
-										>
-											<path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-											<polyline points="22 4 12 14.01 9 11.01" />
-										</svg>
-										{ __(
-											'Valid schema markup',
-											'saman-seo'
-										) }
-									</>
-								) : (
-									<>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2"
-											width="16"
-											height="16"
-										>
-											<circle cx="12" cy="12" r="10" />
-											<line
-												x1="12"
-												y1="8"
-												x2="12"
-												y2="12"
-											/>
-											<line
-												x1="12"
-												y1="16"
-												x2="12.01"
-												y2="16"
-											/>
-										</svg>
-										{ validation.errors?.length || 0 }{ ' ' }
-										{ __( 'issues found', 'saman-seo' ) }
-									</>
-								) }
-							</div>
-						) }
-
-						{ validation?.errors?.length > 0 && (
-							<ul className="validation-errors">
-								{ validation.errors.map( ( err, idx ) => (
-									<li key={ idx }>{ err }</li>
-								) ) }
-							</ul>
-						) }
-
-						{ validation?.warnings?.length > 0 && (
-							<ul
-								className="validation-errors validation-warnings"
-								style={ { color: '#92400e' } }
-							>
-								{ validation.warnings.map( ( warn, idx ) => (
-									<li key={ idx }>{ warn }</li>
-								) ) }
-							</ul>
-						) }
-
-						{ generateNotices.length > 0 && (
-							<ul
-								className="validation-errors validation-notices"
-								style={ { color: '#135e96' } }
-							>
-								{ generateNotices.map( ( notice, idx ) => (
-									<li key={ idx }>{ notice }</li>
-								) ) }
-							</ul>
-						) }
-
-						<pre className="schema-code">
-							<code>
-								{ JSON.stringify( generatedSchema, null, 2 ) }
-							</code>
-						</pre>
-
-						<div className="preview-footer">
-							<a
-								href={ `https://search.google.com/test/rich-results?url=${ encodeURIComponent(
-									'data:application/ld+json,' +
-										JSON.stringify( generatedSchema )
-								) }` }
-								target="_blank"
-								rel="noopener noreferrer"
-								className="button button--secondary"
-							>
-								{ __( 'Test in Google', 'saman-seo' ) }
-								<svg
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									width="14"
-									height="14"
-								>
-									<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-									<polyline points="15 3 21 3 21 9" />
-									<line x1="10" y1="14" x2="21" y2="3" />
-								</svg>
-							</a>
-							<button
-								type="button"
-								className="button button--primary"
-								onClick={ handleSaveSchema }
-								disabled={ saving }
-							>
-								{ saving
-									? __( 'Saving\u2026', 'saman-seo' )
-									: __( 'Save Schema', 'saman-seo' ) }
-							</button>
-						</div>
-					</div>
-				) }
-				{ templates.length > 0 && (
-					<div className="schema-templates">
-						<h3>{ __( 'Saved Templates', 'saman-seo' ) }</h3>
-						<div className="templates-grid">
-							{ templates.map( ( template, idx ) => (
-								<button
-									key={ idx }
-									type="button"
-									className="template-card"
-									onClick={ () =>
-										handleApplyTemplate( template )
-									}
-								>
-									<span className="template-name">
-										{ template.name }
-									</span>
-									<span className="template-type">
-										{ template.type }
-									</span>
-								</button>
-							) ) }
-						</div>
-					</div>
+					</aside>
 				) }
 			</div>
 		</div>
@@ -1449,6 +1452,26 @@ const SchemaBuilder = ( { onNavigate } ) => {
 };
 
 // Sub-components for complex field types
+const RemoveButton = ( { onClick } ) => (
+	<button
+		type="button"
+		className="button ghost small"
+		aria-label={ __( 'Remove', 'saman-seo' ) }
+		onClick={ onClick }
+	>
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			width="14"
+			height="14"
+		>
+			<line x1="18" y1="6" x2="6" y2="18" />
+			<line x1="6" y1="6" x2="18" y2="18" />
+		</svg>
+	</button>
+);
 const FAQListField = ( { value, onChange } ) => {
 	const addItem = () => {
 		onChange( [
@@ -1471,45 +1494,31 @@ const FAQListField = ( { value, onChange } ) => {
 		onChange( value.filter( ( _, i ) => i !== index ) );
 	};
 	return (
-		<div className="list-field">
+		<div className="repeat-list">
 			{ value.map( ( item, idx ) => (
-				<div key={ idx } className="list-item faq-item">
-					<input
-						type="text"
-						value={ item.question }
-						onChange={ ( e ) =>
-							updateItem( idx, 'question', e.target.value )
-						}
-						placeholder={ __( 'Question', 'saman-seo' ) }
-					/>
-					<textarea
-						value={ item.answer }
-						onChange={ ( e ) =>
-							updateItem( idx, 'answer', e.target.value )
-						}
-						placeholder={ __( 'Answer', 'saman-seo' ) }
-						rows={ 2 }
-					/>
-					<button
-						type="button"
-						className="remove-item"
-						onClick={ () => removeItem( idx ) }
-					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="14"
-							height="14"
-						>
-							<line x1="18" y1="6" x2="6" y2="18" />
-							<line x1="6" y1="6" x2="18" y2="18" />
-						</svg>
-					</button>
+				<div key={ idx } className="repeat-item">
+					<div className="repeat-item__fields">
+						<input
+							type="text"
+							value={ item.question }
+							onChange={ ( e ) =>
+								updateItem( idx, 'question', e.target.value )
+							}
+							placeholder={ __( 'Question', 'saman-seo' ) }
+						/>
+						<textarea
+							value={ item.answer }
+							onChange={ ( e ) =>
+								updateItem( idx, 'answer', e.target.value )
+							}
+							placeholder={ __( 'Answer', 'saman-seo' ) }
+							rows={ 2 }
+						/>
+					</div>
+					<RemoveButton onClick={ () => removeItem( idx ) } />
 				</div>
 			) ) }
-			<button type="button" className="add-item" onClick={ addItem }>
+			<button type="button" className="button small" onClick={ addItem }>
 				{ __( '+ Add FAQ', 'saman-seo' ) }
 			</button>
 		</div>
@@ -1537,11 +1546,11 @@ const StepsListField = ( { value, onChange } ) => {
 		onChange( value.filter( ( _, i ) => i !== index ) );
 	};
 	return (
-		<div className="list-field">
+		<div className="repeat-list">
 			{ value.map( ( item, idx ) => (
-				<div key={ idx } className="list-item step-item">
-					<span className="step-number">{ idx + 1 }</span>
-					<div className="step-fields">
+				<div key={ idx } className="repeat-item">
+					<span className="repeat-item__index">{ idx + 1 }</span>
+					<div className="repeat-item__fields">
 						<input
 							type="text"
 							value={ item.name }
@@ -1562,27 +1571,11 @@ const StepsListField = ( { value, onChange } ) => {
 							rows={ 2 }
 						/>
 					</div>
-					<button
-						type="button"
-						className="remove-item"
-						onClick={ () => removeItem( idx ) }
-					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="14"
-							height="14"
-						>
-							<line x1="18" y1="6" x2="6" y2="18" />
-							<line x1="6" y1="6" x2="18" y2="18" />
-						</svg>
-					</button>
+					<RemoveButton onClick={ () => removeItem( idx ) } />
 				</div>
 			) ) }
-			<button type="button" className="add-item" onClick={ addItem }>
-				{ __( '+ Add Step', 'saman-seo' ) }
+			<button type="button" className="button small" onClick={ addItem }>
+				{ __( '+ Add step', 'saman-seo' ) }
 			</button>
 		</div>
 	);
@@ -1600,9 +1593,9 @@ const SimpleListField = ( { value, onChange } ) => {
 		onChange( value.filter( ( _, i ) => i !== index ) );
 	};
 	return (
-		<div className="list-field">
+		<div className="repeat-list">
 			{ value.map( ( item, idx ) => (
-				<div key={ idx } className="list-item simple-item">
+				<div key={ idx } className="repeat-item">
 					<input
 						type="text"
 						value={ item }
@@ -1615,27 +1608,11 @@ const SimpleListField = ( { value, onChange } ) => {
 							idx + 1
 						) }
 					/>
-					<button
-						type="button"
-						className="remove-item"
-						onClick={ () => removeItem( idx ) }
-					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="14"
-							height="14"
-						>
-							<line x1="18" y1="6" x2="6" y2="18" />
-							<line x1="6" y1="6" x2="18" y2="18" />
-						</svg>
-					</button>
+					<RemoveButton onClick={ () => removeItem( idx ) } />
 				</div>
 			) ) }
-			<button type="button" className="add-item" onClick={ addItem }>
-				{ __( '+ Add Item', 'saman-seo' ) }
+			<button type="button" className="button small" onClick={ addItem }>
+				{ __( '+ Add item', 'saman-seo' ) }
 			</button>
 		</div>
 	);
@@ -1662,10 +1639,10 @@ const BreadcrumbListField = ( { value, onChange } ) => {
 		onChange( value.filter( ( _, i ) => i !== index ) );
 	};
 	return (
-		<div className="list-field">
+		<div className="repeat-list">
 			{ value.map( ( item, idx ) => (
-				<div key={ idx } className="list-item breadcrumb-item">
-					<span className="breadcrumb-position">{ idx + 1 }</span>
+				<div key={ idx } className="repeat-item">
+					<span className="repeat-item__index">{ idx + 1 }</span>
 					<input
 						type="text"
 						value={ item.name }
@@ -1682,27 +1659,11 @@ const BreadcrumbListField = ( { value, onChange } ) => {
 						}
 						placeholder={ __( 'URL', 'saman-seo' ) }
 					/>
-					<button
-						type="button"
-						className="remove-item"
-						onClick={ () => removeItem( idx ) }
-					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							width="14"
-							height="14"
-						>
-							<line x1="18" y1="6" x2="6" y2="18" />
-							<line x1="6" y1="6" x2="18" y2="18" />
-						</svg>
-					</button>
+					<RemoveButton onClick={ () => removeItem( idx ) } />
 				</div>
 			) ) }
-			<button type="button" className="add-item" onClick={ addItem }>
-				{ __( '+ Add Breadcrumb', 'saman-seo' ) }
+			<button type="button" className="button small" onClick={ addItem }>
+				{ __( '+ Add breadcrumb', 'saman-seo' ) }
 			</button>
 		</div>
 	);

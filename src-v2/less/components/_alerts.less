@@ -10,8 +10,8 @@
     margin-bottom: @spacing-xl;
 
     &.warning {
-        border-left: 4px solid @color-warning;
-        background: linear-gradient(90deg, rgba(192, 124, 26, 0.06), transparent 30%);
+        border: 1px solid fade(@color-warning, 30%);
+        background: @color-warning-bg;
     }
 
     .alert-header {
@@ -22,8 +22,69 @@
             font-size: @font-size-lg;
         }
     }
+}
 
-    .suggestions-table {
-        margin-top: @spacing-md;
+// Inline messages. `.notice-message <tone>` and
+// `.alert-banner alert-banner--<tone>` are the same component under two
+// spellings; both resolve to the tones below.
+.alert-banner,
+.notice-message {
+    padding: @spacing-md @spacing-lg;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    background: @color-surface;
+    color: @color-text;
+    font-size: @font-size-base;
+    line-height: @line-height-normal;
+
+    p {
+        margin: 0;
     }
+}
+
+.alert-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: @spacing-md;
+
+    svg {
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+}
+
+.notice-message {
+    margin-bottom: @spacing-lg;
+}
+
+.alert-banner--success,
+.notice-message.success {
+    background: @color-success-bg;
+    border-color: fade(@color-success, 25%);
+    color: @color-success-text;
+}
+
+.alert-banner--warning,
+.notice-message.warning {
+    background: @color-warning-bg;
+    border-color: fade(@color-warning, 30%);
+    color: @color-warning-text;
+}
+
+.alert-banner--error,
+.notice-message.error {
+    background: @color-danger-bg;
+    border-color: fade(@color-danger, 25%);
+    color: @color-danger-text;
+}
+
+.alert-banner--info,
+.notice-message.info {
+    background: @color-primary-lighter;
+    border-color: fade(@color-primary, 20%);
+}
+
+.alert-banner p + p,
+.notice-message p + p {
+    margin-top: @spacing-sm;
 }

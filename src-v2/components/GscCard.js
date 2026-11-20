@@ -19,6 +19,9 @@ const GscCard = () => {
 	const [ clientId, setClientId ] = useState( '' );
 	const [ clientSecret, setClientSecret ] = useState( '' );
 	const [ showSetup, setShowSetup ] = useState( false );
+	// Unconfigured sites see a short intro first; the credential form opens on
+	// request so it does not dominate the dashboard.
+	const [ setupOpen, setSetupOpen ] = useState( false );
 
 	const fetchAnalytics = useCallback( async () => {
 		setLoadingAnalytics( true );
@@ -173,7 +176,7 @@ const GscCard = () => {
 		return (
 			<div className="dashboard-card gsc-card">
 				<div className="card-header">
-					<h3>{ __( 'Search Performance', 'saman-seo' ) }</h3>
+					<h3>{ __( 'Search performance', 'saman-seo' ) }</h3>
 				</div>
 				<div className="gsc-loading">
 					{ __( 'Checking Search Console connection…', 'saman-seo' ) }
@@ -188,7 +191,7 @@ const GscCard = () => {
 	return (
 		<div className="dashboard-card gsc-card">
 			<div className="card-header">
-				<h3>{ __( 'Search Performance', 'saman-seo' ) }</h3>
+				<h3>{ __( 'Search performance', 'saman-seo' ) }</h3>
 				{ connected ? (
 					<span className="pill success">
 						{ __( 'Connected', 'saman-seo' ) }
@@ -217,7 +220,26 @@ const GscCard = () => {
 				<div className="gsc-alert gsc-alert--info">{ notice }</div>
 			) }
 
+			{ ! connected && ! configured && ! setupOpen && (
+				<div className="gsc-connect">
+					<p>
+						{ __(
+							'See real clicks, impressions and rankings from Google Search Console next to your SEO score. Setup takes a free OAuth client from Google Cloud and about five minutes.',
+							'saman-seo'
+						) }
+					</p>
+					<button
+						type="button"
+						className="button primary"
+						onClick={ () => setSetupOpen( true ) }
+					>
+						{ __( 'Set up Search Console', 'saman-seo' ) }
+					</button>
+				</div>
+			) }
+
 			{ ! connected &&
+				( configured || setupOpen ) &&
 				( configured && ! showSetup ? (
 					<div className="gsc-connect">
 						<p>
@@ -234,7 +256,7 @@ const GscCard = () => {
 						>
 							{ busy
 								? __( 'Redirecting…', 'saman-seo' )
-								: __( 'Connect Google Account', 'saman-seo' ) }
+								: __( 'Connect Google account', 'saman-seo' ) }
 						</button>
 						<p className="gsc-fineprint">
 							{ status?.email && (
@@ -263,7 +285,7 @@ const GscCard = () => {
 					>
 						<p>
 							{ __(
-								'Show real clicks, impressions, and rankings from Google Search Console. Create a free OAuth client in Google Cloud, then paste both values here.',
+								'Create an OAuth client in Google Cloud, then paste its client ID and secret here.',
 								'saman-seo'
 							) }
 						</p>
@@ -344,13 +366,16 @@ const GscCard = () => {
 							>
 								{ busy
 									? __( 'Working…', 'saman-seo' )
-									: __( 'Save & Connect', 'saman-seo' ) }
+									: __( 'Save & connect', 'saman-seo' ) }
 							</button>
-							{ configured && (
+							{ ( configured || setupOpen ) && (
 								<button
 									type="button"
 									className="button"
-									onClick={ () => setShowSetup( false ) }
+									onClick={ () => {
+										setShowSetup( false );
+										setSetupOpen( false );
+									} }
 								>
 									{ __( 'Cancel', 'saman-seo' ) }
 								</button>
@@ -394,7 +419,7 @@ const GscCard = () => {
 								·{ ' ' }
 								<button
 									type="button"
-									className="gsc-link-button"
+									className="gsc-link-button gsc-link-button--danger"
 									disabled={ busy }
 									onClick={ handleDisconnect }
 								>
@@ -507,7 +532,7 @@ const GscCard = () => {
 								) }
 								<button
 									type="button"
-									className="gsc-link-button"
+									className="gsc-link-button gsc-link-button--danger"
 									disabled={ busy }
 									onClick={ handleDisconnect }
 								>

@@ -2,17 +2,6 @@
 // Assistants Page - AI Chat Interface
 // ==========================================================================
 
-// Assistants Grid (on selector page)
-.assistants-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: @spacing-lg;
-
-    @media (max-width: @breakpoint-lg) {
-        grid-template-columns: 1fr;
-    }
-}
-
 // Assistant Card (reuses tool-card styles, additional tweaks)
 .assistant-card {
     position: relative;
@@ -31,7 +20,7 @@
 
     &:hover {
         border-color: @color-primary;
-        box-shadow: 0 8px 24px rgba(34, 113, 177, 0.12);
+        box-shadow: 0 8px 24px fade(@color-primary, 12%);
         transform: translateY(-2px);
 
         .assistant-card__arrow {
@@ -91,14 +80,6 @@
         width: 20px;
         height: 20px;
     }
-}
-
-// AI Badge for Tools page
-.tool-card__badge--ai {
-    background: @color-primary;
-    color: #fff;
-    font-size: 10px;
-    padding: 2px 6px;
 }
 
 // Assistants Page Layout
@@ -477,58 +458,6 @@
     }
 }
 
-// ==========================================================================
-// Assistants Management View
-// ==========================================================================
-
-// Stats Grid
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: @spacing-lg;
-    margin-bottom: @spacing-2xl;
-
-    @media (max-width: @breakpoint-lg) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: @breakpoint-sm) {
-        grid-template-columns: 1fr;
-    }
-}
-
-.stat-card {
-    padding: @spacing-xl;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-lg;
-    text-align: center;
-}
-
-.stat-card__value {
-    font-size: 2rem;
-    font-weight: @font-weight-bold;
-    color: @color-primary;
-    margin-bottom: @spacing-xs;
-}
-
-.stat-card__label {
-    font-size: @font-size-sm;
-    color: @color-muted;
-}
-
-// Assistants Section
-.assistants-section {
-    margin-bottom: @spacing-2xl;
-
-    h2 {
-        font-size: @font-size-lg;
-        font-weight: @font-weight-semibold;
-        color: @color-text;
-        margin: 0 0 @spacing-lg;
-    }
-}
-
 // Custom assistant card with actions
 .assistant-card--custom {
     display: flex;
@@ -574,36 +503,6 @@
     background: @color-surface-muted;
 }
 
-// Icon buttons for edit/delete
-.icon-button {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-md;
-    color: @color-muted;
-    cursor: pointer;
-    .flex-center();
-    .transition();
-
-    svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    &:hover {
-        color: @color-primary;
-        border-color: @color-primary;
-    }
-
-    &--danger:hover {
-        color: @color-danger;
-        border-color: @color-danger;
-        background: @color-danger-bg;
-    }
-}
-
 // Empty state
 .empty-state {
     padding: @spacing-3xl;
@@ -626,11 +525,6 @@
     border-radius: @radius-sm;
     margin-left: @spacing-sm;
     vertical-align: middle;
-
-    &--muted {
-        background: @color-surface-muted;
-        color: @color-muted;
-    }
 }
 
 // ==========================================================================
@@ -661,31 +555,6 @@
         resize: vertical;
         min-height: 80px;
     }
-}
-
-.form-row--checkbox {
-    label {
-        display: flex;
-        align-items: center;
-        gap: @spacing-sm;
-        cursor: pointer;
-
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: @color-primary;
-        }
-
-        span {
-            font-weight: @font-weight-normal;
-        }
-    }
-}
-
-.form-help {
-    font-size: @font-size-sm;
-    color: @color-muted;
-    margin-top: @spacing-xs;
 }
 
 // Icon Picker
@@ -801,4 +670,11 @@
             width: 100%;
         }
     }
+}
+
+// Create and edit screens: the back button plus the form's own headings are
+// enough, so the title block is hidden like on every other page. The chat
+// screen (`.assistants-page`) keeps its header: it names the assistant.
+.page:not(.assistants-page) > .page-header--with-back > div {
+    .visually-hidden();
 }

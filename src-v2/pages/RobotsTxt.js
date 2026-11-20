@@ -25,7 +25,7 @@ Sitemap: {{sitemap_url}}`,
 	},
 	{
 		id: 'block-all',
-		name: __( 'Block All Robots', 'saman-seo' ),
+		name: __( 'Block all robots', 'saman-seo' ),
 		description: __(
 			'Prevent all search engines from crawling',
 			'saman-seo'
@@ -35,7 +35,7 @@ Disallow: /`,
 	},
 	{
 		id: 'allow-all',
-		name: __( 'Allow All', 'saman-seo' ),
+		name: __( 'Allow all', 'saman-seo' ),
 		description: __(
 			'Allow all search engines to crawl everything',
 			'saman-seo'
@@ -47,7 +47,7 @@ Sitemap: {{sitemap_url}}`,
 	},
 	{
 		id: 'seo-optimized',
-		name: __( 'SEO Optimized', 'saman-seo' ),
+		name: __( 'SEO optimized', 'saman-seo' ),
 		description: __(
 			'Block unnecessary paths, allow important ones',
 			'saman-seo'
@@ -286,10 +286,12 @@ const RobotsTxt = () => {
 			const response = await apiFetch( {
 				path: '/saman-seo/v1/tools/robots-txt',
 			} );
-			setContent( response.content || '' );
-			setOriginalContent( response.content || '' );
-			setSiteUrl( response.site_url || '' );
-			setSitemapUrl( response.sitemap_url || '' );
+			// The endpoint wraps its payload in { success, data }.
+			const payload = response?.data || response || {};
+			setContent( payload.content || '' );
+			setOriginalContent( payload.content || '' );
+			setSiteUrl( payload.site_url || '' );
+			setSitemapUrl( payload.sitemap_url || '' );
 		} catch ( error ) {
 			console.error( 'Error loading robots.txt:', error );
 		} finally {
@@ -320,8 +322,9 @@ const RobotsTxt = () => {
 				path: '/saman-seo/v1/tools/robots-txt/reset',
 				method: 'POST',
 			} );
-			setContent( response.content || '' );
-			setOriginalContent( response.content || '' );
+			const payload = response?.data || response || {};
+			setContent( payload.content || '' );
+			setOriginalContent( payload.content || '' );
 			setActivePreset( null );
 		} catch ( error ) {
 			console.error( 'Error resetting robots.txt:', error );
@@ -411,7 +414,6 @@ const RobotsTxt = () => {
 		const warnings = [];
 		const lines = text.split( '\n' );
 		let hasUserAgent = false;
-		let lastUserAgent = null;
 		lines.forEach( ( line, index ) => {
 			const trimmed = line.trim();
 			const lineNum = index + 1;
@@ -447,7 +449,6 @@ const RobotsTxt = () => {
 			// User-agent tracking
 			if ( directivePart === 'user-agent' ) {
 				hasUserAgent = true;
-				lastUserAgent = trimmed.split( ':' )[ 1 ]?.trim();
 			}
 
 			// Check if Disallow/Allow comes before User-agent
@@ -492,21 +493,23 @@ const RobotsTxt = () => {
 	const hasChanges = content !== originalContent;
 	if ( loading ) {
 		return (
-			<div className="page">
+			<div className="page robots-page">
 				<div className="page-header">
-					<h1>{ __( 'robots.txt Editor', 'saman-seo' ) }</h1>
+					<div>
+						<h1>{ __( 'robots.txt editor', 'saman-seo' ) }</h1>
+					</div>
 				</div>
-				<div className="loading-spinner">
+				<div className="loading-state">
 					{ __( 'Loading\u2026', 'saman-seo' ) }
 				</div>
 			</div>
 		);
 	}
 	return (
-		<div className="page">
+		<div className="page robots-page">
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'robots.txt Editor', 'saman-seo' ) }</h1>
+					<h1>{ __( 'robots.txt editor', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Control how search engines crawl your site. Changes are saved to the database and override the default WordPress robots.txt.',
@@ -514,195 +517,64 @@ const RobotsTxt = () => {
 						) }
 					</p>
 				</div>
-				<div className="page-header__actions">
+				<div className="header-actions">
+					<a
+						href={ `${ siteUrl }/robots.txt` }
+						target="_blank"
+						rel="noopener noreferrer"
+						className="button ghost"
+					>
+						{ __( 'View live robots.txt', 'saman-seo' ) }
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+						>
+							<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+						</svg>
+					</a>
 					<button
 						type="button"
-						className="btn btn--secondary"
+						className="button"
 						onClick={ resetToDefault }
 						disabled={ saving }
 					>
-						{ __( 'Reset to Default', 'saman-seo' ) }
+						{ __( 'Reset to default', 'saman-seo' ) }
 					</button>
 					<button
 						type="button"
-						className="btn btn--primary"
+						className="button primary"
 						onClick={ saveRobotsTxt }
 						disabled={ saving || ! hasChanges }
 					>
 						{ saving
 							? __( 'Saving\u2026', 'saman-seo' )
-							: __( 'Save Changes', 'saman-seo' ) }
+							: __( 'Save changes', 'saman-seo' ) }
 					</button>
 				</div>
 			</div>
 
-			<div className="robots-editor">
-				{ /* Presets Section */ }
-				<div className="robots-editor__presets card">
-					<h3>{ __( 'Quick Presets', 'saman-seo' ) }</h3>
-					<p className="text-muted">
-						{ __(
-							'Apply a preset configuration to get started quickly.',
-							'saman-seo'
-						) }
-					</p>
-					<div className="presets-grid">
-						{ presets.map( ( preset ) => (
-							<button
-								key={ preset.id }
-								type="button"
-								className={ `preset-card ${
-									activePreset === preset.id
-										? 'preset-card--active'
-										: ''
-								}` }
-								onClick={ () => applyPreset( preset ) }
-							>
-								<strong>{ preset.name }</strong>
-								<span>{ preset.description }</span>
-							</button>
-						) ) }
-					</div>
-				</div>
-
-				{ /* AI crawlers */ }
-				<div className="robots-editor__ai card">
-					<h3>{ __( 'AI crawlers', 'saman-seo' ) }</h3>
-					<p className="text-muted">
-						{ __(
-							'Select AI crawlers to add a Disallow rule for them to the editor below. Nothing changes until you save.',
-							'saman-seo'
-						) }
-					</p>
-					<ul className="ai-notes">
-						<li>
-							{ __(
-								'Google-Extended does not affect Google Search, AI Overviews or AI Mode. To limit how pages appear there, use the nosnippet / max-snippet settings in the post editor (Advanced tab).',
-								'saman-seo'
-							) }
-						</li>
-						<li>
-							{ __(
-								'Blocking AI search crawlers (OAI-SearchBot, Claude-SearchBot, PerplexityBot) removes the site from those AI search products and their citations. Training crawlers can be blocked without that effect.',
-								'saman-seo'
-							) }
-						</li>
-						<li>
-							{ __(
-								'robots.txt is a request, not access control: each crawler decides whether to honor it.',
-								'saman-seo'
-							) }
-						</li>
-					</ul>
-					<div className="ai-actions">
-						<button
-							type="button"
-							className="btn btn--secondary"
-							onClick={ selectTrainingBots }
-						>
-							{ __( 'Select AI training crawlers', 'saman-seo' ) }
-						</button>
-						<button
-							type="button"
-							className="btn btn--primary"
-							onClick={ insertAiBlock }
-							disabled={ ! selectedBots.length }
-						>
-							{ sprintf(
-								/* translators: %d: number of selected crawlers */ __(
-									'Add Disallow rules (%d)',
-									'saman-seo'
-								),
-								selectedBots.length
-							) }
-						</button>
-					</div>
-					<div className="ai-grid">
-						{ aiCrawlers.map( ( bot ) => {
-							const present = contentHasUserAgent(
-								content,
-								bot.token
-							);
-							const inputId = `saman-seo-ai-bot-${ bot.token }`;
-							return (
-								<div
-									key={ bot.token }
-									className={ `ai-bot ${
-										present ? 'ai-bot--present' : ''
-									}` }
-								>
-									<input
-										id={ inputId }
-										type="checkbox"
-										checked={
-											present ||
-											selectedBots.includes( bot.token )
-										}
-										disabled={ present }
-										aria-describedby={ `${ inputId }-desc` }
-										onChange={ () =>
-											toggleBot( bot.token )
-										}
-									/>
-									<span className="ai-bot__body">
-										<span className="ai-bot__head">
-											<label htmlFor={ inputId }>
-												{ bot.token }
-											</label>
-											<span
-												className={ `ai-bot__tag ai-bot__tag--${ bot.purpose }` }
-											>
-												{
-													aiPurposeLabels[
-														bot.purpose
-													]
-												}
-											</span>
-										</span>
-										<span
-											id={ `${ inputId }-desc` }
-											className="ai-bot__desc"
-										>
-											{ bot.owner }: { bot.description }
-											{ present &&
-												` ${ __(
-													'(already in robots.txt)',
-													'saman-seo'
-												) }` }
-										</span>
-									</span>
-								</div>
-							);
-						} ) }
-					</div>
-				</div>
-
-				<div className="robots-editor__main">
+			<div className="page-body two-column">
+				<div className="main-column">
 					{ /* Editor */ }
-					<div className="robots-editor__editor card">
-						<div className="editor-header">
-							<h3>{ __( 'robots.txt Content', 'saman-seo' ) }</h3>
-							<a
-								href={ `${ siteUrl }/robots.txt` }
-								target="_blank"
-								rel="noopener noreferrer"
-								className="btn btn--text"
-							>
-								{ __( 'View Live robots.txt', 'saman-seo' ) }
-								<svg
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
-								</svg>
-							</a>
+					<section className="panel code-panel">
+						<div className="code-panel__head">
+							<h3>{ __( 'robots.txt content', 'saman-seo' ) }</h3>
+							{ hasChanges && (
+								<span className="pill warning">
+									{ __( 'Modified', 'saman-seo' ) }
+								</span>
+							) }
 						</div>
 						<textarea
-							className="robots-textarea"
+							className="code-editor"
+							aria-label={ __(
+								'robots.txt content',
+								'saman-seo'
+							) }
 							value={ content }
 							onChange={ ( e ) => setContent( e.target.value ) }
 							placeholder={ `${ __(
@@ -713,15 +585,15 @@ const RobotsTxt = () => {
 						/>
 
 						{ /* Quick Insert */ }
-						<div className="quick-insert">
-							<span className="quick-insert__label">
+						<div className="code-panel__foot">
+							<span className="code-panel__label">
 								{ __( 'Insert:', 'saman-seo' ) }
 							</span>
 							{ directives.map( ( d, i ) => (
 								<button
 									key={ i }
 									type="button"
-									className="quick-insert__btn"
+									className="button small"
 									onClick={ () => insertDirective( d.value ) }
 									title={ d.description }
 								>
@@ -729,514 +601,303 @@ const RobotsTxt = () => {
 								</button>
 							) ) }
 						</div>
-					</div>
+					</section>
 
-					{ /* Sidebar */ }
-					<div className="robots-editor__sidebar">
-						{ /* Validation */ }
-						<div className="card">
-							<h3>
-								<svg
-									className="icon-inline"
-									width="18"
-									height="18"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									{ validation.valid ? (
-										<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-									) : (
-										<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-									) }
-								</svg>
-								{ __( 'Validation', 'saman-seo' ) }
-							</h3>
-							{ validation.valid &&
-							validation.warnings.length === 0 ? (
-								<p className="validation-success">
-									{ __( 'No issues found', 'saman-seo' ) }
-								</p>
-							) : (
-								<div className="validation-issues">
-									{ validation.errors.map( ( err, i ) => (
-										<div
-											key={ `e${ i }` }
-											className="validation-issue validation-issue--error"
-										>
-											<svg
-												width="14"
-												height="14"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<circle
-													cx="12"
-													cy="12"
-													r="10"
-												/>
-												<path d="M15 9l-6 6M9 9l6 6" />
-											</svg>
-											{ err }
-										</div>
-									) ) }
-									{ validation.warnings.map( ( warn, i ) => (
-										<div
-											key={ `w${ i }` }
-											className="validation-issue validation-issue--warning"
-										>
-											<svg
-												width="14"
-												height="14"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<path d="M12 9v2m0 4h.01" />
-												<circle
-													cx="12"
-													cy="12"
-													r="10"
-												/>
-											</svg>
-											{ warn }
-										</div>
-									) ) }
-								</div>
+					{ /* Presets Section */ }
+					<section className="improvements-group">
+						<h2 className="improvements-group__title">
+							{ __( 'Quick presets', 'saman-seo' ) }
+						</h2>
+						<p className="group-note">
+							{ __(
+								'Apply a preset configuration to get started quickly.',
+								'saman-seo'
 							) }
-						</div>
+						</p>
+						<ul className="improvements-list">
+							{ presets.map( ( preset ) => (
+								<li
+									key={ preset.id }
+									className="improvement-row"
+								>
+									<div className="improvement-row__main">
+										<div className="improvement-row__title">
+											<h3>{ preset.name }</h3>
+											{ activePreset === preset.id && (
+												<span className="pill success">
+													{ __(
+														'Applied',
+														'saman-seo'
+													) }
+												</span>
+											) }
+										</div>
+										<p className="improvement-row__desc">
+											{ preset.description }
+										</p>
+									</div>
+									<button
+										type="button"
+										className="button small"
+										onClick={ () => applyPreset( preset ) }
+									>
+										{ __( 'Apply', 'saman-seo' ) }
+									</button>
+								</li>
+							) ) }
+						</ul>
+					</section>
 
-						{ /* Path Tester */ }
-						<div className="card">
-							<h3>{ __( 'Test Path', 'saman-seo' ) }</h3>
-							<p className="text-muted">
+					{ /* AI crawlers */ }
+					<section className="panel">
+						<h3>{ __( 'AI crawlers', 'saman-seo' ) }</h3>
+						<p className="panel-desc">
+							{ __(
+								'Select AI crawlers to add a Disallow rule for them to the editor. Nothing changes until you save.',
+								'saman-seo'
+							) }
+						</p>
+						<ul className="ai-notes">
+							<li>
 								{ __(
-									'Check if a URL path is allowed or blocked.',
+									'Google-Extended does not affect Google Search, AI Overviews or AI Mode. To limit how pages appear there, use the nosnippet / max-snippet settings in the post editor (Advanced tab).',
 									'saman-seo'
 								) }
-							</p>
-							<div className="path-tester">
-								<input
-									type="text"
-									value={ testUrl }
-									onChange={ ( e ) =>
-										setTestUrl( e.target.value )
-									}
-									placeholder={ __(
-										'/example-path/',
-										'saman-seo'
-									) }
-								/>
-								<button
-									type="button"
-									className="btn btn--secondary"
-									onClick={ testPath }
-									disabled={ testing }
-								>
-									{ testing
-										? __( 'Testing\u2026', 'saman-seo' )
-										: __( 'Test', 'saman-seo' ) }
-								</button>
-							</div>
-							{ testResult && (
-								<div
-									className={ `test-result ${
-										testResult.allowed
-											? 'test-result--allowed'
-											: 'test-result--blocked'
-									}` }
-								>
-									{ testResult.allowed ? (
-										<>
-											<svg
-												width="18"
-												height="18"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
+							</li>
+							<li>
+								{ __(
+									'Blocking AI search crawlers (OAI-SearchBot, Claude-SearchBot, PerplexityBot) removes the site from those AI search products and their citations. Training crawlers can be blocked without that effect.',
+									'saman-seo'
+								) }
+							</li>
+							<li>
+								{ __(
+									'robots.txt is a request, not access control: each crawler decides whether to honor it.',
+									'saman-seo'
+								) }
+							</li>
+						</ul>
+						<div className="ai-grid">
+							{ aiCrawlers.map( ( bot ) => {
+								const present = contentHasUserAgent(
+									content,
+									bot.token
+								);
+								const inputId = `saman-seo-ai-bot-${ bot.token }`;
+								return (
+									<div
+										key={ bot.token }
+										className={ `ai-bot${
+											present ? ' is-present' : ''
+										}` }
+									>
+										<input
+											id={ inputId }
+											type="checkbox"
+											checked={
+												present ||
+												selectedBots.includes(
+													bot.token
+												)
+											}
+											disabled={ present }
+											aria-describedby={ `${ inputId }-desc` }
+											onChange={ () =>
+												toggleBot( bot.token )
+											}
+										/>
+										<span className="ai-bot__body">
+											<span className="ai-bot__head">
+												<label htmlFor={ inputId }>
+													{ bot.token }
+												</label>
+												<span
+													className={
+														bot.purpose === 'search'
+															? 'pill warning'
+															: 'pill'
+													}
+												>
+													{
+														aiPurposeLabels[
+															bot.purpose
+														]
+													}
+												</span>
+											</span>
+											<span
+												id={ `${ inputId }-desc` }
+												className="ai-bot__desc"
 											>
-												<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-											</svg>
-											{ __( 'Allowed', 'saman-seo' ) }
-										</>
-									) : (
-										<>
-											<svg
-												width="18"
-												height="18"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<circle
-													cx="12"
-													cy="12"
-													r="10"
-												/>
-												<path d="M15 9l-6 6M9 9l6 6" />
-											</svg>
-											{ __( 'Blocked', 'saman-seo' ) }
-										</>
-									) }
-									{ testResult.rule && (
-										<span className="test-result__rule">
-											{ __( 'by:', 'saman-seo' ) }{ ' ' }
-											{ testResult.rule }
+												{ bot.owner }:{ ' ' }
+												{ bot.description }
+												{ present &&
+													` ${ __(
+														'(already in robots.txt)',
+														'saman-seo'
+													) }` }
+											</span>
 										</span>
-									) }
-								</div>
-							) }
+									</div>
+								);
+							} ) }
 						</div>
-
-						{ /* Help */ }
-						<div className="card">
-							<h3>{ __( 'Reference', 'saman-seo' ) }</h3>
-							<dl className="reference-list">
-								<dt>{ __( 'User-agent: *', 'saman-seo' ) }</dt>
-								<dd>
-									{ __(
-										'Apply rules to all crawlers',
+						<div className="inline-row">
+							<button
+								type="button"
+								className="button"
+								onClick={ selectTrainingBots }
+							>
+								{ __(
+									'Select AI training crawlers',
+									'saman-seo'
+								) }
+							</button>
+							<button
+								type="button"
+								className="button primary"
+								onClick={ insertAiBlock }
+								disabled={ ! selectedBots.length }
+							>
+								{ sprintf(
+									/* translators: %d: number of selected crawlers */ __(
+										'Add Disallow rules (%d)',
 										'saman-seo'
-									) }
-								</dd>
-								<dt>
-									{ __( 'Disallow: /path/', 'saman-seo' ) }
-								</dt>
-								<dd>
-									{ __(
-										'Block crawling of path',
-										'saman-seo'
-									) }
-								</dd>
-								<dt>{ __( 'Allow: /path/', 'saman-seo' ) }</dt>
-								<dd>
-									{ __(
-										'Override Disallow for path',
-										'saman-seo'
-									) }
-								</dd>
-								<dt>{ __( 'Sitemap: url', 'saman-seo' ) }</dt>
-								<dd>
-									{ __(
-										'Point to XML sitemap',
-										'saman-seo'
-									) }
-								</dd>
-								<dt>
-									{ __( 'Crawl-delay: 10', 'saman-seo' ) }
-								</dt>
-								<dd>
-									{ __(
-										'Seconds between requests. Googlebot ignores this directive.',
-										'saman-seo'
-									) }
-								</dd>
-							</dl>
+									),
+									selectedBots.length
+								) }
+							</button>
 						</div>
-					</div>
+					</section>
 				</div>
-			</div>
 
-			<style>{ `
-                .robots-editor__presets {
-                    margin-bottom: 24px;
-                }
-                .robots-editor__presets h3 {
-                    margin: 0 0 4px;
-                }
-                .presets-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                    gap: 12px;
-                    margin-top: 16px;
-                }
-                .preset-card {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-                    padding: 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    background: #fff;
-                    cursor: pointer;
-                    text-align: left;
-                    transition: all 0.15s;
-                }
-                .preset-card:hover {
-                    border-color: #2271b1;
-                    background: #f0f6fc;
-                }
-                .preset-card--active {
-                    border-color: #2271b1;
-                    background: #f0f6fc;
-                    box-shadow: 0 0 0 1px #2271b1;
-                }
-                .preset-card strong {
-                    color: #1d2327;
-                    font-size: 13px;
-                }
-                .preset-card span {
-                    color: #646970;
-                    font-size: 12px;
-                }
-                .robots-editor__ai {
-                    margin-bottom: 24px;
-                }
-                .robots-editor__ai h3 {
-                    margin: 0 0 4px;
-                }
-                .ai-notes {
-                    margin: 12px 0;
-                    padding-left: 18px;
-                    list-style: disc;
-                    color: #50575e;
-                    font-size: 12px;
-                }
-                .ai-notes li {
-                    margin-bottom: 4px;
-                }
-                .ai-actions {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 8px;
-                    margin-bottom: 12px;
-                }
-                .ai-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-                    gap: 8px;
-                }
-                .ai-bot {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 8px;
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    background: #fff;
-                }
-                .ai-bot input {
-                    margin-top: 2px;
-                }
-                .ai-bot--present {
-                    background: #f6f7f7;
-                    cursor: default;
-                }
-                .ai-bot__body {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-                    min-width: 0;
-                }
-                .ai-bot__head {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    flex-wrap: wrap;
-                }
-                .ai-bot__head label {
-                    font-family: monospace;
-                    font-size: 12px;
-                    font-weight: 600;
-                    cursor: pointer;
-                }
-                .ai-bot__tag {
-                    font-size: 11px;
-                    padding: 1px 6px;
-                    border-radius: 3px;
-                    background: #f0f0f1;
-                    color: #50575e;
-                }
-                .ai-bot__tag--search {
-                    background: #fcf9e8;
-                    color: #996800;
-                }
-                .ai-bot__desc {
-                    font-size: 12px;
-                    color: #646970;
-                }
-                .robots-editor__main {
-                    display: grid;
-                    grid-template-columns: 1fr 320px;
-                    gap: 24px;
-                }
-                @media (max-width: 1024px) {
-                    .robots-editor__main {
-                        grid-template-columns: 1fr;
-                    }
-                }
-                .robots-editor__editor {
-                    min-height: 400px;
-                }
-                .editor-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 12px;
-                }
-                .editor-header h3 {
-                    margin: 0;
-                }
-                .robots-textarea {
-                    width: 100%;
-                    min-height: 350px;
-                    padding: 16px;
-                    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-                    font-size: 13px;
-                    line-height: 1.6;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    resize: vertical;
-                    background: #f9f9f9;
-                }
-                .robots-textarea:focus {
-                    outline: none;
-                    border-color: #2271b1;
-                    box-shadow: 0 0 0 1px #2271b1;
-                }
-                .quick-insert {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 8px;
-                    align-items: center;
-                    margin-top: 12px;
-                    padding-top: 12px;
-                    border-top: 1px solid #eee;
-                }
-                .quick-insert__label {
-                    color: #646970;
-                    font-size: 12px;
-                    font-weight: 500;
-                }
-                .quick-insert__btn {
-                    padding: 4px 10px;
-                    font-size: 12px;
-                    background: #f0f0f1;
-                    border: 1px solid #ddd;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                }
-                .quick-insert__btn:hover {
-                    background: #e0e0e1;
-                    border-color: #c0c0c0;
-                }
-                .robots-editor__sidebar .card {
-                    margin-bottom: 16px;
-                }
-                .robots-editor__sidebar .card h3 {
-                    display: flex;
-                    align-items: center;
-                    margin: 0 0 8px;
-                    font-size: 14px;
-                }
-                .validation-success {
-                    color: #00a32a;
-                    font-size: 13px;
-                }
-                .validation-issues {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                }
-                .validation-issue {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 8px;
-                    font-size: 12px;
-                    padding: 8px;
-                    border-radius: 4px;
-                }
-                .validation-issue svg {
-                    flex-shrink: 0;
-                    margin-top: 1px;
-                }
-                .validation-issue--error {
-                    background: #fcf0f1;
-                    color: #d63638;
-                }
-                .validation-issue--warning {
-                    background: #fcf9e8;
-                    color: #996800;
-                }
-                .path-tester {
-                    display: flex;
-                    gap: 8px;
-                    margin-top: 8px;
-                }
-                .path-tester input {
-                    flex: 1;
-                    padding: 6px 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                }
-                .test-result {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-top: 12px;
-                    padding: 10px;
-                    border-radius: 4px;
-                    font-weight: 500;
-                }
-                .test-result--allowed {
-                    background: #edfaef;
-                    color: #00a32a;
-                }
-                .test-result--blocked {
-                    background: #fcf0f1;
-                    color: #d63638;
-                }
-                .test-result__rule {
-                    font-weight: 400;
-                    font-size: 12px;
-                    opacity: 0.8;
-                }
-                .reference-list {
-                    margin: 0;
-                    font-size: 12px;
-                }
-                .reference-list dt {
-                    font-family: monospace;
-                    font-weight: 600;
-                    color: #1d2327;
-                    margin-top: 8px;
-                }
-                .reference-list dt:first-child {
-                    margin-top: 0;
-                }
-                .reference-list dd {
-                    margin: 2px 0 0 0;
-                    color: #646970;
-                }
-                .text-muted {
-                    color: #646970;
-                    font-size: 13px;
-                    margin: 0;
-                }
-                .btn--text {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    color: #2271b1;
-                    background: none;
-                    border: none;
-                    padding: 0;
-                    font-size: 13px;
-                    cursor: pointer;
-                    text-decoration: none;
-                }
-                .btn--text:hover {
-                    color: #135e96;
-                    text-decoration: underline;
-                }
-            ` }</style>
+				{ /* Sidebar */ }
+				<aside className="side-panel">
+					{ /* Validation */ }
+					<div className="side-card">
+						<div className="side-card__head">
+							<h3>{ __( 'Validation', 'saman-seo' ) }</h3>
+							{ validation.valid &&
+								validation.warnings.length === 0 && (
+									<span className="pill success">
+										{ __( 'No issues found', 'saman-seo' ) }
+									</span>
+								) }
+						</div>
+						{ ( ! validation.valid ||
+							validation.warnings.length > 0 ) && (
+							<ul className="plain-list plain-list--notes">
+								{ validation.errors.map( ( err, i ) => (
+									<li key={ `e${ i }` }>
+										<span className="pill danger">
+											{ __( 'Error', 'saman-seo' ) }
+										</span>
+										<span>{ err }</span>
+									</li>
+								) ) }
+								{ validation.warnings.map( ( warn, i ) => (
+									<li key={ `w${ i }` }>
+										<span className="pill warning">
+											{ __( 'Warning', 'saman-seo' ) }
+										</span>
+										<span>{ warn }</span>
+									</li>
+								) ) }
+							</ul>
+						) }
+					</div>
+
+					{ /* Path Tester */ }
+					<div className="side-card">
+						<h3>{ __( 'Test path', 'saman-seo' ) }</h3>
+						<p className="panel-desc">
+							{ __(
+								'Check if a URL path is allowed or blocked.',
+								'saman-seo'
+							) }
+						</p>
+						<div className="inline-row">
+							<input
+								type="text"
+								aria-label={ __( 'Test path', 'saman-seo' ) }
+								value={ testUrl }
+								onChange={ ( e ) =>
+									setTestUrl( e.target.value )
+								}
+								placeholder={ __(
+									'/example-path/',
+									'saman-seo'
+								) }
+							/>
+							<button
+								type="button"
+								className="button"
+								onClick={ testPath }
+								disabled={ testing }
+							>
+								{ testing
+									? __( 'Testing\u2026', 'saman-seo' )
+									: __( 'Test', 'saman-seo' ) }
+							</button>
+						</div>
+						{ testResult && (
+							<div className="test-result">
+								{ testResult.allowed ? (
+									<span className="pill success">
+										{ __( 'Allowed', 'saman-seo' ) }
+									</span>
+								) : (
+									<span className="pill danger">
+										{ __( 'Blocked', 'saman-seo' ) }
+									</span>
+								) }
+								{ testResult.rule && (
+									<span className="test-result__rule">
+										{ __( 'by:', 'saman-seo' ) }{ ' ' }
+										{ testResult.rule }
+									</span>
+								) }
+							</div>
+						) }
+					</div>
+
+					{ /* Help */ }
+					<div className="side-card">
+						<h3>{ __( 'Reference', 'saman-seo' ) }</h3>
+						<dl className="reference-list">
+							<dt>{ __( 'User-agent: *', 'saman-seo' ) }</dt>
+							<dd>
+								{ __(
+									'Apply rules to all crawlers',
+									'saman-seo'
+								) }
+							</dd>
+							<dt>{ __( 'Disallow: /path/', 'saman-seo' ) }</dt>
+							<dd>
+								{ __( 'Block crawling of path', 'saman-seo' ) }
+							</dd>
+							<dt>{ __( 'Allow: /path/', 'saman-seo' ) }</dt>
+							<dd>
+								{ __(
+									'Override Disallow for path',
+									'saman-seo'
+								) }
+							</dd>
+							<dt>{ __( 'Sitemap: url', 'saman-seo' ) }</dt>
+							<dd>
+								{ __( 'Point to XML sitemap', 'saman-seo' ) }
+							</dd>
+							<dt>{ __( 'Crawl-delay: 10', 'saman-seo' ) }</dt>
+							<dd>
+								{ __(
+									'Seconds between requests. Googlebot ignores this directive.',
+									'saman-seo'
+								) }
+							</dd>
+						</dl>
+					</div>
+				</aside>
+			</div>
 		</div>
 	);
 };

@@ -43,7 +43,9 @@ class Admin_UI {
 		add_action( 'wp_ajax_SAMAN_SEO_render_preview', array( $this, 'ajax_render_preview' ) );
 
 		// Add admin notice for Saman Labs AI installation
-		add_action( 'admin_notices', array( $this, 'ai_installation_notice' ) );
+		// The "Install Saman Labs AI" admin notice is switched off for now.
+		// Re-enable by restoring this hook.
+		// add_action( 'admin_notices', array( $this, 'ai_installation_notice' ) );
 		add_action( 'wp_ajax_SAMAN_SEO_dismiss_ai_notice', array( $this, 'dismiss_ai_notice' ) );
 	}
 

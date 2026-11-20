@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { KpiBand, MetricCard } from '../components/Kpi';
 import { __, sprintf } from '@wordpress/i18n';
 const InstantIndexing = ( { onNavigate } ) => {
 	// State
@@ -200,7 +201,7 @@ const InstantIndexing = ( { onNavigate } ) => {
 				className: 'danger',
 			},
 			never: {
-				label: __( 'Not Submitted', 'saman-seo' ),
+				label: __( 'Not submitted', 'saman-seo' ),
 				className: '',
 			},
 		};
@@ -218,7 +219,7 @@ const InstantIndexing = ( { onNavigate } ) => {
 			<div className="page">
 				<div className="page-header">
 					<div>
-						<h1>{ __( 'Instant Indexing', 'saman-seo' ) }</h1>
+						<h1>{ __( 'Instant indexing', 'saman-seo' ) }</h1>
 						<p>
 							{ __(
 								'Submit URLs to search engines via IndexNow for faster discovery.',
@@ -258,7 +259,7 @@ const InstantIndexing = ( { onNavigate } ) => {
 								onNavigate && onNavigate( 'settings' )
 							}
 						>
-							{ __( 'Go to Settings', 'saman-seo' ) }
+							{ __( 'Go to settings', 'saman-seo' ) }
 						</button>
 					</div>
 				</div>
@@ -267,9 +268,33 @@ const InstantIndexing = ( { onNavigate } ) => {
 	}
 	return (
 		<div className="page">
+			{ stats ? (
+				<KpiBand label={ __( 'Submission summary', 'saman-seo' ) }>
+					<MetricCard
+						label={ __( 'Total submissions', 'saman-seo' ) }
+						value={ ( stats.total || 0 ).toLocaleString() }
+					/>
+					<MetricCard
+						label={ __( 'Successful', 'saman-seo' ) }
+						value={ ( stats.success || 0 ).toLocaleString() }
+						tone="success"
+					/>
+					<MetricCard
+						label={ __( 'Failed', 'saman-seo' ) }
+						value={ ( stats.failed || 0 ).toLocaleString() }
+						tone={ stats.failed > 0 ? 'danger' : 'off' }
+					/>
+					<MetricCard
+						label={ __( 'Today', 'saman-seo' ) }
+						value={ ( stats.today || 0 ).toLocaleString() }
+					/>
+				</KpiBand>
+			) : (
+				<KpiBand loading count={ 4 } />
+			) }
 			<div className="page-header">
 				<div>
-					<h1>{ __( 'Instant Indexing', 'saman-seo' ) }</h1>
+					<h1>{ __( 'Instant indexing', 'saman-seo' ) }</h1>
 					<p>
 						{ __(
 							'Submit URLs to search engines via IndexNow for faster discovery.',
@@ -297,44 +322,6 @@ const InstantIndexing = ( { onNavigate } ) => {
 				) }
 			</div>
 
-			{ /* Stats Cards */ }
-			{ stats && (
-				<div className="indexing-stats">
-					<div className="indexing-stat">
-						<div className="indexing-stat__value">
-							{ stats.total || 0 }
-						</div>
-						<div className="indexing-stat__label">
-							{ __( 'Total Submissions', 'saman-seo' ) }
-						</div>
-					</div>
-					<div className="indexing-stat indexing-stat--success">
-						<div className="indexing-stat__value">
-							{ stats.success || 0 }
-						</div>
-						<div className="indexing-stat__label">
-							{ __( 'Successful', 'saman-seo' ) }
-						</div>
-					</div>
-					<div className="indexing-stat indexing-stat--danger">
-						<div className="indexing-stat__value">
-							{ stats.failed || 0 }
-						</div>
-						<div className="indexing-stat__label">
-							{ __( 'Failed', 'saman-seo' ) }
-						</div>
-					</div>
-					<div className="indexing-stat">
-						<div className="indexing-stat__value">
-							{ stats.today || 0 }
-						</div>
-						<div className="indexing-stat__label">
-							{ __( 'Today', 'saman-seo' ) }
-						</div>
-					</div>
-				</div>
-			) }
-
 			{ /* Tabs */ }
 			<div className="sub-tabs">
 				<button
@@ -353,7 +340,7 @@ const InstantIndexing = ( { onNavigate } ) => {
 					}` }
 					onClick={ () => setActiveTab( 'logs' ) }
 				>
-					{ __( 'Submission Logs', 'saman-seo' ) }
+					{ __( 'Submission logs', 'saman-seo' ) }
 				</button>
 			</div>
 
@@ -384,10 +371,10 @@ const InstantIndexing = ( { onNavigate } ) => {
 								} }
 							>
 								<option value="">
-									{ __( 'All Status', 'saman-seo' ) }
+									{ __( 'All status', 'saman-seo' ) }
 								</option>
 								<option value="never">
-									{ __( 'Not Submitted', 'saman-seo' ) }
+									{ __( 'Not submitted', 'saman-seo' ) }
 								</option>
 								<option value="indexed">
 									{ __( 'Indexed', 'saman-seo' ) }
@@ -413,112 +400,132 @@ const InstantIndexing = ( { onNavigate } ) => {
 					</div>
 
 					{ /* Posts Table */ }
-					<table className="data-table">
-						<thead>
-							<tr>
-								<th className="checkbox-col">
-									<input
-										type="checkbox"
-										checked={
-											posts.length > 0 &&
-											selectedPosts.length ===
-												posts.length
-										}
-										onChange={ handleSelectAll }
-									/>
-								</th>
-								<th>{ __( 'Title', 'saman-seo' ) }</th>
-								<th>{ __( 'Status', 'saman-seo' ) }</th>
-								<th>{ __( 'Last Indexed', 'saman-seo' ) }</th>
-								<th>{ __( 'Actions', 'saman-seo' ) }</th>
-							</tr>
-						</thead>
-						<tbody>
-							{ loading ? (
+					<div className="table-wrap">
+						<table className="data-table">
+							<thead>
 								<tr>
-									<td colSpan="5" className="loading-cell">
-										{ __( 'Loading\u2026', 'saman-seo' ) }
-									</td>
+									<th className="checkbox-col">
+										<input
+											type="checkbox"
+											checked={
+												posts.length > 0 &&
+												selectedPosts.length ===
+													posts.length
+											}
+											onChange={ handleSelectAll }
+										/>
+									</th>
+									<th>{ __( 'Title', 'saman-seo' ) }</th>
+									<th>{ __( 'Status', 'saman-seo' ) }</th>
+									<th>
+										{ __( 'Last indexed', 'saman-seo' ) }
+									</th>
+									<th>{ __( 'Actions', 'saman-seo' ) }</th>
 								</tr>
-							) : posts.length === 0 ? (
-								<tr>
-									<td colSpan="5" className="empty-cell">
-										{ __( 'No posts found.', 'saman-seo' ) }
-									</td>
-								</tr>
-							) : (
-								posts.map( ( post ) => (
-									<tr key={ post.id }>
-										<td className="checkbox-col">
-											<input
-												type="checkbox"
-												checked={ selectedPosts.includes(
-													post.id
-												) }
-												onChange={ () =>
-													handleSelectPost( post.id )
-												}
-											/>
-										</td>
-										<td>
-											<div className="post-cell">
-												<strong>
-													{ post.title ||
-														__(
-															'(no title)',
-															'saman-seo'
-														) }
-												</strong>
-												<a
-													href={ post.url }
-													target="_blank"
-													rel="noopener noreferrer"
-													className="post-cell__url"
-												>
-													{ post.url }
-												</a>
-											</div>
-										</td>
-										<td>
-											<StatusBadge
-												status={ post.indexing_status }
-											/>
-										</td>
-										<td>
-											{ post.last_indexed_ago || '-' }
-										</td>
-										<td>
-											<button
-												type="button"
-												className="button ghost small"
-												onClick={ () =>
-													handleSubmitSingle(
-														post.id
-													)
-												}
-												title={ __(
-													'Submit for indexing',
-													'saman-seo'
-												) }
-											>
-												<svg
-													width="14"
-													height="14"
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-												>
-													<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-												</svg>
-												{ __( 'Submit', 'saman-seo' ) }
-											</button>
+							</thead>
+							<tbody>
+								{ loading ? (
+									<tr>
+										<td
+											colSpan="5"
+											className="loading-cell"
+										>
+											{ __(
+												'Loading\u2026',
+												'saman-seo'
+											) }
 										</td>
 									</tr>
-								) )
-							) }
-						</tbody>
-					</table>
+								) : posts.length === 0 ? (
+									<tr>
+										<td colSpan="5" className="empty-cell">
+											{ __(
+												'No posts found.',
+												'saman-seo'
+											) }
+										</td>
+									</tr>
+								) : (
+									posts.map( ( post ) => (
+										<tr key={ post.id }>
+											<td className="checkbox-col">
+												<input
+													type="checkbox"
+													checked={ selectedPosts.includes(
+														post.id
+													) }
+													onChange={ () =>
+														handleSelectPost(
+															post.id
+														)
+													}
+												/>
+											</td>
+											<td>
+												<div className="post-cell">
+													<strong>
+														{ post.title ||
+															__(
+																'(no title)',
+																'saman-seo'
+															) }
+													</strong>
+													<a
+														href={ post.url }
+														target="_blank"
+														rel="noopener noreferrer"
+														className="post-cell__url"
+													>
+														{ post.url }
+													</a>
+												</div>
+											</td>
+											<td>
+												<StatusBadge
+													status={
+														post.indexing_status
+													}
+												/>
+											</td>
+											<td>
+												{ post.last_indexed_ago || '-' }
+											</td>
+											<td>
+												<button
+													type="button"
+													className="button ghost small"
+													onClick={ () =>
+														handleSubmitSingle(
+															post.id
+														)
+													}
+													title={ __(
+														'Submit for indexing',
+														'saman-seo'
+													) }
+												>
+													<svg
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+													>
+														<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+													</svg>
+													{ __(
+														'Submit',
+														'saman-seo'
+													) }
+												</button>
+											</td>
+										</tr>
+									) )
+								) }
+							</tbody>
+						</table>
+					</div>
 
 					{ /* Pagination */ }
 					{ totalPages > 1 && (
@@ -554,50 +561,54 @@ const InstantIndexing = ( { onNavigate } ) => {
 
 			{ /* Logs Tab */ }
 			{ activeTab === 'logs' && (
-				<table className="data-table">
-					<thead>
-						<tr>
-							<th>{ __( 'URL', 'saman-seo' ) }</th>
-							<th>{ __( 'Status', 'saman-seo' ) }</th>
-							<th>{ __( 'Response', 'saman-seo' ) }</th>
-							<th>{ __( 'Search Engine', 'saman-seo' ) }</th>
-							<th>{ __( 'Submitted', 'saman-seo' ) }</th>
-						</tr>
-					</thead>
-					<tbody>
-						{ logs.length === 0 ? (
+				<div className="table-wrap">
+					<table className="data-table">
+						<thead>
 							<tr>
-								<td colSpan="5" className="empty-cell">
-									{ __(
-										'No submission logs yet.',
-										'saman-seo'
-									) }
-								</td>
+								<th>{ __( 'URL', 'saman-seo' ) }</th>
+								<th>{ __( 'Status', 'saman-seo' ) }</th>
+								<th>{ __( 'Response', 'saman-seo' ) }</th>
+								<th>{ __( 'Search engine', 'saman-seo' ) }</th>
+								<th>{ __( 'Submitted', 'saman-seo' ) }</th>
 							</tr>
-						) : (
-							logs.map( ( log ) => (
-								<tr key={ log.id }>
-									<td>
-										<a
-											href={ log.url }
-											target="_blank"
-											rel="noopener noreferrer"
-											className="truncate-link"
-										>
-											{ log.url }
-										</a>
+						</thead>
+						<tbody>
+							{ logs.length === 0 ? (
+								<tr>
+									<td colSpan="5" className="empty-cell">
+										{ __(
+											'No submission logs yet.',
+											'saman-seo'
+										) }
 									</td>
-									<td>
-										<StatusBadge status={ log.status } />
-									</td>
-									<td>{ log.response_code || '-' }</td>
-									<td>{ log.search_engine }</td>
-									<td>{ log.submitted_at }</td>
 								</tr>
-							) )
-						) }
-					</tbody>
-				</table>
+							) : (
+								logs.map( ( log ) => (
+									<tr key={ log.id }>
+										<td>
+											<a
+												href={ log.url }
+												target="_blank"
+												rel="noopener noreferrer"
+												className="truncate-link"
+											>
+												{ log.url }
+											</a>
+										</td>
+										<td>
+											<StatusBadge
+												status={ log.status }
+											/>
+										</td>
+										<td>{ log.response_code || '-' }</td>
+										<td>{ log.search_engine }</td>
+										<td>{ log.submitted_at }</td>
+									</tr>
+								) )
+							) }
+						</tbody>
+					</table>
+				</div>
 			) }
 		</div>
 	);

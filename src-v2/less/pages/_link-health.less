@@ -31,31 +31,6 @@
             height: 100%;
             transform: rotate(-90deg);
         }
-
-        .score-bg {
-            fill: none;
-            stroke: @color-border-light;
-            stroke-width: 8;
-        }
-
-        .score-fill {
-            fill: none;
-            stroke-width: 8;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-
-        &--good .score-fill {
-            stroke: @color-success;
-        }
-
-        &--warning .score-fill {
-            stroke: @color-warning;
-        }
-
-        &--poor .score-fill {
-            stroke: @color-danger;
-        }
     }
 
     &__score-value {
@@ -64,19 +39,6 @@
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
-
-        .score-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: @color-text;
-            line-height: 1;
-        }
-
-        .score-label {
-            font-size: 12px;
-            color: @color-text-secondary;
-            margin-top: 4px;
-        }
     }
 
     &__score-info {
@@ -112,12 +74,6 @@
             font-size: 24px;
             font-weight: 700;
             line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: @color-text-secondary;
-            margin-top: 4px;
         }
 
         &--good .stat-value {
@@ -204,28 +160,6 @@
             color: @color-text;
             line-height: 1;
         }
-
-        .stat-label {
-            font-size: 13px;
-            color: @color-text-secondary;
-            margin-top: 4px;
-        }
-
-        .stat-change {
-            font-size: 12px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-
-            &--positive {
-                color: @color-success;
-            }
-
-            &--negative {
-                color: @color-danger;
-            }
-        }
     }
 
     // Tab Navigation
@@ -257,26 +191,6 @@
             color: @color-primary;
             border-bottom-color: @color-primary;
         }
-
-        .tab-count {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            margin-left: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 10px;
-            background: @color-border-light;
-            color: @color-text-secondary;
-        }
-
-        &--active .tab-count {
-            background: @color-primary-light;
-            color: @color-primary;
-        }
     }
 
     // Scan Card
@@ -307,43 +221,10 @@
         gap: 16px;
         font-size: 13px;
         color: @color-text-secondary;
-
-        .last-scan {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-
-            svg {
-                width: 16px;
-                height: 16px;
-            }
-        }
     }
 
     &__scan-progress {
         margin-top: 16px;
-
-        .progress-bar {
-            height: 8px;
-            background: @color-border-light;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 8px;
-
-            .progress-fill {
-                height: 100%;
-                background: @color-primary;
-                border-radius: 4px;
-                transition: width 0.3s ease;
-            }
-        }
-
-        .progress-text {
-            font-size: 13px;
-            color: @color-text-secondary;
-            display: flex;
-            justify-content: space-between;
-        }
     }
 
     // Action Cards
@@ -371,11 +252,11 @@
         }
 
         &--danger {
-            border-left: 3px solid @color-danger;
+            border: 1px solid fade(@color-danger, 30%);
         }
 
         &--warning {
-            border-left: 3px solid @color-warning;
+            border: 1px solid fade(@color-warning, 30%);
         }
     }
 
@@ -485,15 +366,6 @@
 
         a {
             color: @color-text;
-
-            &:hover {
-                color: @color-primary;
-            }
-        }
-
-        .edit-link {
-            color: @color-text-secondary;
-            font-size: 12px;
 
             &:hover {
                 color: @color-primary;
@@ -641,70 +513,6 @@
     }
 }
 
-// Health score card component (used in overview)
-.health-score-card {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    padding: 24px;
-    background: @color-surface;
-    border: 1px solid @color-border;
-    border-radius: @radius-md;
-    margin-bottom: 24px;
-
-    @media (max-width: @breakpoint-sm) {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-.health-score {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    flex-shrink: 0;
-
-    &.success {
-        background: @color-success-bg;
-        color: @color-success;
-    }
-
-    &.warning {
-        background: @color-warning-bg;
-        color: @color-warning;
-    }
-
-    &.danger {
-        background: @color-danger-bg;
-        color: @color-danger;
-    }
-
-    &__value {
-        font-size: 28px;
-        font-weight: 700;
-        line-height: 1;
-    }
-
-    &__label {
-        font-size: 11px;
-        margin-top: 4px;
-    }
-
-    &__info {
-        flex: 1;
-
-        p {
-            margin: 0 0 8px;
-            font-size: 14px;
-            color: @color-text-secondary;
-        }
-    }
-}
-
 // Scan progress component
 .scan-progress {
     background: @color-surface;
@@ -802,6 +610,49 @@
         span {
             font-size: 13px;
             color: @color-text-secondary;
+        }
+    }
+}
+
+// Overview tab: a status line and the recommended actions as rows.
+.link-health-status {
+    margin: 0;
+    font-size: @font-size-base;
+    color: @color-text-secondary;
+}
+
+.link-health-overview .quick-actions {
+    display: block;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+
+    h3 {
+        margin: 0 0 @spacing-sm;
+        padding: 0;
+        font-size: @font-size-base;
+        font-weight: @font-weight-semibold;
+        text-transform: none;
+        letter-spacing: 0;
+        color: @color-text;
+    }
+
+    .action-card {
+        margin: 0;
+        padding: @spacing-md 0;
+        background: none;
+        border: 0;
+        border-top: 1px solid @color-border-light;
+        border-radius: 0;
+        font-family: inherit;
+
+        &:hover {
+            background: none;
+
+            strong {
+                color: @color-primary;
+            }
         }
     }
 }

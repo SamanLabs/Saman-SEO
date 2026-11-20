@@ -764,13 +764,16 @@ class Tools_Controller extends REST_Controller {
 		if ( ! $data ) {
 			return $this->success(
 				array(
-					'gaps'      => array(),
-					'clusters'  => array(),
-					'next_post' => null,
-					'raw'       => $result,
+					'gaps'           => array(),
+					'clusters'       => array(),
+					'next_post'      => null,
+					'raw'            => $result,
+					'posts_analyzed' => count( $existing_titles ),
 				)
 			);
 		}
+
+		$data['posts_analyzed'] = count( $existing_titles );
 
 		return $this->success( $data );
 	}

@@ -2403,6 +2403,39 @@ class Redirect_Manager {
 	}
 
 	/**
+	 * Redirect hits per day, oldest first, for the last N days.
+	 *
+	 * Days with no recorded hits are returned as 0 so the series always has
+	 * exactly N points.
+	 *
+	 * @param int $days Number of days, 1 to 60.
+	 * @return int[]
+	 */
+	public function get_daily_hits_series( $days ) {
+		global $wpdb;
+
+		$days  = max( 1, min( 60, (int) $days ) );
+		$names = array();
+		$now   = (int) current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Site-local day boundaries, matching how hits are keyed.
+
+		for ( $i = $days - 1; $i >= 0; $i-- ) {
+			$names[] = self::DAILY_HITS_PREFIX . gmdate( 'Ymd', $now - $i * DAY_IN_SECONDS );
+		}
+
+		$placeholders = implode( ', ', array_fill( 0, count( $names ), '%s' ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders generated above; read straight from the table the counter writes to.
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name IN ({$placeholders})", $names ), OBJECT_K );
+
+		$series = array();
+		foreach ( $names as $name ) {
+			$series[] = isset( $rows[ $name ] ) ? (int) $rows[ $name ]->option_value : 0;
+		}
+
+		return $series;
+	}
+
+	/**
 	 * Drop per-day hit counters older than 60 days.
 	 *
 	 * @return void

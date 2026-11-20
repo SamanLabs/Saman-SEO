@@ -7,7 +7,7 @@ import {
 	useTransition,
 } from 'react';
 import apiFetch from '@wordpress/api-fetch';
-import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import './index.css';
 
 // Eager-load the primary nav views so top-level navigation feels instant.
@@ -18,6 +18,7 @@ import More from './pages/More';
 
 // Lazy load secondary / heavy page components
 import { __ } from '@wordpress/i18n';
+import { DialogHost } from './components/Dialogs';
 const SearchAppearance = lazy( () => import( './pages/SearchAppearance' ) );
 const Sitemap = lazy( () => import( './pages/Sitemap' ) );
 const Redirects = lazy( () => import( './pages/Redirects' ) );
@@ -120,7 +121,7 @@ const App = ( { initialView = 'dashboard' } ) => {
 				if ( response.success && response.data.show_wizard ) {
 					setShowSetup( true );
 				}
-			} catch ( err ) {
+			} catch {
 				// Ignore errors, just show the app
 			}
 			setSetupChecked( true );
@@ -197,7 +198,7 @@ const App = ( { initialView = 'dashboard' } ) => {
 		if ( importer && typeof importer === 'function' ) {
 			try {
 				importer();
-			} catch ( err ) {
+			} catch {
 				// Prefetch is best-effort; ignore failures.
 			}
 		}
@@ -297,12 +298,10 @@ const App = ( { initialView = 'dashboard' } ) => {
 	// Show loading while checking setup status
 	if ( ! setupChecked ) {
 		return (
-			<div className="saman-seo-admin">
-				<div className="saman-seo-shell">
-					<div className="content-area">
-						<div className="loading-state">
-							{ __( 'Loading\u2026', 'saman-seo' ) }
-						</div>
+			<div className="saman-seo-admin saman-seo-admin--plain">
+				<div className="content-area">
+					<div className="loading-state">
+						{ __( 'Loading\u2026', 'saman-seo' ) }
 					</div>
 				</div>
 			</div>
@@ -312,30 +311,34 @@ const App = ( { initialView = 'dashboard' } ) => {
 	// Show setup wizard if needed
 	if ( showSetup ) {
 		return (
-			<div className="saman-seo-admin">
+			<div className="saman-seo-admin saman-seo-admin--plain">
 				<Suspense fallback={ <PageLoader /> }>
 					<Setup
 						onComplete={ handleSetupComplete }
 						onSkip={ handleSetupSkip }
 					/>
 				</Suspense>
+				<DialogHost />
 			</div>
 		);
 	}
 	return (
 		<div className="saman-seo-admin">
 			<div className="saman-seo-shell">
-				<Header
+				<Sidebar
 					currentView={ currentView }
 					onNavigate={ handleNavigate }
 					onPrefetch={ handlePrefetch }
 				/>
-				<div className="content-area">
-					<Suspense fallback={ <PageLoader /> }>
-						{ renderView() }
-					</Suspense>
-				</div>
+				<main className="saman-seo-main">
+					<div className="content-area">
+						<Suspense fallback={ <PageLoader /> }>
+							{ renderView() }
+						</Suspense>
+					</div>
+				</main>
 			</div>
+			<DialogHost />
 		</div>
 	);
 };
