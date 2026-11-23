@@ -71,6 +71,7 @@ class Frontend {
 		$this->suppress_conflicting_social_tags();
 
 		add_action( 'wp_head', array( $this, 'render_head_tags' ), 1 );
+		add_action( 'wp_head', array( $this, 'render_verification_tags' ), 2 );
 		add_action( 'wp_head', array( $this, 'render_social_tags' ), 5 );
 		add_action( 'wp_head', array( $this, 'render_json_ld' ), 20 );
 		add_action( 'wp_head', array( $this, 'render_hreflang' ), 8 );
@@ -499,6 +500,45 @@ class Frontend {
 
 		if ( ! empty( $keywords ) ) {
 			printf( "<meta name=\"keywords\" content=\"%s\" />\n", esc_attr( $keywords ) );
+		}
+	}
+
+	/**
+	 * Render search engine site verification meta tags.
+	 *
+	 * Verifiers only fetch the home page, so the tags stay off every other
+	 * URL. Codes are re-checked here because theme config, WP-CLI or a direct
+	 * update_option() can store values that never passed the settings API.
+	 *
+	 * @return void
+	 */
+	public function render_verification_tags() {
+		if ( ! is_front_page() ) {
+			return;
+		}
+
+		$codes = array();
+		foreach ( \Saman\SEO\Helpers\site_verification_services() as $key => $meta_name ) {
+			$codes[ $meta_name ] = get_option( 'SAMAN_SEO_' . $key, '' );
+		}
+
+		/**
+		 * Filter site verification codes before they are printed.
+		 *
+		 * @param array<string,string> $codes Meta tag name => verification code.
+		 */
+		$codes = saman_seo_apply_filters( 'saman_seo_site_verification', $codes );
+
+		if ( ! is_array( $codes ) ) {
+			return;
+		}
+
+		foreach ( $codes as $meta_name => $code ) {
+			$code = \Saman\SEO\Helpers\sanitize_verification_code( $code );
+			if ( '' === $code || ! is_string( $meta_name ) || '' === $meta_name ) {
+				continue;
+			}
+			printf( "<meta name=\"%s\" content=\"%s\" />\n", esc_attr( $meta_name ), esc_attr( $code ) );
 		}
 	}
 
