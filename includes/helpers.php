@@ -1223,6 +1223,55 @@ namespace Saman\SEO\Helpers {
 	}
 
 	/**
+	 * Site verification services: setting key => meta tag name.
+	 *
+	 * @return array<string,string>
+	 */
+	function site_verification_services() {
+		return array(
+			'google_verification'    => 'google-site-verification',
+			'bing_verification'      => 'msvalidate.01',
+			'pinterest_verification' => 'p:domain_verify',
+			'yandex_verification'    => 'yandex-verification',
+			'baidu_verification'     => 'baidu-site-verification',
+		);
+	}
+
+	/**
+	 * Reduce a pasted site verification value to the bare code.
+	 *
+	 * Accepts the code itself or the whole meta tag the service hands out,
+	 * and keeps only the content value. Anything that is not a plain token
+	 * (an HTML verification file name, stray markup) is dropped, because
+	 * printing it would never verify and only clutters the head.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string Code, or '' when the value is not a usable code.
+	 */
+	function sanitize_verification_code( $value ) {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		$value = trim( (string) $value );
+
+		if ( preg_match( '/\bcontent\s*=\s*(["\'])(.*?)\1/is', $value, $matches ) ) {
+			$value = trim( $matches[2] );
+		}
+
+		// The file method's name (googleXXXX.html) is not the meta tag code.
+		if ( preg_match( '/\.html?$/i', $value ) ) {
+			return '';
+		}
+
+		if ( ! preg_match( '/^[A-Za-z0-9_.=+\/-]{1,200}$/', $value ) ) {
+			return '';
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Render breadcrumbs markup.
 	 *
 	 * Uses the Breadcrumbs service for full-featured output with styling and JSON-LD schema.
