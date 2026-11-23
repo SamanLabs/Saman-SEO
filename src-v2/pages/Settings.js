@@ -61,6 +61,43 @@ const settingsTabs = [
 		label: __( 'Tools', 'saman-seo' ),
 	},
 ];
+// Search engine verification fields. Keys match the settings API allowlist.
+const verificationServices = [
+	{
+		key: 'google_verification',
+		label: __( 'Google Search Console', 'saman-seo' ),
+		help: __( 'Search Console > Add property > HTML tag.', 'saman-seo' ),
+		placeholder: 'abc123DEF456…',
+	},
+	{
+		key: 'bing_verification',
+		label: __( 'Bing Webmaster Tools', 'saman-seo' ),
+		help: __(
+			'Bing Webmaster Tools > Add site > HTML Meta Tag.',
+			'saman-seo'
+		),
+		placeholder: '0123456789ABCDEF…',
+	},
+	{
+		key: 'pinterest_verification',
+		label: __( 'Pinterest', 'saman-seo' ),
+		help: __( 'Pinterest > Claim website > Add HTML tag.', 'saman-seo' ),
+		placeholder: '0123456789abcdef…',
+	},
+	{
+		key: 'yandex_verification',
+		label: __( 'Yandex', 'saman-seo' ),
+		help: __( 'Yandex Webmaster > Add site > Meta tag.', 'saman-seo' ),
+		placeholder: '0123456789abcdef',
+	},
+	{
+		key: 'baidu_verification',
+		label: __( 'Baidu', 'saman-seo' ),
+		help: __( 'Baidu Webmaster Tools > Add site > HTML tag.', 'saman-seo' ),
+		placeholder: 'codeva-abc123…',
+	},
+];
+
 const defaultSettings = {
 	// General
 	separator: '-',
@@ -922,113 +959,59 @@ const GeneralTab = ( { settings, updateSetting, openMediaLibrary } ) => {
 					</h3>
 					<p className="panel-desc">
 						{ __(
-							'Verify your site with search engines and services.',
+							'Paste the code from each service, or its whole meta tag. The tag is added to your home page so the service can verify the site.',
 							'saman-seo'
 						) }
 					</p>
 
-					<div className="settings-row">
-						<div className="settings-label">
-							<label htmlFor="google-verify">
-								{ __( 'Google Search Console', 'saman-seo' ) }
-							</label>
-							<p className="settings-help">
-								{ __( 'Meta tag content value.', 'saman-seo' ) }
-							</p>
-						</div>
-						<div className="settings-control">
-							<input
-								id="google-verify"
-								type="text"
-								value={ settings.google_verification }
-								onChange={ ( e ) =>
-									updateSetting(
-										'google_verification',
-										e.target.value
-									)
-								}
-								placeholder={ __(
-									'abc123\u2026',
-									'saman-seo'
-								) }
-							/>
-						</div>
-					</div>
-
-					<div className="settings-row">
-						<div className="settings-label">
-							<label htmlFor="bing-verify">
-								{ __( 'Bing Webmaster Tools', 'saman-seo' ) }
-							</label>
-						</div>
-						<div className="settings-control">
-							<input
-								id="bing-verify"
-								type="text"
-								value={ settings.bing_verification }
-								onChange={ ( e ) =>
-									updateSetting(
-										'bing_verification',
-										e.target.value
-									)
-								}
-								placeholder={ __(
-									'abc123\u2026',
-									'saman-seo'
-								) }
-							/>
-						</div>
-					</div>
-
-					<div className="settings-row">
-						<div className="settings-label">
-							<label htmlFor="pinterest-verify">
-								{ __( 'Pinterest', 'saman-seo' ) }
-							</label>
-						</div>
-						<div className="settings-control">
-							<input
-								id="pinterest-verify"
-								type="text"
-								value={ settings.pinterest_verification }
-								onChange={ ( e ) =>
-									updateSetting(
-										'pinterest_verification',
-										e.target.value
-									)
-								}
-								placeholder={ __(
-									'abc123\u2026',
-									'saman-seo'
-								) }
-							/>
-						</div>
-					</div>
-
-					<div className="settings-row">
-						<div className="settings-label">
-							<label htmlFor="yandex-verify">
-								{ __( 'Yandex', 'saman-seo' ) }
-							</label>
-						</div>
-						<div className="settings-control">
-							<input
-								id="yandex-verify"
-								type="text"
-								value={ settings.yandex_verification }
-								onChange={ ( e ) =>
-									updateSetting(
-										'yandex_verification',
-										e.target.value
-									)
-								}
-								placeholder={ __(
-									'abc123\u2026',
-									'saman-seo'
-								) }
-							/>
-						</div>
-					</div>
+					{ verificationServices.map( ( service ) => {
+						const value = settings[ service.key ] || '';
+						const looksLikeFile = /\.html?\s*$/i.test( value );
+						return (
+							<div className="settings-row" key={ service.key }>
+								<div className="settings-label">
+									<label
+										htmlFor={ `verify-${ service.key }` }
+									>
+										{ service.label }
+									</label>
+									<p className="settings-help">
+										{ service.help }
+									</p>
+								</div>
+								<div className="settings-control">
+									<input
+										id={ `verify-${ service.key }` }
+										type="text"
+										value={ value }
+										onChange={ ( e ) =>
+											updateSetting(
+												service.key,
+												e.target.value
+											)
+										}
+										placeholder={ service.placeholder }
+										aria-describedby={
+											looksLikeFile
+												? `verify-${ service.key }-warning`
+												: undefined
+										}
+									/>
+									{ looksLikeFile && (
+										<p
+											id={ `verify-${ service.key }-warning` }
+											className="settings-help settings-help--warning"
+										>
+											{ __(
+												'This is the HTML file name, which will not be saved. Choose the HTML tag method instead and paste that code.',
+												'saman-seo'
+											) }
+										</p>
+									) }
+								</div>
+							</div>
+						);
+					} ) }
 				</section>
 
 				<section className="panel">

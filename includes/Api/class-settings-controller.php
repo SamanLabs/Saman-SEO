@@ -385,6 +385,13 @@ class Settings_Controller extends REST_Controller {
 			'indexnow_submit_on_publish'       => 'bool',
 			'indexnow_submit_on_update'        => 'bool',
 
+			// Search engine site verification codes.
+			'google_verification'              => 'verification',
+			'bing_verification'                => 'verification',
+			'pinterest_verification'           => 'verification',
+			'yandex_verification'              => 'verification',
+			'baidu_verification'               => 'verification',
+
 			// Misc.
 			'llm_txt'                          => 'textarea',
 			'hreflang_map'                     => 'textarea',
@@ -457,6 +464,9 @@ class Settings_Controller extends REST_Controller {
 
 			case 'email':
 				return sanitize_email( $value );
+
+			case 'verification':
+				return \Saman\SEO\Helpers\sanitize_verification_code( $value );
 
 			case 'array':
 				if ( ! is_array( $value ) ) {
